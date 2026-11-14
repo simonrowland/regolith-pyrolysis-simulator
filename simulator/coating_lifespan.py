@@ -524,6 +524,75 @@ def interface_first_melt_limiter(
     return normalized
 
 
+def interface_first_melt_from_liner_state(
+    liner_state: Mapping[str, Any],
+) -> Limiter:
+    """Adapt runner recurrence bounds to the lifecycle diagnostic stack."""
+
+    segments = liner_state.get("segments")
+    if not isinstance(segments, Mapping):
+        refusal = {
+            "reason": "liner_state_segments_missing",
+            "detail": "liner-state-v1 has no segment records",
+        }
+        selected: list[tuple[str, int]] = []
+    else:
+        selected = []
+        for raw_name, raw_state in segments.items():
+            if not isinstance(raw_state, Mapping):
+                continue
+            interval = raw_state.get("campaigns_to_runaway")
+            if (
+                isinstance(interval, Sequence)
+                and not isinstance(interval, (str, bytes))
+                and len(interval) == 2
+                and isinstance(interval[0], int)
+                and not isinstance(interval[0], bool)
+            ):
+                selected.append((str(raw_name), interval[0]))
+        refusal = None
+        if not selected:
+            for raw_state in segments.values():
+                if not isinstance(raw_state, Mapping):
+                    continue
+                for item in raw_state.get("refusals", ()) or ():
+                    if isinstance(item, Mapping) and item.get("reason"):
+                        refusal = dict(item)
+                        break
+                if refusal is not None:
+                    break
+            if refusal is None:
+                refusal = {
+                    "reason": "liner_campaign_interval_unavailable",
+                    "detail": "liner state has no finite reactive campaign bound",
+                }
+
+    selected.sort(key=lambda item: (item[1], item[0]))
+
+    def evaluate(
+        _snapshot: FoulingTerminalSnapshot,
+        campaign_index: int,
+    ) -> LimiterEvaluation:
+        if not selected:
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal=refusal,
+            )
+        segment, onset_campaign = selected[0]
+        return LimiterEvaluation(
+            name=INTERFACE_FIRST_MELT_LIMITER,
+            fired=campaign_index >= onset_campaign,
+            segment=segment,
+            value=float(campaign_index),
+            limit=float(onset_campaign),
+            campaign_index=campaign_index,
+        )
+
+    return interface_first_melt_limiter(evaluate)
+
+
 def _interface_first_melt_diagnostic(
     trajectory: Sequence[FoulingTerminalSnapshot],
     limiter: Limiter | None,

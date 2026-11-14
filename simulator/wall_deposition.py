@@ -193,6 +193,7 @@ def wall_deposit_candidate_for_surface_kg(
     pipe_diameter_m: float | None = None,
     regime_factor: float | None = None,
     segment: Any | None = None,
+    wall_surface_state: Mapping[str, Any] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float | dict[str, Any]:
     from simulator.condensation import (
@@ -265,6 +266,7 @@ def wall_deposit_candidate_for_surface_kg(
         materials,
         segment=segment,
         T_K=T_wall_K,
+        wall_surface_state=wall_surface_state,
     )
     alpha_s = _required_record_alpha_s(
         alpha_record, species=species, site="wall_deposit_candidate_for_surface_kg"
@@ -380,6 +382,7 @@ def wall_deposit_candidate_for_surface_kg(
                 ),
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=rate_diagnostic,
+                wall_surface_state=wall_surface_state,
             )
         except WallSaturationPressureRefusal:
             if not rate_diagnostic.get("wall_saturation_pressure_refused"):

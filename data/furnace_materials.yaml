@@ -157,8 +157,15 @@ furnace_materials:
       missing_composition_reason: rump_composition_not_generated
       citation: "Generated terminal-rump oxide report; generator provenance is stored in the referenced artifact."
       criterion_tier: A
-      invariant_table: null
-      invariant_table_file: data/literature/liner_invariants/rump_liner_lunar_mare_low_ti.yaml
+      invariant_table:
+        loader: liner_corrosion_source_extracts
+        subsystems:
+          - CaO-Al2O3
+          - CaO-Al2O3-SiO2
+          - Na2O-CaO-Al2O3
+          - MgO-CaO-Al2O3
+        acquisition_gaps:
+          FeO-CaO-Al2O3: "No source-located FeO-CaO-Al2O3 invariant values are digitized; Fe2O3 data are not a substitute."
       density_kg_m3: null
       reacted_layer_depth_m: null
       margin_C: null

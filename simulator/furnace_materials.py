@@ -82,7 +82,6 @@ def _catalog_max_service_T_C() -> float:
     return max(ratings)
 
 
-FURNACE_MAX_T_BOUNDS_C: tuple[float, float]
 CERTIFIED_WALL_ANCHORED_FURNACE_MATERIALS = frozenset(
     {
         "dense_alumina_continuous",
@@ -207,7 +206,38 @@ def load_interface_invariant_table(
         raise InterfaceChemistryRefusal("interface_chemistry_missing", material_id)
     table = chemistry.get("invariant_table")
     if isinstance(table, Mapping) and table:
-        return dict(table)
+        if table.get("loader") != "liner_corrosion_source_extracts":
+            return dict(table)
+        subsystems = table.get("subsystems")
+        if (
+            not isinstance(subsystems, list)
+            or not subsystems
+            or any(not isinstance(item, str) or not item.strip() for item in subsystems)
+        ):
+            raise InterfaceChemistryRefusal(
+                "liner_invariant_subsystems_invalid", material_id
+            )
+        try:
+            from simulator.liner_corrosion import load_liner_corrosion_invariants
+
+            rows = load_liner_corrosion_invariants()
+        except Exception as exc:  # noqa: BLE001 - keep source failures typed
+            raise InterfaceChemistryRefusal(
+                "liner_invariant_source_unavailable", str(exc)
+            ) from exc
+        requested = {str(item).strip() for item in subsystems}
+        selected = [row for row in rows if row.get("subsystem") in requested]
+        if not selected:
+            raise InterfaceChemistryRefusal(
+                "liner_invariant_rows_missing", ", ".join(sorted(requested))
+            )
+        return {
+            "schema": "liner-source-invariants-v1",
+            "source": table.get("loader"),
+            "subsystems": sorted(requested),
+            "acquisition_gaps": dict(table.get("acquisition_gaps") or {}),
+            "invariants": selected,
+        }
     table_path = chemistry.get("invariant_table_file")
     if not isinstance(table_path, str) or not table_path.strip():
         raise InterfaceChemistryRefusal("liner_invariant_table_missing", material_id)

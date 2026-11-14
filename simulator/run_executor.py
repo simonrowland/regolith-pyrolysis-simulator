@@ -125,6 +125,27 @@ class RunExecution:
     )
 
 
+def completed_runner_status(
+    status: Any,
+    reason: Any,
+    *,
+    sequence_complete: bool,
+) -> bool:
+    """Recognize exact runner statuses backed by a completed sequence.
+
+    RunExecutor uses ``partial`` with an empty reason when the campaign sequence
+    ends before the requested hour budget. The simulator's terminal state must
+    also confirm sequence completion; this excludes pending decisions and
+    stage-0 early exits that share a status family.
+    """
+
+    return (
+        status in {"ok", "partial"}
+        and reason in (None, "")
+        and sequence_complete
+    )
+
+
 def _campaigns_elapsed_from_session_history(
     session: SimSession,
     *,

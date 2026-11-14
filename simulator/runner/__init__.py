@@ -122,7 +122,11 @@ from simulator.mre_reproduction import (
     load_mre_reproduction_program,
     run_mre_reproduction,
 )
-from simulator.trace import wall_deposit_by_segment_species_kg
+from simulator.trace import (
+    WALL_DEPOSIT_REPORT_EPSILON_KG,
+    nested_wall_deposit_by_segment_species,
+    wall_deposit_by_segment_species_kg,
+)
 from simulator.three_product_report import classify_products
 from simulator.three_product_report_markdown import (
     format_three_product_markdown,
@@ -168,17 +172,18 @@ O2_SOURCE_SIDE_POTENTIAL_LABEL = (
     "source-side O2 potential (emitted; not recovered)"
 )
 
+
 # parents[2]: this file moved one level deeper in the t-421 package
 # conversion (simulator/runner.py -> simulator/runner/__init__.py);
 # repo root is now three levels up, and DATA_DIR is load-bearing.
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 
-SIO_YIELD_FEEDSTOCKS: tuple[str, ...] = (
+SIO_YIELD_FEEDSTOCKS = (
     "lunar_mare_low_ti",
     "mars_basalt",
 )
 SIO_YIELD_CAMPAIGN = "C2A_continuous"
-SIO_YIELD_CAMPAIGN_ALIASES: dict[str, str] = {
+SIO_YIELD_CAMPAIGN_ALIASES = {
     SIO_YIELD_CAMPAIGN: "C2A",
 }
 SIO_ALPHA_PROVENANCE = (
@@ -186,9 +191,9 @@ SIO_ALPHA_PROVENANCE = (
     "alpha_s_SiO(T)=0.52*exp(-3685/T), UNCERTIFIED solid-SiO "
     "particle-growth proxy, not silicate-melt evaporation evidence"
 )
-SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
+SIO_INDUSTRIAL_BENCHMARK_PCT = (8, 15)
 WALL_DEPOSIT_ACCOUNT = "process.wall_deposit"
-SIO_YIELD_STAGE_KEYS: dict[str, str] = {
+SIO_YIELD_STAGE_KEYS = {
     COLLECTOR_STAGE_KEY_BY_NUMBER[1]: "stage_1_fe_condenser_impurity",
     COLLECTOR_STAGE_KEY_BY_NUMBER[3]: "stage_3_sio_zone_product",
     NA_COLLECTOR_STAGE_KEY: "stage_4_alkali_mg_carryover",
@@ -198,9 +203,9 @@ SIO_YIELD_STAGE_KEYS: dict[str, str] = {
 NOT_APPLICABLE_UNTIL_P0 = "not_applicable_until_p0"
 PRESET_PROVENANCE_METADATA_KEY = "preset"
 SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
-SIO_TSWEEP_DEFAULT_T_LOW_GRID_C: tuple[float, ...] = (1050.0, 1100.0, 1150.0)
-SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C: tuple[float, ...] = (1400.0, 1500.0, 1600.0)
-SIO_TSWEEP_DEFAULT_RAMP_GRID_C_PER_HR: tuple[float, ...] = (5.0, 10.0, 15.0)
+SIO_TSWEEP_DEFAULT_T_LOW_GRID_C = (1050.0, 1100.0, 1150.0)
+SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C = (1400.0, 1500.0, 1600.0)
+SIO_TSWEEP_DEFAULT_RAMP_GRID_C_PER_HR = (5.0, 10.0, 15.0)
 SIO_TSWEEP_MASS_BALANCE_LIMIT_PCT = RUNNER_MASS_BALANCE_LIMIT_PCT
 SIO_TSWEEP_GAP_A_BAND = "1200-1673K low-T extrapolation"
 SIO_TSWEEP_WARNING_TEXT = (
@@ -210,18 +215,18 @@ SIO_TSWEEP_WARNING_TEXT = (
     "this recommendation operationally."
 )
 SIO_WALL_SWEEP_SCHEMA_VERSION = "sio-wall-sweep-v1"
-SIO_WALL_SWEEP_DEFAULT_WALL_T_GRID_C: tuple[float, ...] = (
+SIO_WALL_SWEEP_DEFAULT_WALL_T_GRID_C = (
     1100.0,
     1300.0,
     1500.0,
     1650.0,
 )
-SIO_WALL_SWEEP_DEFAULT_PO2_MODES: tuple[str, ...] = (
+SIO_WALL_SWEEP_DEFAULT_PO2_MODES = (
     "no_suppress",
     "o2_1mbar",
 )
 _SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = CHEMISTRY_KERNEL_RUN_INPUT_KEYS
-SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
+SIO_WALL_SWEEP_PO2_MODE_CONFIG = {
     "no_suppress": {
         "label": "C2A no-suppress SiO extraction",
         "pO2_mbar": None,
@@ -241,7 +246,7 @@ _MBAR_TO_BAR = 1.0e-3
 # Metal product species the per-hour summary surfaces.  Anything else
 # (oxides, salts, halides) stays inside ``final_state`` -- the summary
 # is the "operator readout" view, not the full ledger projection.
-_METAL_PRODUCT_SPECIES: tuple[str, ...] = (
+_METAL_PRODUCT_SPECIES = (
     "Fe",
     "Mg",
     "Al",
@@ -260,7 +265,7 @@ _METAL_PRODUCT_SPECIES: tuple[str, ...] = (
 # relabelled N2 in every hourly artifact (carrier_identity + p_carrier_bar
 # read from the N2 partial) — the accepted-at-the-gate, silently-relabelled
 # downstream class.
-_CARRIER_TOKENS: dict[str, str] = {
+_CARRIER_TOKENS = {
     "N2": "N2",
     "AR": "Ar",
     "KR": "Kr",
@@ -1040,6 +1045,9 @@ class PyrolysisRun:
     imcc_activity_shadow: bool = False
     high_t_melt_activity: str | None = None
     strict_result_contract: bool = field(init=False, default=True)
+    _last_execution: RunExecution | None = field(
+        default=None, init=False, repr=False, compare=False
+    )
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
     )
@@ -1129,6 +1137,7 @@ class PyrolysisRun:
         else:
             config = self._session_config()
             execution = RunExecutor().execute(config)
+        self._last_execution = execution
         document = self._build_output(execution)
         self._capture_target_inventory_side_channel(execution)
         execution.session._set_result_document(document)
@@ -1143,6 +1152,7 @@ class PyrolysisRun:
         self._apply_lab_area_bridge(session.simulator, self._lab_area_bridge())
         self._apply_sio_pre_run_controls(session.simulator)
         execution = RunExecutor().execute_session(session, hours=int(self.hours))
+        self._last_execution = execution
         document = self._build_output(execution)
         self._capture_target_inventory_side_channel(execution)
         execution.session._set_result_document(document)
@@ -1663,176 +1673,16 @@ class PyrolysisRun:
                 },
             )
 
-            def build_liner_state() -> dict[str, Any] | None:
-                from simulator.furnace_materials import (
-                    InterfaceChemistryRefusal,
-                    load_furnace_materials,
-                    load_interface_chemistry,
-                    load_interface_invariant_table,
-                )
-                from simulator.liner_corrosion import (
-                    LinerCorrosionRefusal,
-                    MageminLinerSampler,
-                    build_liner_state_segment,
-                )
-
-                catalog = load_furnace_materials()
-                material = catalog.get(furnace_material_id)
-                raw_chemistry = (
-                    material.get("interface_chemistry")
-                    if isinstance(material, Mapping)
-                    else None
-                )
-                if not isinstance(raw_chemistry, Mapping):
-                    return None
-
-                condensation_model = getattr(sim, "condensation_model", None)
-                pipe_segments = tuple(
-                    getattr(condensation_model, "pipe_segments", ()) or ()
-                )
-                service_temperature_by_segment: dict[str, float] = {}
-                service_temperature_refusals: dict[str, str] = {}
-                for history in tuple(
-                    getattr(condensation_model, "operating_history", ()) or ()
-                ):
-                    temperatures = (
-                        history.get("pipe_segment_temperatures_C")
-                        if isinstance(history, Mapping)
-                        else None
-                    )
-                    if not isinstance(temperatures, Mapping):
-                        continue
-                    for raw_name, raw_temperature in temperatures.items():
-                        name = str(raw_name)
-                        if not is_declared_real_scalar(raw_temperature):
-                            service_temperature_refusals[name] = (
-                                "liner_service_temperature_invalid"
-                            )
-                            continue
-                        temperature = float(raw_temperature)
-                        if not math.isfinite(temperature):
-                            service_temperature_refusals[name] = (
-                                "liner_service_temperature_invalid"
-                            )
-                            continue
-                        service_temperature_by_segment[name] = max(
-                            temperature,
-                            service_temperature_by_segment.get(name, -math.inf),
-                        )
-                deposit_by_segment = _nested_species_kg_from_segment_species(
-                    getattr(execution.trace, "wall_deposit_by_segment_species_kg", {})
-                )
-                segment_names = sorted(
-                    {str(segment.name) for segment in pipe_segments}
-                    | set(deposit_by_segment)
-                )
-                if not segment_names:
-                    segment_names = ["_run"]
-
-                try:
-                    chemistry = load_interface_chemistry(
-                        furnace_material_id,
-                        catalog=catalog,
-                    )
-                    if chemistry is None:
-                        return None
-                    tier = str(chemistry.get("criterion_tier") or "B").upper()
-                    if tier == "A":
-                        chemistry["invariant_table"] = load_interface_invariant_table(
-                            furnace_material_id,
-                            catalog=catalog,
-                        )
-                except InterfaceChemistryRefusal as exc:
-                    refusal = {"reason": exc.reason, "detail": exc.detail}
-                    return {
-                        "schema": "liner-state-v1",
-                        "segments": {
-                            name: {
-                                "status": "refused",
-                                "refusal": refusal,
-                                "flags": list(raw_chemistry.get("flags", ()) or ()),
-                            }
-                            for name in segment_names
-                        },
-                    }
-
-                segments_by_name = {
-                    str(segment.name): segment for segment in pipe_segments
-                }
-                sampler = MageminLinerSampler() if tier == "B" else None
-                records: dict[str, Any] = {}
-                try:
-                    for name in segment_names:
-                        segment = segments_by_name.get(name)
-                        if segment is None:
-                            records[name] = {
-                                "status": "refused",
-                                "refusal": {
-                                    "reason": "liner_segment_geometry_missing",
-                                },
-                            }
-                            continue
-                        if name in service_temperature_refusals:
-                            records[name] = {
-                                "status": "refused",
-                                "refusal": {
-                                    "reason": service_temperature_refusals[name],
-                                },
-                            }
-                            continue
-                        service_temperature = service_temperature_by_segment.get(name)
-                        if service_temperature is None:
-                            records[name] = {
-                                "status": "refused",
-                                "refusal": {
-                                    "reason": "liner_service_temperature_missing",
-                                },
-                            }
-                            continue
-                        pressure_mbar = getattr(
-                            condensation_model,
-                            "overhead_pressure_mbar",
-                            None,
-                        )
-                        pressure_bar = (
-                            float(pressure_mbar) * PA_PER_MBAR / PA_PER_BAR
-                            if pressure_mbar is not None
-                            else None
-                        )
-                        try:
-                            state = build_liner_state_segment(
-                                chemistry,
-                                deposit_by_segment.get(name, {}),
-                                area_m2=segment.surface_area_m2,
-                                service_temperature_C=service_temperature,
-                                pressure_bar=pressure_bar,
-                                sampler=sampler,
-                            )
-                        except LinerCorrosionRefusal as exc:
-                            records[name] = {
-                                "status": "refused",
-                                "refusal": exc.as_dict(),
-                                "flags": list(raw_chemistry.get("flags", ()) or ()),
-                            }
-                            continue
-                        except Exception as exc:  # noqa: BLE001 - segment is diagnostic
-                            records[name] = {
-                                "status": "refused",
-                                "refusal": {
-                                    "reason": "liner_segment_input_invalid",
-                                    "detail": _safe_exception_text(exc),
-                                },
-                            }
-                            continue
-                        state["status"] = "partial" if state["refusals"] else "ok"
-                        records[name] = state
-                finally:
-                    if sampler is not None:
-                        sampler.close()
-                return {"schema": "liner-state-v1", "segments": records}
-
+            from simulator.liner_corrosion import attach_liner_state_metadata
             try:
-                liner_state = _json_safe(build_liner_state())
+                liner_state = _json_safe(
+                    attach_liner_state_metadata(
+                        run_metadata,
+                        furnace_material_id,
+                        sim,
+                        execution.trace,
+                    )
+                )
             except Exception as exc:  # noqa: BLE001 - diagnostic never gates a run
                 liner_state = {
                     "schema": "liner-state-v1",
@@ -2419,19 +2269,20 @@ def _status_with_mass_balance_invariant(
 def _nested_species_kg_from_segment_species(
     values: Mapping[tuple[str, str], float],
 ) -> dict[str, dict[str, float]]:
-    nested: dict[str, dict[str, float]] = {}
-    for key, raw_kg in sorted(values.items()):
-        if not isinstance(key, tuple) or len(key) != 2:
-            raise RunnerError(f"wall deposit key must be (segment, species): {key!r}")
-        segment, species = key
-        kg = _finite_export_float(raw_kg, field="wall deposit kg")
-        if abs(kg) <= 1.0e-12:
-            continue
-        nested.setdefault(str(segment), {})[str(species)] = kg
-    return {
-        segment: dict(sorted(species_kg.items()))
-        for segment, species_kg in sorted(nested.items())
-    }
+    try:
+        nested = nested_wall_deposit_by_segment_species(values)
+    except ValueError as exc:
+        raise RunnerError(str(exc)) from exc
+    filtered: dict[str, dict[str, float]] = {}
+    for segment, species_kg in nested.items():
+        kept = {
+            species: kg
+            for species, kg in species_kg.items()
+            if abs(kg) > WALL_DEPOSIT_REPORT_EPSILON_KG
+        }
+        if kept:
+            filtered[segment] = kept
+    return filtered
 
 
 def _sum_wall_deposit_deltas(
@@ -2461,7 +2312,7 @@ def _wall_deposit_rate_from_delta(
                 raw_kg,
                 field=f"wall deposit delta kg {segment}.{species}",
             )
-            if abs(kg) <= 1.0e-12:
+            if abs(kg) <= WALL_DEPOSIT_REPORT_EPSILON_KG:
                 continue
             formula = resolve_species_formula(str(species))
             kg_h = kg / dt_h
@@ -2565,9 +2416,7 @@ class _WallDepositCumulativeCache:
     cumulative: dict[tuple[str, str], float]
 
 
-_WALL_DEPOSIT_CUMULATIVE_CACHE: weakref.WeakKeyDictionary[
-    PyrolysisSimulator, _WallDepositCumulativeCache
-] = weakref.WeakKeyDictionary()
+_WALL_DEPOSIT_CUMULATIVE_CACHE = weakref.WeakKeyDictionary()
 _WALL_DEPOSIT_CUMULATIVE_CACHE_LOCK = threading.Lock()
 
 

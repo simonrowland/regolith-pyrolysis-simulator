@@ -7,19 +7,26 @@ not model dissolution or corrosion kinetics.
 from __future__ import annotations
 
 from bisect import bisect_right
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import math
 from pathlib import Path
 import re
+from types import SimpleNamespace
 from typing import Any, Callable, Mapping, Sequence
 
 import yaml
 
-from simulator.accounting.formulas import parse_formula
+from simulator.accounting.formulas import parse_formula, resolve_species_formula
 from simulator.melt_backend.liquidus import LIQUIDUS_SOLID_EPSILON
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    PA_PER_BAR,
+    PA_PER_MBAR,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
+
+EXTRACTS_DIR = Path(__file__).resolve().parents[1] / "data" / "literature" / "extracts"
 
 DEPOSIT_OXIDE_BY_SPECIES = {
     "Na": "Na2O",
@@ -146,8 +153,8 @@ def _oxide_equivalent_kg_by_species(
         species_formula = parse_formula(species)
         oxide_formula = parse_formula(oxide)
         cation_atoms = {
-            element: count
-            for element, count in species_formula.elements.items()
+            element: atoms
+            for element, atoms in species_formula.atom_moles(1.0).items()
             if element != "O"
         }
         if len(cation_atoms) != 1:
@@ -155,21 +162,23 @@ def _oxide_equivalent_kg_by_species(
                 "deposit_oxidation_mapping_invalid", species
             )
         cation = next(iter(cation_atoms))
-        oxide_cation_count = float(oxide_formula.elements.get(cation, 0.0))
+        oxide_cation_count = float(oxide_formula.atom_moles(1.0).get(cation, 0.0))
         species_cation_count = float(cation_atoms[cation])
+        oxide_molar_mass = oxide_formula.molar_mass_g_per_mol()
+        species_molar_mass = species_formula.molar_mass_g_per_mol()
         if (
             oxide_cation_count <= 0.0
-            or species_formula.molar_mass_g_per_mol is None
-            or oxide_formula.molar_mass_g_per_mol is None
+            or species_molar_mass is None
+            or oxide_molar_mass is None
         ):
             raise LinerCorrosionRefusal(
                 "deposit_oxidation_mapping_invalid", species
             )
         oxide_moles_per_species_mole = species_cation_count / oxide_cation_count
         mass_ratio = (
-            float(oxide_formula.molar_mass_g_per_mol)
+            float(oxide_molar_mass)
             * oxide_moles_per_species_mole
-            / float(species_formula.molar_mass_g_per_mol)
+            / float(species_molar_mass)
         )
         result[species] = kg * mass_ratio
     return result
@@ -214,16 +223,33 @@ def contamination_mixing_fractions(
     """
 
     checked = _oxide_equivalent_kg_by_species(deposit_kg_by_species)
+    return _mixing_fractions_from_oxide_masses(
+        checked,
+        density_kg_m3=density_kg_m3,
+        area_m2=area_m2,
+        reacted_layer_depth_m=reacted_layer_depth_m,
+    )
+
+
+def _mixing_fractions_from_oxide_masses(
+    oxide_equivalent_kg_by_species: Mapping[str, float],
+    *,
+    density_kg_m3: float,
+    area_m2: float,
+    reacted_layer_depth_m: float,
+) -> dict[str, float]:
+    """Mix already converted oxide masses with the reacted liner layer."""
+
     rho = _positive(density_kg_m3, "density_kg_m3")
     area = _positive(area_m2, "area_m2")
     depth = _positive(reacted_layer_depth_m, "reacted_layer_depth_m")
     liner_mass_kg = rho * area * depth
-    denominator_kg = liner_mass_kg + math.fsum(checked.values())
+    denominator_kg = liner_mass_kg + math.fsum(oxide_equivalent_kg_by_species.values())
     if not math.isfinite(denominator_kg) or denominator_kg <= 0.0:
         raise LinerCorrosionRefusal("liner_mass_invalid")
     return {
         species: kg / denominator_kg
-        for species, kg in checked.items()
+        for species, kg in oxide_equivalent_kg_by_species.items()
         if kg > 0.0
     }
 
@@ -265,7 +291,7 @@ def contaminated_interface_composition(
         )
     return {
         "composition_wt_pct": interface,
-        "mixing_fraction_by_species": contamination_mixing_fractions(
+        "mixing_fraction_by_species": _mixing_fractions_from_oxide_masses(
             deposits,
             density_kg_m3=rho,
             area_m2=area,
@@ -342,8 +368,6 @@ def sticking_deposit_interval(
     inert = _checked_deposit(deposit_inert_kg_by_species)
     reactive = _checked_deposit(deposit_reactive_kg_by_species)
     species = set(inert) | set(reactive)
-    if not species:
-        raise LinerCorrosionRefusal("campaign_deposit_missing")
     for item in species:
         low = inert.get(item, 0.0)
         high = reactive.get(item, 0.0)
@@ -457,7 +481,7 @@ def corrosion_campaign_recurrence(
     liner_composition_wt_pct: Mapping[str, Any],
     initial_deposit_kg_by_species: Mapping[str, Any],
     deposit_inert_kg_by_species: Mapping[str, Any],
-    deposit_reactive_kg_by_species: Mapping[str, Any],
+    deposit_reactive_kg_by_species: Mapping[str, Any] | None,
     *,
     density_kg_m3: float,
     area_m2: float,
@@ -472,8 +496,26 @@ def corrosion_campaign_recurrence(
 
     liner = validate_oxide_composition(liner_composition_wt_pct)
     inert = _checked_deposit(deposit_inert_kg_by_species)
-    reactive = _checked_deposit(deposit_reactive_kg_by_species)
-    branches = sticking_deposit_interval(inert, reactive)
+    reactive_refusal: dict[str, str] | None = None
+    try:
+        if deposit_reactive_kg_by_species is None:
+            raise LinerCorrosionRefusal("reactive_deposit_branch_missing")
+        reactive = _checked_deposit(deposit_reactive_kg_by_species)
+        branches = sticking_deposit_interval(inert, reactive)
+    except LinerCorrosionRefusal as exc:
+        reactive_refusal = exc.as_dict()
+        reactive = None
+        branches = {
+            "inert": {species: mass for species, mass in sorted(inert.items())},
+            "reactive_upper_bound": {
+                "deposit_kg_by_species": None,
+                "alpha_s": 1.0,
+                "P_eq_Pa": 0.0,
+                "flags": [REACTIVE_STICKING_FLAG],
+                "status": "refused",
+                "refusal": reactive_refusal,
+            },
+        }
     if isinstance(horizon, bool) or not isinstance(horizon, int) or horizon < 0:
         raise LinerCorrosionRefusal("campaign_horizon_invalid")
     margin = _finite_real(margin_C, "margin_C")
@@ -482,19 +524,6 @@ def corrosion_campaign_recurrence(
 
     # The high-rate branch reaches the criterion first (lo); the inert branch
     # is the slower bound (hi). Both are explicit M_(N+1)=M_N+D recurrences.
-    lo, lo_deposit, lo_signal = _campaign_branch(
-        liner,
-        initial_deposit_kg_by_species,
-        branches["reactive_upper_bound"]["deposit_kg_by_species"],
-        density_kg_m3=density_kg_m3,
-        area_m2=area_m2,
-        reacted_layer_depth_m=reacted_layer_depth_m,
-        temperature_C=temperature_C,
-        pressure_bar=pressure_bar,
-        margin_C=margin,
-        horizon=horizon,
-        sampler=sampler,
-    )
     hi, hi_deposit, hi_signal = _campaign_branch(
         liner,
         initial_deposit_kg_by_species,
@@ -508,22 +537,41 @@ def corrosion_campaign_recurrence(
         horizon=horizon,
         sampler=sampler,
     )
-    coupled, coupled_deposit, coupled_signal = _campaign_branch(
-        liner,
-        initial_deposit_kg_by_species,
-        branches["inert"],
-        density_kg_m3=density_kg_m3,
-        area_m2=area_m2,
-        reacted_layer_depth_m=reacted_layer_depth_m,
-        temperature_C=temperature_C,
-        pressure_bar=pressure_bar,
-        margin_C=margin,
-        horizon=horizon,
-        sampler=sampler,
-        feedback_deposit_kg_by_species=(
-            branches["reactive_upper_bound"]["deposit_kg_by_species"]
-        ),
-    )
+    lo: int | str | None = None
+    lo_deposit: dict[str, float] | None = None
+    lo_signal: float | None = None
+    coupled: int | str | None = None
+    coupled_deposit: dict[str, float] | None = None
+    coupled_signal: float | None = None
+    if reactive is not None:
+        reactive_deposit = branches["reactive_upper_bound"]["deposit_kg_by_species"]
+        lo, lo_deposit, lo_signal = _campaign_branch(
+            liner,
+            initial_deposit_kg_by_species,
+            reactive_deposit,
+            density_kg_m3=density_kg_m3,
+            area_m2=area_m2,
+            reacted_layer_depth_m=reacted_layer_depth_m,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            margin_C=margin,
+            horizon=horizon,
+            sampler=sampler,
+        )
+        coupled, coupled_deposit, coupled_signal = _campaign_branch(
+            liner,
+            initial_deposit_kg_by_species,
+            branches["inert"],
+            density_kg_m3=density_kg_m3,
+            area_m2=area_m2,
+            reacted_layer_depth_m=reacted_layer_depth_m,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            margin_C=margin,
+            horizon=horizon,
+            sampler=sampler,
+            feedback_deposit_kg_by_species=reactive_deposit,
+        )
     flags = [
         DEPOSIT_OXIDATION_STATE_FLAG,
         REACTED_LAYER_DEPTH_FLAG,
@@ -532,6 +580,8 @@ def corrosion_campaign_recurrence(
         DISSOLUTION_KINETICS_FLAG,
         CORROSION_NO_RATE_FLAG,
     ]
+    if reactive_refusal is not None:
+        flags.append("reactive_deposit_branch_refused")
     return {
         "campaigns_to_runaway": [lo, hi],
         "coupled_campaigns_to_runaway": coupled,
@@ -545,6 +595,7 @@ def corrosion_campaign_recurrence(
             "inert": hi_signal,
             "coupled": coupled_signal,
         },
+        "reactive_branch_refusal": reactive_refusal,
         "sticking_state": branches,
         "reacted_layer_depth_m": {
             "declared_h": _positive(reacted_layer_depth_m, "reacted_layer_depth_m"),
@@ -560,11 +611,12 @@ def first_liquid_tier_a(
     invariant_table: Mapping[str, Any],
     composition_wt_pct: Mapping[str, Any],
 ) -> float:
-    """Find the lowest digitized first-liquid invariant covering a bulk.
+    """Resolve first-liquid onset from declared bounds or exact cited points.
 
-    Each invariant row names a ``first_liquid_temperature_C`` and oxide
-    ``composition_bounds_wt_pct`` as ``[low, high]`` pairs. Missing or
-    uncovered data refuses; it never becomes a zero-liquid answer.
+    Source extracts provide invariant points, not interpolated phase fields.
+    Those points apply only when the supplied bulk matches their printed
+    liquid composition. Other compositions need explicit bounds and refuse
+    instead of acquiring inferred phase fields.
     """
 
     composition = validate_oxide_composition(composition_wt_pct)
@@ -576,32 +628,80 @@ def first_liquid_tier_a(
         if not isinstance(row, Mapping):
             continue
         bounds = row.get("composition_bounds_wt_pct")
-        if not isinstance(bounds, Mapping) or not bounds:
+        if isinstance(bounds, Mapping) and bounds:
+            covered = True
+            for oxide, raw_range in bounds.items():
+                if isinstance(raw_range, Mapping):
+                    low = raw_range.get("min")
+                    high = raw_range.get("max")
+                elif isinstance(raw_range, (list, tuple)) and len(raw_range) == 2:
+                    low, high = raw_range
+                else:
+                    covered = False
+                    break
+                lower = _finite_real(low, f"{oxide}.min")
+                upper = _finite_real(high, f"{oxide}.max")
+                wt_pct = composition.get(str(oxide), 0.0)
+                if lower > upper or wt_pct < lower or wt_pct > upper:
+                    covered = False
+                    break
+            if covered:
+                matches.append(
+                    _finite_real(
+                        row.get("first_liquid_temperature_C"),
+                        "first_liquid_temperature_C",
+                    )
+                )
             continue
-        covered = True
-        for oxide, raw_range in bounds.items():
-            if isinstance(raw_range, Mapping):
-                low = raw_range.get("min")
-                high = raw_range.get("max")
-            elif isinstance(raw_range, (list, tuple)) and len(raw_range) == 2:
-                low, high = raw_range
-            else:
-                covered = False
-                break
-            lower = _finite_real(low, f"{oxide}.min")
-            upper = _finite_real(high, f"{oxide}.max")
-            wt_pct = composition.get(str(oxide), 0.0)
-            if lower > upper or wt_pct < lower or wt_pct > upper:
-                covered = False
-                break
-        if covered:
+
+        liquid_composition = row.get("liquid_composition")
+        subsystem = row.get("subsystem")
+        if not isinstance(liquid_composition, Mapping) or not isinstance(subsystem, str):
+            continue
+        components = set(subsystem.split("-"))
+        if set(composition) != components or set(liquid_composition) != components:
+            continue
+        phases = row.get("phases")
+        if isinstance(phases, Sequence) and not isinstance(phases, (str, bytes)):
+            has_liquid = any("liquid" in str(phase).lower() for phase in phases)
+        else:
+            kind = str(row.get("invariant_type", "")).lower()
+            has_liquid = "melting" in kind or "fusion" in kind
+        if not has_liquid:
+            continue
+        if all(
+            math.isclose(
+                composition[oxide],
+                _finite_real(liquid_composition[oxide], f"{oxide}.liquid_wt_pct"),
+                rel_tol=0.0,
+                abs_tol=1.0e-9,
+            )
+            for oxide in components
+        ):
             matches.append(
                 _finite_real(
-                    row.get("first_liquid_temperature_C"),
-                    "first_liquid_temperature_C",
+                    row.get("T_invariant_C"),
+                    "T_invariant_C",
                 )
             )
     if not matches:
+        gaps = invariant_table.get("acquisition_gaps", {})
+        if isinstance(gaps, Mapping) and {"FeO", "CaO", "Al2O3"}.issubset(
+            composition
+        ):
+            gap = next(
+                (
+                    (str(name), str(detail))
+                    for name, detail in gaps.items()
+                    if set(str(name).split("-")) == {"FeO", "CaO", "Al2O3"}
+                ),
+                None,
+            )
+            if gap is not None:
+                raise LinerCorrosionRefusal(
+                    "liner_tier_a_acquisition_gap",
+                    f"{gap[0]}: {gap[1]}",
+                )
         raise LinerCorrosionRefusal("tier_a_invariant_field_missing")
     return min(matches)
 
@@ -672,6 +772,112 @@ def species_aggressiveness_tier_a_finite_difference(
     }
 
 
+def _run_corrosion_recurrence(
+    liner: Mapping[str, float],
+    initial_deposit: Mapping[str, float],
+    deposit_inert: Mapping[str, Any],
+    deposit_reactive: Mapping[str, Any] | None,
+    *,
+    density_kg_m3: float,
+    area_m2: float,
+    reacted_layer_depth_m: float,
+    temperature_C: float,
+    pressure_bar: float | None,
+    margin_C: float,
+    horizon: int,
+    criterion_tier: str,
+    invariant_table: Mapping[str, Any] | None,
+    sampler: LiquidFractionSampler | None,
+) -> dict[str, Any]:
+    if criterion_tier == "A":
+        if not isinstance(invariant_table, Mapping) or not invariant_table:
+            raise LinerCorrosionRefusal("liner_invariant_table_missing")
+        recurrence_sampler: LiquidFractionSampler = TierAInvariantSampler(
+            invariant_table
+        )
+    elif criterion_tier == "B":
+        if sampler is None:
+            raise LinerCorrosionRefusal("liquid_fraction_sampler_missing")
+        if pressure_bar is None:
+            raise LinerCorrosionRefusal("liner_service_pressure_missing")
+        recurrence_sampler = sampler
+    else:
+        raise LinerCorrosionRefusal("liner_criterion_tier_invalid", criterion_tier)
+    return corrosion_campaign_recurrence(
+        liner,
+        initial_deposit,
+        deposit_inert,
+        deposit_reactive,
+        density_kg_m3=density_kg_m3,
+        area_m2=area_m2,
+        reacted_layer_depth_m=reacted_layer_depth_m,
+        temperature_C=temperature_C,
+        pressure_bar=pressure_bar,
+        margin_C=margin_C,
+        horizon=horizon,
+        sampler=recurrence_sampler,
+    )
+
+
+def _interface_state_at_depth(
+    liner_composition_wt_pct: Mapping[str, Any],
+    deposit_kg_by_species: Mapping[str, Any],
+    *,
+    density_kg_m3: float,
+    area_m2: float,
+    reacted_layer_depth_m: float,
+    service_temperature_C: float,
+    margin_C: float,
+    pressure_bar: float | None,
+    criterion_tier: str,
+    invariant_table: Mapping[str, Any] | None,
+    sampler: LiquidFractionSampler | None,
+) -> dict[str, Any]:
+    mixed = contaminated_interface_composition(
+        liner_composition_wt_pct,
+        deposit_kg_by_species,
+        density_kg_m3=density_kg_m3,
+        area_m2=area_m2,
+        reacted_layer_depth_m=reacted_layer_depth_m,
+    )
+    sample_temperature_C = service_temperature_C - margin_C
+    if criterion_tier == "A":
+        if not isinstance(invariant_table, Mapping) or not invariant_table:
+            raise LinerCorrosionRefusal("liner_invariant_table_missing")
+        first_melt_C = first_liquid_tier_a(
+            invariant_table,
+            mixed["composition_wt_pct"],
+        )
+        return {
+            "mixed": mixed,
+            "first_melt_T_C": first_melt_C,
+            "liquid_fraction": None,
+            "onset": first_melt_C <= sample_temperature_C,
+        }
+    if criterion_tier != "B":
+        raise LinerCorrosionRefusal("liner_criterion_tier_invalid", criterion_tier)
+    if sampler is None:
+        raise LinerCorrosionRefusal("liquid_fraction_sampler_missing")
+    if pressure_bar is None:
+        raise LinerCorrosionRefusal("liner_service_pressure_missing")
+    liquid_fraction = _checked_liquid_fraction(
+        _sample_liquid_fraction(
+            sampler,
+            mixed["composition_wt_pct"],
+            _checked_deposit(deposit_kg_by_species),
+            validate_oxide_composition(liner_composition_wt_pct),
+            sample_temperature_C,
+            pressure_bar,
+        )
+    )
+    return {
+        "mixed": mixed,
+        "first_melt_T_C": None,
+        "liquid_fraction": liquid_fraction,
+        "onset": liquid_fraction > LIQUIDUS_SOLID_EPSILON,
+    }
+
+
 def build_liner_state_segment(
     interface_chemistry: Mapping[str, Any],
     deposit_kg_by_species: Mapping[str, Any],
@@ -718,15 +924,22 @@ def build_liner_state_segment(
     if isinstance(horizon, bool) or not isinstance(horizon, int) or horizon < 0:
         raise LinerCorrosionRefusal("campaign_horizon_invalid")
 
-    mixed = contaminated_interface_composition(
+    tier = str(interface_chemistry.get("criterion_tier") or "B").upper()
+    table = interface_chemistry.get("invariant_table") if tier == "A" else None
+    interface_state = _interface_state_at_depth(
         liner,
         deposits,
         density_kg_m3=density,
         area_m2=area,
         reacted_layer_depth_m=depth,
+        service_temperature_C=service_C,
+        margin_C=margin_C,
+        pressure_bar=pressure,
+        criterion_tier=tier,
+        invariant_table=table,
+        sampler=sampler,
     )
-    sample_temperature_C = service_C - margin_C
-    tier = str(interface_chemistry.get("criterion_tier") or "B").upper()
+    mixed = interface_state["mixed"]
     refusals: list[dict[str, str]] = []
     flags = list(mixed["flags"])
     flags.extend((TEMPERATURE_MARGIN_FLAG, HORIZON_FLAG))
@@ -757,39 +970,12 @@ def build_liner_state_segment(
                 LinerCorrosionRefusal("liner_porosity_invalid").as_dict()
             )
 
-    first_melt_C: float | None = None
-    liquid_fraction: float | None = None
-    if tier == "A":
-        table = interface_chemistry.get("invariant_table")
-        if not isinstance(table, Mapping) or not table:
-            raise LinerCorrosionRefusal("liner_invariant_table_missing")
-        tier_a = tier_a_first_liquid_onset(
-            table,
-            mixed["composition_wt_pct"],
-            service_temperature_C=service_C,
-            margin_C=margin_C,
-        )
-        first_melt_C = float(tier_a["first_melt_T_C"])
-        onset = bool(tier_a["onset"])
-    elif tier == "B":
-        if sampler is None:
-            raise LinerCorrosionRefusal("liquid_fraction_sampler_missing")
-        if pressure is None:
-            raise LinerCorrosionRefusal("liner_service_pressure_missing")
-        liquid_fraction = _checked_liquid_fraction(
-            _sample_liquid_fraction(
-                sampler,
-                mixed["composition_wt_pct"],
-                deposits,
-                liner,
-                sample_temperature_C,
-                pressure,
-            )
-        )
-        onset = liquid_fraction > LIQUIDUS_SOLID_EPSILON
+    first_melt_C = interface_state["first_melt_T_C"]
+    liquid_fraction = interface_state["liquid_fraction"]
+    onset = bool(interface_state["onset"])
+    sample_temperature_C = service_C - margin_C
+    if tier == "B":
         flags.append("tier_b_liquid_fraction_only_no_solidus_claim")
-    else:
-        raise LinerCorrosionRefusal("liner_criterion_tier_invalid", tier)
 
     species_aggressiveness: dict[str, Any] = {}
     if tier == "B" and sampler is not None and pressure is not None:
@@ -835,23 +1021,15 @@ def build_liner_state_segment(
         flags.append(CORROSION_NO_RATE_FLAG)
 
     recurrence: dict[str, Any] | None = None
-    if deposit_inert_kg_by_species is None or deposit_reactive_kg_by_species is None:
+    if deposit_inert_kg_by_species is None:
         refusals.append(
-            LinerCorrosionRefusal("reactive_deposit_branch_missing").as_dict()
+            LinerCorrosionRefusal("inert_deposit_branch_missing").as_dict()
         )
-    elif tier == "B":
-        if sampler is None:
-            refusals.append(
-                LinerCorrosionRefusal("liquid_fraction_sampler_missing").as_dict()
-            )
-        elif pressure is None:
-            refusals.append(
-                LinerCorrosionRefusal("liner_service_pressure_missing").as_dict()
-            )
-        else:
-            recurrence = corrosion_campaign_recurrence(
+    else:
+        try:
+            recurrence = _run_corrosion_recurrence(
                 liner,
-                deposits,
+                {},
                 deposit_inert_kg_by_species,
                 deposit_reactive_kg_by_species,
                 density_kg_m3=density,
@@ -861,25 +1039,84 @@ def build_liner_state_segment(
                 pressure_bar=pressure,
                 margin_C=margin_C,
                 horizon=horizon,
+                criterion_tier=tier,
+                invariant_table=table,
                 sampler=sampler,
             )
-    elif tier == "A":
-        recurrence = corrosion_campaign_recurrence(
-            liner,
-            deposits,
-            deposit_inert_kg_by_species,
-            deposit_reactive_kg_by_species,
-            density_kg_m3=density,
-            area_m2=area,
-            reacted_layer_depth_m=depth,
-            temperature_C=service_C,
-            pressure_bar=pressure,
-            margin_C=margin_C,
-            horizon=horizon,
-            sampler=TierAInvariantSampler(table),
-        )
-    else:
-        raise LinerCorrosionRefusal("liner_criterion_tier_invalid", tier)
+        except LinerCorrosionRefusal as exc:
+            refusals.append(exc.as_dict())
+        if recurrence and recurrence.get("reactive_branch_refusal"):
+            refusals.append(dict(recurrence["reactive_branch_refusal"]))
+
+    depth_sensitivity: list[dict[str, Any]] = []
+    for sensitivity_depth in reacted_layer_depths(depth):
+        try:
+            if math.isclose(sensitivity_depth, depth, rel_tol=0.0, abs_tol=0.0):
+                sensitivity_state = interface_state
+                sensitivity_recurrence = recurrence
+            else:
+                sensitivity_state = _interface_state_at_depth(
+                    liner,
+                    deposits,
+                    density_kg_m3=density,
+                    area_m2=area,
+                    reacted_layer_depth_m=sensitivity_depth,
+                    service_temperature_C=service_C,
+                    margin_C=margin_C,
+                    pressure_bar=pressure,
+                    criterion_tier=tier,
+                    invariant_table=table,
+                    sampler=sampler,
+                )
+                sensitivity_recurrence = (
+                    _run_corrosion_recurrence(
+                        liner,
+                        {},
+                        deposit_inert_kg_by_species,
+                        deposit_reactive_kg_by_species,
+                        density_kg_m3=density,
+                        area_m2=area,
+                        reacted_layer_depth_m=sensitivity_depth,
+                        temperature_C=service_C,
+                        pressure_bar=pressure,
+                        margin_C=margin_C,
+                        horizon=horizon,
+                        criterion_tier=tier,
+                        invariant_table=table,
+                        sampler=sampler,
+                    )
+                    if deposit_inert_kg_by_species is not None
+                    else None
+                )
+            depth_sensitivity.append(
+                {
+                    "reacted_layer_depth_m": sensitivity_depth,
+                    "interface_wt_pct": sensitivity_state["mixed"][
+                        "composition_wt_pct"
+                    ],
+                    "first_melt_T_C": sensitivity_state["first_melt_T_C"],
+                    "liquid_fraction": sensitivity_state["liquid_fraction"],
+                    "onset": sensitivity_state["onset"],
+                    "campaigns_to_runaway": (
+                        sensitivity_recurrence["campaigns_to_runaway"]
+                        if sensitivity_recurrence
+                        else None
+                    ),
+                    "coupled_campaigns_to_runaway": (
+                        sensitivity_recurrence["coupled_campaigns_to_runaway"]
+                        if sensitivity_recurrence
+                        else None
+                    ),
+                }
+            )
+        except LinerCorrosionRefusal as exc:
+            depth_sensitivity.append(
+                {
+                    "reacted_layer_depth_m": sensitivity_depth,
+                    "status": "refused",
+                    "refusal": exc.as_dict(),
+                }
+            )
 
     return {
         "diagnostic_only": True,
@@ -894,6 +1131,7 @@ def build_liner_state_segment(
         "interface_wt_pct": mixed["composition_wt_pct"],
         "reacted_layer_depth_m": depth,
         "reacted_layer_depth_sensitivity_m": list(reacted_layer_depths(depth)),
+        "depth_sensitivity": depth_sensitivity,
         "porosity_fraction": raw_porosity,
         "deposit_kg_by_species": deposits,
         "first_melt_T_C": first_melt_C,
@@ -915,6 +1153,356 @@ def build_liner_state_segment(
         "flags": list(dict.fromkeys((*flags, *(recurrence["flags"] if recurrence else ())))),
         "refusals": refusals,
     }
+
+
+def _trace_deposits_by_segment(trace: Any) -> dict[str, dict[str, float]]:
+    from simulator.trace import nested_wall_deposit_by_segment_species
+
+    raw = getattr(trace, "wall_deposit_by_segment_species_kg", {}) or {}
+    if not isinstance(raw, Mapping):
+        raise LinerCorrosionRefusal("inert_deposit_trace_invalid")
+    try:
+        deposits = nested_wall_deposit_by_segment_species(raw)
+    except ValueError as exc:
+        raise LinerCorrosionRefusal(
+            "inert_deposit_trace_invalid", str(exc)
+        ) from exc
+    if any(mass < 0.0 for by_species in deposits.values() for mass in by_species.values()):
+        raise LinerCorrosionRefusal(
+            "inert_deposit_trace_invalid", "wall deposit mass must be non-negative"
+        )
+    return deposits
+
+
+def _reactive_deposit_upper_bound_for_segment(
+    model: Any,
+    segment: Any,
+    inert_deposit_kg_by_species: Mapping[str, float],
+    snapshots: Sequence[Any],
+) -> dict[str, float]:
+    """Replay recorded species supply through the wall owner at alpha=1, P_eq=0."""
+
+    from simulator.wall_deposition import (
+        SECONDS_PER_HOUR,
+        wall_deposit_candidate_for_surface_kg,
+    )
+
+    if not snapshots:
+        raise LinerCorrosionRefusal("reactive_deposit_operating_history_missing")
+
+    records_by_species: dict[str, list[tuple[Any, Mapping[str, Any]]]] = {}
+    inert_species = set(inert_deposit_kg_by_species)
+    for snapshot in snapshots:
+        candidates = getattr(
+            snapshot, "wall_deposition_rate_shadow_candidate", {}
+        ) or {}
+        by_species = (
+            candidates.get(str(segment.name), {})
+            if isinstance(candidates, Mapping)
+            else {}
+        )
+        if not isinstance(by_species, Mapping):
+            continue
+        for raw_species, record in by_species.items():
+            species = str(raw_species)
+            if not isinstance(record, Mapping):
+                raise LinerCorrosionRefusal(
+                    "reactive_deposit_operating_state_invalid",
+                    f"{segment.name}:{species}: candidate is not a mapping",
+                )
+            supply_mol_s = _finite_real(
+                record.get("available_supply_mol_s"),
+                f"available_supply_mol_s[{segment.name},{species}]",
+            )
+            if supply_mol_s < 0.0:
+                raise LinerCorrosionRefusal(
+                    "reactive_deposit_operating_state_invalid",
+                    f"{segment.name}:{species}: negative available supply",
+                )
+            if supply_mol_s > 0.0 or species in inert_species:
+                records_by_species.setdefault(species, []).append(
+                    (snapshot, record)
+                )
+    species_to_replay = sorted(inert_species | set(records_by_species))
+
+    result: dict[str, float] = {}
+    for species in species_to_replay:
+        inert_mass_kg = float(inert_deposit_kg_by_species.get(species, 0.0))
+        try:
+            formula = resolve_species_formula(
+                species, getattr(model, "species_formula_registry", None)
+            )
+        except Exception as exc:  # noqa: BLE001 - unknown formula is typed below
+            raise LinerCorrosionRefusal(
+                "reactive_deposit_species_formula_missing", species
+            ) from exc
+        molar_mass_kg_mol = formula.molar_mass_kg_per_mol()
+        if molar_mass_kg_mol is None or molar_mass_kg_mol <= 0.0:
+            raise LinerCorrosionRefusal(
+                "reactive_deposit_species_formula_missing", species
+            )
+
+        reactive_mass_kg = 0.0
+        saw_candidate = False
+        T_cond_C = getattr(model, "condensation_temperatures_C", {}).get(species)
+        if T_cond_C is None:
+            raise LinerCorrosionRefusal(
+                "reactive_deposit_condensation_temperature_missing", species
+            )
+        melt_temperature_C = getattr(
+            getattr(model, "melt", None),
+            "temperature_C",
+            getattr(model, "gas_temperature_C", None),
+        )
+        for snapshot, record in records_by_species.get(species, ()):
+            duration_h = _positive(
+                getattr(snapshot, "duration_h", None), "snapshot.duration_h"
+            )
+            saw_candidate = True
+            supply_mol_s = _finite_real(
+                record.get("available_supply_mol_s"),
+                f"available_supply_mol_s[{segment.name},{species}]",
+            )
+            if supply_mol_s < 0.0:
+                raise LinerCorrosionRefusal(
+                    "reactive_deposit_operating_state_invalid",
+                    f"{segment.name}:{species}: negative available supply",
+                )
+            if supply_mol_s == 0.0:
+                continue
+            pressure = _finite_real(
+                record.get("species_partial_pressure_pa"),
+                f"species_partial_pressure_pa[{segment.name},{species}]",
+            )
+            if pressure < 0.0:
+                raise LinerCorrosionRefusal(
+                    "reactive_deposit_operating_state_invalid",
+                    f"{segment.name}:{species}: negative partial pressure",
+                )
+            surface = record.get("surface")
+            wall_temperature_K = (
+                surface.get("wall_temperature_K")
+                if isinstance(surface, Mapping)
+                else None
+            )
+            wall_temperature_C = _finite_real(
+                wall_temperature_K, "wall_temperature_K"
+            ) - CELSIUS_TO_KELVIN_OFFSET
+            if wall_temperature_C <= -CELSIUS_TO_KELVIN_OFFSET:
+                raise LinerCorrosionRefusal(
+                    "reactive_deposit_operating_state_invalid",
+                    f"{segment.name}:{species}: wall temperature below absolute zero",
+                )
+            if pressure == 0.0:
+                continue
+
+            proxy = SimpleNamespace(
+                materials=getattr(model, "materials", None),
+                vapor_pressure_data=getattr(model, "vapor_pressure_data", None),
+                species_formula_registry=getattr(
+                    model, "species_formula_registry", None
+                ),
+                wall_temperature_input_refusals={},
+                overhead_pressure_mbar=getattr(
+                    model, "overhead_pressure_mbar", None
+                ),
+                wall_species_partial_pressures_pa={species: pressure},
+                wall_species_partial_pressures_pa_by_segment={
+                    str(segment.name): {species: pressure}
+                },
+                _species_partial_pressures_configured=True,
+                species_partial_pressures_mbar={},
+                gas_temperature_C=getattr(model, "gas_temperature_C", None),
+                pipe_diameter_m=getattr(model, "pipe_diameter_m", None),
+                regime_factor=getattr(model, "regime_factor", None),
+                stir_factor=getattr(model, "stir_factor", None),
+                radial_stir_factor=getattr(model, "radial_stir_factor", None),
+                carrier_gas=getattr(model, "carrier_gas", None),
+                last_wall_deposition_rate_shadow_candidate={},
+                last_sticking_alpha_provenance_notice={},
+            )
+            reactive_segment = replace(
+                segment, wall_temperature_C=wall_temperature_C
+            )
+            try:
+                candidate = wall_deposit_candidate_for_surface_kg(
+                    proxy,
+                    species=species,
+                    rate_kg_hr=supply_mol_s
+                    * molar_mass_kg_mol
+                    * SECONDS_PER_HOUR,
+                    T_cond_C=float(T_cond_C),
+                    melt_temperature_C=float(melt_temperature_C),
+                    wall_temperature_C=wall_temperature_C,
+                    surface_area_m2=float(segment.surface_area_m2),
+                    segment=reactive_segment,
+                    wall_surface_state={"alpha_s": 1.0, "P_eq_Pa": 0.0},
+                )
+            except Exception as exc:  # noqa: BLE001 - branch refusal is diagnostic
+                raise LinerCorrosionRefusal(
+                    "reactive_deposit_seam_refused",
+                    str(getattr(exc, "reason", None) or exc),
+                ) from exc
+            if isinstance(candidate, Mapping):
+                raise LinerCorrosionRefusal(
+                    "reactive_deposit_seam_refused",
+                    str(
+                        candidate.get("reason")
+                        or candidate.get("status")
+                        or species
+                    ),
+                )
+            candidate_kg_hr = _finite_real(
+                candidate, "reactive_deposit_candidate"
+            )
+            reactive_mass_kg += candidate_kg_hr * duration_h
+        if not saw_candidate:
+            raise LinerCorrosionRefusal(
+                "reactive_deposit_operating_state_missing",
+                f"{segment.name}:{species}",
+            )
+        if reactive_mass_kg + 1.0e-15 < inert_mass_kg:
+            raise LinerCorrosionRefusal(
+                "reactive_deposit_upper_bound_below_inert",
+                f"{segment.name}:{species}",
+            )
+        result[species] = reactive_mass_kg
+    return result
+
+
+def build_liner_state_for_run(
+    material_id: str,
+    simulator: Any,
+    trace: Any,
+) -> dict[str, Any] | None:
+    """Build terminal liner metadata in the physics owner module."""
+
+    from simulator.furnace_materials import (
+        InterfaceChemistryRefusal,
+        load_furnace_materials,
+        load_interface_chemistry,
+        load_interface_invariant_table,
+    )
+    from simulator.trace import wall_temperature_by_segment_C
+
+    catalog = load_furnace_materials()
+    material = catalog.get(str(material_id))
+    raw_chemistry = (
+        material.get("interface_chemistry") if isinstance(material, Mapping) else None
+    )
+    if not isinstance(raw_chemistry, Mapping):
+        return None
+
+    model = getattr(simulator, "condensation_model", None)
+    pipe_segments = tuple(getattr(model, "pipe_segments", ()) or ())
+    inert_by_segment = _trace_deposits_by_segment(trace)
+    segment_names = sorted(
+        {str(segment.name) for segment in pipe_segments} | set(inert_by_segment)
+    ) or ["_run"]
+    temperatures = wall_temperature_by_segment_C(simulator)
+    try:
+        chemistry = load_interface_chemistry(str(material_id), catalog=catalog)
+        if chemistry is None:
+            return None
+        tier = str(chemistry.get("criterion_tier") or "B").upper()
+        if tier == "A":
+            chemistry["invariant_table"] = load_interface_invariant_table(
+                str(material_id), catalog=catalog
+            )
+    except InterfaceChemistryRefusal as exc:
+        refusal = {"reason": exc.reason, "detail": exc.detail}
+        return {
+            "schema": "liner-state-v1",
+            "segments": {
+                name: {
+                    "status": "refused",
+                    "refusal": refusal,
+                    "flags": list(raw_chemistry.get("flags", ()) or ()),
+                }
+                for name in segment_names
+            },
+        }
+
+    segments_by_name = {str(segment.name): segment for segment in pipe_segments}
+    sampler = MageminLinerSampler() if tier == "B" else None
+    pressure_mbar = getattr(model, "overhead_pressure_mbar", None)
+    pressure_bar = (
+        None
+        if pressure_mbar is None
+        else float(pressure_mbar) * PA_PER_MBAR / PA_PER_BAR
+    )
+    records: dict[str, Any] = {}
+    snapshots = tuple(getattr(trace, "snapshots", ()) or ())
+    try:
+        for name in segment_names:
+            segment = segments_by_name.get(name)
+            if segment is None:
+                records[name] = {
+                    "status": "refused",
+                    "refusal": {"reason": "liner_segment_geometry_missing"},
+                }
+                continue
+            service_temperature = temperatures.get(name)
+            if service_temperature is None:
+                records[name] = {
+                    "status": "refused",
+                    "refusal": {"reason": "liner_service_temperature_missing"},
+                }
+                continue
+            inert = inert_by_segment.get(name, {})
+            try:
+                reactive = _reactive_deposit_upper_bound_for_segment(
+                    model, segment, inert, snapshots
+                )
+            except LinerCorrosionRefusal as exc:
+                reactive = None
+                reactive_refusal = exc.as_dict()
+            else:
+                reactive_refusal = None
+            try:
+                state = build_liner_state_segment(
+                    chemistry,
+                    inert,
+                    area_m2=float(segment.surface_area_m2),
+                    service_temperature_C=service_temperature,
+                    pressure_bar=pressure_bar,
+                    sampler=sampler,
+                    deposit_inert_kg_by_species=inert,
+                    deposit_reactive_kg_by_species=reactive,
+                )
+            except LinerCorrosionRefusal as exc:
+                records[name] = {
+                    "status": "refused",
+                    "refusal": exc.as_dict(),
+                    "flags": list(raw_chemistry.get("flags", ()) or ()),
+                }
+                continue
+            if reactive_refusal is not None:
+                state["refusals"].append(reactive_refusal)
+            state["status"] = "partial" if state["refusals"] else "ok"
+            state["deposit_inert_kg_by_species"] = dict(inert)
+            state["deposit_reactive_kg_by_species"] = (
+                None if reactive is None else dict(reactive)
+            )
+            records[name] = state
+    finally:
+        if sampler is not None:
+            sampler.close()
+    return {"schema": "liner-state-v1", "segments": records}
+
+
+def attach_liner_state_metadata(
+    run_metadata: dict[str, Any],
+    material_id: str,
+    simulator: Any,
+    trace: Any,
+) -> dict[str, Any] | None:
+    """Attach the selected material's diagnostic to terminal run metadata."""
+
+    state = build_liner_state_for_run(material_id, simulator, trace)
+    if state is not None:
+        run_metadata["liner_state"] = state
+    return state
 
 
 def _rounded_composition(composition_wt_pct: Mapping[str, Any]) -> tuple[tuple[str, float], ...]:
@@ -972,12 +1560,12 @@ def _element_moles_from_oxide_weights(
             raise LinerCorrosionRefusal(
                 ELEMENT_CLOSURE_FLAG, f"cannot parse oxide {oxide!r}"
             ) from exc
-        molar_mass = formula.molar_mass_g_per_mol
+        molar_mass = formula.molar_mass_g_per_mol()
         if molar_mass is None or molar_mass <= 0.0:
             raise LinerCorrosionRefusal(ELEMENT_CLOSURE_FLAG, oxide)
         oxide_moles_per_100g = float(wt_pct) / float(molar_mass)
-        for element, atoms in formula.elements.items():
-            result[element] = result.get(element, 0.0) + oxide_moles_per_100g * float(atoms)
+        for element, atom_moles in formula.atom_moles(oxide_moles_per_100g).items():
+            result[element] = result.get(element, 0.0) + float(atom_moles)
     return result
 
 

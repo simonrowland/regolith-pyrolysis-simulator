@@ -12,6 +12,7 @@ from simulator.coating_lifespan import (
     LifecycleProjection,
     NestedDeposit,
     campaigns_to_resinter_total,
+    interface_first_melt_from_liner_state,
     merge_run_snapshot,
     project_lifecycle,
 )
@@ -113,9 +114,25 @@ class FoulingLifecycleHarness:
         ledgers: list[Any] = []
         snapshots_authoritative = True
         snapshot_notices: list[Mapping[str, Any]] = []
+        interface_first_melt = None
 
         for campaign_index, campaign_input in enumerate(campaign_inputs, start=1):
             artifact = _coerce_run_artifact(self._run_campaign(campaign_input))
+            document = artifact.result_document
+            run_metadata = (
+                document.get("run_metadata")
+                if isinstance(document, Mapping)
+                else None
+            )
+            liner_state = (
+                run_metadata.get("liner_state")
+                if isinstance(run_metadata, Mapping)
+                else None
+            )
+            if interface_first_melt is None and isinstance(liner_state, Mapping):
+                interface_first_melt = interface_first_melt_from_liner_state(
+                    liner_state
+                )
             mass_balance_error_pct = _mass_balance_error_pct(artifact)
             if (
                 mass_balance_error_pct is not None
@@ -233,6 +250,7 @@ class FoulingLifecycleHarness:
                 rho_deposit_kg_m3=self._rho_deposit_kg_m3,
                 thickness_limit_m=self._thickness_limit_m,
                 resinter_threshold_kg=self._resinter_threshold_kg,
+                interface_first_melt=interface_first_melt,
             ),
             fouling_state_trajectory=tuple(trajectory),
             run_records=tuple(records),
