@@ -167,3 +167,23 @@ def test_every_data_yaml_has_no_untyped_dotless_exponent_in_numeric_fields(yaml_
         + "\nStrict parser refusals (P3):\n"
         + "\n".join(parse_refusals)
     )
+
+
+def test_oneill_identity_pressure_keeps_its_exact_decimal_lexeme():
+    relative = (
+        "data/literature/extracts/"
+        "oneill-2002-feo-activity-coefficients-cmas.yaml"
+    )
+    document = yaml.load(
+        (REPO_ROOT / relative).read_text(encoding="utf-8"),
+        Loader=YAML12SafeLoader,
+    )
+    value = document["species"]["FeO"]["observations"][0]["values"][
+        "oxygen_partial_pressure"
+    ]["value"]
+
+    assert isinstance(value, str)
+    assert value == "2.454708915685030356082721740674509764216E-13"
+    assert _deliberate_printed_string_reason(
+        relative, "species.FeO.observations.0.values.oxygen_partial_pressure.value"
+    ) is not None
