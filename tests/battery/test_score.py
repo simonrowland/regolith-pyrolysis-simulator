@@ -20,7 +20,6 @@ from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from typing import Mapping
 
 import pytest
 import yaml
@@ -3921,13 +3920,6 @@ def test_metric_domain_refuses_zero_and_negative_dex() -> None:
 def test_determinism_two_dumps_byte_identical() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
-    ref = F.observation(
-        "o2-ref",
-        exp.experiment_id,
-        ident,
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
     residual, candidate = _compile(
         F.observation(
             "o2-ref",
@@ -12424,6 +12416,7 @@ def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
 
 def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     from simulator.battery.score import (
+        COEFFICIENT_SOURCE_STORE_IDS,
         ENGINE_COEFFICIENT_SOURCES,
         expand_coefficient_sources,
         lineage_complete_for,
@@ -12449,6 +12442,55 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     assert "sf04-magma-companion-workbook" in expand_coefficient_sources(
         d066_source
     )
+    openimcc = pytest.importorskip("openimcc")
+    packaged_default = openimcc.load_datapack()
+    packaged_default_sources = openimcc_pack_coefficient_sources(
+        packaged_default.version
+    )
+    assert packaged_default_sources
+    assert all(
+        source in COEFFICIENT_SOURCE_STORE_IDS
+        for source in packaged_default_sources
+    )
+    assert lineage_complete_for(packaged_default_sources) is True
+
+
+def test_unknown_openimcc_pack_alias_is_a_typed_lineage_refusal() -> None:
+    experiment = F.tabulation_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        "unknown-openimcc-pack-alias-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    context = _context(F.work(), experiment, reference)
+    prediction = EnginePrediction(
+        engine=Engine.OPENIMCC,
+        channel="openimcc",
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("0.2"),
+        unit=QUANTITY_UNITS[Quantity.ACTIVITY],
+        coefficient_sources=("openimcc-v9.9.9-unknown",),
+        identity=identity,
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=prediction,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.LINEAGE_UNKNOWN
+    assert residual.refusal.detail == {
+        "reason": "openimcc_pack_coefficient_source_alias_missing",
+        "coefficient_source_aliases": ("openimcc-v9.9.9-unknown",),
+    }
 
 
 @pytest.mark.parametrize(
@@ -19404,7 +19446,6 @@ def test_score_store_refuses_rejected_unavailable_stolyarova_rows_by_state() -> 
         "stolyarova-1995-cao-alumina-kems.yaml",
     )
 
-    root = context.root
     expected_row_keys = {
         "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cd704583d7d4",
         "stolyarova_1991_gibbs_integral_energy_fig3::points:h=a5d8822cf03d",
