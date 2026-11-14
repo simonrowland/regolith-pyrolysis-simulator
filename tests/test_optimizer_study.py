@@ -7299,15 +7299,9 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     )
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
-    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
-    # 20 C. Seed 7's liner is now about 822 C; the same unit coordinate on
-    # the old 1400-2200 C map was about 1694 C. At 822 C the CrO2 wall
-    # saturation pressure is refused, furnace amortization is
-    # batch_cost_unavailable, and the objective scores are empty. The
-    # candidate stays feasible on furnace temperature, but there is no
-    # priced winner. The honest study status is completed-no-feasible-winner,
-    # and the writer omits winner.recipe.yaml. A status of completed with
-    # no winner file would be a bug; this run is not that status.
+    # d-402 uses a pO2-free bound only for reactions that can be evaluated
+    # without oxygen. CrO2 and CrO3 wall reactions require pO2 on every route,
+    # so the feasible candidate has no priced winner.
     assert not (out_dir / "winner.recipe.yaml").exists()
     status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
     assert status["status"] == "completed-no-feasible-winner"
@@ -7327,7 +7321,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     refused = summary["wall_deposit_refusal"]["authority"][
         "wall_saturation_pressure_refused_species"
     ]
-    assert refused == ["CrO2"]
+    assert refused == ["CrO2", "CrO3"]
 
 
 def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> None:
