@@ -364,18 +364,19 @@ def test_campaign_events_preserve_fractional_times():
     assert manager.last_c2a_staged_termination["campaign_hour"] == 0.75
 
 
-def test_failure_metadata_retains_fractional_requested_duration():
+@pytest.mark.parametrize("hours", [77.4 / 3600, -1])
+def test_failure_metadata_retains_fractional_requested_duration(hours):
     from simulator.runner import _runner_failure_result
 
     payload = _runner_failure_result(
         error=RunnerError("elapsed-time failure probe"),
-        feedstock_id="lunar_mare_low_ti", campaign="C0", hours=77.4 / 3600,
+        feedstock_id="lunar_mare_low_ti", campaign="C0", hours=hours,
         mass_kg=1.0, additives_kg={}, track="pyrolysis",
         backend_name="internal-analytical", engines={},
         metadata_overrides={"started_at_utc": "2026-11-14T00:00:00Z",
                             "kernel_commit_sha": "fractional-failure"},
     )
-    assert payload["run_metadata"]["hours_requested"] == 77.4 / 3600
+    assert payload["run_metadata"]["hours_requested"] == hours
 
 
 @pytest.mark.parametrize("dt_hr", [1.0, 0.25])
