@@ -318,6 +318,9 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
     notice = diagnostic["wall_saturation_pressure_notice"]
     assert notice["reason"] == "wall_pO2_unknown_pO2_free_route_used"
     assert notice["authority_level"] == "status_bearing"
+    assert species not in model.last_sticking_alpha_provenance_notice.get(
+        "wall_saturation_pressure_extrapolations_by_species", {}
+    )
     assert diagnostic["surface"]["wall_temperature_K"] == pytest.approx(2073.15)
 
 
