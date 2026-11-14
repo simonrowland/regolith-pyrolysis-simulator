@@ -12,6 +12,11 @@ import yaml
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.identity import IdentityEqualKind, identity_equal, profile_for
 from simulator.battery.migrate import Migrator
+from simulator.battery.records import (
+    ApproxPressure,
+    BandBasis,
+    approximate_pressure_from_printed_point,
+)
 from simulator.battery.score import _printed_uncertainty_band
 
 
@@ -282,6 +287,44 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
             assert scored_band.band is not None
             assert scored_band.band.value == Decimal("0.5879891953620162")
             assert scored_band.notice is None
+
+    missing_component_errors = []
+    table1_components = {
+        label.split(".", maxsplit=1)[1]
+        for label in cells_by_label(TABLE1_RENDER)
+        if label.startswith(("EM.", "IM."))
+    }
+    for _formula, block in source["species"].items():
+        for observation in block.get("observations", ()):
+            values = observation.get("values", {})
+            if values.get("quantity") != "residue_composition_vs_time":
+                continue
+            for point in values.get("series", ()):
+                standard_errors = point.get("standard_errors", {})
+                for formula in table1_components:
+                    if f"{formula}_wt_pct" in point and formula not in standard_errors:
+                        missing_component_errors.append(
+                            (observation["observation_id"], point["sample"], formula)
+                        )
+    assert len(missing_component_errors) == 26
+    for observation_id, sample, formula in missing_component_errors:
+        matches = [
+            row for row in observations
+            if f"::{observation_id}::" in row.observation_id
+            and re.search(rf"row={re.escape(sample)}(?!\d)", row.locator.note or "")
+            and row.identity.species.formula == formula
+        ]
+        assert len(matches) == 1, (observation_id, sample, formula)
+        observation = matches[0]
+        assert observation.uncertainty.kind.value == "none"
+        resolution = _printed_uncertainty_band(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            observation.uncertainty,
+            observation.value.point,
+            source_observation=observation,
+        )
+        assert resolution.refusal is None
+        assert resolution.notice is None
     sc1_experiment_id = "10.1016/s0016-7037(00)00529-9::experiment::run-sc1"
     sc1_experiment = migrator.result.experiments[sc1_experiment_id]
     assert sc1_experiment.sample.mass_kg.state.value.point == Decimal("0.0001653")
@@ -304,13 +347,20 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         and re.search(r"row=SC1(?!\d)", row.locator.note or "")
     ]
     assert len(sc1_residue_cells) == 27
-    # Like the approximate pressure in Hashimoto 1983, this identity keeps the
-    # migrator's point representation until t-1810 bands approximate pressures.
-    assert all(
-        row.identity.total_pressure_Pa.is_value
-        and row.identity.total_pressure_Pa.value == pressure.state.value.point
-        for row in sc1_residue_cells
+    # Hashimoto 1983 remains the uniformity witness in test_migrate.py; all
+    # Wang SC1 identities now carry the same d-399 approximate-pressure band.
+    expected_pressure_band = approximate_pressure_from_printed_point(
+        pressure.state.value
     )
+    assert expected_pressure_band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+    for row in sc1_residue_cells:
+        assert row.identity.total_pressure_Pa.is_value
+        pressure_band = row.identity.total_pressure_Pa.value
+        assert isinstance(pressure_band, ApproxPressure)
+        assert pressure_band.point == expected_pressure_band.point
+        assert pressure_band.low == expected_pressure_band.low
+        assert pressure_band.high == expected_pressure_band.high
+        assert pressure_band.band_basis is expected_pressure_band.band_basis
     assert all(
         "total_pressure_Pa" in profile_for(row.identity).required
         for row in sc1_residue_cells

@@ -30107,6 +30107,16 @@ class Migrator:
         if parent_id in self._author_derivations:
             self._author_derivations[point_id] = self._author_derivations[parent_id]
         unc = uncertainty
+        if (
+            source_id == "wang-2001-solar-melt-evaporation-residues"
+            and q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and component_standard_error is None
+        ):
+            # Wang's observation-level declaration describes the numeric
+            # component errors only. Cells without one retain the old
+            # derived-band fallback instead of parsing that declaration as
+            # an uncertainty value.
+            unc = Uncertainty(kind=UncertaintyKind.NONE)
         if component_standard_error is not None:
             unc = Uncertainty(
                 kind=UncertaintyKind.PRINTED,
