@@ -12127,6 +12127,60 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
         for source in packaged_default_sources
     )
     assert lineage_complete_for(packaged_default_sources) is True
+    full_context = load_score_context()
+    assert lineage_complete_for(
+        packaged_default_sources,
+        works=full_context.works,
+        observations=full_context.observations,
+        experiments=full_context.experiments,
+    ) is True
+
+
+def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contexts() -> None:
+    openimcc = pytest.importorskip("openimcc")
+    from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
+
+    pack = openimcc.load_datapack()
+    coefficient_sources = openimcc_pack_coefficient_sources(
+        pack.version, pack.binding_digest
+    )
+    full_context = load_score_context()
+    reference = next(
+        observation
+        for observation in full_context.observations.values()
+        if observation.source_id == "shornikov-2017-spinel-thermodynamics"
+    )
+    experiment = full_context.experiments[reference.experiment_id]
+    work = full_context.works[experiment.work_id]
+    restricted_stores = (
+        {work.work_id: work},
+        {reference.observation_id: reference},
+        {experiment.experiment_id: experiment},
+    )
+
+    for works, observations, experiments in (
+        (
+            full_context.works,
+            full_context.observations,
+            full_context.experiments,
+        ),
+        restricted_stores,
+    ):
+        complete = score_mod.lineage_complete_for(
+            coefficient_sources,
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        )
+        assert complete is True
+        assert resolve_source_relation(
+            reference,
+            coefficient_sources,
+            complete,
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        ) is SourceRelation.SAME_INPUT
 
 
 def test_openimcc_canonical_doi_is_a_terminal_source_root() -> None:
