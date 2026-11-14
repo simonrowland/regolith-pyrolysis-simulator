@@ -1020,18 +1020,23 @@ def test_wall_deposit_report_tracks_condensation_bookings_and_labels() -> None:
         snapshots=snapshots,
     )
 
-    assert pass_through.condensation_refusals_by_species["Cr"]["status"] == (
-        "pass_through"
-    ), pass_through.condensation_refusals_by_species["Cr"]["reason"]
-    assert pass_through.condensation_refusals_by_species["Cr"]["reason"] == (
-        "no_supersaturation"
-    )
-    assert pass_through.condensation_refusals_by_species["Mn"]["status"] == (
-        "pass_through"
-    )
-    assert pass_through.condensation_refusals_by_species["Mn"]["reason"] == (
-        "no_supersaturation"
-    )
+    for species in ("Cr", "Mn"):
+        outcomes = pass_through.condensation_refusals_by_species[species][
+            "stage_outcomes"
+        ]
+        extrapolated = [
+            item for item in outcomes
+            if item.get("authority_level") == "extrapolated"
+            and item.get("reason")
+            == "wall_saturation_pressure_out_of_validated_range"
+        ]
+        no_supersaturation = [
+            item for item in outcomes
+            if item.get("reason") == "no_supersaturation"
+            and item.get("stage_number") is not None
+        ]
+        assert extrapolated, (species, outcomes)
+        assert no_supersaturation, (species, outcomes)
     assert pass_through.wall_deposit_by_species.get("Cr", 0.0) == 0.0
     assert pass_through.wall_deposit_by_species.get("Mn", 0.0) == 0.0
     assert pass_through.wall_deposit_by_species.get("SiO", 0.0) == 0.0
