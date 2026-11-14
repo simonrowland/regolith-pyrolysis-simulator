@@ -221,86 +221,112 @@ class CoatingFeasibilityReportError(ValueError):
     """Runner wall-fouling report cannot support a coating verdict."""
 
 
-_WALL_SUPPLY_RUN_TOTALS_ATTR = "wall_supply_run_totals_kg"
-_WALL_SUPPLY_CAMPAIGNS_ELAPSED_ATTR = "wall_supply_campaigns_elapsed"
+_WALL_SUPPLY_WINDOW_REPORT_KEY = "_wall_supply_window"
 
 
-class _OptimizerCoatingReport(dict):
-    """Public coating report plus internal run-basis supply inputs.
+@dataclass(frozen=True)
+class _WallSupplyWindow:
+    """Run-total supply and elapsed campaigns for one integration window."""
 
-    The run totals and campaign count let the gate apply the same run-basis
-    ledger cutoff as product booking. They are attributes so they do not
-    become extra fields in the public report payload.
-    """
+    run_total_kg: Mapping[str, float]
+    campaigns_elapsed: float
+    supply_interval_upper_bound_used: Mapping[str, int] = field(default_factory=dict)
+    inventory_capped: Mapping[str, bool] = field(default_factory=dict)
+    supply_unavailable: Mapping[str, Sequence[str]] = field(default_factory=dict)
+    computed_exceeds_inventory: Mapping[str, bool] = field(default_factory=dict)
 
-    def __init__(
-        self,
-        payload: Mapping[str, Any],
-        *,
-        run_supply_totals_kg: Mapping[str, float],
-        campaigns_elapsed: float,
-    ) -> None:
-        super().__init__(payload)
-        self.wall_supply_run_totals_kg = dict(run_supply_totals_kg)
-        self.wall_supply_campaigns_elapsed = campaigns_elapsed
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "run_total_kg",
+            MappingProxyType(dict(self.run_total_kg)),
+        )
+        object.__setattr__(
+            self,
+            "supply_interval_upper_bound_used",
+            MappingProxyType(dict(self.supply_interval_upper_bound_used)),
+        )
+        object.__setattr__(
+            self,
+            "inventory_capped",
+            MappingProxyType(dict(self.inventory_capped)),
+        )
+        object.__setattr__(
+            self,
+            "supply_unavailable",
+            MappingProxyType(
+                {
+                    key: tuple(value)
+                    for key, value in self.supply_unavailable.items()
+                }
+            ),
+        )
+        object.__setattr__(
+            self,
+            "computed_exceeds_inventory",
+            MappingProxyType(dict(self.computed_exceeds_inventory)),
+        )
 
 
-def _classify_refused_wall_supply_booking_kg(
-    supply_kg: float,
+@dataclass(frozen=True)
+class _ClassifiedWallSupplyWindow:
+    """Upper bound publication and authorized-zero booking for one window."""
+
+    upper_bound_kg_per_campaign: Mapping[str, float]
+    booked_run_total_kg: Mapping[str, float]
+    booked_kg_per_campaign: Mapping[str, float]
+
+
+def _classify_refused_wall_supply_window(
+    window: _WallSupplyWindow,
     ledger_resolution_kg: float,
-) -> float:
-    """Book a run-total supply, or its authorized zero, on one basis."""
+) -> _ClassifiedWallSupplyWindow:
+    """Normalize one window and apply the ledger cutoff to its run totals.
+
+    Integration produces kg/run. Each published kg/campaign value divides
+    by campaigns_elapsed from that same window; the authorized-zero cutoff
+    compares the undivided run total against the run-total ledger resolution.
+    """
 
     try:
-        supply = float(supply_kg)
+        elapsed = float(window.campaigns_elapsed)
         resolution = float(ledger_resolution_kg)
-    except (TypeError, ValueError) as exc:
+        totals = {
+            str(species): float(value)
+            for species, value in window.run_total_kg.items()
+        }
+    except (AttributeError, TypeError, ValueError) as exc:
         raise CoatingFeasibilityReportError(
-            "refused wall supply and ledger resolution must be numeric"
+            "wall supply window and ledger resolution must be numeric"
         ) from exc
-    if (
-        not math.isfinite(supply)
-        or supply < 0.0
-        or not math.isfinite(resolution)
-        or resolution < 0.0
-    ):
-        raise CoatingFeasibilityReportError(
-            "refused wall supply and ledger resolution must be finite and "
-            "non-negative"
-        )
-    return 0.0 if supply <= resolution else supply
-
-
-def _wall_supply_bounds_per_campaign(
-    run_supply_kg: Mapping[str, float],
-    campaigns_elapsed: float,
-) -> _WallSupplyIntegral:
-    """Normalize run integrals for publication under per-campaign keys.
-
-    Premise: integrating kg/hour over run hours produces kg/run. Divide
-    by campaigns_elapsed (campaign/run); the units are
-    kg/run / (campaign/run) = kg/campaign. The 24-hour fixture is 24/35
-    campaign, so 1 kg/run publishes as 1 / (24/35) = 35/24 =
-    1.4583333333333333 kg/campaign. For 2 campaigns, 1 kg/run publishes
-    as 1 / 2 = 0.5 kg/campaign.
-    """
-
-    elapsed = float(campaigns_elapsed)
     if not math.isfinite(elapsed) or elapsed <= 0.0:
         raise CoatingFeasibilityReportError(
             "campaigns_elapsed must be finite and positive for wall supply "
             "publication"
         )
-    normalized = {
-        str(species): float(supply) / elapsed
-        for species, supply in run_supply_kg.items()
+    if not math.isfinite(resolution) or resolution < 0.0:
+        raise CoatingFeasibilityReportError(
+            "wall supply ledger resolution must be finite and non-negative"
+        )
+    if any(not math.isfinite(value) or value < 0.0 for value in totals.values()):
+        raise CoatingFeasibilityReportError(
+            "wall supply run totals must be finite and non-negative"
+        )
+    booked_run_total = {
+        species: 0.0 if value <= resolution else value
+        for species, value in totals.items()
     }
-    return _WallSupplyIntegral(
-        normalized,
-        getattr(run_supply_kg, SUPPLY_INTERVAL_UPPER_BOUND_USED, {}),
-        getattr(run_supply_kg, INVENTORY_CAPPED, {}),
-        getattr(run_supply_kg, SUPPLY_UNAVAILABLE, {}),
-        getattr(run_supply_kg, COMPUTED_EXCEEDS_INVENTORY, {}),
+    upper_bound = {
+        species: value / elapsed for species, value in totals.items()
+    }
+    booked_per_campaign = {
+        species: value / elapsed
+        for species, value in booked_run_total.items()
+    }
+    return _ClassifiedWallSupplyWindow(
+        upper_bound_kg_per_campaign=MappingProxyType(upper_bound),
+        booked_run_total_kg=MappingProxyType(booked_run_total),
+        booked_kg_per_campaign=MappingProxyType(booked_per_campaign),
     )
 
 
@@ -394,43 +420,33 @@ class _WallSupplyInterval:
 
 
 class _WallSupplyIntegral(dict):
-    """Species kilogram map plus the bound count and inventory flags.
+    """Per-campaign view of an integral, retaining its typed window basis."""
 
-    Dict equality ignores the attributes. Callers that persist the map
-    copy the kilograms into a plain dict and each attribute beside it.
-    ``computed_exceeds_inventory`` names a published carrier whose
-    computed vapour was scaled down to the window-start charge.
-    """
-
-    def __init__(
-        self,
-        masses: Mapping[str, float],
-        counts: Mapping[str, int] | None = None,
-        inventory_capped: Mapping[str, bool] | None = None,
-        supply_unavailable: Mapping[str, Sequence[str]] | None = None,
-        computed_exceeds_inventory: Mapping[str, bool] | None = None,
-    ) -> None:
-        super().__init__(masses)
+    def __init__(self, window: _WallSupplyWindow) -> None:
+        normalized = _classify_refused_wall_supply_window(
+            window,
+            ledger_resolution_kg=0.0,
+        )
+        super().__init__(normalized.upper_bound_kg_per_campaign)
+        self.window = window
         self.supply_interval_upper_bound_used = {
             str(species): int(count)
-            for species, count in (counts or {}).items()
+            for species, count in window.supply_interval_upper_bound_used.items()
             if int(count) > 0 and str(species) in self
         }
         self.inventory_capped = {
             str(species): True
-            for species, flagged in (inventory_capped or {}).items()
+            for species, flagged in window.inventory_capped.items()
             if flagged and str(species) in self
         }
         self.computed_exceeds_inventory = {
             str(species): True
-            for species, flagged in (computed_exceeds_inventory or {}).items()
+            for species, flagged in window.computed_exceeds_inventory.items()
             if flagged and str(species) in self
         }
-        # Reasons for species this integral did not publish. A published
-        # species is not unavailable. Dict equality ignores this attribute.
         self.supply_unavailable = {
             str(species): list(reasons)
-            for species, reasons in (supply_unavailable or {}).items()
+            for species, reasons in window.supply_unavailable.items()
             if reasons and str(species) not in self
         }
 
@@ -2166,16 +2182,18 @@ def _optimizer_refused_flux_bounds(
     *,
     campaigns_elapsed: float = 1.0,
     catalog: Any | None = None,
-) -> dict[str, float]:
+) -> _WallSupplyIntegral:
     """Integral of each species' vapour supply over the window.
 
-    Product summary, furnace lifespan, and the tap projection book only
-    the map returned here. No other path integrates a wall-supply flux.
+    The mapping view is kg/campaign, while its typed ``window`` retains the
+    run-total supply and campaign count. Product summary, furnace lifespan,
+    the tap projection, and the production gate consume that same window.
+    No other path integrates a wall-supply flux.
     Each positive-duration interval is classified by
     ``_classify_wall_supply_interval`` and is not re-read here. Refused
     kilograms come only from ``_allocate_parent_oxide_supply``.
 
-    A returned number sums computed rates and the allocator's refused
+    The window's run total sums computed rates and the allocator's refused
     masses, then ``_enforce_published_element_inventory`` caps that sum
     at the window-start charge. A computed total above the charge is
     not published: the published oxide equals the charge, and
@@ -2212,7 +2230,8 @@ def _optimizer_refused_flux_bounds(
 
     A species absent from every contributing interval is not given a
     fabricated zero. Ledger resolution is not applied here. Booking
-    applies it.
+    applies it. The typed window is the only basis source for both the
+    classifier's run-total cutoff and its per-campaign normalization.
     """
 
     if not refused_species:
@@ -2315,17 +2334,17 @@ def _optimizer_refused_flux_bounds(
     capped = {species: True for species in allocation.inventory_capped}
     for species in extra_capped:
         capped[species] = True
-    masses = {
-        species: float(totals[species] / campaigns_elapsed)
-        for species in published
-    }
-    return _WallSupplyIntegral(
-        masses,
-        bound_counts,
-        capped,
-        allocation.unavailable,
-        {species: True for species in computed_flags},
+    basis = _WallSupplyWindow(
+        run_total_kg={species: float(totals[species]) for species in published},
+        campaigns_elapsed=float(campaigns_elapsed),
+        supply_interval_upper_bound_used={
+            species: count for species, count in bound_counts.items() if count > 0
+        },
+        inventory_capped=capped,
+        supply_unavailable=allocation.unavailable,
+        computed_exceeds_inventory={species: True for species in computed_flags},
     )
+    return _WallSupplyIntegral(basis)
 
 
 @dataclass(frozen=True)
@@ -4244,16 +4263,14 @@ def _priced_upstream_deposit_kg(
     certain_records: list[Mapping[str, Any]],
     refused_species: tuple[str, ...],
     refused_bounds: Mapping[str, float],
-    refused_run_supply_bounds: Mapping[str, float],
-    resolution_kg: float,
-    campaigns_elapsed: float,
+    classified_supply: _ClassifiedWallSupplyWindow,
 ) -> tuple[float, float]:
     """Measured mass that stays, and the booked mass of refused species.
 
     Invariant. A refused species is classified once by
-    ``_classify_refused_wall_supply_booking_kg`` on its run-total supply.
-    The booked run total is divided by ``campaigns_elapsed`` only when it
-    is added to the per-campaign deposit. Measured kilograms of this
+    ``_classify_refused_wall_supply_window`` on its integration window.
+    The booked run total is normalized by that same window before it is
+    added to the per-campaign deposit. Measured kilograms of this
     species are omitted. Product costing removes them with
     ``_replace_species_deposit_with_supply``; the physics classifier is
     shared with that product-booking path.
@@ -4276,16 +4293,12 @@ def _priced_upstream_deposit_kg(
     for species in refused_species:
         if species not in refused_bounds:
             continue
-        run_supply = refused_run_supply_bounds.get(species)
-        if run_supply is None:
+        booked_campaigns = classified_supply.booked_kg_per_campaign.get(species)
+        if booked_campaigns is None:
             raise CoatingFeasibilityReportError(
-                f"run-total refused wall supply is missing for {species!r}"
+                f"classified refused wall supply is missing for {species!r}"
             )
-        booked_run_supply = _classify_refused_wall_supply_booking_kg(
-            run_supply,
-            resolution_kg,
-        )
-        booked_supply += booked_run_supply / campaigns_elapsed
+        booked_supply += booked_campaigns
     return certain_deposit_kg - replaced, booked_supply
 
 
@@ -4311,35 +4324,17 @@ def _coating_from_upstream_deposit_fraction_report(
         report,
         deposit_records,
     )
-    refused_bounds = _coating_refused_flux_bounds(report, refused_species)
-    raw_campaigns_elapsed = getattr(
-        report,
-        _WALL_SUPPLY_CAMPAIGNS_ELAPSED_ATTR,
-        1.0,
-    )
-    try:
-        campaigns_elapsed = float(raw_campaigns_elapsed)
-    except (TypeError, ValueError) as exc:
-        raise CoatingFeasibilityReportError(
-            "wall supply campaigns_elapsed must be numeric"
-        ) from exc
-    if not math.isfinite(campaigns_elapsed) or campaigns_elapsed <= 0.0:
-        raise CoatingFeasibilityReportError(
-            "wall supply campaigns_elapsed must be finite and positive"
-        )
-    raw_run_bounds = getattr(report, _WALL_SUPPLY_RUN_TOTALS_ATTR, None)
-    if isinstance(raw_run_bounds, MappingABC):
-        refused_run_supply_bounds = {
-            str(species): float(bound)
-            for species, bound in raw_run_bounds.items()
-        }
+    raw_window = report.get(_WALL_SUPPLY_WINDOW_REPORT_KEY)
+    if isinstance(raw_window, _WallSupplyWindow):
+        supply_window = raw_window
     else:
-        # Reports without the internal run-total map describe one campaign;
-        # reconstructing kg/run from their kg/campaign values is exact there.
-        refused_run_supply_bounds = {
-            species: float(bound) * campaigns_elapsed
-            for species, bound in refused_bounds.items()
-        }
+        # Older runner reports describe one campaign unless they carry an
+        # explicit window record. Reconstitute that record before classifying.
+        legacy_bounds = _coating_refused_flux_bounds(report, refused_species)
+        supply_window = _WallSupplyWindow(
+            run_total_kg=legacy_bounds,
+            campaigns_elapsed=1.0,
+        )
     # The optimizer overlay keeps measured rows (evaluate.py's upstream
     # records). This is the only sum of those rows with the supply.
     # Product costing books the same species through
@@ -4348,14 +4343,18 @@ def _coating_from_upstream_deposit_fraction_report(
     from simulator.optimize.objective import _mass_balance_ledger_resolution_kg
 
     resolution_kg = _mass_balance_ledger_resolution_kg(charge_mass_kg)
+    classified_supply = _classify_refused_wall_supply_window(
+        supply_window,
+        resolution_kg,
+    )
+    refused_bounds = classified_supply.upper_bound_kg_per_campaign
+    campaigns_elapsed = supply_window.campaigns_elapsed
     priced_certain_kg, booked_supply_kg = _priced_upstream_deposit_kg(
         certain_deposit_kg,
         certain_records,
         refused_species,
         refused_bounds,
-        refused_run_supply_bounds,
-        resolution_kg,
-        campaigns_elapsed,
+        classified_supply,
     )
     warning_flags: list[dict[str, Any]] = []
     violation_reasons: list[dict[str, Any]] = []
@@ -4678,8 +4677,13 @@ def _coating_fraction_payload(
     verdict: str,
     constraint_authoritative: bool,
 ) -> dict[str, Any]:
+    public_report = {
+        key: value
+        for key, value in report.items()
+        if key != _WALL_SUPPLY_WINDOW_REPORT_KEY
+    }
     payload = {
-        **_plain_value(report),
+        **_plain_value(public_report),
         "coating_constraint_mode": "upstream_deposit_fraction",
         "coating_constraint_authoritative": constraint_authoritative,
         "constraint_mode": "fraction",

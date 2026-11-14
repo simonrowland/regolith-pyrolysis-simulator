@@ -26,12 +26,13 @@ from simulator.optimize.canonical import canonical_json_dumps, normalize_canonic
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
-    _classify_refused_wall_supply_booking_kg,
+    _WALL_SUPPLY_WINDOW_REPORT_KEY,
+    _WallSupplyWindow,
+    _classify_refused_wall_supply_window,
     _coating_wall_quantity_unavailable,
     _coating_wall_refused_species,
     extraction_completeness_report,
     target_species_yield_report,
-    _wall_supply_bounds_per_campaign,
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.cost_energy import (
@@ -1954,6 +1955,7 @@ def _tap_coating_product_summary(
             for snapshot in snapshots
             if _snapshot_hour(snapshot) <= hour
         ),
+        campaigns_elapsed=campaigns_elapsed,
     )
     priced_deposit = booked["deposit"]
     availability = booked["availability_authority"]
@@ -4444,16 +4446,19 @@ def _refused_vapour_supply_kg(
     run_execution: Any,
     refused_species: tuple[str, ...],
     snapshots: Sequence[Any] | None = None,
+    *,
+    campaigns_elapsed: float = 1.0,
 ) -> dict[str, float]:
-    """Integral of each refused species' vapour supply over the run.
+    """Per-campaign view of each refused species' supply integral.
 
     Missing species stay missing. A flux that was not computed is not
     zero. A refused interval is the activity-1 Hertz-Knudsen bound when
-    saturation pressure exists, and the count of those intervals rides
-    on the map. An interval with no flux law and no saturation pressure
-    leaves the species missing: the other hours are not its supply.
-    ``snapshots`` is the integral window. The tap-hour projection passes
-    the hours up to the tap so later vapour cannot raise that bound.
+    saturation pressure exists. The returned mapping is normalized using
+    the campaigns_elapsed for this window; ``.window`` retains its run
+    totals and interval diagnostics. An interval with no flux law and no
+    saturation pressure leaves the species missing: the other hours are
+    not its supply. The tap-hour projection passes the hours up to the tap
+    and that window's elapsed campaigns.
     """
 
     if not refused_species:
@@ -4465,13 +4470,13 @@ def _refused_vapour_supply_kg(
 
     if snapshots is None:
         snapshots = getattr(run_execution, "snapshots", ())
-    # The supply integral stays in kg/run for cutoff classification and
+    # The window record retains kg/run for cutoff classification and
     # booking. The catalog is the run's; the integral does not open the
     # default vapour file.
     return _optimizer_refused_flux_bounds(
         snapshots,
         refused_species,
-        campaigns_elapsed=1.0,
+        campaigns_elapsed=campaigns_elapsed,
         catalog=_execution_vapour_catalog(run_execution),
     )
 
@@ -4781,6 +4786,8 @@ def _book_wall_deposits_at_vapour_supply(
     authority: Mapping[str, Any],
     run_execution: Any,
     snapshots: Sequence[Any] | None = None,
+    *,
+    campaigns_elapsed: float | None = None,
 ) -> dict[str, Any]:
     """Book each refused species at its vapour-supply bound.
 
@@ -4839,10 +4846,16 @@ def _book_wall_deposits_at_vapour_supply(
             "notice_authority": notice_authority,
             "bookings": (),
         }
+    window_campaigns_elapsed = (
+        _campaigns_elapsed(run_execution)
+        if campaigns_elapsed is None
+        else campaigns_elapsed
+    )
     supply_kg = _refused_vapour_supply_kg(
         run_execution,
         refused,
         snapshots,
+        campaigns_elapsed=window_campaigns_elapsed,
     )
     from simulator.optimize.physics import (
         COMPUTED_EXCEEDS_INVENTORY,
@@ -4868,18 +4881,19 @@ def _book_wall_deposits_at_vapour_supply(
         }
 
     resolution_kg = _mass_balance_ledger_resolution_kg(charge_kg)
-    campaigns_elapsed = _campaigns_elapsed(run_execution)
-    normalized_supply_kg = _wall_supply_bounds_per_campaign(
-        supply_kg,
-        campaigns_elapsed,
+    classified_supply = _classify_refused_wall_supply_window(
+        supply_kg.window,
+        resolution_kg,
     )
     notice_authority[
         "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
     ] = {
         species: float(bound)
-        for species, bound in sorted(normalized_supply_kg.items())
+        for species, bound in sorted(
+            classified_supply.upper_bound_kg_per_campaign.items()
+        )
     }
-    raw_counts = getattr(supply_kg, SUPPLY_INTERVAL_UPPER_BOUND_USED, {})
+    raw_counts = supply_kg.window.supply_interval_upper_bound_used
     bound_counts = raw_counts if isinstance(raw_counts, Mapping) else {}
     interval_counts = {
         str(species): int(bound_counts[species])
@@ -4893,14 +4907,14 @@ def _book_wall_deposits_at_vapour_supply(
     }
     if interval_counts:
         notice_authority[SUPPLY_INTERVAL_UPPER_BOUND_USED] = interval_counts
-    raw_capped = getattr(supply_kg, INVENTORY_CAPPED, None)
+    raw_capped = supply_kg.window.inventory_capped
     if isinstance(raw_capped, Mapping) and raw_capped:
         notice_authority[INVENTORY_CAPPED] = {
             str(species): True
             for species in raw_capped
             if species in supply_kg
         }
-    raw_exceeded = getattr(supply_kg, COMPUTED_EXCEEDS_INVENTORY, None)
+    raw_exceeded = supply_kg.window.computed_exceeds_inventory
     if isinstance(raw_exceeded, Mapping) and raw_exceeded:
         notice_authority[COMPUTED_EXCEEDS_INVENTORY] = {
             str(species): True
@@ -4914,14 +4928,11 @@ def _book_wall_deposits_at_vapour_supply(
     for species in refused:
         if species not in supply_kg:
             continue
-        supply = float(supply_kg[species])
+        supply = float(supply_kg.window.run_total_kg[species])
         candidates = _refusal_candidate_segments(notice_authority, species)
-        # Classify once on the run-total basis. Zero means the authorized-
-        # zero branch; the raw supply stays on the normalized notice.
-        booked_kg = _classify_refused_wall_supply_booking_kg(
-            supply,
-            resolution_kg,
-        )
+        # The window classifier compares this run total to ledger resolution
+        # and publishes its same-window per-campaign bound above.
+        booked_kg = classified_supply.booked_run_total_kg[species]
         classified.append((species, supply, candidates, booked_kg))
     for species, _supply, _candidates, booked_kg in classified:
         if booked_kg == 0.0:

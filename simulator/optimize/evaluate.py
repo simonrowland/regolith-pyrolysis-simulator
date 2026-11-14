@@ -119,12 +119,11 @@ from simulator.optimize.physics import (
     ThresholdSpec,
     SUPPLY_INTERVAL_UPPER_BOUND_USED,
     SUPPLY_UNAVAILABLE,
-    _OptimizerCoatingReport,
+    _WALL_SUPPLY_WINDOW_REPORT_KEY,
     _coating_runtime_diagnostics,
     _coating_wall_refused_species,
     _execution_vapour_catalog,
     _optimizer_refused_flux_bounds,
-    _wall_supply_bounds_per_campaign,
     physics_constraints_digest,
 )
 from simulator.optimize.profiles import (
@@ -1861,15 +1860,11 @@ def _trace_with_optimizer_coating_report(
         if isinstance(nested_authority, MappingABC):
             refusal_sources.append(nested_authority)
     refused_species = _coating_wall_refused_species(*refusal_sources)
-    refused_flux_run_bounds = _optimizer_refused_flux_bounds(
+    refused_flux_integral = _optimizer_refused_flux_bounds(
         getattr(run_execution, "snapshots", ()),
         refused_species,
-        campaigns_elapsed=1.0,
+        campaigns_elapsed=campaigns_elapsed,
         catalog=_execution_vapour_catalog(run_execution),
-    )
-    refused_flux_bounds = _wall_supply_bounds_per_campaign(
-        refused_flux_run_bounds,
-        campaigns_elapsed,
     )
     from simulator.runner import _wall_fouling_report
 
@@ -1968,17 +1963,19 @@ def _trace_with_optimizer_coating_report(
             ),
         )
     if refused_species:
-        # The kilogram map is a plain dict. The interval count is an
-        # attribute of the integral, so it has to be stored beside the map
-        # or a JSON copy of the dict drops it.
+        if charge_mass_kg is not None:
+            # This typed basis survives report dict merges, unlike loose
+            # attributes on a dict subclass. The gate reclassifies its run
+            # totals against product booking's ledger resolution.
+            report[_WALL_SUPPLY_WINDOW_REPORT_KEY] = refused_flux_integral.window
         report[
             "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
         ] = {
             str(species): float(kg)
-            for species, kg in refused_flux_bounds.items()
+            for species, kg in refused_flux_integral.items()
         }
         bound_counts = getattr(
-            refused_flux_bounds,
+            refused_flux_integral,
             SUPPLY_INTERVAL_UPPER_BOUND_USED,
             None,
         )
@@ -1987,14 +1984,14 @@ def _trace_with_optimizer_coating_report(
                 str(species): int(count)
                 for species, count in bound_counts.items()
             }
-        capped = getattr(refused_flux_bounds, INVENTORY_CAPPED, None)
+        capped = getattr(refused_flux_integral, INVENTORY_CAPPED, None)
         if capped:
             report[INVENTORY_CAPPED] = {
                 str(species): True
                 for species in capped
             }
         exceeded = getattr(
-            refused_flux_bounds,
+            refused_flux_integral,
             COMPUTED_EXCEEDS_INVENTORY,
             None,
         )
@@ -2003,7 +2000,7 @@ def _trace_with_optimizer_coating_report(
                 str(species): True
                 for species in exceeded
             }
-        unavailable = getattr(refused_flux_bounds, SUPPLY_UNAVAILABLE, None)
+        unavailable = getattr(refused_flux_integral, SUPPLY_UNAVAILABLE, None)
         if isinstance(unavailable, MappingABC) and unavailable:
             report[SUPPLY_UNAVAILABLE] = {
                 str(species): list(reasons)
@@ -2034,11 +2031,6 @@ def _trace_with_optimizer_coating_report(
             status="warning",
             verdict="non-authoritative",
         )
-    report = _OptimizerCoatingReport(
-        report,
-        run_supply_totals_kg=refused_flux_run_bounds,
-        campaigns_elapsed=campaigns_elapsed,
-    )
     return _TraceAttributeOverlay(trace, {"wall_fouling_report": report})
 
 

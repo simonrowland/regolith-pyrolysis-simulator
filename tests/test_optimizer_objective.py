@@ -9,6 +9,7 @@ from typing import Mapping
 
 import pytest
 
+import simulator.optimize.evaluate as evaluate_module
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
 from simulator.optimize import study
@@ -41,9 +42,11 @@ import simulator.optimize.physics as physics_module
 from simulator.optimize.evaluate import (
     RunReference,
     ScoredResult,
+    evaluate,
     _run_reference,
     _trace_with_optimizer_coating_report,
 )
+from simulator.optimize.evalspec import EvalSpec
 from simulator.optimize.physics import (
     COMPUTED_EXCEEDS_INVENTORY,
     INVENTORY_CAPPED,
@@ -79,6 +82,7 @@ from simulator.optimize.objective import (
     target_spec_digest,
     _metric_value,
 )
+from simulator.recipe import RecipePatch
 from simulator.optimize.sso2_evidence import (
     SSO2_CERTIFIED_PN2_MBAR,
     SSO2_CERTIFIED_PO2_MBAR,
@@ -2129,16 +2133,11 @@ def test_product_booking_and_coating_gate_share_run_total_zero_classification() 
     assert report[
         "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
     ]["SiO"] == pytest.approx(3.75e-11)
-    assert report.wall_supply_run_totals_kg == {"SiO": 7.5e-11}
-    assert report.wall_supply_campaigns_elapsed == 2.0
-    gate = physics_module._coating_from_upstream_deposit_fraction_report(
-        report=report,
-        authority={},
-        diagnostics={},
-        deposit_records=[],
-        output_status=str(report.get("output_status") or "status_bearing"),
-        status_reason=str(report.get("status_reason") or ""),
-    )
+    window = report[physics_module._WALL_SUPPLY_WINDOW_REPORT_KEY]
+    assert window.run_total_kg == {"SiO": 7.5e-11}
+    assert window.campaigns_elapsed == 2.0
+    # Exercise the public gate entry: its diagnostic merge copies the report.
+    gate = physics_module.PhysicsConstraintSet().coating(overlay)
     gate_deposit_per_campaign = (
         float(gate.status_payload["upstream_wall_deposit_upper_bound_kg_per_campaign"])
     )
@@ -2146,6 +2145,195 @@ def test_product_booking_and_coating_gate_share_run_total_zero_classification() 
     assert gate_deposit_per_campaign * 2.0 == pytest.approx(
         product_booking["deposit_kg"]
     )
+
+
+@pytest.mark.parametrize(
+    "publication_path",
+    ("terminal_summary", "tap_hour_summary", "production_gate", "evaluate_report"),
+)
+@pytest.mark.parametrize(
+    (
+        "window_name",
+        "campaigns_elapsed",
+        "rates_kg_hr",
+        "terminal_expected_kg_per_campaign",
+        "tap_expected_kg_per_campaign",
+    ),
+    (
+        ("24/35 campaign", 24.0 / 35.0, (1.0,), 1.4583333333333333, 1.4583333333333333),
+        ("one campaign", 1.0, (1.0,), 1.0, 1.0),
+        ("two campaigns", 2.0, (1.0,), 0.5, 0.5),
+        ("tap after one of two campaigns", 2.0, (1.0, 10.0), 5.5, 1.0),
+    ),
+)
+def test_publication_paths_use_their_own_wall_supply_window(
+    monkeypatch: pytest.MonkeyPatch,
+    publication_path: str,
+    window_name: str,
+    campaigns_elapsed: float,
+    rates_kg_hr: tuple[float, ...],
+    terminal_expected_kg_per_campaign: float,
+    tap_expected_kg_per_campaign: float,
+) -> None:
+    """Every published per-campaign bound uses its integral window.
+
+    For 1 kg/run, 1 / (24/35) = 1.4583333333333333, 1 / 1 = 1,
+    and 1 / 2 = 0.5 kg/campaign. In the two-campaign tap case, the
+    terminal integral is (1 + 10) / 2 = 5.5, while the tap integral is
+    1 / 1 = 1 kg/campaign.
+    """
+
+    flux_snapshots = tuple(
+        {
+            "hour": index,
+            "duration_h": 1.0,
+            "flux": (),
+            "published_flux": (("SiO", rate),),
+        }
+        for index, rate in enumerate(rates_kg_hr, start=1)
+    )
+    deposit = (("other_wall", "Mg"), 20.0)
+    execution, _snapshots, _deposit = _wall_bound_execution({
+        "deposit": (deposit,),
+        "flux": (),
+        "flux_snapshots": flux_snapshots,
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+    })
+    execution.campaigns_elapsed = campaigns_elapsed
+    expected = (
+        tap_expected_kg_per_campaign
+        if publication_path == "tap_hour_summary"
+        else terminal_expected_kg_per_campaign
+    )
+
+    if publication_path == "terminal_summary":
+        published = objective_module.product_summary(execution, {})
+    elif publication_path == "tap_hour_summary":
+        tap_snapshots = tuple(
+            _tap_snapshot(
+                index,
+                {"SiO2": 50.0, "CaO": 50.0},
+            )
+            for index in range(1, len(rates_kg_hr) + 1)
+        )
+        for snapshot, rate in zip(tap_snapshots, rates_kg_hr, strict=True):
+            snapshot.duration_h = 1.0
+            # The synthetic flux's parent stays nonbinding across both hours.
+            snapshot.inventory.melt_oxide_kg = {"_measured_SiO": 1.0e6}
+            snapshot.evap_flux = _wall_bound_evap_flux({
+                "flux": (),
+                "published_flux": (("SiO", rate),),
+            })
+        execution = _tap_run(tap_snapshots, configured_hours=len(tap_snapshots))
+        execution.campaigns_elapsed = campaigns_elapsed
+        execution.trace.wall_deposit_by_segment_species_kg = {}
+        execution.trace.wall_zone_by_segment = {"hot_wall": "Hot"}
+        execution.trace.wall_deposit_sticking_authority = {
+            "wall_saturation_pressure_refusals_by_species": {
+                "SiO": {
+                    "hot_wall": {
+                        "status": "refused",
+                        "output_status": "status_bearing",
+                        "reason": "test wall saturation pressure refusal",
+                    }
+                }
+            }
+        }
+        profile = _composition_score_profile(
+            "residual_rump_at_stop",
+            oxides={
+                "SiO2": {"min": 49.0, "max": 51.0, "weight": 1.0},
+                "CaO": {"min": 49.0, "max": 51.0, "weight": 1.0},
+            },
+            maturity={"best_tap": {"enabled": True, "tap_grid": [1]}},
+        )
+        _set_profile_hours(profile, len(tap_snapshots))
+        evidence = compute_objectives(profile, execution).evidence[
+            "composition_target:pool-test"
+        ]["composition_target"]
+        published = evidence["tap_coating_product_summary"]
+    else:
+        if publication_path == "evaluate_report":
+            spec = EvalSpec(
+                recipe_id="window-test",
+                feedstock_recipe_digest="window-test",
+                feedstock_id="lunar_mare_low_ti",
+                profile_id="window-test",
+                fidelity="internal-analytical",
+                code_version="window-test",
+                data_digests={},
+            )
+            constraints = physics_module.PhysicsConstraintSet(
+                active_gates=("coating",),
+            )
+            run_config = SimpleNamespace(
+                backend_name=spec.backend_name,
+                feedstock_id=spec.feedstock_id,
+                feedstocks={},
+            )
+            monkeypatch.setattr(
+                evaluate_module,
+                "_build_eval_inputs_for_candidate",
+                lambda *_args, **_kwargs: (constraints, spec, run_config),
+            )
+            monkeypatch.setattr(
+                evaluate_module,
+                "real_backend_feedstock_domain_reason",
+                lambda *_args, **_kwargs: None,
+            )
+            monkeypatch.setattr(
+                evaluate_module,
+                "_abort_on_mass_balance_breach",
+                lambda *_args, **_kwargs: None,
+            )
+            monkeypatch.setattr(
+                evaluate_module,
+                "_compute_objective_vector",
+                lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                    ObjectiveComputationError("synthetic gate-only evaluation")
+                ),
+            )
+
+            class StaticExecutor:
+                def execute(self, _config, *, worker_runtime=None):
+                    return execution
+
+            execution.backend_status = "ok"
+            execution.backend_authoritative = True
+            execution.status = "ok"
+            result = evaluate(
+                RecipePatch({}),
+                "lunar_mare_low_ti",
+                "internal-analytical",
+                profile={},
+                candidate_id="window-test",
+                executor=StaticExecutor(),
+                constraints=constraints,
+                worker_runtime=object(),
+            )
+            published = result.feasibility_margins["coating"].status_payload
+        else:
+            overlay = _trace_with_optimizer_coating_report(execution, None)
+            gate = physics_module.PhysicsConstraintSet().coating(overlay)
+            published = gate.status_payload
+
+    bound_map = published.get(
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    )
+    if bound_map is None:
+        authority = published.get("wall_deposit_sticking_authority", {})
+        assert isinstance(authority, Mapping)
+        bound_map = authority.get(
+            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign",
+            {},
+        )
+    bound = bound_map["SiO"]
+    assert bound == pytest.approx(expected)
+    if window_name == "tap after one of two campaigns":
+        # This pins sol's case: the tap has 1 kg of supply over 1 campaign,
+        # even though the terminal run spans 2 campaigns.
+        assert bound == pytest.approx(1.0 if publication_path == "tap_hour_summary" else 5.5)
 
 
 def _wall_bound_refused_names(authority: Mapping[str, object]) -> set[str]:
@@ -9992,7 +10180,7 @@ def test_booked_refusal_keeps_furnace_price_when_coating_margin_rate_is_null(
 def test_tap_supply_bound_stops_at_the_tap_hour() -> None:
     """Later vapour is outside the tap-hour integral and does not raise it."""
 
-    early_flux = SimpleNamespace(species_kg_hr={"SiO": 0.25})
+    early_flux = SimpleNamespace(species_kg_hr={"SiO": 1.0})
     later_flux = SimpleNamespace(species_kg_hr={"SiO": 10.0})
     _stamp_flux_measured_rates(early_flux)
     _stamp_flux_measured_rates(later_flux)
@@ -10010,11 +10198,12 @@ def test_tap_supply_bound_stops_at_the_tap_hour() -> None:
     )
     execution, _snapshots, _deposit = _wall_bound_execution({
         "deposit": ((("cold_wall", "SiO"), 0.1),),
-        "flux": (("SiO", 0.25),),
+        "flux": (("SiO", 1.0),),
         "refused": (("SiO", "hot_wall"),),
         "charge": 1000.0,
     })
     execution.snapshots = (early, later)
+    execution.campaigns_elapsed = 2.0
     execution.trace.wall_deposit_by_segment_species_kg = {
         ("cold_wall", "SiO"): 0.1,
     }
@@ -10027,10 +10216,20 @@ def test_tap_supply_bound_stops_at_the_tap_hour() -> None:
 
     assert terminal["wall_deposit_kg_by_segment_species"]["hot_wall"][
         "SiO"
-    ] == pytest.approx(10.25)
+    ] == pytest.approx(11.0)
     assert tapped["wall_deposit_kg_by_segment_species"]["hot_wall"][
         "SiO"
-    ] == pytest.approx(0.25)
+    ] == pytest.approx(1.0)
+    # Terminal supply is 11 kg / 2 campaigns = 5.5 kg/campaign.
+    # The tap window is 1 kg / 1 elapsed campaign = 1 kg/campaign.
+    terminal_bounds = terminal["wall_deposit_sticking_authority"][
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    ]
+    tap_bounds = tapped["wall_deposit_sticking_authority"][
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    ]
+    assert terminal_bounds["SiO"] == pytest.approx(5.5)
+    assert tap_bounds["SiO"] == pytest.approx(1.0)
     assert "SiO" not in terminal["wall_deposit_kg_by_segment_species"].get(
         "cold_wall",
         {},
