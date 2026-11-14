@@ -122,6 +122,16 @@ _PAREN_GROUP_RE = re.compile(r"\(([A-Za-z0-9]+)\)(\d*)")
 _CANONICAL_DOI_SOURCE_RE = re.compile(r"doi:10\.\d{4,9}/[^\s]+")
 
 
+def _canonical_doi_source(source: str | None) -> str | None:
+    if (
+        not isinstance(source, str)
+        or source != source.lower()
+        or _CANONICAL_DOI_SOURCE_RE.fullmatch(source) is None
+    ):
+        return None
+    return source
+
+
 @dataclass(frozen=True)
 class ValidationIssue:
     path: str
@@ -2233,6 +2243,12 @@ def _resolve_coefficient_sources(
             )
         elif src in indexes.table_ids:
             nested = Ancestry.of({src})
+        elif _canonical_doi_source(src) is not None:
+            # A declared DOI is a stable external source identity. Resolve it
+            # as that root even when a registered work has incomplete member
+            # extracts; completeness of the source ID does not depend on every
+            # observation in that work having a complete derivation graph.
+            nested = Ancestry.of({src})
         else:
             work = indexes.work_by_alias.get(src)
             if work is not None:
@@ -2244,11 +2260,6 @@ def _resolve_coefficient_sources(
                     indexes.asset_ids,
                     _indexes=indexes,
                 )
-            elif _CANONICAL_DOI_SOURCE_RE.fullmatch(src) and src == src.lower():
-                # A declared pack DOI may have no Work row in this corpus. Keeping
-                # that stable external root complete prevents a known source from
-                # making the whole pack lineage incomplete or falsely independent.
-                nested = Ancestry.of({src})
             else:
                 result = Ancestry.incomplete(AncestryFailure.UNKNOWN_ALIAS)
                 indexes.coefficient_source_lineages[source_key] = result

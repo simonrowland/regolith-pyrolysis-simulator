@@ -12452,6 +12452,8 @@ def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
 
 
 def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
+    from importlib.resources import as_file, files
+
     from simulator.battery.score import (
         COEFFICIENT_SOURCE_STORE_IDS,
         ENGINE_COEFFICIENT_SOURCES,
@@ -12480,25 +12482,39 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
         d066_source
     )
     openimcc = pytest.importorskip("openimcc")
-    packaged_default = openimcc.load_datapack()
-    packaged_default_sources = openimcc_pack_coefficient_sources(
-        packaged_default.version, packaged_default.binding_digest
+    pack_resources = files(openimcc).joinpath("data", "packs")
+    manifest = json.loads(
+        pack_resources.joinpath("MANIFEST.json").read_text(encoding="utf-8")
     )
-    assert packaged_default_sources
-    declared_source_refs = {
-        source_ref
-        for row_sources in packaged_default._row_source_refs.values()
-        for source_ref in row_sources
-    }
-    assert packaged_default_sources == tuple(
-        f"openimcc-source-ref:{source_ref}"
-        for source_ref in sorted(declared_source_refs)
+    default_melt_file = manifest["DEFAULT-COMBINATION"]["melt"]["file"]
+    packaged_default_files = tuple(
+        entry["file"]
+        for entry in manifest["packs"]
+        if entry.get("kind") == "melt" and entry.get("role") == "default"
     )
-    assert all(
-        source in COEFFICIENT_SOURCE_STORE_IDS
-        for source in packaged_default_sources
-    )
-    assert lineage_complete_for(packaged_default_sources) is True
+    assert packaged_default_files
+    assert default_melt_file in packaged_default_files
+    for default_file in packaged_default_files:
+        with as_file(pack_resources.joinpath(default_file)) as pack_path:
+            packaged_default = openimcc.load_datapack(pack_path)
+        packaged_default_sources = openimcc_pack_coefficient_sources(
+            packaged_default.version, packaged_default.binding_digest
+        )
+        assert packaged_default_sources
+        declared_source_refs = {
+            source_ref
+            for row_sources in packaged_default._row_source_refs.values()
+            for source_ref in row_sources
+        }
+        assert packaged_default_sources == tuple(
+            f"openimcc-source-ref:{source_ref}"
+            for source_ref in sorted(declared_source_refs)
+        )
+        assert all(
+            source in COEFFICIENT_SOURCE_STORE_IDS
+            for source in packaged_default_sources
+        )
+        assert lineage_complete_for(packaged_default_sources) is True
 
 
 def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contexts() -> None:

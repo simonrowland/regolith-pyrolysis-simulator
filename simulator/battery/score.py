@@ -297,6 +297,7 @@ from simulator.battery.validate import (
     ValidationIssue,
     _BOUND_WORK_INPUTS,
     _asset_ids,
+    _canonical_doi_source,
     _observation_lineage,
     observation_issue_location,
     _pressure_blocking_notices,
@@ -5392,6 +5393,32 @@ def resolve_source_relation(
     )
 
 
+def _reference_lineage_with_work_doi(
+    reference: Observation, indexes: _ValidationIndexes
+) -> Ancestry:
+    lineage = _observation_lineage(
+        reference.observation_id,
+        indexes.observations,
+        indexes.table_ids,
+        asset_ids=indexes.asset_ids,
+        _cache=indexes.observation_lineages,
+    )
+    if not lineage.complete or lineage.ids is None:
+        return lineage
+    if indexes.works is None or indexes.experiments is None:
+        return lineage
+    experiment = indexes.experiments.get(reference.experiment_id)
+    work = None if experiment is None else indexes.works.get(experiment.work_id)
+    doi_source = (
+        None
+        if work is None or not work.doi
+        else _canonical_doi_source(f"doi:{work.doi}".lower())
+    )
+    if doi_source is None:
+        return lineage
+    return Ancestry.of(set(lineage.ids) | {doi_source})
+
+
 def _resolve_source_relation_with_indexes(
     reference: Observation,
     coefficient_sources: Sequence[str],
@@ -5407,13 +5434,7 @@ def _resolve_source_relation_with_indexes(
     indexes = _indexes
     if indexes is None or not indexes.matches(works, observations, experiments):
         indexes = _build_validation_indexes(works, observations, experiments)
-    reference_lineage = _observation_lineage(
-        reference.observation_id,
-        observations,
-        indexes.table_ids,
-        asset_ids=indexes.asset_ids,
-        _cache=indexes.observation_lineages,
-    )
+    reference_lineage = _reference_lineage_with_work_doi(reference, indexes)
     candidate_complete, candidate_lineage = _candidate_lineage_for_sources(
         coefficient_sources,
         works=works,
@@ -5486,12 +5507,8 @@ class _ScoringLineageResolver:
             reference.observation_id
         )
         if reference_lineage is None:
-            reference_lineage = _observation_lineage(
-                reference.observation_id,
-                self.context.observations,
-                self.indexes.table_ids,
-                asset_ids=self.indexes.asset_ids,
-                _cache=self.indexes.observation_lineages,
+            reference_lineage = _reference_lineage_with_work_doi(
+                reference, self.indexes
             )
 
         if (
