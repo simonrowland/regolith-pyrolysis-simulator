@@ -10,6 +10,7 @@ import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
+from decimal import Decimal
 from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any
@@ -3496,6 +3497,9 @@ def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapp
     definition = value.get("definition")
     quote = value.get("quote")
     page = value.get("page")
+    # The generic point-condition migrator preserves numeric metadata as Decimal.
+    if isinstance(page, Decimal) and page.is_finite() and page == page.to_integral_value():
+        page = int(page)
     if (
         definition not in {"concentration_retention", "mass_retention"}
         or not isinstance(quote, str)
@@ -3508,7 +3512,10 @@ def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapp
             "fo_definition_unprinted",
             "fm_definition needs a named definition, printed quote, and page",
         )
-    if definition == "concentration_retention" and value.get("concentration_basis") not in _FM_CONCENTRATION_BASES:
+    if (
+        definition == "concentration_retention"
+        and value.get("concentration_basis") not in _FM_CONCENTRATION_BASES
+    ):
         raise ResidueInventoryRefusal(
             "fm_concentration_basis_unprinted_or_unknown",
             "fm_definition needs a printed concentration_basis",
@@ -3564,7 +3571,10 @@ def _element_retention_ratio_from_inventories(
 ) -> float:
     if definition not in {"concentration_retention", "mass_retention"}:
         raise ResidueInventoryRefusal("fo_definition_unprinted")
-    if definition == "concentration_retention" and concentration_basis not in _FM_CONCENTRATION_BASES:
+    if (
+        definition == "concentration_retention"
+        and concentration_basis not in _FM_CONCENTRATION_BASES
+    ):
         raise ResidueInventoryRefusal("fm_concentration_basis_unprinted_or_unknown")
     if not any(
         float(amount) > 0.0 and _formula_terms(formula)[0].get(element, 0.0) > 0.0

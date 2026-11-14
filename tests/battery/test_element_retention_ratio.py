@@ -57,7 +57,6 @@ def test_inventory_retention_uses_the_declared_printed_definition() -> None:
     ) == pytest.approx(1.2190530023044481)
 
 
-
 def test_norris_single_cation_mole_basis_differs_from_mass_basis() -> None:
     retention = residue._element_retention_ratio_from_inventories
     assert retention(
@@ -94,6 +93,21 @@ def test_unprinted_or_unknown_concentration_basis_refuses(basis) -> None:
             concentration_basis=basis,
         )
     assert exc.value.reason == "fm_concentration_basis_unprinted_or_unknown"
+
+
+
+def test_printed_fm_definition_resolves_migrated_numeric_page() -> None:
+    from decimal import Decimal
+    from simulator.battery.records import Located, Locator, State
+
+    record = {
+        "definition": "concentration_retention",
+        "concentration_basis": "mole_fraction_single_cation_oxide",
+        "quote": "final divided by initial", "page": Decimal("201"),
+    }
+    assert residue._printed_fm_definition(
+        Located(State.of(record), locator=Locator(page=231))
+    ) == ("concentration_retention", record)
 
 
 def test_unprinted_fm_definition_is_a_typed_refusal() -> None:
