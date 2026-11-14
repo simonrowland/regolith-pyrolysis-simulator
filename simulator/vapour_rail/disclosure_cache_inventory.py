@@ -1325,4 +1325,3 @@ def unclassified_controller_cache_lines(
         ) is None:
             missing.append(f"{path}:{_lineno}:{text.strip()}")
     return missing
-
