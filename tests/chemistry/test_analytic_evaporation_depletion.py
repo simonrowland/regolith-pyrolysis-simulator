@@ -308,9 +308,13 @@ def test_subhour_oxygen_consumers_retain_abundant_reactant_rates_and_close_atoms
         )
         assert transition is not None
     oxygen_after = sim.atom_ledger.kg_by_account("process.overhead_gas")["O2"]
+    # Ledger kg -> mol -> kg projections and the subtraction round at the
+    # inventory scale. Bound those operations in ulps, not yield-relative
+    # tolerance (the oxygen draw is intentionally tiny in this limit).
     assert oxygen_before - oxygen_after == pytest.approx(
         sum(actual.species_kg_hr[s] * abs(row["O2_per_product_kg"]) * dt
-            for s, row in stoich.items()), rel=1e-8,
+            for s, row in stoich.items()), rel=0,
+        abs=16 * len(stoich) * math.ulp(oxygen_before),
     )
     assert sim.atom_ledger.assert_balanced()
 
