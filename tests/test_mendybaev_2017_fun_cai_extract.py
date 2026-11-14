@@ -12,6 +12,12 @@ from simulator.battery.migrate import Migrator
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/mendybaev-2017-fun-cai-lab-evaporation.yaml"
 OXIDES = {"MgO", "Al2O3", "SiO2", "CaO"}
+FUNC_STARTING_COMPOSITION = {
+    "MgO": Decimal("37.9"),
+    "Al2O3": Decimal("11.6"),
+    "SiO2": Decimal("42.9"),
+    "CaO": Decimal("7.6"),
+}
 
 
 def _migrate(path: Path = EXTRACT) -> Migrator:
@@ -71,12 +77,41 @@ def test_table_1_residues_migrate_with_run_charge_clock_and_conditions() -> None
         run = row.locator.note.partition(";")[0].removeprefix("row=")
         assert row.experiment_id.endswith(f"::experiment::{run.casefold()}")
         assert row.identity.sample_mass_kg.is_value
-        assert row.point_conditions["starting_composition"].state.is_value
+        starting = row.point_conditions["starting_composition"]
+        assert starting.state.is_value
+        assert {
+            oxide: Decimal(str(value))
+            for oxide, value in starting.state.value.items()
+        } == FUNC_STARTING_COMPOSITION
         elapsed = row.point_conditions["time_min"]
         assert elapsed.state.is_value
         assert elapsed.locator is not None
+        assert elapsed.locator.pdf_page_index == 39
+        assert elapsed.locator.table == "1"
         assert row.locator.pdf_page_index == 39
         assert row.locator.table == "1"
+
+    scheduled_experiments = [
+        experiment
+        for experiment in migrator.result.experiments.values()
+        if experiment.thermal_schedule is not None
+    ]
+    assert len(scheduled_experiments) == 9
+    for experiment in scheduled_experiments:
+        schedule = experiment.thermal_schedule
+        assert schedule.method is not None
+        method_locator = schedule.method.locator
+        assert method_locator is not None
+        assert method_locator.section == "3.1"
+        assert method_locator.pdf_page_index == 8
+        assert method_locator.line_range == "166-173"
+        assert schedule.total_duration_s is not None
+        assert schedule.total_duration_s.state.is_unknown
+        assert schedule.total_duration_s.state.reason == "not_published"
+        duration_locator = schedule.total_duration_s.locator
+        assert duration_locator is not None
+        assert duration_locator.section == "3.1"
+        assert duration_locator.pdf_page_index == 8
 
 
 def test_table_1_cell_value_and_sigma_mutations_reach_migrated_rows(tmp_path: Path) -> None:
