@@ -9,6 +9,7 @@ import pytest
 from simulator.config import load_config_bundle
 from simulator.cost_ledger import run_pumping_input_cost
 from simulator.environment import MARS_DATUM_PRESSURE_BAR, MARS_OLYMPUS_PRESSURE_BAR
+from simulator.state import HourSnapshot, OverheadGas
 from simulator.pumping_cost import (
     ASTEROID_AMBIENT_PA,
     MARS_DATUM_AMBIENT_PA,
@@ -589,6 +590,55 @@ def test_pumping_context_forwards_only_explicit_validated_line_conductance():
     assert diagnostic["status"] == "ok"
     assert diagnostic["feasible"] is True
     assert diagnostic["pumping_electrical_kWh"] > 0.0
+
+
+@pytest.mark.parametrize("conductance", [1000.0, None])
+def test_quarter_hour_pumping_snapshots_charge_one_hour(conductance):
+    sim = SimpleNamespace(
+        record=SimpleNamespace(feedstock_key="mars_global_mgs1"),
+        melt=SimpleNamespace(body="", ambient_pressure_mbar=0.0),
+    )
+
+    def snapshot(hour, duration):
+        overhead = OverheadGas(pressure_mbar=1.0, headspace_temperature_K=300.0)
+        if conductance is not None:
+            overhead.validated_line_conductance_m3_s = conductance
+        return HourSnapshot(
+            hour=hour, duration_h=duration, temperature_C=300.0,
+            overhead=overhead, O2_vented_mol_hr=2.0,
+        )
+
+    full_context = pumping_context_from_sim(sim, [snapshot(1, 1.0)])
+    quarter_context = pumping_context_from_sim(
+        sim, [snapshot(i / 4, 0.25) for i in range(1, 5)],
+    )
+    assert [row["duration_s"] for row in quarter_context["rows"]] == [900.0] * 4
+    full_cost, full = run_pumping_input_cost(full_context)
+    quarter_cost, quarter = run_pumping_input_cost(quarter_context)
+    assert full_cost is not None and quarter_cost is not None
+    assert quarter_cost.electrical_kWh == pytest.approx(
+        full_cost.electrical_kWh, rel=0, abs=4 * math.ulp(full_cost.electrical_kWh),
+    )
+    assert quarter["status"] == full["status"]
+    assert quarter["feasible"] is full["feasible"]
+    if conductance is None:
+        assert all(row["status"] == "missing-validated-line-conductance"
+                   for row in quarter["rows"])
+
+
+@pytest.mark.parametrize("duration", [None, -0.25, float("nan"), float("inf"), True])
+def test_pumping_context_refuses_unknown_or_invalid_step_duration(duration):
+    context = pumping_context_from_sim(
+        SimpleNamespace(melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1)),
+        [HourSnapshot(
+            duration_h=duration, O2_vented_mol_hr=2.0,
+            overhead=OverheadGas(pressure_mbar=1.0, headspace_temperature_K=300.0),
+        )],
+    )
+    assert context["status"] == "refused"
+    assert context["reason"] == (
+        "missing-step-duration" if duration is None else "invalid-step-duration"
+    )
 
 
 # --- b-259: a missing offgas rate is not a proven zero -----------------------
