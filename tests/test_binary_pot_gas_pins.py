@@ -607,7 +607,7 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
         assert _hx_tree(balance["dominant_O_carriers"]) == expected["O"]
         assert _hx_tree(balance["dominant_metal_carriers"]) == expected["metal"]
         assert float(solved["pO2_bar"]).hex() == expected["pO2"]
-        assert diagnostics["authority"] is None
+        assert diagnostics["authority"] == "extrapolated"
         assert diagnostics["openimcc_provenance"] == gas_provenance
         assert gas["domain_flags"] == _DOMAIN_FLAGS[(pot_id, temperature_K)]
         assert gas["provenance_class"] == _PROVENANCE_CLASSES
