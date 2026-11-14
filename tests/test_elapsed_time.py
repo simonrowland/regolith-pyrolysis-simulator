@@ -84,6 +84,7 @@ def _endpoint(session):
         sim.O2_stored_cumulative_kg,
         sim.energy_tracker.cumulative_breakdown(),
         dict(getattr(sim, "_alpha_authority_status_by_species_engaged", {})),
+        sim.condensation_model.last_sticking_alpha_provenance_notice,
     )
 
 

@@ -266,7 +266,9 @@ class RunExecutor:
     ) -> RunExecution:
         sim = session.simulator
         condensation_model = getattr(sim, "_condensation_model", None)
-        if condensation_model is not None:
+        if condensation_model is not None and not getattr(
+            getattr(sim, "record", None), "snapshots", ()
+        ):
             condensation_model.reset_run_sticking_authority()
         per_hour: list[dict[str, Any]] = []
         operator_decisions: list[dict[str, Any]] = []
