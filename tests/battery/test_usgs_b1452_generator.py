@@ -742,6 +742,58 @@ def test_oxide_asterisk_is_basis_not_damage() -> None:
     assert refused_star == []
 
 
+def test_mullite_oxide_caption_keeps_all_formation_rows_typed_refused() -> None:
+    record_id = "robie-hemingway-fisher-1978-usgs-b1452-0320"
+    record = _load(record_id)
+    caption = generator._header_text(record).upper()
+    assert "OXIDE" in caption
+    assert generator._formation_basis_for_record(record) == "from_the_oxides"
+
+    generated = _generation(record_id)
+    mullite_rows = [
+        row
+        for row in generated.observations
+        if row.identity.species.formula == "3Al2O3.2SiO2"
+        and any(
+            f":{quantity.value}:" in row.observation_id
+            for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
+        )
+    ]
+    assert len(mullite_rows) == 48
+    assert {row.identity.quantity.reason for row in mullite_rows} == {
+        "No quantity token represents formation from simple oxides; "
+        f"{quantity.value} denotes formation from the elements."
+        for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
+    }
+    assert all(row.identity.quantity.is_unknown for row in mullite_rows)
+    assert all(
+        row.identity.reaction is not None and row.identity.reaction.is_value
+        for row in mullite_rows
+    )
+    assert all(
+        "formation_basis=from_the_oxides" in (row.locator.note or "")
+        for row in mullite_rows
+    )
+
+    example = next(
+        row
+        for row in mullite_rows
+        if quantity_token(row.identity) is None
+        and row.value.point == Decimal("6.669")
+        and row.identity.temperature_K is not None
+        and row.identity.temperature_K.is_value
+        and str(row.identity.temperature_K.value) == "1000"
+    )
+    assert tuple(
+        (term.species.formula, term.coefficient)
+        for term in example.identity.reaction.value.terms
+    ) == (
+        ("3Al2O3.2SiO2", Decimal("1")),
+        ("Al2O3", Decimal("-3")),
+        ("SiO2", Decimal("-2")),
+    )
+
+
 def test_b1452_element_reference_follows_the_janaf_state_at_temperature() -> None:
     """Every non-diatomic element is stamped crystal plus Polymorph.REFERENCE."""
 

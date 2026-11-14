@@ -20,11 +20,11 @@ from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from typing import Mapping
 
 import pytest
 import yaml
 
+from simulator.accounting.formulas import parse_formula
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -3375,11 +3375,12 @@ def test_species_formula_parser_preserves_200_existing_parses() -> None:
     )
     rows = json.loads(fixture.read_text(encoding="utf-8"))
     assert len(rows) == 200
+    # ZnSO4.6H2O -> Zn 1, S 1, H 6×2 = 12, O 4 + 6×1 = 10.
     for row in rows:
         expected = tuple(
             (str(symbol), float(count)) for symbol, count in row["elements"]
         )
-        assert parse_species_formula(row["formula"]) == expected
+        assert parse_species_formula(row["formula"]) == expected, row["formula"]
 
 
 def test_species_formula_parser_accepts_published_typography() -> None:
@@ -3390,15 +3391,93 @@ def test_species_formula_parser_accepts_published_typography() -> None:
     ) == (("Cl", 1.0), ("H", 1.0))
 
 
-def test_species_formula_parser_refuses_normalized_ascii_dot_adducts() -> None:
-    for formula in ("Al₂O₃.3H₂O", "$Al_2O_3.3H_2O$", "CoSO₄.7H₂O"):
-        assert parse_species_formula(formula) is None
+def test_species_formula_parser_accepts_normalized_ascii_dot_adducts() -> None:
+    for formula, canonical in (
+        ("Al₂O₃.3H₂O", "Al2O3.3H2O"),
+        ("$Al_2O_3.3H_2O$", "Al2O3.3H2O"),
+        ("CoSO₄.7H₂O", "CoSO4.7H2O"),
+    ):
+        assert parse_species_formula(formula) == tuple(
+            sorted(parse_formula(canonical).elements.items())
+        )
 
-    for formula in ("Fe0.947O", "Al2O3.3H2O"):
-        assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    # Al2O3.3H2O -> Al 2, H 3×2 = 6, O 3 + 3×1 = 6.
+    assert parse_species_formula("Al2O3.3H2O") == (
+        ("Al", 2.0),
+        ("H", 6.0),
+        ("O", 6.0),
+    ), "Al2O3.3H2O"
+    formula = "Fe0.947O"
+    assert parse_species_formula(formula) == (
+        score_mod.formula_composition(formula)
+        or tuple(sorted(parse_formula(formula).elements.items()))
+    ), formula
     assert parse_species_formula(
         "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
     ) == score_mod.formula_composition("Fe0.947O")
+
+
+def test_species_formula_parser_accepts_fractional_endmember_subscripts() -> None:
+    for formula, canonical in (
+        ("NbC.98", "NbC0.98"),
+        ("MoN.5", "MoN0.5"),
+        ("VC.88", "VC0.88"),
+        ("PuC.88", "PuC0.88"),
+        ("PuC.82", "PuC0.82"),
+    ):
+        assert parse_species_formula(formula) == (
+            score_mod.formula_composition(canonical)
+            or tuple(sorted(parse_formula(canonical).elements.items()))
+        )
+
+
+def test_species_formula_parser_refuses_ocr_suspect_terminal_decimals() -> None:
+    for formula in ("W.465", "Fe.9470"):
+        assert parse_species_formula(formula) is None, formula
+
+    # Pankratz table 1174 prints Fe₀.₉₄₇O(c,l): Fe 0.947 and O 1.
+    assert parse_species_formula("Fe0.947O") == (("Fe", 0.947), ("O", 1.0))
+
+
+def test_species_formula_parser_refuses_empty_adduct_segments() -> None:
+    for formula in ("·CuSO4", "CuSO4·", "CuSO4··5H2O", "Br·", "Na•", "P04•··"):
+        assert parse_species_formula(formula) is None, formula
+
+
+def test_species_formula_parser_rejects_phase_exposed_after_charge_removal() -> None:
+    species = Species("Fe0.95O", Phase.G, charge=1)
+    assert parse_species_formula("Fe0.95O[s]+", species=species) is None
+
+
+def test_species_formula_parser_accepts_compound_adduct_and_bullet_dot() -> None:
+    for formula in ("3Al2O3.2SiO2", "Na2O.SiO2"):
+        assert parse_species_formula(formula) == tuple(
+            sorted(parse_formula(formula).elements.items())
+        )
+    assert parse_species_formula("CuO•CuSO₄") == tuple(
+        sorted(parse_formula("CuO·CuSO4").elements.items())
+    )
+
+
+def test_species_formula_parser_preserves_deuterium_in_isotope_hydrates() -> None:
+    assert parse_species_formula("CuSO4·5D2O") == (
+        ("Cu", 1.0),
+        ("D", 10.0),
+        ("O", 9.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("D2O·H2O") == (
+        ("D", 2.0),
+        ("H", 2.0),
+        ("O", 2.0),
+    )
+
+
+def test_species_formula_parser_keeps_variable_and_ambiguous_formulae_unmatched() -> None:
+    assert parse_species_formula("Fe(1-x)O") is None
+    assert parse_species_formula("Fe_tO") is None
+    assert parse_species_formula("CaAl.SiCK") is None
+    assert parse_species_formula("N1.5617IO.41959Ar.00937C.00032") is None
 
 
 def test_species_formula_parser_accepts_nested_groups() -> None:
@@ -3829,13 +3908,6 @@ def test_metric_domain_refuses_zero_and_negative_dex() -> None:
 def test_determinism_two_dumps_byte_identical() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
-    ref = F.observation(
-        "o2-ref",
-        exp.experiment_id,
-        ident,
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
     residual, candidate = _compile(
         F.observation(
             "o2-ref",
@@ -18881,7 +18953,6 @@ def test_score_store_refuses_rejected_unavailable_stolyarova_rows_by_state() -> 
         "stolyarova-1995-cao-alumina-kems.yaml",
     )
 
-    root = context.root
     expected_row_keys = {
         "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cd704583d7d4",
         "stolyarova_1991_gibbs_integral_energy_fig3::points:h=a5d8822cf03d",

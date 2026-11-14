@@ -28,9 +28,22 @@ from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterable,
+    Iterator,
+    Literal,
+    Mapping,
+    Protocol,
+    Sequence,
+)
 
 import yaml
+
+if TYPE_CHECKING:
+    from simulator.diagnostic_helpers.binary_pot_battery import Po2Request
 
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.enums import (
@@ -1116,9 +1129,9 @@ def parse_species_formula(
 
     The baseline ``formula_composition`` result is returned unchanged. Its
     source-derived extension accepts element symbols with numeric counts,
-    nested ``()[]{}`` groups, hydrate segments (including fractional or
-    decimal water multipliers) separated by a middle dot, TeX math wrappers /
-    ``\\text{}``, and TeX or Unicode subscripts. Newly normalized terminal
+    nested ``()[]{}`` groups, hydrate and compound-adduct segments (including
+    decimal subscripts), TeX math wrappers / ``\\text{}``, and TeX or Unicode
+    subscripts. Newly normalized terminal
     phase or polymorph labels require a matching existing species axis, as in
     ``$AsCl_3(g)$`` and ``$Fe(α)$``. A terminal bracket phase label that the
     accounting parser would strip, as in ``Fe2O3[s]``, uses that same axis
@@ -1128,9 +1141,10 @@ def parse_species_formula(
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    established = formula_composition(formula)
-    if established is not None:
-        return established
+    if not any(separator in formula for separator in (".", "·", "•")):
+        established = formula_composition(formula)
+        if established is not None:
+            return established
 
     text = formula.strip()
     if text.startswith("$") and text.endswith("$"):
@@ -1141,11 +1155,6 @@ def parse_species_formula(
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
     text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
-    # formula_composition reads the ASCII-dot water-adduct separator as a
-    # decimal count. Refuse that normalized form first; raw fast-path results
-    # and explicit middle-dot hydrates stay unchanged.
-    if "·" not in text and re.search(r"\.\d+H2O", text):
-        return None
     phase_labels = {
         "c": Phase.CR,
         "cr": Phase.CR,
@@ -1201,52 +1210,27 @@ def parse_species_formula(
         if species is None or charge_value(species) != annotated_charge:
             return None
         text = text[: charge_annotation.start()]
-
-    if "·" in text:
-        hydrated: defaultdict[str, float] = defaultdict(float)
-        try:
-            from simulator.accounting.formulas import parse_formula
-
-            # Parse each middle-dot segment separately so hydrate multipliers
-            # such as 1/2 and 6.5 do not collide with period splitting.
-            for segment in text.split("·"):
-                multiplier_match = re.match(
-                    r"^(\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", segment
-                )
-                multiplier = 1.0
-                body = segment
-                if multiplier_match is not None:
-                    number = multiplier_match.group(1)
-                    if "/" in number:
-                        numerator, denominator = number.split("/", 1)
-                        if int(denominator) == 0:
-                            return None
-                        multiplier = int(numerator) / int(denominator)
-                    else:
-                        multiplier = float(number)
-                    body = segment[multiplier_match.end() :]
-                if not body:
-                    return None
-                composition = formula_composition(body)
-                if composition is None:
-                    parsed_body = parse_formula(body, species=body).elements
-                    composition = tuple(
-                        sorted(
-                            (str(symbol), float(count))
-                            for symbol, count in parsed_body.items()
-                        )
-                    )
-                for symbol, count in composition:
-                    hydrated[symbol] += multiplier * count
-        except ValueError:
+        exposed_parenthetical_phase = re.search(r"\(([^()]*)\)$", text)
+        exposed_bracket_phase = re.search(r"\[([^\[\]]*)\]$", text)
+        if (
+            exposed_parenthetical_phase is not None
+            and exposed_parenthetical_phase.group(1).strip().lower() in phase_labels
+        ) or (
+            exposed_bracket_phase is not None
+            and exposed_bracket_phase.group(1).strip().lower() in phase_labels
+        ):
             return None
-        return tuple(sorted(hydrated.items()))
+
+    if any(separator in text for separator in (".", "·", "•")):
+        from simulator.accounting.formulas import atoms_parse_formula_else_janaf
+
+        parsed = atoms_parse_formula_else_janaf(text)
+        if parsed is not None:
+            return parsed
 
     parsed = formula_composition(text)
     if parsed is not None:
         return parsed
-    if "." in text:
-        return None
     try:
         from simulator.accounting.formulas import parse_formula
 
