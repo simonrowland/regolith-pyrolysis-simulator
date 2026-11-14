@@ -6758,6 +6758,9 @@ def test_score_progress_total_is_series_cells(monkeypatch, capsys) -> None:
 
     def advance_monotonic() -> float:
         nonlocal current_time
+        # Preparation now runs before the scorer timestamp, so the old two-tick
+        # fixture no longer guarantees 60 seconds during scoring. Advance every
+        # read to make the progress interval deterministic.
         current_time += 61.0
         return current_time
 
