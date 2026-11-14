@@ -2214,17 +2214,18 @@ def test_publication_paths_use_their_own_wall_supply_window(
     if publication_path == "terminal_summary":
         published = objective_module.product_summary(execution, {})
     elif publication_path == "tap_hour_summary":
+        tap_melt_oxide_kg = {"SiO2": 1.0e6, "CaO": 1.0e6}
         tap_snapshots = tuple(
             _tap_snapshot(
                 index,
                 {"SiO2": 50.0, "CaO": 50.0},
+                inventory_melt_oxide_kg=tap_melt_oxide_kg,
             )
             for index in range(1, len(rates_kg_hr) + 1)
         )
         for snapshot, rate in zip(tap_snapshots, rates_kg_hr, strict=True):
             snapshot.duration_h = 1.0
             # The synthetic flux's parent stays nonbinding across both hours.
-            snapshot.inventory.melt_oxide_kg = {"SiO2": 1.0e6}
             flux = _wall_bound_evap_flux({
                 "flux": (),
                 "published_flux": (("SiO", rate),),
