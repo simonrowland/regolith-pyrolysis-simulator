@@ -231,6 +231,49 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     observations = tuple(migrator.result.observations.values())
     assert len(observations) == 538
 
+    source = yaml.safe_load(EXTRACT.read_text())
+    expected_errors = []
+    for formula, block in source["species"].items():
+        for observation in block.get("observations", ()):
+            values = observation.get("values", {})
+            if values.get("quantity") != "residue_composition_vs_time":
+                continue
+            for point in values.get("series", ()):
+                for component, error in point.get("standard_errors", {}).items():
+                    expected_errors.append((observation["observation_id"], point["sample"], component, error))
+
+    migrated_errors = [row for row in observations if row.uncertainty.value is not None]
+    assert len(migrated_errors) == len(expected_errors) == 182
+    for observation_id, sample, formula, error in expected_errors:
+        matches = [
+            row for row in migrated_errors
+            if f"::{observation_id}::" in row.observation_id
+            and row.locator.row == sample
+            and row.identity.species.formula == formula
+        ]
+        assert len(matches) == 1, (observation_id, sample, formula)
+        uncertainty = matches[0].uncertainty
+        assert uncertainty.kind.value == "printed"
+        assert uncertainty.value == Decimal(error)
+        assert uncertainty.basis == "wt%"
+
+    sc1_experiment_id = "10.1016/s0016-7037(00)00529-9::experiment::run-sc1"
+    sc1_experiment = migrator.result.experiments[sc1_experiment_id]
+    assert sc1_experiment.sample.mass_kg.state.value.point == Decimal("0.0001653")
+    starting = sc1_experiment.sample.printed_composition
+    assert Decimal(str(starting.state.value["SiO2"])) == Decimal("33.8")
+    pressure = sc1_experiment.pressure_environment.total_pressure_Pa
+    assert pressure.state.value.point == Decimal("0.00013332236842105")
+    assert pressure.state.value.approximate is True
+    sc1_silica = [
+        row for row in observations
+        if row.identity.species.formula == "SiO2"
+        and row.locator.row == "SC1"
+        and "table1_electron_microprobe_residue_compositions" in row.observation_id
+    ]
+    assert len(sc1_silica) == 1
+    assert sc1_silica[0].experiment_id == sc1_experiment_id
+
     expected_by_quantity = {
         Quantity.RESIDUE_COMPONENT_COMPOSITION: {
             **{formula: 32 for formula in ("MgO", "Al2O3", "SiO2", "CaO", "TiO2", "FeO")},
