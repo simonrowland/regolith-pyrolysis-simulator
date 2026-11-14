@@ -31,8 +31,8 @@ ACTIVITY_EQUATION_ID = (
     f"{SOURCE_ID}::context::roeder_1974_activity_equation_and_gamma_fit"
 )
 OXIDES = ("SiO2", "Al2O3", "FeO", "MgO", "CaO", "Na2O", "K2O", "TiO2", "MnO")
-STANDARD_STATE = (
-    "The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron."
+STANDARD_STATE_QUOTE = (
+    "In this paper all iron oxide values including the activity, are those in equilibrium with metallic iron."
 )
 
 
@@ -101,8 +101,16 @@ def _assert_source_cells_match_audit(document: dict, audit: dict[int, dict[str, 
             assert obs["values"]["method_class"] == "measured_reduced"
             assert obs["values"]["evidence_class"] == "measured_reduced"
             assert obs["phase"] == "l"
-            assert obs["standard_state"] == STANDARD_STATE
-            assert obs["values"]["standard_state_as_printed"] == STANDARD_STATE
+            standard_state = obs["standard_state"]
+            assert standard_state["state"]["value"]["convention"] == (
+                "raoultian_pure_endmember"
+            )
+            assert standard_state["state"]["value"]["endmember"]["formula"] == (
+                "Fe(1-x)O"
+            )
+            assert standard_state["locator"]["published_page"] == 398
+            assert standard_state["locator"]["section"] == "Experimental details"
+            assert obs["values"]["standard_state_as_printed"] == STANDARD_STATE_QUOTE
             assert obs["locator"]["page"] == source_row["page"]
             assert obs["locator"]["published_page"] == source_row["published_page"]
             assert obs["locator"]["table"] == "1"

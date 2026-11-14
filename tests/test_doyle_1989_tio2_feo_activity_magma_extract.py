@@ -263,8 +263,10 @@ def _assert_source_matches_every_render_pin(document: dict) -> None:
         assert values["T_K"] == "1600"
         assert values["temperature_as_printed"] == "1600±2 K"
         assert values["temperature_uncertainty_K"] == "2"
-        assert values["standard_state_as_printed"] == "molten Fe0.947O"
-        assert values["standard_state_schema_gap"].endswith("simulator/battery/enums.py::ReferenceStateConvention.")
+        assert values["standard_state_as_printed"] == (
+            "The standard state is molten Fe0.947O."
+        )
+        assert "standard_state_schema_gap" not in values
         assert values["method_class"] == values["evidence_class"] == "measured_reduced"
         assert source["phase"] == "l"
 
@@ -397,7 +399,17 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert all(row.identity.species.formula == "FeO" for row in observations.values())
     assert all(row.identity.species.phase.value is Phase.L for row in observations.values())
     assert all(row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for row in observations.values())
-    assert all(row.identity.reference_state is None or row.identity.reference_state.is_unknown for row in observations.values())
+    assert all(row.identity.reference_state.is_value for row in observations.values())
+    assert all(
+        row.identity.reference_state.value.endmember.formula == "Fe(1-x)O"
+        and row.identity.reference_state.value.iron_saturation_composition.method
+        == "cited_standard"
+        and row.identity.reference_state.value.iron_saturation_composition.quote
+        == "The standard state is molten Fe_{0.947}O."
+        and row.identity.reference_state.value.iron_saturation_composition.locator.published_page
+        == 2633
+        for row in observations.values()
+    )
     assert all(row.identity.total_pressure_Pa.is_unknown for row in observations.values())
     assert sum(row.identity.composition.is_value for row in observations.values()) == 167
     renormalized_admissions = 0
@@ -475,7 +487,6 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         for row in observations.values()
     )
     assert Counter(entry.why for entry in result.queue) == Counter({
-        "source standard_state is not typed: molten Fe0.947O": 167,
         "source does not state method": 167,
     })
 
@@ -540,9 +551,14 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
             assert identity.composition.value == expected_composition
             assert composition_condition.state.value == expected_composition
         assert migrated.point_conditions["composition"].locator.page == 4
-        assert identity.reference_state.is_unknown
-        assert source["standard_state"] == "molten Fe0.947O"
-        assert "ReferenceStateConvention" in source["values"]["standard_state_schema_gap"]
+        assert identity.reference_state.is_value
+        assert identity.reference_state.value.iron_saturation_composition.method == (
+            "cited_standard"
+        )
+        assert source["standard_state"]["state"]["value"]["endmember"][
+            "formula"
+        ] == "Fe(1-x)O"
+        assert "standard_state_schema_gap" not in source["values"]
 
     assert renormalized_admissions == 33
 

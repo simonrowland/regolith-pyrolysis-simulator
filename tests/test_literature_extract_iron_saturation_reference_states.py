@@ -1,0 +1,85 @@
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+
+from simulator.battery.enums import Authority, Quantity
+from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.records import Located, StandardState
+from simulator.battery.score import iron_saturation_composition, temperature_of
+
+
+ROOT = Path(REPO_ROOT)
+SOURCE_COUNTS = {
+    "distin-1971-ferrous-silicate-melts": 24,
+    "roeder-1974-iron-activity-olivine-basaltic-liquids": 90,
+    "doyle-1988-feo-activity-multicomponent-magma": 130,
+    "doyle-1989-tio2-feo-activity-magma": 167,
+}
+TEMPERATURE_CONDITION = {
+    "distin-1971-ferrous-silicate-melts": "T_C",
+    "roeder-1974-iron-activity-olivine-basaltic-liquids": "T_C",
+    "doyle-1988-feo-activity-multicomponent-magma": "temperature_K",
+    "doyle-1989-tio2-feo-activity-magma": "T_K",
+}
+
+
+def _isolated_migration(source_id: str):
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+    )
+    migrator.finalize()
+    return migrator.result
+
+
+@pytest.mark.parametrize(("source_id", "expected_count"), SOURCE_COUNTS.items())
+def test_reference_sources_migrate_in_isolation_with_conditions(
+    source_id: str, expected_count: int
+) -> None:
+    result = _isolated_migration(source_id)
+    assert len(result.observations) == expected_count
+    assert not result.validation.hard_issues
+    temperature_key = TEMPERATURE_CONDITION[source_id]
+    # Mutation: remove a source's typed state or located temperature coordinate and this fails.
+    for row in result.observations.values():
+        identity = row.identity
+        assert identity.reference_state is not None
+        assert identity.reference_state.is_value
+        assert isinstance(identity.reference_state.value, StandardState)
+        assert identity.reference_state.value.endmember.formula == "Fe(1-x)O"
+        assert temperature_of(identity) is not None
+        assert row.point_conditions
+        temperature = row.point_conditions[temperature_key]
+        assert isinstance(temperature, Located)
+        assert temperature.locator is not None
+        assert temperature.state.is_value
+        assert identity.quantity.value in {
+            Quantity.ACTIVITY,
+            Quantity.ACTIVITY_COEFFICIENT,
+        }
+
+
+def test_rule_precedence_uses_roeder_dg_and_doyle_coughlin() -> None:
+    # Mutation: changing either payload from D&G/cited to prose breaks its route.
+    roeder = _isolated_migration(
+        "roeder-1974-iron-activity-olivine-basaltic-liquids"
+    )
+    roeder_row = next(iter(roeder.observations.values()))
+    roeder_decision = iron_saturation_composition(roeder_row)
+    assert roeder_decision.notice == "fe_saturation_composition_owner_supplied"
+    assert roeder_decision.authority is Authority.EXTRAPOLATED
+    assert roeder_decision.extrapolated
+    assert roeder_decision.n_fe2_plus is not None
+
+    for source_id in (
+        "doyle-1988-feo-activity-multicomponent-magma",
+        "doyle-1989-tio2-feo-activity-magma",
+    ):
+        migration = _isolated_migration(source_id)
+        row = next(iter(migration.observations.values()))
+        decision = iron_saturation_composition(row)
+        assert decision.notice == "fe_saturation_composition_from_cited_standard"
+        assert decision.n_fe2_plus == Decimal("0.8880675818373812038014783527")
+        assert decision.band_dex is None
+        assert decision.authority is None

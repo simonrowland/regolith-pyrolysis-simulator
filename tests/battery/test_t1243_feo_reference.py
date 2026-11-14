@@ -236,7 +236,9 @@ def test_anchors_match_the_derivation_and_an_independent_recompute() -> None:
         row = _wustite_row(temperature, Decimal("1"))
         converted = fusion_comparison_reference(row, engine=Engine.INTERNAL_ANALYTICAL)
         assert converted is not row
-        assert converted.value.point == _independent_factor(temperature)
+        composition = iron_saturation_composition(row)
+        assert composition.n_fe2_plus is not None
+        assert converted.value.point == _independent_factor(temperature) / composition.n_fe2_plus
         notice = _conversion_notice(converted.notices)
         assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
         assert (
@@ -472,8 +474,12 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
             "; converted_value=", 1
         )
         converted_value, _rest = converted.split("; factor=", 1)
-        assert Decimal(converted_value) == Decimal(source) * _independent_factor(
-            temperature
+        composition_decision = iron_saturation_composition(observation)
+        assert composition_decision.n_fe2_plus is not None
+        assert Decimal(converted_value) == (
+            Decimal(source)
+            * _independent_factor(temperature)
+            / composition_decision.n_fe2_plus
         )
         band = [
             item
@@ -484,13 +490,21 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         composition = next(
             item
             for item in residual.notices
-            if item.reason.startswith("fe_saturation_composition_owner_supplied")
+            if item.reason.startswith(
+                (
+                    "fe_saturation_composition_owner_supplied",
+                    "composition_derived_from_source_analyses",
+                )
+            )
         )
         if outside:
             assert len(band) == 1
             assert band[0].reason == _EXTRAPOLATED
             assert band[0].band == _WINDOW
-            assert composition.authority is Authority.EXTRAPOLATED
+            if observation.source_id == _DISTIN:
+                assert composition.authority is Authority.DERIVED
+            else:
+                assert composition.authority is Authority.EXTRAPOLATED
             extrapolated += 1
         else:
             assert band == []
@@ -624,9 +638,9 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
         residuals.append(residual)
         assert residual.status is ResidualStatus.NO_BAND
         assert residual.numeric is not None
-        assert not any(
-            notice.reason.startswith("reference_converted_via_iron_saturation;")
-            or "distin_masson_temkin_frame" in notice.reason
+        assert any(
+            notice.reason.startswith("composition_derived_from_source_analyses")
+            and notice.band is not None
             for notice in residual.notices
         )
         conversion = _conversion_notice(residual.notices)
@@ -642,8 +656,10 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
             )
             converted_value, _rest = converted.split("; factor=", 1)
             assert Decimal(source) == Decimal("0.952")
-            assert Decimal(converted_value) == Decimal("0.952") * _independent_factor(
-                temperature
+            decision = iron_saturation_composition(observation)
+            assert decision.n_fe2_plus is not None
+            assert Decimal(converted_value) == (
+                Decimal("0.952") * _independent_factor(temperature) / decision.n_fe2_plus
             )
         for engine, reason in {
             Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
@@ -662,6 +678,55 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
             assert refusal.refusal is not None
             assert refusal.refusal.reason is reason
     assert len(residuals) == 24
+
+
+def test_distin_table_records_masson_n0_and_method_spread(migration) -> None:
+    """Pin the table-derived N0 values and per-temperature method bands."""
+    expected = {
+        Decimal("2058.15"): (
+            Decimal("0.9786949448512436295642817507"),
+            Decimal("0.002431240492822927046941972422"),
+            Decimal("0.9787"),
+        ),
+        Decimal("2153.15"): (
+            Decimal("0.9861097841165973149618546920"),
+            Decimal("0.007436620909554859980899190015"),
+            Decimal("0.9861"),
+        ),
+        Decimal("2233.15"): (
+            Decimal("0.9967873240267174416319985201"),
+            Decimal("0.009119584210532076176535328665"),
+            Decimal("0.9968"),
+        ),
+    }
+    rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
+    assert len(rows) == 24
+    # Mutation: reverting the three recorded payloads removes N0 and this test fails.
+    for row in rows:
+        temperature = temperature_of(row.identity)
+        assert temperature in expected
+        standard = row.identity.reference_state.value
+        assert isinstance(standard, StandardState)
+        recorded = standard.iron_saturation_composition
+        assert recorded is not None
+        assert recorded.method == "derived_from_source_analyses"
+        assert recorded.n_fe2_plus == expected[temperature][0]
+        assert recorded.band_dex == expected[temperature][1]
+        assert recorded.n_fe2_plus.quantize(Decimal("0.0001")) == expected[temperature][2]
+        assert recorded.quote == (
+            "Activities of FeO, as measured in this study, refer to the "
+            "nonstoichiometric oxide in equilibrium with liquid iron at the "
+            "temperature of measurement as the standard state."
+        )
+        assert recorded.locator.page == 74
+        assert recorded.locator.table == "Experimental results"
+        assert "linear lowest-3" in recorded.provenance
+        assert "quadratic lowest-4" in recorded.provenance
+        assert iron_saturation_composition(row).n_fe2_plus == expected[temperature][0]
+    source = load_yaml(ROOT / "data/literature/extracts" / f"{_DISTIN}.yaml")
+    standard_state = source["species"]["FeO"]["observations"][0]["standard_state"]
+    assert standard_state["locator"]["page"] == 75
+    assert standard_state["locator"]["section"] == "Discussion"
 
 
 def test_distin_printed_facts_and_inferred_fe_saturation_are_separate(migration) -> None:
@@ -970,7 +1035,9 @@ def test_cited_coughlin_composition_is_used_exactly() -> None:
     assert decision.n_fe2_plus != decision.n_fe2_plus.quantize(Decimal("0.001"))
     assert decision.n_fe2_plus != owner.n_fe2_plus
     converted = fusion_comparison_reference(row, engine=Engine.INTERNAL_ANALYTICAL)
-    assert converted.value.point == _independent_factor(Decimal("1649.15"))
+    assert converted.value.point == (
+        _independent_factor(Decimal("1649.15")) / decision.n_fe2_plus
+    )
     cited = next(
         notice
         for notice in converted.notices
@@ -990,11 +1057,10 @@ def test_unparseable_cited_composition_does_not_fall_through() -> None:
     assert decision.failure is not None
     assert decision.n_fe2_plus is None
     converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
-    # The activity step is f and does not read the failed formula.
-    assert converted.value.point == _independent_factor(Decimal("1649.15"))
-    standard = converted.identity.reference_state.value
-    assert isinstance(standard, StandardState)
-    assert standard.endmember.formula == "FeO"
+    # A malformed cited composition cannot silently become N0=1 or D&G.
+    assert converted.value.point == row.value.point
+    assert converted.identity.reference_state.is_unknown
+    assert "not-a-formula" in converted.identity.reference_state.reason
     assert any(
         notice.reason.startswith("fe_saturation_composition_from_cited_standard")
         and "not-a-formula" in notice.reason
@@ -1051,15 +1117,17 @@ def test_recorded_source_analysis_composition_precedes_the_owner_line() -> None:
     assert decision.band_dex == Decimal("0.03")
     assert decision.source is not None and "openimcc constant" in decision.source
     converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
-    assert converted.value.point == Decimal("1.2") * _independent_factor(temperature)
+    assert converted.value.point == (
+        Decimal("1.2") * _independent_factor(temperature) / n0
+    )
     assert any(
         notice.reason.startswith("composition_derived_from_source_analyses")
         for notice in converted.notices
     )
 
 
-def test_distin_oxygen_ratio_converts_by_the_gibbs_factor() -> None:
-    """Stored a_FeO is O_metal/O_sat. a_F019 = a_D * f. a_D = 1 maps to f."""
+def test_distin_oxygen_ratio_converts_through_the_recorded_temkin_frame() -> None:
+    """The nonstoichiometric oxygen ratio converts as a_D*f/N0."""
 
     assert (Decimal("0.43") / Decimal("0.44")).quantize(Decimal("0.001")) == Decimal(
         "0.977"
@@ -1072,8 +1140,13 @@ def test_distin_oxygen_ratio_converts_by_the_gibbs_factor() -> None:
     )
     temperature = Decimal("2153.15")
     point = Decimal("0.952")
-    row = replace(_wustite_row(temperature, point), source_id=_DISTIN)
+    n0 = Decimal("0.9861097841165973149618546919976066")
+    row = _with_saturation(
+        replace(_wustite_row(temperature, point), source_id=_DISTIN),
+        _derived_saturation(n0, Decimal("0.007436620909554859980899190015")),
+    )
     factor = _independent_factor(temperature)
+    # Mutation: reverting the /N0 conversion makes these expected values fail.
     for engine in (
         None,
         Engine.OPENIMCC,
@@ -1083,27 +1156,27 @@ def test_distin_oxygen_ratio_converts_by_the_gibbs_factor() -> None:
         Engine.THERMOENGINE,
     ):
         converted = fusion_comparison_reference(row, engine=engine)
-        assert converted.value.point == point * factor
+        assert converted.value.point == point * factor / n0
         standard = converted.identity.reference_state.value
         assert isinstance(standard, StandardState)
         assert standard.endmember.formula == "FeO"
         composition = next(
             notice
             for notice in converted.notices
-            if notice.reason.startswith("fe_saturation_composition_owner_supplied")
+            if notice.reason.startswith("composition_derived_from_source_analyses")
         )
-        assert composition.authority is Authority.EXTRAPOLATED
+        assert composition.authority is Authority.DERIVED
         assert any(notice.reason == _EXTRAPOLATED for notice in converted.notices)
     saturated = replace(_wustite_row(temperature, Decimal("1")), source_id=_DISTIN)
     assert (
         fusion_comparison_reference(saturated, engine=Engine.OPENIMCC).value.point
-        == factor
+        == factor / n0
     )
     vaporock = fusion_comparison_reference(row, engine=Engine.VAPOROCK)
     assert vaporock.value.point == point
 
 
-def test_recorded_n0_does_not_scale_a_distin_oxygen_ratio() -> None:
+def test_recorded_n0_scales_a_distin_oxygen_ratio() -> None:
     temperature = Decimal("2153.15")
     point = Decimal("0.952")
     n0 = Decimal("0.90")
@@ -1112,8 +1185,8 @@ def test_recorded_n0_does_not_scale_a_distin_oxygen_ratio() -> None:
         _derived_saturation(n0, Decimal("0.02")),
     )
     converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
-    assert converted.value.point == point * _independent_factor(temperature)
-    assert converted.value.point != point * _independent_factor(temperature) / n0
+    # Mutation: deleting the N0 divisor turns the former withdrawn-frame test red.
+    assert converted.value.point == point * _independent_factor(temperature) / n0
     decision = iron_saturation_composition(row)
     assert decision.n_fe2_plus == n0
     assert decision.notice == "composition_derived_from_source_analyses"
