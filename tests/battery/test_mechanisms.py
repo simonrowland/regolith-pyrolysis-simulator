@@ -1356,9 +1356,8 @@ def test_model_derived_unprinted_inputs_rejects_page_only_placeholder_method() -
         issue.path.endswith(".derivation.raw_inputs")
         for issue in issues
     )
-    assert not any(
-        issue.path.endswith((".derivation.method", ".derivation.references"))
-        for issue in issues
+    assert any(
+        issue.path.endswith(".derivation.method") for issue in issues
     )
     assert [
         (notice.code, notice.source_id, notice.count)
@@ -1693,8 +1692,10 @@ def test_model_derived_provenance_notice_keeps_malformed_raw_input_hard() -> Non
         ),
         references=("none_printed",),
     )
+    assert observation.derivation is not None
     observation = replace(
         observation,
+        derivation=replace(observation.derivation, inputs=("raw-parent",)),
         notices=(
             Notice(
                 kind=NoticeKind.ENGINE_MODEL_CAVEAT,
@@ -1743,8 +1744,12 @@ def test_model_derived_raw_inputs_not_printed_requires_method_locator() -> None:
         issue.path.endswith(".derivation.raw_inputs")
         for issue in report.hard_issues
     )
-    assert not any(
-        issue.path.endswith((".derivation.method", ".derivation.references"))
+    assert any(
+        issue.path.endswith(".derivation.method")
+        for issue in report.hard_issues
+    )
+    assert any(
+        issue.path.endswith(".derivation.references")
         for issue in report.hard_issues
     )
     assert [
