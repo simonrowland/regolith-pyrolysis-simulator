@@ -17088,7 +17088,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 'redox_source_context': source_context,
                 'redox_source_campaign': str(source_context.get('campaign', '')),
-                **step_clock.source_context_time_fields(source_context),
+                **step_clock.source_context_time_fields(source_context, "redox_source"),
             })
         # Mass balance check
         mass_in = self.record.batch_mass_kg + sum(

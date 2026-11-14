@@ -42,10 +42,13 @@ def next_melt_hour(melt, dt_hr: float) -> float:
     return melt.hour + (1 if dt_hr == 1.0 else dt_hr)
 
 
-def source_context_time_fields(source_context) -> dict[str, float]:
+def source_context_time_fields(
+    source_context,
+    prefix: str = "source",
+) -> dict[str, float]:
     return {
-        "source_hour": coerce_nonnegative_hours(source_context.get("hour", 0)),
-        "source_campaign_hour": coerce_nonnegative_hours(
+        f"{prefix}_hour": coerce_nonnegative_hours(source_context.get("hour", 0)),
+        f"{prefix}_campaign_hour": coerce_nonnegative_hours(
             source_context.get("campaign_hour", 0)
         ),
     }
