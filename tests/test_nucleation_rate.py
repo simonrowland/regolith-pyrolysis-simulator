@@ -9,6 +9,8 @@ published correlation, checked against the data file the owner reads.
 from __future__ import annotations
 
 import math
+from copy import deepcopy
+from decimal import Decimal
 
 import pytest
 
@@ -68,6 +70,29 @@ def test_fink_coefficients_are_the_published_correlation() -> None:
     }
     assert row["surface_tension"]["A_mN_per_m"] == 240.5
     assert row["surface_tension"]["exponent"] == 1.126
+
+
+@pytest.mark.parametrize("value", [True, "2503.7", Decimal("2503.7"), 2503.7j, None, math.nan, math.inf])
+def test_liquid_property_admission_does_not_coerce_undeclared_numbers(value) -> None:
+    from simulator.nucleation import _fink_liquid
+
+    row = deepcopy(nucleation_liquid_data()["species"]["Na"])
+    row["reference_temperature_K"] = value
+    assert _fink_liquid(row, 523.0) == (
+        None, None, None, "Fink reference temperature is not sourced",
+    )
+
+
+@pytest.mark.parametrize("value", [2503, 2503.7])
+def test_liquid_property_admission_keeps_declared_ints_and_floats(value) -> None:
+    from simulator.nucleation import _fink_liquid
+
+    row = deepcopy(nucleation_liquid_data()["species"]["Na"])
+    row["reference_temperature_K"] = value
+    rho, sigma, _notice, refusal = _fink_liquid(row, 523.0)
+    assert refusal is None
+    assert rho is not None and rho > 0.0
+    assert sigma is not None and sigma > 0.0
 
 
 def test_water_293k_critical_supersaturation_is_about_3_3() -> None:

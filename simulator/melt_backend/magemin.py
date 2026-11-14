@@ -114,6 +114,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.oxygen_buffers import (
     ONEILL_QFM_TEMPERATURE_RANGE_K,
@@ -2324,7 +2325,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             sample_fO2_log = (
                 fO2_log
                 if redox_state is None
-                else redox_state.log_fO2_at(float(temperature_C) + 273.15)
+                else redox_state.log_fO2_at(float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET)
             )
             result = self.equilibrate(
                 float(temperature_C),
@@ -3089,7 +3090,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 call_timeout_s,
             )
         )
-        temperature_K = temperature_C + 273.15
+        temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
         pressure_GPa = self._pressure_bar_to_GPa(pressure_bar)
         pressure_kbar = self._GPa_to_kbar(pressure_GPa)
 
@@ -3588,16 +3589,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'applied_fO2_buffer': buffer_name,
             'applied_fO2_buffer_n': float(f'{buffer_n:.6f}'),
         })
-        if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + 273.15):
+        if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + CELSIUS_TO_KELVIN_OFFSET):
             operating_point_diagnostics['qfm_reference_notice'] = {
                 'kind': 'out_of_certified_band', 'authority': 'extrapolated',
                 'reference': 'PySulfSat Oneill linearisation; initial offset only',
-                'temperature_K': temperature_C + 273.15,
+                'temperature_K': temperature_C + CELSIUS_TO_KELVIN_OFFSET,
                 'certified_temperature_K': list(ONEILL_QFM_TEMPERATURE_RANGE_K),
             }
             buffer_warnings = (*buffer_warnings, (
                 'MAGEMin QFM initial-offset reference: out_of_certified_band '
-                f'at {temperature_C + 273.15:g} K (extrapolated)'
+                f'at {temperature_C + CELSIUS_TO_KELVIN_OFFSET:g} K (extrapolated)'
             ))
 
         if completed.returncode != 0:
@@ -3813,7 +3814,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:
         """Convert Celsius to Kelvin and evaluate the O'Neill QFM fit."""
-        T_K = float(temperature_C) + 273.15
+        T_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         return oneill_qfm_log10_fO2_bar(T_K)
 
     def _resolve_buffer(
@@ -4138,7 +4139,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         def endmember_g_j(temperature_K_query: float) -> Tuple[float, List[str]]:
             stdout, matlab_text, notes = self._run_pure_phase_probe(
                 bulk_wt_ig=dict(spec.bulk_wt_pct),
-                temperature_C=temperature_K_query - 273.15,
+                temperature_C=temperature_K_query - CELSIUS_TO_KELVIN_OFFSET,
                 pressure_kbar=pressure_kbar,
             )
             _assert_magemin_bulk_echo(spec.bulk_wt_pct, matlab_text)
@@ -4280,10 +4281,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # a notice rather than certifying the probe's arbitrary redox input.
         control = self._fo2_operating_point(-9.0, native_log, buffer_present)
         buffer_warnings.append(f'MAGEMin pure-phase native fO2 readback: {control}')
-        if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + 273.15):
+        if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + CELSIUS_TO_KELVIN_OFFSET):
             buffer_warnings.append(
                 'out_of_certified_band: QFM initial-offset reference is '
-                f'extrapolated at {temperature_C + 273.15:g} K; '
+                f'extrapolated at {temperature_C + CELSIUS_TO_KELVIN_OFFSET:g} K; '
                 'the native endmember temperature was not clamped'
             )
         return completed.stdout or '', matlab_text, buffer_warnings

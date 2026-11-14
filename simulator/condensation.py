@@ -3245,7 +3245,7 @@ class CondensationModel:
             temperature = _deposition_finite_scalar('bypass.wall_temperature_C', cfg['wall_temperature_C'])
             if not all(math.isfinite(v) and v > 0 for v in (length, diameter)):
                 raise ValueError('bypass dimensions must be finite and positive')
-            if not math.isfinite(temperature) or temperature <= -273.15:
+            if not math.isfinite(temperature) or temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError('bypass temperature must exceed absolute zero')
         except (KeyError, TypeError, ValueError) as exc:
             raise DepositionInputRefusal('stage3_bypass', cfg, str(exc)) from exc
@@ -10625,8 +10625,9 @@ def cold_spot_diagnostic(
     check. Upstream hot-wall fouling is the per-species dew point:
     the partial pressure of the mixture that arrives at that segment,
     after upstream capture, above the wall saturation pressure. That
-    inversion is the CLAUDE.md §4 / docs/concepts.md table (Na bake-off
-    about 486 C, Fe bake-off about 1775 C, both at 1 mbar). A uniform
+    inversion gives Na about 425 C at 100 Pa (1 mbar), from the
+    Browning-Potter saturation owner (extrapolated below its certified
+    band); Fe bake-off is about 1775 C at that same pressure. A uniform
     temperature is not a second gate, and the inlet partial is not a
     stand-in for a later segment. ``upstream_hot_wall_min_C`` is
     accepted and ignored so a stage-0 schedule band cannot reintroduce
@@ -10843,11 +10844,13 @@ def cold_spot_diagnostic(
                     # Algebra: supersaturation iff p_local_Pa - P_sat_Pa > 0.
                     # Units: both pressures are Pa. Sanity: Fe
                     # P_sat(1673.15 K) ≈ 1.14 Pa, so 100 Pa Fe is ~88-fold
-                    # supersaturated. Na P_sat(773.15 K) ≈ 162 Pa, so 100 Pa
-                    # Na is undersaturated, but 90% Fe capture at 1000 Pa
-                    # total (inlet Na/Fe/carrier 100/800/100 Pa) raises Na
-                    # to 1000*0.1/(0.1+0.08+0.1) ≈ 357 Pa and that same
-                    # 500 C wall violates. A refused P_sat is not P_sat = 0.
+                    # supersaturated. Browning-Potter Na P_sat(773.15 K)
+                    # ≈ 552 Pa (extrapolated), so 100 Pa Na is undersaturated.
+                    # At total 5*P_sat, inlet Na/Fe/carrier = 0.5/4/0.5 times
+                    # P_sat. After 90% Fe capture, Dalton gives Na pressure
+                    # 5*P_sat*0.5/(0.5+0.4+0.5) = (25/14)*P_sat ≈ 986 Pa:
+                    # Pa times a dimensionless ratio, now above saturation.
+                    # A refused P_sat is not P_sat = 0.
                     # Out-of-domain P_sat is kept and qualified.
                     wall_T_K = wall_T_C + CELSIUS_TO_KELVIN_OFFSET
                     # Read this evaluation from a private dict, then copy it

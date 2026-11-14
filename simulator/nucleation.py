@@ -63,6 +63,7 @@ from typing import Mapping
 from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.accounting.formulas import parse_formula
 from simulator.physical_constants import AVOGADRO, BOLTZMANN
+from simulator.scalar_boundary import finite_float
 from simulator.yaml_cache import load_cached_safe_yaml
 
 _DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "nucleation_liquid.yaml"
@@ -156,13 +157,11 @@ def _sodium_saturation_block() -> tuple[dict | None, str | None]:
     return deepcopy(dict(block)), None
 
 
-def _finite_number(value: object) -> float | None:
+def _liquid_property_number(value: object) -> float | None:
+    """Admit only declared property numbers before the scalar owner converts."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
-    number = float(value)
-    if not math.isfinite(number):
-        return None
-    return number
+    return finite_float(value)
 
 
 def _temperature_K(value: object) -> float:
@@ -244,7 +243,7 @@ def _fink_liquid(
 ) -> tuple[float | None, float | None, str | None, str | None]:
     """Return rho kg/m3, sigma N/m, property notice, or a refusal reason."""
 
-    reference = _finite_number(row.get("reference_temperature_K"))
+    reference = _liquid_property_number(row.get("reference_temperature_K"))
     if reference is None or reference <= 0.0:
         return None, None, None, "Fink reference temperature is not sourced"
     tau = 1.0 - temperature_K / reference
@@ -260,12 +259,12 @@ def _fink_liquid(
     tension = row.get("surface_tension")
     if not isinstance(density, Mapping) or not isinstance(tension, Mapping):
         return None, None, None, "liquid density or surface tension is not sourced"
-    intercept = _finite_number(density.get("a_kg_m3"))
-    linear = _finite_number(density.get("b_kg_m3"))
-    sqrt_term = _finite_number(density.get("c_kg_m3"))
-    density_exponent = _finite_number(density.get("tau_exponent"))
-    amplitude = _finite_number(tension.get("A_mN_per_m"))
-    tension_exponent = _finite_number(tension.get("exponent"))
+    intercept = _liquid_property_number(density.get("a_kg_m3"))
+    linear = _liquid_property_number(density.get("b_kg_m3"))
+    sqrt_term = _liquid_property_number(density.get("c_kg_m3"))
+    density_exponent = _liquid_property_number(density.get("tau_exponent"))
+    amplitude = _liquid_property_number(tension.get("A_mN_per_m"))
+    tension_exponent = _liquid_property_number(tension.get("exponent"))
     if None in {
         intercept,
         linear,
@@ -295,7 +294,7 @@ def _fink_liquid(
             "liquid density or surface tension is not a finite positive number",
         )
     notice = None
-    melting = _finite_number(row.get("melting_temperature_K"))
+    melting = _liquid_property_number(row.get("melting_temperature_K"))
     if melting is not None and temperature_K < melting:
         notice = (
             "Fink and Leibowitz liquid density and surface tension evaluated "
@@ -310,10 +309,10 @@ def _iapws_sigma_N_per_m(
     tension: Mapping,
     temperature_K: float,
 ) -> tuple[float | None, str | None]:
-    critical = _finite_number(tension.get("critical_temperature_K"))
-    amplitude = _finite_number(tension.get("B_mN_per_m"))
-    mu = _finite_number(tension.get("mu"))
-    coefficient = _finite_number(tension.get("b"))
+    critical = _liquid_property_number(tension.get("critical_temperature_K"))
+    amplitude = _liquid_property_number(tension.get("B_mN_per_m"))
+    mu = _liquid_property_number(tension.get("mu"))
+    coefficient = _liquid_property_number(tension.get("b"))
     if None in {critical, amplitude, mu, coefficient} or critical <= 0.0:
         return None, "liquid surface tension is not sourced"
     tau = 1.0 - temperature_K / critical
@@ -333,7 +332,7 @@ def _sanity_point_liquid(
 ) -> tuple[float | None, float | None, float | None, str | None, str | None]:
     """Cited (rho, sigma, P_sat) at one temperature. Other temperatures refuse."""
 
-    sourced = _finite_number(row.get("temperature_K"))
+    sourced = _liquid_property_number(row.get("temperature_K"))
     if sourced is None:
         return None, None, None, None, "sanity-point temperature is not sourced"
     if temperature_K != sourced:
@@ -344,8 +343,8 @@ def _sanity_point_liquid(
             None,
             f"liquid properties for this species are sourced only at {sourced:g} K",
         )
-    rho = _finite_number(row.get("density_kg_m3"))
-    saturation = _finite_number(row.get("saturation_pressure_Pa"))
+    rho = _liquid_property_number(row.get("density_kg_m3"))
+    saturation = _liquid_property_number(row.get("saturation_pressure_Pa"))
     tension = row.get("surface_tension")
     if (
         rho is None
