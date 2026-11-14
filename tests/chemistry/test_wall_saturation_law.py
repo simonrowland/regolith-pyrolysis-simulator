@@ -660,10 +660,12 @@ def test_record_state_cache_tracks_path_and_file_version(
     loaded_paths: list[Path] = []
     polynomial_calls = []
     polynomial_evaluations = []
+    thermo_evaluations = []
 
     if thermo == "nasa":
         original_polynomial = wall_module.NasaCeaPolynomial
         original_evaluate = original_polynomial.evaluate
+        original_segment_evaluate = wall_module.Nasa9Segment.evaluate_ratios
 
         def counted_polynomial(*args: object, **kwargs: object):
             polynomial_calls.append((args, kwargs))
@@ -673,8 +675,23 @@ def test_record_state_cache_tracks_path_and_file_version(
             polynomial_evaluations.append(temperature_K)
             return original_evaluate(polynomial, temperature_K)
 
+        def counted_segment_evaluate(segment: object, temperature_K: float):
+            thermo_evaluations.append(temperature_K)
+            return original_segment_evaluate(segment, temperature_K)
+
         monkeypatch.setattr(wall_module, "NasaCeaPolynomial", counted_polynomial)
         monkeypatch.setattr(original_polynomial, "evaluate", counted_evaluate)
+        monkeypatch.setattr(
+            wall_module.Nasa9Segment, "evaluate_ratios", counted_segment_evaluate
+        )
+    else:
+        original_linear_bracket = wall_module._linear_bracket
+
+        def counted_linear_bracket(points, temperature_K: float, table_id: str):
+            thermo_evaluations.append(temperature_K)
+            return original_linear_bracket(points, temperature_K, table_id)
+
+        monkeypatch.setattr(wall_module, "_linear_bracket", counted_linear_bracket)
 
     def counted_loader(path: Path) -> dict[str, object]:
         loaded_paths.append(path)
@@ -693,7 +710,9 @@ def test_record_state_cache_tracks_path_and_file_version(
 
     first_temperature_K, second_temperature_K = 1323.15, 1573.15
     first = evaluate(first_temperature_K)
+    assert evaluate(first_temperature_K) == first
     assert evaluate(second_temperature_K) != first
+    assert thermo_evaluations == [first_temperature_K, second_temperature_K]
     assert loaded_paths == [target_a]
     if thermo == "nasa":
         assert len(polynomial_calls) == 1
@@ -702,6 +721,11 @@ def test_record_state_cache_tracks_path_and_file_version(
     # Same record ID and file metadata in a different root is a different source.
     monkeypatch.setattr(wall_module, root_name, root_b)
     assert evaluate(first_temperature_K) == first
+    assert thermo_evaluations == [
+        first_temperature_K,
+        second_temperature_K,
+        first_temperature_K,
+    ]
     assert loaded_paths == [target_a, target_b]
     if thermo == "nasa":
         assert len(polynomial_calls) == 2
@@ -741,6 +765,12 @@ def test_record_state_cache_tracks_path_and_file_version(
     )
 
     assert evaluate(first_temperature_K) != first
+    assert thermo_evaluations == [
+        first_temperature_K,
+        second_temperature_K,
+        first_temperature_K,
+        first_temperature_K,
+    ]
     assert loaded_paths == [target_a, target_b, target_b]
     if thermo == "nasa":
         assert len(polynomial_calls) == 3
