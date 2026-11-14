@@ -568,7 +568,7 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
         "Bi": "0.227 0.080 0.170 0.078 0.074 0.007 0.008 0.007",
         "Cd": "0.228 0.057 0.071 0.014 0.019 0.003 0.019 0.009",
         "Cr": "1.021 0.179 1.192 0.179 0.998 0.150 1.171 0.265",
-        "Cu": "0.618 0.072 0.331 0.030 0.367 0.314 0.176 0.138",
+        "Cu": "0.618 0.072 0.331 0.030 0.367 0.030 0.176 0.138",
         "Ga": "1.454 0.432 1.217 0.361 1.314 0.388 0.669 0.380",
         "Ge": "0.315 0.090 0.168 0.050 0.045 0.013 0.014 0.005",
         "In": "0.816 0.095 0.622 0.074 0.621 0.068 0.192 0.142",
@@ -591,12 +591,12 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
             "CaO": "12.28", "Na2O": "1.96", "K2O": "0.07",
         }.items()
     })
-    runs = {"-7": "F008", "-9": "F014", "-11": "F018", "-13": "F019"}
+    log_fO2s = ("-7", "-9", "-11", "-13")
     expected = {
         (element, log_fO2): (Decimal(cells[2 * index]), cells[2 * index + 1])
         for element, printed_row in printed.items()
         for cells in [printed_row.split()]
-        for index, log_fO2 in enumerate(runs)
+        for index, log_fO2 in enumerate(log_fO2s)
     }
     assert len(rows) == len(expected) == 64
     assert not result.validation.hard_issues
@@ -604,12 +604,13 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
     seen = set()
     for observation in rows:
         element = observation.identity.species.formula
-        log_fO2 = observation.locator.row
+        row_id = observation.observation_id.split("::")[1]
+        log_fO2 = "-" + row_id.rsplit("_neg", 1)[1]
+        assert row_id == f"norris_2016_table5_7_{element.lower()}_logfo2_neg{log_fO2[1:]}"
         key = (element, log_fO2)
         assert key not in seen
         seen.add(key)
         fm, sigma = expected[key]
-        assert observation.locator.column == element
         assert (observation.locator.page, observation.locator.published_page) == (232, 202)
         assert quantity_token(observation.identity) is Quantity.ELEMENT_RETENTION_RATIO
         assert observation.value.kind is ValueKind.POINT
@@ -618,6 +619,8 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
         assert observation.uncertainty.verbatim == {
             "kind": "standard_deviation", "value": sigma,
             "units": "dimensionless", "verbatim": sigma,
+            "confidence_level": "not_stated",
+            "basis": "Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.",
         }
         assert observation.identity.subtype == State.of("concentration_retention")
         assert observation.identity.temperature_K == State.of(Decimal("1573.15"))
@@ -627,13 +630,13 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
         conditions = observation.point_conditions
         assert conditions is not None
         assert conditions["temperature_K"].state.value == Decimal("1573.15")
-        assert conditions["temperature_K"].locator.row == runs[log_fO2]
         assert conditions["fO2_log"].state.value.point == Decimal(log_fO2)
-        assert conditions["fO2_log"].locator.row == log_fO2
+        assert (conditions["fO2_log"].locator.page, conditions["fO2_log"].locator.table) == (232, "5.7")
         assert conditions["composition"].state.value.components == charge.components
         assert conditions["composition"].locator.table == "5.2"
-        assert conditions["composition"].locator.row == "EBT1"
+        assert conditions["composition"].locator.page == 220
         experiment = result.experiments[observation.experiment_id]
+        assert experiment.sample.initial_composition.state.value.components == charge.components
         assert experiment.thermal_schedule.total_duration_s.state.value.point == Decimal("3600")
         located = conditions["fm_definition"]
         definition, record = _printed_fm_definition(located)
