@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import heapq
 from pathlib import Path
 import re
+
+import pytest
 import yaml
 
 from simulator.yaml_cache import YAML12SafeLoader
@@ -12,6 +15,7 @@ from simulator.yaml_cache import YAML12SafeLoader
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = REPO_ROOT / "data"
 DOTLESS_EXPONENT = re.compile(r"^[-+]?\d+(?:\.\d+)?[eE][-+]?\d+$")
+YAML_CORPUS_SHARD_COUNT = 16
 
 # These fields intentionally retain printed lexemes or prose as strings. Each
 # rule names a schema field and why converting it would lose its contract.
@@ -37,6 +41,24 @@ EXACT_DECIMAL_STRING_FIELDS = {
         "species.FeO.observations.0.values.oxygen_partial_pressure.value",
     ),
 }
+
+
+def _balanced_yaml_corpus_shards() -> tuple[tuple[Path, ...], ...]:
+    """Distribute the full YAML corpus across xdist workers by source size."""
+    yaml_paths = sorted(DATA_ROOT.rglob("*.yaml")) + sorted(
+        DATA_ROOT.rglob("*.yml")
+    )
+    loads = [(0, shard) for shard in range(YAML_CORPUS_SHARD_COUNT)]
+    heapq.heapify(loads)
+    shards: list[list[Path]] = [[] for _ in range(YAML_CORPUS_SHARD_COUNT)]
+    for path in sorted(yaml_paths, key=lambda item: item.stat().st_size, reverse=True):
+        size, shard = heapq.heappop(loads)
+        shards[shard].append(path)
+        heapq.heappush(loads, (size + path.stat().st_size, shard))
+    return tuple(tuple(shard) for shard in shards)
+
+
+YAML_CORPUS_SHARDS = _balanced_yaml_corpus_shards()
 
 
 def _deliberate_printed_string_reason(relative: str, key_path: str) -> str | None:
@@ -110,11 +132,18 @@ def _load_with_source_nodes(source: str):
         loader.dispose()
 
 
-def test_every_data_yaml_has_no_untyped_dotless_exponent_in_numeric_fields():
-    """Use production parsing over every data YAML, including flow sequences."""
+@pytest.mark.parametrize(
+    "yaml_paths",
+    YAML_CORPUS_SHARDS,
+    ids=[
+        f"yaml-corpus-shard-{index:02d}"
+        for index in range(YAML_CORPUS_SHARD_COUNT)
+    ],
+)
+def test_every_data_yaml_has_no_untyped_dotless_exponent_in_numeric_fields(yaml_paths):
+    """Use the production loader over the complete corpus, including flow sequences."""
     findings: list[str] = []
     parse_refusals: list[str] = []
-    yaml_paths = sorted(DATA_ROOT.rglob("*.yaml")) + sorted(DATA_ROOT.rglob("*.yml"))
     assert yaml_paths, f"no YAML files found below {DATA_ROOT}"
 
     for path in yaml_paths:
