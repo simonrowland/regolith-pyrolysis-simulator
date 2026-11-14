@@ -1,4 +1,5 @@
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -7,8 +8,22 @@ import yaml
 
 from simulator.battery import migrate as migrate_module
 from simulator.battery.migrate import Migrator
+from simulator.battery.validate import validate_corpus
 
 ROOT = Path(__file__).resolve().parents[1]
+SC475_SOURCE_IDS = frozenset(
+    {
+        "shornikov-2008-mgo-aluminosilicate-melts",
+        "shornikov-2011-cao-mgo-alumina-melts",
+        "shornikov-2014-sodium-germanate-melts",
+        "shornikov-2017-spinel-thermodynamics",
+        "shornikova-2019-perovskite-thermodynamics",
+        "zaitsev-2006-magnesium-silicate-thermodynamics",
+        "beyer-1980-potassium-metasilicate-disilicate-ri8410",
+        "bennington-brown-1982-synthetic-acmite-ri8621",
+        "bennington-brown-beyer-1984-aegirine-ri8912",
+    }
+)
 FRAME_REASON = (
     "No quantity token represents formation from simple oxides; "
     "delta_fG denotes formation from the elements."
@@ -2680,6 +2695,7 @@ def _assert_stack_shornikov_rows(document, hit_rows):
 
 
 def test_increment_and_frame_repairs_migrate_unavailable():
+    assert migrate_module._SC475_SCHEMA_GAP_SOURCE_IDS == SC475_SOURCE_IDS
     reason_mismatches = []
     for source_id, expected in HIT_ROWS.items():
         path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
@@ -2696,6 +2712,8 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 assert values["value_as_printed"] == printed_value
             if observation_id == "bennington_1982_table6_log10_Kf":
                 assert values["quantity"] == "log10_formation_from_oxides_as_printed"
+        if source_id not in SC475_SOURCE_IDS:
+            continue
         migrator = Migrator(root=ROOT, index={}, aliases={})
         migrator._migrate_extract(path)
         migrator.finalize()
@@ -2790,6 +2808,7 @@ def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows()
 
 
 def _assert_schema_gap_refusals(migrator, source_id, expected_reasons, *, report):
+    validator_observation_ids = []
     for observation_id, expected_reason in expected_reasons.items():
         migrated = [
             row
@@ -2800,6 +2819,7 @@ def _assert_schema_gap_refusals(migrator, source_id, expected_reasons, *, report
         assert len(migrated) == 1, observation_id
         actual_reasons = [row.value.unavailable_reason for row in migrated]
         admissions = [row.admission.status.value for row in migrated]
+        validator_observation_ids.extend(row.observation_id for row in migrated)
         if report:
             print(
                 f"SC-475 class reason {source_id}::{observation_id}: "
@@ -2810,6 +2830,24 @@ def _assert_schema_gap_refusals(migrator, source_id, expected_reasons, *, report
         assert all(row.value.kind.value == "unavailable" for row in migrated)
         assert all(reason == expected_reason for reason in actual_reasons), observation_id
         assert all(status != "admitted" for status in admissions), observation_id
+        assert all(
+            row.admission.status.value != "rejected"
+            or row.admission.decided_by is not None
+            for row in migrated
+        ), observation_id
+    validation = validate_corpus(
+        migrator.result.works,
+        migrator.result.experiments,
+        migrator.result.observations,
+        residuals=None,
+    )
+    decision_paths = {
+        f"observation[{observation_id}].admission.decided_by"
+        for observation_id in validator_observation_ids
+    }
+    assert not [
+        issue for issue in validation.hard_issues if issue.path in decision_paths
+    ]
 
 
 def _migrate_shornikov_rows(source_id, hit_rows, *, report):
@@ -2900,6 +2938,7 @@ def _migrate_zaitsev_rows(*, report):
         },
         report=report,
     )
+    return migrator
 
 
 def test_stack_zaitsev_table4_from_oxides_rows_remain_unavailable():
@@ -2916,3 +2955,61 @@ def test_zaitsev_reason_assertions_catch_reason_loss_mutation(monkeypatch):
     )
     with pytest.raises(AssertionError):
         _migrate_zaitsev_rows(report=False)
+
+
+def test_schema_gap_rejection_decided_by_remains_validator_required():
+    migrator = _migrate_zaitsev_rows(report=False)
+    observation_id = (
+        "zaitsev-2006-magnesium-silicate-thermodynamics::"
+        f"{next(iter(ZAITSEV_HIT_ROWS))}"
+    )
+    observation = migrator.result.observations[observation_id]
+    assert observation.admission.status.value == "rejected"
+    assert observation.admission.decided_by is not None
+
+    mutated_observations = dict(migrator.result.observations)
+    mutated_observations[observation_id] = replace(
+        observation,
+        admission=replace(observation.admission, decided_by=None),
+    )
+    validation = validate_corpus(
+        migrator.result.works,
+        migrator.result.experiments,
+        mutated_observations,
+        residuals=None,
+    )
+    assert any(
+        issue.path == f"observation[{observation_id}].admission.decided_by"
+        and issue.reason.value == "conditional_field"
+        for issue in validation.hard_issues
+    )
+
+
+def test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path):
+    source_id = "kelley-1953-alkali-aluminosilicate-thermodynamics"
+    observation_id = "kelley_1953_table25_s51_extrapolated_albite"
+    extract_path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    source_row = _records(extract)[observation_id]
+    assert source_row["type"] == "heat_capacity_and_heat_content_series"
+    assert source_row["values"]["schema_gap"]
+
+    migrator = Migrator(root=ROOT)
+    migrator._migrate_extract(extract_path)
+    migrator.finalize()
+    migrated = [
+        row
+        for key, row in migrator.result.observations.items()
+        if key == f"{source_id}::{observation_id}"
+        or key.startswith(f"{source_id}::{observation_id}::")
+    ]
+    assert migrated
+    assert all(row.value.kind.value == "unavailable" for row in migrated)
+    assert all(row.admission.decided_by is None for row in migrated)
+
+    migrate_module.write_outputs(migrator.result, root=tmp_path)
+    migrated_store = (
+        tmp_path / "data/literature/extracts-v2" / f"{source_id}.yaml"
+    )
+    green_store = ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml"
+    assert migrated_store.read_bytes() == green_store.read_bytes()
