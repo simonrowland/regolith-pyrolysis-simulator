@@ -572,6 +572,88 @@ def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
     )
 
 
+def test_inventory_cap_reserves_finite_shared_parent_channel(
+    prescribed_pressure_engine, fig3_source, r11_inputs, monkeypatch,
+):
+    import simulator.battery.residue as residue
+    from simulator.accounting.formulas import parse_formula
+    from simulator.battery.enums import ValueKind
+    from simulator.battery.records import State, Value
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    row, experiment = r11_inputs
+    ceiling = float(parse_formula("SiO2").molar_mass_kg_per_mol())
+    mass = replace(
+        experiment.sample.mass_kg,
+        state=State.of(Value(ValueKind.POINT, point=Decimal(str(ceiling)))),
+    )
+    experiment = replace(experiment, sample=replace(experiment.sample, mass_kg=mass))
+    channels = [
+        ("Si2O2", ("SiO2", 0.5, 0.5)),
+        ("SiO2", ("SiO2", 1.0, 0.0)),
+        ("O2", (None, 0.0, 1.0)),
+    ]
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_openimcc_gas_channels_and_omission_notices",
+        lambda *_: (channels, ()),
+    )
+    monkeypatch.setattr(
+        residue, "_initial_oxide_wt_percent", lambda _: {"SiO2": 100.0}
+    )
+    monkeypatch.setattr(
+        residue,
+        "_mass_loss_thermal_segments",
+        lambda *_: (1173.15, 120.0, ((2073.15, 120.0), (2073.15, 120.0))),
+    )
+    monkeypatch.setattr(
+        residue,
+        "_make_residue_pressure_model",
+        lambda *_, **__: (
+            lambda _inventory, logp: {
+                "Si2O2": 1e-25 / 10.0**logp,
+                "SiO2": 1e-25,
+                "O2": 1e5 * 10.0**logp,
+            }
+        ),
+    )
+    unscaled_finite_point_bounds = []
+    original_bounds = residue._mass_loss_corner_bounds
+
+    def record_unscaled_finite_bound(*args, **kwargs):
+        bounds, corners = original_bounds(*args, **kwargs)
+        if not kwargs.get("include_sourced"):
+            unscaled_finite_point_bounds.append(bounds.get("SiO2", 0.0))
+        return bounds, corners
+
+    monkeypatch.setattr(
+        residue, "_mass_loss_corner_bounds", record_unscaled_finite_bound
+    )
+    with pytest.raises(ResidueInventoryRefusal) as failure:
+        residue.predict_mass_loss_fraction(
+            "openimcc",
+            experiment,
+            temperature_K=2073.15,
+            source_document=fig3_source,
+            observation=row,
+        )
+
+    assert failure.value.reason == "alpha_not_sourced"
+    bound = json.loads(failure.value.detail)
+    by_channel = bound["unsourced_bound_kg_by_channel"]
+    cap = bound["inventory_bound_kg_by_parent"]["SiO2"]
+    assert bound["inventory_capped_channels"] == ["Si2O2"]
+    assert by_channel["SiO2"] == pytest.approx(
+        sum(unscaled_finite_point_bounds), rel=1e-14, abs=0.0
+    )
+    assert by_channel["SiO2"] > 0.0
+    assert by_channel["Si2O2"] < ceiling
+    assert by_channel["Si2O2"] + by_channel["SiO2"] <= ceiling
+    assert cap["uncapped_bound_kg"] > ceiling
+    assert cap["ceiling_kg"] == pytest.approx(ceiling, rel=1e-14, abs=0.0)
+    assert cap["applied_bound_kg"] == pytest.approx(ceiling, rel=1e-14, abs=0.0)
+
+
 def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch):
     pytest.importorskip("openimcc")
     row, experiment = r11_inputs

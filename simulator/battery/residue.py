@@ -2686,16 +2686,25 @@ def predict_mass_loss_fraction(
             }
         ):
             species = [
-                name for name in capped_channels
-                if parent in term_by_species[name].parent_moles_per_product
+                name for name, term in term_by_species.items()
+                if parent in term.parent_moles_per_product
             ]
-            total = math.fsum(
+            finite_total = math.fsum(
                 mapping.get(name, 0.0) * parent_mass_share_by_channel[name][parent]
                 for mapping in (bounds_by_channel, preheat_bounds_by_channel)
                 for name in species
+                if name not in capped_channels
             )
+            capped_total = math.fsum(
+                mapping.get(name, 0.0) * parent_mass_share_by_channel[name][parent]
+                for mapping in (bounds_by_channel, preheat_bounds_by_channel)
+                for name in species
+                if name in capped_channels
+            )
+            total = finite_total + capped_total
             ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
-            scale = min(1.0, ceiling / total) if total > 0.0 else 1.0
+            remaining = max(0.0, ceiling - finite_total)
+            scale = min(1.0, remaining / capped_total) if capped_total > 0.0 else 1.0
             parent_scales[parent] = scale
             inventory_bounds_by_parent[parent] = {
                 "uncapped_bound_kg": total, "ceiling_kg": ceiling,
@@ -2714,10 +2723,11 @@ def predict_mass_loss_fraction(
                     mapping[species] *= scale
         for parent, record in inventory_bounds_by_parent.items():
             record["applied_bound_kg"] = math.fsum(
-                mapping.get(species, 0.0) * parent_mass_share_by_channel[species][parent]
+                mapping.get(species, 0.0)
+                * parent_mass_share_by_channel[species][parent]
                 for mapping in (bounds_by_channel, preheat_bounds_by_channel)
-                for species in capped_channels
-                if parent in parent_mass_share_by_channel.get(species, {})
+                for species, term in term_by_species.items()
+                if parent in term.parent_moles_per_product
             )
         unsourced_bound_kg = math.fsum(bounds_by_channel.values())
         preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
