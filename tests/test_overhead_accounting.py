@@ -958,22 +958,11 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
         cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
         if cro2_kg > 0.0:
             wall_cro2_by_account_kg[account] = cro2_kg
-    # t-1217 set these deposits from the inlet. b1113 now condenses CrO2
-    # on stage 1, so the wall after that stage keeps only the leftover.
-    # The wall before stage 1 is unchanged. Cr2O3 below is the converted
-    # remainder, and the chromium atoms stay on the wall plus the terminal.
-    assert wall_cro2_by_account_kg == pytest.approx(
-        {
-            "process.wall_deposit_segment_stage_0_to_stage_1": (
-                0.017091617459996433
-            ),
-            "process.wall_deposit_segment_stage_1_to_stage_2": (
-                2.443690283478522e-08
-            ),
-        },
-        rel=1e-12,
-        abs=0.0,
-    )
+    # d-402 solid-standard-state equilibrium moves the old 0.01709164 kg
+    # pipe-wall CrO2 pin to zero at these segment partial pressures. The
+    # stage still captures 0.01145425 kg as CrO2 and stores it as terminal
+    # Cr2O3; the remainder stays in overhead gas.
+    assert wall_cro2_by_account_kg == {}
     remaining_cro2_kg = flux.species_kg_hr["CrO2"] - sum(
         wall_cro2_by_account_kg.values()
     )
