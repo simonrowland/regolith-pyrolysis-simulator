@@ -3,8 +3,15 @@
 
 Usage for the train: on landing offer X, run
 ``reconcile_landing.py close-landed --offer X --green <new green>``. ``X`` may
-be the offer body file or the id of its merge-request envelope. The historical
-census is report-only; only the live command reads ``Closes:`` declarations.
+be the offer body file or the id of its merge-request envelope, and the caller
+must pass the current offer being landed. Its body needs one active tip line
+(``Offer sha: <tip>``; existing ``Ref ..., tip <tip>`` lines are also accepted)
+and one anchored ``Closes: <task-id>[, <task-id>...]`` line. For example::
+
+    Offer sha: abc1234
+    Closes: t-123, b-456
+
+The historical census is report-only; only the live command reads ``Closes:``.
 """
 
 from __future__ import annotations
@@ -25,9 +32,9 @@ LEDGER_RELATIVE = Path("docs-private/controller-tools/mb-20260923/pending-landin
 LANDING_GRACE = 1
 # Accept valid all-numeric SHA prefixes without matching digits inside task or branch IDs.
 SHA_PATTERN = r"(?<![0-9a-z_-])(?=[0-9a-f]{7,40}(?![0-9a-f]))[0-9a-f]{7,40}(?![0-9a-f])"
-TASK_ID = re.compile(r"\b(?:t-?\d+[a-z]?|b-\d+[a-z]?)\b", re.IGNORECASE)
-TASK_ID_TEXT = r"(?:t-?\d+[a-z]?|b-\d+[a-z]?)"
-SUBJECT_TASK_ID = re.compile(r"(?<![a-z0-9])((?:t-?\d+[a-z]?|b-\d+[a-z]?))(?![a-z0-9])", re.IGNORECASE)
+TASK_ID_TOKEN = r"(?:t-?\d+[a-z]?|b-\d+[a-z]?)"
+TASK_ID = re.compile(rf"\b{TASK_ID_TOKEN}\b", re.IGNORECASE)
+SUBJECT_TASK_ID = re.compile(rf"(?<![a-z0-9])({TASK_ID_TOKEN})(?![a-z0-9])", re.IGNORECASE)
 TIMESTAMP = re.compile(r"^(\d{4}-\d{2}-\d{2})\s+~?(\d{2}:\d{2})")
 BATCH = re.compile(r"\b(?:rides\s+|LANDED\s+)(b\d+)\b", re.IGNORECASE)
 PARTIAL_NOTE = re.compile(
@@ -565,32 +572,44 @@ def _ledger_path(root: Path) -> Path:
     raise RuntimeError(f"landing ledger not found at {path} or {fallback}")
 
 
-CLOSES_LINE = re.compile(rf"^Closes:\s+({TASK_ID_TEXT}(?:,\s*{TASK_ID_TEXT})*)\s*$")
+CLOSES_LINE = re.compile(rf"^Closes:\s+({TASK_ID_TOKEN}(?:,\s*{TASK_ID_TOKEN})*)\s*$")
 OFFER_SHA_LINE = re.compile(rf"^Offer sha:\s+({SHA_PATTERN})(?:\s+.*)?$", re.IGNORECASE)
-TASK_NOTE_HEADING = re.compile(rf"^\s*{TASK_ID_TEXT}\s+notes?\s*:", re.IGNORECASE)
+REF_TIP_LINE = re.compile(rf"^Ref\b[^\n]*?\btip\s+({SHA_PATTERN})(?:\s+.*)?$", re.IGNORECASE)
+TASK_NOTE_HEADING = re.compile(rf"^\s*{TASK_ID_TOKEN}\s+notes?\s*:", re.IGNORECASE)
 
 
-def _offer_declarations(body: str) -> tuple[list[str], list[dict[str, str]]]:
-    declared: list[str] = []
-    refusals: list[dict[str, str]] = []
+def _eligible_offer_lines(body: str) -> list[tuple[int, str]]:
+    eligible: list[tuple[int, str]] = []
     fence: tuple[str, int] | None = None
     in_task_note = False
     for line_number, line in enumerate(body.splitlines(), 1):
-        stripped = line.lstrip()
-        fence_match = re.match(r"(`{3,}|~{3,})", stripped)
-        if fence_match:
-            marker = fence_match.group(1)
-            if fence is None:
-                fence = (marker[0], len(marker))
-            elif marker[0] == fence[0] and len(marker) >= fence[1]:
-                fence = None
+        fence_match = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence:
+            if fence_match:
+                marker, trailing = fence_match.groups()
+                if marker[0] == fence[0] and len(marker) >= fence[1] and not trailing.strip():
+                    fence = None
             continue
-        if fence or stripped.startswith(">"):
+        if fence_match:
+            marker, info = fence_match.groups()
+            if marker[0] == "`" and "`" in info:
+                continue
+            fence = (marker[0], len(marker))
+            continue
+        if line.lstrip().startswith(">"):
             continue
         if TASK_NOTE_HEADING.match(line):
             in_task_note = True
         if in_task_note:
             continue
+        eligible.append((line_number, line))
+    return eligible
+
+
+def _offer_declarations(body: str) -> tuple[list[str], list[dict[str, str]]]:
+    declared: list[str] = []
+    refusals: list[dict[str, str]] = []
+    for line_number, line in _eligible_offer_lines(body):
         if not line.startswith("Closes:"):
             continue
         match = CLOSES_LINE.fullmatch(line)
@@ -605,10 +624,15 @@ def _offer_declarations(body: str) -> tuple[list[str], list[dict[str, str]]]:
 
 
 def _offer_tip(body: str) -> tuple[str | None, str | None]:
-    tips = [match.group(1) for line in body.splitlines() if (match := OFFER_SHA_LINE.fullmatch(line))]
+    tips = [
+        match.group(1)
+        for _, line in _eligible_offer_lines(body)
+        for pattern in (OFFER_SHA_LINE, REF_TIP_LINE)
+        if (match := pattern.fullmatch(line))
+    ]
     unique = list(dict.fromkeys(tips))
     if not unique:
-        return None, "offer has no anchored Offer sha declaration"
+        return None, "offer has no active Offer sha or Ref ..., tip declaration"
     if len(unique) != 1:
         return None, "offer has multiple distinct Offer sha declarations"
     return unique[0], None

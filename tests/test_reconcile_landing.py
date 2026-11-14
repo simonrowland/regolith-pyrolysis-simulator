@@ -14,6 +14,7 @@ from scripts.reconcile_landing import (
     _merge_request_body,
     _normalize_task_id,
     _offer_close_candidates,
+    _offer_tip,
     _render_close_landed,
     ledger_events,
     report_candidates,
@@ -240,6 +241,44 @@ class LandingReconciliationTests(unittest.TestCase):
                 candidates, _, declarations = _offer_close_candidates(body, history, items)
                 self.assertEqual(declarations, [])
                 self.assertEqual(candidates, [])
+
+    def test_nonclosing_fence_line_keeps_closes_example_inert(self) -> None:
+        tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
+        green = self.repo.commit_file("green.txt", "green\n", "green")
+        body = f"Offer sha: {tip}\n```text\n```python\nCloses: t-2\n```\n"
+        items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
+
+        candidates, _, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
+        self.assertEqual(declarations, [])
+        self.assertEqual(candidates, [])
+
+    def test_offer_tip_ignores_fenced_quoted_and_task_note_examples(self) -> None:
+        tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
+        green = self.repo.commit_file("green.txt", "green\n", "green")
+        items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
+        bodies = [
+            f"Example:\n```text\nOffer sha: {tip}\n```\nCloses: t-2\n",
+            f"> Offer sha: {tip}\nCloses: t-2\n",
+            f"t-99 note:\nOffer sha: {tip}\nCloses: t-2\n",
+        ]
+        for body in bodies:
+            with self.subTest(body=body):
+                self.assertIsNone(_offer_tip(body)[0])
+                candidates, refusals, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
+                self.assertEqual(declarations, ["t-2"] if "Closes:" in body and not body.startswith("t-99 note:") else [])
+                self.assertEqual(candidates, [])
+                self.assertEqual(refusals[0]["type"], "invalid-offer-tip" if declarations else "no-closes-declaration")
+
+    def test_real_ref_tip_line_supplies_offer_identity(self) -> None:
+        tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
+        green = self.repo.commit_file("green.txt", "green\n", "green")
+        body = f"Ref origin review/t-2, tip {tip}\nCloses: t-2\n"
+        items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
+
+        candidates, refusals, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
+        self.assertEqual(declarations, ["t-2"])
+        self.assertEqual([candidate["id"] for candidate in candidates], ["t-2"])
+        self.assertEqual(refusals, [])
 
     def test_unknown_suffix_is_not_normalized_to_parent_id(self) -> None:
         tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
