@@ -4272,11 +4272,12 @@ def _coughlin_n0() -> Decimal:
 def _composition_band_dex(n0: Decimal, *, extrapolated: bool, temperature_K: Decimal) -> Decimal:
     """Propagate |N0(D&G) - N0(Coughlin Fe0.947O)| onto log10 a.
 
-    A shift of the standard's Fe2+ fraction scales a stoichiometric activity
-    by N0, so the dex width is |log10(N0 / N0_Coughlin)|. Outside the anchor
-    window the band is at least the spread at the nearest anchor: the local
-    spread can shrink as the line moves toward 0.888, and the ruling forbids
-    a tighter band than the D&G-versus-Coughlin spread.
+    The ruled composition discrepancy band is the log ratio between owned
+    D&G N0 and cited Coughlin N0; it is not another factor in the JANAF
+    activity conversion. Outside the anchor window the band is at least the
+    spread at the nearest anchor: the local spread can shrink as the line
+    moves toward 0.888, and the ruling forbids a tighter band than the
+    D&G-versus-Coughlin spread.
     """
 
     coughlin = _coughlin_n0()
@@ -4486,20 +4487,19 @@ def _iron_saturated_feo_comparison(
 
     An iron-saturated Fe(1-x)O standard has chemical potential
     mu_FeO = mu_Fe + mu_O; a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
-    carries that partial onto JANAF Fe-019. Its Fe2+ fraction N0 comes from
-    iron_saturation_composition: source-analysis extrapolation when recorded,
-    a cited Fe-O composition when named by the source, and otherwise the D&G
-    owner route.
+    carries that partial onto JANAF Fe-019. iron_saturation_composition owns
+    the typed saturation composition and its comparison band; N0 is not a
+    second factor in the JANAF activity conversion.
 
     Distin defines its tabulated activity as a_D = O_metal / O_sat (p. 74),
     then identifies nonstoichiometric oxide in equilibrium with liquid iron
-    as the measured standard state (p. 75, Discussion). In Masson's Temkin
-    frame, the stoichiometric comparison is a_FeO = a_D * f / N0, where
-    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Premise: f converts oxygen chemical
-    potential and N0 converts the Temkin component activity. Algebra:
-    a_FeO = a_D * f * (1/N0). Both f and N0 are dimensionless, so activity
-    stays dimensionless. Sanity: N0 = 1 reduces to the gas-ratio conversion;
-    the one iron_saturation_composition owner supplies N0 for this conversion.
+    as the measured standard state (p. 75, Discussion). Chemical-potential
+    equality maps that activity onto JANAF Fe-019 with a_FeO = a_D * f, where
+    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Premise: f carries the measured
+    oxygen chemical potential onto the JANAF standard. Algebra:
+    a_FeO = a_D * exp((ΔG_w - ΔfG(Fe-019)) / RT). The exponent and both
+    activities are dimensionless, so a_FeO remains dimensionless. Sanity:
+    f = 1 leaves the measured activity unchanged.
 
     Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
     (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
@@ -4587,8 +4587,7 @@ def _iron_saturated_feo_comparison(
             band=f"Darken & Gurry / JANAF FeO reference: {exc}",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
-    effective_factor = factor / n0
-    converted = reference.value.point * effective_factor
+    converted = reference.value.point * factor
     log_f_spread_dex = (
         Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
     ).log10()
@@ -4609,13 +4608,14 @@ def _iron_saturated_feo_comparison(
             f"{_display_decimal(2 * log_f_spread_dex, '0.001')} dex; "
             "Masson 1965 Temkin estimate 0.936 is EXCLUDED from the band "
             "(stated validity N_Fe2+ 0.7-0.9; this case lies outside it); "
-            "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric "
-            f"FeO(l) with the Temkin N0 correction; "
+            "iron-saturated Fe(1-x)O(l) activity converted to stoichiometric "
+            "FeO(l) by JANAF chemical-potential equality; N0 records the "
+            "saturation composition and its comparison band, not an extra "
+            "activity factor; "
             f"source_value={reference.value.point}; "
             f"converted_value={converted}; "
             f"factor={_display_decimal(factor, '0.001')}; "
             f"N0={_display_decimal(n0, '0.0001')}; "
-            f"effective_factor={_display_decimal(effective_factor, '0.001')}; "
             "jackknife sensitivity factor "
             f"[{_display_decimal(jackknife_low, '0.001')}, "
             f"{_display_decimal(jackknife_high, '0.001')}] "
