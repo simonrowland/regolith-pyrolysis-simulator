@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 
 import pytest
 
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
+    MELT_OXIDE_GAMMA_COMPOSITION_OUT_OF_DOMAIN_STATUS,
     P2O5_ACTIVITY_COEFFICIENT,
     melt_oxide_activity,
     melt_oxide_gamma_domain_authority,
@@ -30,6 +32,18 @@ _TABLE2_RANGE = {
     "MgO": (0.25, 4.0),
     "MnO": (0.5, 7.2),  # CAS row (Ohta & Suito 1995), not FCMS(P)
 }
+
+_CMAS_AN_DI = {"CaO": 2.0, "Al2O3": 1.0, "MgO": 1.0, "SiO2": 4.0}
+_CAS_ANORTHITE = {"CaO": 1.0, "Al2O3": 1.0, "SiO2": 2.0}
+_COMPOSITION_DOMAIN_CASES = [
+    ("CaO", _CMAS_AN_DI, "CMAS_BASICITY"),
+    ("MgO", _CMAS_AN_DI, "CMAS_BASICITY"),
+    ("Al2O3", _CMAS_AN_DI, "CMAS_AN_DI"),
+    ("SiO2", _CMAS_AN_DI, "CMAS_AN_DI"),
+    ("TiO2", {**_CMAS_AN_DI, "TiO2": 0.1}, "CMAS"),
+    ("Cr2O3", {**_CAS_ANORTHITE, "Cr2O3": 0.1}, "CAS"),
+    ("MnO", {**_CAS_ANORTHITE, "MnO": 0.1}, "CAS"),
+]
 
 
 def test_limitation_does_not_claim_cited_point_or_universal_gamma_model() -> None:
@@ -57,6 +71,19 @@ def test_table2_range_rows_remain_geometric_midpoints_with_source_domains() -> N
         assert coeff.valid_range_K == temperature_ranges[parent]
         assert "geometric midpoint" in coeff.citation
         assert "DOI" in coeff.citation
+
+    assert {
+        parent: MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent].composition_domain
+        for parent in _TABLE2_RANGE
+    } == {
+        "CaO": "CMAS_BASICITY",
+        "MgO": "CMAS_BASICITY",
+        "Al2O3": "CMAS_AN_DI",
+        "SiO2": "CMAS_AN_DI",
+        "TiO2": "CMAS",
+        "Cr2O3": "CAS",
+        "MnO": "CAS",
+    }
 
 
 @pytest.mark.parametrize(
@@ -104,13 +131,83 @@ def test_melt_midpoint_gamma_domain_flags_outside_only(parent, temperature_range
 
 
 def test_melt_midpoint_gamma_flags_missing_temperature_as_unchecked() -> None:
-    activity = melt_oxide_activity("CaO", {"CaO": 1.0})
+    activity = melt_oxide_activity("CaO", _CMAS_AN_DI)
 
     assert activity is not None
     assert activity.warning is not None
     assert "reason=temperature_not_supplied" in activity.warning
     assert "valid_range_K=[1873, 1873]" in activity.warning
     assert activity.authority_status == "temperature_not_supplied_domain_unchecked"
+
+
+@pytest.mark.parametrize(("parent", "inventory", "domain"), _COMPOSITION_DOMAIN_CASES)
+def test_melt_midpoint_composition_domains_flag_outside_support_without_moving_value(
+    monkeypatch, parent, inventory, domain
+):
+    coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent]
+    assert coeff.composition_domain == domain
+    assert coeff.valid_range_K is not None
+    low, high = coeff.valid_range_K
+    temperature = (low + high) / 2.0
+
+    supported = melt_oxide_activity(parent, inventory, temperature_K=temperature)
+    assert supported is not None
+    assert supported.warning is None
+    assert supported.authority_status == "in_gamma_domain"
+
+    if parent == "CaO":
+        outside_inventory = {"CaO": 1.0, "FeO": 9.0}
+    else:
+        outside_inventory = {**inventory, "FeO": 0.5}
+    outside = melt_oxide_activity(
+        parent, outside_inventory, temperature_K=temperature
+    )
+    assert outside is not None
+    assert outside.warning is not None
+    assert "constant_gamma_composition_out_of_domain" in outside.warning
+    assert outside.authority_status == (
+        MELT_OXIDE_GAMMA_COMPOSITION_OUT_OF_DOMAIN_STATUS
+    )
+    provenance = outside.provenance()
+    assert provenance["gamma_domain_authority"]["authority_status"] == "in_domain"
+    assert "composition_domain=" + domain in provenance[
+        "melt_oxide_activity_warning"
+    ]
+
+    # Removing only the new composition verdict leaves the production
+    # constant-gamma resolver and its numeric activity unchanged.
+    monkeypatch.setitem(
+        MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+        parent,
+        replace(coeff, composition_domain=None, optical_basicity_range=None),
+    )
+    numeric_only = melt_oxide_activity(
+        parent, outside_inventory, temperature_K=temperature
+    )
+    assert numeric_only is not None
+    assert outside.activity == numeric_only.activity
+    assert outside.effective_gamma == numeric_only.effective_gamma
+
+
+def test_cao_basicity_axis_and_unknown_composition_are_independent_of_temperature():
+    outside_basicity = melt_oxide_activity(
+        "CaO", {"CaO": 3.0, "SiO2": 1.0}, temperature_K=1873.0
+    )
+    assert outside_basicity is not None
+    assert outside_basicity.warning is not None
+    assert "optical_basicity=" in outside_basicity.warning
+    assert "composition_domain=CMAS_BASICITY" in outside_basicity.warning
+
+    unknown = melt_oxide_activity(
+        "CaO", {"CaO": 1.0, "unresolved-oxide": 1.0}, temperature_K=1873.0
+    )
+    assert unknown is not None
+    assert unknown.warning is not None
+    assert "composition_domain_unchecked" in unknown.warning
+    assert "unsupported_species:unresolved-oxide" in unknown.warning
+    assert unknown.authority_status == (
+        "composition_domain_unchecked_status_bearing_non_authoritative"
+    )
 
 
 def test_na_and_k_remain_cited_point_anchors_with_domains() -> None:

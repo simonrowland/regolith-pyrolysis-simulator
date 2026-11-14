@@ -13820,6 +13820,8 @@ def _predict_with_engine(
         from simulator.battery.records import Composition as OxideComposition
         from simulator.chemistry.melt_activity import (
             MELT_OXIDE_CATIONS_PER_FORMULA,
+            MELT_OXIDE_GAMMA_COMPOSITION_OUT_OF_DOMAIN_STATUS,
+            MELT_OXIDE_GAMMA_TEMPERATURE_OUT_OF_DOMAIN_STATUS,
         )
 
         if (
@@ -13958,23 +13960,47 @@ def _predict_with_engine(
                 certified_band = {
                     "temperature_K": (Decimal(str(low)), Decimal(str(high)))
                 }
-                if activity.authority_status == (
-                    "out_of_gamma_domain_status_bearing_non_authoritative"
-                ):
-                    authority = Authority.EXTRAPOLATED
-                    notices.append(
-                        Notice(
-                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                            affected_quantities=(Quantity.ACTIVITY,),
-                            reason=(activity.warning or "melt oxide activity extrapolated"),
-                            origin=(
-                                "simulator.chemistry.melt_activity.melt_oxide_activity"
-                            ),
-                            band=f"[{low:g}, {high:g}] K",
-                            authority=Authority.EXTRAPOLATED,
-                        )
+            if activity.authority_status == (
+                MELT_OXIDE_GAMMA_TEMPERATURE_OUT_OF_DOMAIN_STATUS
+            ):
+                authority = Authority.EXTRAPOLATED
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(activity.warning or "melt oxide activity extrapolated"),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        band=(
+                            f"[{float(activity.valid_range_K[0]):g}, "
+                            f"{float(activity.valid_range_K[1]):g}] K"
+                            if activity.valid_range_K is not None
+                            else None
+                        ),
+                        authority=Authority.EXTRAPOLATED,
                     )
-            elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
+                )
+            elif activity.authority_status == (
+                MELT_OXIDE_GAMMA_COMPOSITION_OUT_OF_DOMAIN_STATUS
+            ):
+                authority = Authority.EXTRAPOLATED
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(activity.warning or "melt oxide composition extrapolated"),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        band="Table 2 composition domain",
+                        authority=Authority.EXTRAPOLATED,
+                    )
+                )
+            elif activity.warning or (
+                activity.valid_range_K is None
+                and activity.evidence_tier == "UNCERTIFIED"
+            ):
                 notices.append(
                     Notice(
                         kind=NoticeKind.FALLBACK,

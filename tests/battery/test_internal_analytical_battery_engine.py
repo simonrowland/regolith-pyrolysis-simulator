@@ -562,6 +562,73 @@ def test_internal_analytical_predicts_below_gamma_band_with_notice() -> None:
     assert notice.band == "[1673, 1673] K"
 
 
+def test_internal_analytical_carries_gamma_composition_domain_notice(
+    monkeypatch,
+) -> None:
+    from simulator.chemistry.melt_activity import MELT_OXIDE_ACTIVITY_COEFFICIENTS
+
+    temperature = Decimal("1873")
+    experiment, bench, observation = _case(
+        composition=_composition(("CaO", "0.1"), ("FeO", "0.9")),
+        temperature=Value.point_of(temperature),
+        formula="CaO",
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(temperature),
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.authority is Authority.EXTRAPOLATED
+    composition_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert composition_notice.authority is Authority.EXTRAPOLATED
+    assert composition_notice.band == "Table 2 composition domain"
+    assert "constant_gamma_composition_out_of_domain" in composition_notice.reason
+    assert "composition_domain=CMAS_BASICITY" in composition_notice.reason
+
+    # Mutation check: remove only the Table 2 composition metadata. The same
+    # production activity remains, while the extrapolation notice disappears.
+    coefficient = MELT_OXIDE_ACTIVITY_COEFFICIENTS["CaO"]
+    with monkeypatch.context() as patch:
+        patch.setitem(
+            MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+            "CaO",
+            replace(coefficient, composition_domain=None, optical_basicity_range=None),
+        )
+        without_domain = predict_with_engine(
+            Engine.INTERNAL_ANALYTICAL,
+            observation,
+            experiment=experiment,
+            bench=bench,
+            handles={},
+            isolated=False,
+        )
+
+    assert without_domain.execution.state is ExecutionState.PRODUCED
+    assert without_domain.value == prediction.value
+    assert without_domain.authority is not Authority.EXTRAPOLATED
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in without_domain.notices
+    )
+
+
 def test_internal_analytical_keeps_missing_activity_composition_typed() -> None:
     experiment, bench, observation = _case(
         composition=None,

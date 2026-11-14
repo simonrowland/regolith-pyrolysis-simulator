@@ -39,8 +39,9 @@ MELT_OXIDE_ACTIVITY_LIMITATION = (
     "MC-5); as X approaches 1 the shell enforces Raoultian a->1 continuously so "
     "the former gamma*X to a=1 step (31.1x for Cr) is absent; when "
     "valid_range_K is set, a temperature outside that interval remains "
-    "flux-driving and status-bearing; the gamma-domain authority is a notice "
-    "only and does not scale or replace the table coefficient"
+    "flux-driving and status-bearing; where composition_domain is set, its "
+    "printed composition support is also status-bearing; both are notices "
+    "only and do not scale or replace the table coefficient"
 )
 MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
     "single_cation_Raoultian_pure_liquid_reference"
@@ -69,6 +70,15 @@ def normalize_high_t_melt_activity(value: Any) -> str:
 # the number would move activities for X in the seam; do not retune it here.
 MELT_OXIDE_ENDMEMBER_CONTINUITY_BLEND_START = 0.99
 R_KJ_PER_MOL_K = GAS_CONSTANT / J_PER_KJ
+MELT_OXIDE_GAMMA_TEMPERATURE_OUT_OF_DOMAIN_STATUS = (
+    "out_of_gamma_domain_status_bearing_non_authoritative"
+)
+MELT_OXIDE_GAMMA_COMPOSITION_OUT_OF_DOMAIN_STATUS = (
+    "composition_out_of_gamma_domain_status_bearing_non_authoritative"
+)
+MELT_OXIDE_GAMMA_COMPOSITION_UNCHECKED_STATUS = (
+    "composition_domain_unchecked_status_bearing_non_authoritative"
+)
 
 
 @dataclass(frozen=True)
@@ -80,6 +90,8 @@ class MeltOxideActivityCoefficient:
     citation: str
     valid_range_K: tuple[float, float] | None = None
     anchor_T_K: float | None = None
+    composition_domain: str | None = None
+    optical_basicity_range: tuple[float, float] | None = None
 
 
 # provenance: gamma_alkali_melt_activity
@@ -138,6 +150,8 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "not a single Table 2 coefficient",
         valid_range_K=(1873.0, 1873.0),
         anchor_T_K=1873.0,
+        composition_domain="CMAS_BASICITY",
+        optical_basicity_range=(0.55, 0.65),
     ),
     "Al2O3": MeltOxideActivityCoefficient(
         "Al2O3",
@@ -149,6 +163,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "AlO1.5 range 0.28-0.37 at 1573-1773 K (CMAS An-Di; Ghiorso & Sack "
         "1995), not a single Table 2 coefficient",
         valid_range_K=(1573.0, 1773.0),
+        composition_domain="CMAS_AN_DI",
     ),
     "SiO2": MeltOxideActivityCoefficient(
         "SiO2",
@@ -160,6 +175,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "range 0.9-1.1 at 1573-1773 K (CMAS An-Di; Ghiorso & Sack 1995), not "
         "a single Table 2 coefficient",
         valid_range_K=(1573.0, 1773.0),
+        composition_domain="CMAS_AN_DI",
     ),
     "TiO2": MeltOxideActivityCoefficient(
         "TiO2",
@@ -171,6 +187,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "range 1.5-1.7 at 1573-1773 K (CMAS; Ghiorso & Sack 1995), not a "
         "single Table 2 coefficient",
         valid_range_K=(1573.0, 1773.0),
+        composition_domain="CMAS",
     ),
     "Cr2O3": MeltOxideActivityCoefficient(
         "Cr2O3",
@@ -183,6 +200,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "single Table 2 coefficient",
         valid_range_K=(1773.0, 1773.0),
         anchor_T_K=1773.0,
+        composition_domain="CAS",
     ),
     "MgO": MeltOxideActivityCoefficient(
         "MgO",
@@ -195,6 +213,8 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "single Table 2 coefficient",
         valid_range_K=(1873.0, 1873.0),
         anchor_T_K=1873.0,
+        composition_domain="CMAS_BASICITY",
+        optical_basicity_range=(0.55, 0.65),
     ),
     "MnO": MeltOxideActivityCoefficient(
         "MnO",
@@ -207,7 +227,19 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "row 0.7-3.5 at 1823-1923 K and not a single Table 2 coefficient",
         valid_range_K=(1873.0, 1873.0),
         anchor_T_K=1873.0,
+        composition_domain="CAS",
     ),
+}
+
+# Sossi & Fegley 2018 Table 2 prints these host systems. TiO2, Cr2O3, and
+# MnO are the evaluated trace solutes, so their own inventory is excluded
+# when checking the CMAS/CAS host. The domain labels and basicity limits live
+# on the coefficient rows above; these sets define the corresponding systems.
+_GAMMA_COMPOSITION_DOMAIN_SYSTEMS: dict[str, frozenset[str]] = {
+    "CMAS_BASICITY": frozenset({"CaO", "MgO", "Al2O3", "SiO2"}),
+    "CMAS_AN_DI": frozenset({"CaO", "MgO", "Al2O3", "SiO2"}),
+    "CMAS": frozenset({"CaO", "MgO", "Al2O3", "SiO2"}),
+    "CAS": frozenset({"CaO", "Al2O3", "SiO2"}),
 }
 
 # P2O5 is intentionally separate from the legacy coefficient table. Several
@@ -454,11 +486,12 @@ def melt_oxide_gamma_domain_authority(
     *,
     gamma: float | None = None,
 ) -> dict[str, Any] | None:
-    """Return the temperature-domain verdict for a gamma anchor.
+    """Return the temperature-axis verdict for a gamma anchor.
 
     Inside this function, a component with no ``valid_range_K`` returns
     ``None`` at every finite positive temperature (no ``in_domain`` /
-    ``out_of_gamma_domain`` payload). Non-finite or non-positive
+    ``out_of_gamma_domain`` payload). Composition support is assessed
+    independently when evaluating an activity. Non-finite or non-positive
     ``temperature_K`` raises ``ValueError``. On a component that has
     ``valid_range_K``, a supplied non-finite or non-positive ``gamma``
     also raises rather than wrapping that scalar in a typed authority
@@ -488,6 +521,121 @@ def melt_oxide_gamma_domain_authority(
     if payload["authority_status"] == "out_of_gamma_domain":
         payload["anchor_T_K"] = coeff.anchor_T_K
     return payload
+
+
+def _melt_oxide_gamma_composition_domain_notice(
+    coeff: MeltOxideActivityCoefficient,
+    account_mol: Mapping[str, float],
+) -> tuple[str | None, str | None]:
+    """Return the Table 2 composition-axis status and its warning, if any."""
+
+    domain = coeff.composition_domain
+    if domain is None:
+        return None, None
+    allowed_system = _GAMMA_COMPOSITION_DOMAIN_SYSTEMS.get(domain)
+    if allowed_system is None:
+        raise RuntimeError(f"unknown melt-gamma composition domain: {domain}")
+
+    # Beckett 2002 Eq. 3 identifies the printed Basicity axis as optical
+    # basicity; structural_activity_features owns its Duffy-Ingram calculation
+    # and the formula-unit basis used below.
+    from simulator.chemistry.structural_activity import (
+        structural_activity_features,
+    )
+
+    try:
+        features = structural_activity_features(account_mol)
+    except ValueError as exc:
+        # The activity path has already validated recognized oxide entries.
+        # Unknown entries are otherwise ignored there, so they leave this
+        # independent calibration axis unchecked instead of changing the value.
+        return (
+            "unchecked",
+            "constant_gamma_composition_domain_unchecked: "
+            f"parent_oxide={coeff.parent_oxide} composition_domain={domain} "
+            f"reason=composition_inventory_unresolved:{type(exc).__name__} "
+            "cannot_certify",
+        )
+    host_mol = dict(features.formula_unit_mole_fractions)
+    # Table 2's TiO2-in-CMAS and Cr/MnO-in-CAS rows describe trace solutes in
+    # those host systems; remove the evaluated solute before checking the host.
+    if coeff.parent_oxide not in allowed_system:
+        host_mol.pop(coeff.parent_oxide, None)
+    host_species = set(host_mol)
+    outside_species = sorted(host_species - allowed_system)
+    if outside_species:
+        reason = "host_contains_oxides_outside_printed_system:" + ",".join(
+            outside_species
+        )
+        return (
+            "out_of_domain",
+            "constant_gamma_composition_out_of_domain: "
+            f"parent_oxide={coeff.parent_oxide} composition_domain={domain} "
+            f"reason={reason} cannot_certify",
+        )
+    if features.unsupported_species:
+        reason = "unsupported_species:" + ",".join(features.unsupported_species)
+        return (
+            "unchecked",
+            "constant_gamma_composition_domain_unchecked: "
+            f"parent_oxide={coeff.parent_oxide} composition_domain={domain} "
+            f"reason={reason} cannot_certify",
+        )
+    if not host_mol:
+        return (
+            "unchecked",
+            "constant_gamma_composition_domain_unchecked: "
+            f"parent_oxide={coeff.parent_oxide} composition_domain={domain} "
+            "reason=host_composition_missing cannot_certify",
+        )
+
+    if domain == "CMAS_BASICITY":
+        if coeff.optical_basicity_range is None:
+            raise RuntimeError(
+                f"{domain} requires an optical_basicity_range on {coeff.parent_oxide}"
+            )
+        basicity = features.optical_basicity
+        low, high = coeff.optical_basicity_range
+        if basicity is None or not math.isfinite(float(basicity)):
+            return (
+                "unchecked",
+                "constant_gamma_composition_domain_unchecked: "
+                f"parent_oxide={coeff.parent_oxide} composition_domain={domain} "
+                "reason=optical_basicity_undefined cannot_certify",
+            )
+        if not low < basicity < high:
+            return (
+                "out_of_domain",
+                "constant_gamma_composition_out_of_domain: "
+                f"parent_oxide={coeff.parent_oxide} composition_domain={domain} "
+                f"optical_basicity={basicity:.6g} valid_open_range="
+                f"({low:g}, {high:g}) cannot_certify",
+            )
+    elif domain == "CMAS_AN_DI":
+        # Sossi & Fegley Table 2 prints CMAS (An-Di). Anorthite = CaO + Al2O3
+        # + 2SiO2; diopside = CaO + MgO + 2SiO2.
+        # A mixture on that join therefore has n(CaO)=n(Al2O3)+n(MgO) and
+        # n(SiO2)=2n(CaO). These formula-unit mol ratios are scale-free.
+        # Sanity: one mole each of An and Di gives Ca=2, Al=1, Mg=1, Si=4.
+        ca = host_mol.get("CaO", 0.0)
+        al = host_mol.get("Al2O3", 0.0)
+        mg = host_mol.get("MgO", 0.0)
+        si = host_mol.get("SiO2", 0.0)
+        # Mole fractions are binary64; relative tolerance 1e-12 is >4,000x
+        # machine epsilon (2.22e-16), while zero absolute tolerance prevents
+        # trace/absent components from being treated as a join member.
+        on_an_di_join = math.isclose(
+            ca, al + mg, rel_tol=1e-12, abs_tol=0.0
+        ) and math.isclose(si, 2.0 * ca, rel_tol=1e-12, abs_tol=0.0)
+        if not on_an_di_join:
+            return (
+                "out_of_domain",
+                "constant_gamma_composition_out_of_domain: "
+                f"parent_oxide={coeff.parent_oxide} composition_domain={domain} "
+                "reason=composition_not_on_anorthite_diopside_join cannot_certify",
+            )
+
+    return "in_domain", None
 
 
 def table_gamma_effective(
@@ -673,12 +821,12 @@ def melt_oxide_activity(
         )
 
     activity_authority_status = "temperature_not_supplied"
-    activity_warning = None
+    activity_warnings: list[str] = []
     if coeff.valid_range_K is not None:
         low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
         if resolved_temperature_K is None:
             activity_authority_status = "temperature_not_supplied_domain_unchecked"
-            activity_warning = (
+            activity_warnings.append(
                 "constant_gamma_domain_unchecked: "
                 f"parent_oxide={parent} reason=temperature_not_supplied "
                 f"valid_range_K=[{low:g}, {high:g}] cannot_certify"
@@ -687,13 +835,33 @@ def melt_oxide_activity(
             activity_authority_status = "in_gamma_domain"
         else:
             activity_authority_status = (
-                "out_of_gamma_domain_status_bearing_non_authoritative"
+                MELT_OXIDE_GAMMA_TEMPERATURE_OUT_OF_DOMAIN_STATUS
             )
-            activity_warning = (
+            activity_warnings.append(
                 "constant_gamma_extrapolated_out_of_domain: "
                 f"parent_oxide={parent} temperature_K={resolved_temperature_K:.3f} "
                 f"valid_range_K=[{low:g}, {high:g}] cannot_certify"
             )
+
+    composition_domain_status, composition_warning = (
+        _melt_oxide_gamma_composition_domain_notice(coeff, account_mol)
+    )
+    if composition_warning is not None:
+        activity_warnings.append(composition_warning)
+    if composition_domain_status == "out_of_domain":
+        if activity_authority_status != (
+            MELT_OXIDE_GAMMA_TEMPERATURE_OUT_OF_DOMAIN_STATUS
+        ):
+            activity_authority_status = (
+                MELT_OXIDE_GAMMA_COMPOSITION_OUT_OF_DOMAIN_STATUS
+            )
+    elif (
+        composition_domain_status == "unchecked"
+        and activity_authority_status
+        != MELT_OXIDE_GAMMA_TEMPERATURE_OUT_OF_DOMAIN_STATUS
+    ):
+        activity_authority_status = MELT_OXIDE_GAMMA_COMPOSITION_UNCHECKED_STATUS
+    activity_warning = "; ".join(activity_warnings) or None
 
     if x_single_cation <= 0.0:
         return MeltOxideActivity(
