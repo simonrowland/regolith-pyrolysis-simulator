@@ -22,13 +22,11 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
-    Rail,
     RefusalReason,
     ValueKind,
 )
 from simulator.battery.fo2_ladder import (
     ResolvedFo2,
-    fo2_tier_notice,
     resolve_row_fo2,
 )
 from simulator.battery.records import FO2Control, State, Value
@@ -42,8 +40,6 @@ from simulator.battery.score import (
     load_score_context,
     _predict_with_engine,
     predict_with_engine,
-    residual_to_plain,
-    score_store,
 )
 from simulator.battery.waypoints import (
     GapReason,

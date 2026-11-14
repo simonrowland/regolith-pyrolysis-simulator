@@ -339,7 +339,10 @@ def test_rys_na_extract_keeps_unclassified_row_oxygen_unknown() -> None:
         ROOT
         / "data/literature/extracts-v2/rys-2007-alkali-oxide-thermodynamics.yaml"
     )
-    migrated = yaml.safe_load(migrated_path.read_text(encoding="utf-8"))
+    migrated = yaml.load(
+        migrated_path.read_text(encoding="utf-8"),
+        Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader),
+    )
     rows = [
         row
         for row in migrated["observations"]
