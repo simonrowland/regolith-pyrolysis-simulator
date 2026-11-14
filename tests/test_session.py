@@ -359,9 +359,11 @@ class _FakeSim:
         self.applied_decisions: list[tuple[DecisionType, str]] = []
         self._summaries = list(summaries or [])
         self._decision_after_step = decision_after_step
+        self._step_dt_hr = 1.0
 
-    def step(self) -> HourSnapshot:
-        self.melt.hour += 1
+    def step(self, dt_hr=1.0) -> HourSnapshot:
+        self._step_dt_hr = dt_hr
+        self.melt.hour += 1 if dt_hr == 1.0 else dt_hr
         if self._summaries:
             self._last_campaign_summary = self._summaries.pop(0)
         if self._decision_after_step is not None:
@@ -384,6 +386,7 @@ class _FakeSim:
     def _make_snapshot(self) -> HourSnapshot:
         return HourSnapshot(
             hour=self.melt.hour,
+            duration_h=self._step_dt_hr,
             campaign=self.melt.campaign,
             temperature_C=25.0 + self.melt.hour,
         )

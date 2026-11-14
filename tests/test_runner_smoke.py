@@ -2937,9 +2937,9 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     original_step = sim.step
     observed_errors = []
 
-    def record_step_error():
+    def record_step_error(dt_hr=1.0):
         try:
-            return original_step()
+            return original_step(dt_hr=dt_hr)
         except Exception as exc:
             observed_errors.append(exc)
             raise

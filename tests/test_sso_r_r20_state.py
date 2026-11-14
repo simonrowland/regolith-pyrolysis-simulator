@@ -427,7 +427,7 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
     monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
     monkeypatch.setattr(sim, "_get_equilibrium", fake_equilibrium)
     monkeypatch.setattr(sim, "_calculate_evaporation", fake_evaporation)
-    monkeypatch.setattr(sim, "_apply_analytic_evaporation_depletion", lambda flux: flux)
+    monkeypatch.setattr(sim, "_apply_analytic_evaporation_depletion", lambda flux, dt_hr=1.0: flux)
     monkeypatch.setattr(sim, "_configure_condensation_operating_conditions", lambda flux: None)
     monkeypatch.setattr(sim, "_apply_lab_surface_temperatures", lambda *, sample_time_h: None)
     monkeypatch.setattr(sim, "_route_to_condensation", fake_route)

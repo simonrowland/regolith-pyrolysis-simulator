@@ -1132,7 +1132,7 @@ def test_run_case_enforces_wall_cap_during_advance(tmp_path, monkeypatch):
     advance_started = False
     advance_completed = False
 
-    def slow_advance():
+    def slow_advance(**kwargs):
         nonlocal advance_started, advance_completed
         advance_started = True
         # Natural completion sits 5 s out against a 0.02 s cap: a 250x margin
@@ -1241,7 +1241,7 @@ class _FakeSession:
     def is_complete(self):
         return False
 
-    def advance(self):
+    def advance(self, **kwargs):
         return _FakeStep()
 
 

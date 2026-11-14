@@ -595,7 +595,7 @@ def test_all_zero_capacity_flux_preserves_and_routes_live_carrier_authority(
     monkeypatch.setattr(
         active,
         "_apply_analytic_evaporation_depletion",
-        lambda flux: flux,
+        lambda flux, dt_hr=1.0: flux,
     )
 
     routed_fluxes = []

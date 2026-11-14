@@ -1451,7 +1451,7 @@ def _refusal_sequence_session(
 ):
     from simulator.campaigns import CampaignHoldTargetRefusal
     from simulator.core import PyrolysisSimulator
-    from simulator.state import CondensationTrain
+    from simulator.state import CampaignPhase, CondensationTrain
     from simulator.session import SimSession
 
     ledger = AtomLedger()
@@ -1462,6 +1462,7 @@ def _refusal_sequence_session(
         material_origin="feedstock",
     )
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     # A terminal refusal reads the lazy condensation model after rollback.
     # Supply its construction inputs while leaving both models unbuilt.
     sim.setpoints = {}
@@ -1480,7 +1481,8 @@ def _refusal_sequence_session(
     sim._chem_kernel = object()
     sim._build_chemistry_kernel = lambda: object()
     sim.atom_ledger = ledger
-    sim.melt = SimpleNamespace(hour=0)
+    sim.melt = SimpleNamespace(hour=0, campaign=CampaignPhase.C0, campaign_hour=0)
+    sim.campaign_mgr = SimpleNamespace(_lab_schedule=lambda _campaign: None)
     sim.record = SimpleNamespace(snapshots=[])
     sim.pending_decision = None
     sim.is_complete = lambda: False
@@ -1512,7 +1514,7 @@ def _refusal_sequence_session(
                 {"detail": "synthetic C6 terminal refusal"}
             )
         sim.melt.hour += 1
-        return SimpleNamespace(hour=sim.melt.hour)
+        return SimpleNamespace(hour=sim.melt.hour, duration_h=sim._step_dt_hr)
 
     sim._step_one_hour = step_one_hour
     session = SimSession()
@@ -1550,7 +1552,7 @@ def test_run_executor_refusal_rollback_owns_all_ledger_state() -> None:
     session, sim = _refusal_sequence_session(0)
     initial_ledger = snapshot_atom_ledger(sim.atom_ledger)
 
-    def refuse_directly():
+    def refuse_directly(dt_hr=1.0):
         active_ledger = sim.atom_ledger
         active_ledger.move(
             "outer_snapshot_pool_capture",

@@ -709,6 +709,7 @@ def test_sc67_pressure_proposal_does_not_call_missing_boundary_an_empty_set() ->
 def test_missing_pumping_rollup_recomputes_and_refuses_subambient_flow() -> None:
     pumping_snapshot = SimpleNamespace(
         hour=1,
+        duration_h=1.0,
         temperature_C=300.0,
         overhead=SimpleNamespace(
             pressure_mbar=1.0e-6,
@@ -745,6 +746,7 @@ def test_missing_pumping_rollup_recomputes_and_refuses_subambient_flow() -> None
 def test_missing_pumping_rollup_certified_energy_reaches_objective() -> None:
     pumping_snapshot = SimpleNamespace(
         hour=1,
+        duration_h=1.0,
         temperature_C=300.0,
         overhead=SimpleNamespace(
             pressure_mbar=5.0,
@@ -1083,8 +1085,8 @@ class ProductionMassBalanceRealPathExecutor:
         sim = session.simulator
         original_step = sim.step
 
-        def marked_step() -> HourSnapshot:
-            snapshot = original_step()
+        def marked_step(dt_hr=1.0) -> HourSnapshot:
+            snapshot = original_step(dt_hr=dt_hr)
             marked = replace(
                 snapshot,
                 mass_balance_error_pct=self.mass_balance_error_pct,

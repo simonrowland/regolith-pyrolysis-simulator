@@ -82,9 +82,9 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     original_advance = session.advance
     c0b_entry: dict[str, float | int] = {}
 
-    def advance_with_c0b_boundary():
+    def advance_with_c0b_boundary(dt_hr=1.0):
         previous_campaign = session.simulator.melt.campaign
-        step = original_advance()
+        step = original_advance(dt_hr=dt_hr)
         if (
             previous_campaign != CampaignPhase.C0B
             and session.simulator.melt.campaign == CampaignPhase.C0B

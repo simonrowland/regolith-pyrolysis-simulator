@@ -491,7 +491,10 @@ def _campaign_ramp_alias(field: str, value: Any) -> float:
 
 
 def _drive_hours(value: Any) -> list[Any]:
-    session = SimpleNamespace(is_complete=lambda: True)
+    session = SimpleNamespace(
+        is_complete=lambda: True,
+        simulator=SimpleNamespace(melt=SimpleNamespace(hour=0)),
+    )
     return list(drive_session(session, value, None))
 
 

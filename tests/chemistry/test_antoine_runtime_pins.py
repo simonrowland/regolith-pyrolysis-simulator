@@ -254,6 +254,7 @@ def test_c7_ca_partial_antoine_block_is_omitted_with_notice(monkeypatch):
 
     class FakeExtraction(ExtractionMixin):
         def __init__(self):
+            self._step_dt_hr = 1.0
             source_row = load_config_bundle().setpoints["campaigns"]["C7"]
             self.setpoints = {
                 "campaigns": {

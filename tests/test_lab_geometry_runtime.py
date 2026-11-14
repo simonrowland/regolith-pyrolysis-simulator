@@ -257,7 +257,7 @@ def _surface_temperature_rows(schedule: dict) -> list[dict]:
         species_kg_hr={"SiO": 0.02},
         total_kg_hr=0.02,
     )
-    sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    sim._apply_analytic_evaporation_depletion = lambda flux, dt_hr=1.0: flux
     return [
         session.advance().per_hour_summary
         for _ in range(2)

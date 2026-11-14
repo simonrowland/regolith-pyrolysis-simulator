@@ -3796,11 +3796,12 @@ def test_best_tap_coating_summary_normalizes_through_partial_campaign(
     run.campaigns_elapsed = 1.5
     run.simulator.campaign_mgr = SimpleNamespace(_max_hold_hr=lambda campaign: 4)
     run.session = SimpleNamespace(
+        simulator=run.simulator,
         _step_results=(
-            SimpleNamespace(campaign_summary=None),
-            SimpleNamespace(campaign_summary={"campaign": "C0", "duration_h": 2}),
-            SimpleNamespace(campaign_summary=None),
-            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(snapshot=snapshots[0], campaign_summary=None),
+            SimpleNamespace(snapshot=snapshots[1], campaign_summary={"campaign": "C0", "duration_h": 2}),
+            SimpleNamespace(snapshot=snapshots[2], campaign_summary=None),
+            SimpleNamespace(snapshot=snapshots[3], campaign_summary=None),
         )
     )
     profile = _composition_score_profile(
@@ -4012,6 +4013,7 @@ def _tap_snapshot(
 ):
     return SimpleNamespace(
         hour=hour,
+        duration_h=1.0,
         campaign=SimpleNamespace(name="C2A"),
         temperature_C=1200.0 + hour,
         melt_mass_kg=melt_mass_kg,
