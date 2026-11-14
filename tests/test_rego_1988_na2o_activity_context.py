@@ -457,6 +457,19 @@ def _assert_rego_table_i_sibling_links(observations: list[dict]) -> dict[str, di
     return by_id
 
 
+def _assert_rego_table_i_evidence_origins(origins: dict[str, str]) -> None:
+    for base_id in TABLE_I_ACTIVITY_PINS:
+        activity_id = f"{base_id}_activity"
+        input_id = f"{base_id}_printed_log_input"
+        expected_origin = (
+            "model_derived" if "_cao_sio2_" in base_id else "quoted_attributed"
+        )
+        assert origins[activity_id] == origins[input_id], (
+            f"{activity_id} must preserve its printed-log evidence origin"
+        )
+        assert origins[activity_id] == expected_origin
+
+
 def test_rego_table_i_log_activity_siblings_resolve_and_round_to_printed_precision() -> None:
     extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     observations = extract["species"]["SiO2"]["observations"]
@@ -508,6 +521,13 @@ def test_rego_table_i_log_activity_siblings_resolve_and_round_to_printed_precisi
         and observation_id.rsplit("::", 1)[-1].startswith("rego_1988_table_i_")
     }
     assert len(migrated) == 16
+    assert migrator.result.validation.hard_issues == ()
+    evidence_origins = {
+        observation_id: observation.evidence.class_.value.value
+        for observation_id, observation in migrated.items()
+    }
+    _assert_rego_table_i_evidence_origins(evidence_origins)
+
     for base_id, (printed, linear) in TABLE_I_ACTIVITY_PINS.items():
         activity_id = f"{base_id}_activity"
         input_id = f"{base_id}_printed_log_input"
@@ -516,6 +536,9 @@ def test_rego_table_i_log_activity_siblings_resolve_and_round_to_printed_precisi
         parent_id = activity.derived_from[0]
         assert parent_id in migrator.result.observations
         assert parent_id.rsplit("::", 1)[-1] == input_id
+        assert activity.evidence.class_.value == printed_log.evidence.class_.value
+        assert activity.evidence.attribution == printed_log.evidence.attribution
+        assert activity.evidence.attribution
         assert Decimal(str(activity.value.point)) == Decimal(linear)
         assert activity.identity.quantity.is_value
         assert activity.identity.quantity.value is Quantity.ACTIVITY
@@ -530,3 +553,8 @@ def test_rego_table_i_log_activity_siblings_resolve_and_round_to_printed_precisi
             assert observation.point_conditions["T_C"].locator.page == 5
             assert observation.point_conditions["composition"].state.is_value
             assert observation.point_conditions["composition"].locator.table == "I"
+
+    mutated_origins = evidence_origins.copy()
+    mutated_origins["rego_1988_table_i_cao_sio2_x060_activity"] = "measured_reduced"
+    with pytest.raises(AssertionError):
+        _assert_rego_table_i_evidence_origins(mutated_origins)

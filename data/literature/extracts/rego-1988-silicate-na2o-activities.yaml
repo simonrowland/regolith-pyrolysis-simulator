@@ -7471,12 +7471,13 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: measured_reduced
-        evidence_class: measured_reduced
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
         activity: '0.877'
         value_as_printed: '-0.057'
         printed_quantity: log a_SiO2(l)
+        attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF."
         T_C: '1400'
         composition_mol: {CaO: '0.40', SiO2: '0.60', basis: printed_mole_fraction}
       point_conditions: &rego_table_i_cao_x060_conditions
@@ -7511,6 +7512,7 @@ species:
         value_as_printed: '-0.057'
         printed_quantity: log a_SiO2(l)
         printed_form: log10
+        attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF."
         T_C: '1400'
         composition_mol: {CaO: '0.40', SiO2: '0.60', basis: printed_mole_fraction}
         schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.
@@ -7529,12 +7531,13 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: measured_reduced
-        evidence_class: measured_reduced
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
         admission_status: admitted
         activity: '0.104'
         value_as_printed: '-0.982'
         printed_quantity: log a_SiO2(l)
+        attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2]."
         T_C: '1400'
         composition_mol: {Na2O: '0.40', SiO2: '0.60', basis: printed_mole_fraction}
       point_conditions: &rego_table_i_na2o_x060_conditions
@@ -7569,6 +7572,7 @@ species:
         value_as_printed: '-0.982'
         printed_quantity: log a_SiO2(l)
         printed_form: log10
+        attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2]."
         T_C: '1400'
         composition_mol: {Na2O: '0.40', SiO2: '0.60', basis: printed_mole_fraction}
         schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.
@@ -7580,7 +7584,7 @@ species:
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2; CaO-(SiO2)y terminal binary; X_SiO2=0.65.}
       standard_state: pure liquid SiO2 at 1400 C
       units: dimensionless activity
-      values: {quantity: activity, method_class: measured_reduced, evidence_class: measured_reduced, admission_status: admitted, activity: '1.05', value_as_printed: '0.023', printed_quantity: log a_SiO2(l), T_C: '1400', composition_mol: {CaO: '0.35', SiO2: '0.65', basis: printed_mole_fraction}}
+      values: {quantity: activity, method_class: model_derived, evidence_class: model_derived, admission_status: admitted, activity: '1.05', value_as_printed: '0.023', printed_quantity: log a_SiO2(l), attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.35', SiO2: '0.65', basis: printed_mole_fraction}}
       point_conditions: &rego_table_i_cao_x065_conditions
         T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2}}
         composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.35'], [SiO2, '0.65']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2}}
@@ -7591,7 +7595,7 @@ species:
       phase: l
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2; CaO-(SiO2)y terminal binary; X_SiO2=0.65.}
       units: printed log10 activity; no log-valued activity form
-      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.023', printed_quantity: log a_SiO2(l), printed_form: log10, T_C: '1400', composition_mol: {CaO: '0.35', SiO2: '0.65', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.023', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.35', SiO2: '0.65', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
       point_conditions: *rego_table_i_cao_x065_conditions
     - observation_id: rego_1988_table_i_na2o_sio2_x065_activity
       type: activity_coefficient
@@ -7600,7 +7604,7 @@ species:
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2; Na2O-(SiO2)y terminal binary; X_SiO2=0.65.}
       standard_state: pure liquid SiO2 at 1400 C
       units: dimensionless activity
-      values: {quantity: activity, method_class: measured_reduced, evidence_class: measured_reduced, admission_status: admitted, activity: '0.227', value_as_printed: '-0.644', printed_quantity: log a_SiO2(l), T_C: '1400', composition_mol: {Na2O: '0.35', SiO2: '0.65', basis: printed_mole_fraction}}
+      values: {quantity: activity, method_class: quoted_attributed, evidence_class: quoted_attributed, admission_status: admitted, activity: '0.227', value_as_printed: '-0.644', printed_quantity: log a_SiO2(l), attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.35', SiO2: '0.65', basis: printed_mole_fraction}}
       point_conditions: &rego_table_i_na2o_x065_conditions
         T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2}}
         composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.35'], [SiO2, '0.65']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2}}
@@ -7611,7 +7615,7 @@ species:
       phase: l
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2; Na2O-(SiO2)y terminal binary; X_SiO2=0.65.}
       units: printed log10 activity; no log-valued activity form
-      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.644', printed_quantity: log a_SiO2(l), printed_form: log10, T_C: '1400', composition_mol: {Na2O: '0.35', SiO2: '0.65', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.644', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.35', SiO2: '0.65', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
       point_conditions: *rego_table_i_na2o_x065_conditions
     - observation_id: rego_1988_table_i_cao_sio2_x070_activity
       type: activity_coefficient
@@ -7620,7 +7624,7 @@ species:
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3; CaO-(SiO2)y terminal binary; X_SiO2=0.70.}
       standard_state: pure liquid SiO2 at 1400 C
       units: dimensionless activity
-      values: {quantity: activity, method_class: measured_reduced, evidence_class: measured_reduced, admission_status: admitted, activity: '1.12', value_as_printed: '0.050', printed_quantity: log a_SiO2(l), T_C: '1400', composition_mol: {CaO: '0.30', SiO2: '0.70', basis: printed_mole_fraction}}
+      values: {quantity: activity, method_class: model_derived, evidence_class: model_derived, admission_status: admitted, activity: '1.12', value_as_printed: '0.050', printed_quantity: log a_SiO2(l), attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.30', SiO2: '0.70', basis: printed_mole_fraction}}
       point_conditions: &rego_table_i_cao_x070_conditions
         T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3}}
         composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.30'], [SiO2, '0.70']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3}}
@@ -7630,7 +7634,7 @@ species:
       type: activity_coefficient
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3; CaO-(SiO2)y terminal binary; X_SiO2=0.70.}
       units: printed log10 activity; no log-valued activity form
-      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.050', printed_quantity: log a_SiO2(l), printed_form: log10, T_C: '1400', composition_mol: {CaO: '0.30', SiO2: '0.70', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.050', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.30', SiO2: '0.70', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
       point_conditions: *rego_table_i_cao_x070_conditions
     - observation_id: rego_1988_table_i_na2o_sio2_x070_activity
       type: activity_coefficient
@@ -7639,7 +7643,7 @@ species:
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3; Na2O-(SiO2)y terminal binary; X_SiO2=0.70.}
       standard_state: pure liquid SiO2 at 1400 C
       units: dimensionless activity
-      values: {quantity: activity, method_class: measured_reduced, evidence_class: measured_reduced, admission_status: admitted, activity: '0.397', value_as_printed: '-0.401', printed_quantity: log a_SiO2(l), T_C: '1400', composition_mol: {Na2O: '0.30', SiO2: '0.70', basis: printed_mole_fraction}}
+      values: {quantity: activity, method_class: quoted_attributed, evidence_class: quoted_attributed, admission_status: admitted, activity: '0.397', value_as_printed: '-0.401', printed_quantity: log a_SiO2(l), attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.30', SiO2: '0.70', basis: printed_mole_fraction}}
       point_conditions: &rego_table_i_na2o_x070_conditions
         T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3}}
         composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.30'], [SiO2, '0.70']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3}}
@@ -7649,7 +7653,7 @@ species:
       type: activity_coefficient
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3; Na2O-(SiO2)y terminal binary; X_SiO2=0.70.}
       units: printed log10 activity; no log-valued activity form
-      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.401', printed_quantity: log a_SiO2(l), printed_form: log10, T_C: '1400', composition_mol: {Na2O: '0.30', SiO2: '0.70', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.401', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.30', SiO2: '0.70', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
       point_conditions: *rego_table_i_na2o_x070_conditions
     - observation_id: rego_1988_table_i_cao_sio2_x075_activity
       type: activity_coefficient
@@ -7658,7 +7662,7 @@ species:
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4; CaO-(SiO2)y terminal binary; X_SiO2=0.75.}
       standard_state: pure liquid SiO2 at 1400 C
       units: dimensionless activity
-      values: {quantity: activity, method_class: measured_reduced, evidence_class: measured_reduced, admission_status: admitted, activity: '1.18', value_as_printed: '0.072', printed_quantity: log a_SiO2(l), T_C: '1400', composition_mol: {CaO: '0.25', SiO2: '0.75', basis: printed_mole_fraction}}
+      values: {quantity: activity, method_class: model_derived, evidence_class: model_derived, admission_status: admitted, activity: '1.18', value_as_printed: '0.072', printed_quantity: log a_SiO2(l), attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.25', SiO2: '0.75', basis: printed_mole_fraction}}
       point_conditions: &rego_table_i_cao_x075_conditions
         T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4}}
         composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.25'], [SiO2, '0.75']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4}}
@@ -7668,7 +7672,7 @@ species:
       type: activity_coefficient
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4; CaO-(SiO2)y terminal binary; X_SiO2=0.75.}
       units: printed log10 activity; no log-valued activity form
-      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.072', printed_quantity: log a_SiO2(l), printed_form: log10, T_C: '1400', composition_mol: {CaO: '0.25', SiO2: '0.75', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.072', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.25', SiO2: '0.75', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
       point_conditions: *rego_table_i_cao_x075_conditions
     - observation_id: rego_1988_table_i_na2o_sio2_x075_activity
       type: activity_coefficient
@@ -7677,7 +7681,7 @@ species:
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4; Na2O-(SiO2)y terminal binary; X_SiO2=0.75.}
       standard_state: pure liquid SiO2 at 1400 C
       units: dimensionless activity
-      values: {quantity: activity, method_class: measured_reduced, evidence_class: measured_reduced, admission_status: admitted, activity: '0.585', value_as_printed: '-0.233', printed_quantity: log a_SiO2(l), T_C: '1400', composition_mol: {Na2O: '0.25', SiO2: '0.75', basis: printed_mole_fraction}}
+      values: {quantity: activity, method_class: quoted_attributed, evidence_class: quoted_attributed, admission_status: admitted, activity: '0.585', value_as_printed: '-0.233', printed_quantity: log a_SiO2(l), attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.25', SiO2: '0.75', basis: printed_mole_fraction}}
       point_conditions: &rego_table_i_na2o_x075_conditions
         T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4}}
         composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.25'], [SiO2, '0.75']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4}}
@@ -7687,7 +7691,7 @@ species:
       type: activity_coefficient
       locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4; Na2O-(SiO2)y terminal binary; X_SiO2=0.75.}
       units: printed log10 activity; no log-valued activity form
-      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.233', printed_quantity: log a_SiO2(l), printed_form: log10, T_C: '1400', composition_mol: {Na2O: '0.25', SiO2: '0.75', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.233', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.25', SiO2: '0.75', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
       point_conditions: *rego_table_i_na2o_x075_conditions
     context:
       - observation_id: rego_1988_fig4_sio2_isoactivity_model
