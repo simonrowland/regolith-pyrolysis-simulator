@@ -270,7 +270,7 @@ def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
 # 0.0491 m²/s vs the legacy 0.01 constant (about 5×). The previously
 # quoted ~0.042 m²/s is the same formula at 1773 K (1500 C), not at
 # 1973 K.
-_LENNARD_JONES_PARAMS = {
+_LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     # (sigma Angstrom, eps/k_B K, M g/mol)
     # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
     'N2':  _carrier_lennard_jones_params('N2'),  # BSL Table E.1
@@ -292,7 +292,7 @@ _LENNARD_JONES_PARAMS = {
     'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
 }
 
-_LENNARD_JONES_PROVENANCE = {
+_LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     'N2': {
         'status': 'sourced',
         'source': 'Bird/Stewart/Lightfoot Table E.1',
@@ -1200,9 +1200,9 @@ def _cold_wall_condensation_record_payload(
     return payload
 
 
-_ANTOINE_TELEMETRY_CONTEXT = ContextVar(
-    'condensation_antoine_telemetry_context', default=None
-)
+_ANTOINE_TELEMETRY_CONTEXT: ContextVar[
+    tuple[MutableMapping[str, Dict[str, Any]] | None, list[str] | None] | None
+] = ContextVar('condensation_antoine_telemetry_context', default=None)
 
 
 def _valid_temperature_range_K(value: Any) -> list[float] | None:

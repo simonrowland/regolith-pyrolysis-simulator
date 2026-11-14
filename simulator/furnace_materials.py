@@ -82,6 +82,7 @@ def _catalog_max_service_T_C() -> float:
     return max(ratings)
 
 
+FURNACE_MAX_T_BOUNDS_C: tuple[float, float]
 CERTIFIED_WALL_ANCHORED_FURNACE_MATERIALS = frozenset(
     {
         "dense_alumina_continuous",

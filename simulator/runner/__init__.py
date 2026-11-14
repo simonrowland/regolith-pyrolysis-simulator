@@ -178,12 +178,12 @@ O2_SOURCE_SIDE_POTENTIAL_LABEL = (
 # repo root is now three levels up, and DATA_DIR is load-bearing.
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 
-SIO_YIELD_FEEDSTOCKS = (
+SIO_YIELD_FEEDSTOCKS: tuple[str, ...] = (
     "lunar_mare_low_ti",
     "mars_basalt",
 )
 SIO_YIELD_CAMPAIGN = "C2A_continuous"
-SIO_YIELD_CAMPAIGN_ALIASES = {
+SIO_YIELD_CAMPAIGN_ALIASES: dict[str, str] = {
     SIO_YIELD_CAMPAIGN: "C2A",
 }
 SIO_ALPHA_PROVENANCE = (
@@ -191,9 +191,9 @@ SIO_ALPHA_PROVENANCE = (
     "alpha_s_SiO(T)=0.52*exp(-3685/T), UNCERTIFIED solid-SiO "
     "particle-growth proxy, not silicate-melt evaporation evidence"
 )
-SIO_INDUSTRIAL_BENCHMARK_PCT = (8, 15)
+SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
 WALL_DEPOSIT_ACCOUNT = "process.wall_deposit"
-SIO_YIELD_STAGE_KEYS = {
+SIO_YIELD_STAGE_KEYS: dict[str, str] = {
     COLLECTOR_STAGE_KEY_BY_NUMBER[1]: "stage_1_fe_condenser_impurity",
     COLLECTOR_STAGE_KEY_BY_NUMBER[3]: "stage_3_sio_zone_product",
     NA_COLLECTOR_STAGE_KEY: "stage_4_alkali_mg_carryover",
@@ -203,9 +203,9 @@ SIO_YIELD_STAGE_KEYS = {
 NOT_APPLICABLE_UNTIL_P0 = "not_applicable_until_p0"
 PRESET_PROVENANCE_METADATA_KEY = "preset"
 SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
-SIO_TSWEEP_DEFAULT_T_LOW_GRID_C = (1050.0, 1100.0, 1150.0)
-SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C = (1400.0, 1500.0, 1600.0)
-SIO_TSWEEP_DEFAULT_RAMP_GRID_C_PER_HR = (5.0, 10.0, 15.0)
+SIO_TSWEEP_DEFAULT_T_LOW_GRID_C: tuple[float, ...] = (1050.0, 1100.0, 1150.0)
+SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C: tuple[float, ...] = (1400.0, 1500.0, 1600.0)
+SIO_TSWEEP_DEFAULT_RAMP_GRID_C_PER_HR: tuple[float, ...] = (5.0, 10.0, 15.0)
 SIO_TSWEEP_MASS_BALANCE_LIMIT_PCT = RUNNER_MASS_BALANCE_LIMIT_PCT
 SIO_TSWEEP_GAP_A_BAND = "1200-1673K low-T extrapolation"
 SIO_TSWEEP_WARNING_TEXT = (
@@ -215,18 +215,18 @@ SIO_TSWEEP_WARNING_TEXT = (
     "this recommendation operationally."
 )
 SIO_WALL_SWEEP_SCHEMA_VERSION = "sio-wall-sweep-v1"
-SIO_WALL_SWEEP_DEFAULT_WALL_T_GRID_C = (
+SIO_WALL_SWEEP_DEFAULT_WALL_T_GRID_C: tuple[float, ...] = (
     1100.0,
     1300.0,
     1500.0,
     1650.0,
 )
-SIO_WALL_SWEEP_DEFAULT_PO2_MODES = (
+SIO_WALL_SWEEP_DEFAULT_PO2_MODES: tuple[str, ...] = (
     "no_suppress",
     "o2_1mbar",
 )
 _SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = CHEMISTRY_KERNEL_RUN_INPUT_KEYS
-SIO_WALL_SWEEP_PO2_MODE_CONFIG = {
+SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
     "no_suppress": {
         "label": "C2A no-suppress SiO extraction",
         "pO2_mbar": None,
@@ -246,7 +246,7 @@ _MBAR_TO_BAR = 1.0e-3
 # Metal product species the per-hour summary surfaces.  Anything else
 # (oxides, salts, halides) stays inside ``final_state`` -- the summary
 # is the "operator readout" view, not the full ledger projection.
-_METAL_PRODUCT_SPECIES = (
+_METAL_PRODUCT_SPECIES: tuple[str, ...] = (
     "Fe",
     "Mg",
     "Al",
@@ -265,7 +265,7 @@ _METAL_PRODUCT_SPECIES = (
 # relabelled N2 in every hourly artifact (carrier_identity + p_carrier_bar
 # read from the N2 partial) — the accepted-at-the-gate, silently-relabelled
 # downstream class.
-_CARRIER_TOKENS = {
+_CARRIER_TOKENS: dict[str, str] = {
     "N2": "N2",
     "AR": "Ar",
     "KR": "Kr",
@@ -2416,7 +2416,9 @@ class _WallDepositCumulativeCache:
     cumulative: dict[tuple[str, str], float]
 
 
-_WALL_DEPOSIT_CUMULATIVE_CACHE = weakref.WeakKeyDictionary()
+_WALL_DEPOSIT_CUMULATIVE_CACHE: weakref.WeakKeyDictionary[
+    PyrolysisSimulator, _WallDepositCumulativeCache
+] = weakref.WeakKeyDictionary()
 _WALL_DEPOSIT_CUMULATIVE_CACHE_LOCK = threading.Lock()
 
 
