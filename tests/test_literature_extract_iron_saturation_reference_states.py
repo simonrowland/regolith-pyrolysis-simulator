@@ -41,16 +41,29 @@ def test_reference_sources_migrate_in_isolation_with_conditions(
     assert len(result.observations) == expected_count
     assert not result.validation.hard_issues
     temperature_key = TEMPERATURE_CONDITION[source_id]
+    typed = 0
     # Mutation: remove a source's typed state or located temperature coordinate and this fails.
     for row in result.observations.values():
         identity = row.identity
+        quoted_stoich = (
+            source_id == "doyle-1988-feo-activity-multicomponent-magma"
+            and row.observation_id.endswith(
+                "doyle_1988_quoted_activity_stoichiometric_liquid_feo_1_93"
+            )
+        )
         assert identity.reference_state is not None
-        assert identity.reference_state.is_value
-        assert isinstance(identity.reference_state.value, StandardState)
-        assert identity.reference_state.value.endmember.formula == "Fe(1-x)O"
+        row_temperature_key = temperature_key
+        if quoted_stoich:
+            assert identity.reference_state.is_unknown
+            row_temperature_key = "T_C"
+        else:
+            assert identity.reference_state.is_value
+            assert isinstance(identity.reference_state.value, StandardState)
+            assert identity.reference_state.value.endmember.formula == "Fe(1-x)O"
+            typed += 1
         assert temperature_of(identity) is not None
         assert row.point_conditions
-        temperature = row.point_conditions[temperature_key]
+        temperature = row.point_conditions[row_temperature_key]
         assert isinstance(temperature, Located)
         assert temperature.locator is not None
         assert temperature.state.is_value
@@ -58,6 +71,9 @@ def test_reference_sources_migrate_in_isolation_with_conditions(
             Quantity.ACTIVITY,
             Quantity.ACTIVITY_COEFFICIENT,
         }
+    assert typed == expected_count - (
+        1 if source_id == "doyle-1988-feo-activity-multicomponent-magma" else 0
+    )
 
 
 def test_rule_precedence_uses_roeder_dg_and_doyle_coughlin() -> None:

@@ -28,7 +28,17 @@ from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterable,
+    Iterator,
+    Literal,
+    Mapping,
+    Protocol,
+    Sequence,
+)
 
 import yaml
 
@@ -125,6 +135,9 @@ from simulator.battery.input_provenance import (
     single_phase_printed_bulk_policy,
 )
 from simulator.physical_constants import ATM_PA_DECIMAL, GAS_CONSTANT, PA_PER_BAR
+
+if TYPE_CHECKING:
+    from simulator.diagnostic_helpers.binary_pot_battery import Po2Request
 from simulator.battery.migrate import (
     REPO_ROOT,
     _COMPOSITION_COMPONENTS,
@@ -4471,29 +4484,23 @@ def _iron_saturated_feo_comparison(
 ) -> Observation | None:
     """Retag iron-saturated Fe(1-x)O(l) onto the comparison FeO frame.
 
-    Holzheid's standard is the iron-saturated liquid's chemical potential,
-    mu_FeO = mu_Fe + mu_O. a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
-    carries that partial onto JANAF Fe-019. Page 801's N_O/N_Fe = (3r−1)/(2r)
-    fixes the saturation composition and does not multiply this partial.
-    The composition itself comes from iron_saturation_composition. It does
-    not scale the activity.
+    An iron-saturated Fe(1-x)O standard has chemical potential
+    mu_FeO = mu_Fe + mu_O; a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
+    carries that partial onto JANAF Fe-019. Its Fe2+ fraction N0 comes from
+    iron_saturation_composition: source-analysis extrapolation when recorded,
+    a cited Fe-O composition when named by the source, and otherwise the D&G
+    owner route.
 
-    Distin's tabulated activity is the oxygen ratio a_D = O_metal / O_sat
-    on that same iron-saturated standard (p. 74). O_sat is the oxygen
-    solubility of iron under pure iron oxide at that T. Printed p. 75
-    divides the measured metal oxygen by 0.44, 0.63 and 0.83 wt% at
-    1785, 1880 and 1960 °C (0.43/0.44 rounds to the stored 0.977). This
-    paper's eight references do not include Taylor & Chipman. The
-    levitation technique is their own prior paper (6), Can. Met. Quart.
-    10(1): 13 (1971); the saturation sentence does not say whether those
-    three percents were measured there or taken from an uncited table.
-    The extract records the printed percents in derivation prose and
-    carries no cited solubility source. That source is follow-up data,
-    not a number invented here. a_F019 = a_D * f, with
-    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Sanity: an iron-saturated melt
-    (a_D = 1) maps to f. The Temkin-frame reading a_F019 = a_D * f / N0
-    is withdrawn: the stored column is the oxygen ratio, and Masson's N0
-    multiply is not this Fe-019 step. No ion-fraction constant lives here.
+    Distin defines its tabulated activity as a_D = O_metal / O_sat (p. 74),
+    then identifies nonstoichiometric oxide in equilibrium with liquid iron
+    as the measured standard state (p. 75, Discussion). In Masson's Temkin
+    frame, the stoichiometric comparison is a_FeO = a_D * f / N0, where
+    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Premise: f converts oxygen chemical
+    potential and N0 converts the Temkin component activity. Algebra:
+    a_FeO = a_D * f * (1/N0). Both f and N0 are dimensionless, so activity
+    stays dimensionless. Sanity: N0 = 1 reduces to the gas-ratio conversion;
+    Distin's 1785 °C table limit N0 rounds to OpenIMCC's 0.9787. The one
+    iron_saturation_composition owner supplies N0 for this conversion.
 
     Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
     (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
@@ -4547,6 +4554,25 @@ def _iron_saturated_feo_comparison(
             band="Darken & Gurry iron-boundary conversion requires temperature_K",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    composition_decision = iron_saturation_composition(reference)
+    composition_notice = _composition_notice(
+        reference, composition_decision, quantity
+    )
+    n0 = composition_decision.n_fe2_plus
+    if composition_decision.failure is not None or n0 is None:
+        failure = composition_decision.failure or (
+            "iron-saturated FeO conversion requires a resolved Fe2+ fraction N0"
+        )
+        return replace(
+            reference,
+            identity=replace(
+                identity,
+                reference_state=State.unknown(
+                    f"{composition_decision.notice}: {failure}"
+                ),
+            ),
+            notices=union_notices(reference.notices, (composition_notice,)),
+        )
     try:
         calibration, delta_g_w = _iron_saturated_feo_calibration()
         factor = _feo_reference_factor(calibration, temperature_K)
@@ -4562,7 +4588,8 @@ def _iron_saturated_feo_comparison(
             band=f"Darken & Gurry / JANAF FeO reference: {exc}",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
-    converted = reference.value.point * factor
+    effective_factor = factor / n0
+    converted = reference.value.point * effective_factor
     log_f_spread_dex = (
         Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
     ).log10()
@@ -4584,9 +4611,12 @@ def _iron_saturated_feo_comparison(
             "Masson 1965 Temkin estimate 0.936 is EXCLUDED from the band "
             "(stated validity N_Fe2+ 0.7-0.9; this case lies outside it); "
             "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric "
-            f"FeO(l); source_value={reference.value.point}; "
+            f"FeO(l) with the Temkin N0 correction; "
+            f"source_value={reference.value.point}; "
             f"converted_value={converted}; "
             f"factor={_display_decimal(factor, '0.001')}; "
+            f"N0={_display_decimal(n0, '0.0001')}; "
+            f"effective_factor={_display_decimal(effective_factor, '0.001')}; "
             "jackknife sensitivity factor "
             f"[{_display_decimal(jackknife_low, '0.001')}, "
             f"{_display_decimal(jackknife_high, '0.001')}] "
@@ -4620,11 +4650,7 @@ def _iron_saturated_feo_comparison(
     )
     if row_band.notice is not None:
         notices += (row_band.notice,)
-    notices += (
-        _composition_notice(
-            reference, iron_saturation_composition(reference), quantity
-        ),
-    )
+    notices += (composition_notice,)
     return replace(
         reference,
         identity=replace(identity, reference_state=State.of(stoichiometric)),

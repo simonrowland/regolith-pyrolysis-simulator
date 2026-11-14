@@ -134,7 +134,39 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: &doyle_1989_coughlin_feo_standard_state
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase: {tag: value, value: l}
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge: {tag: value, value: 0}
+            component_basis: Fe(1-x)O
+            iron_saturation_composition:
+              method: cited_standard
+              composition_as_printed: Fe0.947O
+              quote: >-
+                The standard state is molten Fe_{0.947}O.
+              locator:
+                page: 3
+                published_page: 2633
+                pdf_page_index: 2
+                section: Control of the activity of FeO
+        inferred: false
+        note: >-
+          The standard state is molten Fe_{0.947}O.
+          The typed endmember is iron-saturated liquid Fe(1-x)O; the
+          score-time composition is supplied by the single D&G/cited-standard owner.
+        locator:
+          page: 3
+          published_page: 2633
+          pdf_page_index: 2
+          section: Control of the activity of FeO
       values:
         quantity: activity
         method_class: measured_reduced
@@ -146,9 +178,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -290,7 +321,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -302,9 +333,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -446,7 +476,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -458,9 +488,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -602,7 +631,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -614,9 +643,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -758,7 +786,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -770,9 +798,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -914,7 +941,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -926,9 +953,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -1070,7 +1096,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1082,9 +1108,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -1226,7 +1251,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1238,9 +1263,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -1382,7 +1406,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1394,9 +1418,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -1538,7 +1561,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1550,9 +1573,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -1694,7 +1716,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1706,9 +1728,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -1850,7 +1871,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1862,9 +1883,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -2006,7 +2026,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2018,9 +2038,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -2162,7 +2181,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2174,9 +2193,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -2318,7 +2336,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2330,9 +2348,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -2474,7 +2491,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2486,9 +2503,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -2630,7 +2646,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2642,9 +2658,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -2786,7 +2801,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2798,9 +2813,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -2942,7 +2956,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2954,9 +2968,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -3098,7 +3111,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3110,9 +3123,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -3254,7 +3266,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3266,9 +3278,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -3410,7 +3421,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3422,9 +3433,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -3566,7 +3576,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3578,9 +3588,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -3722,7 +3731,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3734,9 +3743,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -3878,7 +3886,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3890,9 +3898,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -4034,7 +4041,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4046,9 +4053,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -4190,7 +4196,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4202,9 +4208,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -4346,7 +4351,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4358,9 +4363,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -4502,7 +4506,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4514,9 +4518,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -4658,7 +4661,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4670,9 +4673,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -4814,7 +4816,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4826,9 +4828,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -4970,7 +4971,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4982,9 +4983,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -5126,7 +5126,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5138,9 +5138,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -5282,7 +5281,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5294,9 +5293,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -5438,7 +5436,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5450,9 +5448,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -5594,7 +5591,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5606,9 +5603,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -5750,7 +5746,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5762,9 +5758,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -5906,7 +5901,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5918,9 +5913,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -6062,7 +6056,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6074,9 +6068,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -6218,7 +6211,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6230,9 +6223,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -6374,7 +6366,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6386,9 +6378,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -6530,7 +6521,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6542,9 +6533,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -6686,7 +6676,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6698,9 +6688,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -6842,7 +6831,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6854,9 +6843,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -6998,7 +6986,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7010,9 +6998,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -7154,7 +7141,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7166,9 +7153,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -7310,7 +7296,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7322,9 +7308,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -7466,7 +7451,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7478,9 +7463,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -7622,7 +7606,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7634,9 +7618,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -7778,7 +7761,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7790,9 +7773,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -7934,7 +7916,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7946,9 +7928,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -8090,7 +8071,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8102,9 +8083,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -8246,7 +8226,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8258,9 +8238,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -8402,7 +8381,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8414,9 +8393,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -8558,7 +8536,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8570,9 +8548,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -8714,7 +8691,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8726,9 +8703,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -8870,7 +8846,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8882,9 +8858,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -9026,7 +9001,7 @@ species:
         panel: 4A
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9038,9 +9013,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -9182,7 +9156,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9194,9 +9168,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -9338,7 +9311,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9350,9 +9323,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -9494,7 +9466,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9506,9 +9478,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -9650,7 +9621,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9662,9 +9633,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -9806,7 +9776,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9818,9 +9788,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -9962,7 +9931,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9974,9 +9943,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -10118,7 +10086,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10130,9 +10098,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -10274,7 +10241,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10286,9 +10253,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -10430,7 +10396,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10442,9 +10408,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -10586,7 +10551,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10598,9 +10563,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -10742,7 +10706,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10754,9 +10718,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -10898,7 +10861,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10910,9 +10873,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -11054,7 +11016,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11066,9 +11028,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -11210,7 +11171,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11222,9 +11183,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -11366,7 +11326,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11378,9 +11338,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -11522,7 +11481,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11534,9 +11493,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -11678,7 +11636,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11690,9 +11648,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -11834,7 +11791,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11846,9 +11803,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -11990,7 +11946,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12002,9 +11958,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -12146,7 +12101,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12158,9 +12113,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -12302,7 +12256,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12314,9 +12268,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -12458,7 +12411,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12470,9 +12423,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -12614,7 +12566,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12626,9 +12578,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -12770,7 +12721,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12782,9 +12733,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -12926,7 +12876,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12938,9 +12888,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -13082,7 +13031,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13094,9 +13043,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -13238,7 +13186,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13250,9 +13198,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -13394,7 +13341,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13406,9 +13353,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -13550,7 +13496,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13562,9 +13508,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -13706,7 +13651,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13718,9 +13663,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -13862,7 +13806,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13874,9 +13818,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -14018,7 +13961,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14030,9 +13973,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -14174,7 +14116,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14186,9 +14128,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -14330,7 +14271,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14342,9 +14283,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -14486,7 +14426,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14498,9 +14438,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -14642,7 +14581,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14654,9 +14593,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -14798,7 +14736,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14810,9 +14748,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -14954,7 +14891,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14966,9 +14903,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -15110,7 +15046,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15122,9 +15058,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -15266,7 +15201,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15278,9 +15213,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -15422,7 +15356,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15434,9 +15368,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -15578,7 +15511,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15590,9 +15523,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -15734,7 +15666,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15746,9 +15678,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -15890,7 +15821,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15902,9 +15833,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -16046,7 +15976,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16058,9 +15988,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -16202,7 +16131,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16214,9 +16143,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -16358,7 +16286,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16370,9 +16298,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -16514,7 +16441,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16526,9 +16453,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -16670,7 +16596,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16682,9 +16608,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -16826,7 +16751,7 @@ species:
         panel: 4B
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16838,9 +16763,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -16982,7 +16906,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16994,9 +16918,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -17138,7 +17061,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17150,9 +17073,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -17294,7 +17216,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17306,9 +17228,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -17450,7 +17371,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17462,9 +17383,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -17606,7 +17526,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17618,9 +17538,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -17762,7 +17681,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17774,9 +17693,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -17918,7 +17836,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17930,9 +17848,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -18074,7 +17991,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18086,9 +18003,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -18230,7 +18146,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18242,9 +18158,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -18386,7 +18301,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18398,9 +18313,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -18542,7 +18456,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18554,9 +18468,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -18698,7 +18611,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18710,9 +18623,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -18854,7 +18766,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18866,9 +18778,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -19010,7 +18921,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -19022,9 +18933,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -19166,7 +19076,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -19178,9 +19088,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -19322,7 +19231,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -19334,9 +19243,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -19478,7 +19386,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -19490,9 +19398,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -19634,7 +19541,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -19646,9 +19553,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -19790,7 +19696,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -19802,9 +19708,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -19946,7 +19851,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -19958,9 +19863,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -20102,7 +20006,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -20114,9 +20018,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -20258,7 +20161,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -20270,9 +20173,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -20414,7 +20316,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -20426,9 +20328,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -20570,7 +20471,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -20582,9 +20483,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -20726,7 +20626,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -20738,9 +20638,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -20882,7 +20781,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -20894,9 +20793,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -21038,7 +20936,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -21050,9 +20948,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -21194,7 +21091,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -21206,9 +21103,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -21350,7 +21246,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -21362,9 +21258,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -21506,7 +21401,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -21518,9 +21413,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -21662,7 +21556,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -21674,9 +21568,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -21818,7 +21711,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -21830,9 +21723,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -21974,7 +21866,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -21986,9 +21878,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -22130,7 +22021,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -22142,9 +22033,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -22286,7 +22176,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -22298,9 +22188,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -22442,7 +22331,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -22454,9 +22343,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -22598,7 +22486,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -22610,9 +22498,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -22754,7 +22641,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -22766,9 +22653,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -22910,7 +22796,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -22922,9 +22808,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -23066,7 +22951,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -23078,9 +22963,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -23222,7 +23106,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -23234,9 +23118,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -23378,7 +23261,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -23390,9 +23273,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -23534,7 +23416,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -23546,9 +23428,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -23690,7 +23571,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -23702,9 +23583,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -23846,7 +23726,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -23858,9 +23738,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -24002,7 +23881,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -24014,9 +23893,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -24158,7 +24036,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -24170,9 +24048,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -24314,7 +24191,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -24326,9 +24203,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -24470,7 +24346,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -24482,9 +24358,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -24626,7 +24501,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -24638,9 +24513,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -24782,7 +24656,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -24794,9 +24668,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -24938,7 +24811,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -24950,9 +24823,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -25094,7 +24966,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -25106,9 +24978,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -25250,7 +25121,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -25262,9 +25133,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -25406,7 +25276,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -25418,9 +25288,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -25562,7 +25431,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -25574,9 +25443,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -25718,7 +25586,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -25730,9 +25598,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -25874,7 +25741,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -25886,9 +25753,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -26030,7 +25896,7 @@ species:
         panel: 4C
       units: dimensionless activity
       phase: l
-      standard_state: molten Fe0.947O
+      standard_state: *doyle_1989_coughlin_feo_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -26042,9 +25908,8 @@ species:
         T_K: '1600'
         temperature_as_printed: 1600±2 K
         temperature_uncertainty_K: '2'
-        standard_state_as_printed: molten Fe0.947O
-        standard_state_schema_gap: No exact enum exists for the stated non-stoichiometric molten Fe0.947O reference; preserve
-          it verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         activity_relation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8)
         phase_as_printed: liquid melt at equilibration; run-product glass analyzed
         composition_wt_percent_as_printed:
@@ -26226,7 +26091,8 @@ species:
       values:
         equation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837)
         temperature_basis_as_printed: T is the absolute temperature
-        standard_state_as_printed: molten Fe0.947O
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         method_as_printed: At equilibrium Fe + 0.5 O2 = FeO; the equilibrium constant is from Coughlin (1954), and metallic
           iron is stated to be almost pure (a_Fe = 1).
         fugacity_method_as_printed: Gas fugacities in the hot zone are calculated by Brinkley's (1946) method using the algorithm
@@ -26262,7 +26128,8 @@ species:
       values:
         quantity: activity
         species: FeO
-        standard_state_as_printed: molten Fe0.947O
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         data_as_printed: Dashed contours calculated using Eqn. (6) assuming w = 105 KJ/mole; data attributed to Abdelkarim
           (1976), Abdelkarim and Sommerville (1984), and Smith and Bell (1970).
         digitisation: figure_only and undigitised
@@ -26278,7 +26145,8 @@ species:
         quantity: activity
         species: FeO
         temperature_as_printed: 1748±2 K
-        standard_state_as_printed: molten Fe0.947O
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         interaction_parameter_as_printed: 105 KJ/mole
         data_as_printed: FeO-SiO2 and FeO-TiO2 curves; ternary data projected with Eqn. (6a).
         digitisation: figure_only and undigitised
@@ -26294,7 +26162,8 @@ species:
         quantity: activity
         species: FeO
         temperature_as_printed: 1600±2 K
-        standard_state_as_printed: molten Fe0.947O
+        standard_state_as_printed: >-
+          The standard state is molten Fe0.947O.
         figure4_as_printed: Three systems contoured for a_FeO; runs at the same a_FeO have the same symbol; filled/open symbols
           are initially FeO-richer/poorer materials.
         table1a_activity_cell_suffix_audit: The 167 Table 1A a_FeO cells have no printed suffix; Hi/Lo is printed in the separate

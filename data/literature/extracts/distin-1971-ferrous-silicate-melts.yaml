@@ -104,7 +104,7 @@ species:
             "Activities of 'FeO' were obtained as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure 'FeO' at the same temperature." O_metal is this row's printed values.oxygen_in_metal_wt_percent_as_printed (printed p. 74, table Experimental results). The p. 75 Results sentence states that the measured oxygen values are divided by the saturation values "0.44, 0.63 and 0.83 per cent at 1785°, 1880° and 1960°C, respectively" (printed p. 75). O_sat(T) therefore uses 0.44 wt% at 1785 °C, 0.63 wt% at 1880 °C, and 0.83 wt% at 1960 °C. At 1960 °C, all seven printed activities through initial SiO2 31.9 wt% equal round(O_metal / 0.84, 3), although the p. 75 sentence states 0.83 wt%. Worked row: initial SiO2 38.6 wt% has O_metal = 0.38 wt% and printed activity 0.456; round(0.38 / 0.84, 3) = 0.452, while round(0.38 / 0.83, 3) = 0.458. The printed activity remains unchanged.
           inputs: [*distin_source_asset]
           output_unit: dimensionless
-        standard_state: &distin_wustite_standard_state
+        standard_state: &distin_wustite_standard_state_1785
           state:
             tag: value
             value:
@@ -118,9 +118,37 @@ species:
                 charge: {tag: value, value: 0}
               component_basis: Fe(1-x)O
               reference_pressure_bar: '1.01325'
+              iron_saturation_composition:
+                method: derived_from_source_analyses
+                composition_as_printed: Table I final slag oxide analyses; derived N0 limit
+                quote: >-
+                  Activities of FeO, as measured in this study, refer to the nonstoichiometric oxide in
+                  equilibrium with liquid iron at the temperature of measurement as the standard state.
+                locator: {page: 74, table: 'Experimental results'}
+                n_fe2_plus: '0.9786949448512436295642817507'
+                provenance: >-
+                  Printed Table I p. 74 final FeO/Fe2O3/SiO2 wt% tuples in ascending SiO2: 95.5/2.2/2.3; 90.0/2.2/7.8;
+                  84.8/1.8/13.4; 80.6/0.3/19.1; 73.9/0.5/25.6; 71.2/0.0/28.8; 63.6/0.0/36.4; 56.9/0.4/42.7. On a 100 g
+                  basis use formula masses FeO 71.844, Fe2O3 159.687 and SiO2 60.083 g/mol; n_i=mass_i/M_i,
+                  xSiO2=nSiO2/(nSiO2+nFeO+2*nFe2O3), and N0_i=nFeO/(nFeO+2*nFe2O3). All fits use least squares on the
+                  lowest three or four SiO2 rows. Fit intercepts/residuals:
+                  linear-3=0.9786949448512436295642817506780106713411;
+                  quadratic-3=0.9814222927686571598193879736520192864199;
+                  linear-4=0.9736821380350517030430846772395297178299;
+                  quadratic-4=0.9839395887645318661316407943029182580132. Maximum residuals:
+                  0.0013326439570578903427938858875751441991, 6.2E-39, 0.0054635623181192401286484241197569040637,
+                  0.0013253642409848531384477728403291597041. Method band=0.002321089631062993988258921561281658158619
+                  dex; residual band=0.002431240492822927046941972422391953125609 dex. Central estimate is the
+                  linear/lowest-3 intercept. Method band is max(abs(log10(N0_fit/N0_central))) across all four fits;
+                  residual band is max(abs(log10((N0_central +/- max_fit_residual)/N0_central))). The recorded band is the
+                  larger value. Units check: mass/(g/mol) gives moles; xSiO2, N0, intercept spreads and dex bands are
+                  dimensionless.
+                band_dex: '0.002431240492822927046941972422'
           inferred: false
           note: >-
-            The paper states that the measured activities refer to nonstoichiometric oxide in equilibrium with liquid iron, and that conversion to the stoichiometric oxide follows by a later procedure (printed p. 75, Discussion). The typed schema has no explicit nonstoichiometric liquid-wüstite convention; this uses the same closest Raoultian pure-endmember representation as Holzheid 1997 and does not label the material stoichiometric FeO.
+            Masson's Temkin frame is recorded by the non-stoichiometric
+            Fe(1-x)O endmember and its table-derived zero-silica N0.
+            The supporting source quote is at printed p. 75, Discussion.
           locator: {page: 75, section: Discussion}
         units: dimensionless activity
         point_conditions:
@@ -135,7 +163,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1785
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: 'helium or argon + helium atmospheres of the same composition and flow rate as previously employed'}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 6.1, FeO_wt_percent_as_printed: 90.0, Fe2O3_wt_percent_as_printed: 2.2, SiO2_wt_percent_as_printed: 7.8, oxygen_in_metal_wt_percent_as_printed: 0.41, equilibration_time_s_as_printed: 831, composition_wt_pct: {FeO: 90.0, Fe2O3: 2.2, SiO2: 7.8}, composition_basis_note: Final slag composition as printed., activity: 0.932, T_C: 1785, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -146,7 +174,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1785
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 10.7, FeO_wt_percent_as_printed: 84.8, Fe2O3_wt_percent_as_printed: 1.8, SiO2_wt_percent_as_printed: 13.4, oxygen_in_metal_wt_percent_as_printed: 0.39, equilibration_time_s_as_printed: 903, composition_wt_pct: {FeO: 84.8, Fe2O3: 1.8, SiO2: 13.4}, composition_basis_note: Final slag composition as printed., activity: 0.886, T_C: 1785, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -157,7 +185,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1785
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 15.4, FeO_wt_percent_as_printed: 80.6, Fe2O3_wt_percent_as_printed: 0.3, SiO2_wt_percent_as_printed: 19.1, oxygen_in_metal_wt_percent_as_printed: 0.35, equilibration_time_s_as_printed: 884, composition_wt_pct: {FeO: 80.6, Fe2O3: 0.3, SiO2: 19.1}, composition_basis_note: Final slag composition as printed., activity: 0.795, T_C: 1785, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -168,7 +196,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1785
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 21.9, FeO_wt_percent_as_printed: 73.9, Fe2O3_wt_percent_as_printed: 0.5, SiO2_wt_percent_as_printed: 25.6, oxygen_in_metal_wt_percent_as_printed: 0.31, equilibration_time_s_as_printed: 673, composition_wt_pct: {FeO: 73.9, Fe2O3: 0.5, SiO2: 25.6}, composition_basis_note: Final slag composition as printed., activity: 0.705, T_C: 1785, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -179,7 +207,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1785
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 25.3, FeO_wt_percent_as_printed: 71.2, Fe2O3_wt_percent_as_printed: 0.0, SiO2_wt_percent_as_printed: 28.8, oxygen_in_metal_wt_percent_as_printed: 0.29, equilibration_time_s_as_printed: 681, composition_wt_pct: {FeO: 71.2, Fe2O3: 0.0, SiO2: 28.8}, composition_basis_note: Final slag composition as printed., activity: 0.659, T_C: 1785, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -190,7 +218,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1785
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 31.9, FeO_wt_percent_as_printed: 63.6, Fe2O3_wt_percent_as_printed: 0.0, SiO2_wt_percent_as_printed: 36.4, oxygen_in_metal_wt_percent_as_printed: 0.24, equilibration_time_s_as_printed: 745, composition_wt_pct: {FeO: 63.6, Fe2O3: 0.0, SiO2: 36.4}, composition_basis_note: Final slag composition as printed., activity: 0.545, T_C: 1785, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -201,7 +229,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1785
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 38.6, FeO_wt_percent_as_printed: 56.9, Fe2O3_wt_percent_as_printed: 0.4, SiO2_wt_percent_as_printed: 42.7, oxygen_in_metal_wt_percent_as_printed: 0.21, equilibration_time_s_as_printed: 772, composition_wt_pct: {FeO: 56.9, Fe2O3: 0.4, SiO2: 42.7}, composition_basis_note: Final slag composition as printed., activity: 0.477, T_C: 1785, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -212,7 +240,52 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: &distin_wustite_standard_state_1880
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase: {tag: value, value: l}
+                polymorph:
+                  tag: not_applicable
+                  reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+                charge: {tag: value, value: 0}
+              component_basis: Fe(1-x)O
+              reference_pressure_bar: '1.01325'
+              iron_saturation_composition:
+                method: derived_from_source_analyses
+                composition_as_printed: Table I final slag oxide analyses; derived N0 limit
+                quote: >-
+                  Activities of FeO, as measured in this study, refer to the nonstoichiometric oxide in
+                  equilibrium with liquid iron at the temperature of measurement as the standard state.
+                locator: {page: 74, table: 'Experimental results'}
+                n_fe2_plus: '0.9861097841165973149618546920'
+                provenance: >-
+                  Printed Table I p. 74 final FeO/Fe2O3/SiO2 wt% tuples in ascending SiO2: 93.9/1.1/5.0; 88.4/1.3/10.3;
+                  84.6/0.6/14.8; 80.5/0.0/19.5; 71.5/0.3/28.2; 68.0/0.2/31.8; 62.2/0.0/37.8; 54.3/0.0/45.7. On a 100 g
+                  basis use formula masses FeO 71.844, Fe2O3 159.687 and SiO2 60.083 g/mol; n_i=mass_i/M_i,
+                  xSiO2=nSiO2/(nSiO2+nFeO+2*nFe2O3), and N0_i=nFeO/(nFeO+2*nFe2O3). All fits use least squares on the
+                  lowest three or four SiO2 rows. Fit intercepts/residuals:
+                  linear-3=0.9861097841165973149618546919976065642746;
+                  quadratic-3=1.003140786755881727974595842683507074811;
+                  linear-4=0.9827934702464010283594982151677321991841;
+                  quadratic-4=0.9957257576606564537040680885806938834635. Maximum residuals:
+                  0.0032323041110247107634485890329336525768, 4.9E-39, 0.0040247671416359599089565730345452938730,
+                  0.0014748150563425987135225309359364353459. Method band=0.007436620909554859980899190014599155237310
+                  dex; residual band=0.001776182516078176368805941704923802525009 dex. Central estimate is the
+                  linear/lowest-3 intercept. Method band is max(abs(log10(N0_fit/N0_central))) across all four fits;
+                  residual band is max(abs(log10((N0_central +/- max_fit_residual)/N0_central))). The recorded band is the
+                  larger value. Units check: mass/(g/mol) gives moles; xSiO2, N0, intercept spreads and dex bands are
+                  dimensionless.
+                band_dex: '0.007436620909554859980899190015'
+          inferred: false
+          note: >-
+            Masson's Temkin frame is recorded by the non-stoichiometric
+            Fe(1-x)O endmember and its table-derived zero-silica N0.
+            The supporting source quote is at printed p. 75, Discussion.
+          locator: {page: 75, section: Discussion}
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 1.4, FeO_wt_percent_as_printed: 93.9, Fe2O3_wt_percent_as_printed: 1.1, SiO2_wt_percent_as_printed: 5.0, oxygen_in_metal_wt_percent_as_printed: 0.60, equilibration_time_s_as_printed: 681, composition_wt_pct: {FeO: 93.9, Fe2O3: 1.1, SiO2: 5.0}, composition_basis_note: Final slag composition as printed., activity: 0.952, T_C: 1880, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -223,7 +296,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1880
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 6.1, FeO_wt_percent_as_printed: 88.4, Fe2O3_wt_percent_as_printed: 1.3, SiO2_wt_percent_as_printed: 10.3, oxygen_in_metal_wt_percent_as_printed: 0.57, equilibration_time_s_as_printed: 843, composition_wt_pct: {FeO: 88.4, Fe2O3: 1.3, SiO2: 10.3}, composition_basis_note: Final slag composition as printed., activity: 0.905, T_C: 1880, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -234,7 +307,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1880
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 10.7, FeO_wt_percent_as_printed: 84.6, Fe2O3_wt_percent_as_printed: 0.6, SiO2_wt_percent_as_printed: 14.8, oxygen_in_metal_wt_percent_as_printed: 0.54, equilibration_time_s_as_printed: 828, composition_wt_pct: {FeO: 84.6, Fe2O3: 0.6, SiO2: 14.8}, composition_basis_note: Final slag composition as printed., activity: 0.857, T_C: 1880, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -245,7 +318,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1880
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 15.4, FeO_wt_percent_as_printed: 80.5, Fe2O3_wt_percent_as_printed: 0.0, SiO2_wt_percent_as_printed: 19.5, oxygen_in_metal_wt_percent_as_printed: 0.49, equilibration_time_s_as_printed: 917, composition_wt_pct: {FeO: 80.5, Fe2O3: 0.0, SiO2: 19.5}, composition_basis_note: Final slag composition as printed., activity: 0.778, T_C: 1880, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -256,7 +329,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1880
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 21.9, FeO_wt_percent_as_printed: 71.5, Fe2O3_wt_percent_as_printed: 0.3, SiO2_wt_percent_as_printed: 28.2, oxygen_in_metal_wt_percent_as_printed: 0.42, equilibration_time_s_as_printed: 743, composition_wt_pct: {FeO: 71.5, Fe2O3: 0.3, SiO2: 28.2}, composition_basis_note: Final slag composition as printed., activity: 0.667, T_C: 1880, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -267,7 +340,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1880
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 25.3, FeO_wt_percent_as_printed: 68.0, Fe2O3_wt_percent_as_printed: 0.2, SiO2_wt_percent_as_printed: 31.8, oxygen_in_metal_wt_percent_as_printed: 0.39, equilibration_time_s_as_printed: 789, composition_wt_pct: {FeO: 68.0, Fe2O3: 0.2, SiO2: 31.8}, composition_basis_note: Final slag composition as printed., activity: 0.619, T_C: 1880, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -278,7 +351,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1880
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 31.9, FeO_wt_percent_as_printed: 62.2, Fe2O3_wt_percent_as_printed: 0.0, SiO2_wt_percent_as_printed: 37.8, oxygen_in_metal_wt_percent_as_printed: 0.34, equilibration_time_s_as_printed: 697, composition_wt_pct: {FeO: 62.2, Fe2O3: 0.0, SiO2: 37.8}, composition_basis_note: Final slag composition as printed., activity: 0.540, T_C: 1880, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -289,7 +362,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1880
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 38.6, FeO_wt_percent_as_printed: 54.3, Fe2O3_wt_percent_as_printed: 0.0, SiO2_wt_percent_as_printed: 45.7, oxygen_in_metal_wt_percent_as_printed: 0.29, equilibration_time_s_as_printed: 770, composition_wt_pct: {FeO: 54.3, Fe2O3: 0.0, SiO2: 45.7}, composition_basis_note: Final slag composition as printed., activity: 0.460, T_C: 1880, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -300,7 +373,52 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: &distin_wustite_standard_state_1960
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase: {tag: value, value: l}
+                polymorph:
+                  tag: not_applicable
+                  reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+                charge: {tag: value, value: 0}
+              component_basis: Fe(1-x)O
+              reference_pressure_bar: '1.01325'
+              iron_saturation_composition:
+                method: derived_from_source_analyses
+                composition_as_printed: Table I final slag oxide analyses; derived N0 limit
+                quote: >-
+                  Activities of FeO, as measured in this study, refer to the nonstoichiometric oxide in
+                  equilibrium with liquid iron at the temperature of measurement as the standard state.
+                locator: {page: 74, table: 'Experimental results'}
+                n_fe2_plus: '0.9967873240267174416319985201'
+                provenance: >-
+                  Printed Table I p. 74 final FeO/Fe2O3/SiO2 wt% tuples in ascending SiO2: 92.9/0.5/6.6; 87.3/0.2/12.5;
+                  83.4/0.6/16.0; 77.2/0.0/22.8; 71.2/0.0/28.8; 65.7/0.4/33.9; 60.0/0.1/39.9; 51.7/0.2/48.1. On a 100 g
+                  basis use formula masses FeO 71.844, Fe2O3 159.687 and SiO2 60.083 g/mol; n_i=mass_i/M_i,
+                  xSiO2=nSiO2/(nSiO2+nFeO+2*nFe2O3), and N0_i=nFeO/(nFeO+2*nFe2O3). All fits use least squares on the
+                  lowest three or four SiO2 rows. Fit intercepts/residuals:
+                  linear-3=0.9967873240267174416319985200570994455932;
+                  quadratic-3=0.9760743996215491642390111492151246014223;
+                  linear-4=0.9932250031251583828916277334482592784452;
+                  quadratic-4=0.9989381488769736338018906280824003732029. Maximum residuals:
+                  0.0024635163860729082217782727245771946515, 1E-40, 0.0034748908840676369990979161848864100183,
+                  0.0026022212321729695954401285532392921422. Method band=0.009119584210532076176535328664336133500440
+                  dex; residual band=0.001516634997235829622006560534048931928922 dex. Central estimate is the
+                  linear/lowest-3 intercept. Method band is max(abs(log10(N0_fit/N0_central))) across all four fits;
+                  residual band is max(abs(log10((N0_central +/- max_fit_residual)/N0_central))). The recorded band is the
+                  larger value. Units check: mass/(g/mol) gives moles; xSiO2, N0, intercept spreads and dex bands are
+                  dimensionless.
+                band_dex: '0.009119584210532076176535328665'
+          inferred: false
+          note: >-
+            Masson's Temkin frame is recorded by the non-stoichiometric
+            Fe(1-x)O endmember and its table-derived zero-silica N0.
+            The supporting source quote is at printed p. 75, Discussion.
+          locator: {page: 75, section: Discussion}
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 1.4, FeO_wt_percent_as_printed: 92.9, Fe2O3_wt_percent_as_printed: 0.5, SiO2_wt_percent_as_printed: 6.6, oxygen_in_metal_wt_percent_as_printed: 0.78, equilibration_time_s_as_printed: 803, composition_wt_pct: {FeO: 92.9, Fe2O3: 0.5, SiO2: 6.6}, composition_basis_note: Final slag composition as printed., activity: 0.929, T_C: 1960, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -311,7 +429,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1960
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 6.1, FeO_wt_percent_as_printed: 87.3, Fe2O3_wt_percent_as_printed: 0.2, SiO2_wt_percent_as_printed: 12.5, oxygen_in_metal_wt_percent_as_printed: 0.74, equilibration_time_s_as_printed: 619, composition_wt_pct: {FeO: 87.3, Fe2O3: 0.2, SiO2: 12.5}, composition_basis_note: Final slag composition as printed., activity: 0.881, T_C: 1960, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -322,7 +440,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1960
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 10.7, FeO_wt_percent_as_printed: 83.4, Fe2O3_wt_percent_as_printed: 0.6, SiO2_wt_percent_as_printed: 16.0, oxygen_in_metal_wt_percent_as_printed: 0.70, equilibration_time_s_as_printed: 658, composition_wt_pct: {FeO: 83.4, Fe2O3: 0.6, SiO2: 16.0}, composition_basis_note: Final slag composition as printed., activity: 0.833, T_C: 1960, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -333,7 +451,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1960
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 15.4, FeO_wt_percent_as_printed: 77.2, Fe2O3_wt_percent_as_printed: 0.0, SiO2_wt_percent_as_printed: 22.8, oxygen_in_metal_wt_percent_as_printed: 0.62, equilibration_time_s_as_printed: 694, composition_wt_pct: {FeO: 77.2, Fe2O3: 0.0, SiO2: 22.8}, composition_basis_note: Final slag composition as printed., activity: 0.738, T_C: 1960, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -344,7 +462,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1960
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 21.9, FeO_wt_percent_as_printed: 71.2, Fe2O3_wt_percent_as_printed: 0.0, SiO2_wt_percent_as_printed: 28.8, oxygen_in_metal_wt_percent_as_printed: 0.56, equilibration_time_s_as_printed: 781, composition_wt_pct: {FeO: 71.2, Fe2O3: 0.0, SiO2: 28.8}, composition_basis_note: Final slag composition as printed., activity: 0.667, T_C: 1960, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -355,7 +473,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1960
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 25.3, FeO_wt_percent_as_printed: 65.7, Fe2O3_wt_percent_as_printed: 0.4, SiO2_wt_percent_as_printed: 33.9, oxygen_in_metal_wt_percent_as_printed: 0.50, equilibration_time_s_as_printed: 835, composition_wt_pct: {FeO: 65.7, Fe2O3: 0.4, SiO2: 33.9}, composition_basis_note: Final slag composition as printed., activity: 0.595, T_C: 1960, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -366,7 +484,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1960
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 31.9, FeO_wt_percent_as_printed: 60.0, Fe2O3_wt_percent_as_printed: 0.1, SiO2_wt_percent_as_printed: 39.9, oxygen_in_metal_wt_percent_as_printed: 0.45, equilibration_time_s_as_printed: 905, composition_wt_pct: {FeO: 60.0, Fe2O3: 0.1, SiO2: 39.9}, composition_basis_note: Final slag composition as printed., activity: 0.536, T_C: 1960, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
@@ -377,7 +495,7 @@ species:
         phase: liquid FeO-SiO2 slag
         derived_from: [*distin_source_asset]
         derivation: *distin_activity_derivation
-        standard_state: *distin_wustite_standard_state
+        standard_state: *distin_wustite_standard_state_1960
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
         values: {initial_SiO2_wt_percent_as_printed: 38.6, FeO_wt_percent_as_printed: 51.7, Fe2O3_wt_percent_as_printed: 0.2, SiO2_wt_percent_as_printed: 48.1, oxygen_in_metal_wt_percent_as_printed: 0.38, equilibration_time_s_as_printed: 734, composition_wt_pct: {FeO: 51.7, Fe2O3: 0.2, SiO2: 48.1}, composition_basis_note: Final slag composition as printed., activity: 0.456, T_C: 1960, quantity: activity, component: FeO, method_class: measured_reduced, evidence_class: measured_reduced}
