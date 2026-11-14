@@ -261,6 +261,72 @@ def test_stale_plain_scope_cannot_hide_a_widened_band_or_source_flag(complete_co
     assert qualified["evidence_label"] == "development_validation"
 
 
+def test_omitted_review_cannot_authorize_an_unreviewed_wider_band(complete_contract):
+    args = complete_contract
+    oid, obs = next(iter(args[4].items()))
+    args[5][oid] = Decimal("24.74")
+    assert evaluate_card(*args)["verdict"] == "NOT_PASS"
+    args[2]["entries"] = [entry for entry in args[2]["entries"]
+                           if entry["ref"][0] != "observations"]
+    args[2]["consumed_paths"] = [entry["ref"] for entry in args[2]["entries"]]
+    args[4][oid] = replace(obs, uncertainty=Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"value": "3", "unit": "wt%", "confidence_level": "two_sigma"}))
+    receipt = evaluate_card(*args)
+    assert receipt["verdict"] == "NOT_PASS"
+    assert receipt["review_current"] is False
+    assert any(cause.get("reason") == "uncovered_consumed_path"
+               and cause["path"][:2] == ["observations", oid] for cause in receipt["causes"])
+
+
+def test_group_gate_rejects_coordinate_availability_swap(complete_contract):
+    args = complete_contract
+    oid, obs = next(iter(args[4].items()))
+    other = oid + "-second-coordinate"
+    args[4][other] = replace(obs, observation_id=other)
+    args[1]["outcomes"][0]["observation_ids"].append(other)
+    args[1]["outcomes"][0]["required_coordinates"] = 2
+    args[2]["frozen_run"] = deepcopy(args[1])
+    for entry in list(args[2]["entries"]):
+        if entry["ref"][0] == "observations":
+            copied = deepcopy(entry)
+            copied["ref"][1] = other
+            args[2]["entries"].append(copied)
+    args[2]["consumed_paths"] = [entry["ref"] for entry in args[2]["entries"]]
+    args[5].update({oid: Decimal("24.74"), other: None})
+    before = evaluate_card(*args)
+    args[5].update({oid: None, other: Decimal("24.74")})
+    after = evaluate_card(*args)
+    assert before["n_numeric"] == after["n_numeric"] == 1
+    assert before["rms_band"] is after["rms_band"] is None
+    gate = group_gate(before, after)
+    assert gate["accepted"] is False
+    assert f"chemistry:{oid}:numeric_availability" in gate["regressions"]
+
+
+def test_unrelated_outcome_attestation_preserves_reproduced_chemistry(complete_contract):
+    args = complete_contract
+    args[1]["outcomes"].append({
+        "group_id": "isotopes", "observation_ids": [], "required_coordinates": 1,
+        "independent": True, "comparator": "unsupported", "blockers": ["unsupported"]})
+    args[1]["printed_inventory"].append({
+        "group_id": "isotopes", "context_ref": ["extracts", "isotope_outcome"],
+        "locator": {"page": 6}})
+    args[2]["frozen_run"] = deepcopy(args[1])
+    args[3]["extracts"] = {"isotope_outcome": "printed isotope"}
+    args[2]["entries"].append({
+        "ref": ["extracts", "isotope_outcome"], "resolved": "printed isotope",
+        "role": "outcome", "status": "source_unattested", "reviewer": "fixture",
+        "locator": {"page": 6}, "quote": "printed isotope", "unit": "permil"})
+    args[2]["consumed_paths"] = [entry["ref"] for entry in args[2]["entries"]]
+    receipt = evaluate_card(*args)
+    assert receipt["verdict"] == "NOT_PASS"
+    assert receipt["groups"][0]["reproduced"] is True
+    assert receipt["groups"][0]["causes"] == []
+    assert receipt["groups"][0]["rms_band"] == "0.00"
+    assert receipt["group_fraction"] == {"numerator": 1, "denominator": 2}
+
+
 def test_setup_review_can_expire_while_existing_observation_certification_stays_green(
     complete_contract, tmp_path,
 ):
