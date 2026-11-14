@@ -279,7 +279,392 @@ benches:
         note: Used only for melting points of substances which melt completely at a definite temperature within 1600°-2100°.
 species:
   CaO:
-    observations: []
+    observations:
+    - observation_id: rankin_wright_1915_tB_r1_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 1'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [αCaO.SiO2, SiO2, liquid]
+        temperature_C: 1436
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 37, SiO2: 63}
+    - observation_id: rankin_wright_1915_tB_r2_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 2'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [αCaO.SiO2, 3CaO.2SiO2, liquid]
+        temperature_C: 1455
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 54.5, SiO2: 45.5}
+    - observation_id: rankin_wright_1915_tB_r3_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 3'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [α2CaO.SiO2, CaO, liquid]
+        temperature_C: 2065
+        temperature_uncertainty_C: 10
+        liquid_composition_mass_percent: {CaO: 67.5, SiO2: 32.5}
+    - observation_id: rankin_wright_1915_tB_r4_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 4'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [3CaO.Al2O3, 5CaO.3Al2O3, liquid]
+        temperature_C: 1395
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 50, Al2O3: 50}
+    - observation_id: rankin_wright_1915_tB_r5_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 5'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [5CaO.3Al2O3, CaO.Al2O3, liquid]
+        temperature_C: 1400
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 47, Al2O3: 53}
+    - observation_id: rankin_wright_1915_tB_r6_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 6'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [CaO.Al2O3, 3CaO.5Al2O3, liquid]
+        temperature_C: 1590
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 33.5, Al2O3: 66.5}
+    - observation_id: rankin_wright_1915_tB_r7_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 7'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [3CaO.5Al2O3, Al2O3, liquid]
+        temperature_C: 1700
+        temperature_uncertainty_C: 10
+        liquid_composition_mass_percent: {CaO: 24, Al2O3: 76}
+    - observation_id: rankin_wright_1915_tB_r8_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 8'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [Al2O3.SiO2, SiO2, liquid]
+        temperature_C: 1610
+        temperature_uncertainty_C: 10
+        liquid_composition_mass_percent: {Al2O3: 13, SiO2: 87}
+    - observation_id: rankin_wright_1915_tB_r9_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 9'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [Al2O3.SiO2, Al2O3, liquid]
+        temperature_C: 1810
+        temperature_uncertainty_C: 10
+        liquid_composition_mass_percent: {Al2O3: 64, SiO2: 36}
+    - observation_id: rankin_wright_1915_tB_r10_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 10'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, αCaO.SiO2, liquid]
+        temperature_C: 1299
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 34.1, Al2O3: 18.6, SiO2: 47.3}
+    - observation_id: rankin_wright_1915_tB_r11_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 11'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, SiO2, liquid]
+        temperature_C: 1359
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 10.5, Al2O3: 19.5, SiO2: 70}
+    - observation_id: rankin_wright_1915_tB_r12_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 12'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [2CaO.Al2O3.SiO2, α2CaO.SiO2, liquid]
+        temperature_C: 1545
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 49.6, Al2O3: 23.7, SiO2: 26.7}
+    - observation_id: rankin_wright_1915_tB_r13_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 13'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, Al2O3.SiO2, liquid]
+        temperature_C: 1547
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 19.3, Al2O3: 39.3, SiO2: 41.4}
+    - observation_id: rankin_wright_1915_tB_r14_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 14'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [2CaO.Al2O3.SiO2, CaO.Al2O3, liquid]
+        temperature_C: 1512
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 37.8, Al2O3: 52.9, SiO2: 9.3}
+    - observation_id: rankin_wright_1915_tB_r15_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 15'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [2CaO.Al2O3.SiO2, 3CaO.5Al2O3, liquid]
+        temperature_C: 1552
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 35, Al2O3: 50.8, SiO2: 14.2}
+    - observation_id: rankin_wright_1915_tB_r16_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 16'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, 2CaO.Al2O3.SiO2, liquid]
+        temperature_C: 1385
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 30.2, Al2O3: 36.8, SiO2: 33}
+    - observation_id: rankin_wright_1915_tB_r17_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 17'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [2CaO.Al2O3.SiO2, αCaO.SiO2, liquid]
+        temperature_C: 1316
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 45.7, Al2O3: 13.2, SiO2: 41.1}
+    - observation_id: rankin_wright_1915_tB_r18_invariant
+      type: transition_point
+      locator: {page: 77, published_page: 77, table: B, note: 'Table B row 18'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: binary eutectic
+        phases_as_printed: [β2CaO.SiO2, 5CaO.3Al2O3, liquid]
+        temperature_C: 1350
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 51.3, Al2O3: 41.8, SiO2: 6.9}
+    - observation_id: rankin_wright_1915_tC_r1_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: C, note: 'Table C row 1'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-SiO2
+        invariant_type_as_printed: quadruple point other than eutectic
+        phases_as_printed: [3CaO.2SiO2, α2CaO.SiO2, liquid]
+        temperature_C: 1475
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 55.5, SiO2: 44.5}
+    - observation_id: rankin_wright_1915_tC_r2_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: C, note: 'Table C row 2'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3
+        invariant_type_as_printed: quadruple point other than eutectic
+        phases_as_printed: [CaO, 3CaO.Al2O3, liquid]
+        temperature_C: 1535
+        temperature_uncertainty_C: 2
+        liquid_composition_mass_percent: {CaO: 57, Al2O3: 43}
+    - observation_id: rankin_wright_1915_tD_r1_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: D, note: 'Table D row 1'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: ternary eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, SiO2, αCaO.SiO2, liquid]
+        temperature_C: 1170
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 23.25, Al2O3: 14.75, SiO2: 62}
+    - observation_id: rankin_wright_1915_tD_r2_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: D, note: 'Table D row 2'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: ternary eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, Al2O3.SiO2, SiO2, liquid]
+        temperature_C: 1345
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 9.8, Al2O3: 19.8, SiO2: 70.4}
+    - observation_id: rankin_wright_1915_tD_r3_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: D, note: 'Table D row 3'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: ternary eutectic
+        phases_as_printed: [2CaO.Al2O3.SiO2, 3CaO.2SiO2, αCaO.SiO2, liquid]
+        temperature_C: 1310
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 47.2, Al2O3: 11.8, SiO2: 41}
+    - observation_id: rankin_wright_1915_tD_r4_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: D, note: 'Table D row 4'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: ternary eutectic
+        phases_as_printed: [2CaO.Al2O3.SiO2, CaO.Al2O3, 3CaO.5Al2O3, liquid]
+        temperature_C: 1505
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 37.5, Al2O3: 53.25, SiO2: 9.25}
+    - observation_id: rankin_wright_1915_tD_r5_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: D, note: 'Table D row 5'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: ternary eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, 2CaO.Al2O3.SiO2, αCaO.SiO2, liquid]
+        temperature_C: 1265
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 38, Al2O3: 20, SiO2: 42}
+    - observation_id: rankin_wright_1915_tD_r6_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: D, note: 'Table D row 6'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: ternary eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, 2CaO.Al2O3.SiO2, Al2O3, liquid]
+        temperature_C: 1380
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 29.2, Al2O3: 39, SiO2: 31.8}
+    - observation_id: rankin_wright_1915_tD_r7_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: D, note: 'Table D row 7'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: ternary eutectic
+        phases_as_printed: [β2CaO.SiO2, CaO.Al2O3, 5CaO.3Al2O3, liquid]
+        temperature_C: 1335
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 49.5, Al2O3: 43.7, SiO2: 6.8}
+    - observation_id: rankin_wright_1915_tD_r8_invariant
+      type: transition_point
+      locator: {page: 78, published_page: 78, table: D, note: 'Table D row 8'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: ternary eutectic
+        phases_as_printed: [β2CaO.SiO2, 3CaO.Al2O3, 5CaO.3Al2O3, liquid]
+        temperature_C: 1335
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 52, Al2O3: 41.2, SiO2: 6.8}
+    - observation_id: rankin_wright_1915_tE_r1_invariant
+      type: transition_point
+      locator: {page: 79, published_page: 79, table: E, note: 'Table E row 1'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: quintuple point other than eutectic
+        phases_as_printed: [CaO.Al2O3.2SiO2, Al2O3, Al2O3.SiO2, liquid]
+        temperature_C: 1512
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 15.6, Al2O3: 36.5, SiO2: 47.9}
+    - observation_id: rankin_wright_1915_tE_r2_invariant
+      type: transition_point
+      locator: {page: 79, published_page: 79, table: E, note: 'Table E row 2'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: quintuple point other than eutectic
+        phases_as_printed: [2CaO.Al2O3.SiO2, β2CaO.SiO2, CaO.Al2O3, liquid]
+        temperature_C: 1380
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 48.3, Al2O3: 42, SiO2: 9.7}
+    - observation_id: rankin_wright_1915_tE_r3_invariant
+      type: transition_point
+      locator: {page: 79, published_page: 79, table: E, note: 'Table E row 3'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: quintuple point other than eutectic
+        phases_as_printed: [2CaO.Al2O3.SiO2, 3CaO.2SiO2, β2CaO.SiO2, liquid]
+        temperature_C: 1335
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 48.2, Al2O3: 11.9, SiO2: 39.9}
+    - observation_id: rankin_wright_1915_tE_r4_invariant
+      type: transition_point
+      locator: {page: 79, published_page: 79, table: E, note: 'Table E row 4'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: quintuple point other than eutectic
+        phases_as_printed: [3CaO.5Al2O3, 2CaO.Al2O3.SiO2, Al2O3, liquid]
+        temperature_C: 1475
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 31.2, Al2O3: 44.5, SiO2: 24.3}
+    - observation_id: rankin_wright_1915_tE_r5_invariant
+      type: transition_point
+      locator: {page: 79, published_page: 79, table: E, note: 'Table E row 5'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: quintuple point other than eutectic
+        phases_as_printed: [3CaO.SiO2, 3CaO.Al2O3, α2CaO.SiO2, liquid]
+        temperature_C: 1455
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 58.3, Al2O3: 33, SiO2: 8.7}
+    - observation_id: rankin_wright_1915_tE_r6_invariant
+      type: transition_point
+      locator: {page: 79, published_page: 79, table: E, note: 'Table E row 6'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: quintuple point other than eutectic
+        phases_as_printed: [CaO, 3CaO.SiO2, 3CaO.Al2O3, liquid]
+        temperature_C: 1470
+        temperature_uncertainty_C: 5
+        liquid_composition_mass_percent: {CaO: 59.7, Al2O3: 32.8, SiO2: 7.5}
+    - observation_id: rankin_wright_1915_tE_r7_invariant
+      type: transition_point
+      locator: {page: 79, published_page: 79, table: E, note: 'Table E row 7'}
+      units: 'wt%; °C'
+      values:
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        invariant_type_as_printed: quintuple point other than eutectic
+        phases_as_printed: [CaO, α2CaO.SiO2, 3CaO.SiO2, liquid]
+        temperature_C: 1900
+        temperature_uncertainty_C: 20
+        liquid_composition_mass_percent: {CaO: 68.4, Al2O3: 9.2, SiO2: 22.4}
     context:
     - observation_id: rankin_wright_1915_tA_r1
       type: composition

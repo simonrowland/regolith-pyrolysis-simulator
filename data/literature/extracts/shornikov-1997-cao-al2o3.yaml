@@ -8,14 +8,16 @@ source:
   year: 1997
   corpus_asset: raw/shornikov-1997-cao-al2o3/shornikov-1997-cao-al2o3.pdf
 extraction:
-  method: "mineru_table_draft emit of Table 1, then hand placement of ± splits, composition complements,\
-    \ and the 1833–2033 K range. The fourteen partial-entropy cells were type-refused: Quantity has no\
-    \ partial-molar entropy, and they are not absolute S. Table 2 This-work rows and Table 3 This-study\
-    \ fusion rows were entered from the 600 dpi pages because the compound name is a spanning header.\
-    \ The right-column This-work rows above CaO·2Al2O3 continue the CaO·Al2O3 block. The 5CaO·3Al2O3 equation\
-    \ (8) uncertainty glyph is not a resolved digit."
-  date: '2026-10-20'
-  worker: t1372-w1
+  method: >-
+    mineru_table_draft emit of Table 1, then hand placement of ± splits, composition complements, and the 1833–2033 K
+    range. The fourteen partial-entropy cells were type-refused: Quantity has no partial-molar entropy, and they are not
+    absolute S. Table 2 This-work rows and Table 3 This-study fusion rows were entered from the 600 dpi pages because the
+    compound name is a spanning header. The right-column This-work rows above CaO·2Al2O3 continue the CaO·Al2O3 block.
+    The 5CaO·3Al2O3 equation (8) uncertainty glyph is not a resolved digit. The eleven additional cited Tfus entries
+    in Table 3 were transcribed from the rendered physical page 26; the twelve This-study Tfus entries already present
+    in the extract were retained.
+  date: '2026-11-14'
+  worker: bugs1110-fix-1816-tierA-141429
 review_status: draft
 fidelity_samples:
 - path: "species.CaO.observations[shornikov_1997_cao_al2o3_t1_cao_h_x0143].values.partial_molar_enthalpy_kJ_mol"
@@ -61,6 +63,22 @@ fidelity_samples:
 - path: "species.Ca5Al6O14.observations[shornikov_1997_cao_al2o3_t3_ca5al6o14_eq8].values.value.value"
   value: '25.2'
   note: Table 3, 5CaO·3Al2O3, equation (8), central value 25.2. Uncertainty glyph unresolved.
+  locator:
+    page: 4
+    published_page: 26
+    pdf_page_index: 3
+    table: '3'
+- path: "species.Ca3Al2O6.observations[shornikov_1997_cao_al2o3_t3_ca3al2o6_ref16].values.T_fus_as_printed"
+  value: "1808 ± 5"
+  note: Table 3, 3CaO·Al2O3, cited row [16].
+  locator:
+    page: 4
+    published_page: 26
+    pdf_page_index: 3
+    table: '3'
+- path: "species.CaAl12O19.observations[shornikov_1997_cao_al2o3_t3_caal12o19_ref30].values.T_fus_as_printed"
+  value: '2133'
+  note: Table 3, CaO·6Al2O3, cited row [30].
   locator:
     page: 4
     published_page: 26
@@ -1612,6 +1630,70 @@ species:
         - 2033
   Ca3Al2O6:
     observations:
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca3al2o6_ref30
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 3CaO·Al2O3
+        note: Tfus entry, printed reference [30]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: Ca3Al2O6
+        printed_compound: 3CaO·Al2O3
+        T_K: '1827'
+        T_fus_as_printed: '1827'
+        source_reference_as_printed: '[30]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca3al2o6_ref29
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 3CaO·Al2O3
+        note: Tfus entry, printed reference [29]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: Ca3Al2O6
+        printed_compound: 3CaO·Al2O3
+        T_K: '1817'
+        T_fus_as_printed: '1817'
+        source_reference_as_printed: '[29]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca3al2o6_ref16
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 3CaO·Al2O3
+        note: Tfus entry, printed reference [16]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: Ca3Al2O6
+        printed_compound: 3CaO·Al2O3
+        T_K: '1808'
+        T_fus_as_printed: 1808 ± 5
+        source_reference_as_printed: '[16]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
+        temperature_uncertainty_K: 5
     - observation_id: shornikov_1997_cao_al2o3_t2_ca3al2o6_iii_1600_1808_left_h
       type: gibbs_table
       locator:
@@ -1804,6 +1886,49 @@ species:
         attribution: This study
   Ca12Al14O33:
     observations:
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca12al14o33_ref30
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 12CaO·7Al2O3
+        note: Tfus entry, printed reference [30]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: Ca12Al14O33
+        printed_compound: 12CaO·7Al2O3
+        T_K: '1728'
+        T_fus_as_printed: '1728'
+        source_reference_as_printed: '[30]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
+    - observation_id: shornikov_1997_cao_al2o3_t3_ca12al14o33_ref56
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: 12CaO·7Al2O3
+        note: Tfus entry, printed reference [5, 6]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: Ca12Al14O33
+        printed_compound: 12CaO·7Al2O3
+        T_K: '1733'
+        T_fus_as_printed: 1733 ± 5
+        source_reference_as_printed: '[5, 6]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
+        temperature_uncertainty_K: 5
     - observation_id: shornikov_1997_cao_al2o3_t2_ca12al14o33_iii_1600_1733_left_h
       type: gibbs_table
       locator:
@@ -2072,6 +2197,69 @@ species:
         attribution: This study
   CaAl2O4:
     observations:
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal2o4_ref31
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·Al2O3
+        note: Tfus entry, printed reference [31]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: CaAl2O4
+        printed_compound: CaO·Al2O3
+        T_K: '1878'
+        T_fus_as_printed: '1878'
+        source_reference_as_printed: '[31]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal2o4_ref30
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·Al2O3
+        note: Tfus entry, printed reference [30]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: CaAl2O4
+        printed_compound: CaO·Al2O3
+        T_K: '1886'
+        T_fus_as_printed: '1886'
+        source_reference_as_printed: '[30]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal2o4_ref56
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·Al2O3
+        note: Tfus entry, printed reference [5, 6]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: CaAl2O4
+        printed_compound: CaO·Al2O3
+        T_K: '1875'
+        T_fus_as_printed: '1875'
+        source_reference_as_printed: '[5, 6]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
     - observation_id: shornikov_1997_cao_al2o3_t2_caal2o4_iii_1600_1877_right_h
       type: gibbs_table
       locator:
@@ -2223,6 +2411,48 @@ species:
         attribution: This study
   CaAl4O7:
     observations:
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal4o7_ref31
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·2Al2O3
+        note: Tfus entry, printed reference [31]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: CaAl4O7
+        printed_compound: CaO·2Al2O3
+        T_K: '2033'
+        T_fus_as_printed: '2033'
+        source_reference_as_printed: '[31]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal4o7_ref30
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·2Al2O3
+        note: Tfus entry, printed reference [30]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: CaAl4O7
+        printed_compound: CaO·2Al2O3
+        T_K: '2049'
+        T_fus_as_printed: '2049'
+        source_reference_as_printed: '[30]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
     - observation_id: shornikov_1997_cao_al2o3_t2_caal4o7_iii_1600_2033_right_h
       type: gibbs_table
       locator:
@@ -2357,6 +2587,27 @@ species:
         attribution: This study
   CaAl12O19:
     observations:
+    - observation_id: shornikov_1997_cao_al2o3_t3_caal12o19_ref30
+      type: transition_point
+      locator:
+        page: 4
+        published_page: 26
+        pdf_page_index: 3
+        table: '3'
+        row_label: CaO·6Al2O3
+        note: Tfus entry, printed reference [30]
+      units: K
+      values:
+        quantity: fusion_temperature
+        method_class: quoted_attributed
+        formula: CaAl12O19
+        printed_compound: CaO·6Al2O3
+        T_K: '2133'
+        T_fus_as_printed: '2133'
+        source_reference_as_printed: '[30]'
+        phases_as_printed: not stated
+        liquid_composition_as_printed: not stated
+        invariant_type_as_printed: fusion temperature; congruent or incongruent mode not stated
     - observation_id: shornikov_1997_cao_al2o3_t2_caal12o19_v_1833_2033_right_h
       type: gibbs_table
       locator:
