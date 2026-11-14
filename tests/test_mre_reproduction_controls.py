@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import copy
 
 import pytest
 
@@ -298,6 +299,41 @@ def test_plant_mre_isolated_from_reproduction_loader_and_driver(
     monkeypatch.setattr(reproduction_module, "run_mre_reproduction", forbidden)
 
     assert sim._step_mre() > 0.0
+
+
+@pytest.mark.parametrize("campaign", (CampaignPhase.C5, CampaignPhase.MRE_BASELINE))
+def test_subhour_mre_snapshot_rate_matches_terminal_oxygen_amount(campaign):
+    bundle = load_config_bundle()
+    setpoints = copy.deepcopy(bundle.setpoints)
+    setpoints["mre_voltage_sequence"] = {"sequence": [{
+        "species": "FeO", "decomposition_V": 0.8, "min_hold_hours": 1,
+    }]}
+    setpoints.setdefault("chemistry_kernel", {}).update(
+        liquid_fraction_provider="analytical", allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend, setpoints,
+        {"x": {"label": "X", "composition_wt_pct": {"FeO": 100.0}}},
+        bundle.vapor_pressures, materials=bundle.materials,
+    )
+    sim.load_batch("x", mass_kg=1000.0)
+    sim.start_campaign(campaign)
+    sim.melt.temperature_C = 1600.0
+    if campaign == CampaignPhase.C5:
+        sim.melt.c5_enabled = True
+        sim.melt.mre_target_species = "FeO"
+        sim.melt.mre_max_voltage_V = 0.8
+    account = "terminal.oxygen_mre_anode_stored"
+    before = sim.atom_ledger.mol_by_account(account).get("O2", 0.0)
+    snapshot = sim.step(dt_hr=0.25)
+    delta = sim.atom_ledger.mol_by_account(account).get("O2", 0.0) - before
+    assert delta > 0
+    assert snapshot.mre_anode_O2_mol_hr == pytest.approx(delta / snapshot.duration_h)
+    assert snapshot.overhead.mre_anode_O2_mol_hr == snapshot.mre_anode_O2_mol_hr
+    assert sim.atom_ledger.assert_balanced()
 
     assert not hasattr(sim, "mre_reproduction")
     assert "yu_2025_hollow_anode" not in repr(sim.__dict__)
