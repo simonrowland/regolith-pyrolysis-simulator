@@ -4,6 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import yaml
+import pytest
 
 from simulator.battery.enums import NoticeKind
 from simulator.battery.migrate import (
@@ -81,7 +82,10 @@ def test_sossi_and_doyle_real_rows_reach_bare_log_admission_with_pins() -> None:
     assert doyle_result.uncertainty_band_dex is not None
 
 
-def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatch() -> None:
+@pytest.mark.parametrize("chunk_index", range(3))
+def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatch(
+    chunk_index: int,
+) -> None:
     records: list[tuple[str, Decimal, Decimal, str]] = []
     sossi = _source_doc("sossi-2020-magma-ocean-redox.yaml")
     for experiment in sossi["experiments"]:
@@ -141,7 +145,8 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
                 outcome,
             )
         )
-    print("\n".join(",".join(row) for row in decision_table))
+    start = chunk_index * 5
+    assert False, decision_table[start : start + 5]
 
 
 def test_inert_n2_dilution_is_in_the_total_but_cancels_and_ratio_mutation_moves_fo2() -> None:
