@@ -13,7 +13,7 @@ import re
 import yaml
 import pytest
 from tests.helpers.corpus_paths import regolith_corpus_root
-from tests.helpers.named_manifests import assert_named_rows
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 from simulator.reference_data.janaf import load_manifest as load_janaf_manifest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -428,8 +428,33 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     counts = index["counts"]
     # Pin the generated index for the approved combined-offer merge stack.
     assert counts["sources"] == 850
-    assert counts["extracts"] == 848
-    assert counts["extracts_without_pdf"] == 848
+    extract_census = load_named_manifest(
+        REPO_ROOT / "tests" / "manifests" / "literature_extract_source_ids.jsonl"
+    )
+    excluded_extract = "bencze-yazhenskikh-2016-table-s1-k.yaml"
+    assert excluded_extract in extract_census
+    # The supplementary table uses literature_extract_table.v1, so build_index
+    # excludes it from the literature_extract.v1 index census.
+    expected_extracts = {
+        path: source_id
+        for path, source_id in extract_census.items()
+        if path != excluded_extract
+    }
+    indexed_extracts = {
+        Path(extract["path"]).name: source["source_id"]
+        for source in index["sources"]
+        for extract in source["extracts"]
+    }
+    assert_named_rows(
+        indexed_extracts, expected_extracts, label="literature index extracts"
+    )
+    extracts_without_pdf = {
+        source["source_id"]
+        for source in index["sources"]
+        if source["extracts"] and source["pdf_status"] == "ABSENT"
+    }
+    assert counts["extracts"] == len(indexed_extracts)
+    assert counts["extracts_without_pdf"] == len(extracts_without_pdf)
     assert counts["alias_groups_needing_resolution"] == 94
 
     status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
