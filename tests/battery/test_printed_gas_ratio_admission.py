@@ -45,7 +45,7 @@ def test_sossi_and_doyle_real_rows_reach_bare_log_admission_with_pins() -> None:
     sossi_experiment = next(
         experiment
         for experiment in sossi["experiments"]
-        if experiment["experiment_id"] == "sossi-per-f-o2-3"
+        if experiment["experiment_id"] == "sossi-per-f-o2-12"
     )
     sossi_conditions = sossi_experiment["conditions"]
     sossi_mix = _quoted_atmosphere_values(
@@ -99,7 +99,7 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
 
     doyle = _source_doc("doyle-1989-tio2-feo-activity-magma.yaml")
     for block in doyle["species"].values():
-        for row in block["observations"]:
+        for row in block.get("context", []):
             if row.get("type") != "typed_context":
                 continue
             values = row.get("values", {})
@@ -116,7 +116,9 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
             )
 
     assert len(records) == 15
+    decision_table = []
     for record_id, printed, temperature, atmosphere in records:
+        result = _resolution(atmosphere, temperature)
         decision = _bare_log_frame_decision(
             printed,
             temperature,
@@ -125,11 +127,23 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
         )
         if decision.state.is_value:
             assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            outcome = "admitted"
         else:
             assert decision.state.is_unknown
             assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
             assert "mismatch=" in decision.state.reason
             assert "dex" in decision.state.reason
+            outcome = decision.state.reason
+        decision_table.append(
+            (
+                record_id,
+                str(printed),
+                f"{result.log10_fO2:.8f}",
+                f"{result.uncertainty_band_dex}",
+                outcome,
+            )
+        )
+    assert False, decision_table
 
 
 def test_inert_n2_dilution_is_in_the_total_but_cancels_and_ratio_mutation_moves_fo2() -> None:
@@ -162,7 +176,7 @@ def test_deliberately_wrong_printed_log_is_refused_with_dex_mismatch() -> None:
     experiment = next(
         experiment
         for experiment in sossi["experiments"]
-        if experiment["experiment_id"] == "sossi-per-f-o2-3"
+        if experiment["experiment_id"] == "sossi-per-f-o2-12"
     )
     atmosphere = _quoted_atmosphere_values(
         experiment["conditions"], experiment["locator"]
