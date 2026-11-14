@@ -644,11 +644,13 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # Prior cumulative typed diff: 1 d-195, 27,533 d-045, 195,428 d-252, 0 unexplained.
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
-    # constack merge: repin on gate box
     assert hashlib.sha256(actual_bytes).hexdigest() == (
         # b-244: Al/Ti operator T_cond overrides removed (report-only); 14 text/audit leaves, 0 numeric; Al crossing authority -> capture_threshold_fallback.
         # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
-        "c0925c2ef9e53894ba9ac89e748a1e1bfaba220195c29af8c8d1dcc429aaff78"
+        # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
+        # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
+        # Recomputed with produce_coating_golden on the merged production tree.
+        "dcbbb6da8930b50a7a34f50a4a2fb6b83278bbf822ac045fde3aff37321dc355"
     )
 
 

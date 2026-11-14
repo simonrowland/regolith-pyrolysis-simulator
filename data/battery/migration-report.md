@@ -4,7 +4,7 @@ rows in: 93335
 records out (observations): 191609
 works: 852
 experiments: 8040
-queue size: 125197
+queue size: 125069
 identical-payload dedupe aliases: 342
 metadata files: 50
 index sources: 850
@@ -19528,7 +19528,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/nist-srd69-p4.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/nist-webbook.yaml` | 46 | 46 | 181 |
 | `data/literature/extracts/no27-fegley-cameron-1987-epsl.yaml` | 8 | 97 | 112 |
-| `data/literature/extracts/norris-2016-trace-volatility-thesis.yaml` | 64 | 64 | 192 |
+| `data/literature/extracts/norris-2016-trace-volatility-thesis.yaml` | 64 | 64 | 64 |
 | `data/literature/extracts/norris-2017-earth-volatiles-nature.yaml` | 9 | 9 | 37 |
 | `data/literature/extracts/ntrs-19650014783.yaml` | 8 | 52 | 27 |
 | `data/literature/extracts/ntrs-19730008085.yaml` | 2 | 30 | 66 |
@@ -19964,11 +19964,11 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 322275
+advisory issues: 321869
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 322275 |
+| `identity_incomplete` | 321869 |
 
 ## Notices
 
@@ -20038,3 +20038,66 @@ advisory issues: 322275
 | `model_derived_provenance_unrecorded` | `zaitsev-1999-na2o-sio2-pccp` | 3 |
 | `model_derived_provenance_unrecorded` | `zaitsev-2000-sodium-silicate-thermodynamics` | 3 |
 | `model_derived_provenance_unrecorded` | `zigo-1987-gehlenite-fusion` | 10 |
+| `model_derived_provenance_unrecorded_unavailable` | `ammin-73-470-oneill-1988` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `ammin-75-781-hemingway-1990` | 5 |
+| `model_derived_provenance_unrecorded_unavailable` | `ammin-76-904` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `arxiv-1602-00658-fegley-rock-steam-solubility` | 4 |
+| `model_derived_provenance_unrecorded_unavailable` | `arxiv-2509-sio-flame-nucleation` | 8 |
+| `model_derived_provenance_unrecorded_unavailable` | `beckett-2002-silicate-melt-activities` | 14 |
+| `model_derived_provenance_unrecorded_unavailable` | `bencze-yazhenskikh-2016` | 9 |
+| `model_derived_provenance_unrecorded_unavailable` | `busemann-2000-phase-q-noble-gases` | 54 |
+| `model_derived_provenance_unrecorded_unavailable` | `fegley-2023-chemical-equilibrium-calculations-bu` | 27 |
+| `model_derived_provenance_unrecorded_unavailable` | `hashimoto-nakano-2021-bubbles-to-chondrites-ii` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `holzheid-1997-feo-nio-coo-activity-metal-saturated` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `itoh-hino-banya-1997-mg-deoxidation` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-020-hastie-1981-nbsir` | 39 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-027-plante-hastie-1983` | 3 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-033-shornikov-2010` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-039-wolf-2023-vaporock` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-045-sossi-2018-pnas-cr` | 11 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-046-van-limpt-2007` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-048-turkdogan-2001-sio2-gamma` | 4 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-049-kato-1993-ms-review` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-057-kambayashi-1985` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-066-ichise-1977` | 31 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-067-yamada-1980` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-069-furukawa-1976` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-087-yamada-kato-1980` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-093-piacente-1975` | 15 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-095-ueda-1986` | 23 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-103-fraser-1983` | 46 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-111-ichise-1982` | 3 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-114-nichols-1995` | 6 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-118-yamamoto-1983` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-119-furukawa-1975` | 8 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-120-ueshima-1984` | 12 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-127-qi-1989` | 4 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-132-nakajima-2016` | 15 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-137-bischof-2023` | 8 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-140-heck-2025` | 42 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-169-nakazawa-1976` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-184-behrens-1979` | 24 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-188-nanjo-1976` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-190-wu-1993` | 50 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-198-ichise-ueshima-1989` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `kems-ms2000-044` | 8 |
+| `model_derived_provenance_unrecorded_unavailable` | `llnl-2021-cai-aerodynamic-levitation` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `murchison-hydropyrolysis-1990s-gca` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `nagabayashi-hino-banya-1989-phosphorus` | 3 |
+| `model_derived_provenance_unrecorded_unavailable` | `nakamura-2022-science-ryugu-thermal` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `norris-2017-earth-volatiles-nature` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `ntrs-19650014783` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `reiss-2019-thermal-extraction-nulht2m` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `shornikova-2019-perovskite-thermodynamics` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `slag-001-banya-1993` | 49 |
+| `model_derived_provenance_unrecorded_unavailable` | `slag-002-banya-hino-nagasaka-1993` | 17 |
+| `model_derived_provenance_unrecorded_unavailable` | `slag-003-hino-kitagawa-banya-1993` | 5 |
+| `model_derived_provenance_unrecorded_unavailable` | `sossi-2020-cu-zn-isotope-evap-formalism` | 25 |
+| `model_derived_provenance_unrecorded_unavailable` | `steurer-1985-vapor-phase-pyrolysis` | 18 |
+| `model_derived_provenance_unrecorded_unavailable` | `steurer-1992-vapor-phase-pyrolysis` | 11 |
+| `model_derived_provenance_unrecorded_unavailable` | `sublimation-kinetics-2023-minerals` | 24 |
+| `model_derived_provenance_unrecorded_unavailable` | `ta-flemetakis-2024` | 17 |
+| `model_derived_provenance_unrecorded_unavailable` | `ta-yamanaka-1997-metsoc` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `tachibana-tsuchiyama-1998-forsterite-dust-lpsc` | 2 |
+| `model_derived_provenance_unrecorded_unavailable` | `witthohn-2000-coal-slag-alkali-vaporisation` | 1 |
+| `model_derived_provenance_unrecorded_unavailable` | `zigo-1987-gehlenite-fusion` | 3 |
