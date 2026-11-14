@@ -478,8 +478,10 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         assert composition_decision.n_fe2_plus is not None
         assert Decimal(converted_value) == (
             Decimal(source)
-            * _independent_factor(temperature)
-            / composition_decision.n_fe2_plus
+            * (
+                _independent_factor(temperature)
+                / composition_decision.n_fe2_plus
+            )
         )
         band = [
             item
@@ -720,8 +722,8 @@ def test_distin_table_records_masson_n0_and_method_spread(migration) -> None:
         )
         assert recorded.locator.page == 74
         assert recorded.locator.table == "Experimental results"
-        assert "linear lowest-3" in recorded.provenance
-        assert "quadratic lowest-4" in recorded.provenance
+        assert "linear-3=" in recorded.provenance
+        assert "quadratic-4=" in recorded.provenance
         assert iron_saturation_composition(row).n_fe2_plus == expected[temperature][0]
     source = load_yaml(ROOT / "data/literature/extracts" / f"{_DISTIN}.yaml")
     standard_state = source["species"]["FeO"]["observations"][0]["standard_state"]
@@ -1126,8 +1128,8 @@ def test_recorded_source_analysis_composition_precedes_the_owner_line() -> None:
     )
 
 
-def test_distin_oxygen_ratio_converts_through_the_recorded_temkin_frame() -> None:
-    """The nonstoichiometric oxygen ratio converts as a_D*f/N0."""
+def test_distin_oxygen_ratio_conversion_uses_recorded_n0() -> None:
+    """The nonstoichiometric oxygen ratio converts through its recorded N0."""
 
     assert (Decimal("0.43") / Decimal("0.44")).quantize(Decimal("0.001")) == Decimal(
         "0.977"
@@ -1156,7 +1158,7 @@ def test_distin_oxygen_ratio_converts_through_the_recorded_temkin_frame() -> Non
         Engine.THERMOENGINE,
     ):
         converted = fusion_comparison_reference(row, engine=engine)
-        assert converted.value.point == point * factor / n0
+        assert converted.value.point == point * (factor / n0)
         standard = converted.identity.reference_state.value
         assert isinstance(standard, StandardState)
         assert standard.endmember.formula == "FeO"
@@ -1186,7 +1188,7 @@ def test_recorded_n0_scales_a_distin_oxygen_ratio() -> None:
     )
     converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
     # Mutation: deleting the N0 divisor turns the former withdrawn-frame test red.
-    assert converted.value.point == point * _independent_factor(temperature) / n0
+    assert converted.value.point == point * (_independent_factor(temperature) / n0)
     decision = iron_saturation_composition(row)
     assert decision.n_fe2_plus == n0
     assert decision.notice == "composition_derived_from_source_analyses"

@@ -387,7 +387,8 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert result.validation.hard_issues == ()
     assert not result.registry_issues
     assert len(result.observations) == 167
-    assert len(result.queue) == 334
+    # Mutation: restoring unknown reference states restores one queue item per row.
+    assert len(result.queue) == 167
 
     observations = result.observations
     assert set(observations) == {

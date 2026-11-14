@@ -12,6 +12,7 @@ import yaml
 from simulator.battery.enums import EvidenceClass, Phase, Quantity
 from simulator.battery.migrate import convert_temperature_to_k, wt_pct_to_mole_fraction
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.battery.records import StandardState
 from tests.battery.test_migrate import _migrate_real_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -246,8 +247,12 @@ def _assert_migrated_cells_match_audit(result, audit: dict[int, dict[str, object
 
             assert row.identity.total_pressure_Pa.is_unknown
             assert "total_pressure_Pa" not in row.point_conditions
-            assert row.identity.reference_state.is_unknown
-            assert row.identity.reference_state.reason
+            # Mutation: reverting the typed iron-saturated FeO state breaks this.
+            assert row.identity.reference_state.is_value
+            standard_state = row.identity.reference_state.value
+            assert isinstance(standard_state, StandardState)
+            assert standard_state.endmember.formula == "Fe(1-x)O"
+            assert standard_state.iron_saturation_composition is None
 
             composition = row.point_conditions["composition"]
             if cells["MnO"] is None:
@@ -324,4 +329,8 @@ def test_render_audit_binds_every_table1_value_and_condition_with_mutation_check
         assert row.identity.temperature_K.is_value
         assert row.identity.fO2_Pa.is_value
         assert row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.reference_state.is_unknown
+        assert row.identity.reference_state.is_value
+        standard_state = row.identity.reference_state.value
+        assert isinstance(standard_state, StandardState)
+        assert standard_state.endmember.formula == "Fe(1-x)O"
+        assert standard_state.iron_saturation_composition is None
