@@ -18,6 +18,7 @@ from typing import Any
 from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, resolve_species_formula
 from simulator.accounting.yield_disposition import _ACCOUNT_TO_BIN
+from simulator.scalar_boundary import coerce_nonnegative_hours
 
 
 STAGE0_RELEASE_KINETICS = "temperature_resolved_equilibrium_hk_upper_bound"
@@ -205,7 +206,7 @@ def remaining_c0_inventory_kg(
 
 def depletion_record(
     *,
-    hour: int,
+    hour: int | float,
     campaign: str,
     temperature_C: float,
     ledger: Any,
@@ -214,7 +215,7 @@ def depletion_record(
     setpoints: Mapping[str, Any] | None = None,
     feedstocks: Mapping[str, Any] | None = None,
     feedstock_key: str = "",
-    previous_depletion_hour: int | str | None = None,
+    previous_depletion_hour: int | float | str | None = None,
     epsilon: float = DEFAULT_EPSILON,
     exclude_elements: tuple[str, ...] = DEFAULT_EXCLUDE_ELEMENTS,
 ) -> dict[str, Any]:
@@ -282,16 +283,17 @@ def depletion_record(
         aggregate = None
         depleted = False
         target_evidence = "unavailable"
+    hour = coerce_nonnegative_hours(hour)
     if previous_depletion_hour is not None:
-        depletion_hour: int | str | None = previous_depletion_hour
-    elif depleted and int(hour) > 0:
-        depletion_hour = int(hour)
+        depletion_hour: int | float | str | None = previous_depletion_hour
+    elif depleted and hour > 0:
+        depletion_hour = hour
     else:
         depletion_hour = None
 
     campaign_name = str(campaign or "")
     return {
-        "hour": int(hour),
+        "hour": hour,
         "campaign": campaign_name,
         "T_C": float(temperature_C),
         "targets": rows,

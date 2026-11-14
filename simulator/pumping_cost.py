@@ -612,7 +612,7 @@ def pumping_context_from_sim(
                 "invalid-o2-vented-flow",
                 body=body,
                 feedstock_id=feedstock_id,
-                hour=int(getattr(snapshot, "hour", len(rows))),
+                hour=getattr(snapshot, "hour", len(rows)),
                 ambient_pressure_pa=ambient_pressure_pa,
                 ambient_pressure_source=ambient_pressure_source,
             )
@@ -624,7 +624,7 @@ def pumping_context_from_sim(
                 "missing-target-pressure",
                 body=body,
                 feedstock_id=feedstock_id,
-                hour=int(getattr(snapshot, "hour", len(rows))),
+                hour=getattr(snapshot, "hour", len(rows)),
                 ambient_pressure_pa=ambient_pressure_pa,
                 ambient_pressure_source=ambient_pressure_source,
             )
@@ -649,7 +649,7 @@ def pumping_context_from_sim(
                 ambient_pressure_source=ambient_pressure_source,
             )
         row = {
-            "hour": int(getattr(snapshot, "hour", len(rows))),
+            "hour": coerce_nonnegative_hours(getattr(snapshot, "hour", len(rows))),
             "target_pressure_pa": target_pressure_pa,
             "offgas_mol_per_s": offgas_mol_per_s,
             # Exposure [h] * seconds/h = s. A .25 h snapshot charges
@@ -701,7 +701,7 @@ def _pumping_context_refusal(
     *,
     body: str = "",
     feedstock_id: str = "",
-    hour: int | None = None,
+    hour: int | float | None = None,
     ambient_pressure_pa: float | None = None,
     ambient_pressure_source: str = "",
 ) -> dict[str, Any]:
@@ -720,7 +720,7 @@ def _pumping_context_refusal(
     if ambient_pressure_source:
         refusal["ambient_pressure_source"] = ambient_pressure_source
     if hour is not None:
-        refusal["hour"] = int(hour)
+        refusal["hour"] = coerce_nonnegative_hours(hour)
     return refusal
 
 

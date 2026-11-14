@@ -32,7 +32,7 @@ from simulator.pumping_cost import (
     pumping_cost_parameters,
 )
 from simulator.config_flags import bool_feature_flag
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import coerce_nonnegative_hours, is_declared_real_scalar
 
 VECTOR_TOLERANCE = 1e-12
 COST_LEDGER_SCHEMA_VERSION = "cost-ledger-v1"
@@ -1130,11 +1130,11 @@ def _per_hour_with_snapshot_electrical_breakdown(
         snapshot_rows = ()
     if not snapshot_rows:
         return tuple(per_hour)
-    snapshots_by_hour: dict[int, Any] = {}
+    snapshots_by_hour: dict[float, Any] = {}
     for snapshot in snapshot_rows:
         hour = _finite(getattr(snapshot, "hour", math.nan), default=math.nan)
         if math.isfinite(hour):
-            snapshots_by_hour[int(hour)] = snapshot
+            snapshots_by_hour[hour] = snapshot
 
     rows: list[dict[str, Any]] = []
     for index, row in enumerate(tuple(per_hour)):
@@ -1160,11 +1160,11 @@ def _snapshot_for_per_hour_row(
     row: Mapping[str, Any],
     index: int,
     snapshots: tuple[Any, ...],
-    snapshots_by_hour: Mapping[int, Any],
+    snapshots_by_hour: Mapping[float, Any],
 ) -> Any:
     hour = _finite(row.get("hour"), default=math.nan)
-    if math.isfinite(hour) and int(hour) in snapshots_by_hour:
-        return snapshots_by_hour[int(hour)]
+    if math.isfinite(hour) and hour in snapshots_by_hour:
+        return snapshots_by_hour[hour]
     if index < len(snapshots):
         return snapshots[index]
     return None
@@ -1377,7 +1377,7 @@ def run_pumping_input_cost(
         if result.notice:
             row_notices.append(result.notice)
         rows.append({
-            "hour": int(_finite(raw_row.get("hour"), len(rows))),
+            "hour": coerce_nonnegative_hours(_finite(raw_row.get("hour"), len(rows))),
             "target_pressure_pa": json_safe_number(
                 raw_row.get("target_pressure_pa"), reason=row_reason, units="Pa"
             ),

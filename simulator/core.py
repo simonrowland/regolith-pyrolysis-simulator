@@ -7010,8 +7010,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'source_context': source_context,
             'redox_source_refusal_context': refusal_context,
             'source_campaign': str(source_context.get('campaign', '')),
-            'source_hour': int(source_context.get('hour', 0)),
-            'source_campaign_hour': int(source_context.get('campaign_hour', 0)),
+            'source_hour': coerce_nonnegative_hours(source_context.get('hour', 0)),
+            'source_campaign_hour': coerce_nonnegative_hours(source_context.get('campaign_hour', 0)),
         }
 
     def _apply_oxygen_reservoir_exchange(
@@ -9737,7 +9737,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         steps = getattr(self, '_sulfur_saturation_steps', ())
         if not isinstance(steps, (list, tuple)) or not steps:
             return None
-        hours: list[int] = []
+        hours: list[int | float] = []
         notices: list[dict[str, Any]] = []
         seen: set[tuple[Any, ...]] = set()
         for step in steps:
@@ -9750,7 +9750,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if not status or status == 'in_range':
                 continue
             try:
-                hour = int(step['hour'])
+                hour = coerce_nonnegative_hours(step['hour'])
             except (KeyError, TypeError, ValueError):
                 continue
             hours.append(hour)
@@ -9850,7 +9850,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         valid_steps = [step for step in steps if isinstance(step, Mapping)]
         if not valid_steps:
             return None
-        hours = [int(step['hour']) for step in valid_steps if 'hour' in step]
+        hours = [coerce_nonnegative_hours(step['hour']) for step in valid_steps if 'hour' in step]
         parent_oxides = sorted(
             {
                 str(parent)
@@ -15385,7 +15385,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return
         try:
             record = depletion_record(
-                hour=int(getattr(self.melt, "hour", 0) or 0),
+                hour=coerce_nonnegative_hours(getattr(self.melt, "hour", 0)),
                 campaign=str(getattr(self.melt.campaign, "name", "") or ""),
                 temperature_C=float(getattr(self.melt, "temperature_C", 0.0) or 0.0),
                 ledger=ledger,
@@ -15404,7 +15404,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         except Exception as exc:
             record = {
-                "hour": int(getattr(self.melt, "hour", 0) or 0),
+                "hour": coerce_nonnegative_hours(getattr(self.melt, "hour", 0)),
                 "campaign": str(getattr(self.melt.campaign, "name", "") or ""),
                 "T_C": float(getattr(self.melt, "temperature_C", 0.0) or 0.0),
                 "targets": [],
@@ -17122,8 +17122,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 'redox_source_context': source_context,
                 'redox_source_campaign': str(source_context.get('campaign', '')),
-                'redox_source_hour': int(source_context.get('hour', 0)),
-                'redox_source_campaign_hour': int(
+                'redox_source_hour': coerce_nonnegative_hours(source_context.get('hour', 0)),
+                'redox_source_campaign_hour': coerce_nonnegative_hours(
                     source_context.get('campaign_hour', 0)
                 ),
             })
