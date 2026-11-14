@@ -193,6 +193,29 @@ def test_magemin_phi_curve_is_cached_and_interpolated():
     assert len(backend.calls) > first_call_count
 
 
+def test_magemin_phi_curve_brackets_valid_request_near_silica_domain_edge():
+    backend = _FakeMageminBackend()
+    sampler = MageminLinerSampler(backend)
+    liner = {"SiO2": 31.0, "Al2O3": 49.0, "CaO": 20.0}
+    curve = sampler.curve(
+        liner,
+        {"Na": 0.1},
+        temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+    )
+    deposit = curve.deposit_composition_wt_pct
+    request = {
+        oxide: 0.99 * liner.get(oxide, 0.0) + 0.01 * deposit.get(oxide, 0.0)
+        for oxide in set(liner) | set(deposit)
+    }
+
+    assert curve(request, 1500.0, 1.0e-6) == pytest.approx(
+        request.get("Na2O", 0.0) / 20.0
+    )
+    assert curve.points[-1][0] >= 0.01
+    assert all(call[3]["SiO2"] >= 30.0 for call in backend.calls)
+
+
 @pytest.mark.live_engine
 @pytest.mark.xdist_group("magemin_fullrun_a")
 def test_anorthite_first_liquid_anchor_requires_live_magemin():
@@ -344,6 +367,37 @@ def test_reactive_branch_refusal_keeps_the_inert_campaign_bound():
     assert result["campaigns_to_runaway"] == [None, 1]
     assert result["reactive_branch_refusal"]["reason"] == (
         "reactive_deposit_branch_missing"
+    )
+    assert result["branch_end_deposit_kg_by_species"]["inert"] == {"Na": 0.2}
+
+
+def test_reactive_sampling_refusal_keeps_completed_inert_bound():
+    def sampler(composition, _temperature_C, _pressure_bar):
+        na2o_wt_pct = composition.get("Na2O", 0.0)
+        if na2o_wt_pct > 30.0:
+            raise LinerCorrosionRefusal(
+                "liner_first_melt_engine_out_of_domain", "reactive blend leaves domain"
+            )
+        return 1.0 if na2o_wt_pct >= 15.0 else 0.0
+
+    result = corrosion_campaign_recurrence(
+        {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+        {},
+        {"Na": 0.2},
+        {"Na": 0.5},
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+        temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+        margin_C=0.0,
+        horizon=100,
+        sampler=sampler,
+    )
+
+    assert result["campaigns_to_runaway"] == [None, 1]
+    assert result["reactive_branch_refusal"]["reason"] == (
+        "liner_first_melt_engine_out_of_domain"
     )
     assert result["branch_end_deposit_kg_by_species"]["inert"] == {"Na": 0.2}
 
