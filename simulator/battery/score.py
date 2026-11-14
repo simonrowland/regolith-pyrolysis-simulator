@@ -7804,6 +7804,42 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
     )
 
 
+def _hashimoto_channel_omission_notices(
+    omissions: object, quantity: Quantity, *, origin: str
+) -> tuple[Notice, ...]:
+    """Keep each Hashimoto channel omission visible on its scored row."""
+
+    if not omissions:
+        return ()
+    if isinstance(omissions, Sequence) and not isinstance(omissions, (str, bytes)):
+        records = omissions
+    else:
+        records = ({"reason": "hashimoto_channel_omission_payload_invalid"},)
+    notices: list[Notice] = []
+    for record in records:
+        if isinstance(record, Mapping):
+            channel = record.get("channel")
+            reason = record.get("reason")
+            kind = record.get("kind")
+            if not isinstance(reason, str) or not reason:
+                reason = "hashimoto_channel_omission_reason_missing"
+            if kind not in {None, NoticeKind.INPUT_OMITTED.value}:
+                reason = f"untyped omission record ({kind!r}): {reason}"
+            if isinstance(channel, str) and channel:
+                reason = f"{channel}: {reason}"
+        else:
+            reason = f"hashimoto_channel_omission_record_invalid: {record!r}"
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(quantity,),
+                reason=reason,
+                origin=origin,
+            )
+        )
+    return tuple(notices)
+
+
 def _cell_oxygen_not_modelled_notice(
     quantity: Quantity,
     materials: Sequence[Located[CellMaterial]] | None,
@@ -15973,6 +16009,20 @@ def _hashimoto_residue_prediction(
             _hashimoto_engine_floor_inversion_notices(
                 engine,
                 primary_provenance.get("engine_floor_inversion_diagnostics"),
+            )
+        )
+        notices.extend(
+            _hashimoto_channel_omission_notices(
+                primary_provenance.get("gas_channel_omissions"),
+                reported_quantity,
+                origin="hashimoto-openimcc-gas-channel",
+            )
+        )
+        notices.extend(
+            _hashimoto_channel_omission_notices(
+                production.provenance.get("runtime_catalog_omissions"),
+                reported_quantity,
+                origin="hashimoto-runtime-catalog",
             )
         )
         surface_floor = primary_provenance.get("surface_pO2_balance_floor")
