@@ -535,7 +535,8 @@ def _attempt_coefficient_sources(
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
-# IMCC consumes the SF04 magma companion workbook.
+# OpenIMCC row refs resolve through its packaged source declarations. Older
+# packs without those declarations retain their explicit version aliases.
 COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "vaporock": ("janaf-4th",),
     "nasa-glenn": ("nasa-glenn",),
@@ -553,7 +554,11 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.6-d066-v4": ("sf04-magma-companion-workbook",),
+    "openimcc-source-ref:DarkenGurry1946": ("darken-gurry-1946-iron-oxygen-ii",),
+    "openimcc-source-ref:FC87": ("sf04-magma-companion-workbook",),
+    "openimcc-source-ref:Masson1965": ("masson-1965-proc-roy-soc-a287-201",),
+    "openimcc-source-ref:SF04": ("sf04-magma-companion-workbook",),
+    "openimcc-source-ref:Shornikov2017": ("shornikov-2017-spinel-thermodynamics",),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -572,6 +577,7 @@ def _unmapped_coefficient_source_aliases(
         and (
             source in _ENGINE_SOURCE_ALIASES
             or source.startswith("openimcc-v")
+            or source.startswith("openimcc-source-ref:")
         )
     )
 
@@ -14208,7 +14214,8 @@ def _predict_with_engine(
                     [
                         *sources,
                         *openimcc_pack_coefficient_sources(
-                            identity_block.get("pack_version")
+                            identity_block.get("pack_version"),
+                            identity_block.get("pack_digest"),
                         ),
                         *openimcc_engine_identity_sources(
                             identity_block.get("engine_binding_identity")
@@ -15674,7 +15681,10 @@ def _hashimoto_residue_prediction(
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
-                primary_provenance.get("datapack_version")
+                primary_provenance.get("datapack_version"),
+                primary_provenance.get("pack_digest", {}).get("melt_datapack")
+                if isinstance(primary_provenance.get("pack_digest"), Mapping)
+                else None,
             ),
             *openimcc_engine_identity_sources(
                 primary_provenance.get("engine_binding_identity")
@@ -16265,10 +16275,14 @@ def _sossi_residue_prediction(
                 f"no positive Sossi {formula} prediction",
             )
         provenance = dict(prediction.provenance)
+        melt_pack_identity = provenance.get("melt_pack_identity")
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
-                provenance.get("datapack_version")
+                provenance.get("datapack_version"),
+                melt_pack_identity.get("pack_digest")
+                if isinstance(melt_pack_identity, Mapping)
+                else None,
             ),
             *openimcc_engine_identity_sources(
                 provenance.get("engine_binding_identity")

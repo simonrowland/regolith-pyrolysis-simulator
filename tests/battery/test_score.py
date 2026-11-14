@@ -12199,9 +12199,18 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     openimcc = pytest.importorskip("openimcc")
     packaged_default = openimcc.load_datapack()
     packaged_default_sources = openimcc_pack_coefficient_sources(
-        packaged_default.version
+        packaged_default.version, packaged_default.binding_digest
     )
     assert packaged_default_sources
+    declared_source_refs = {
+        source_ref
+        for row_sources in packaged_default._row_source_refs.values()
+        for source_ref in row_sources
+    }
+    assert packaged_default_sources == tuple(
+        f"openimcc-source-ref:{source_ref}"
+        for source_ref in sorted(declared_source_refs)
+    )
     assert all(
         source in COEFFICIENT_SOURCE_STORE_IDS
         for source in packaged_default_sources
@@ -12209,7 +12218,16 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     assert lineage_complete_for(packaged_default_sources) is True
 
 
-def test_unknown_openimcc_pack_alias_is_a_typed_lineage_refusal() -> None:
+@pytest.mark.parametrize(
+    "unknown_alias",
+    (
+        "openimcc-v9.9.9-unknown",
+        "openimcc-source-ref:FutureSource",
+    ),
+)
+def test_unknown_openimcc_pack_alias_is_a_typed_lineage_refusal(
+    unknown_alias: str,
+) -> None:
     experiment = F.tabulation_experiment()
     identity = F.activity_identity()
     reference = F.observation(
@@ -12226,7 +12244,7 @@ def test_unknown_openimcc_pack_alias_is_a_typed_lineage_refusal() -> None:
         execution=Execution(state=ExecutionState.PRODUCED),
         value=Decimal("0.2"),
         unit=QUANTITY_UNITS[Quantity.ACTIVITY],
-        coefficient_sources=("openimcc-v9.9.9-unknown",),
+        coefficient_sources=(unknown_alias,),
         identity=identity,
     )
 
@@ -12243,7 +12261,7 @@ def test_unknown_openimcc_pack_alias_is_a_typed_lineage_refusal() -> None:
     assert residual.refusal.reason is RefusalReason.LINEAGE_UNKNOWN
     assert residual.refusal.detail == {
         "reason": "openimcc_pack_coefficient_source_alias_missing",
-        "coefficient_source_aliases": ("openimcc-v9.9.9-unknown",),
+        "coefficient_source_aliases": (unknown_alias,),
     }
 
 
