@@ -42,7 +42,7 @@ from simulator.furnace_materials import (
     setpoints_furnace_ceiling_C,
 )
 from simulator.recipe_errors import MalformedRecipeError
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import coerce_nonnegative_hours, is_declared_real_scalar
 from simulator.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
     C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
@@ -96,7 +96,7 @@ C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
 class C0ForecastAdjustmentNotice(TypedDict):
     type: Literal["c0_forecast_predates_adjustment"]
     adjusted_fields: list[str]
-    campaign_hour: int
+    campaign_hour: float
     loss_budget_re_evaluated: bool
 
 
@@ -107,7 +107,7 @@ class C0RemainingBudgetExit(TypedDict):
         "no_candidate_satisfies_alkali_budget",
         "forecast_unavailable",
     ]
-    campaign_hour: int
+    campaign_hour: float
     remaining_budget_hr: float
     best_candidate_temperature_C: float | None
     best_candidate_required_hold_hr: float | None
@@ -959,14 +959,14 @@ class CampaignManager:
     def record_c0_forecast_adjustment(
         self,
         adjusted_field: str,
-        campaign_hour: int,
+        campaign_hour: float,
         *,
         loss_budget_re_evaluated: bool,
     ) -> C0ForecastAdjustmentNotice:
         notice: C0ForecastAdjustmentNotice = {
             "type": "c0_forecast_predates_adjustment",
             "adjusted_fields": [adjusted_field],
-            "campaign_hour": int(campaign_hour),
+            "campaign_hour": coerce_nonnegative_hours(campaign_hour),
             "loss_budget_re_evaluated": loss_budget_re_evaluated,
         }
         self.c0_forecast_adjustment_notices.append(notice)
@@ -976,7 +976,7 @@ class CampaignManager:
         self,
         prediction: Mapping[str, object],
         *,
-        campaign_hour: int,
+        campaign_hour: float,
         remaining_budget_hr: float,
     ) -> C0RemainingBudgetExit:
         reason = prediction.get("remaining_budget_exit_reason")
@@ -995,7 +995,7 @@ class CampaignManager:
         event: C0RemainingBudgetExit = {
             "type": "c0_remaining_budget_exit",
             "reason": reason,
-            "campaign_hour": int(campaign_hour),
+            "campaign_hour": coerce_nonnegative_hours(campaign_hour),
             "remaining_budget_hr": float(remaining_budget_hr),
             "best_candidate_temperature_C": (
                 float(value)
@@ -1550,7 +1550,7 @@ class CampaignManager:
 
     def _c2a_staged_stage_by_hour(
         self,
-        campaign_hour: int,
+        campaign_hour: float,
         stages: list,
     ) -> dict | None:
         if not isinstance(stages, list) or not stages:
@@ -1568,7 +1568,7 @@ class CampaignManager:
             elapsed += duration
         return selected if isinstance(selected, dict) else None
 
-    def _c2a_staged_active_stage(self, campaign_hour: int) -> dict | None:
+    def _c2a_staged_active_stage(self, campaign_hour: float) -> dict | None:
         stages = self._c2a_staged_enabled_stages()
         if (
                 self._c2a_staged_depletion_flux_decay_fraction() <= 0.0
@@ -2073,7 +2073,7 @@ class CampaignManager:
     # ------------------------------------------------------------------
 
     def get_temp_target(self, campaign: CampaignPhase,
-                        campaign_hour: int,
+                        campaign_hour: float,
                         melt: MeltState, *, dt_hr: float = 1.0) -> Tuple[Optional[float], float]:
         """
         Get the target temperature and ramp rate for a campaign.
@@ -2122,7 +2122,7 @@ class CampaignManager:
         return min(requested, self.furnace_max_T_C)
 
     def _get_base_temp_target(self, campaign: CampaignPhase,
-                               campaign_hour: int,
+                               campaign_hour: float,
                                melt: MeltState, *, dt_hr: float = 1.0) -> Tuple[Optional[float], float]:
         """Base temperature targets before runtime overrides."""
         lab_schedule = self._lab_schedule(campaign)
@@ -2655,7 +2655,7 @@ class CampaignManager:
             # First melt has priority over the computed exit and maximum hold.
             if self.c0_first_melt_backstop:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
+                    campaign, melt.campaign_hour, melt, dt_hr=dt_hr)
                 self.last_c0_exit = c0_exit_record(
                     STAGE0_RELEASE_KINETICS,
                     backstop="first_melt",
@@ -2670,7 +2670,7 @@ class CampaignManager:
 
             if self.c0_remaining_budget_exit is not None:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
+                    campaign, melt.campaign_hour, melt, dt_hr=dt_hr)
                 self.last_c0_exit = c0_exit_record(
                     STAGE0_RELEASE_KINETICS,
                     backstop="remaining_budget",
@@ -2698,7 +2698,7 @@ class CampaignManager:
                     and completed_campaign_hour >= float(exit_campaign_hour)
                 ):
                     _target_T, ramp_C_per_hr = self.get_temp_target(
-                        campaign, int(melt.campaign_hour), melt)
+                        campaign, melt.campaign_hour, melt, dt_hr=dt_hr)
                     self.last_c0_exit = c0_exit_record(
                         STAGE0_RELEASE_KINETICS,
                         backstop="computed_exit",
@@ -2714,7 +2714,7 @@ class CampaignManager:
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
+                    campaign, melt.campaign_hour, melt, dt_hr=dt_hr)
                 self.last_c0_exit = c0_exit_record(
                     STAGE0_RELEASE_KINETICS,
                     backstop="maximum_hold",
@@ -2779,7 +2779,7 @@ class CampaignManager:
                 if completed_campaign_hour >= max_hold_hr:
                     self.last_c2a_staged_termination = {
                         'reason': 'fixed_duration',
-                        'campaign_hour': int(melt.campaign_hour),
+                        'campaign_hour': coerce_nonnegative_hours(melt.campaign_hour),
                     }
                     return True
                 return False
@@ -2788,7 +2788,7 @@ class CampaignManager:
                 if completed_campaign_hour >= max_hold_hr:
                     self.last_c2a_staged_termination = {
                         'reason': 'fixed_duration',
-                        'campaign_hour': int(melt.campaign_hour),
+                        'campaign_hour': coerce_nonnegative_hours(melt.campaign_hour),
                     }
                     return True
                 return False
@@ -2867,8 +2867,8 @@ class CampaignManager:
                     'reason': reason,
                     'stage': self._c2a_staged_stage_label(stage),
                     'stage_idx': stage_idx,
-                    'campaign_hour': int(melt.campaign_hour),
-                    'stage_elapsed_h': int(stage_elapsed_h),
+                    'campaign_hour': coerce_nonnegative_hours(melt.campaign_hour),
+                    'stage_elapsed_h': coerce_nonnegative_hours(stage_elapsed_h),
                     'cumulative_yield_mol_by_species': dict(
                         self._c2a_staged_cumulative_yield_mol_by_species
                     ),
@@ -2891,7 +2891,7 @@ class CampaignManager:
                     'reason': 'max_hold_ceiling',
                     'stage': self._c2a_staged_stage_label(stage),
                     'stage_idx': stage_idx,
-                    'campaign_hour': int(melt.campaign_hour),
+                    'campaign_hour': coerce_nonnegative_hours(melt.campaign_hour),
                 }
                 return True
 
