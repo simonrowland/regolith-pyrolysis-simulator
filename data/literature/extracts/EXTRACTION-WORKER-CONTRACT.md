@@ -130,8 +130,12 @@ matches extract content fails
 
 ## Validation entry points
 
-Before reporting, run `scripts/source_battery_report.py <sid>` on a Studio and
-paste the table.
+Before reporting, from the repository root on a Studio with the project
+environment active, run:
+
+`PYTHONPATH=. .venv/bin/python scripts/source_battery_report.py <sid>`
+
+Then paste the table.
 
 ```bash
 python tools/validate_literature_extracts.py

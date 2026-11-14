@@ -4,11 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import shutil
 import sys
 import tempfile
 from collections import Counter, defaultdict
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -19,9 +21,14 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.battery.enums import AdmissionStatus, Engine, ResidualStatus  # noqa: E402
-from simulator.battery.migrate import migrate, write_outputs  # noqa: E402
+from simulator.battery.migrate import (  # noqa: E402
+    iter_observation_store_paths,
+    migrate,
+    write_outputs,
+)
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
+    _observation_matches_run_filters,
     _short_refusal_token,
     comparison_candidates,
     load_score_context,
@@ -74,6 +81,118 @@ def _isolated_source_root(source_id: str, repo_root: Path, out_root: Path) -> Pa
         battery.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ratchet, battery / ratchet.name)
     return out_root
+
+
+def _overlay_observation_store(
+    committed_dir: Path,
+    migrated_dir: Path,
+    overlay_dir: Path,
+    *,
+    source_id: str,
+    replace_source_extract: bool = False,
+) -> None:
+    overlay_dir.mkdir(parents=True)
+    migrated_paths = iter_observation_store_paths(migrated_dir)
+    migrated_by_relative = {
+        path.relative_to(migrated_dir): path for path in migrated_paths
+    }
+    for path in iter_observation_store_paths(committed_dir):
+        relative = path.relative_to(committed_dir)
+        if replace_source_extract and relative == Path(f"{source_id}.yaml"):
+            continue
+        if relative in migrated_by_relative:
+            continue
+        target = overlay_dir / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.symlink_to(path)
+    for relative, path in migrated_by_relative.items():
+        target = overlay_dir / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+
+
+def _score_overlay_root(
+    source_id: str,
+    repo_root: Path,
+    migrated_root: Path,
+    scratch_root: Path,
+) -> Path:
+    """Build a read-only corpus view with this source's migrated store overlaid."""
+
+    literature = repo_root / "data" / "literature"
+    migrated_literature = migrated_root / "data" / "literature"
+    overlay_root = scratch_root / "score-context"
+    overlay_literature = overlay_root / "data" / "literature"
+    overlay_literature.mkdir(parents=True)
+    for path in literature.iterdir():
+        target = overlay_literature / path.name
+        if path.name in {"extracts-v2", "observations-v2"}:
+            _overlay_observation_store(
+                path,
+                migrated_literature / path.name,
+                target,
+                source_id=source_id,
+                replace_source_extract=path.name == "extracts-v2",
+            )
+        else:
+            target.symlink_to(path, target_is_directory=path.is_dir())
+    (overlay_root / "data" / "battery").symlink_to(
+        repo_root / "data" / "battery", target_is_directory=True
+    )
+    return overlay_root
+
+
+def _score_context_for_source(
+    source_id: str,
+    *,
+    repo_root: Path,
+    migrated_root: Path,
+    scratch_root: Path,
+) -> Any:
+    overlay_root = _score_overlay_root(
+        source_id, repo_root, migrated_root, scratch_root
+    )
+    corpus = load_score_context(overlay_root)
+    migrated = load_score_context(migrated_root, sources=(source_id,))
+    return replace(
+        corpus,
+        works={**corpus.works, **migrated.works},
+        experiments={**corpus.experiments, **migrated.experiments},
+        observations={**corpus.observations, **migrated.observations},
+        origins={**corpus.origins, **migrated.origins},
+        extract_review={**corpus.extract_review, **migrated.extract_review},
+        benches={**corpus.benches, **migrated.benches},
+        hard_issues_by_observation={
+            **corpus.hard_issues_by_observation,
+            **migrated.hard_issues_by_observation,
+        },
+        root=overlay_root,
+    )
+
+
+def _score_source(
+    context: Any,
+    source_id: str,
+    *,
+    engines: Sequence[Engine] | None,
+) -> tuple[tuple[Any, ...], tuple[Any, ...]]:
+    source_observation_ids = {
+        observation_id
+        for observation_id, observation in context.observations.items()
+        if observation.source_id == source_id
+    }
+    candidates = tuple(
+        row
+        for row in comparison_candidates(context)
+        if row.observation_id in source_observation_ids
+        and _observation_matches_run_filters(context, row, work_id=source_id)
+    )
+    residuals, _scored_candidates = score_store(
+        context, engines=engines, work_id=source_id
+    )
+    return candidates, tuple(
+        row for row in residuals if row.reference in source_observation_ids
+    )
 
 
 def _hard_issue_rows(validation: Any) -> tuple[int, list[dict[str, object]]]:
@@ -207,7 +326,7 @@ def build_source_report(
     repo_root: Path = ROOT,
     scratch_out_dir: Path | None = None,
 ) -> dict[str, object]:
-    """Migrate and score one extract under an isolated scratch root."""
+    """Migrate one extract, then score it against the full-corpus context."""
 
     if scratch_out_dir is None:
         out_root = Path(tempfile.mkdtemp(prefix=f"source-battery-report-{source_id}-"))
@@ -221,8 +340,13 @@ def build_source_report(
         raise RuntimeError("migration did not return its validator report")
     write_outputs(result, out_root)
 
-    context = load_score_context(out_root, sources=(source_id,))
-    candidates = comparison_candidates(context)
+    context = _score_context_for_source(
+        source_id,
+        repo_root=repo_root,
+        migrated_root=out_root,
+        scratch_root=out_root,
+    )
+    candidates, residuals = _score_source(context, source_id, engines=engines)
     admitted = sorted(
         row.observation_id
         for row in candidates
@@ -233,7 +357,6 @@ def build_source_report(
         for row in candidates
         if row.admission.status is AdmissionStatus.PENDING
     )
-    residuals, _scored_candidates = score_store(context, engines=engines)
 
     hard_issue_count, hard_issues_by_reason = _hard_issue_rows(result.validation)
     extract_key = f"data/literature/extracts/{source_id}.yaml"
@@ -341,10 +464,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     args = parser.parse_args(argv)
     engines = None if args.engines is None else tuple(Engine(item) for item in args.engines)
-    report = build_source_report(args.source_id, engines=engines)
     if args.json:
+        with contextlib.redirect_stdout(sys.stderr):
+            report = build_source_report(args.source_id, engines=engines)
         print(json.dumps(report, indent=2, ensure_ascii=False))
     else:
+        report = build_source_report(args.source_id, engines=engines)
         print(_markdown(report))
     return 0
 
