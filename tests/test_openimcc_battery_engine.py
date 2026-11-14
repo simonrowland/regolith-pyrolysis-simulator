@@ -2773,7 +2773,14 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     )
 
 
-def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch) -> None:
+def test_openimcc_vaporock_override_refusal_is_typed(monkeypatch) -> None:
+    """The 9c loader rejects VapoRock's untyped JANAF CSV before evaluation.
+
+    Earlier OpenIMCC pins accepted this override and changed gas predictions.
+    The current pin requires source-validity columns the external CSV does not
+    provide, so this test pins the explicit load refusal and result notice
+    instead of expecting a changed prediction from a gas table that did not load.
+    """
     _require_openimcc()
     scratch = _scratch_path()
     if (
@@ -2785,144 +2792,65 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
     row = json.loads(scratch.read_text(encoding="utf-8"))["hand_rows"][0]
     composition_wt = {"K2O": float(row["K2O_wt_pct"]), "SiO2": float(row["SiO2_wt_pct"])}
     composition_kg, composition_mol = composition_kg_and_mol(composition_wt)
-    import openimcc
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
 
     monkeypatch.delenv("OPENIMCC_VAPOROCK_ROOT", raising=False)
     packaged = _OpenImccBatteryBackend("openimcc")
     monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(VAPOROCK_ROOT))
     mutated = _OpenImccBatteryBackend("openimcc")
+    gas_load_failure = mutated._identity.get("gas_load_failure")
+    assert isinstance(gas_load_failure, str)
+    assert gas_load_failure.startswith("ImccGasValidityMetadataError:")
+    assert "source-validity columns" in gas_load_failure
+    assert "engine_binding_identity" not in mutated._identity
+
     temperature_K = float(row["T_K"])
-    evaluate_gas = openimcc.evaluate_gas
-    gas_results = []
-
-    def record_gas_result(*args, **kwargs):
-        result = evaluate_gas(*args, **kwargs)
-        gas_results.append(result)
-        return result
-
-    monkeypatch.setattr(openimcc, "evaluate_gas", record_gas_result)
-
+    fO2_log = math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5)
     packaged_result = packaged.equilibrate(
         temperature_C=temperature_K - 273.15,
         composition_kg=composition_kg,
         composition_mol=composition_mol,
-        fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
+        fO2_log=fO2_log,
     )
     mutated_result = mutated.equilibrate(
         temperature_C=temperature_K - 273.15,
         composition_kg=composition_kg,
         composition_mol=composition_mol,
-        fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
+        fO2_log=fO2_log,
     )
-    assert (
-        mutated._identity["engine_binding_identity"]["gas_table_digest"]
-        != packaged._identity["engine_binding_identity"]["gas_table_digest"]
-    )
-    assert (
-        mutated._identity["engine_binding_identity"]["engine_binding_digest"]
-        != packaged._identity["engine_binding_identity"]["engine_binding_digest"]
-    )
-    assert len(gas_results) == 2
-    _packaged_gas_result, mutated_gas_result = gas_results
-    packaged_melt = openimcc.evaluate(
-        composition_mol,
-        temperature_K,
-        packaged._pack,
-        basis_type="mol",
-        allow_extrapolation=True,
-        allow_out_of_envelope=True,
-    )
-    from openimcc.gas import _default_reactions
 
-    _packaged_channels, packaged_omissions = _default_reactions(
-        packaged_melt.parent_oxides, packaged._gas
-    )
-    assert packaged_omissions == {}
-    expected_omissions = {
-        "Na2O": "Na2O(g)",
-        "K2O": "K2O(g)",
-        "Ti": "TiO2(l)",
-        "TiO": "TiO2(l)",
-        "TiO2": "TiO2(l)",
-    }
-    assert set(expected_omissions) <= set(mutated_gas_result.omitted_channels)
-    for channel, missing_row in expected_omissions.items():
-        reason = mutated_gas_result.omitted_channels[channel]
-        assert "missing from active table" in reason
-        assert missing_row in reason
-        if missing_row.endswith("(g)"):
-            assert missing_row not in mutated._gas.gas_df.index
-        else:
-            assert missing_row not in mutated._gas.oxide_df.index
+    packaged_binding = packaged._identity["engine_binding_identity"]
     packaged_pressure = float(packaged_result.vapor_pressures_Pa["K"])
-    mutated_pressure = float(mutated_result.vapor_pressures_Pa["K"])
     assert packaged_pressure > 0.0
-    assert mutated_pressure > 0.0
-    assert abs(
-        math.log10(mutated_pressure / packaged_pressure)
-    ) > 1.0e-9
+    assert packaged_result.vapor_pressures_source["K"] == (
+        "openimcc-gas-table:sha256:"
+        f"{packaged_binding['gas_table_digest']}"
+    )
+    assert mutated_result.status == "ok"
+    assert mutated_result.vapor_pressures_Pa == {}
+    assert mutated_result.vapor_pressures_source == {}
+    unavailable_notice = next(
+        notice
+        for notice in mutated_result.diagnostics["imcc_notices"]
+        if notice["kind"] == "openimcc_gas_unavailable"
+    )
+    assert unavailable_notice["reason"] == gas_load_failure
 
-    inert_balance_result = mutated.equilibrate(
-        temperature_C=temperature_K - 273.15,
-        composition_kg=composition_kg,
-        composition_mol=composition_mol,
-        po2_request=Po2Request(
-            mode=PO2_OXYGEN_BALANCE_EFFUSION,
-            po2_bar=None,
-            cell_material=None,
-        ),
-    )
-    reactive_result = mutated.equilibrate(
-        temperature_C=temperature_K - 273.15,
-        composition_kg=composition_kg,
-        composition_mol=composition_mol,
-        po2_request=Po2Request(
-            mode=PO2_OXYGEN_BALANCE_EFFUSION,
-            po2_bar=None,
-            cell_material="W",
-        ),
-    )
     from types import SimpleNamespace
 
     from simulator.battery.score import cell_notices
 
-    for path, path_result in (
-        ("explicit pO2", mutated_result),
-        ("inert balance", inert_balance_result),
-        ("reactive/cell-oxide balance", reactive_result),
-    ):
-        omission_notices = [
-            notice
-            for notice in path_result.diagnostics["imcc_notices"]
-            if notice["kind"] == NoticeKind.INPUT_OMITTED.value
-            and notice["reason"].startswith("gas channel ")
-        ]
-        assert len(omission_notices) == len(expected_omissions), path
-        for channel, missing_row in expected_omissions.items():
-            notice = next(
-                item
-                for item in omission_notices
-                if item["reason"].startswith(f"gas channel {channel} omitted:")
-            )
-            assert "missing from active table" in notice["reason"], path
-            assert missing_row in notice["reason"], path
-            assert str(mutated._gas.gas_path) in notice["reason"], path
-
-        typed_notices = cell_notices(
-            Quantity.P_PARTIAL,
-            Engine.OPENIMCC,
-            SimpleNamespace(notices=path_result.diagnostics["imcc_notices"]),
-        )
-        typed_omissions = [
-            notice
-            for notice in typed_notices
-            if notice.reason.startswith("gas channel ")
-        ]
-        assert len(typed_omissions) == len(expected_omissions), path
-        assert all(notice.kind is NoticeKind.INPUT_OMITTED for notice in typed_omissions)
-        assert all(notice.origin == "engine:openimcc" for notice in typed_omissions)
-        assert all(Quantity.P_PARTIAL in notice.affected_quantities for notice in typed_omissions)
+    typed_notices = cell_notices(
+        Quantity.P_PARTIAL,
+        Engine.OPENIMCC,
+        SimpleNamespace(notices=mutated_result.diagnostics["imcc_notices"]),
+    )
+    typed_failure = next(
+        notice for notice in typed_notices if notice.reason == gas_load_failure
+    )
+    assert typed_failure.kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert typed_failure.origin == "engine:openimcc"
+    assert Quantity.P_PARTIAL in typed_failure.affected_quantities
 
 
 
