@@ -14,11 +14,10 @@ Serialized-row path: ``write_headline_summary_from_payloads_json``,
 with its own prose and decimal text, so it has its own pins.
 
 No clock, host, or absolute path is rewritten. The fixture hostname is the
-literal ``test`` from the fixture's ``ScoreContext``, not this machine.
-The store revision inside the stamp is ``store_git_revision`` of the store
-paths (the last commit that touched those paths). It is not this process's
-HEAD, a timestamp, or a hostname, and it is part of the emitted stamp, so
-the pins keep it.
+literal ``test`` from the fixture's ``ScoreContext``, not this machine. A
+fixed test store stamp keeps the pins independent of corpus regeneration while
+covering stamp serialization; live stamp derivation has its own test in
+``tests.battery.test_score``.
 """
 
 from __future__ import annotations
@@ -38,6 +37,16 @@ import simulator.battery.score as score_mod
 from tests.battery.test_score import _streaming_score_fixture
 
 HEADING = "# Battery score report (schema v2.1)"
+FIXTURE_STORE_STAMP = {
+    "experiments": 7001,
+    "hard_issues": 1685,
+    "kind": "battery_store_stamp",
+    "observations": 186648,
+    "queue": 124428,
+    "revision": "2043bca61",
+    "rows_in": 91208,
+    "works": 785,
+}
 _CERTIFIED_COUNT_FIELD = re.compile(r'(?m)^[ \t]*"n_certified":\s*\d+,\n')
 
 
@@ -2086,6 +2095,11 @@ def _score_outputs(
         return residual, candidate
 
     monkeypatch.setattr(score_mod, "_compile_residual_with_lineage", compile_stub)
+    monkeypatch.setattr(
+        score_mod,
+        "derive_store_stamp",
+        lambda _root=None: dict(FIXTURE_STORE_STAMP),
+    )
     engines = (engine,)
     root = score_mod.REPO_ROOT
     residuals, candidates = score_mod.score_store(context, engines=engines)
