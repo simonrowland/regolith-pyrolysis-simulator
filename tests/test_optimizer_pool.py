@@ -15,7 +15,10 @@ from types import MappingProxyType
 
 import pytest
 
-from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    ProprietaryEngineRefusal,
+)
 from simulator.chemistry.kernel import ProposalRejected
 from simulator.core import PoisonedHourError, PoisonedHourState
 from simulator.engine_pool import EngineWorkerRemoteError
@@ -237,6 +240,45 @@ def _profile() -> dict[str, object]:
             "track": "pyrolysis",
         },
     }
+
+
+def test_backend_name_for_fidelity_folds_request_alias_to_profile_overlay() -> None:
+    profile = {
+        "run": {"backend_name": "proprietary_remote"},
+        "fidelities": {
+            "internal-analytical": {"backend_name": "internal-analytical"}
+        },
+    }
+
+    assert pool_module._backend_name_for_fidelity(
+        profile, "stub", mode="optimizer_search"
+    ) == "internal-analytical"
+
+
+def test_backend_name_for_fidelity_folds_profile_alias_to_request() -> None:
+    profile = {
+        "run": {"backend_name": "proprietary_remote"},
+        "fidelities": {"stub": {"backend_name": "internal-analytical"}},
+    }
+
+    assert (
+        pool_module._backend_name_for_fidelity(
+            profile, "internal-analytical", mode="optimizer_search"
+        )
+        == "internal-analytical"
+    )
+
+
+def test_unoverlaid_proprietary_backend_still_refuses() -> None:
+    profile = {
+        "run": {"backend_name": "proprietary_remote"},
+        "fidelities": {"high": {"backend_name": "internal-analytical"}},
+    }
+
+    with pytest.raises(ProprietaryEngineRefusal):
+        pool_module._backend_name_for_fidelity(
+            profile, "stub", mode="optimizer_search"
+        )
 
 
 def _pool_task(
