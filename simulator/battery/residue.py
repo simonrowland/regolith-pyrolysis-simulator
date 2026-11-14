@@ -2706,17 +2706,15 @@ def predict_mass_loss_fraction(
                 if name in capped_channels
             )
             total = finite_total + capped_total
-            # Keep the prior single-parent arithmetic bit-identical: the
-            # inventory is normalized to moles first, then returned to mass.
-            # This is conservative at a floating-point boundary and remains
-            # the same parent-mass ceiling for shared and mixed-parent channels.
+            # Keep the prior single-parent ceiling arithmetic: inventory is
+            # normalized to moles, then returned to mass.
             ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
             remaining = max(0.0, ceiling - finite_total)
             scale = min(1.0, remaining / capped_total) if capped_total > 0.0 else 1.0
             parent_scales[parent] = scale
             inventory_bounds_by_parent[parent] = {
                 "uncapped_bound_kg": total, "ceiling_kg": ceiling,
-                "applied_bound_kg": 0.0,
+                "applied_bound_kg": min(total, ceiling),
             }
         channel_scales = {
             species: min(
@@ -2729,14 +2727,6 @@ def predict_mass_loss_fraction(
             for species, scale in channel_scales.items():
                 if species in mapping:
                     mapping[species] *= scale
-        for parent, record in inventory_bounds_by_parent.items():
-            record["applied_bound_kg"] = math.fsum(
-                mapping.get(species, 0.0)
-                * parent_mass_share_by_channel[species][parent]
-                for mapping in (bounds_by_channel, preheat_bounds_by_channel)
-                for species, term in term_by_species.items()
-                if parent in term.parent_moles_per_product
-            )
         unsourced_bound_kg = math.fsum(bounds_by_channel.values())
         preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
         point_loss_kg = documented_loss_kg
