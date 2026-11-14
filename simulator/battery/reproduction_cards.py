@@ -253,10 +253,29 @@ def evaluate_card(
         causes.append({"cause": "missing_input", "reason": "setup_not_adopted"})
     if run.get("assumptions") or frozen.get("assumptions"):
         causes.append({"cause": "assumed", "reason": "necessary_setup_assumption"})
+    outcome_refs = [tuple(entry["ref"]) for entry in review["entries"] if entry.get("role") == "outcome"]
+    inventory_refs = [(item["group_id"], tuple(item["context_ref"]))
+                      for item in frozen["printed_inventory"] if item.get("context_ref")]
+    outcome_refs.extend(ref for _, ref in inventory_refs)
+    outcome_causes = []
+    shared_causes = []
+    for cause in causes:
+        path = tuple(cause.get("path", ()))
+        if path and (path[0] == "observations" or any(
+            path[:len(ref)] == ref or ref[:len(path)] == path for ref in outcome_refs
+        )):
+            outcome_causes.append(cause)
+        else:
+            shared_causes.append(cause)
     groups: list[dict[str, Any]] = []
     seen: set[str] = set()
     for group in frozen["outcomes"]:
-        group_causes: list[dict[str, Any]] = []
+        group_refs = [("observations", oid) for oid in group["observation_ids"]]
+        group_refs.extend(ref for gid, ref in inventory_refs if gid == group["group_id"])
+        group_causes: list[dict[str, Any]] = [cause for cause in outcome_causes if any(
+            tuple(cause["path"])[:len(ref)] == ref or ref[:len(cause["path"])] == tuple(cause["path"])
+            for ref in group_refs
+        )]
         rows: list[dict[str, Any]] = []
         for blocker in group["blockers"]:
             group_causes.append({"cause": blocker, "group_id": group["group_id"]})
@@ -296,7 +315,7 @@ def evaluate_card(
         native_rms = {unit: _rms_text([Decimal(row["native_residual"]) for row in rows
                                  if row.get("native_unit") == unit and row["native_residual"] is not None])
                       for unit in units}
-        reproduced = complete and not causes and not group_causes and all(
+        reproduced = complete and not shared_causes and not group_causes and all(
             row["status"] == "MATCH" for row in rows
         )
         groups.append({
@@ -310,7 +329,7 @@ def evaluate_card(
             "native_rms": native_rms, "independent": group["independent"],
             "causes": group_causes, "coordinates": rows,
         })
-    all_causes = causes + [cause for group in groups for cause in group["causes"]]
+    all_causes = causes + [cause for group in groups for cause in group["causes"] if cause not in causes]
     passed = bool(groups) and not all_causes and all(group["reproduced"] for group in groups)
     flagged = any(_row_out_of_certified_band(str(flag.get("kind", "")), flag)
                   for group in groups for row in group["coordinates"] for flag in row["flags"])

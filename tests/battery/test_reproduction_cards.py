@@ -319,7 +319,8 @@ def test_group_gate_rejects_coordinate_availability_swap(complete_contract):
     assert f"chemistry:{oid}:numeric_availability" in gate["regressions"]
 
 
-def test_unrelated_outcome_attestation_preserves_reproduced_chemistry(complete_contract):
+@pytest.mark.parametrize("evidence_owner", ["context", "observation"])
+def test_unrelated_outcome_attestation_preserves_reproduced_chemistry(complete_contract, evidence_owner):
     args = complete_contract
     args[1]["outcomes"].append({
         "group_id": "isotopes", "observation_ids": [], "required_coordinates": 1,
@@ -333,6 +334,16 @@ def test_unrelated_outcome_attestation_preserves_reproduced_chemistry(complete_c
         "ref": ["extracts", "isotope_outcome"], "resolved": "printed isotope",
         "role": "outcome", "status": "source_unattested", "reviewer": "fixture",
         "locator": {"page": 6}, "quote": "printed isotope", "unit": "permil"})
+    if evidence_owner == "observation":
+        oid, obs = next(iter(args[4].items()))
+        other = oid + "-isotope-evidence"
+        args[4][other] = replace(obs, observation_id=other)
+        args[1]["outcomes"][-1]["observation_ids"] = [other]
+        args[2]["frozen_run"] = deepcopy(args[1])
+        args[2]["entries"].append({
+            "ref": ["observations", other], "resolved": to_plain(args[4][other]),
+            "role": "outcome", "status": "source_unattested", "reviewer": "fixture",
+            "locator": to_plain(obs.locator), "quote": "unattested outcome fixture", "unit": "as printed"})
     args[2]["consumed_paths"] = [entry["ref"] for entry in args[2]["entries"]]
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "NOT_PASS"
