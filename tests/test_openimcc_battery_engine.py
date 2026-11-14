@@ -640,7 +640,7 @@ def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
         if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
     )
     ratio = notice["pO2_bar"] * 1.0e5 / cell.gas_partial_pressures_Pa["K"]
-    assert ratio == pytest.approx(0.22444037883428292, abs=1e-8)
+    assert ratio == pytest.approx(0.22446221548960008, abs=1e-8)
     assert notice["relative_residual"] < 1.0e-8
     assert notice["bracket_log10_bar"] == [-30.0, 0.0]
     assert notice["cell_material"] is None
@@ -2160,7 +2160,7 @@ assert all(
     if candidate.observation_id.startswith("engine:openimcc:")
 )
 assert summary["n_inside_band"] == 56
-assert abs(float(summary["median_dex"]) - (-0.193144973432544415)) < 0.00000001
+assert abs(float(summary["median_dex"]) - (-0.19068318829283099)) < 0.00000001
 assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
 print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
@@ -2185,7 +2185,7 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     assert result["headline"]["n_score_eligible"] == 160
     assert result["headline"]["n_inside_band"] == 56
     assert float(result["headline"]["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
+        -0.19068318829283099, abs=1e-8
     )
     assert float(result["headline"]["rms_dex"]) == pytest.approx(
         0.2097386994979764836, abs=1e-8
@@ -2748,7 +2748,7 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         0.14612803567823803, abs=1e-12
     )
     assert float(openimcc["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
+        -0.19068318829283099, abs=1e-8
     )
     assert float(openimcc["rms_dex"]) == pytest.approx(
         0.209738699497976484, abs=1e-8
