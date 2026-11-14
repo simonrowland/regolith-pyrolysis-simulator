@@ -1169,7 +1169,10 @@ def test_distin_oxygen_ratio_conversion_uses_recorded_n0() -> None:
         )
         assert composition.authority is Authority.DERIVED
         assert any(notice.reason == _EXTRAPOLATED for notice in converted.notices)
-    saturated = replace(_wustite_row(temperature, Decimal("1")), source_id=_DISTIN)
+    saturated = _with_saturation(
+        replace(_wustite_row(temperature, Decimal("1")), source_id=_DISTIN),
+        _derived_saturation(n0, Decimal("0.007436620909554859980899190015")),
+    )
     assert (
         fusion_comparison_reference(saturated, engine=Engine.OPENIMCC).value.point
         == factor / n0
