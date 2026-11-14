@@ -235,25 +235,20 @@ def _series_call(**overrides):
     return condensation._series_resistance_deposition_flux_mol_m2_s(**kwargs)
 
 
-def test_series_flux_missing_po2_refuses_with_diagnostic():
-    """SiO's wall block refuses when pO2 is absent. The diagnostic records
-    that refusal. It does not mint a flux from the retired Psat = 0 backstop.
-    """
+def test_series_flux_missing_po2_uses_flagged_conservative_bound():
+    """d-402 uses the pO2-free SiO reaction and records its conservative bound."""
 
     diagnostic = {}
-
-    with pytest.raises(
-        condensation.WallSaturationPressureRefusal,
-        match="reason=wall_pO2_required",
-    ):
-        _series_call(
-            reactive_product_backstop=False,
-            diagnostic_out=diagnostic,
-        )
-
-    assert diagnostic["wall_saturation_pressure_refused"] is True
-    assert diagnostic["wall_saturation_pressure_pa"] is None
-    assert diagnostic["wall_saturation_pressure_refusal_reason"] == "wall_pO2_required"
+    flux = _series_call(
+        reactive_product_backstop=False,
+        diagnostic_out=diagnostic,
+    )
+    assert flux > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    assert 0.0 < diagnostic["wall_saturation_pressure_pa"] < 100.0
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "status_bearing"
+    assert notice["reason"] == "wall_pO2_unknown_pO2_free_route_used"
 
 
 def test_wall_candidate_keeps_missing_saturation_diagnostic(monkeypatch):
@@ -393,22 +388,22 @@ def test_hkl_surface_flux_zero_alpha_returns_zero():
 
 
 def test_hkl_surface_flux_healthy_input_uses_the_wall_law():
-    """A healthy SiO call needs parcel pO2. Driving force is p_local - Psat.
+    """Unknown pO2 uses the flagged pO2-free route and its actual Psat."""
 
-    Missing pO2 refuses. It does not return the full local pressure.
-    """
-
-    with pytest.raises(
-        condensation.WallSaturationPressureRefusal,
-        match="reason=wall_pO2_required",
-    ):
-        _hkl_call()
+    diagnostic = {}
+    bound_flux = _hkl_call(diagnostic_out=diagnostic)
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    assert diagnostic["wall_saturation_pressure_notice"]["reason"] == (
+        "wall_pO2_unknown_pO2_free_route_used"
+    )
+    assert bound_flux > 0.0
+    assert diagnostic["wall_saturation_pressure_pa"] < _HKL_SIO_KWARGS["P_local_pa"]
     po2_pa = 1.0e-4
     psat = condensation._antoine_psat_pa(
         "SiO", _HKL_SIO_KWARGS["T_surface_K"], wall_pO2_Pa=po2_pa,
     )
     assert psat is not None and 0.0 < psat < _HKL_SIO_KWARGS["P_local_pa"]
-    flux = _hkl_call(wall_pO2_Pa=po2_pa)
+    known_po2_flux = _hkl_call(wall_pO2_Pa=po2_pa)
     expected = _HKL_SIO_KWARGS["alpha_s"] * condensation._hkl_impingement_flux_mol_m2_s(
         "SiO",
         _HKL_SIO_KWARGS["P_local_pa"] - psat,
@@ -419,8 +414,11 @@ def test_hkl_surface_flux_healthy_input_uses_the_wall_law():
         _HKL_SIO_KWARGS["P_local_pa"],
         _HKL_SIO_KWARGS["T_surface_K"],
     )
-    assert flux == pytest.approx(expected)
-    assert 0.0 < flux < full
+    assert known_po2_flux == pytest.approx(expected)
+    assert 0.0 < known_po2_flux < full
+    # Adding committed pO2 can select a lower-Psat oxidative route; omitting
+    # it therefore bounds capture conservatively from below.
+    assert bound_flux <= known_po2_flux
 
 
 # ---------------------------------------------------------------------------
