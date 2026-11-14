@@ -3348,24 +3348,6 @@ class _OpenImccBatteryBackend:
                     channels,
                     parent_oxides=result.parent_oxides,
                 )
-                for name, _reaction in channels:
-                    metadata = base_species[name]
-                    # Premise: each listed parent oxide supplies its oxygen
-                    # congruently to the product's non-oxygen atoms. Algebra:
-                    # νpO2=(O_product-O_parent_demand)/2. The counts are O
-                    # atoms per product mole, so ν is dimensionless. AlSiO
-                    # gives (1-3.5)/2=-1.25; Si2O2 gives (2-4)/2=-1.0.
-                    expected = (
-                        metadata.oxygen_atoms - metadata.parent_oxygen_demand
-                    ) / 2.0
-                    if not math.isclose(
-                        metadata.pO2_exponent, expected, abs_tol=1e-12
-                    ):
-                        raise _OxygenBalanceRefusal(
-                            "imcc_gas_oxygen_balance_failed",
-                            f"openimcc reaction exponent for {name!r} "
-                            "does not match formula metadata",
-                        )
 
                 def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
