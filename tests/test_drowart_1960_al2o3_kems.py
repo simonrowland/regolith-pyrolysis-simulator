@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -51,7 +52,7 @@ def test_rendered_table_cells_and_printed_row_counts() -> None:
         ]
         assert len(selected) == 1
         point = selected[0]
-        assert point["pressure_atm"] == pressure_atm
+        assert Decimal(str(point["pressure_atm"])) == Decimal(pressure_atm)
         assert point["pressure_as_printed"] == printed
         assert point["locator"]["published_page"] == page
         assert point["locator"]["column"] == column

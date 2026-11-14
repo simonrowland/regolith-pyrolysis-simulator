@@ -54,5 +54,5 @@ def test_located_table2_oxygen_condition_survives_migration(tmp_path):
         value = point.state.value
         if hasattr(value, "point"):
             value = value.point
-        expected = Decimal(source_point["state"]["value"]["point"])
+        expected = Decimal(str(source_point["state"]["value"]["point"]))
         assert value == expected

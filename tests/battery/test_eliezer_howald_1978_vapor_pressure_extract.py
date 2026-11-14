@@ -82,7 +82,7 @@ def test_eliezer_howald_source_cells_and_render_pins():
     for observation_id, expected in numeric_pins.items():
         values = source[observation_id]["values"]
         actual = values.get("value", values.get("gamma", values.get("activity")))
-        assert str(actual) == expected, observation_id
+        assert Decimal(str(actual)) == Decimal(expected), observation_id
 
     assert source["eliezer_howald_1978_table1_x021537_hm827"]["locator"]["table"] == "I"
     assert source["eliezer_howald_1978_table1_x021537_hm827"]["locator"]["page"] == 3

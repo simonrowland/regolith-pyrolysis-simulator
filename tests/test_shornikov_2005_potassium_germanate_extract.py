@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -90,7 +91,7 @@ def test_table1_fit_and_alpha_rows_keep_located_methods_and_score(tmp_path: Path
     pressure_references = ("[23]", "[24]", "[29]", "[30]")
     for observation_id, (value, printed, log_a, log_b) in expected.items():
         row = observations[observation_id]
-        assert row["values"]["value"] == value
+        assert Decimal(str(row["values"]["value"])) == Decimal(value)
         assert row["values"]["value_as_printed"] == printed
         assert row["values"]["log10_p_A_K"] == log_a
         assert row["values"]["log10_p_B"] == log_b

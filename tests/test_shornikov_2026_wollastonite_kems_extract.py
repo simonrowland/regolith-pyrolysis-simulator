@@ -4,7 +4,7 @@ import copy
 import subprocess
 import sys
 from collections import Counter
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import pytest
@@ -185,7 +185,17 @@ def _source_observations(document: dict) -> dict[str, tuple[str, dict]]:
 def test_table3_render_grid_and_both_cell_mutations_are_detected() -> None:
     document = _document()
     actual = _table3_grid(document)
-    assert actual == TABLE3_RENDER
+    def normalize(value):
+        if value is None:
+            return None
+        try:
+            return Decimal(str(value))
+        except InvalidOperation:
+            return value
+
+    assert tuple(tuple(normalize(value) for value in row) for row in actual) == tuple(
+        tuple(normalize(value) for value in row) for row in TABLE3_RENDER
+    )
     assert len(actual) == 14
     assert sum(value is not None for row in actual for value in row[1:]) == 146
 

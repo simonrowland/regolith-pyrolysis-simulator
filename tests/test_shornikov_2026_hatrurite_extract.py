@@ -106,9 +106,9 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
             )
             assert relation == "atm_to_Pa"
             assert record.value.point == expected_pressure
-            assert record.identity.temperature_K.value == Decimal(point["T_K"])
+            assert record.identity.temperature_K.value == Decimal(str(point["T_K"]))
             condition = record.point_conditions["temperature_K"]
-            assert condition.state.value == Decimal(point["T_K"])
+            assert condition.state.value == Decimal(str(point["T_K"]))
             assert condition.locator.table == "2"
             assert condition.locator.pdf_page_index == 10
             assert record.locator.published_page == 306
@@ -223,7 +223,7 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
             for outcome in outcomes
         )
         for point, record in zip(source_points, migrated, strict=True):
-            assert record.value.point == Decimal(point["activity"])
+            assert record.value.point == Decimal(str(point["activity"]))
             assert record.identity.temperature_K.value == Decimal(point["T_K"])
             assert record.evidence.class_.value is EvidenceClass.FIGURE_ONLY
             condition = record.point_conditions["temperature_K"]

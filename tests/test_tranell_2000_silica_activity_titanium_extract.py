@@ -195,7 +195,11 @@ def _assert_rendered_grid_matches(document: dict, audit_cells: dict, tables: dic
                 if printed in {"-", "*"}:
                     assert extracted.get(key, printed) == printed, (key, extracted.get(key))
                 else:
-                    assert extracted[key] == printed, (key, extracted.get(key), printed)
+                    assert Decimal(str(extracted[key])) == Decimal(printed), (
+                        key,
+                        extracted.get(key),
+                        printed,
+                    )
     _assert_typed_numeric_cells_match(document, tables)
 
 

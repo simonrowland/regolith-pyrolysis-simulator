@@ -183,7 +183,7 @@ def test_table_and_figure_reads_are_pinned():
         if row["observation_id"] == "shornikov_2011_reducing_pO2_boundary"
     )
     assert oxygen["values"]["pressure_as_printed"] == "5.0 . 10\u20135"
-    assert oxygen["values"]["pressure_atm"] == "5.0e-5"
+    assert Decimal(str(oxygen["values"]["pressure_atm"])) == Decimal("5.0e-5")
 
     activity_points = []
     for _formula, row in _observations(document):
@@ -207,7 +207,7 @@ def test_table_and_figure_reads_are_pinned():
         match = next(item for item in row if item["observation_id"] == observation_id)
         point = match["values"]["points"][0]
         assert point["T_K"] == temperature
-        assert point["activity"] == activity
+        assert Decimal(str(point["activity"])) == Decimal(activity)
         assert point["embedded_px_read_1"] == embedded
         assert point["page_600dpi_px_read_1"] == page
         assert point["embedded_px_read_2"] == embedded_2
@@ -225,7 +225,7 @@ def test_table_and_figure_reads_are_pinned():
             if item["observation_id"] == observation_id
         )
         point = next(item for item in match["values"]["points"] if item["embedded_px_read_1"] == embedded)
-        assert point["activity"] == activity
+        assert Decimal(str(point["activity"])) == Decimal(activity)
         assert point["T_K"] == "2050"
         assert point["page_600dpi_px_read_1"] == page
         assert point["embedded_px_read_2"] == embedded_2

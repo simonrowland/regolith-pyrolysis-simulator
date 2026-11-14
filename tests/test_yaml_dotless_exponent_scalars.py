@@ -3,19 +3,24 @@
 from __future__ import annotations
 
 import heapq
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
-import re
+import subprocess
 
 import pytest
 import yaml
 
 from simulator.yaml_cache import YAML12SafeLoader
+from tools.validate_literature_extracts import _DOTLESS_EXPONENT_RE
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = REPO_ROOT / "data"
-DOTLESS_EXPONENT = re.compile(r"^[-+]?\d+(?:\.\d+)?[eE][-+]?\d+$")
 YAML_CORPUS_SHARD_COUNT = 16
+GREEN_SCALAR_BASE = "be76d28ad"
+# Follow-up b-1220 owns reducing green's 139 legacy losses; this round keeps
+# that set as a ceiling while preventing rewritten scalars from adding losses.
+GREEN_LOSSY_FLOAT_CEILING = 139
 
 # These fields intentionally retain printed lexemes or prose as strings. Each
 # rule names a schema field and why converting it would lose its contract.
@@ -101,7 +106,7 @@ def _find_untyped_exponents(node: yaml.Node, path: tuple[str, ...]):
     if isinstance(node, yaml.ScalarNode):
         if (
             node.tag == "tag:yaml.org,2002:str"
-            and DOTLESS_EXPONENT.fullmatch(node.value)
+            and _DOTLESS_EXPONENT_RE.fullmatch(node.value)
         ):
             yield (
                 ".".join(path),
@@ -121,15 +126,57 @@ def _find_untyped_exponents(node: yaml.Node, path: tuple[str, ...]):
             yield from _find_untyped_exponents(value_node, path + (str(index),))
 
 
-def _load_with_source_nodes(source: str):
+def _find_precision_losing_floats(node: yaml.Node, path: tuple[str, ...] = ()):
+    """Find float scalars whose YAML lexeme is not preserved by float text."""
+    if isinstance(node, yaml.ScalarNode):
+        if node.tag == "tag:yaml.org,2002:float":
+            token = node.value.replace("_", "")
+            try:
+                printed = Decimal(token)
+                parsed_float = float(token)
+                parsed = Decimal(str(parsed_float))
+            except (InvalidOperation, ValueError, OverflowError):
+                return
+            if printed.is_finite() and printed != parsed:
+                yield (path, node.start_mark.line + 1, token)
+        return
+    if isinstance(node, yaml.MappingNode):
+        for key_node, value_node in node.value:
+            yield from _find_precision_losing_floats(
+                value_node, path + (str(key_node.value),)
+            )
+    elif isinstance(node, yaml.SequenceNode):
+        for index, value_node in enumerate(node.value):
+            yield from _find_precision_losing_floats(value_node, path + (str(index),))
+
+
+def _source_extract(relative: str) -> bool:
+    return (
+        (
+            relative.startswith("data/literature/extracts/")
+            or relative.startswith("data/literature/extracts-v2/")
+        )
+        and "/audits/" not in relative
+        and not relative.endswith(".mapping.yaml")
+    )
+
+
+def _source_node(source: str) -> yaml.Node | None:
     loader = YAML12SafeLoader(source)
     try:
-        node = loader.get_single_node()
-        if node is None:
-            return []
-        return list(_find_untyped_exponents(node, ()))
+        return loader.get_single_node()
     finally:
         loader.dispose()
+
+
+def _load_with_source_nodes(source: str):
+    node = _source_node(source)
+    if node is None:
+        return [], []
+    return (
+        list(_find_untyped_exponents(node, ())),
+        list(_find_precision_losing_floats(node)),
+    )
 
 
 @pytest.mark.parametrize(
@@ -143,30 +190,91 @@ def _load_with_source_nodes(source: str):
 def test_every_data_yaml_has_no_untyped_dotless_exponent_in_numeric_fields(yaml_paths):
     """Use the production loader over the complete corpus, including flow sequences."""
     findings: list[str] = []
+    precision_findings: list[str] = []
     parse_refusals: list[str] = []
+    current_loss_count = 0
+    green_loss_count = 0
     assert yaml_paths, f"no YAML files found below {DATA_ROOT}"
 
     for path in yaml_paths:
         source = path.read_text(encoding="utf-8")
         try:
-            untyped = _load_with_source_nodes(source)
+            untyped, precision_losses = _load_with_source_nodes(source)
         except yaml.YAMLError as exc:
             # P3: a strict parser refusal means there are no loaded scalar
             # values to inspect in this document. Keep it visible in failures.
             parse_refusals.append(f"{path.relative_to(REPO_ROOT)}: {exc}")
             continue
+        relative = path.relative_to(REPO_ROOT).as_posix()
+        if _source_extract(relative):
+            green_source = subprocess.check_output(
+                ["git", "show", f"{GREEN_SCALAR_BASE}:{relative}"],
+                cwd=REPO_ROOT,
+                text=True,
+            )
+            _green_exponents, green_losses = _load_with_source_nodes(green_source)
+            green_signatures = {
+                (key_path, value) for key_path, _line, value in green_losses
+            }
+            current_signatures = {
+                (key_path, value) for key_path, _line, value in precision_losses
+            }
+            new_losses = current_signatures - green_signatures
+            current_loss_count += len(current_signatures)
+            green_loss_count += len(green_signatures)
+            precision_findings.extend(
+                f"{relative}:{line} {'.'.join(key_path)} = {value!r}"
+                for key_path, line, value in precision_losses
+                if (key_path, value) in new_losses
+            )
+            assert current_signatures <= green_signatures, (
+                f"new precision-losing float in {relative}; "
+                "the pre-existing source losses are only a ceiling "
+                "for follow-up b-1220"
+            )
         for key_path, line, value, _start, _end in untyped:
-            relative = path.relative_to(REPO_ROOT).as_posix()
             if _deliberate_printed_string_reason(relative, key_path):
                 continue
             findings.append(f"{relative}:{line} {key_path} = {value!r}")
 
+    assert green_loss_count <= GREEN_LOSSY_FLOAT_CEILING, (
+        "green shard exceeds the corpus precision-loss ceiling; see follow-up b-1220"
+    )
+    assert current_loss_count <= green_loss_count, (
+        "extract precision-loss count must only fall; see follow-up b-1220"
+    )
+    assert not precision_findings, (
+        "new extract floats lose digits against their YAML lexemes:\n"
+        + "\n".join(precision_findings)
+    )
     assert not findings, (
         "YAML numeric-looking string scalars:\n"
         + "\n".join(findings)
         + "\nStrict parser refusals (P3):\n"
         + "\n".join(parse_refusals)
     )
+
+
+def test_precision_guard_rejects_a_new_lossy_float_mutation():
+    exact_source = "value: '0.0027299999999999997879474022965951007790863513946533203125'\n"
+    mutated_source = (
+        "value: 0.0027299999999999997879474022965951007790863513946533203125\n"
+    )
+    exact_node = _source_node(exact_source)
+    mutated_node = _source_node(mutated_source)
+    assert exact_node is not None and mutated_node is not None
+    prior_signatures = {
+        (key_path, value)
+        for key_path, _line, value in _find_precision_losing_floats(exact_node)
+    }
+    mutated_signatures = {
+        (key_path, value)
+        for key_path, _line, value in _find_precision_losing_floats(mutated_node)
+    }
+
+    assert mutated_signatures - prior_signatures == {
+        (("value",), "0.0027299999999999997879474022965951007790863513946533203125")
+    }
 
 
 def test_oneill_identity_pressure_keeps_its_exact_decimal_lexeme():

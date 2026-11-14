@@ -394,7 +394,7 @@ def _assert_digitized_activities(document: dict, contexts: list, result) -> None
         assert components == _TABLE_5_1_MOLE_PERCENT[numeral]
         observation = migrated[row["observation_id"]]
         assert observation.value.kind.value == "point"
-        assert observation.value.point == Decimal(row["values"]["activity"])
+        assert observation.value.point == Decimal(str(row["values"]["activity"]))
         assert observation.identity.quantity.value is Quantity.ACTIVITY
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert observation.identity.temperature_K.is_value

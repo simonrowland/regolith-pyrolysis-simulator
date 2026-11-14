@@ -229,13 +229,13 @@ def _assert_figure_reads(document) -> None:
             ("T_K", "T_K_read_1"),
             ("T_K", "T_K_read_2"),
         ):
-            nominal = Decimal(values["T_K"])
+            nominal = Decimal(str(values["T_K"]))
             width = Decimal(values["read_uncertainty_K"])
-            assert nominal - width <= Decimal(values[raw_key]) <= nominal + width
-        nominal = Decimal(values["cao_mol_pct_read"])
+            assert nominal - width <= Decimal(str(values[raw_key])) <= nominal + width
+        nominal = Decimal(str(values["cao_mol_pct_read"]))
         width = Decimal(values["read_uncertainty_mol_pct"])
         for raw_key in ("cao_mol_pct_read_1", "cao_mol_pct_read_2"):
-            assert nominal - width <= Decimal(values[raw_key]) <= nominal + width
+            assert nominal - width <= Decimal(str(values[raw_key])) <= nominal + width
     for observation_id, kind in CURVE_KINDS.items():
         match = next(item for item in markers if item["observation_id"] == observation_id)
         assert match["type"] == "transition_point"
@@ -246,16 +246,16 @@ def _assert_figure_reads(document) -> None:
         assert row["values"]["property_kind"] == "not_a_liquidus_or_solidus"
         assert "liquidus" in row["values"]["schema_gap"]
         assert "solidus" in row["values"]["schema_gap"]
-        assert Decimal(row["values"]["read_uncertainty_K"]) > 0
-        assert Decimal(row["values"]["read_uncertainty_mol_pct"]) > 0
-        nominal = Decimal(row["values"]["T_K"])
-        width = Decimal(row["values"]["read_uncertainty_K"])
+        assert Decimal(str(row["values"]["read_uncertainty_K"])) > 0
+        assert Decimal(str(row["values"]["read_uncertainty_mol_pct"])) > 0
+        nominal = Decimal(str(row["values"]["T_K"]))
+        width = Decimal(str(row["values"]["read_uncertainty_K"]))
         for raw_key in ("T_K_read_1", "T_K_read_2"):
-            assert nominal - width <= Decimal(row["values"][raw_key]) <= nominal + width
-        nominal = Decimal(row["values"]["cao_mol_pct_read"])
-        width = Decimal(row["values"]["read_uncertainty_mol_pct"])
+            assert nominal - width <= Decimal(str(row["values"][raw_key])) <= nominal + width
+        nominal = Decimal(str(row["values"]["cao_mol_pct_read"]))
+        width = Decimal(str(row["values"]["read_uncertainty_mol_pct"]))
         for raw_key in ("cao_mol_pct_read_1", "cao_mol_pct_read_2"):
-            assert nominal - width <= Decimal(row["values"][raw_key]) <= nominal + width
+            assert nominal - width <= Decimal(str(row["values"][raw_key])) <= nominal + width
     for (
         observation_id,
         temperature,
@@ -267,9 +267,9 @@ def _assert_figure_reads(document) -> None:
         marker,
     ) in FIGURE_READS:
         match = next(item for item in markers if item["observation_id"] == observation_id)
-        assert match["values"]["T_K"] == temperature
-        assert match["values"]["T_K_read_1"] == temperature_read
-        assert match["values"]["cao_mol_pct_read"] == mole_pct
+        assert Decimal(str(match["values"]["T_K"])) == Decimal(temperature)
+        assert Decimal(str(match["values"]["T_K_read_1"])) == Decimal(temperature_read)
+        assert Decimal(str(match["values"]["cao_mol_pct_read"])) == Decimal(mole_pct)
         assert match["values"]["embedded_px_read_1"] == embedded
         assert match["values"]["page_600dpi_px_read_2"] == page
         assert match["values"]["property_kind"] == kind
@@ -293,8 +293,8 @@ def _assert_figure_reads(document) -> None:
     apex = next(
         item for item in markers if item["observation_id"] == "shornikov_2020_fig1_s3_01"
     )
-    assert apex["values"]["T_K"] == "3.10e3"
-    assert apex["values"]["T_K_read_1"] == "3103.8"
+    assert Decimal(str(apex["values"]["T_K"])) == Decimal("3.10e3")
+    assert Decimal(str(apex["values"]["T_K_read_1"])) == Decimal("3103.8")
     assert apex["values"]["page_600dpi_px_read_2"] == [586.0, 2342.5]
     assert apex["values"]["property_kind"] == "liquidus"
     crescent = next(

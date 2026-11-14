@@ -59,8 +59,10 @@ def assert_table3_matches_render(extract: dict, rendered: list | None = None) ->
         assert len(cells) == len(SURFACES)
         for surface, (rate, uncertainty, marker) in zip(SURFACES, cells, strict=True):
             point, method_class = rate_points[(sample, temperature, surface)]
-            assert point["evaporation_rate"] == rate
-            assert point["uncertainty"] == {"evaporation_rate": uncertainty}
+            assert Decimal(str(point["evaporation_rate"])) == Decimal(rate)
+            assert Decimal(
+                str(point["uncertainty"]["evaporation_rate"])
+            ) == Decimal(uncertainty)
             assert point["experiments_n"] == str(experiments_n)
             assert point["rate_as_printed"].endswith(marker)
             expected_class = "quoted_attributed" if marker == "*" else "measured_reduced"
@@ -111,7 +113,7 @@ def assert_extract_area_binding(
     )
     located_area = experiment["apparatus"]["geometry"].get("exposed_area_m2")
     assert located_area is not None
-    assert Decimal(located_area["state"]["value"]["point"]) == expected
+    assert Decimal(str(located_area["state"]["value"]["point"])) == expected
     assert located_area["locator"]["table"] == "1"
     assert located_area["locator"]["row"] == run_id
     quote = (
@@ -222,7 +224,9 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
         if source_pressure["tag"] == "value":
             assert pressure is not None
             assert pressure.state.is_value
-            assert pressure.state.value.point == Decimal(source_pressure["value"]["point"])
+            assert pressure.state.value.point == Decimal(
+                str(source_pressure["value"]["point"])
+            )
             assert pressure.locator.table == "1"
         else:
             # Table 1 uses a dash for runs whose pressure was not measured.
@@ -282,7 +286,9 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
         if appendix_source_pressure["tag"] == "value":
             assert pressure is not None
             assert pressure.state.is_value
-            assert pressure.state.value.point == Decimal(appendix_source_pressure["value"]["point"])
+            assert pressure.state.value.point == Decimal(
+                str(appendix_source_pressure["value"]["point"])
+            )
             assert pressure.locator.table == "1"
         else:
             assert appendix_source_pressure["tag"] == "unknown"

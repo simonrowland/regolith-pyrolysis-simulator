@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import pytest
@@ -91,7 +91,18 @@ def _table3_grid(document: dict) -> tuple[tuple[str | None, ...], ...]:
 
 
 def _assert_table3_matches(expected, actual) -> None:
-    assert actual == expected
+    def decimal_if_numeric(value):
+        if not isinstance(value, str):
+            return value
+        try:
+            return Decimal(value)
+        except InvalidOperation:
+            return value
+
+    normalize = lambda rows: tuple(
+        tuple(decimal_if_numeric(value) for value in row) for row in rows
+    )
+    assert normalize(actual) == normalize(expected)
 
 
 def test_table3_transcription_and_both_cell_mutations_are_detected() -> None:

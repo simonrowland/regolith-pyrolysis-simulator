@@ -58,7 +58,7 @@ def _assert_kim_2004_pins(document: dict) -> None:
     for observation_id, (activity, page, table) in EXPECTED_ACTIVITY.items():
         row = rows[observation_id]
         point = row["values"]["points"][0]
-        assert point["activity"] == activity
+        assert Decimal(str(point["activity"])) == Decimal(activity)
         assert row["locator"]["page"] == page
         assert row["locator"]["table"] == table
         assert row["standard_state_as_printed"] == KIM_STANDARD_STATE_AS_PRINTED

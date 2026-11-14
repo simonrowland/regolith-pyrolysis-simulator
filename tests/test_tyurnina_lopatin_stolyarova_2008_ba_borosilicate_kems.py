@@ -20,10 +20,10 @@ def test_tyurnina_activities_migrate_with_temperature_series_and_composition():
     }
     assert len(rows_by_id) == 90
     first_series = rows_by_id["tyurnina_2008_bao_activity_table1_comp_01"]["values"]["series"]
-    assert first_series == [
-        {"T_K": 1650, "activity": "2.2e-2"},
-        {"T_K": 1730, "activity": "1.8e-2"},
-    ]
+    assert [
+        (point["T_K"], Decimal(str(point["activity"])))
+        for point in first_series
+    ] == [(1650, Decimal("2.2e-2")), (1730, Decimal("1.8e-2"))]
     unsupported = next(
         row
         for row in document["species"]["SiO2"]["context"]
@@ -84,7 +84,7 @@ def test_tyurnina_activities_migrate_with_temperature_series_and_composition():
         ]
         assert len(matches) == 2
         for observation, point in zip(matches, source["values"]["series"]):
-            assert observation.value.point == Decimal(point["activity"])
+            assert observation.value.point == Decimal(str(point["activity"]))
             assert observation.identity.temperature_K.is_value
             assert observation.identity.temperature_K.value == Decimal(str(point["T_K"]))
             composition = observation.point_conditions["composition"]

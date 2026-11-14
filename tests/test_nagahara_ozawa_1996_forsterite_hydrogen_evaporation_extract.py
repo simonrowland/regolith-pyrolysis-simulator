@@ -74,7 +74,7 @@ def _assert_rendered_table_values(document: dict) -> None:
     }
     for observation_id, (field, expected, page, table) in rendered.items():
         row = rows[observation_id]
-        assert row["values"][field] == expected
+        assert Decimal(str(row["values"][field])) == Decimal(expected)
         assert row["locator"]["page"] == page
         assert row["locator"]["table"] == table
 

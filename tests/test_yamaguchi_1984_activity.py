@@ -21,7 +21,7 @@ def test_abstract_activity_migrates_with_printed_conditions() -> None:
     # The page 43 render gives the reported approximate activity, composition,
     # and temperature; equation (1) is on page 44. Table 1 is not an activity
     # point table: its seven rows are fit coefficients.
-    assert point["activity"] == "1e-13"
+    assert Decimal(str(point["activity"])) == Decimal("1e-13")
     assert point["T_K"] == "1573"
     assert point["composition_mol"] == {"Na2O": "0.5", "P2O5": "0.5"}
     assert row["locator"]["published_page"] == 43
