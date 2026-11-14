@@ -808,16 +808,21 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
     ]["Ca"]
     assert custom_collector < default_collector
 
-    with pytest.raises(condensation_module.WallSaturationPressureRefusal) as default:
-        condensation_module._antoine_psat_pa("SiO", 1700.0)
-    with pytest.raises(condensation_module.WallSaturationPressureRefusal) as fallback:
-        condensation_module._antoine_psat_pa(
-            "SiO", 1700.0, vapor_pressure_data=custom_vapor_pressures,
-        )
-    # SiO is not in the custom row, so both calls resolve the global wall
-    # block. Missing parcel pO2 is wall_pO2_required. The law refusal does
-    # not carry the legacy source valid_range_K.
-    assert fallback.value.reason == default.value.reason == "wall_pO2_required"
+    default_psat = condensation_module._antoine_psat_pa("SiO", 1700.0)
+    fallback_psat = condensation_module._antoine_psat_pa(
+        "SiO", 1700.0, vapor_pressure_data=custom_vapor_pressures,
+    )
+    # SiO is absent from the custom row, so both calls use the same global
+    # pO2-free wall equilibrium (d-402), independent of the Ca source fit.
+    assert fallback_psat == pytest.approx(default_psat)
+    assert default_psat is not None and default_psat > 0.0
+    diagnostic = {}
+    condensation_module._wall_deposition_driving_pressure_pa(
+        "SiO", 100.0, 1700.0, diagnostic_out=diagnostic,
+    )
+    assert diagnostic["wall_saturation_pressure_notice"]["reason"] == (
+        "wall_pO2_unknown_pO2_free_route_used"
+    )
 
 
 def test_partial_custom_antoine_block_falls_back_to_global_coefficients():
