@@ -14,7 +14,7 @@ import math
 import re
 from types import MappingProxyType, SimpleNamespace
 from typing import Any, Mapping, Sequence
-from collections.abc import Iterable, Mapping as MappingABC
+from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
 from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
 from engines.builtin.vapor_pressure import (
