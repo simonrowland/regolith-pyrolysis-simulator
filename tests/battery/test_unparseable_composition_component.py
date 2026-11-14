@@ -160,6 +160,15 @@ def _atoms(formula: str) -> dict[str, float]:
     return {element: float(count) for element, count in parsed.elements.items()}
 
 
+def test_accounting_formula_owner_parses_score_formula_spellings() -> None:
+    assert _atoms("Al2O3.3H2O") == {"Al": 2.0, "H": 6.0, "O": 6.0}
+    assert _atoms("3Al2O3.2SiO2") == {"Al": 6.0, "O": 13.0, "Si": 2.0}
+    assert _atoms("CuO•CuSO4") == {"Cu": 2.0, "O": 5.0, "S": 1.0}
+    assert _atoms("NbC.98") == {"Nb": 1.0, "C": 0.98}
+    with pytest.raises(AccountingError):
+        parse_formula("CaAl.SiCK")
+
+
 def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None:
     """A printed decimal subscript is one species. A hydrate dot still splits.
 
