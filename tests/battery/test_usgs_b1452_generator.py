@@ -754,6 +754,10 @@ def test_mullite_oxide_caption_keeps_all_formation_rows_typed_refused() -> None:
         row
         for row in generated.observations
         if row.identity.species.formula == "3Al2O3.2SiO2"
+        and any(
+            f":{quantity.value}:" in row.observation_id
+            for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
+        )
     ]
     assert len(mullite_rows) == 48
     assert {row.identity.quantity.reason for row in mullite_rows} == {
