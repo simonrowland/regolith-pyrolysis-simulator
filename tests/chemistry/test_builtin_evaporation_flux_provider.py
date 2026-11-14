@@ -70,7 +70,7 @@ def _series_resistance_reference_flux(
     sim: PyrolysisSimulator,
     vapor_pressures_Pa: dict,
 ) -> dict:
-    """Re-invoke the series-resistance source outside ``_calculate_evaporation``.
+    """Re-invoke the publisher law using the surface owner's pressure map.
 
     NOTE (2026-06-29 review): this calls the SAME production helper
     ``_series_resistance_evaporation_flux_kg_m2_s`` (below), so the parity tests
@@ -81,6 +81,18 @@ def _series_resistance_reference_flux(
     double-count guard, stir saturation, and vacuum gas-film limit) are pinned
     independently in ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
     """
+
+    # d-376 amendment 1 closes the persisted mass-action pressures before
+    # publishing flux. Re-enter the same physics owner for the reference
+    # path so this caller-wiring check compares like pressure vectors; the
+    # surface root itself has separate pins.
+    context = getattr(sim, "_langmuir_flux_closure_context", None)
+    if isinstance(context, dict) and context.get("root_closed"):
+        surface = sim._reclose_langmuir_pressures(
+            context.get("film_partials_Pa", {})
+        )
+        if surface is not None and surface.applied:
+            vapor_pressures_Pa = dict(surface.pressures_Pa)
 
     T_K = sim.melt.temperature_C + 273.15
     flux: dict[str, float] = {}
@@ -1110,8 +1122,8 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "would be vacuous"
     )
 
-    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
+    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     refusals = sim._last_vapour_batch_report["refusals_by_species"]
     refused_reference_species = set(reference_flux) & set(refusals)
 
@@ -1252,10 +1264,10 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         if not vapor_pressures_Pa:
             continue
 
-        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
+        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114

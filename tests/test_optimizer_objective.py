@@ -37,20 +37,22 @@ from simulator.vapour_rail.batch import (
     VapourAnswer,
     VapourBatch,
 )
-import simulator.optimize.evaluate as evaluate_module
+import simulator.optimize.physics as physics_module
 from simulator.optimize.evaluate import (
+    RunReference,
+    ScoredResult,
+    _run_reference,
+)
+from simulator.optimize.physics import (
     COMPUTED_EXCEEDS_INVENTORY,
     INVENTORY_CAPPED,
     MISSING_PARENT_OXIDE_INVENTORY,
     MISSING_PARENT_OXIDE_STOICHIOMETRY,
     SUPPLY_INTERVAL_UPPER_BOUND_USED,
     SUPPLY_UNAVAILABLE,
-    RunReference,
-    ScoredResult,
     _WallSupplyInterval,
     _classify_wall_supply_interval,
     _optimizer_refused_flux_bounds,
-    _run_reference,
 )
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
@@ -4800,9 +4802,9 @@ def test_computed_parent_oxide_is_reserved_before_refused_bounds(
                 float(window_start.get(parent, 0.0)) + 1e-12
             )
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_computed_parent_oxide_draws",
-        lambda *args, **kwargs: evaluate_module._empty_oxide_draws(),
+        lambda *args, **kwargs: physics_module._empty_oxide_draws(),
     )
     for order in orders:
         mutated = _optimizer_refused_flux_bounds(snapshots, order)
@@ -4866,7 +4868,7 @@ def test_first_post_debit_snapshot_keeps_the_pre_evaporation_charge(
     assert bounds["K2O_gas"] < 0.4 + _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
     assert bounds.inventory_capped == {"K2O_gas": True}
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_pre_evaporation_oxide_kg",
         lambda _snapshot: None,
     )
@@ -5079,7 +5081,7 @@ def test_missing_both_conservation_operands_is_not_the_kinetic_ceiling(
         assert bounds["K2O_gas"] == _approx_kg(charge)
         assert bounds["K2O_gas"] < kinetic
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_allocate_parent_oxide_supply",
         _unrestricted_parent_oxide_allocation,
     )
@@ -5175,11 +5177,11 @@ def test_computed_ratio_without_parent_withholds_every_refused_sibling(
             assert bounds.supply_unavailable[name] == [reason]
         assert bounds.inventory_capped == {}
 
-    real_draws = evaluate_module._computed_parent_oxide_draws
+    real_draws = physics_module._computed_parent_oxide_draws
 
     def drop_unattributed(snapshot: object, catalog: object) -> object:
         draw = real_draws(snapshot, catalog)
-        return evaluate_module._ComputedOxideDraws(
+        return physics_module._ComputedOxideDraws(
             draw.oxide_kg,
             draw.missing_stoich_species,
             frozenset(),
@@ -5187,7 +5189,7 @@ def test_computed_ratio_without_parent_withholds_every_refused_sibling(
         )
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_computed_parent_oxide_draws",
         drop_unattributed,
     )
@@ -5429,11 +5431,11 @@ def test_skipping_an_unparented_computed_rate_respends_the_charge(
     assert held.supply_unavailable["K2O_gas"] == [
         MISSING_PARENT_OXIDE_STOICHIOMETRY
     ]
-    real_draws = evaluate_module._computed_parent_oxide_draws
+    real_draws = physics_module._computed_parent_oxide_draws
 
     def drop_unattributed(snapshot_arg: object, catalog: object) -> object:
         draw = real_draws(snapshot_arg, catalog)
-        return evaluate_module._ComputedOxideDraws(
+        return physics_module._ComputedOxideDraws(
             draw.oxide_kg,
             draw.missing_stoich_species,
             draw.unreservable_parents,
@@ -5441,7 +5443,7 @@ def test_skipping_an_unparented_computed_rate_respends_the_charge(
         )
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_computed_parent_oxide_draws",
         drop_unattributed,
     )
@@ -5605,7 +5607,7 @@ def test_empty_inventory_truthiness_lets_composition_fund_the_bound(
         return None
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_snapshot_oxide_inventory_kg",
         composition_overrides_empty,
     )
@@ -5735,19 +5737,19 @@ def test_first_recorded_charge_does_not_adopt_later_inventory(
     if not case["later_must_not_count"]:
         return
 
-    real_budget = evaluate_module._window_parent_oxide_budget
+    real_budget = physics_module._window_parent_oxide_budget
 
     def adopt_later_keys(snapshots_arg: object, catalog: object) -> object:
         budget = real_budget(snapshots_arg, catalog)
         widened = dict(budget.charge_kg)
         for snapshot in snapshots_arg:
-            post = evaluate_module._snapshot_oxide_inventory_kg(snapshot)
+            post = physics_module._snapshot_oxide_inventory_kg(snapshot)
             if not post:
                 continue
             for parent, kg in post.items():
                 if parent not in widened:
                     widened[parent] = kg
-        return evaluate_module._OxideWindowBudget(
+        return physics_module._OxideWindowBudget(
             widened,
             budget.computed_kg,
             budget.missing_stoich_species,
@@ -5756,7 +5758,7 @@ def test_first_recorded_charge_does_not_adopt_later_inventory(
         )
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_window_parent_oxide_budget",
         adopt_later_keys,
     )
@@ -5963,7 +5965,7 @@ def test_stripping_the_pre_evaporation_map_understates_a_leading_debit(
         )
         assert held_oxide == _approx_kg(1.0)
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_pre_evaporation_oxide_kg",
         lambda _snapshot: None,
     )
@@ -6655,9 +6657,9 @@ def test_dropping_a_withheld_computed_debit_respends_the_charge(
     """
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_computed_parent_oxide_draws",
-        lambda *args, **kwargs: evaluate_module._empty_oxide_draws(),
+        lambda *args, **kwargs: physics_module._empty_oxide_draws(),
     )
     bounds = _optimizer_refused_flux_bounds(
         _withheld_k2o_gas_snapshots(),
@@ -6788,7 +6790,7 @@ def _unrestricted_parent_oxide_allocation(classified_window, catalog):
             ):
                 row[species] = float(contribution.rate_kg_hr) * duration_h
         rows.append(row)
-    return evaluate_module._ParentOxideAllocation(
+    return physics_module._ParentOxideAllocation(
         tuple(rows),
         frozenset(),
         frozenset(),
@@ -6812,7 +6814,7 @@ def test_unrestricted_refused_mass_breaks_the_parent_oxide_budget(
     """
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_allocate_parent_oxide_supply",
         _unrestricted_parent_oxide_allocation,
     )
@@ -6842,7 +6844,7 @@ def test_unrestricted_refused_mass_breaks_the_parent_oxide_budget(
         return set(), set()
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_enforce_published_element_inventory",
         _leave_published_uncapped,
     )
@@ -7619,7 +7621,7 @@ def test_ceiling_hour_po2_is_the_evaluated_pressure(
     """
 
     snapshot = _provenance_hour(**fields)
-    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
+    assert physics_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
     assert _oracle_transport_pO2_bar(snapshot) == expected_bar
 
 
@@ -7662,14 +7664,14 @@ def test_reservoir_first_reader_fails_when_the_states_differ(
     snapshot = _provenance_hour(**fields)
     legacy = _reservoir_first_pO2_bar(snapshot)
     assert legacy != expected_bar
-    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
+    assert physics_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_snapshot_transport_pO2_bar",
         _reservoir_first_pO2_bar,
     )
-    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) == legacy
-    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) != expected_bar
+    assert physics_module._snapshot_transport_pO2_bar(snapshot) == legacy
+    assert physics_module._snapshot_transport_pO2_bar(snapshot) != expected_bar
 
 
 def _m025_catalog() -> _CeilingCatalog:
@@ -7742,7 +7744,7 @@ def test_post_bleed_reservoir_does_not_shrink_the_activity_one_ceiling(
     assert bounds["M025"] != _approx_kg(wrong)
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_snapshot_transport_pO2_bar",
         _reservoir_first_pO2_bar,
     )
@@ -8011,7 +8013,7 @@ def test_cache_consumption_stamps_the_evaluated_po2(
     flux = _m025_refused_flux()
     attach_evaluated_transport_pO2(flux, host)
     snapshot = _m025_refused_hour(flux, _CACHE_BLED_BAR)
-    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
+    assert physics_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
     if expected_bar is None:
         interval = _classify_wall_supply_interval(snapshot, "M025")
         assert interval.kind == "unavailable"
@@ -8067,7 +8069,7 @@ def test_cache_consumption_stamps_the_evaluated_po2(
 def test_snapshot_temperature_uses_the_celsius_offset_constant() -> None:
     """The kelvin conversion is the owned offset, not a second 273.15."""
 
-    source = inspect.getsource(evaluate_module._snapshot_temperature_K)
+    source = inspect.getsource(physics_module._snapshot_temperature_K)
     assert "CELSIUS_TO_KELVIN_OFFSET" in source
     assert "273.15" not in source
 
@@ -8309,7 +8311,7 @@ def test_each_interval_kind_mutation_fails_the_unmutated_oracle(
     _assert_supply_map(live, species, sibling, species_kg, sibling_kg)
     _assert_supply_map(oracle, species, sibling, species_kg, sibling_kg)
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_classify_wall_supply_interval",
         _mutate_classified_interval(kind, species),
     )
@@ -8370,7 +8372,7 @@ def test_subthreshold_floor_mutation_fails_the_supply_oracle(
         return interval
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_classify_wall_supply_interval",
         floor_subthreshold,
     )
@@ -8422,7 +8424,7 @@ def test_dropping_interval_physical_zero_fails_the_supply_oracle(
         return interval
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_classify_wall_supply_interval",
         drop_interval_zero,
     )
@@ -13074,7 +13076,7 @@ def test_skipping_the_publication_cap_books_the_computed_overdraw(
         return set(), set()
 
     monkeypatch.setattr(
-        evaluate_module,
+        physics_module,
         "_enforce_published_element_inventory",
         _leave_published_uncapped,
     )

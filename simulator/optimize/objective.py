@@ -4456,7 +4456,7 @@ def _refused_vapour_supply_kg(
 
     if not refused_species:
         return {}
-    from simulator.optimize.evaluate import (
+    from simulator.optimize.physics import (
         _execution_vapour_catalog,
         _optimizer_refused_flux_bounds,
     )
@@ -4529,7 +4529,7 @@ def _wall_supply_booking_fields(booked: Mapping[str, Any]) -> dict[str, Any]:
     bookings = booked.get("bookings") or ()
     if not bookings:
         return {}
-    from simulator.optimize.evaluate import SUPPLY_INTERVAL_UPPER_BOUND_USED
+    from simulator.optimize.physics import SUPPLY_INTERVAL_UPPER_BOUND_USED
 
     fields: dict[str, Any] = {"wall_supply_bound_bookings": bookings}
     if any(
@@ -4859,7 +4859,7 @@ def _book_wall_deposits_at_vapour_supply(
         refused,
         snapshots,
     )
-    from simulator.optimize.evaluate import (
+    from simulator.optimize.physics import (
         COMPUTED_EXCEEDS_INVENTORY,
         INVENTORY_CAPPED,
         SUPPLY_INTERVAL_UPPER_BOUND_USED,
