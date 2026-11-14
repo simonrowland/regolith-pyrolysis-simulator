@@ -315,8 +315,10 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         engine="openimcc",
     )
     predictions = copy.deepcopy(cohort)
-    # 8b8665343 removed provenance.code_revision; the digest strips CPU timing
-    # fields, and the primary numeric outputs remain pinned below as float.hex.
+    # 8b8665343 removed provenance.code_revision and both integration CPU-time
+    # fields; this digest strips those timing fields, so only code_revision
+    # changes the digest. The primary numeric outputs remain pinned below as
+    # float.hex.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
         "3b1878ecf87665fde693e50342c568cfa276ab166eb936671ab6addc3e634642"
     )
