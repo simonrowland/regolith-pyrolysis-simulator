@@ -76,6 +76,61 @@ def test_schedule_breakpoints_split_physics_not_only_control_reads():
     assert execution.snapshots[0].temperature_C == pytest.approx(1051.0)
 
 
+def _shuttle_session(campaign, *, hours, dt_hr):
+    alkali = "K" if campaign == "C3_K" else "Na"
+    run = _run(
+        campaign=campaign,
+        hours=hours,
+        dt_hr=dt_hr,
+        additives_kg={"C": 30.0, alkali: 1.0},
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.record.path = "A"
+    sim._transfer_condensed_species = lambda *_args: 0.0
+    sim._top_up_c3_alkali_credit = lambda *_args: 0.0
+    sim._freeze_gate_enabled = lambda: False
+    sim._shuttle_inject_K = lambda **_kwargs: None
+    sim._shuttle_inject_Na = lambda **_kwargs: None
+    return session
+
+
+def _assert_shuttle_snapshot_cycles(snapshots):
+    entries = 0
+    previous_phase = ""
+    for snapshot in snapshots:
+        if previous_phase != "bakeout" and snapshot.shuttle_phase == "bakeout":
+            entries += 1
+        assert snapshot.shuttle_cycle == entries
+        previous_phase = snapshot.shuttle_phase
+    return entries
+
+
+@pytest.mark.parametrize("campaign", ["C3_K", "C3_NA"])
+def test_c3_bakeout_counter_survives_exact_stop_interval(campaign):
+    session = _shuttle_session(campaign, hours=3.3, dt_hr=0.4)
+
+    execution = RunExecutor().execute_session(session, hours=3.3)
+
+    assert execution.status == "ok", execution.error_message
+    assert session.simulator.melt.hour == pytest.approx(3.3)
+    assert _assert_shuttle_snapshot_cycles(execution.snapshots) == 1
+
+
+@pytest.mark.parametrize("campaign", ["C3_K", "C3_NA"])
+def test_c3_bakeout_counter_survives_changed_step_sizes(campaign):
+    session = _shuttle_session(campaign, hours=3.3, dt_hr=1.0)
+
+    session.advance(dt_hr=1.0)
+    session.advance(dt_hr=0.4)
+    while session.simulator.melt.hour < 3.3:
+        remaining = 3.3 - session.simulator.melt.hour
+        session.advance(dt_hr=min(1 / 60, remaining))
+
+    assert session.simulator.melt.hour == pytest.approx(3.3)
+    assert _assert_shuttle_snapshot_cycles(session.simulator.record.snapshots) == 1
+
+
 def _endpoint(session):
     sim = session.simulator
     accounts = sim.atom_ledger.mol_by_account()

@@ -2770,13 +2770,16 @@ class ExtractionMixin:
         # Staged C2A enters the cool Na cleanup at the end of the cooldown
         # tick, so the first real shuttle tick starts with campaign_hour == 1.
         # campaign_hour is the end of the last committed interval when the
-        # shuttle phase is sampled. Derive the preceding interval's start;
-        # compare its cycle phase with the current phase so crossing from
-        # injection (<3) into bakeout (>=3) survives fractional steps and
-        # the modulo wrap at each six-hour cycle boundary.
+        # shuttle phase is sampled. Use the saved start of that committed
+        # interval; the current _step_dt_hr belongs to the next step and may
+        # differ (for example at a run stop or schedule breakpoint).
         interval_end_hour = float(self.melt.campaign_hour)
-        interval_start_hour = interval_end_hour - float(
-            getattr(self, '_step_dt_hr', 1.0)
+        interval_start_hour = float(
+            getattr(
+                self,
+                '_last_committed_campaign_interval_start_h',
+                interval_end_hour,
+            )
         )
         staged_cycle = (
             campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA)
@@ -2784,11 +2787,23 @@ class ExtractionMixin:
         )
         if staged_cycle:
             is_injection = self.melt.campaign_hour <= 3
-            previous_is_injection = interval_start_hour <= 3
+            entered_bakeout_cycles = int(
+                interval_start_hour <= 3 < interval_end_hour
+            )
         else:
             is_injection = interval_end_hour % cycle_period < 3
-            previous_is_injection = interval_start_hour % cycle_period < 3
-        entered_bakeout = previous_is_injection and not is_injection
+            # Shifting by the three-hour injection boundary makes each entry
+            # into bakeout an integer cycle boundary. The floor difference
+            # counts crossings in (start, end], including after modulo wrap.
+            entered_bakeout_cycles = max(
+                0,
+                math.floor((interval_end_hour - 3.0) / cycle_period)
+                - math.floor((interval_start_hour - 3.0) / cycle_period),
+            )
+        if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
+            self._pending_shuttle_bakeout_cycle_increment += (
+                entered_bakeout_cycles
+            )
 
         if is_injection:
             self._shuttle_phase = 'inject'
@@ -2818,14 +2833,8 @@ class ExtractionMixin:
             self._shuttle_phase = 'bakeout'
             # Bakeout is handled by normal evaporation (K/Na have high
             # vapor pressure at 1520-1680°C).  Track cycle transitions.
-            if entered_bakeout:
-                # Just entered bakeout. Defer the diagnostic counter until the
-                # hour snapshots successfully; zero-transition aborts must be
-                # replayable without mutating state.
-                if campaign == CampaignPhase.C3_K:
-                    self._pending_shuttle_bakeout_cycle_increment = campaign.name
-                elif campaign == CampaignPhase.C3_NA:
-                    self._pending_shuttle_bakeout_cycle_increment = campaign.name
+            # Defer the diagnostic counter until snapshots succeed; a refused
+            # interval must not commit its crossed bakeout boundaries.
 
     def _shuttle_inject_K(self, *, liquid_fraction=None):
         """

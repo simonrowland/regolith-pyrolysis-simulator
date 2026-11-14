@@ -1544,6 +1544,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         #   Inject:  2K(g) + FeO(melt) → K₂O(melt) + Fe(l)
         #   Bakeout: K₂O(melt) → 2K(g) + ½O₂(g)
         #   Net:     FeO → Fe + ½O₂   (K recycled)
+        self._last_committed_campaign_interval_start_h = 0.0
         self.shuttle_K_inventory_kg = 0.0       # K available for injection
         self.shuttle_Na_inventory_kg = 0.0      # Na available for injection
         self.shuttle_cycle_K = 0                # Current K inject-bakeout cycle
@@ -13693,6 +13694,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         self.melt.campaign = campaign
         self.melt.campaign_hour = 0
+        self._last_committed_campaign_interval_start_h = 0.0
         if campaign == CampaignPhase.C0:
             self.campaign_mgr.c0_exit_prediction = None
             self.campaign_mgr.last_c0_exit = None
@@ -15948,7 +15950,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._step_dt_hr = dt_hr
             return self._step_one_hour()
         except BaseException as exc:
-            self._pending_shuttle_bakeout_cycle_increment = ''
+            self._pending_shuttle_bakeout_cycle_increment = 0
             committed_transition_count = max(
                 0,
                 len(self.atom_ledger.transitions) - transition_count_before,
@@ -16056,7 +16058,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_overlap_evaporation_diagnostic = {}
         self._last_metal_phase_stratification_diagnostic = {}
         self._last_phase_context_diagnostic = {}
-        self._pending_shuttle_bakeout_cycle_increment = ''
+        self._pending_shuttle_bakeout_cycle_increment = 0
         self._reset_redox_source_diagnostics_for_hour()
         self._reset_o2_bubbler_telemetry_for_hour()
 
@@ -16507,6 +16509,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- 10. Record snapshot ---
         completed_hour = self.melt.hour
+        campaign_interval_start_h = float(self.melt.campaign_hour)
         # Preserve integer whole-hour serialization used by the campaign pins.
         clock_delta = 1 if self._step_dt_hr == 1.0 else self._step_dt_hr
         self.melt.hour += clock_delta
@@ -16558,13 +16561,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.energy_cumulative_breakdown_kWh)
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()
         self.record.snapshots.append(snapshot)
-        pending_shuttle_cycle = str(
-            getattr(self, '_pending_shuttle_bakeout_cycle_increment', '') or '')
-        if pending_shuttle_cycle == CampaignPhase.C3_K.name:
-            self.shuttle_cycle_K += 1
-        elif pending_shuttle_cycle == CampaignPhase.C3_NA.name:
-            self.shuttle_cycle_Na += 1
-        self._pending_shuttle_bakeout_cycle_increment = ''
+        self._last_committed_campaign_interval_start_h = (
+            campaign_interval_start_h
+        )
+        pending_shuttle_cycles = int(
+            getattr(self, '_pending_shuttle_bakeout_cycle_increment', 0) or 0
+        )
+        if self.melt.campaign == CampaignPhase.C3_K:
+            self.shuttle_cycle_K += pending_shuttle_cycles
+        elif self.melt.campaign == CampaignPhase.C3_NA:
+            self.shuttle_cycle_Na += pending_shuttle_cycles
+        self._pending_shuttle_bakeout_cycle_increment = 0
         self._clear_melt_redox_gate_authority_for_completed_hour(completed_hour)
 
         if complete_after_snapshot:
@@ -17244,25 +17251,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             },
             shuttle_cycle=(
                 self.shuttle_cycle_K
-                + (
-                    1
-                    if getattr(
+                + int(
+                    getattr(
                         self,
                         '_pending_shuttle_bakeout_cycle_increment',
-                        '',
-                    ) == CampaignPhase.C3_K.name
-                    else 0
+                        0,
+                    ) or 0
                 )
                 if self.melt.campaign == CampaignPhase.C3_K
                 else self.shuttle_cycle_Na
-                + (
-                    1
-                    if getattr(
+                + int(
+                    getattr(
                         self,
                         '_pending_shuttle_bakeout_cycle_increment',
-                        '',
-                    ) == CampaignPhase.C3_NA.name
-                    else 0
+                        0,
+                    ) or 0
                 )
             ),
             # MRE electrolysis

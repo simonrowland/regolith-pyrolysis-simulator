@@ -4620,7 +4620,7 @@ def test_shuttle_bakeout_cycle_counter_waits_for_successful_hour(
         sim.step()
 
     assert sim.shuttle_cycle_K == 0
-    assert sim._pending_shuttle_bakeout_cycle_increment == ''
+    assert sim._pending_shuttle_bakeout_cycle_increment == 0
     assert sim._make_snapshot().shuttle_cycle == 0
     assert sim._poisoned_hour is None
 
@@ -4633,7 +4633,10 @@ def _bakeout_cycle_trace(sim, dt_hr):
     campaign_hour = 0.0
     for _ in range(round(12.0 / dt_hr)):
         sim.melt.campaign_hour = campaign_hour
-        sim._pending_shuttle_bakeout_cycle_increment = ''
+        sim._pending_shuttle_bakeout_cycle_increment = 0
+        sim._last_committed_campaign_interval_start_h = max(
+            0.0, campaign_hour - dt_hr
+        )
         previous_phase = sim._shuttle_phase
         sim._step_shuttle()
         if previous_phase != 'bakeout' and sim._shuttle_phase == 'bakeout':
@@ -4650,7 +4653,7 @@ def _assert_bakeout_schedule(sim, campaign, dt_hr):
     bakeout_entries, scheduled = _bakeout_cycle_trace(sim, dt_hr)
     assert len(bakeout_entries) == 2
     assert len(scheduled) == len(bakeout_entries)
-    assert [cycle for _, cycle in scheduled] == [campaign] * 2
+    assert [cycle for _, cycle in scheduled] == [1, 1]
     assert [hour for hour, _ in scheduled] == pytest.approx(bakeout_entries)
     if dt_hr == 1.0:
         assert bakeout_entries == [3.0, 9.0]
@@ -4685,6 +4688,23 @@ def test_shuttle_bakeout_counter_tracks_each_phase_entry(
     _assert_bakeout_schedule(sim, campaign, dt_hr)
 
 
+@pytest.mark.parametrize('campaign', ['C3_K', 'C3_NA'])
+def test_shuttle_bakeout_counter_counts_two_crossed_cycles(
+    campaign, vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _make_bakeout_cycle_sim(
+        campaign, vapor_pressure_data, feedstocks_data, setpoints_data,
+        monkeypatch,
+    )
+    sim.melt.campaign_hour = 14.0
+    sim._last_committed_campaign_interval_start_h = 2.0
+    sim._pending_shuttle_bakeout_cycle_increment = 0
+
+    sim._step_shuttle()
+
+    assert sim._pending_shuttle_bakeout_cycle_increment == 2
+
+
 @pytest.mark.parametrize(('campaign', 'dt_hr'), [
     ('C3_K', 0.4),
     ('C3_NA', 1 / 60),
@@ -4702,10 +4722,10 @@ def test_restoring_exact_hour_bakeout_trigger_fails(
     def exact_hour_mutation():
         current_step_shuttle()
         sim._pending_shuttle_bakeout_cycle_increment = (
-            campaign
+            1
             if sim._shuttle_phase == 'bakeout'
             and sim.melt.campaign_hour % 6 == 3
-            else ''
+            else 0
         )
 
     monkeypatch.setattr(sim, '_step_shuttle', exact_hour_mutation)
