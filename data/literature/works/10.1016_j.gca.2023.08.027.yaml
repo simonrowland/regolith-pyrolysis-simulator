@@ -52,7 +52,7 @@ experiments:
           point: '0.0000791'
           approximate: false
       locator:
-        page: 5
+        page: 6
         table: '2'
         note: Printed initial weight 79.1 mg; unit conversion only
       inference:
@@ -66,7 +66,7 @@ experiments:
               tag: value
               value: '79.1'
             locator:
-              page: 5
+              page: 6
               table: '2'
               note: Printed initial weight 79.1 mg; unit conversion only
         - - factor
@@ -74,7 +74,7 @@ experiments:
               tag: value
               value: '1000000'
             locator:
-              page: 5
+              page: 6
               table: '2'
               note: Printed initial weight 79.1 mg; unit conversion only
         output_unit: kg
@@ -96,7 +96,8 @@ experiments:
         tag: value
         value: powdered glasses packed into the KC
       locator:
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
         paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with
           low trace element concentrations, were then packed into the KC
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
@@ -105,7 +106,8 @@ experiments:
         tag: value
         value: iridium Knudsen cell (crucible and lid)
       locator:
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
         paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with
           low trace element concentrations, were then packed into the KC
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
@@ -115,7 +117,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 5
+        page: 6
         table: '2'
         note: Run-specific temperatures are retained in the attached observations
   pressure_environment:
@@ -127,7 +129,7 @@ experiments:
           point: '0.0001'
           approximate: true
       locator:
-        page: 4
+        page: 5
         note: KC chamber about 10^-6 mbar; unit conversion only
       inference:
         relation: mbar_to_Pa
@@ -140,14 +142,14 @@ experiments:
               tag: value
               value: '0.000001'
             locator:
-              page: 4
+              page: 5
               note: KC chamber about 10^-6 mbar; unit conversion only
         - - factor
           - state:
               tag: value
               value: '100'
             locator:
-              page: 4
+              page: 5
               note: KC chamber about 10^-6 mbar; unit conversion only
         output_unit: Pa
         references: []
@@ -164,7 +166,7 @@ experiments:
         value: molecular
   work_id: 10.1016/j.gca.2023.08.027
   locator:
-    page: 5
+    page: 6
     table: '2'
     note: Physical run 1_low; Table 2 and S1/S2 label this charge explicitly
   apparatus:
@@ -173,7 +175,8 @@ experiments:
         tag: value
         value: Ir
       locator:
-        pdf_page_index: 4
+        page: 4
+        pdf_page_index: 3
         paragraph: the iridium Knudsen cell (KC)
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
     geometry:
@@ -185,7 +188,8 @@ experiments:
             point: '0.0004'
             approximate: false
         locator:
-          pdf_page_index: 5
+          page: 5
+          pdf_page_index: 4
           paragraph: a lid with a 0.4 mm orifice at its centre
           section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
         inference:
@@ -201,7 +205,8 @@ experiments:
                 tag: value
                 value: '0.4'
               locator:
-                pdf_page_index: 5
+                page: 5
+                pdf_page_index: 4
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           - - factor
@@ -209,7 +214,8 @@ experiments:
                 tag: value
                 value: '1000'
               locator:
-                pdf_page_index: 5
+                page: 5
+                pdf_page_index: 4
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           output_unit: m
@@ -223,8 +229,9 @@ experiments:
         tag: value
         value: ΔIW
       locator:
-        page: 6
+        page: 2
         table: S1
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   bench_id: 10.1016/j.gca.2023.08.027::bench::finnigan-mat-271-ir
 - experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   kind: literature
@@ -240,7 +247,7 @@ experiments:
           point: '0.00007292'
           approximate: false
       locator:
-        page: 5
+        page: 6
         table: '2'
         note: Printed initial weight 72.92 mg; unit conversion only
       inference:
@@ -254,7 +261,7 @@ experiments:
               tag: value
               value: '72.92'
             locator:
-              page: 5
+              page: 6
               table: '2'
               note: Printed initial weight 72.92 mg; unit conversion only
         - - factor
@@ -262,7 +269,7 @@ experiments:
               tag: value
               value: '1000000'
             locator:
-              page: 5
+              page: 6
               table: '2'
               note: Printed initial weight 72.92 mg; unit conversion only
         output_unit: kg
@@ -284,7 +291,8 @@ experiments:
         tag: value
         value: powdered glasses packed into the KC
       locator:
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
         paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with
           low trace element concentrations, were then packed into the KC
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
@@ -293,7 +301,8 @@ experiments:
         tag: value
         value: iridium Knudsen cell (crucible and lid)
       locator:
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
         paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with
           low trace element concentrations, were then packed into the KC
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
@@ -303,7 +312,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 5
+        page: 6
         table: '2'
         note: Run-specific temperatures are retained in the attached observations
   pressure_environment:
@@ -315,7 +324,7 @@ experiments:
           point: '0.0001'
           approximate: true
       locator:
-        page: 4
+        page: 5
         note: KC chamber about 10^-6 mbar; unit conversion only
       inference:
         relation: mbar_to_Pa
@@ -328,14 +337,14 @@ experiments:
               tag: value
               value: '0.000001'
             locator:
-              page: 4
+              page: 5
               note: KC chamber about 10^-6 mbar; unit conversion only
         - - factor
           - state:
               tag: value
               value: '100'
             locator:
-              page: 4
+              page: 5
               note: KC chamber about 10^-6 mbar; unit conversion only
         output_unit: Pa
         references: []
@@ -352,7 +361,7 @@ experiments:
         value: molecular
   work_id: 10.1016/j.gca.2023.08.027
   locator:
-    page: 5
+    page: 6
     table: '2'
     note: Physical run 2_low; Table 2 and S3 label this charge explicitly
   apparatus:
@@ -361,7 +370,8 @@ experiments:
         tag: value
         value: Ir
       locator:
-        pdf_page_index: 4
+        page: 4
+        pdf_page_index: 3
         paragraph: the iridium Knudsen cell (KC)
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
     geometry:
@@ -373,7 +383,8 @@ experiments:
             point: '0.0004'
             approximate: false
         locator:
-          pdf_page_index: 5
+          page: 5
+          pdf_page_index: 4
           paragraph: a lid with a 0.4 mm orifice at its centre
           section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
         inference:
@@ -389,7 +400,8 @@ experiments:
                 tag: value
                 value: '0.4'
               locator:
-                pdf_page_index: 5
+                page: 5
+                pdf_page_index: 4
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           - - factor
@@ -397,7 +409,8 @@ experiments:
                 tag: value
                 value: '1000'
               locator:
-                pdf_page_index: 5
+                page: 5
+                pdf_page_index: 4
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           output_unit: m
@@ -411,8 +424,9 @@ experiments:
         tag: value
         value: ΔIW
       locator:
-        page: 6
+        page: 2
         table: S1
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   bench_id: 10.1016/j.gca.2023.08.027::bench::finnigan-mat-271-ir
 - experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   kind: literature
@@ -428,7 +442,7 @@ experiments:
           point: '0.00003869'
           approximate: false
       locator:
-        page: 5
+        page: 6
         table: '2'
         note: Printed initial weight 38.69 mg; unit conversion only
       inference:
@@ -442,7 +456,7 @@ experiments:
               tag: value
               value: '38.69'
             locator:
-              page: 5
+              page: 6
               table: '2'
               note: Printed initial weight 38.69 mg; unit conversion only
         - - factor
@@ -450,7 +464,7 @@ experiments:
               tag: value
               value: '1000000'
             locator:
-              page: 5
+              page: 6
               table: '2'
               note: Printed initial weight 38.69 mg; unit conversion only
         output_unit: kg
@@ -472,7 +486,8 @@ experiments:
         tag: value
         value: powdered glasses packed into the KC
       locator:
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
         paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with
           low trace element concentrations, were then packed into the KC
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
@@ -481,7 +496,8 @@ experiments:
         tag: value
         value: iridium Knudsen cell (crucible and lid)
       locator:
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
         paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with
           low trace element concentrations, were then packed into the KC
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
@@ -491,7 +507,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 5
+        page: 6
         table: '2'
         note: Run-specific temperatures are retained in the attached observations
   pressure_environment:
@@ -503,7 +519,7 @@ experiments:
           point: '0.0001'
           approximate: true
       locator:
-        page: 4
+        page: 5
         note: KC chamber about 10^-6 mbar; unit conversion only
       inference:
         relation: mbar_to_Pa
@@ -516,14 +532,14 @@ experiments:
               tag: value
               value: '0.000001'
             locator:
-              page: 4
+              page: 5
               note: KC chamber about 10^-6 mbar; unit conversion only
         - - factor
           - state:
               tag: value
               value: '100'
             locator:
-              page: 4
+              page: 5
               note: KC chamber about 10^-6 mbar; unit conversion only
         output_unit: Pa
         references: []
@@ -540,7 +556,7 @@ experiments:
         value: molecular
   work_id: 10.1016/j.gca.2023.08.027
   locator:
-    page: 5
+    page: 6
     table: '2'
     note: Physical run 3_high; Table 2 and S4 label this charge explicitly
   apparatus:
@@ -549,7 +565,8 @@ experiments:
         tag: value
         value: Ir
       locator:
-        pdf_page_index: 4
+        page: 4
+        pdf_page_index: 3
         paragraph: the iridium Knudsen cell (KC)
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
     geometry:
@@ -561,7 +578,8 @@ experiments:
             point: '0.0004'
             approximate: false
         locator:
-          pdf_page_index: 5
+          page: 5
+          pdf_page_index: 4
           paragraph: a lid with a 0.4 mm orifice at its centre
           section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
         inference:
@@ -577,7 +595,8 @@ experiments:
                 tag: value
                 value: '0.4'
               locator:
-                pdf_page_index: 5
+                page: 5
+                pdf_page_index: 4
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           - - factor
@@ -585,7 +604,8 @@ experiments:
                 tag: value
                 value: '1000'
               locator:
-                pdf_page_index: 5
+                page: 5
+                pdf_page_index: 4
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           output_unit: m
@@ -599,8 +619,9 @@ experiments:
         tag: value
         value: ΔIW
       locator:
-        page: 6
+        page: 2
         table: S1
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   bench_id: 10.1016/j.gca.2023.08.027::bench::finnigan-mat-271-ir
 - experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   kind: literature
@@ -616,7 +637,8 @@ experiments:
           point: '0.0000791'
           approximate: false
       locator:
-        pdf_page_index: 3
+        page: 3
+        pdf_page_index: 2
         table: S2
       inference:
         relation: mg_to_kg
@@ -631,14 +653,16 @@ experiments:
               tag: value
               value: '79.1'
             locator:
-              pdf_page_index: 3
+              page: 3
+              pdf_page_index: 2
               table: S2
         - - factor
           - state:
               tag: value
               value: '1000000'
             locator:
-              pdf_page_index: 3
+              page: 3
+              pdf_page_index: 2
               table: S2
         output_unit: kg
         references: []
@@ -690,7 +714,8 @@ experiments:
         tag: value
         value: powdered glasses packed into the KC
       locator:
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
         paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with
           low trace element concentrations, were then packed into the KC
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
@@ -699,7 +724,8 @@ experiments:
         tag: value
         value: iridium Knudsen cell (crucible and lid)
       locator:
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
         paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with
           low trace element concentrations, were then packed into the KC
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
@@ -724,7 +750,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 5
+        page: 6
         table: '2'
         note: Table 2 has run-specific isotherm and polytherm temperatures; no one series setpoint
   pressure_environment:
@@ -736,7 +762,7 @@ experiments:
           point: '0.0001'
           approximate: true
       locator:
-        page: 4
+        page: 5
         note: KC chamber about 10^-6 mbar; unit conversion only
       inference:
         relation: mbar_to_Pa
@@ -749,14 +775,14 @@ experiments:
               tag: value
               value: '0.000001'
             locator:
-              page: 4
+              page: 5
               note: KC chamber about 10^-6 mbar; unit conversion only
         - - factor
           - state:
               tag: value
               value: '100'
             locator:
-              page: 4
+              page: 5
               note: KC chamber about 10^-6 mbar; unit conversion only
         output_unit: Pa
         references: []
@@ -773,7 +799,7 @@ experiments:
         value: molecular
   work_id: 10.1016/j.gca.2023.08.027
   locator:
-    page: 5
+    page: 6
     table: '2'
     note: Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge
   apparatus:
@@ -782,7 +808,8 @@ experiments:
         tag: value
         value: Ir
       locator:
-        pdf_page_index: 4
+        page: 4
+        pdf_page_index: 3
         paragraph: the iridium Knudsen cell (KC)
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
     geometry:
@@ -801,7 +828,7 @@ experiments:
           tag: unknown
           reason: not_published
         locator:
-          page: 4
+          page: 5
           note: No channel length printed
   bench_id: 10.1016/j.gca.2023.08.027::bench::finnigan-mat-271-ir
   thermal_schedule:
@@ -810,14 +837,14 @@ experiments:
         tag: value
         value: Isotherm and polytherm measurements; 5 min equilibration at each polytherm step
       locator:
-        page: 5
+        page: 6
         table: '2'
     total_duration_s:
       state:
         tag: unknown
         reason: not_published
       locator:
-        page: 5
+        page: 6
         table: '2'
         note: 15 h at 1742 K applies to 1_low only, not every series run
 - experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
@@ -934,7 +961,8 @@ context:
   experiment: an-di-series
   locator:
     table: '6'
-    pdf_page_index: 15
+    page: 15
+    pdf_page_index: 14
     section: 4.1. EPMA
     note: Table 6 1_low End; post-KEMS; not an initial/sample engine selector
   phase: anorthite_diopside_eutectic_silicate_melt
@@ -971,7 +999,8 @@ context:
   experiment: an-di-series
   locator:
     table: '6'
-    pdf_page_index: 15
+    page: 15
+    pdf_page_index: 14
     section: 4.1. EPMA
     note: Table 6 2_low End; post-KEMS; not an initial/sample engine selector
   phase: anorthite_diopside_eutectic_silicate_melt
@@ -1008,7 +1037,8 @@ context:
   experiment: an-di-series
   locator:
     table: '6'
-    pdf_page_index: 15
+    page: 15
+    pdf_page_index: 14
     section: 4.1. EPMA
     note: Table 6 3_high End; post-KEMS; not an initial/sample engine selector
   phase: anorthite_diopside_eutectic_silicate_melt
@@ -1045,7 +1075,8 @@ context:
   experiment: an-di-series
   locator:
     table: '6'
-    pdf_page_index: 15
+    page: 15
+    pdf_page_index: 14
     section: 4.1. EPMA
     note: Table 6 1_low Start; pre-KEMS starting glass
   phase: anorthite_diopside_eutectic_silicate_melt
@@ -1082,7 +1113,8 @@ context:
   experiment: an-di-series
   locator:
     table: '6'
-    pdf_page_index: 15
+    page: 15
+    pdf_page_index: 14
     section: 4.1. EPMA
     note: Table 6 2_low Start; identical starting glass to 1_low Start
   phase: anorthite_diopside_eutectic_silicate_melt
@@ -1118,7 +1150,8 @@ context:
   experiment: an-di-series
   locator:
     table: '6'
-    pdf_page_index: 15
+    page: 15
+    pdf_page_index: 14
     section: 4.1. EPMA
     note: Table 6 3_high Start; pre-KEMS starting glass
   phase: anorthite_diopside_eutectic_silicate_melt

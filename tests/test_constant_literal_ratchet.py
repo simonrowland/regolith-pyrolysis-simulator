@@ -33,7 +33,8 @@ CEILINGS = {
     "gas": 0,
     "bar": 0,
     "atm": 0,
-    "celsius": 86,
+    # b262: engine ia-stateless (d-403) removed one `+ 273.15` from simulator/core.py (86 -> 85).
+    "celsius": 85,
 }
 
 # path, bare numeric text, family, allowed count, reason

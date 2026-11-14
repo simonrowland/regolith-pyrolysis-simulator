@@ -13,7 +13,14 @@ import yaml
 from simulator.battery.enums import AmountBasis, Phase, Quantity
 from simulator.battery.fo2_ladder import resolve_row_fo2
 from simulator.battery.identity import Identity
-from simulator.battery.records import Composition, Species, State, Value
+from simulator.battery.records import (
+    ApproxPressure,
+    BandBasis,
+    Composition,
+    Species,
+    State,
+    Value,
+)
 from tests.battery import factories as F
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -95,6 +102,44 @@ def test_rego_table_i_row_selects_flagged_two_species_c_co_condition() -> None:
     )
     assert changed is not None
     assert changed.log10_fO2_bar > selected.log10_fO2_bar
+
+
+def test_rego_route_uses_banded_identity_nominal_pressure() -> None:
+    experiment = F.tabulation_experiment(
+        "rego-run-01-banded",
+        T_K=Decimal("1573.15"),
+        total_P=Decimal("102844.875"),
+    )
+    row = _na_partial_row(
+        source_id=REGO_SOURCE,
+        observation_id="rego-run-01-pNa-banded",
+        experiment_id=experiment.experiment_id,
+        temperature_K="1573.15",
+        pressure_Pa="226.968",
+        total_pressure_Pa="102844.875",
+    )
+    exact = resolve_row_fo2(experiment, None, row, quantity=Quantity.P_PARTIAL)
+    banded_identity = replace(
+        row.identity,
+        total_pressure_Pa=State.of(
+            ApproxPressure(
+                Decimal("102844.875"),
+                Decimal("100000"),
+                Decimal("105000"),
+                BandBasis.PRINTED,
+            )
+        ),
+    )
+    banded = resolve_row_fo2(
+        experiment,
+        None,
+        replace(row, identity=banded_identity),
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert exact is not None and banded is not None
+    assert exact.route == banded.route == "rego_c_co_two_species_approximation"
+    assert exact.log10_fO2_bar == banded.log10_fO2_bar
 
 
 def test_rys_na_row_without_oxygen_selects_flagged_congruent_condition() -> None:
