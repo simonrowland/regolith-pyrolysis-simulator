@@ -1269,6 +1269,7 @@ def _validate_observation(
     ev = observation.evidence.class_
     derivation = observation.derivation
     raw_inputs = derivation.raw_inputs if derivation is not None else None
+    model_derived_backlogged = _model_derived_provenance_is_backlogged(observation)
     method_located = derivation is not None and derivation.has_located_method
     method_unknown_notice = _has_model_derived_notice(observation, "method_unknown:")
     references_are_none_printed = (
@@ -1282,6 +1283,21 @@ def _validate_observation(
         derivation.has_named_references
         or (references_are_none_printed and none_printed_references_notice)
     )
+    declares_invalid_none_printed_references = (
+        ev.is_value
+        and ev.value is EvidenceClass.MODEL_DERIVED
+        and derivation is not None
+        and "none_printed" in derivation.references
+        and not model_references_declared
+    )
+    if declares_invalid_none_printed_references:
+        issues.append(
+            _issue(
+                f"{path}.derivation.references",
+                RefusalReason.CONDITIONAL_FIELD,
+                "model_derived requires named references or none_printed with a notice",
+            )
+        )
     has_resolved_lineage = any(
         parent in observations or parent in asset_ids or parent in context_ids
         for parent in observation.derived_from or ()
@@ -1337,7 +1353,7 @@ def _validate_observation(
             _issue(
                 f"{path}.derivation.raw_inputs",
                 RefusalReason.CONDITIONAL_FIELD,
-                "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
+                "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and reference declaration",
             )
         )
     if ev.is_value and ev.value is EvidenceClass.ENGINE_PREDICTION:
@@ -1387,7 +1403,7 @@ def _validate_observation(
         if (
             ev.value is EvidenceClass.MODEL_DERIVED
             and _value_has_numeric_value(observation.value)
-            and not declares_unprinted_raw_inputs
+            and (not model_derived_backlogged or declares_unprinted_raw_inputs)
         ):
             if not method_declared:
                 issues.append(
@@ -1397,7 +1413,10 @@ def _validate_observation(
                         "model_derived without a located method requires a method_unknown notice",
                     )
                 )
-            if not model_references_declared:
+            if (
+                not model_references_declared
+                and not declares_invalid_none_printed_references
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derivation.references",
@@ -1437,26 +1456,6 @@ def _validate_observation(
                     "raw_inputs not_printed declaration contradicts derived_from",
                 )
             )
-        if (
-            ev.value is EvidenceClass.MODEL_DERIVED
-            and declares_unprinted_raw_inputs
-        ):
-            if not method_declared:
-                issues.append(
-                    _issue(
-                        f"{path}.derivation.method",
-                        RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived without a located method requires a method_unknown notice",
-                    )
-                )
-            if not model_references_declared:
-                issues.append(
-                    _issue(
-                        f"{path}.derivation.references",
-                        RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived requires named references or none_printed with a notice",
-                    )
-                )
         raw_inputs_supply_lineage = (
             derivation is not None
             and derivation.has_located_unprinted_raw_inputs
@@ -1474,7 +1473,7 @@ def _validate_observation(
             and observation.value.kind is ValueKind.UNAVAILABLE
         )
         model_derived_without_derivation = (
-            ev.value is EvidenceClass.MODEL_DERIVED and derivation is None
+            model_derived_backlogged and derivation is None
         )
         if not figure_only_without_value and not (
             model_derived_without_derivation or model_derived_unavailable

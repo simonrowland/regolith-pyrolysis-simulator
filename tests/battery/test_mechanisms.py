@@ -1523,8 +1523,8 @@ def test_model_derived_prose_method_without_named_references_fails() -> None:
     report = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
     )
-    assert any(
-        issue.path.endswith(".derivation.references")
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
         for issue in report.hard_issues
     )
     assert any(
