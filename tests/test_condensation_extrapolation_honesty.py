@@ -89,6 +89,9 @@ def test_k_trap_area_admission_keeps_sio_route_authority(cartridge_area):
     authority = result.condensation_authority_by_species["SiO"]
     assert authority["authority_level"] == "status_bearing"
     assert authority["reason"] == "wall_pO2_unknown_pO2_free_route_used"
+    notice = authority["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "status_bearing"
+    assert notice["reason"] == authority["reason"]
     # The conservative pO2-free bound is never authoritative, so a missing
     # cartridge cannot certify terminal offgas downstream.
     assert authority["authoritative_for_condensation"] is False
@@ -382,7 +385,7 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         wall = row["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
         assert wall["authoritative_for_coating"] is False
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
-        refused = wall["wall_saturation_pressure_refusals_by_species"]
+        refused = wall.get("wall_saturation_pressure_refusals_by_species", {})
         # Sodium's cold wall is the Browning-Potter saturation, flagged outside
         # 864-2499 K. It is no longer the retired Antoine pole refusal.
         assert "Na" not in refused
@@ -798,9 +801,8 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
 
     SiO is a melt standard-reaction term (fit_target=standard_reaction_term),
     not a pure-species wall P_sat. Its oxide Antoine coefficients are not
-    wall-condensation certified; the reactive wall path uses the product
-    backstop. Probe Antoine telemetry on Ca, which still has a pure-component
-    condensed rail with a declared valid_range_K.
+    wall-condensation certified. Probe Antoine telemetry on Ca, which still
+    has a pure-component condensed rail with a declared valid_range_K.
     """
     T_wall_K = 1900.0  # above Ca pure-component certified band
     local_pressure_pa = 100.0
@@ -835,29 +837,26 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
         for warning in antoine_warnings
     )
 
-    # SiO's wall reaction needs a parcel pO2. Missing pO2 refuses. It does
-    # not invent a pure-SiO Antoine pressure or a Psat = 0 backstop.
+    # SiO is a wall-reaction term, not a pure-SiO Antoine pressure. With no
+    # wall pO2, use the d-402 pO2-free route and carry its status-bearing bound.
     sio_range = condensation.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"][
         "valid_range_K"
     ]
     assert sio_range == [1400, 2273.15]
     sio_extrap: dict[str, dict[str, object]] = {}
     sio_warns: list[str] = []
-    with pytest.raises(
-        condensation.WallSaturationPressureRefusal,
-        match="reason=wall_pO2_required",
-    ):
-        condensation._wall_deposition_driving_pressure_pa(
-            "SiO",
-            local_pressure_pa,
-            1173.15,
-            reactive_product_backstop=False,
-            antoine_extrapolations=sio_extrap,
-            antoine_extrapolation_warnings=sio_warns,
-        )
-    refusal = sio_extrap["SiO#wall:1173.15"]
-    assert refusal["authority_level"] == "unavailable"
-    assert refusal["reason"] == "wall_pO2_required"
+    sio_driving_pressure = condensation._wall_deposition_driving_pressure_pa(
+        "SiO",
+        local_pressure_pa,
+        1173.15,
+        reactive_product_backstop=False,
+        antoine_extrapolations=sio_extrap,
+        antoine_extrapolation_warnings=sio_warns,
+    )
+    assert sio_driving_pressure > 0.0
+    notice = sio_extrap["SiO"]
+    assert notice["authority_level"] == "status_bearing"
+    assert notice["reason"] == "wall_pO2_unknown_pO2_free_route_used"
 
 
 def test_wall_deposit_query_reports_out_of_domain_antoine_prediction():
