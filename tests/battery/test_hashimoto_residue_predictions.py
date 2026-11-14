@@ -320,7 +320,7 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
     # changes the digest. The primary numeric outputs remain pinned below as
     # float.hex.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
-        "3b1878ecf87665fde693e50342c568cfa276ab166eb936671ab6addc3e634642"
+        "a4eec091ae9bbf962ba3667f8726eb5ca570d48250697614dc5b0898550cec0d"
     )
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM

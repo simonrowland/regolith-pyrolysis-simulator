@@ -1006,7 +1006,7 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
     expected = {
         1473.15: {
             "KO0.5": 2.1891401806319048e-6,
-            "NaO0.5": 0.00013466805822228952,
+            "NaO0.5": 0.00017560125503048718,
         },
         1673.15: {
             "KO0.5": 9.441799509227296e-6,

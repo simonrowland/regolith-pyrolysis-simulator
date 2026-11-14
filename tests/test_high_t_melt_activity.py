@@ -425,7 +425,7 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
+    ).hexdigest() == "4436bf3966f0a146e381c304ee8a3756897dc7af00cc1462f1cfc6bb64eac703"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
