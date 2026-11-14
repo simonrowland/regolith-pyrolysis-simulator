@@ -2562,6 +2562,161 @@ def test_corpus_fidelity_gate_rejects_copied_unattested_values():
     assert any("reviewed_by is required" in error for error in errors), errors
 
 
+def test_barin_1995_aluminate_tables_are_pinned_and_migrate_conditions(
+    tmp_path: Path,
+) -> None:
+    source_name = "barin-1995.yaml"
+    doc = yaml.safe_load((EXTRACTS / source_name).read_text(encoding="utf-8"))
+    expected_tables = {
+        "CaAl2O4": (17, 557, 442, 556, "barin95_caal2o4_sol_cp", "120.791"),
+        "CaAl4O7": (19, 558, 443, 557, "barin95_caal4o7_sol_cp", "198.174"),
+        "Ca3Al2O6": (17, 560, 445, 559, "barin95_c3a_sol_cp", "209.697"),
+        "Ca12Al14O33": (16, 560, 445, 559, "barin95_c12a7_sol_cp", "1084.825"),
+        "NaAlO2": (20, 1248, 1132, 1247, "barin95_naalo2_sol_a_cp", "73.535"),
+        "MgAl2O4": (26, 1131, 1015, 1130, "barin95_mgal2o4_sol_cp", "116.191"),
+    }
+    for species_id, (row_count, page, folio, pdf_index, cp_id, cp_value) in (
+        expected_tables.items()
+    ):
+        observations = doc["species"][species_id]["observations"]
+        cp_observations = [
+            observation
+            for observation in observations
+            if observation["observation_id"].endswith("_cp")
+        ]
+        assert sum(len(item["values"]["points"]) for item in cp_observations) == row_count
+        pin = next(
+            observation
+            for observation in cp_observations
+            if observation["observation_id"] == cp_id
+        )
+        first_point = pin["values"]["points"][0]
+        assert first_point["T_K"] == "298.15"
+        assert first_point["value"] == cp_value
+        assert first_point["locator"]["page"] == page
+        assert first_point["locator"]["published_page"] == folio
+        assert first_point["locator"]["pdf_page_index"] == pdf_index
+        assert first_point["locator"]["row"] == f"{pin['phase_label_as_printed']} 298.15"
+        samples = [
+            sample
+            for sample in doc["fidelity_samples"]
+            if sample.get("path", "").startswith(
+                f"species.{species_id}.observations[{cp_id}]"
+            )
+        ]
+        assert any(
+            sample["value"]["points"][0]["value"] == cp_value
+            for sample in samples
+            if sample["path"].endswith(".values")
+        )
+        assert any(
+            sample.get("locator", {}).get("pdf_page_index") == pdf_index
+            for sample in samples
+        )
+        for observation in observations:
+            if observation["type"] != "heat_capacity_and_heat_content_series":
+                continue
+            assert len(observation["values"]["points"]) > 0
+            for point in observation["values"]["points"]:
+                locator = point["locator"]
+                assert locator["page"] == page
+                assert locator["pdf_page_index"] == pdf_index
+                condition = point["point_conditions"]["temperature_K"]
+                assert condition["state"]["value"]["point"] == point["T_K"]
+                assert condition["locator"]["page"] == page
+                assert condition["locator"]["pdf_page_index"] == pdf_index
+                assert condition["locator"]["column"] == "T"
+                assert condition["locator"]["table_column_number"] == 2
+
+    transition_rows = {
+        observation["observation_id"]: observation
+        for species_id in ("NaAlO2", "MgAl2O4")
+        for observation in doc["species"][species_id]["observations"]
+        if observation["type"] in {"transition_point", "phase_transition"}
+    }
+    expected_transitions = {
+        "barin95_naalo2_transition_sol_a_sol_b_temperature_740": (
+            "transition_temperature", "740.00", 1248, 1247
+        ),
+        "barin95_naalo2_transition_enthalpy_740": (
+            "polymorph_transition_enthalpy_as_printed", "1.297", 1248, 1247
+        ),
+        "barin95_naalo2_transition_entropy_740": (
+            "polymorph_transition_entropy_as_printed", "1.753", 1248, 1247
+        ),
+        "barin95_mgal2o4_fusion_temperature_2408": (
+            "transition_temperature", "2408.00", 1131, 1130
+        ),
+        "barin95_mgal2o4_fusion_enthalpy_2408": (
+            "heat_of_fusion", "196.648", 1131, 1130
+        ),
+        "barin95_mgal2o4_fusion_entropy_2408": (
+            "entropy_of_fusion", "81.664", 1131, 1130
+        ),
+    }
+    assert set(transition_rows) == set(expected_transitions)
+    for observation_id, (quantity, value, page, pdf_index) in expected_transitions.items():
+        observation = transition_rows[observation_id]
+        assert observation["values"]["quantity"] == quantity
+        if quantity == "transition_temperature":
+            actual = observation["values"]["T_m_K"]
+        else:
+            actual = observation["values"]["value"]
+        assert actual == value
+        assert observation["locator"]["page"] == page
+        assert observation["locator"]["pdf_page_index"] == pdf_index
+        condition = observation["point_conditions"]["temperature_K"]
+        assert condition["locator"]["page"] == page
+        assert condition["locator"]["pdf_page_index"] == pdf_index
+        assert condition["locator"]["column"] == "T"
+        assert condition["locator"]["table_column_number"] == 2
+
+    new_samples = [
+        sample for sample in doc["fidelity_samples"]
+        if sample.get("path", "").startswith("species.CaAl2O4.observations[barin95_")
+        or sample.get("path", "").startswith("species.CaAl4O7.observations[barin95_")
+        or sample.get("path", "").startswith("species.Ca3Al2O6.observations[barin95_")
+        or sample.get("path", "").startswith("species.Ca12Al14O33.observations[barin95_")
+        or sample.get("path", "").startswith("species.NaAlO2.observations[barin95_")
+        or sample.get("path", "").startswith("species.MgAl2O4.observations[barin95_")
+    ]
+    assert len(new_samples) == 124
+    assert vle.check_all_fidelity_samples_match(doc, label="barin-1995") == []
+    mutated = copy.deepcopy(doc)
+    sample = new_samples[0]
+    actual = vle.resolve_fidelity_sample(mutated, sample)
+    assert actual == sample["value"]
+    path = sample["path"]
+    assert path.endswith(".values")
+    observation_id = path.split("observations[", 1)[1].split("]", 1)[0]
+    species_id = path.split("species.", 1)[1].split(".observations", 1)[0]
+    target = next(
+        observation
+        for observation in mutated["species"][species_id]["observations"]
+        if observation["observation_id"] == observation_id
+    )
+    target["values"]["points"][0]["value"] = "999.999"
+    assert vle.check_all_fidelity_samples_match(mutated, label="barin-1995-mutation")
+
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(tmp_path, source_name, extract_doc=doc)
+    observations = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.source_id == "barin-1995"
+        and observation.locator is not None
+        and observation.locator.page in {557, 558, 560, 1131, 1248}
+    ]
+    assert len(observations) == 811
+    assert all(
+        observation.point_conditions is not None
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in observations
+    )
+
+
 def test_numeric_index_path_does_not_cover_a_scored_observation():
     """``observations[0]`` is a position. Reordering would retarget the pin."""
     doc = _minimal_extract()
