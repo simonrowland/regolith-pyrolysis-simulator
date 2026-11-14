@@ -16110,7 +16110,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         c6_hold_reached = False
         if self.melt.campaign == CampaignPhase.C6:
             c6_target_T, _ = self.campaign_mgr.get_temp_target(
-                self.melt.campaign, self.melt.campaign_hour, self.melt)
+                self.melt.campaign, self.melt.campaign_hour, self.melt,
+                dt_hr=self._step_dt_hr)
             c6_hold_reached = self.campaign_mgr.c6_at_hold_target(
                 c6_target_T,
                 self.melt.temperature_C,
