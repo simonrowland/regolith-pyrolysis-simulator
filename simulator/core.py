@@ -17054,6 +17054,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _make_snapshot(self) -> HourSnapshot:
         """Build an HourSnapshot from current state."""
+        duration_h = self._step_dt_hr
         oxygen_partition = self._oxygen_terminal_partition_kg()
         condensation_totals = self._condensation_totals_with_terminal_oxygen()
         self._stamp_redox_source_context_for_current_state()
@@ -17149,7 +17150,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot = HourSnapshot(
             liquid_fraction_gate=liquid_fraction_gate,
             hour=self.melt.hour,
-            duration_h=1.0,
+            duration_h=duration_h,
             campaign=self.melt.campaign,
             temperature_C=self.melt.temperature_C,
             melt_mass_kg=self.melt.total_mass_kg,
@@ -17204,9 +17205,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             turbine_shaft_power_kW=self.overhead.turbine_shaft_power_kW,
             # Alkali shuttle
             shuttle_phase=self._shuttle_phase,
-            shuttle_injected_kg_hr=self._shuttle_injected_this_hr,
-            shuttle_reduced_kg_hr=self._shuttle_reduced_this_hr,
-            shuttle_metal_produced_kg_hr=self._shuttle_metal_this_hr,
+            # Counters are committed interval kg. Snapshot rate = kg/dt[h]:
+            # 1 kg in .25 h is 4 kg/h; division by 1 h keeps hourly values.
+            shuttle_injected_kg_hr=self._shuttle_injected_this_hr / duration_h,
+            shuttle_reduced_kg_hr=self._shuttle_reduced_this_hr / duration_h,
+            shuttle_metal_produced_kg_hr=self._shuttle_metal_this_hr / duration_h,
             shuttle_K_inventory_kg=self.shuttle_K_inventory_kg,
             shuttle_Na_inventory_kg=self.shuttle_Na_inventory_kg,
             c3_alkali_credit_drawn_kg_by_species=dict(
@@ -17261,7 +17264,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mre_declared_rung_V=float(
                 getattr(self.melt, 'mre_declared_rung_V', 0.0)
             ),
-            mre_metals_kg_hr=dict(self._mre_metals_this_hr),
+            # MRE metal counters are interval kg too; project kg/h once using
+            # this snapshot's exposure (1 kg / .25 h = 4 kg/h).
+            mre_metals_kg_hr={
+                species: kg / duration_h
+                for species, kg in self._mre_metals_this_hr.items()
+            },
             mre_uncertified_yield=dict(self._mre_uncertified_yield),
             mre_ellingham_ladder_diagnostic=dict(
                 self._mre_ellingham_ladder_diagnostic

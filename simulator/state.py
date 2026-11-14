@@ -1128,6 +1128,7 @@ class HourSnapshot:
     mre_declared_rung_V: float = 0.0
     mre_current_A: float = 0.0  # Effective Faradaic current, never nominal dispatch
     mre_metals_kg_hr: Dict[str, float] = field(default_factory=dict)
+    # Per-species metal production rate over this snapshot's duration (kg/h).
     mre_uncertified_yield: Dict[str, Any] = field(default_factory=dict)
     mre_ellingham_ladder_diagnostic: Dict[str, Any] = field(default_factory=dict)
     metal_phase_stratification: Dict[str, Any] = field(default_factory=dict)
@@ -1189,13 +1190,13 @@ class HourSnapshot:
     # 'inject' or 'bakeout' during C3; empty otherwise
 
     shuttle_injected_kg_hr: float = 0.0
-    # Mass of K or Na injected into the melt this hour (kg)
+    # K or Na injection rate over this snapshot's duration (kg/h).
 
     shuttle_reduced_kg_hr: float = 0.0
-    # Mass of oxide (FeO/TiO₂) reduced by shuttle this hour (kg)
+    # Oxide reduction rate over this snapshot's duration (kg/h).
 
     shuttle_metal_produced_kg_hr: float = 0.0
-    # Mass of metal (Fe/Ti) produced by shuttle reduction this hour (kg)
+    # Shuttle metal production rate over this snapshot's duration (kg/h).
 
     shuttle_K_inventory_kg: float = 0.0
     # K available for shuttle injection (from condenser + additives)
