@@ -530,6 +530,7 @@ class SimSession:
     def advance(self, dt_hr: float = 1.0) -> StepResult:
         """Run exactly one policy-free simulator step."""
 
+        dt_hr = coerce_nonnegative_hours(dt_hr)
         sim = self._require_sim()
         if self._poisoned_error is not None:
             raise RuntimeError("session is poisoned after projection failure") from (
