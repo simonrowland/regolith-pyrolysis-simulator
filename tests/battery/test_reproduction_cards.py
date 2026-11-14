@@ -10,7 +10,7 @@ import yaml
 
 from simulator.battery.enums import NoticeKind, UncertaintyKind, ValueKind
 from simulator.battery.migrate import load_migrated_store, to_plain
-from simulator.battery.records import Notice, Uncertainty, Value
+from simulator.battery.records import Notice, State, Uncertainty, Value
 from simulator.battery.reproduction_cards import (
     compare_point,
     evaluate_card,
@@ -139,6 +139,13 @@ def test_real_inventory_and_foreign_keys(store, source, count):
                 and obs.identity.quantity.value.value in {"residue_component_composition", "mass_loss_fraction"}}
     selected = {oid for run in manifest["runs"] for group in run["outcomes"] for oid in group["observation_ids"]}
     assert expected <= selected
+    run = next(run for run in manifest["runs"] if any(g["observation_ids"] for g in run["outcomes"]))
+    oid = next(oid for group in run["outcomes"] for oid in group["observation_ids"])
+    observation = store[2][oid]
+    changed = {**store[2], oid: replace(observation, identity=replace(
+        observation.identity, temperature_K=State.of(Decimal("9999"))))}
+    receipt = evaluate_card(manifest, run, review["runs"][run["card_id"]], scope, changed)
+    assert receipt["review_current"] is False
 
 
 @pytest.fixture
