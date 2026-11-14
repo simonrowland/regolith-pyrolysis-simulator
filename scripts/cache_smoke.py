@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import resource
 import sqlite3
 import sys
@@ -35,7 +34,11 @@ from simulator.battery.migrate import (  # noqa: E402
     source_filter_tokens,
     work_filename,
 )
-from scripts.battery_cache_equivalence import _canonical_rows  # noqa: E402
+from scripts.battery_cache_equivalence import (  # noqa: E402
+    _canonical_rows,
+    _dispatch_scratch_directory,
+    _engine_cache_path,
+)
 
 
 @dataclass(frozen=True)
@@ -225,10 +228,7 @@ def _run(
     workers: int,
     cache_path: Path | None,
 ) -> tuple[list[str], dict[str, dict[str, int]], float, float]:
-    if cache_path is None:
-        os.environ.pop("REGOLITH_ENGINE_CACHE", None)
-    else:
-        os.environ["REGOLITH_ENGINE_CACHE"] = str(cache_path)
+    _engine_cache_path(cache_path)
     before_wall, before_cpu = time.perf_counter(), _cpu_seconds()
     counters: dict[str, dict[str, int]] = {}
     rows: list[str] = []
@@ -325,7 +325,7 @@ def main(argv: list[str] | None = None) -> int:
     ]
     if missing_engines:
         parser.error("selected sources do not exercise: " + ", ".join(missing_engines))
-    tmp_parent = os.environ.get("TMPDIR")
+    tmp_parent = _dispatch_scratch_directory()
     if not tmp_parent:
         parser.error("TMPDIR must name the dispatch scratch directory")
 

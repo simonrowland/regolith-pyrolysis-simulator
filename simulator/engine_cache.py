@@ -269,9 +269,16 @@ def engine_cache_settings(
     }
 
 
+def _cache_environment_setting(
+    name: str,
+    default: str | None = None,
+) -> str | None:
+    return os.environ.get(name, default)
+
+
 def _configured_engine_cache_path() -> str | None:
     """Return the configured cache path, or None when caching is disabled."""
-    return os.environ.get("REGOLITH_ENGINE_CACHE") or None
+    return _cache_environment_setting("REGOLITH_ENGINE_CACHE") or None
 
 
 def _file_sha256(path: Path) -> str:
@@ -425,7 +432,7 @@ def runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
 
 def record_engine_open(engine_id: str, backend: Any | None = None) -> str | None:
     """Capture and report staleness once, outside the request-key path."""
-    if not os.environ.get("REGOLITH_ENGINE_CACHE"):
+    if not _cache_environment_setting("REGOLITH_ENGINE_CACHE"):
         return None
     if engine_id in _RUNTIME_IDENTITIES:
         identity = _RUNTIME_IDENTITIES[engine_id]
@@ -688,7 +695,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     path_value = _configured_engine_cache_path()
     if not path_value:
         return solve()
-    mode = os.environ.get("REGOLITH_ENGINE_CACHE_MODE", "").lower()
+    mode = (_cache_environment_setting("REGOLITH_ENGINE_CACHE_MODE", "") or "").lower()
     if mode not in {"", "readonly"}:
         raise ValueError(f"unknown engine cache mode {mode!r}")
     readonly = mode == "readonly"
@@ -735,7 +742,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         with _LOCK:
             _counter_bucket(engine_id)["store_error"] += 1
         return hot
-    source_box = os.environ.get("REGOLITH_ENGINE_CACHE_BOX", "")
+    source_box = _cache_environment_setting("REGOLITH_ENGINE_CACHE_BOX", "") or ""
     try:
         with _LOCK:
             connection.execute("BEGIN IMMEDIATE")

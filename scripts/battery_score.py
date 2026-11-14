@@ -67,6 +67,10 @@ from simulator.battery.score import (  # noqa: E402
     _write_headline_summary_from_accumulator_json,
     measured_engine_rail_records,
 )
+from scripts.battery_cache_equivalence import (  # noqa: E402
+    _engine_cache_path,
+    _studio_host,
+)
 from simulator.battery.score_report import (  # noqa: E402
     format_nasa9_fit_comparison_stratum,
 )
@@ -646,12 +650,12 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--workers must be at least 1")
 
     if args.engine_cache is not None:
-        os.environ["REGOLITH_ENGINE_CACHE"] = str(args.engine_cache.expanduser())
-    cache_path_value = os.environ.get("REGOLITH_ENGINE_CACHE")
+        _engine_cache_path(str(args.engine_cache.expanduser()))
+    cache_path_value = _engine_cache_path()
     engine_cache_path = (
         None if not cache_path_value else Path(cache_path_value).expanduser()
     )
-    studio_host = os.environ.get("REGOLITH_STUDIO_HOST")
+    studio_host = _studio_host()
     if args.studio and not studio_host:
         parser.error("--studio requires REGOLITH_STUDIO_HOST to be set")
 

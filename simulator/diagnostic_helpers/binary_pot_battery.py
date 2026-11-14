@@ -99,7 +99,8 @@ MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
 
 
 def _hostname() -> str:
-    env_name = os.environ.get("GOALFLIGHT_HOSTNAME") or os.environ.get("HOSTNAME")
+    environment = os.environ
+    env_name = environment.get("GOALFLIGHT_HOSTNAME") or environment.get("HOSTNAME")
     if env_name:
         return str(env_name)
     try:
