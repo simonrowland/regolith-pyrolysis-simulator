@@ -407,3 +407,84 @@ def test_sio_hold_wrapper_steps_at_the_temperature_owners_sample(dt_hr, entry):
     assert payload["per_hour_summary"][-1]["T_C"] == pytest.approx(expected_target)
     # Revert: restoring the three-argument wrapper rejects dt_hr; dropping
     # only its forwarding uses the wrong slope and fails the .25 h target.
+
+
+def _plateau_then_ramp_schedule():
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule
+
+    schedule = dynamic_lab_schedule()
+    schedule.pop("surface_temperature_C")
+    schedule["duration_h"] = 5.0
+    schedule["melt_temperature_C"] = [
+        {"t_h": hour, "value": temperature, "unit": "C"}
+        for hour, temperature in ((0.0, 1500.0), (4.0, 1500.0), (5.0, 1600.0))
+    ]
+    schedule["chamber_pressure_mbar"][-1]["t_h"] = 5.0
+    return schedule
+
+
+@pytest.mark.parametrize("temperature,margin_temperature,advances", [
+    (1500.0, 1500.0, True), (1499.0, 1500.0, False), (1500.0, 1499.0, False),
+])
+def test_c5_unreachable_rung_uses_both_substep_temperature_predicates(
+    temperature, margin_temperature, advances,
+):
+    sim = _run(campaign="C5", dt_hr=0.25, hours=0.25,
+               lab_schedule=_plateau_then_ramp_schedule())._start_session().simulator
+    sim._step_dt_hr = 0.25
+    sim.melt.campaign_hour = 3.5
+    sim.melt.temperature_C = temperature
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = ""
+    sim.melt.mre_max_voltage_V = 1.6
+    sim._mre_voltage_sequence = [
+        {"voltage": 0.5, "species": ["K2O"], "min_hold_hours": 2},
+        {"voltage": 0.9, "species": ["FeO"], "min_hold_hours": 3},
+    ]
+    assert sim.melt.composition_kg["K2O"] >= 1e-6
+    sim._mre_hold_hours = 1.75
+    sim._mre_effective_current_A = 0.0
+    sim._mre_rung_ever_effective = False
+    sim._mre_effective_voltage_margin_V_by_oxide = {"K2O": -0.25}
+    sim._mre_effective_voltage_margin_temperature_C = margin_temperature
+    target, _ = sim.campaign_mgr.get_temp_target(
+        sim.melt.campaign, 3.5, sim.melt, dt_hr=0.25,
+    )
+    assert target == 1500.0  # Sample 3.75 h, before the 4 h ramp boundary.
+    control = sim._select_plant_mre_interval_control()
+    assert control is not None
+    assert control.c5_rung_advanced is advances
+    assert sim._mre_voltage_step_idx == int(advances)
+    # Revert: omit dt_hr at rung admission; its 4.5 h / 1550 C target
+    # makes both 1500 C predicates false and blocks the required advance.
+
+
+@pytest.mark.parametrize("reader", ["staged_na", "c7_hold"])
+def test_remaining_live_target_readers_forward_the_interval(monkeypatch, reader):
+    from simulator.state import CampaignPhase
+
+    sim = _isothermal_session(0.25).simulator
+    sim._step_dt_hr = 0.25
+    sim.melt.campaign_hour = 3.5
+    sim.melt.temperature_C = 1500.0
+    campaign = (CampaignPhase.C3_NA if reader == "staged_na"
+                else CampaignPhase.C7_CA_ALUMINOTHERMIC)
+    key = sim.campaign_mgr._campaign_config_key(campaign)
+    sim.campaign_mgr.overrides[key] = {"lab_schedule": _plateau_then_ramp_schedule()}
+    get_target = sim.campaign_mgr.get_temp_target
+    samples = []
+
+    def record_target(*args, **kwargs):
+        assert kwargs["dt_hr"] == 0.25
+        result = get_target(*args, **kwargs)
+        samples.append(result[0])
+        return result
+
+    monkeypatch.setattr(sim.campaign_mgr, "get_temp_target", record_target)
+    if reader == "staged_na":
+        sim._recompute_staged_na_fe_hold_setpoint()
+    else:
+        assert sim._c7_hold_temperature_C({}) == 1500.0
+    assert samples == [1500.0]
+    # Revert: removing either caller's dt_hr makes this unchanged real-owner
+    # spy fail; C7 additionally samples 1550 C instead of the 1500 C plateau.
