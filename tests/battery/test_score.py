@@ -3375,11 +3375,12 @@ def test_species_formula_parser_preserves_200_existing_parses() -> None:
     )
     rows = json.loads(fixture.read_text(encoding="utf-8"))
     assert len(rows) == 200
+    # ZnSO4.6H2O -> Zn 1, S 1, H 6×2 = 12, O 4 + 6×1 = 10.
     for row in rows:
         expected = tuple(
             (str(symbol), float(count)) for symbol, count in row["elements"]
         )
-        assert parse_species_formula(row["formula"]) == expected
+        assert parse_species_formula(row["formula"]) == expected, row["formula"]
 
 
 def test_species_formula_parser_accepts_published_typography() -> None:
@@ -3400,11 +3401,17 @@ def test_species_formula_parser_accepts_normalized_ascii_dot_adducts() -> None:
             sorted(parse_formula(canonical).elements.items())
         )
 
-    for formula in ("Fe0.947O", "Al2O3.3H2O"):
-        assert parse_species_formula(formula) == (
-            score_mod.formula_composition(formula)
-            or tuple(sorted(parse_formula(formula).elements.items()))
-        )
+    # Al2O3.3H2O -> Al 2, H 3×2 = 6, O 3 + 3×1 = 6.
+    assert parse_species_formula("Al2O3.3H2O") == (
+        ("Al", 2.0),
+        ("H", 6.0),
+        ("O", 6.0),
+    ), "Al2O3.3H2O"
+    formula = "Fe0.947O"
+    assert parse_species_formula(formula) == (
+        score_mod.formula_composition(formula)
+        or tuple(sorted(parse_formula(formula).elements.items()))
+    ), formula
     assert parse_species_formula(
         "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
     ) == score_mod.formula_composition("Fe0.947O")
