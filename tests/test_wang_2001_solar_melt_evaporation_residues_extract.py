@@ -300,16 +300,13 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         and re.search(r"row=SC1(?!\d)", row.locator.note or "")
     ]
     assert len(sc1_residue_cells) == 27
-    pressure_reason = (
-        "printed as an order of magnitude; d-399 identity band pending the ApproxPressure owner"
-    )
+    # Like the approximate pressure in Hashimoto 1983, this identity keeps the
+    # migrator's point representation until t-1810 bands approximate pressures.
     assert all(
-        row.identity.total_pressure_Pa.is_unknown
-        and row.identity.total_pressure_Pa.reason == pressure_reason
+        row.identity.total_pressure_Pa.is_value
+        and row.identity.total_pressure_Pa.value == pressure.state.value.point
         for row in sc1_residue_cells
     )
-    matching = [identity_equal(row.identity, row.identity) for row in sc1_residue_cells]
-    assert all(outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN for outcome in matching)
     assert all(
         "total_pressure_Pa" in profile_for(row.identity).required
         for row in sc1_residue_cells
