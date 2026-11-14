@@ -299,6 +299,15 @@ def test_plant_mre_isolated_from_reproduction_loader_and_driver(
     monkeypatch.setattr(reproduction_module, "run_mre_reproduction", forbidden)
 
     assert sim._step_mre() > 0.0
+    assert not hasattr(sim, "mre_reproduction")
+    assert "yu_2025_hollow_anode" not in repr(sim.__dict__)
+    # Complete reduction exhausts the melt; no liquidus can be queried.
+    assert sim.atom_ledger.total_mol_by_account("process.cleaned_melt") == 0.0
+    assert sim.melt.oxygen_reservoir.redox_source_terms_applied is False
+    assert (
+        sim.melt.oxygen_reservoir.redox_source_skip_reason
+        == "no_melt_redox_capacity"
+    )
 
 
 @pytest.mark.parametrize("campaign", (CampaignPhase.C5, CampaignPhase.MRE_BASELINE))
@@ -334,13 +343,3 @@ def test_subhour_mre_snapshot_rate_matches_terminal_oxygen_amount(campaign):
     assert snapshot.mre_anode_O2_mol_hr == pytest.approx(delta / snapshot.duration_h)
     assert snapshot.overhead.mre_anode_O2_mol_hr == snapshot.mre_anode_O2_mol_hr
     assert sim.atom_ledger.assert_balanced()
-
-    assert not hasattr(sim, "mre_reproduction")
-    assert "yu_2025_hollow_anode" not in repr(sim.__dict__)
-    # Complete reduction exhausts the melt; no liquidus can be queried.
-    assert sim.atom_ledger.total_mol_by_account("process.cleaned_melt") == 0.0
-    assert sim.melt.oxygen_reservoir.redox_source_terms_applied is False
-    assert (
-        sim.melt.oxygen_reservoir.redox_source_skip_reason
-        == "no_melt_redox_capacity"
-    )
