@@ -12518,23 +12518,28 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
 
 
 def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contexts() -> None:
+    """The source-filtered store has Shornikov rows, not every pack source's rows."""
+
     openimcc = pytest.importorskip("openimcc")
     from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
 
     pack = openimcc.load_datapack()
-    coefficient_sources = openimcc_pack_coefficient_sources(
+    packaged_sources = openimcc_pack_coefficient_sources(
         pack.version, pack.binding_digest
     )
-    full_context = load_score_context(
+    shornikov_source = "openimcc-source-ref:Shornikov2017"
+    assert shornikov_source in packaged_sources
+    coefficient_sources = (shornikov_source,)
+    source_context = load_score_context(
         sources=("shornikov-2017-spinel-thermodynamics",)
     )
     reference = next(
         observation
-        for observation in full_context.observations.values()
+        for observation in source_context.observations.values()
         if observation.source_id == "shornikov-2017-spinel-thermodynamics"
     )
-    experiment = full_context.experiments[reference.experiment_id]
-    work = full_context.works[experiment.work_id]
+    experiment = source_context.experiments[reference.experiment_id]
+    work = source_context.works[experiment.work_id]
     restricted_stores = (
         {work.work_id: work},
         {reference.observation_id: reference},
@@ -12543,9 +12548,9 @@ def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contex
 
     for works, observations, experiments in (
         (
-            full_context.works,
-            full_context.observations,
-            full_context.experiments,
+            source_context.works,
+            source_context.observations,
+            source_context.experiments,
         ),
         restricted_stores,
     ):
@@ -12647,6 +12652,12 @@ def test_registered_doi_work_resolves_its_member_ancestry() -> None:
         evidence=EvidenceClass.MODEL_DERIVED,
         source_id=upstream_work.work_id,
         derived_from=(root.observation_id,),
+        derivation=Derivation(
+            relation="derived from upstream observation",
+            inputs=(root.observation_id,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
     )
     registered_row = F.observation(
         "doi-registered-work-row",
@@ -12656,6 +12667,12 @@ def test_registered_doi_work_resolves_its_member_ancestry() -> None:
         evidence=EvidenceClass.MODEL_DERIVED,
         source_id=registered_work.work_id,
         derived_from=(member.observation_id,),
+        derivation=Derivation(
+            relation="derived from registered work member",
+            inputs=(member.observation_id,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
     )
     works = {
         upstream_work.work_id: upstream_work,
