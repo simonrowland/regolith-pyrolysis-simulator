@@ -293,23 +293,19 @@ def resolve_row_fo2(
         and temperature > 0.0
     ):
         total_pressure = identity.total_pressure_Pa
-        p_na_bar = _pascal_point_to_bar(observation.value)
         if (
             total_pressure is not None
             and total_pressure.is_value
             and total_pressure.value is not None
-            and p_na_bar is not None
         ):
             try:
-                total_pressure_bar = float(total_pressure.value) / PA_PER_BAR
+                p_co_bar = float(total_pressure.value) / PA_PER_BAR
             except (TypeError, ValueError, ArithmeticError):
-                total_pressure_bar = math.nan
-            p_co_bar = total_pressure_bar - p_na_bar
+                p_co_bar = math.nan
             if math.isfinite(p_co_bar) and p_co_bar > 0.0:
-                # d-375 accepts the source condition as a flagged two-species
-                # approximation, not a condition fitted to residuals. The
-                # pressure complement is wiring; the reaction equilibrium is
-                # owned by simulator.oxygen_buffers.
+                # Rego reports graphite under a CO-only cover, so the stated
+                # CO pressure is the row's total pressure. Its observed pNa is
+                # the target and does not enter this source condition.
                 return ResolvedFo2(
                     log10_fo2_c_co_bar(temperature, p_co_bar),
                     3,
