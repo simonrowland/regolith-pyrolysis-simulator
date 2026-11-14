@@ -2567,6 +2567,7 @@ def _cleaned_melt_account_mol(
 def _imcc_shadow_rows(
     composition_mol: Mapping[str, float],
     *,
+    temperature_K: float | None,
     imcc_activities: Mapping[str, float] | None,
 ) -> dict[str, dict[str, Any]]:
     """Build the fixed eight-oxide comparison table on explicit bases."""
@@ -2581,7 +2582,7 @@ def _imcc_shadow_rows(
             resolved = melt_oxide_activity(
                 oxide,
                 composition_mol,
-                temperature_K=None,
+                temperature_K=temperature_K,
             )
         except (TypeError, ValueError) as exc:
             resolved = None
@@ -2593,6 +2594,7 @@ def _imcc_shadow_rows(
                 resolved.thermodynamic_parent_activity()
             )
             constant_gamma_status = "ok"
+            constant_gamma_detail = resolved.warning
 
         imcc_activity: float | None = None
         if imcc_activities is not None and oxide in imcc_activities:
@@ -2689,6 +2691,7 @@ def build_imcc_activity_shadow(
         )
         payload["activities_by_oxide"] = _imcc_shadow_rows(
             composition_mol,
+            temperature_K=None,
             imcc_activities=None,
         )
         return payload
@@ -2716,6 +2719,7 @@ def build_imcc_activity_shadow(
             )
             payload["activities_by_oxide"] = _imcc_shadow_rows(
                 composition_mol,
+                temperature_K=temperature,
                 imcc_activities=None,
             )
             return payload
@@ -2742,6 +2746,7 @@ def build_imcc_activity_shadow(
         )
         payload["activities_by_oxide"] = _imcc_shadow_rows(
             composition_mol,
+            temperature_K=temperature,
             imcc_activities=None,
         )
         return payload
@@ -2763,6 +2768,7 @@ def build_imcc_activity_shadow(
     )
     payload["activities_by_oxide"] = _imcc_shadow_rows(
         composition_mol,
+        temperature_K=temperature,
         imcc_activities=result.parent_oxide_activities,
     )
     return payload

@@ -158,6 +158,9 @@ def test_out_of_domain_is_typed_and_does_not_extrapolate() -> None:
         row["imcc_activity"] is None
         for row in shadow["activities_by_oxide"].values()
     )
+    ca_row = shadow["activities_by_oxide"]["CaO"]
+    assert "temperature_K=1600.000" in ca_row["constant_gamma_detail"]
+    assert "temperature_not_supplied" not in ca_row["constant_gamma_detail"]
 
 
 def test_in_domain_shadow_carries_imcc_provenance_and_activity_rows() -> None:

@@ -727,6 +727,42 @@ def test_c5_ellingham_diagnostic_marks_non_finite_input_non_authoritative():
     )
 
 
+def test_c5_ladder_activity_notice_uses_cleaned_melt_temperature():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "MgO", "decomposition_V": "canonical", "min_hold_hours": 0},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim.melt.temperature_C = 1800.0
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    _seed_cleaned_melt_kg(
+        sim,
+        {
+            oxide: moles * MOLAR_MASS[oxide] / 1000.0
+            for oxide, moles in {
+                "CaO": 2.0,
+                "Al2O3": 1.0,
+                "MgO": 1.0,
+                "SiO2": 4.0,
+            }.items()
+        },
+    )
+
+    diagnostic = sim._build_c5_ellingham_ladder_diagnostic(
+        step_info={"species": ("MgO",)},
+        declared_rung_V=2.2,
+        pO2_bar=1.0,
+    )
+
+    assert "temperature_K=2073.150" in diagnostic["species"]["MgO"][
+        "oxide_activity_warning"
+    ]
+
+
 def test_c5_ladder_summary_records_non_authoritative_voltage_fallback():
     setpoints = {
         "campaigns": {},

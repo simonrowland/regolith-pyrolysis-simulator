@@ -1220,7 +1220,11 @@ class ExtractionMixin:
         species_rows: dict[str, Any] = {}
         for static_declared_V, species in ladder_steps:
             for oxide in species:
-                activity_reference = melt_oxide_activity(oxide, cleaned_melt_mol)
+                activity_reference = melt_oxide_activity(
+                    oxide,
+                    cleaned_melt_mol,
+                    temperature_K=temperature_K,
+                )
                 activity = (
                     0.0
                     if activity_reference is None
@@ -1258,6 +1262,13 @@ class ExtractionMixin:
                     'voltage_authoritative': bool(voltage_authoritative),
                     'status': status or 'ok',
                 }
+                if (
+                    activity_reference is not None
+                    and activity_reference.warning is not None
+                ):
+                    species_rows[oxide]['oxide_activity_warning'] = (
+                        activity_reference.warning
+                    )
 
         held_derived = {
             oxide: row['derived_Ed_V']

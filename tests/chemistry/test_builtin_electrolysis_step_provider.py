@@ -71,6 +71,7 @@ from simulator.electrolysis import (
     MREElectrolysisInvalidInput,
     MREElectrolysisRefusal,
     current_efficiency,
+    melt_account_mol_from_kg,
     min_decomposition_voltage,
 )
 from simulator.fe_redox import (
@@ -521,6 +522,54 @@ def test_legacy_step_hour_uses_gamma_x_activity_not_wt_fraction():
     )
     assert result["mre_decomposition_voltage_authoritative_by_oxide"]["Na2O"] is True
     assert result["mre_oxide_activity_by_oxide"]["Na2O"] != pytest.approx(0.5)
+
+
+def _cmas_anorthite_diopside_melt_kg() -> dict[str, float]:
+    oxide_mol = {"CaO": 2.0, "Al2O3": 1.0, "MgO": 1.0, "SiO2": 4.0}
+    return {
+        oxide: mol * MOLAR_MASS[oxide] / 1000.0
+        for oxide, mol in oxide_mol.items()
+    }
+
+
+def test_step_hour_carries_melt_activity_temperature_notice() -> None:
+    melt = MeltState(composition_kg=_cmas_anorthite_diopside_melt_kg())
+    temperature_C = 1800.0
+    temperature_K = temperature_C + 273.15
+    account_mol = melt_account_mol_from_kg(melt.composition_kg)
+    expected_activity = melt_oxide_activity(
+        "MgO", account_mol, temperature_K=temperature_K
+    )
+
+    result = ElectrolysisModel().step_hour(
+        melt,
+        voltage_V=1.0,
+        current_A=1.0,
+        T_C=temperature_C,
+    )
+
+    assert expected_activity is not None
+    assert result["mre_oxide_activity_by_oxide"]["MgO"] == pytest.approx(
+        expected_activity.activity
+    )
+    notices = [
+        notice
+        for notice in result.get("notices", [])
+        if notice.get("site") == "electrolysis.mre_oxide_activity"
+        and notice.get("species") == "MgO"
+    ]
+    assert len(notices) == 1
+    assert "temperature_K=2073.150" in notices[0]["detail"]
+
+
+def test_reduction_sequence_warns_when_activity_is_outside_temperature_band() -> None:
+    melt = MeltState(composition_kg=_cmas_anorthite_diopside_melt_kg())
+
+    with pytest.warns(RuntimeWarning, match="MRE MgO activity") as caught:
+        sequence = ElectrolysisModel().get_reduction_sequence(melt, T_C=1800.0)
+
+    assert any(oxide == "MgO" for oxide, _voltage in sequence)
+    assert any("temperature_K=2073.150" in str(warning.message) for warning in caught)
 
 
 # ---------------------------------------------------------------------------

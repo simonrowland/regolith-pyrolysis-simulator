@@ -103,6 +103,16 @@ def test_melt_midpoint_gamma_domain_flags_outside_only(parent, temperature_range
     assert f"valid_range_K=[{low:g}, {high:g}]" in out_of_domain.warning
 
 
+def test_melt_midpoint_gamma_flags_missing_temperature_as_unchecked() -> None:
+    activity = melt_oxide_activity("CaO", {"CaO": 1.0})
+
+    assert activity is not None
+    assert activity.warning is not None
+    assert "reason=temperature_not_supplied" in activity.warning
+    assert "valid_range_K=[1873, 1873]" in activity.warning
+    assert activity.authority_status == "temperature_not_supplied_domain_unchecked"
+
+
 def test_na_and_k_remain_cited_point_anchors_with_domains() -> None:
     na = MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"]
     k = MELT_OXIDE_ACTIVITY_COEFFICIENTS["K2O"]

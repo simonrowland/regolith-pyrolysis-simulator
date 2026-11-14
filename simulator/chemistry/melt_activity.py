@@ -674,9 +674,16 @@ def melt_oxide_activity(
 
     activity_authority_status = "temperature_not_supplied"
     activity_warning = None
-    if resolved_temperature_K is not None and coeff.valid_range_K is not None:
+    if coeff.valid_range_K is not None:
         low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
-        if low <= resolved_temperature_K <= high:
+        if resolved_temperature_K is None:
+            activity_authority_status = "temperature_not_supplied_domain_unchecked"
+            activity_warning = (
+                "constant_gamma_domain_unchecked: "
+                f"parent_oxide={parent} reason=temperature_not_supplied "
+                f"valid_range_K=[{low:g}, {high:g}] cannot_certify"
+            )
+        elif low <= resolved_temperature_K <= high:
             activity_authority_status = "in_gamma_domain"
         else:
             activity_authority_status = (

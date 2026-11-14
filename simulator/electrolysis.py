@@ -79,6 +79,7 @@ from __future__ import annotations
 
 import math
 import sys
+import warnings
 from typing import Dict, List, Mapping, Tuple
 
 from simulator.chemistry.ellingham_thermo import (
@@ -499,10 +500,31 @@ def melt_account_mol_from_kg(
 def mre_oxide_activity(
     oxide: str,
     account_mol: Mapping[str, float],
+    *,
+    temperature_K: float | None = None,
+    notices: list[dict[str, object]] | None = None,
 ) -> float:
-    activity = melt_oxide_activity(oxide, account_mol)
+    activity = melt_oxide_activity(
+        oxide,
+        account_mol,
+        temperature_K=temperature_K,
+    )
     if activity is None:
         return 0.0
+    if activity.warning:
+        detail = f"MRE {oxide} activity: {activity.warning}"
+        if notices is None:
+            warnings.warn(detail, RuntimeWarning, stacklevel=2)
+        else:
+            notices.append(
+                {
+                    "reason": "melt_oxide_activity_domain",
+                    "site": "electrolysis.mre_oxide_activity",
+                    "species": oxide,
+                    "authority_level": "status_bearing_non_authoritative",
+                    "detail": detail,
+                }
+            )
     return max(0.0, float(activity.activity))
 
 
@@ -953,6 +975,7 @@ class ElectrolysisModel:
 
         # Find all reducible species at this voltage
         reducible = []
+        activity_domain_notices: list[dict[str, object]] = []
         unassessed_notices: list[dict[str, object]] = []
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if oxide not in melt_state.composition_kg:
@@ -960,7 +983,12 @@ class ElectrolysisModel:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
 
-            activity = mre_oxide_activity(oxide, melt_account_mol)
+            activity = mre_oxide_activity(
+                oxide,
+                melt_account_mol,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+                notices=activity_domain_notices,
+            )
             reference = mre_decomposition_voltage_reference(
                 oxide,
                 temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
@@ -1053,8 +1081,18 @@ class ElectrolysisModel:
                 ))
 
         if melt_state.composition_kg.get('Fe2O3', 0.0) >= 1e-6:
-            activity = mre_oxide_activity('Fe2O3', melt_account_mol)
-            feo_activity = mre_oxide_activity('FeO', melt_account_mol)
+            activity = mre_oxide_activity(
+                'Fe2O3',
+                melt_account_mol,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+                notices=activity_domain_notices,
+            )
+            feo_activity = mre_oxide_activity(
+                'FeO',
+                melt_account_mol,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+                notices=activity_domain_notices,
+            )
             E_ferric = self.ferric_to_ferrous_voltage(
                 T_C,
                 activity,
@@ -1070,6 +1108,9 @@ class ElectrolysisModel:
                     "ferric_to_ferrous",
                     None,
                 ))
+
+        if activity_domain_notices:
+            result.setdefault('notices', []).extend(activity_domain_notices)
 
         if not reducible:
             if result['mre_raw_margin_refused_targets']:
@@ -1260,7 +1301,11 @@ class ElectrolysisModel:
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
-            activity = mre_oxide_activity(oxide, melt_account_mol)
+            activity = mre_oxide_activity(
+                oxide,
+                melt_account_mol,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
             metal = OXIDE_TO_METAL.get(oxide, ('', 1, 0))[0]
             E = self.nernst_voltage(
                 oxide,
