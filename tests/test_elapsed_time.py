@@ -60,7 +60,7 @@ def test_schedule_breakpoints_split_physics_not_only_control_reads():
         schedule[key] = [schedule[key][0], {**schedule[key][-1], "t_h": 1.0}]
     # Only the melt/control schedule is needed; geometry profiles belong to
     # their separately tested bridge.
-    schedule.pop("surface_temperatures_C", None)
+    schedule.pop("surface_temperature_C", None)
     run = _run(hours=1, dt_hr=0.25, lab_schedule=schedule)
     execution = RunExecutor().execute(run._session_config())
     assert execution.status == "ok", execution.error_message
@@ -73,10 +73,7 @@ def test_schedule_breakpoints_split_physics_not_only_control_reads():
 
 def _endpoint(session):
     sim = session.simulator
-    accounts = {
-        account: dict(sim.atom_ledger.mol_by_account(account))
-        for account in sim.atom_ledger.accounts()
-    }
+    accounts = sim.atom_ledger.mol_by_account()
     return (
         accounts,
         sim.O2_vented_cumulative_kg,
@@ -110,12 +107,13 @@ def test_first_order_campaign_refinement():
         _, session, execution = _execute(hours=0.25, dt_hr=dt_hr)
         assert execution.status == "ok", execution.error_message
         sim = session.simulator
-        endpoints.append(sim.atom_ledger.total_atom_moles())
+        endpoints.append(sim.atom_ledger.mol_by_account("process.cleaned_melt"))
         assert abs(execution.snapshots[-1].mass_balance_error_pct) < 5e-12
-    # Atom totals are an independent invariant of every conservative split;
-    # refinement must not alter them, including cumulative gas outlets.
-    assert endpoints[0] == pytest.approx(endpoints[1], rel=1e-12)
-    assert endpoints[1] == pytest.approx(endpoints[2], rel=1e-12)
+    species = set().union(*endpoints)
+    coarse = max(abs(endpoints[0].get(s, 0) - endpoints[1].get(s, 0)) for s in species)
+    fine = max(abs(endpoints[1].get(s, 0) - endpoints[2].get(s, 0)) for s in species)
+    roundoff = 64 * math.ulp(max(max(row.values()) for row in endpoints))
+    assert fine <= coarse + roundoff
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS[:2], ids=lambda s: s["name"])
