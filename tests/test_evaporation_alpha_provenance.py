@@ -75,11 +75,15 @@ EXPECTED_ALPHA = {
     },
     ("metals", "K"): {
         "value": 0.13,
-        "envelope": (0.10, 0.16),
+        "T_band_K": (1723, 1723),
+        "envelope": (0.11, 0.15),
         "source": (
-            "REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber "
-            "intrinsic K alpha_e~0.13; replaces prior Na open-furnace analogy "
-            "for series-resistance intrinsic-alpha model"
+            "REF-014 kems-005-fedkin-2006 Fedkin et al. 2006 GCA 70:206-223, "
+            "DOI 10.1016/j.gca.2005.08.014, section 4.2 pp.213-214 and Fig.4B; "
+            "conditional model fit K alpha_e=0.13 +/- 0.02 at 1723 K in 1e-5 bar "
+            "low-pressure air to Yu et al. 2003 chondrule-analog composition 1 (Fedkin "
+            "Table 2; MnO ignored and olivine/orthopyroxene suppressed in the model); "
+            "not a KEMS measurement or a composition-independent intrinsic alpha"
         ),
         "tier": 2,
     },
@@ -243,6 +247,45 @@ def test_tier_3_species_have_fail_loud_policy_not_placeholder_alpha():
         assert policy["tier"] == 3
         assert policy["policy"] == "fail_loud_missing_alpha"
         assert source_marker in policy["source"]
+
+
+def test_fedkin_air_fit_provenance_reaches_catalog_and_runtime_loaders():
+    """Fedkin section 4.2 pp.213-214 fits Yu composition 1 at 1723 K."""
+    raw = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    compiled = compiled_catalog_for(raw)
+    legacy = vapor_pressure_legacy_view(raw)
+    potassium = compiled.species["K"].vaporisation_coefficients
+    assert tuple(potassium.alpha_domain_and_uncertainty["temperature_K"]) == (
+        1723, 1723,
+    )
+    assert tuple(potassium.alpha_domain_and_uncertainty["envelope"]) == (0.11, 0.15)
+    assert potassium.out_of_range_status == "out_of_range_conservative_continuation"
+    assert "alpha_fit_only_1723K_1e-5bar_air_Yu2003_composition1" in (
+        potassium.acquisition_flag
+    )
+    assert _load_evaporation_alpha_by_species(raw)["K"] == pytest.approx(0.13)
+    assert _load_evaporation_alpha_envelope_by_species(raw)["K"] == (0.11, 0.15)
+
+    # Na retains its analytical ceiling; Fedkin is a competing, conditional fit.
+    sodium = legacy["metals"]["Na"]["evaporation_alpha"]
+    assert sodium["value"] == pytest.approx(1.0)
+    assert sodium["status"] == "analytical_upper_bound"
+    competing = sodium["competing_sources"]
+    assert len(competing) == 1
+    assert competing[0]["value"] == pytest.approx(0.26)
+    assert "Na alpha_e=0.26 +/- 0.05" in competing[0]["source"]
+    assert "Fig.4A" in competing[0]["source"]
+
+    for fit in (potassium.evaporation_alpha, competing[0]):
+        text = fit["source"] + " " + fit.get("regime", "")
+        assert "kems-005-fedkin-2006" in text
+        assert "1723 K" in text
+        assert "1e-5 bar" in text
+        assert "low-pressure air" in text
+        assert "composition 1" in text
+        assert "model" in text
+        assert "sealed-chamber" not in text
+        assert "LPSC" not in text
 
 
 def test_sossi_sodium_family_withdrawal_reaches_every_runtime_store():
