@@ -243,7 +243,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     ]
     assert len(values) == 18
     encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
-    # Pinned with the declared OpenIMCC pin 744aade47ceef645e6426e5a6b84a891c27ae856 (pyproject.toml); under e975edd the digest is 12100581….
+    # Pinned with the declared OpenIMCC pin 9c327c2991fcc07b902019d26a8fe7cd25deb075 (pyproject.toml); under e975edd the digest is 12100581….
     assert hashlib.sha256(encoded).hexdigest() == (
         "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
     )
