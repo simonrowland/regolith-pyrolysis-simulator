@@ -1,3 +1,7 @@
+import re
+from dataclasses import replace
+from decimal import Decimal
+
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT
@@ -108,6 +112,7 @@ def test_figure_records_preserve_panels_standards_and_digitisation_status():
 
 
 def test_figure_extract_migrates_figure_only_observations():
+    extract = yaml.safe_load(EXTRACT.read_text())
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -124,3 +129,171 @@ def test_figure_extract_migrates_figure_only_observations():
     assert len(result.observations) == 301
     for observation in result.observations.values():
         assert observation.identity.species.formula
+
+    from simulator.battery.score import _source_oxygen_pressure_for_score
+    from simulator.battery.source_oxygen import linked_source_pressure
+
+    source_id = extract["source_id"]
+    raw_tio_rows = {
+        row["observation_id"]: row
+        for row in extract["species"]["TiO"]["observations"]
+        if row["observation_id"].startswith("shornikov_2000_f1_TiO_")
+    }
+    raw_oxygen_rows = {
+        row["observation_id"]: row
+        for row in extract["species"]["O"]["observations"]
+        if row["observation_id"].startswith("shornikov_2000_f1_O_")
+    }
+
+    def composition_x_allowance_mol_pct(raw_row):
+        locator_note = raw_row["point_conditions"]["composition"]["locator"]["note"]
+        match = re.search(r"±\s*([0-9]+(?:\.[0-9]+)?)", locator_note)
+        assert match is not None, raw_row["observation_id"]
+        return Decimal(match.group(1))
+
+    tio_rows = [
+        row for row in result.observations.values()
+        if row.source_id == source_id
+        and row.observation_id.startswith(
+            f"{source_id}::shornikov_2000_f1_TiO_"
+        )
+    ]
+    oxygen_rows = {
+        row.observation_id: row
+        for row in result.observations.values()
+        if row.source_id == source_id
+        and row.observation_id.startswith(
+            f"{source_id}::shornikov_2000_f1_O_"
+        )
+    }
+    assert len(tio_rows) == 21
+    assert len(oxygen_rows) == 22
+    expected_unlinked = {
+        f"{source_id}::shornikov_2000_f1_TiO_02",
+        f"{source_id}::shornikov_2000_f1_TiO_12",
+        f"{source_id}::shornikov_2000_f1_TiO_16",
+    }
+    observed_unlinked = set()
+    unlinked_pairs = {}
+    linked_count = 0
+
+    def qualifying_oxygen_rows(tio_raw_row, oxygen_candidates):
+        target_x = (
+            Decimal(tio_raw_row["values"]["composition_mol"]["TiO2"])
+            * Decimal("100")
+        )
+        qualifying = {}
+        for oxygen_raw_row in oxygen_candidates:
+            oxygen_x = (
+                Decimal(oxygen_raw_row["values"]["composition_mol"]["TiO2"])
+                * Decimal("100")
+            )
+            gap = abs(target_x - oxygen_x)
+            pair_bound = (
+                composition_x_allowance_mol_pct(tio_raw_row)
+                + composition_x_allowance_mol_pct(oxygen_raw_row)
+            )
+            if gap <= pair_bound:
+                qualifying[oxygen_raw_row["observation_id"]] = (gap, pair_bound)
+        return qualifying
+
+    for row in tio_rows:
+        row_id = row.observation_id.split("::", 1)[1]
+        target_x = (
+            Decimal(raw_tio_rows[row_id]["values"]["composition_mol"]["TiO2"])
+            * Decimal("100")
+        )
+        oxygen_candidates = list(raw_oxygen_rows.values())
+        qualifying = qualifying_oxygen_rows(
+            raw_tio_rows[row_id], oxygen_candidates
+        )
+        reversed_qualifying = qualifying_oxygen_rows(
+            raw_tio_rows[row_id], list(reversed(oxygen_candidates))
+        )
+        assert qualifying == reversed_qualifying
+
+        condition = row.point_conditions.get("fO2_Pa")
+        if len(qualifying) != 1:
+            assert row.observation_id in expected_unlinked
+            assert condition is None or (
+                condition.state.is_unknown and condition.inference is None
+            )
+            assert linked_source_pressure(row) is None
+            observed_unlinked.add(row.observation_id)
+            unlinked_pairs[row_id] = qualifying
+            if len(qualifying) > 1:
+                locator_note = raw_tio_rows[row_id]["locator"]["note"]
+                assert "ambiguous" in locator_note.lower()
+                for oxygen_id, (gap, _bound) in qualifying.items():
+                    assert oxygen_id in locator_note
+                    assert f"gap={gap:.4f} mol%" in locator_note
+            continue
+
+        assert row.observation_id not in expected_unlinked
+        oxygen_id, (source_gap, pair_bound) = next(
+            iter(qualifying.items())
+        )
+        source_oxygen_raw_row = raw_oxygen_rows[oxygen_id]
+        assert condition is not None
+        assert condition.state.is_value
+        assert condition.inference is not None
+        assert condition.inference.relation.startswith("source_oxygen_condition;")
+        assert "unique Fig. 1 O sibling" in condition.inference.relation
+        assert f"gap {source_gap:.4f} mol%" in condition.inference.relation
+        assert f"pair bound {pair_bound} mol%" in condition.inference.relation
+        assert (
+            f"±{composition_x_allowance_mol_pct(raw_tio_rows[row_id])} mol%"
+            in condition.inference.relation
+        )
+        assert (
+            f"±{composition_x_allowance_mol_pct(source_oxygen_raw_row)} mol%"
+            in condition.inference.relation
+        )
+        assert len(condition.inference.inputs) == 1
+        assert row.observation_id not in condition.inference.inputs
+        source_oxygen = oxygen_rows[condition.inference.inputs[0]]
+        assert source_oxygen.observation_id == (
+            f"{source_id}::{oxygen_id}"
+        )
+        source_x = (
+            Decimal(source_oxygen_raw_row["values"]["composition_mol"]["TiO2"])
+            * Decimal("100")
+        )
+        assert abs(target_x - source_x) == source_gap
+        assert source_gap <= pair_bound
+        assert source_oxygen.identity.species.formula == "O"
+        assert source_oxygen.experiment_id == row.experiment_id
+        assert source_oxygen.locator is not None
+        assert source_oxygen.locator.page == 2
+        assert source_oxygen.locator.published_page == 1470
+        linked = linked_source_pressure(row)
+        assert linked is not None and linked > 0
+        assert row.identity.fO2_Pa.is_value
+        assert row.identity.fO2_Pa.value == linked
+        assert _source_oxygen_pressure_for_score(row) == linked
+
+        mutated = replace(
+            row,
+            value=replace(row.value, point=row.value.point * Decimal("10")),
+        )
+        assert mutated.value.point != row.value.point
+        assert linked_source_pressure(mutated) == linked
+        assert _source_oxygen_pressure_for_score(mutated) == linked
+        linked_count += 1
+
+    assert linked_count == 18
+    assert observed_unlinked == expected_unlinked
+    assert unlinked_pairs["shornikov_2000_f1_TiO_02"] == {}
+    assert set(unlinked_pairs["shornikov_2000_f1_TiO_12"]) == {
+        "shornikov_2000_f1_O_12",
+        "shornikov_2000_f1_O_13",
+    }
+    assert set(unlinked_pairs["shornikov_2000_f1_TiO_16"]) == {
+        "shornikov_2000_f1_O_16",
+        "shornikov_2000_f1_O_17",
+    }
+
+    experiment = result.experiments[tio_rows[0].experiment_id]
+    assert experiment.bench_id is not None
+    bench = result.benches[experiment.bench_id]
+    assert {item.state.value.value for item in bench.cell_materials} == {"Mo"}
