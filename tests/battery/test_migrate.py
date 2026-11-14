@@ -64,6 +64,7 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     MigrationResult,
+    QueueEntry,
     Migrator,
     UnknownRailSpellingError,
     UnresolvedEquipmentContextError,
@@ -92,7 +93,6 @@ from simulator.battery.migrate import (
     parse_quantity_suffix,
     split_qualified_quantity,
     QUANTITY_ALIASES,
-    QUANTITY_SOURCE_FIELDS,
     _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
@@ -102,6 +102,7 @@ from simulator.battery.migrate import (
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
     _named_fraction_bound_selection,
+    _queue_work_counts,
     _initial_oxide_map_from_values,
     _located_printed_and_initial,
     load_migrated_store,
@@ -116,9 +117,7 @@ from simulator.battery.migrate import (
     lift_vaporization_reaction_from_ledger_note,
     pressure_from_equipment,
     resolve_equipment_context,
-    select_declared_source,
     to_plain,
-    observation_from_plain,
     work_id_for,
     write_outputs,
 
@@ -4084,7 +4083,7 @@ def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
         for p in (root / "data").rglob("*")
         if p.is_file() and "extracts/fixture-source.yaml" not in p.as_posix()
     }
-    second = migrate(root, write=True)
+    migrate(root, write=True)
     second_bytes = {
         p.relative_to(root): p.read_bytes()
         for p in (root / "data").rglob("*")
@@ -15718,6 +15717,66 @@ def test_committed_migration_queue_is_canonical_grouped_form() -> None:
     assert rebuilt["dedupe_aliases"] == document.get("dedupe_aliases")
     assert expanded
     assert len(expanded) == sum(len(group["observations"]) for group in entries)
+
+
+def test_queue_accounting_uses_manifest_eligibility_and_tracks_mutation(
+    tmp_path: Path,
+) -> None:
+    compilations = tmp_path / "data" / "literature" / "compilations"
+
+    def source(source_id: str, manifest: dict | None, record: str) -> str:
+        folder = compilations / source_id
+        (folder / "records").mkdir(parents=True, exist_ok=True)
+        if manifest is not None:
+            (folder / "manifest.yaml").write_text(
+                yaml.safe_dump(manifest), encoding="utf-8"
+            )
+        return (
+            folder / "records" / f"{record}.yaml"
+        ).relative_to(tmp_path).as_posix()
+
+    false_manifest = {
+        "source_id": "fixture-reference",
+        "compilation_role": {"scoring_eligible": False},
+    }
+    false_source_a = source("fixture-reference", false_manifest, "a")
+    false_source_b = source("fixture-reference", false_manifest, "b")
+    true_source = source(
+        "fixture-eligible",
+        {
+            "source_id": "fixture-eligible",
+            "compilation_role": {"scoring_eligible": True},
+        },
+        "c",
+    )
+    missing_source = source("fixture-unmarked", {"source_id": "fixture-unmarked"}, "d")
+    queue = [
+        QueueEntry("w", {}, ["value"], "why", false_source_a, "obs-a"),
+        QueueEntry("w", {}, ["value"], "why", false_source_b, "obs-b"),
+        QueueEntry("w", {}, ["value"], "why", true_source, "obs-c"),
+        QueueEntry("w", {}, ["value"], "why", missing_source, "obs-d"),
+    ]
+
+    backlog, references, backlog_by_path, references_by_path = _queue_work_counts(
+        queue, tmp_path
+    )
+    assert backlog == {"fixture-eligible": 1, "fixture-unmarked": 1}
+    assert references == {"fixture-reference": 2}
+    assert sum(backlog_by_path.values()) == 2
+    assert sum(references_by_path.values()) == 2
+
+    manifest_path = compilations / "fixture-reference" / "manifest.yaml"
+    false_manifest["compilation_role"]["scoring_eligible"] = True
+    manifest_path.write_text(yaml.safe_dump(false_manifest), encoding="utf-8")
+    backlog, references, _backlog_by_path, _references_by_path = _queue_work_counts(
+        queue, tmp_path
+    )
+    assert backlog == {
+        "fixture-eligible": 1,
+        "fixture-reference": 2,
+        "fixture-unmarked": 1,
+    }
+    assert references == {}
 
 
 def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
