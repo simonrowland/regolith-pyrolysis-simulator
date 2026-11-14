@@ -28,6 +28,7 @@ def _isolated_migration(tmp_path: Path, source_id: str):
         tmp_path / source_id,
         f"{source_id}.yaml",
         write=False,
+        use_repository_index_row=True,
     )
 
 
