@@ -81,6 +81,29 @@ def _authoritative_carrier_record(species: str) -> dict[str, object]:
     }
 
 
+def test_project_lifecycle_consumes_runner_liner_recurrence_when_selected():
+    document = {
+        "run_metadata": {
+            "liner_state": {
+                "schema": "liner-state-v1",
+                "segments": {
+                    "hot_wall": {"campaigns_to_runaway": [2, 4]},
+                    "cool_wall": {"campaigns_to_runaway": [3, 5]},
+                },
+            }
+        }
+    }
+    result = FoulingLifecycleHarness(
+        lambda _input: _artifact({}, result_document=document),
+        segment_area_m2={},
+    ).run(("first", "second", "third"))
+
+    interface = result.lifecycle_projection.to_dict()["interface_first_melt"]
+    assert interface["fired"] is True
+    assert interface["segment"] == "hot_wall"
+    assert interface["campaign_index"] == 2
+
+
 def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:
     return {
         "vapour_carrier_authority_by_species": {

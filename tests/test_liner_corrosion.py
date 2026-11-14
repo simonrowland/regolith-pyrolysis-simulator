@@ -17,6 +17,7 @@ from simulator.liner_corrosion import (
     LinerCorrosionRefusal,
     MageminLinerSampler,
     TierAInvariantSampler,
+    attach_liner_state_metadata,
     contaminated_interface_composition,
     contamination_mixing_fractions,
     corrosion_campaign_recurrence,
@@ -347,6 +348,13 @@ def test_reactive_branch_refusal_keeps_the_inert_campaign_bound():
     assert result["branch_end_deposit_kg_by_species"]["inert"] == {"Na": 0.2}
 
 
+def test_zero_campaign_deposition_reports_beyond_horizon_not_infinity():
+    result = _recurrence(inert_na=0.0, reactive_na=0.0)
+
+    assert result["campaigns_to_runaway"] == ["> 100", "> 100"]
+    assert "infinite" not in str(result["campaigns_to_runaway"])
+
+
 def test_tier_a_uses_invariant_table_and_refuses_uncovered_fields():
     table = {
         "schema": "liner-invariant-table-v1",
@@ -415,6 +423,88 @@ def test_tier_a_fe_aluminate_gap_is_a_typed_refusal_that_names_the_gap():
         )
     assert refused.value.reason == "liner_tier_a_acquisition_gap"
     assert "FeO-CaO-Al2O3" in refused.value.detail
+
+
+def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkeypatch):
+    from simulator import furnace_materials, liner_corrosion
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.state import PipeSegment
+
+    catalog = {
+        "fixture-liner": {
+            "interface_chemistry": {
+                "composition": {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+                "citation": "test fixture composition",
+                "criterion_tier": "B",
+                "density_kg_m3": 1000.0,
+                "reacted_layer_depth_m": 0.001,
+                "margin_C": 0.0,
+                "horizon_campaigns": 10,
+            }
+        }
+    }
+    monkeypatch.setattr(furnace_materials, "load_furnace_materials", lambda: catalog)
+
+    class FixtureSampler:
+        def __call__(self, composition, _temperature_C, _pressure_bar):
+            return 1.0 if composition.get("Na2O", 0.0) >= 0.1 else 0.0
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(liner_corrosion, "MageminLinerSampler", FixtureSampler)
+    segment = PipeSegment(
+        name="liner-wall",
+        upstream_stage="stage_0",
+        downstream_stage="stage_1",
+        wall_temperature_C=1500.0,
+        length_m=1.0,
+        inner_diameter_m=0.12,
+    )
+    model = SimpleNamespace(
+        pipe_segments=(segment,),
+        operating_history=({"pipe_segment_temperatures_C": {"liner-wall": 1500.0}},),
+        overhead_pressure_mbar=10.0,
+        materials={},
+        vapor_pressure_data=VAPOR_PRESSURE_DATA,
+        species_formula_registry=None,
+        wall_temperature_input_refusals={},
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=0.12,
+        regime_factor=1.0,
+        stir_factor=1.0,
+        radial_stir_factor=1.0,
+        carrier_gas="N2",
+        condensation_temperatures_C={"Na": 800.0},
+    )
+    shadow = {
+        "liner-wall": {
+            "Na": {
+                "available_supply_mol_s": 1.0e-5,
+                "species_partial_pressure_pa": 100.0,
+                "surface": {"wall_temperature_K": 1773.15},
+            }
+        }
+    }
+    trace = SimpleNamespace(
+        wall_deposit_by_segment_species_kg={("liner-wall", "Na"): 1.0e-4},
+        snapshots=(SimpleNamespace(duration_h=1.0, wall_deposition_rate_shadow_candidate=shadow),),
+    )
+    simulator = SimpleNamespace(condensation_model=model, melt=SimpleNamespace(temperature_C=1500.0))
+    run_metadata = {"furnace_material_id": "fixture-liner"}
+
+    state = attach_liner_state_metadata(
+        run_metadata, "fixture-liner", simulator, trace
+    )
+
+    assert state["schema"] == "liner-state-v1"
+    segment_state = state["segments"]["liner-wall"]
+    lo, hi = segment_state["campaigns_to_runaway"]
+    assert isinstance(lo, int) and isinstance(hi, int)
+    assert lo <= hi
+    assert run_metadata["liner_state"] == state
+    assert segment_state["deposit_inert_kg_by_species"] == {"Na": 1.0e-4}
+    assert segment_state["deposit_reactive_kg_by_species"]["Na"] >= 1.0e-4
 
 
 def test_tier_a_invariant_signal_runs_the_campaign_recurrence_without_engine_pressure():
