@@ -735,9 +735,10 @@ def test_crossover_temperature_C_has_single_runtime_helper():
 
 
 def test_crossover_temperature_preserves_numeric_golden_outputs():
+    # b-959 / d-307 approved the JANAF Na-013/Na-014 alpha/liquid re-grounding.
     for reductant, target_metal, expected_hex in (
         ("K", "Fe", "0x1.a220265f8e2ffp+9"),
-        ("Na", "Fe", "0x1.275faaf24a6c0p+10"),
+        ("Na", "Fe", "0x1.27eafacdd2ffcp+10"),
         ("Mg", "Al", "0x1.6fd898e39c8bcp+10"),
     ):
         crossover_C = BuiltinMetallothermicStepProvider._crossover_temperature_C(
