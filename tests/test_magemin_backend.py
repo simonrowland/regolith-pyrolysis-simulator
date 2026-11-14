@@ -3980,8 +3980,19 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
-    monkeypatch,
+    monkeypatch, tmp_path,
 ):
+    import simulator.melt_backend.magemin as magemin_module
+
+    # The subprocess is fake: unrelated live engine traffic must not consume
+    # this test's one-second budget before the native-activity parser runs.
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
+    )
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
+        tmp_path / 'magemin-subprocess.lock',
+    )
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = "subprocess"
