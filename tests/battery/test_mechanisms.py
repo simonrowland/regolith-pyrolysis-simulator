@@ -1383,6 +1383,103 @@ def test_model_derived_unprinted_inputs_accepts_located_prose_method() -> None:
         [F.work()], [F.tabulation_experiment()], [observation]
     ).hard_issues
     assert issues == ()
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+
+
+def test_model_derived_unknown_method_requires_and_accepts_notice() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        references=("Gurvich K°(T)",),
+    )
+    observation = replace(
+        observation,
+        notices=(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.DELTA_FG,),
+                reason="method_unknown: no method located in the source",
+                origin="test",
+            ),
+        ),
+    )
+
+    report = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    )
+
+    assert report.hard_issues == ()
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert observation.notices[0].reason.startswith("method_unknown:")
+
+    without_notice = replace(observation, notices=())
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [without_notice]
+    ).hard_issues
+    assert any(issue.path.endswith(".derivation.method") for issue in issues)
+
+
+def test_model_derived_unprinted_references_require_none_printed_notice() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("Gibbs energy minimisation with the authors' model"),
+            locator=F.loc(page=164, section="3.2"),
+        ),
+        references=("none_printed",),
+    )
+    observation = replace(
+        observation,
+        notices=(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.DELTA_FG,),
+                reason="input_references_none_printed: source names no input references",
+                origin="test",
+            ),
+        ),
+    )
+
+    report = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    )
+
+    assert report.hard_issues == ()
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert observation.derivation is not None
+    assert observation.derivation.references == ("none_printed",)
+
+    without_notice = replace(observation, notices=())
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [without_notice]
+    ).hard_issues
+    assert any(issue.path.endswith(".derivation.references") for issue in issues)
+
+
+def test_model_derived_rejects_unrecognized_reference_declaration() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("Gibbs energy minimisation with the authors' model"),
+            locator=F.loc(page=164, section="3.2"),
+        ),
+        references=("none_printed", "Source citation"),
+    )
+
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+
+    assert any(
+        issue.path.endswith(".derivation.references")
+        and "named references or none_printed with a notice" in issue.detail
+        for issue in issues
+    )
 
 
 def test_model_derived_prose_method_without_equation_still_requires_parent() -> None:
@@ -1427,8 +1524,8 @@ def test_model_derived_prose_method_without_named_references_fails() -> None:
     report = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
     )
-    assert not any(
-        issue.path.endswith((".derivation.method", ".derivation.references"))
+    assert any(
+        issue.path.endswith(".derivation.references")
         for issue in report.hard_issues
     )
     assert any(
@@ -1460,8 +1557,8 @@ def test_model_derived_unprinted_inputs_requires_named_references() -> None:
         issue.path.endswith(".derivation.raw_inputs")
         for issue in report.hard_issues
     )
-    assert not any(
-        issue.path.endswith((".derivation.method", ".derivation.references"))
+    assert any(
+        issue.path.endswith(".derivation.references")
         for issue in report.hard_issues
     )
     assert [
@@ -1485,8 +1582,12 @@ def test_model_derived_raw_inputs_not_printed_requires_method() -> None:
         issue.path.endswith(".derivation.raw_inputs")
         for issue in report.hard_issues
     )
-    assert not any(
-        issue.path.endswith((".derivation.method", ".derivation.references"))
+    assert any(
+        issue.path.endswith(".derivation.method")
+        for issue in report.hard_issues
+    )
+    assert any(
+        issue.path.endswith(".derivation.references")
         for issue in report.hard_issues
     )
     assert [
@@ -1556,6 +1657,20 @@ def test_model_derived_resolved_parent_missing_provenance_is_counted() -> None:
             method=None,
             references=("none_printed",),
             raw_inputs=None,
+        ),
+        notices=(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.DELTA_FG,),
+                reason="method_unknown: no method located in the source",
+                origin="test",
+            ),
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.DELTA_FG,),
+                reason="input_references_none_printed: source names no input references",
+                origin="test",
+            ),
         ),
     )
 
@@ -2445,6 +2560,48 @@ def test_r03_score_eligible_requires_measured_evidence() -> None:
     report = validate_corpus([w], [exp], [compiled, cand], [bad])
     assert not report.ok
     assert any("measured_*" in i.detail for i in report.issues)
+
+    model_parent = F.observation(
+        "r03-model-parent",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    model = F.observation(
+        "r03-model-derived",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+    )
+    assert model.derivation is not None
+    model = replace(
+        model,
+        derived_from=(model_parent.observation_id,),
+        derivation=replace(
+            model.derivation,
+            inputs=(model_parent.observation_id,),
+            method=Located(
+                State.of("Gibbs energy minimisation with the authors' model"),
+                locator=F.loc(page=164, section="2.2"),
+            ),
+            references=("Source citation",),
+        ),
+    )
+    model_scored = F.residual(
+        "r03-model-derived-scored",
+        model.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    model_report = validate_corpus(
+        [w], [exp], [model_parent, model, cand], [model_scored]
+    )
+    assert not model_report.ok
+    assert any("measured_*" in issue.detail for issue in model_report.issues)
+
     measured = F.observation(
         "r03-measured",
         exp.experiment_id,
@@ -3169,7 +3326,6 @@ def test_m16_refused_residual_cannot_carry_a_numeric_score() -> None:
     assert refused.numeric is None
     assert validate_corpus([w], [exp], [ref, cand], [refused]).ok
     from simulator.battery.records import Residual, ResidualNumeric, DecisionBand
-    from simulator.battery.enums import MetricOperation
 
     numeric_only = Residual(
         key="m16-numeric-on-refused",
@@ -3541,7 +3697,6 @@ def test_pi_p1_6_projected_pot_changes_identity() -> None:
 
 def test_pi_p2_2_p2_3_bar_equals_1e5_pa_kelvin_is_exact() -> None:
     a = F.o2_identity()
-    b = F.o2_identity()
     assert a.standard_pressure_Pa is not None and a.standard_pressure_Pa.value == Decimal("100000")
     atm = F.o2_identity()
     from dataclasses import replace
