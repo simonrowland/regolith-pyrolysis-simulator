@@ -1963,10 +1963,8 @@ def _inputs_for_work(
             return membership
     assert experiments is not None
     grouped = obs_by_work.get(work.work_id, ())
-    if not grouped:
-        return Ancestry.of({work.work_id})
-
-    ids: set[str] = set()
+    # Preserve Work and table identities when row extracts are not loaded.
+    ids = {work.work_id}
     # The corpus registry, when the caller has one. A single-work caller
     # still has only that work's files. Unknown strings are not assets.
     registered = (
@@ -1977,6 +1975,8 @@ def _inputs_for_work(
     for asset in work.source_files.files:
         if asset.role is AssetRole.TABLE_CSV:
             ids.add(asset.asset_id)
+    if not grouped:
+        return Ancestry.of(ids)
     for obs in grouped:
         nested = _observation_lineage(
             obs.observation_id,
