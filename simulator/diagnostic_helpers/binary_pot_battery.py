@@ -138,6 +138,58 @@ def _openimcc_gas_channels_and_omission_notices(
         for name, reason in omitted_channels.items()
     )
     return channels, notices
+
+
+def _openimcc_oxygen_balance_species_metadata(
+    activities: Mapping[str, float],
+    temperature_K: float,
+    datapack: Any,
+    channels: Sequence[tuple[str, Sequence[Any]]],
+    *,
+    parent_oxides: Sequence[str],
+) -> dict[str, Any]:
+    """Translate OpenIMCC's selected channel metadata for the cell solver."""
+    from openimcc.gas import (
+        OxygenBalanceSpeciesMetadata,
+        gas_channel_metadata,
+    )
+    from simulator.accounting.formulas import resolve_species_formula
+
+    try:
+        channel_metadata = gas_channel_metadata(
+            activities,
+            temperature_K,
+            datapack,
+            parent_oxides=parent_oxides,
+        )
+        result: dict[str, Any] = {}
+        for species, _reaction in channels:
+            source = channel_metadata.get(species)
+            if (
+                source is None
+                or not source.available
+                or source.charge != 0
+                or source.neutral_pO2_exponent is None
+            ):
+                raise ValueError(
+                    f"OpenIMCC has no available neutral oxygen metadata for {species!r}"
+                )
+            molar_mass_g_mol = (
+                resolve_species_formula(species).molar_mass_kg_per_mol() * 1000.0
+            )
+            result[species] = OxygenBalanceSpeciesMetadata(
+                molar_mass_g_mol,
+                float(source.oxygen_atoms),
+                float(source.parent_oxygen_demand),
+                float(source.neutral_pO2_exponent),
+            )
+        return result
+    except Exception as exc:  # noqa: BLE001 - keep optional-engine metadata failures typed
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed", str(exc)
+        ) from exc
+
+
 ARM_HEADLINE = "headline"
 ARM_QUALIFICATION = "qualification"
 
@@ -3242,7 +3294,6 @@ class _OpenImccBatteryBackend:
                     from openimcc import (
                         evaluate_gas,
                         oxygen_balance_from_pressure_model,
-                        oxygen_balance_species_metadata,
                     )
                 except (ImportError, AttributeError) as exc:
                     raise _OxygenBalanceRefusal(
@@ -3256,8 +3307,12 @@ class _OpenImccBatteryBackend:
                         result.parent_oxides, self._gas
                     )
                 )
-                base_species = oxygen_balance_species_metadata(
-                    {name: parent or None for name, (parent, _ng, _no2) in channels}
+                base_species = _openimcc_oxygen_balance_species_metadata(
+                    result.parent_oxide_activities,
+                    temperature_K,
+                    self._gas,
+                    channels,
+                    parent_oxides=result.parent_oxides,
                 )
                 for name, (parent, n_gas, n_o2) in channels:
                     expected = -n_o2 / n_gas if parent else (
