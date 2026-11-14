@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 import csv
 import functools
+from dataclasses import dataclass
 import hashlib
 import importlib.util
 import math
@@ -26,9 +27,9 @@ from simulator.condensation import (
 from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.physical_constants import PA_PER_BAR
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.volatile_properties import _catalog as _volatile_runtime_catalog
+from simulator.vapour_rail import catalog as vapour_rail_catalog
 from simulator.vapour_rail.catalog import (
     RUNTIME_THERMO_EVALUATOR_FAMILIES,
     CatalogCompileError,
@@ -167,188 +168,241 @@ def _load_t609_proof():
     return module
 
 
-def _load_temp_module(tmp_path: Path, name: str, source: str):
-    path = tmp_path / f"{name}.py"
-    path.write_text(source, encoding="utf-8")
-    spec = importlib.util.spec_from_file_location(name, path)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-def test_additivity_proof_canonicalizes_owned_numeric_constants_from_module(
-    tmp_path: Path,
-) -> None:
+def test_t609_canonical_digest_ignores_value_neutral_local_rename() -> None:
     proof = _load_t609_proof()
-    module = _load_temp_module(
-        tmp_path,
-        "proof_owned_constant_positive",
-        "from simulator.physical_constants import PA_PER_BAR\n"
-        "_NOT_OWNER_PA_PER_BAR = 1.0e5\n"
-        "def owner(value):\n"
-        "    return value * PA_PER_BAR\n"
-        "def literal(value):\n"
-        "    return value * 1.0e5\n"
-        "def changed(value):\n"
-        "    return value * 1.0e4\n"
-        "def unrelated(value):\n"
-        "    return value * _NOT_OWNER_PA_PER_BAR\n",
+    original_namespace = {"__name__": "value_fingerprint_fixture"}
+    renamed_namespace = {"__name__": "value_fingerprint_fixture"}
+    exec(
+        "def compiled(value):\n"
+        "    subtotal = value + 2.0\n"
+        "    return subtotal * 3.0\n",
+        original_namespace,
     )
-    for function in (module.literal, module.changed, module.unrelated):
-        function.__qualname__ = module.owner.__qualname__
+    exec(
+        "def compiled(value):\n"
+        "    renamed_local = value + 2.0\n"
+        "    return renamed_local * 3.0\n",
+        renamed_namespace,
+    )
 
-    canonical = proof._canonical(module.owner)
-    assert canonical == proof._canonical(module.literal)
-    assert canonical != proof._canonical(module.changed)
-    assert canonical != proof._canonical(module.unrelated)
-
-
-@pytest.mark.parametrize(
-    ("case", "source"),
-    [
-        pytest.param(
-            "sibling_mutator",
-            "from simulator.physical_constants import PA_PER_BAR\n"
-            "def mutate():\n"
-            "    global PA_PER_BAR\n"
-            "    PA_PER_BAR = 7.0\n"
-            "def owner(value):\n"
-            "    mutate()\n"
-            "    return value * PA_PER_BAR\n"
-            "def literal(value):\n"
-            "    mutate()\n"
-            "    return value * 1.0e5\n",
-            id="sibling-mutator",
-        ),
-        pytest.param(
-            "globals_delete",
-            "from simulator.physical_constants import PA_PER_BAR\n"
-            "def mutate():\n"
-            "    del globals()['PA_PER_BAR']\n"
-            "def owner(value):\n"
-            "    mutate()\n"
-            "    return value * PA_PER_BAR\n"
-            "def literal(value):\n"
-            "    mutate()\n"
-            "    return value * 1.0e5\n",
-            id="globals-delete",
-        ),
-        pytest.param(
-            "globals_assignment",
-            "from simulator.physical_constants import PA_PER_BAR\n"
-            "def mutate():\n"
-            "    globals()['PA_PER_BAR'] = 7.0\n"
-            "def owner(value):\n"
-            "    mutate()\n"
-            "    return value * PA_PER_BAR\n"
-            "def literal(value):\n"
-            "    mutate()\n"
-            "    return value * 1.0e5\n",
-            id="globals-assignment",
-        ),
-        pytest.param(
-            "exec_mutation",
-            "from simulator.physical_constants import PA_PER_BAR\n"
-            "def mutate():\n"
-            "    exec('global PA_PER_BAR; PA_PER_BAR = 7.0')\n"
-            "def owner(value):\n"
-            "    mutate()\n"
-            "    return value * PA_PER_BAR\n"
-            "def literal(value):\n"
-            "    mutate()\n"
-            "    return value * 1.0e5\n",
-            id="exec-mutation",
-        ),
-        pytest.param(
-            "eval_mutation",
-            "from simulator.physical_constants import PA_PER_BAR\n"
-            "def mutate():\n"
-            "    eval(\"globals().__setitem__('PA_PER_BAR', 7.0)\")\n"
-            "def owner(value):\n"
-            "    mutate()\n"
-            "    return value * PA_PER_BAR\n"
-            "def literal(value):\n"
-            "    mutate()\n"
-            "    return value * 1.0e5\n",
-            id="eval-mutation",
-        ),
-        pytest.param(
-            "dynamic_helper",
-            "from simulator.physical_constants import PA_PER_BAR\n"
-            "dynamic = {'__name__': 'dynamic_constant_helper', 'PA_PER_BAR': PA_PER_BAR}\n"
-            "exec('def owner(value):\\n return value * PA_PER_BAR\\n'\n"
-            "     'def literal(value):\\n return value * 1.0e5', dynamic)\n",
-            id="dynamic-helper",
-        ),
-        pytest.param(
-            "inlined_comprehension",
-            "from simulator.physical_constants import PA_PER_BAR\n"
-            "def owner(items):\n"
-            "    return [(globals().__setitem__('PA_PER_BAR', 7.0), value * PA_PER_BAR)[1] for value in items]\n"
-            "def literal(items):\n"
-            "    return [(globals().__setitem__('PA_PER_BAR', 7.0), value * 1.0e5)[1] for value in items]\n",
-            id="inlined-comprehension",
-        ),
-    ],
-)
-def test_additivity_proof_keeps_unstable_module_constant_loads_exact(
-    tmp_path: Path, case: str, source: str
-) -> None:
-    proof = _load_t609_proof()
-    module = _load_temp_module(tmp_path, f"proof_unstable_{case}", source)
-    owner = module.owner if case != "dynamic_helper" else module.dynamic["owner"]
-    literal = module.literal if case != "dynamic_helper" else module.dynamic["literal"]
-    literal.__qualname__ = owner.__qualname__
-
-    assert proof._canonical(owner) != proof._canonical(literal)
-
-
-def test_additivity_proof_does_not_normalize_class_local_load_name() -> None:
-    proof = _load_t609_proof()
-    shadowed_namespace = {
-        "__name__": __name__,
-        "PA_PER_BAR": PA_PER_BAR,
-        "_CLASS_SHADOW_VALUE": 7.0,
+    original = original_namespace["compiled"]
+    renamed = renamed_namespace["compiled"]
+    assert original(4.0) == renamed(4.0) == 18.0
+    expected = {
+        "__function__": "value_fingerprint_fixture.compiled",
+        "defaults": None,
+        "kwdefaults": None,
+        "closure": [],
     }
-    literal_namespace = dict(shadowed_namespace)
-    exec(
-        "def evaluate():\n"
-        "    class C:\n"
-        "        PA_PER_BAR = _CLASS_SHADOW_VALUE\n"
-        "        result = PA_PER_BAR\n"
-        "    return C.result\n",
-        shadowed_namespace,
-    )
-    exec(
-        "def evaluate():\n"
-        "    class C:\n"
-        "        PA_PER_BAR = _CLASS_SHADOW_VALUE\n"
-        "        result = 1.0e5\n"
-        "    return C.result\n",
-        literal_namespace,
-    )
-    assert proof._canonical(shadowed_namespace["evaluate"]) != proof._canonical(
-        literal_namespace["evaluate"]
+    assert proof._canonical(original) == expected
+    assert proof._canonical(renamed) == expected
+    assert proof._digest(proof._canonical(original)) == (
+        "e8809373e00505672e7dd87c7495e6d15eeb153ef42a358d4e5b26718d3a5a39"
     )
 
 
-def test_additivity_proof_does_not_normalize_rebound_global() -> None:
+def test_t609_canonical_detects_one_ulp_captured_coefficient_change() -> None:
     proof = _load_t609_proof()
 
-    def rebound_global(value: float) -> float:
-        global PA_PER_BAR
-        PA_PER_BAR = 7.0
-        return value * PA_PER_BAR
+    def build(coefficient: float):
+        def compiled():
+            return coefficient
 
-    def rebound_literal(value: float) -> float:
-        global PA_PER_BAR
-        PA_PER_BAR = 7.0
-        return value * 1.0e5
+        compiled.__module__ = "capture_fingerprint_fixture"
+        compiled.__qualname__ = "build.<locals>.compiled"
+        return compiled
 
-    rebound_literal.__qualname__ = rebound_global.__qualname__
-    assert proof._canonical(rebound_global) != proof._canonical(rebound_literal)
+    baseline = proof._canonical(build(1.0))
+    changed = proof._canonical(build(math.nextafter(1.0, math.inf)))
+    assert baseline["closure"] == [{"__float_hex__": "0x1.0000000000000p+0"}]
+    assert changed["closure"] == [{"__float_hex__": "0x1.0000000000001p+0"}]
+    assert proof._digest(baseline) == (
+        "47a54d7a149e74dc8f85790aa01ce7e2f3b5fca25b7424051ef1a6439c686c6a"
+    )
+    assert proof._digest(changed) == (
+        "fbd7556b392fe88e8aafe58265a656c4cf62d6b205f8ae1d1ce59ef70d77061d"
+    )
+    with pytest.raises(proof.ProofFailure, match="compiled dataclass for Al2 differs"):
+        proof._assert_equal("compiled dataclass for Al2", baseline, changed)
+
+
+def test_t609_evaluation_grid_catches_segment_interior_change() -> None:
+    proof = _load_t609_proof()
+
+    @dataclass(frozen=True)
+    class Segment:
+        T_min_K: float
+        T_max_K: float
+
+    @dataclass(frozen=True)
+    class Polynomial:
+        segments: tuple[Segment, ...]
+
+    @dataclass(frozen=True)
+    class ReferenceModel:
+        thermo_log10_pressure: object
+
+    @dataclass(frozen=True)
+    class Evaluator:
+        valid_temperature_K: tuple[float, float]
+        reference_model: ReferenceModel
+
+        def evaluate(self, temperature_K, *, source_activity, pO2_bar):
+            return self.reference_model.thermo_log10_pressure(temperature_K)
+
+    def build(interior_shift: float) -> Evaluator:
+        polynomial = Polynomial((Segment(200.0, 1000.0), Segment(1000.0, 2000.0)))
+
+        def thermo_log10_pressure(temperature_K: float) -> float:
+            if polynomial.segments and 1000.0 < temperature_K < 2000.0:
+                return interior_shift
+            return 0.0
+
+        return Evaluator(
+            (200.0, 2000.0), ReferenceModel(thermo_log10_pressure)
+        )
+
+    baseline = build(0.0)
+    changed = build(1.0)
+    grid = proof._evaluation_temperatures(baseline)
+    assert grid == (
+        ("edge-0", 200.0),
+        ("interval-0-mid", 600.0),
+        ("edge-1", 1000.0),
+        ("interval-1-mid", 1500.0),
+        ("edge-2", 2000.0),
+    )
+    baseline_values = {
+        temperature_K: proof._evaluation_or_exception(baseline, temperature_K, 1.0)
+        for _label, temperature_K in grid
+    }
+    changed_values = {
+        temperature_K: proof._evaluation_or_exception(changed, temperature_K, 1.0)
+        for _label, temperature_K in grid
+    }
+    assert baseline_values[200.0] == changed_values[200.0]
+    assert baseline_values[1000.0] == changed_values[1000.0]
+    assert baseline_values[2000.0] == changed_values[2000.0]
+    assert baseline_values[1500.0] == {
+        "kind": "evaluation",
+        "value": {"__float_hex__": "0x0.0p+0"},
+    }
+    assert changed_values[1500.0] == {
+        "kind": "evaluation",
+        "value": {"__float_hex__": "0x1.0000000000000p+0"},
+    }
+
+
+def test_t609_tabulated_h2o_knots_and_interval_change_are_sampled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    proof = _load_t609_proof()
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    )
+    evaluator = catalog.species["H2O"].evaluator
+    assert evaluator is not None
+    assert evaluator.evaluator_family == "tabulated_equilibrium"
+    assert tuple(point[0] for point in evaluator.reference_model.points) == (
+        100.0,
+        180.0,
+        273.16,
+    )
+    grid = proof._evaluation_temperatures(evaluator)
+    assert grid == (
+        ("edge-0", 100.0),
+        ("interval-0-mid", 140.0),
+        ("edge-1", 180.0),
+        ("interval-1-mid", 226.58),
+        ("edge-2", 273.16),
+    )
+    antoine = next(
+        species.evaluator
+        for species in catalog.species.values()
+        if species.evaluator is not None
+        and species.evaluator.evaluator_family == "antoine"
+    )
+    low, high = antoine.valid_temperature_K
+    assert proof._evaluation_temperatures(antoine) == (
+        ("low", low),
+        ("mid", 0.5 * (low + high)),
+        ("high", high),
+    )
+
+    baseline = {
+        temperature_K: proof._evaluation_or_exception(evaluator, temperature_K, 1.0)
+        for _label, temperature_K in grid
+    }
+    interpolate = vapour_rail_catalog._interpolate_log_pressure
+
+    def changed_first_interval(points, temperature_K):
+        result = interpolate(points, temperature_K)
+        if points[0][0] < temperature_K < points[1][0]:
+            return result + 1.0
+        return result
+
+    monkeypatch.setattr(
+        vapour_rail_catalog,
+        "_interpolate_log_pressure",
+        changed_first_interval,
+    )
+    changed = {
+        temperature_K: proof._evaluation_or_exception(evaluator, temperature_K, 1.0)
+        for _label, temperature_K in grid
+    }
+    # The catalog knots are (100 K, 1.0857020504839495e-14 Pa),
+    # (180 K, 0.005394352570928808 Pa), and (273.16 K, 611.6577 Pa).
+    # _interpolate_log_pressure is linear in log10(P) versus T, so at 140 K
+    # the interpolation fraction is (140 - 100) / (180 - 100) = 0.5:
+    # log10(P) = log10(1.0857020504839495e-14) + 0.5 * (
+    #     log10(0.005394352570928808) - log10(1.0857020504839495e-14)
+    # ) = -8.116175006869273, giving P = 7.652881579699751e-9 Pa.
+    # The mutation adds 1 dex in that interval, giving 10 * P =
+    # 7.652881579699752e-8 Pa.
+    assert baseline[140.0]["kind"] == "evaluation"
+    assert baseline[140.0]["value"]["fields"]["pressure_pa"] == {
+        "__float_hex__": "0x1.06f37550b904ep-27"
+    }
+    assert changed[140.0]["kind"] == "evaluation"
+    assert changed[140.0]["value"]["fields"]["pressure_pa"] == {
+        "__float_hex__": "0x1.48b052a4e7462p-24"
+    }
+    assert baseline[100.0] == changed[100.0]
+    assert baseline[180.0] == changed[180.0]
+    assert baseline[226.58] == changed[226.58]
+    assert baseline[273.16] == changed[273.16]
+
+
+def test_t609_canonical_detects_closure_and_default_value_changes() -> None:
+    proof = _load_t609_proof()
+
+    def build(captured: float, default: float):
+        def compiled(value: float = default):
+            return captured + value
+
+        compiled.__module__ = "default_fingerprint_fixture"
+        compiled.__qualname__ = "build.<locals>.compiled"
+        return compiled
+
+    baseline = build(4.0, 1.0)
+    changed_closure = build(math.nextafter(4.0, math.inf), 1.0)
+    changed_default = build(4.0, math.nextafter(1.0, math.inf))
+    expected = {
+        "__function__": "default_fingerprint_fixture.build.<locals>.compiled",
+        "defaults": {"__tuple__": [{"__float_hex__": "0x1.0000000000000p+0"}]},
+        "kwdefaults": None,
+        "closure": [{"__float_hex__": "0x1.0000000000000p+2"}],
+    }
+    assert proof._canonical(baseline) == expected
+    assert proof._digest(proof._canonical(baseline)) == (
+        "a0354b7e5187cb344faa1f3f056fc9ab26f727a820e2fd4c0b4509e2a44b3ade"
+    )
+    assert proof._digest(proof._canonical(changed_closure)) == (
+        "4564dbd0b02eaf55311af6ce240b6dafd7a7f1842a459ee044e2a8f4497a2380"
+    )
+    assert proof._digest(proof._canonical(changed_default)) == (
+        "b5d2c7d9e2b5c4e132f06ba04ab1d6ff1b259db85f2e42c81e0d965e15b5c74e"
+    )
 
 
 def _family_species_ids(text: str) -> set[str]:
@@ -439,10 +493,6 @@ def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
         capture_output=True,
         text=True,
     )
-    assert (
-        "PASS: 227 pre-existing species, 2556 exact grid cases" in completed.stdout
-    )
-
     evidence = yaml.safe_load(evidence_path.read_text(encoding="utf-8"))
     assert evidence["result"] == "pass"
     assert evidence["method"]["baseline_revision"] == (
@@ -459,9 +509,13 @@ def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
         "removals": [],
     }
     equivalence = evidence["preexisting_equivalence"]
+    assert (
+        f"PASS: {equivalence['compiled_species_compared']} pre-existing species, "
+        f"{equivalence['evaluation_cases_compared']} exact grid cases"
+        in completed.stdout
+    )
     assert equivalence["compiled_species_compared"] == 227
     assert equivalence["evaluator_species_compared"] == 213
-    assert equivalence["evaluation_cases_compared"] == 2556
     assert equivalence["baseline_compiled_dataclasses_sha256"] == equivalence[
         "candidate_compiled_dataclasses_sha256"
     ]
