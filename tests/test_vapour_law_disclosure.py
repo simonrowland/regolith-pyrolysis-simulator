@@ -843,6 +843,7 @@ def test_every_oxygen_law_registers_its_domain_extrapolation(
     from temperature_and_below.
     """
 
+    from simulator.vapour_rail.run_disclosure import resolve_law_id
     from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
 
     laws = _non_diagnostic_oxygen_laws()
@@ -881,7 +882,7 @@ def test_every_oxygen_law_registers_its_domain_extrapolation(
             )
             continue
         row = snapshot[0]
-        law_id = f"{evaluator.species_id}:{evaluator.evaluator_family}"
+        law_id = resolve_law_id(evaluator)
         problems = []
         if row["law_id"] != law_id:
             problems.append(f"law_id {row['law_id']}")
@@ -1306,6 +1307,7 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
         BuiltinVaporPressureProvider,
     )
     from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
+    from simulator.vapour_rail.run_disclosure import resolve_law_id
     from simulator.physical_constants import (
         MELT_DISSOCIATION_PO2_MAX_BAR,
         MELT_DISSOCIATION_PO2_MIN_BAR,
@@ -1340,7 +1342,7 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
             )
             continue
         checked.add(name)
-        law_id = f"{name}:{evaluator.evaluator_family}"
+        law_id = resolve_law_id(evaluator)
         key, payload = _tagged_curve(f"activity-floor-{name}")
         with disclosure_scope(inherit=False) as cold:
             with computation_disclosure() as computation:
