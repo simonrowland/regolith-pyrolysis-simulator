@@ -107,7 +107,7 @@ experiments:
         regime_class: {tag: unknown, reason: not_published}
 fidelity_samples:
   - path: species.Mg.observations[shornikov_2017_table2_mg_partial_pressure].values.points[0].pressure_atm
-    value: '4.68e-7'
+    value: 4.68e-7
     locator:
       page: 4
       published_page: 13
@@ -115,7 +115,7 @@ fidelity_samples:
       table: '2'
       note: 'Table 2 row 1 pMg cell confirmed on the render.'
   - path: species.MgAlO.observations[shornikov_2017_table2_mgalo_partial_pressure].values.points[2].pressure_atm
-    value: '8.89e-10'
+    value: 8.89e-10
     locator:
       page: 4
       published_page: 13
@@ -123,7 +123,7 @@ fidelity_samples:
       table: '2'
       note: 'Table 2 row 12 pMgAlO cell confirmed on the render.'
   - path: species.O.observations[shornikov_2017_table3_o_pressure_eq14].values.points[2].pressure_atm
-    value: '4.12e-8'
+    value: 4.12e-8
     locator:
       page: 4
       published_page: 13
@@ -320,18 +320,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '4.68e-7', pressure_as_printed: '4.68 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '5.20e-7', pressure_as_printed: '5.20 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '1.25e-6', pressure_as_printed: '1.25 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '1.82e-6', pressure_as_printed: '1.82 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '2.23e-6', pressure_as_printed: '2.23 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '2.29e-6', pressure_as_printed: '2.29 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '4.38e-6', pressure_as_printed: '4.38 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '5.29e-6', pressure_as_printed: '5.29 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '9.19e-6', pressure_as_printed: '9.19 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '9.15e-6', pressure_as_printed: '9.15 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '9.55e-6', pressure_as_printed: '9.55 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '1.67e-5', pressure_as_printed: '1.67 × 10−5', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 4.68e-7, pressure_as_printed: '4.68 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 5.20e-7, pressure_as_printed: '5.20 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 1.25e-6, pressure_as_printed: '1.25 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 1.82e-6, pressure_as_printed: '1.82 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 2.23e-6, pressure_as_printed: '2.23 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 2.29e-6, pressure_as_printed: '2.29 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 4.38e-6, pressure_as_printed: '4.38 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 5.29e-6, pressure_as_printed: '5.29 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 9.19e-6, pressure_as_printed: '9.19 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 9.15e-6, pressure_as_printed: '9.15 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 9.55e-6, pressure_as_printed: '9.55 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 1.67e-5, pressure_as_printed: '1.67 × 10−5', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
   MgO:
     observations:
     - observation_id: shornikov_2017_table2_mgo_partial_pressure
@@ -357,18 +357,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '9.85e-10', pressure_as_printed: '9.85 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.21e-9', pressure_as_printed: '1.21 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '4.45e-9', pressure_as_printed: '4.45 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '6.66e-9', pressure_as_printed: '6.66 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '9.53e-9', pressure_as_printed: '9.53 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '9.67e-9', pressure_as_printed: '9.67 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '2.25e-8', pressure_as_printed: '2.25 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '2.68e-8', pressure_as_printed: '2.68 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '6.07e-8', pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '6.07e-8', pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '6.44e-8', pressure_as_printed: '6.44 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '1.57e-7', pressure_as_printed: '1.57 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 9.85e-10, pressure_as_printed: '9.85 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 1.21e-9, pressure_as_printed: '1.21 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 4.45e-9, pressure_as_printed: '4.45 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 6.66e-9, pressure_as_printed: '6.66 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 9.53e-9, pressure_as_printed: '9.53 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 9.67e-9, pressure_as_printed: '9.67 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 2.25e-8, pressure_as_printed: '2.25 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 2.68e-8, pressure_as_printed: '2.68 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 6.07e-8, pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 6.07e-8, pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 6.44e-8, pressure_as_printed: '6.44 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 1.57e-7, pressure_as_printed: '1.57 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
   Al:
     observations:
     - observation_id: shornikov_2017_table2_al_partial_pressure
@@ -394,18 +394,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '4.47e-11', pressure_as_printed: '4.47 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '5.26e-11', pressure_as_printed: '5.26 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '1.93e-10', pressure_as_printed: '1.93 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '3.21e-10', pressure_as_printed: '3.21 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '4.44e-10', pressure_as_printed: '4.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '4.41e-10', pressure_as_printed: '4.41 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.10e-9', pressure_as_printed: '1.10 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.42e-9', pressure_as_printed: '1.42 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.22e-9', pressure_as_printed: '3.22 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.36e-9', pressure_as_printed: '3.36 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.39e-9', pressure_as_printed: '3.39 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '7.65e-9', pressure_as_printed: '7.65 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 4.47e-11, pressure_as_printed: '4.47 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 5.26e-11, pressure_as_printed: '5.26 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 1.93e-10, pressure_as_printed: '1.93 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 3.21e-10, pressure_as_printed: '3.21 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 4.44e-10, pressure_as_printed: '4.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 4.41e-10, pressure_as_printed: '4.41 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 1.10e-9, pressure_as_printed: '1.10 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 1.42e-9, pressure_as_printed: '1.42 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 3.22e-9, pressure_as_printed: '3.22 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.36e-9, pressure_as_printed: '3.36 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.39e-9, pressure_as_printed: '3.39 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 7.65e-9, pressure_as_printed: '7.65 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
   AlO:
     observations:
     - observation_id: shornikov_2017_table2_alo_partial_pressure
@@ -431,18 +431,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.60e-10', pressure_as_printed: '1.60 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '2.07e-10', pressure_as_printed: '2.07 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '6.44e-10', pressure_as_printed: '6.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '1.31e-9', pressure_as_printed: '1.31 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '1.67e-9', pressure_as_printed: '1.67 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '1.38e-9', pressure_as_printed: '1.38 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '3.95e-9', pressure_as_printed: '3.95 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '4.71e-9', pressure_as_printed: '4.71 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '1.41e-8', pressure_as_printed: '1.41 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '1.45e-8', pressure_as_printed: '1.45 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '1.40e-8', pressure_as_printed: '1.40 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '3.37e-8', pressure_as_printed: '3.37 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 1.60e-10, pressure_as_printed: '1.60 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 2.07e-10, pressure_as_printed: '2.07 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 6.44e-10, pressure_as_printed: '6.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 1.31e-9, pressure_as_printed: '1.31 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 1.67e-9, pressure_as_printed: '1.67 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 1.38e-9, pressure_as_printed: '1.38 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 3.95e-9, pressure_as_printed: '3.95 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 4.71e-9, pressure_as_printed: '4.71 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 1.41e-8, pressure_as_printed: '1.41 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 1.45e-8, pressure_as_printed: '1.45 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 1.40e-8, pressure_as_printed: '1.40 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 3.37e-8, pressure_as_printed: '3.37 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
   Al2O:
     observations:
     - observation_id: shornikov_2017_table2_al2o_partial_pressure
@@ -468,16 +468,16 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '2.54e-11', pressure_as_printed: '2.54 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '4.40e-11', pressure_as_printed: '4.40 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '6.19e-11', pressure_as_printed: '6.19 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '6.84e-11', pressure_as_printed: '6.84 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '2.31e-10', pressure_as_printed: '2.31 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '3.35e-10', pressure_as_printed: '3.35 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '8.01e-10', pressure_as_printed: '8.01 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '8.88e-10', pressure_as_printed: '8.88 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '9.17e-10', pressure_as_printed: '9.17 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '2.48e-9', pressure_as_printed: '2.48 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 2.54e-11, pressure_as_printed: '2.54 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 4.40e-11, pressure_as_printed: '4.40 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 6.19e-11, pressure_as_printed: '6.19 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 6.84e-11, pressure_as_printed: '6.84 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 2.31e-10, pressure_as_printed: '2.31 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 3.35e-10, pressure_as_printed: '3.35 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 8.01e-10, pressure_as_printed: '8.01 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 8.88e-10, pressure_as_printed: '8.88 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 9.17e-10, pressure_as_printed: '9.17 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 2.48e-9, pressure_as_printed: '2.48 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
     - observation_id: shornikov_2017_table2_al2o_not_detected_1851
       type: partial_pressure
       locator: {<<: *table_2, note: 'Table 2 row 1 column pAl2O prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
@@ -553,18 +553,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '3.25e-9', pressure_as_printed: '3.25 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '5.29e-9', pressure_as_printed: '5.29 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '1.70e-8', pressure_as_printed: '1.70 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '1.88e-8', pressure_as_printed: '1.88 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '3.17e-8', pressure_as_printed: '3.17 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '3.00e-8', pressure_as_printed: '3.00 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '4.82e-8', pressure_as_printed: '4.82 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '6.09e-8', pressure_as_printed: '6.09 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '1.07e-7', pressure_as_printed: '1.07 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '1.75e-7', pressure_as_printed: '1.75 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '1.62e-7', pressure_as_printed: '1.62 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '2.60e-7', pressure_as_printed: '2.60 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 3.25e-9, pressure_as_printed: '3.25 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 5.29e-9, pressure_as_printed: '5.29 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 1.70e-8, pressure_as_printed: '1.70 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 1.88e-8, pressure_as_printed: '1.88 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 3.17e-8, pressure_as_printed: '3.17 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 3.00e-8, pressure_as_printed: '3.00 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 4.82e-8, pressure_as_printed: '4.82 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 6.09e-8, pressure_as_printed: '6.09 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 1.07e-7, pressure_as_printed: '1.07 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 1.75e-7, pressure_as_printed: '1.75 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 1.62e-7, pressure_as_printed: '1.62 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 2.60e-7, pressure_as_printed: '2.60 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
   MgAlO:
     observations:
     - observation_id: shornikov_2017_table2_mgalo_partial_pressure
@@ -590,9 +590,9 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '2.44e-10', pressure_as_printed: '2.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.05e-10', pressure_as_printed: '3.05 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '8.89e-10', pressure_as_printed: '8.89 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 2.44e-10, pressure_as_printed: '2.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.05e-10, pressure_as_printed: '3.05 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 8.89e-10, pressure_as_printed: '8.89 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
     - observation_id: shornikov_2017_table2_mgalo_not_detected_1851
       type: partial_pressure
       locator: {<<: *table_2, note: 'Table 2 row 1 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
@@ -851,18 +851,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.21e-8', pressure_as_printed: '1.21 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.43e-8', pressure_as_printed: '1.43 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '3.87e-8', pressure_as_printed: '3.87 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '6.07e-8', pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.10e-8', pressure_as_printed: '7.10 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.09e-8', pressure_as_printed: '7.09 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.43e-7', pressure_as_printed: '1.43 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.78e-7', pressure_as_printed: '1.78 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.30e-7', pressure_as_printed: '3.30 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.49e-7', pressure_as_printed: '3.49 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.50e-7', pressure_as_printed: '3.50 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '6.75e-7', pressure_as_printed: '6.75 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 1.21e-8, pressure_as_printed: '1.21 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 1.43e-8, pressure_as_printed: '1.43 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 3.87e-8, pressure_as_printed: '3.87 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 6.07e-8, pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 7.10e-8, pressure_as_printed: '7.10 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 7.09e-8, pressure_as_printed: '7.09 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 1.43e-7, pressure_as_printed: '1.43 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 1.78e-7, pressure_as_printed: '1.78 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 3.30e-7, pressure_as_printed: '3.30 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.49e-7, pressure_as_printed: '3.49 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.50e-7, pressure_as_printed: '3.50 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 6.75e-7, pressure_as_printed: '6.75 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
     - observation_id: shornikov_2017_table3_o_pressure_eq14
       type: partial_pressure
       locator: {<<: *table_3, equation: '(14)'}
@@ -907,18 +907,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.14e-8', pressure_as_printed: '1.14 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.39e-8', pressure_as_printed: '1.39 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '4.12e-8', pressure_as_printed: '4.12 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '5.58e-8', pressure_as_printed: '5.58 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.48e-8', pressure_as_printed: '7.48 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.39e-8', pressure_as_printed: '7.39 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.42e-7', pressure_as_printed: '1.42 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.61e-7', pressure_as_printed: '1.61 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.16e-7', pressure_as_printed: '3.16 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.27e-7', pressure_as_printed: '3.27 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.33e-7', pressure_as_printed: '3.33 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '7.05e-7', pressure_as_printed: '7.05 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 1.14e-8, pressure_as_printed: '1.14 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 1.39e-8, pressure_as_printed: '1.39 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 4.12e-8, pressure_as_printed: '4.12 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 5.58e-8, pressure_as_printed: '5.58 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 7.48e-8, pressure_as_printed: '7.48 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 7.39e-8, pressure_as_printed: '7.39 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 1.42e-7, pressure_as_printed: '1.42 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 1.61e-7, pressure_as_printed: '1.61 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 3.16e-7, pressure_as_printed: '3.16 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.27e-7, pressure_as_printed: '3.27 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.33e-7, pressure_as_printed: '3.33 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 7.05e-7, pressure_as_printed: '7.05 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
     - observation_id: shornikov_2017_table3_o_pressure_eq15
       type: partial_pressure
       locator: {<<: *table_3, equation: '(15)'}
@@ -963,18 +963,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.24e-8', pressure_as_printed: '1.24 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.57e-8', pressure_as_printed: '1.57 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '3.49e-8', pressure_as_printed: '3.49 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '6.40e-8', pressure_as_printed: '6.40 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.17e-8', pressure_as_printed: '7.17 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '5.96e-8', pressure_as_printed: '5.96 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.34e-7', pressure_as_printed: '1.34 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.52e-7', pressure_as_printed: '1.52 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.61e-7', pressure_as_printed: '3.61 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.74e-7', pressure_as_printed: '3.74 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.58e-7', pressure_as_printed: '3.58 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '7.03e-7', pressure_as_printed: '7.03 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 1.24e-8, pressure_as_printed: '1.24 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 1.57e-8, pressure_as_printed: '1.57 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 3.49e-8, pressure_as_printed: '3.49 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 6.40e-8, pressure_as_printed: '6.40 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 7.17e-8, pressure_as_printed: '7.17 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 5.96e-8, pressure_as_printed: '5.96 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 1.34e-7, pressure_as_printed: '1.34 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 1.52e-7, pressure_as_printed: '1.52 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 3.61e-7, pressure_as_printed: '3.61 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.74e-7, pressure_as_printed: '3.74 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.58e-7, pressure_as_printed: '3.58 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 7.03e-7, pressure_as_printed: '7.03 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
     - observation_id: shornikov_2017_table3_o_pressure_eq16
       type: partial_pressure
       locator: {<<: *table_3, equation: '(16)'}
@@ -1019,16 +1019,16 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '3.93e-8', pressure_as_printed: '3.93 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '5.61e-8', pressure_as_printed: '5.61 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '6.16e-8', pressure_as_printed: '6.16 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '6.89e-8', pressure_as_printed: '6.89 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.47e-7', pressure_as_printed: '1.47 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.96e-7', pressure_as_printed: '1.96 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.03e-7', pressure_as_printed: '3.03 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.40e-7', pressure_as_printed: '3.40 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.44e-7', pressure_as_printed: '3.44 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '6.37e-7', pressure_as_printed: '6.37 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 3.93e-8, pressure_as_printed: '3.93 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 5.61e-8, pressure_as_printed: '5.61 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 6.16e-8, pressure_as_printed: '6.16 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 6.89e-8, pressure_as_printed: '6.89 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 1.47e-7, pressure_as_printed: '1.47 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 1.96e-7, pressure_as_printed: '1.96 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 3.03e-7, pressure_as_printed: '3.03 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.40e-7, pressure_as_printed: '3.40 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.44e-7, pressure_as_printed: '3.44 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 6.37e-7, pressure_as_printed: '6.37 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
     - observation_id: shornikov_2017_table3_o_pressure_eq17
       type: partial_pressure
       locator: {<<: *table_3, equation: '(17)'}
@@ -1071,18 +1071,18 @@ species:
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
-          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.11e-8', pressure_as_printed: '1.11 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
-          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.52e-8', pressure_as_printed: '1.52 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
-          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '4.37e-8', pressure_as_printed: '4.37 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
-          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '5.60e-8', pressure_as_printed: '5.60 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '8.02e-8', pressure_as_printed: '8.02 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.80e-8', pressure_as_printed: '7.80 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
-          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.38e-7', pressure_as_printed: '1.38 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
-          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.71e-7', pressure_as_printed: '1.71 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
-          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.04e-7', pressure_as_printed: '3.04 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.97e-7', pressure_as_printed: '3.97 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.82e-7', pressure_as_printed: '3.82 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
-          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '6.53e-7', pressure_as_printed: '6.53 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: 1.11e-8, pressure_as_printed: '1.11 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: 1.52e-8, pressure_as_printed: '1.52 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: 4.37e-8, pressure_as_printed: '4.37 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: 5.60e-8, pressure_as_printed: '5.60 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 8.02e-8, pressure_as_printed: '8.02 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: 7.80e-8, pressure_as_printed: '7.80 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: 1.38e-7, pressure_as_printed: '1.38 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: 1.71e-7, pressure_as_printed: '1.71 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: 3.04e-7, pressure_as_printed: '3.04 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.97e-7, pressure_as_printed: '3.97 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: 3.82e-7, pressure_as_printed: '3.82 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: 6.53e-7, pressure_as_printed: '6.53 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
     - observation_id: shornikov_2017_table3_o_pressure_eq16_not_reported_1851
       type: partial_pressure
       locator: {<<: *table_3, note: 'Table 3 row 1 Eq. (16) prints ''-''; no pressure value is reported. The corresponding pAl2O input is also not detected in Table 2.'}

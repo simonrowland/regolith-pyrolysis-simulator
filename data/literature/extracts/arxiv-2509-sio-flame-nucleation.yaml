@@ -67,10 +67,10 @@ species:
         concentration_expression: C_sat = P_sat / (R_gas T)
         P_boil_Pa: 101325.0
         T_boil_K: 2503.0
-        DeltaH_options_J_per_mol: [7.06e5, 5.99e5, 5.78e5]
-        DeltaH_used_J_per_mol: 7.06e5
+        DeltaH_options_J_per_mol: [7.06e+5, 5.99e+5, 5.78e+5]
+        DeltaH_used_J_per_mol: 7.06e+5
         reference_pressure_as_printed: 10^-4 Torr at 1025 deg C
-        DeltaH_from_reference_point_J_per_mol: 3.55e5
+        DeltaH_from_reference_point_J_per_mol: 3.55e+5
         reference_point_semantics: author-reported reference used to show an alternative blue curve; authors call its applicability questionable because 1025 deg C is below the silica-fume melting point
         R_gas_J_per_mol_K: 8.314
     - observation_id: haugen_2025_sio2_transition_thresholds
@@ -179,9 +179,9 @@ species:
         table_rows_as_printed:
         - {case: 'Eul. 200', nbins: 200, mthr: null, Nsw: null, Nphys_1e11: 3.0, time_s: 1.85}
         - {case: 'Eul. 1200', nbins: 1200, mthr: null, Nsw: null, Nphys_1e11: 3.0, time_s: 8.60}
-        - {case: 'Lagr. 10', nbins: 5, mthr_kg: 1e-10, Nsw: 2, Nphys_1e11: 2.7, time_s: 0.50}
-        - {case: 'Lagr. 11', nbins: 10, mthr_kg: 1e-11, Nsw: 22, Nphys_1e11: 3.0, time_s: 0.56}
-        - {case: 'Lagr. 12', nbins: 40, mthr_kg: 1e-12, Nsw: 204, Nphys_1e11: 3.0, time_s: 1.03}
+        - {case: 'Lagr. 10', nbins: 5, mthr_kg: 1.0e-10, Nsw: 2, Nphys_1e11: 2.7, time_s: 0.50}
+        - {case: 'Lagr. 11', nbins: 10, mthr_kg: 1.0e-11, Nsw: 22, Nphys_1e11: 3.0, time_s: 0.56}
+        - {case: 'Lagr. 12', nbins: 40, mthr_kg: 1.0e-12, Nsw: 204, Nphys_1e11: 3.0, time_s: 1.03}
     - observation_id: haugen_2025_sio2_furnace_particle_size_distribution
       type: rate_series
       locator: {page: 15, figure: '10', section: '5.3 Particle size distributions'}
@@ -214,5 +214,5 @@ fidelity_samples:
   observable: psat_series
   observation_id: haugen_2025_sio2_saturation_pressure_model
   field: DeltaH_used_J_per_mol
-  value: 7.06e5
+  value: 7.06e+5
   locator: {page: 9, equation: '35', section: '3.3 Saturation concentration'}

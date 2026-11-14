@@ -64,7 +64,7 @@ species:
             decimal place: sigma_a = a * ln(10) * 0.5 * 10^-1. The resulting
             absolute activity half-width is 1.1512925465e-10; confidence level
             is not stated.
-          value: '1.1512925465e-10'
+          value: 1.1512925465e-10
           units: dimensionless
         derived_from: [itoh_yokokawa_1984_eq5_printed_log_input]
         derivation:
@@ -74,14 +74,14 @@ species:
           printed_precision:
             decimal_places: 1
             half_last_digit_in_log10_activity: '0.05'
-            activity_half_width: '1.1512925465e-10'
+            activity_half_width: 1.1512925465e-10
             note: ln(10) * 0.05 * 1e-9; confidence level not stated.
         values:
           quantity: activity
           method_class: measured_reduced
           evidence_class: measured_reduced
           admission_status: admitted
-          activity: '1e-9'
+          activity: 1.0e-9
           value_as_printed: '-9.0'
           log10_activity_as_published: '-9.0'
           T_K: '1300'

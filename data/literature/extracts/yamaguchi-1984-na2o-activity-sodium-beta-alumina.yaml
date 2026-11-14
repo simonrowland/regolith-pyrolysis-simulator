@@ -15,7 +15,7 @@ fidelity_samples:
     observation_id: yamaguchi_1984_abstract_na2o_activity_1573k
     observable: activity_coefficient
     field: activity
-    value: '1e-13'
+    value: 1.0e-13
     locator: {page: 1, published_page: 43, section: Abstract}
 experiments:
   - experiment_id: yamaguchi-1984-na2o-p2o5-emf
@@ -60,7 +60,7 @@ species:
           method_class: measured_reduced
           evidence_class: measured_reduced
           admission_status: admitted
-          activity: '1e-13'
+          activity: 1.0e-13
           activity_as_printed: about 10^-13
           attribution: Present work; abstract summary of the authors' EMF measurements.
           derivation:
@@ -90,7 +90,7 @@ species:
           composition_as_printed: Na2O-P2O5 binary melt; XNa2O=0.5
           points:
             - T_K: '1573'
-              activity: '1e-13'
+              activity: 1.0e-13
               activity_as_printed: about 10^-13
               composition_mol:
                 Na2O: '0.5'

@@ -41,7 +41,7 @@ fidelity_samples:
     equation: '6'
     note: 'Printed quadratic coefficient in log a_NaO0.5 activity fit at 1400 C'
 - path: species.Na.observations[shirai_2000_jna_fig2_1400].values.series[1].jNa_as_plotted
-  value: 1.1e16
+  value: 1.1e+16
   locator:
     page: 2
     figure: '2'
@@ -780,9 +780,9 @@ species:
         digitization_source: 'PDF page 2, Fig. 2; central markers read against logarithmic axes'
         conditions: {temperature_C_as_printed: 1300, Na2O_wt_pct: 20, total_pressure_atm_as_printed: 1}
         series:
-        - {pO2_bar_as_printed: '10^-10', jNa_as_plotted: 2.5e15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-10 bar'}}
-        - {pO2_bar_as_printed: '10^-9', jNa_as_plotted: 1.5e15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-9 bar'}}
-        - {pO2_bar_as_printed: '10^-8', jNa_as_plotted: 1.1e15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-8 bar'}}
+        - {pO2_bar_as_printed: '10^-10', jNa_as_plotted: 2.5e+15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-10 bar'}}
+        - {pO2_bar_as_printed: '10^-9', jNa_as_plotted: 1.5e+15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-9 bar'}}
+        - {pO2_bar_as_printed: '10^-8', jNa_as_plotted: 1.1e+15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-8 bar'}}
       uncertainty: {note: 'No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.'}
     - observation_id: shirai_2000_jna_fig2_1400
       type: rate_series
@@ -798,9 +798,9 @@ species:
         digitization_source: 'PDF page 2, Fig. 2; central markers read against logarithmic axes'
         conditions: {temperature_C_as_printed: 1400, Na2O_wt_pct: 20, total_pressure_atm_as_printed: 1}
         series:
-        - {pO2_bar_as_printed: '10^-10', jNa_as_plotted: 2.5e16, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-10 bar'}}
-        - {pO2_bar_as_printed: '10^-9', jNa_as_plotted: 1.1e16, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-9 bar'}}
-        - {pO2_bar_as_printed: '10^-8', jNa_as_plotted: 7.0e15, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-8 bar'}}
+        - {pO2_bar_as_printed: '10^-10', jNa_as_plotted: 2.5e+16, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-10 bar'}}
+        - {pO2_bar_as_printed: '10^-9', jNa_as_plotted: 1.1e+16, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-9 bar'}}
+        - {pO2_bar_as_printed: '10^-8', jNa_as_plotted: 7.0e+15, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-8 bar'}}
       uncertainty: {note: 'No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.'}
     - observation_id: shirai_2000_jna_fit_1300
       type: rate_series
@@ -828,7 +828,7 @@ species:
         temperature_C_as_printed: 1300
         Na2O_wt_pct: 20
         equation_as_printed: jNa = 6.70 x 10^13 x^-0.153
-        coefficient: 6.70e13
+        coefficient: 6.70e+13
         exponent: -0.153
         R: 0.99653
         slope_as_printed: -0.153
@@ -858,7 +858,7 @@ species:
         temperature_C_as_printed: 1400
         Na2O_wt_pct: 20
         equation_as_printed: jNa = 5.22 x 10^13 x^-0.26
-        coefficient: 5.22e13
+        coefficient: 5.22e+13
         exponent: -0.26
         R: 0.99426
         slope_as_printed: -0.26

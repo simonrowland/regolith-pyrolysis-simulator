@@ -36,7 +36,7 @@ benches:
   - name: gas_analysis_vacuum
     unit: bar
     value:
-      state: {tag: value, value: {kind: point, point: '1e-9'}}
+      state: {tag: value, value: {kind: point, point: 1.0e-9}}
       locator: {page: 3, pdf_page_index: 2, published_page: 3, section: '2.2.1', note: 'Printed 10⁻⁹ bar; this is the integrated pump retrieving gases from the STA furnace, not the sample furnace pressure.'}
 experiments:
 - experiment_id: eac-1a-tga-dsc-ega

@@ -125,7 +125,7 @@ experiments:
     form: {state: {tag: value, value: 'N/A'}, locator: {table: '8.1', published_page: 203}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '1421.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1148 C converted with T_K = T_C + 273.15}}
-    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '7.13e-9'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: 7.13e-9}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0013476225'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 1.33e-8 atm converted to Pa}}
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
@@ -149,7 +149,7 @@ experiments:
     holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '1400.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1127 C converted with T_K = T_C + 273.15}}
-    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '5.79e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: 5.79e-8}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.027661725'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 2.73e-7 atm converted to Pa}}
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
@@ -171,7 +171,7 @@ experiments:
     holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '1298.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1025 C converted with T_K = T_C + 273.15}}
-    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1.39e-7'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: 1.39e-7}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.03465315'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 3.42e-7 atm converted to Pa}}
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
@@ -193,7 +193,7 @@ experiments:
     holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '1389.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1116 C converted with T_K = T_C + 273.15}}
-    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1.73e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: 1.73e-8}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.002776305'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 2.74e-8 atm converted to Pa}}
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
@@ -237,7 +237,7 @@ experiments:
     holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '1394.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1121 C converted with T_K = T_C + 273.15}}
-    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1.55e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: 1.55e-8}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0050763825'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 5.01e-8 atm converted to Pa}}
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
@@ -259,7 +259,7 @@ experiments:
     holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '1420.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1147 C converted with T_K = T_C + 273.15}}
-    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '6.58e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: 6.58e-8}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.00895713'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 8.84e-8 atm converted to Pa}}
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
@@ -281,7 +281,7 @@ experiments:
     holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '1424.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1151 C converted with T_K = T_C + 273.15}}
-    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1.29e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: 1.29e-8}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0038807475'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 3.83e-8 atm converted to Pa}}
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}

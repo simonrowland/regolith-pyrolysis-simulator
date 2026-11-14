@@ -297,8 +297,8 @@ experiments:
           formula: 'w_i_check = (x_i M_i / sum_j(x_j M_j)) * sum_i(w_i)'
           printed_total_wt_pct: '100.00'
           reconstructed_wt_pct: {B2O3: '2.600000000044', Na2O: '0.100000000031', Al2O3: '14.099999999991', SiO2: '59.699999999925', CaO: '23.500000000009'}
-          residual_wt_pct: {B2O3: '4.396e-11', Na2O: '3.092e-11', Al2O3: '-8.699e-12', SiO2: '-7.492e-11', CaO: '8.747e-12'}
-          max_abs_residual_wt_pct: '7.492e-11'
+          residual_wt_pct: {B2O3: 4.396e-11, Na2O: 3.092e-11, Al2O3: -8.699e-12, SiO2: -7.492e-11, CaO: 8.747e-12}
+          max_abs_residual_wt_pct: 7.492e-11
         output_unit: mole_fraction
     form:
       state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
@@ -363,8 +363,8 @@ experiments:
           formula: 'w_i_check = (x_i M_i / sum_j(x_j M_j)) * sum_i(w_i)'
           printed_total_wt_pct: '100.00'
           reconstructed_wt_pct: {B2O3: '4.999999999986', Na2O: '0.099999999978', Al2O3: '13.699999999966', SiO2: '58.800000000054', CaO: '22.400000000017'}
-          residual_wt_pct: {B2O3: '-1.396e-11', Na2O: '-2.242e-11', Al2O3: '-3.442e-11', SiO2: '5.367e-11', CaO: '1.714e-11'}
-          max_abs_residual_wt_pct: '5.367e-11'
+          residual_wt_pct: {B2O3: -1.396e-11, Na2O: -2.242e-11, Al2O3: -3.442e-11, SiO2: 5.367e-11, CaO: 1.714e-11}
+          max_abs_residual_wt_pct: 5.367e-11
         output_unit: mole_fraction
     form:
       state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
@@ -429,8 +429,8 @@ experiments:
           formula: 'w_i_check = (x_i M_i / sum_j(x_j M_j)) * sum_i(w_i)'
           printed_total_wt_pct: '99.95'
           reconstructed_wt_pct: {B2O3: '7.599999999977', Na2O: '0.149999999976', Al2O3: '13.799999999951', SiO2: '54.100000000081', CaO: '24.300000000015'}
-          residual_wt_pct: {B2O3: '-2.322e-11', Na2O: '-2.365e-11', Al2O3: '-4.916e-11', SiO2: '8.107e-11', CaO: '1.495e-11'}
-          max_abs_residual_wt_pct: '8.107e-11'
+          residual_wt_pct: {B2O3: -2.322e-11, Na2O: -2.365e-11, Al2O3: -4.916e-11, SiO2: 8.107e-11, CaO: 1.495e-11}
+          max_abs_residual_wt_pct: 8.107e-11
           note: Printed glass-3 values sum to 99.95 wt%; the check preserves that printed total instead of silently renormalising it to 100.
         output_unit: mole_fraction
     form:

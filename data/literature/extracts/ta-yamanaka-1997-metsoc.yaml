@@ -71,7 +71,7 @@ experiments:
   fO2_control:
     channel: {tag: value, value: gas_mix}
     oxygen_partial_pressure_Pa:
-      state: {tag: value, value: {kind: interval, interval_low: '1.01325e-8', interval_high: '1.01325e-3'}}
+      state: {tag: value, value: {kind: interval, interval_low: 1.01325e-8, interval_high: 1.01325e-3}}
       locator: {page: 1, section: Experiments, note: 'Printed 1e-13 to 1e-8 atm; converted to Pa without selecting a point.'}
       method_class: calculated
       inference:
@@ -109,8 +109,8 @@ species:
         - 1300
         - 1500
         oxygen_partial_pressure_range_atm:
-        - 1e-13
-        - 1e-8
+        - 1.0e-13
+        - 1.0e-8
         gas_mixing: H2/CO2 mixing gases
         total_pressure_atm: about 1e-3
         pressure_regime: low vacuum conditions

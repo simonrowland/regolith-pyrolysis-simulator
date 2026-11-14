@@ -33,12 +33,12 @@ fidelity_samples:
   - species: Na2O
     observation_id: willenborg_2006_alsi8na1_na2o_activity_1400
     field: activity
-    value: 5e-14
+    value: 5.0e-14
     locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
   - species: Na2O
     observation_id: willenborg_2006_alsi8mg8na1_na2o_activity_1400
     field: activity
-    value: 2e-13
+    value: 2.0e-13
     locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
 species:
   Na2O:
@@ -93,7 +93,7 @@ species:
             output_unit: dimensionless
           admission_status: admitted
           attribution: 'Willenborg et al. (2006), present work.'
-          activity: 5e-14
+          activity: 5.0e-14
           approximate: true
           activity_as_published: about 5 × 10^-14
           composition_role: datum_state
@@ -101,7 +101,7 @@ species:
           quote: 'The sodium oxide activity in AlSi8Na1 is about 5 × 10^-14 at 1400 °C.'
           points:
             - T_C: '1400'
-              activity: 5e-14
+              activity: 5.0e-14
               approximate: true
               composition_role: datum_state
               point_conditions:
@@ -160,7 +160,7 @@ species:
             output_unit: dimensionless
           admission_status: admitted
           attribution: 'Willenborg et al. (2006), present work.'
-          activity: 2e-13
+          activity: 2.0e-13
           approximate: true
           activity_as_published: about 2 × 10^-13
           composition_role: datum_state
@@ -168,7 +168,7 @@ species:
           quote: 'The sodium oxide activity in AlSi8Mg8Na1 is about 2 × 10^-13 at 1400 °C.'
           points:
             - T_C: '1400'
-              activity: 2e-13
+              activity: 2.0e-13
               approximate: true
               composition_role: datum_state
               point_conditions:

@@ -101,7 +101,7 @@ benches:
       - name: ion_source_residual_gas_pressure_upper_bound_at_3000_K
         unit: atm
         value:
-          state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '1e-10'}}
+          state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: 1.0e-10}}
           locator: {published_page: 677, pdf_page_index: 0, section: Introduction, note: 'Ion source high-rate heating capability; not a sample-run chamber background'}
       - name: ionizing_energy_uncertainty
         unit: eV

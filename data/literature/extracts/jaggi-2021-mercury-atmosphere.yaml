@@ -25,7 +25,7 @@ fidelity_samples:
   value: '3.2'
   locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SV; H2 pressure'}
 - path: species.Mercury_model.observations[jaggi_2021_table1_sio_partial_pressure].values.series[0].pressure_bar
-  value: '1.4E-4'
+  value: 1.4e-4
   locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SN5; SiO pressure'}
 - path: species.Mercury_model.observations[jaggi_2021_table1_h2_partial_pressure].values.series[1].pressure_bar
   value: '5.8'
@@ -120,19 +120,19 @@ species:
         series:
         - run: SN5
           T_K: '2000'
-          pressure_bar: '1.4E-4'
+          pressure_bar: 1.4e-4
           locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SN5 row; SiO pressure column'}
         - run: SN3
           T_K: '2000'
-          pressure_bar: '1.4E-4'
+          pressure_bar: 1.4e-4
           locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SN3 row; SiO pressure column'}
         - run: LN5
           T_K: '2000'
-          pressure_bar: '1.4E-4'
+          pressure_bar: 1.4e-4
           locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LN5 row; SiO pressure column'}
         - run: LN3
           T_K: '2000'
-          pressure_bar: '1.4E-4'
+          pressure_bar: 1.4e-4
           locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LN3 row; SiO pressure column'}
     context:
     - observation_id: jaggi_2021_table1_magma_ocean_cases

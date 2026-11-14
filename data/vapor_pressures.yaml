@@ -11621,7 +11621,7 @@ families:
               p_Pa: 4.03e-05
             - T_K: 500.0
               delta_G_sub_kJ_mol: 19.883
-              p_Pa: 8.37e2
+              p_Pa: 8.37e+2
             source:
               citation: Chase (1998) NIST-JANAF tables O-094 and O-095; screening arithmetic this work
               doi: 10.18434/T42S31
@@ -13902,7 +13902,7 @@ families:
             Sanity: 2.13932704290547 = 1 + 1.13932704290547.'
           oxide_activity_exponent: 2.0
           pO2_exponent: -2.0
-          pO2_reference_bar: 1e-9
+          pO2_reference_bar: 1.0e-9
           notes: Status-bearing analytical carrier; landed thermochemistry plus inherited activity and
             kinetic proxies cannot certify.
           validation:
@@ -13985,7 +13985,7 @@ families:
               is Pa. Sanity: lower O2 raises Si2 for this dissociation exchange.'
             activity_exponent: 2.0
             pO2_exponent: -2.0
-            pO2_reference_bar: 1e-9
+            pO2_reference_bar: 1.0e-9
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
@@ -14052,7 +14052,7 @@ families:
             Sanity: 2.13932704290547 = 1 + 1.13932704290547.'
           oxide_activity_exponent: 3.0
           pO2_exponent: -3.0
-          pO2_reference_bar: 1e-9
+          pO2_reference_bar: 1.0e-9
           notes: Status-bearing analytical carrier; landed thermochemistry plus inherited activity and
             kinetic proxies cannot certify.
           validation:
@@ -14136,7 +14136,7 @@ families:
               exchange.'
             activity_exponent: 3.0
             pO2_exponent: -3.0
-            pO2_reference_bar: 1e-9
+            pO2_reference_bar: 1.0e-9
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
@@ -14202,7 +14202,7 @@ families:
             1 kg parent/kg vapor and 0 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1 = 1 + 0.'
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.0
-          pO2_reference_bar: 1e-9
+          pO2_reference_bar: 1.0e-9
           notes: Status-bearing analytical carrier; landed thermochemistry plus inherited activity and
             kinetic proxies cannot certify.
           validation:
@@ -14283,7 +14283,7 @@ families:
               limit.'
             activity_exponent: 1.0
             pO2_exponent: 0.0
-            pO2_reference_bar: 1e-9
+            pO2_reference_bar: 1.0e-9
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
