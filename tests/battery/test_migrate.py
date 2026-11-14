@@ -628,7 +628,7 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
         assert conditions is not None
         assert conditions["temperature_K"].state.value == Decimal("1573.15")
         assert conditions["temperature_K"].locator.row == runs[log_fO2]
-        assert conditions["fO2_log"].state.value == Decimal(log_fO2)
+        assert conditions["fO2_log"].state.value.point == Decimal(log_fO2)
         assert conditions["fO2_log"].locator.row == log_fO2
         assert conditions["composition"].state.value.components == charge.components
         assert conditions["composition"].locator.table == "5.2"
