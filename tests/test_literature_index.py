@@ -426,8 +426,6 @@ def test_repo_source_status_counts_match_rows() -> None:
 def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
     counts = index["counts"]
-    # Pin the generated index for the approved combined-offer merge stack.
-    assert counts["sources"] == 850
     extract_census = load_named_manifest(
         REPO_ROOT / "tests" / "manifests" / "literature_extract_source_ids.jsonl"
     )
@@ -448,6 +446,10 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     assert_named_rows(
         indexed_extracts, expected_extracts, label="literature index extracts"
     )
+    # Pin the generated index for the approved combined-offer merge stack.
+    # The named comparison runs first so an added or dropped extract is
+    # reported by filename before this aggregate pin can fail on a bare count.
+    assert counts["sources"] == 850
     extracts_without_pdf = {
         source["source_id"]
         for source in index["sources"]
