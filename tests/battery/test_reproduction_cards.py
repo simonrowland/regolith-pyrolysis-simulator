@@ -90,7 +90,7 @@ def test_zero_width_and_interval_are_not_manufactured_bands(paper_point):
     assert compare_point(point, Decimal("22.74"))["status"] == "MATCH"
     assert compare_point(point, Decimal("22.74000001"))["status"] == "MISMATCH"
     interval = replace(point, value=Value(kind=ValueKind.INTERVAL,
-                                        lower=Decimal(22), upper=Decimal(23)))
+                                        interval_low=Decimal(22), interval_high=Decimal(23)))
     row = compare_point(interval, Decimal("22.74"))
     assert row["status"] == "MISSING"
     assert row["reason"] == "observed_mass_loss_interval_not_point"

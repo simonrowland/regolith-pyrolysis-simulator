@@ -1,0 +1,5265 @@
+study_id: kems-010-richter-2007
+work_id: 10.1016/j.gca.2007.09.005
+source_ids:
+- kems-010-richter-2007
+authoring_revision: t1766-phase-a-2026-11-13
+evidence_label: development_validation
+engine_policy: source_only_no_engine
+review_ref: kems-010-richter-2007.review.yaml
+runs:
+- card_id: cai-r3-12
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-12
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-12
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-12::T=2173.15:row=r3-12:h=03fe3ab5fc59
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-12::T=2173.15:row=r3-12:h=319547b12699
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-12::T=2173.15:row=r3-12:h=4d1ce9dd6461
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-12::T=2173.15:row=r3-12:h=5f731a7d1362
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-12::T=2173.15:row=r3-12:h=b99e36bccbaf
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id001
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 60
+    - values
+    - series
+    - 0
+    locator: &id002
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id001
+    locator: *id002
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id001
+    locator: *id002
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id001
+    locator: *id002
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id001
+    locator: *id002
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id001
+    locator: *id002
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-10
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-10
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-10
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-10::T=2173.15:row=r3-10:h=5fe7a95a05ac
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-10::T=2173.15:row=r3-10:h=9f1231bef99e
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-10::T=2173.15:row=r3-10:h=a05e6d491c97
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-10::T=2173.15:row=r3-10:h=a6de880581c6
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-10::T=2173.15:row=r3-10:h=bb991fa3b924
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id003
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 61
+    - values
+    - series
+    - 0
+    locator: &id004
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id003
+    locator: *id004
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id003
+    locator: *id004
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id003
+    locator: *id004
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id003
+    locator: *id004
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id003
+    locator: *id004
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-11
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-11
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-11
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-11::T=2173.15:row=r3-11:h=121758abe219
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-11::T=2173.15:row=r3-11:h=4f4c6475e0c3
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-11::T=2173.15:row=r3-11:h=7640faa2a75c
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-11::T=2173.15:row=r3-11:h=e72da24d1db1
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-11::T=2173.15:row=r3-11:h=a82e079ee9c1
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id005
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 62
+    - values
+    - series
+    - 0
+    locator: &id006
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id005
+    locator: *id006
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id005
+    locator: *id006
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id005
+    locator: *id006
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id005
+    locator: *id006
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id005
+    locator: *id006
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-8
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-8
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-8
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-8::T=2073.15:row=r-8:h=01d8fa05955e
+    - kems-010-richter-2007::richter_2007_residue_table1_r-8::T=2073.15:row=r-8:h=54376933cc7d
+    - kems-010-richter-2007::richter_2007_residue_table1_r-8::T=2073.15:row=r-8:h=ce95f3c20da8
+    - kems-010-richter-2007::richter_2007_residue_table1_r-8::T=2073.15:row=r-8:h=da25fbb6fb20
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-8::T=2073.15:row=r-8:h=5375d10a57aa
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id007
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 78
+    - values
+    - series
+    - 0
+    locator: &id008
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id007
+    locator: *id008
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id007
+    locator: *id008
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id007
+    locator: *id008
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id007
+    locator: *id008
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id007
+    locator: *id008
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-9
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-9
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-9
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-9::T=2073.15:row=r-9:h=9384cfeea809
+    - kems-010-richter-2007::richter_2007_residue_table1_r-9::T=2073.15:row=r-9:h=98a7192b30dd
+    - kems-010-richter-2007::richter_2007_residue_table1_r-9::T=2073.15:row=r-9:h=ab71f2ebdf91
+    - kems-010-richter-2007::richter_2007_residue_table1_r-9::T=2073.15:row=r-9:h=f7f658941173
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-9::T=2073.15:row=r-9:h=36955ca4396f
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id009
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 79
+    - values
+    - series
+    - 0
+    locator: &id010
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id009
+    locator: *id010
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id009
+    locator: *id010
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id009
+    locator: *id010
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id009
+    locator: *id010
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id009
+    locator: *id010
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-11
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-11
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-11
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-11::T=2073.15:row=r-11:h=1281e51e7274
+    - kems-010-richter-2007::richter_2007_residue_table1_r-11::T=2073.15:row=r-11:h=18cb7b2f5110
+    - kems-010-richter-2007::richter_2007_residue_table1_r-11::T=2073.15:row=r-11:h=1ab1ee489d96
+    - kems-010-richter-2007::richter_2007_residue_table1_r-11::T=2073.15:row=r-11:h=8a6cabc4f8f4
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-11::T=2073.15:row=r-11:h=0d649fba8fb2
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id011
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 80
+    - values
+    - series
+    - 0
+    locator: &id012
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id011
+    locator: *id012
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id011
+    locator: *id012
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id011
+    locator: *id012
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id011
+    locator: *id012
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id011
+    locator: *id012
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-4
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-4
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-4
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-4::T=2073.15:row=r2-4:h=467b6d974dfd
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-4::T=2073.15:row=r2-4:h=7794e8d99408
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-4::T=2073.15:row=r2-4:h=b2b1356a07e2
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-4::T=2073.15:row=r2-4:h=d1de226dc5c4
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-4::T=2073.15:row=r2-4:h=2bcdf9c57fce
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id013
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 81
+    - values
+    - series
+    - 0
+    locator: &id014
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id013
+    locator: *id014
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id013
+    locator: *id014
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id013
+    locator: *id014
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id013
+    locator: *id014
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id013
+    locator: *id014
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-16
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-16
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-16
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-16::T=2073.15:row=r-16:h=68113ec34569
+    - kems-010-richter-2007::richter_2007_residue_table1_r-16::T=2073.15:row=r-16:h=84331dc683a4
+    - kems-010-richter-2007::richter_2007_residue_table1_r-16::T=2073.15:row=r-16:h=8f56cdd8df21
+    - kems-010-richter-2007::richter_2007_residue_table1_r-16::T=2073.15:row=r-16:h=c0f75db76049
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-16::T=2073.15:row=r-16:h=1dda858f0556
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id015
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 66
+    - values
+    - series
+    - 0
+    locator: &id016
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id015
+    locator: *id016
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id015
+    locator: *id016
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id015
+    locator: *id016
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id015
+    locator: *id016
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id015
+    locator: *id016
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-13
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-13
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-13
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-13::T=2173.15:row=r3-13:h=5027a8b7e441
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-13::T=2173.15:row=r3-13:h=ed6b3c00ece4
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-13::T=2173.15:row=r3-13:h=ef7bbfdd7983
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-13::T=2173.15:row=r3-13:h=fa8bad43a5c2
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-13::T=2173.15:row=r3-13:h=fa304cc4996e
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id017
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 63
+    - values
+    - series
+    - 0
+    locator: &id018
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id017
+    locator: *id018
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id017
+    locator: *id018
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id017
+    locator: *id018
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id017
+    locator: *id018
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id017
+    locator: *id018
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-15
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-15
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-15
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-15::T=2173.15:row=r3-15:h=938c6788b2be
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-15::T=2173.15:row=r3-15:h=b2750e2d4c88
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-15::T=2173.15:row=r3-15:h=f29196fec4b5
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-15::T=2173.15:row=r3-15:h=f793feddfa29
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-15::T=2173.15:row=r3-15:h=8bd45984d9bf
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id019
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 64
+    - values
+    - series
+    - 0
+    locator: &id020
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id019
+    locator: *id020
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id019
+    locator: *id020
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id019
+    locator: *id020
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id019
+    locator: *id020
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id019
+    locator: *id020
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-9
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-9
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-9
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-9::T=2173.15:row=r3-9:h=04f195ff4ecf
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-9::T=2173.15:row=r3-9:h=0ab5d4b0fd98
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-9::T=2173.15:row=r3-9:h=2869874dd414
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-9::T=2173.15:row=r3-9:h=620cc5528bae
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-9::T=2173.15:row=r3-9:h=b77a9ffaa859
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id021
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 65
+    - values
+    - series
+    - 0
+    locator: &id022
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id021
+    locator: *id022
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id021
+    locator: *id022
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id021
+    locator: *id022
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id021
+    locator: *id022
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id021
+    locator: *id022
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-14
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-14
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-14
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-14::T=2073.15:row=r-14:h=3a9497b2eedd
+    - kems-010-richter-2007::richter_2007_residue_table1_r-14::T=2073.15:row=r-14:h=7d269f82e706
+    - kems-010-richter-2007::richter_2007_residue_table1_r-14::T=2073.15:row=r-14:h=b54531ffb28a
+    - kems-010-richter-2007::richter_2007_residue_table1_r-14::T=2073.15:row=r-14:h=e1bf6461ffd8
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-14::T=2073.15:row=r-14:h=22b5e3d18334
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id023
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 67
+    - values
+    - series
+    - 0
+    locator: &id024
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id023
+    locator: *id024
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id023
+    locator: *id024
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id023
+    locator: *id024
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id023
+    locator: *id024
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id023
+    locator: *id024
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-15
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-15
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-15
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-15::T=2073.15:row=r-15:h=0190ff686bac
+    - kems-010-richter-2007::richter_2007_residue_table1_r-15::T=2073.15:row=r-15:h=41844595724a
+    - kems-010-richter-2007::richter_2007_residue_table1_r-15::T=2073.15:row=r-15:h=6a4c2a7b8ce9
+    - kems-010-richter-2007::richter_2007_residue_table1_r-15::T=2073.15:row=r-15:h=f6ca8c2db34f
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-15::T=2073.15:row=r-15:h=14fcec191284
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id025
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 68
+    - values
+    - series
+    - 0
+    locator: &id026
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id025
+    locator: *id026
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id025
+    locator: *id026
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id025
+    locator: *id026
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id025
+    locator: *id026
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id025
+    locator: *id026
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-17
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-17
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-17
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-17::T=2073.15:row=r-17:h=11f21d52a296
+    - kems-010-richter-2007::richter_2007_residue_table1_r-17::T=2073.15:row=r-17:h=4eacd84294b3
+    - kems-010-richter-2007::richter_2007_residue_table1_r-17::T=2073.15:row=r-17:h=764f6a096d1b
+    - kems-010-richter-2007::richter_2007_residue_table1_r-17::T=2073.15:row=r-17:h=e9b869e65d75
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-17::T=2073.15:row=r-17:h=f59c801c89ba
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id027
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 69
+    - values
+    - series
+    - 0
+    locator: &id028
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id027
+    locator: *id028
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id027
+    locator: *id028
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id027
+    locator: *id028
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id027
+    locator: *id028
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id027
+    locator: *id028
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-6
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-6
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-6
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-6::T=2073.15:row=r-6:h=02b8991a38b3
+    - kems-010-richter-2007::richter_2007_residue_table1_r-6::T=2073.15:row=r-6:h=50303badde68
+    - kems-010-richter-2007::richter_2007_residue_table1_r-6::T=2073.15:row=r-6:h=c69df4541281
+    - kems-010-richter-2007::richter_2007_residue_table1_r-6::T=2073.15:row=r-6:h=ddda3ba0a9e8
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-6::T=2073.15:row=r-6:h=d3327bb9bc66
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id029
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 70
+    - values
+    - series
+    - 0
+    locator: &id030
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id029
+    locator: *id030
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id029
+    locator: *id030
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id029
+    locator: *id030
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id029
+    locator: *id030
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id029
+    locator: *id030
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-3
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-3
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-3
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-3::T=2073.15:row=r-3:h=2ee1f0fb06a9
+    - kems-010-richter-2007::richter_2007_residue_table1_r-3::T=2073.15:row=r-3:h=70e3497e0cf5
+    - kems-010-richter-2007::richter_2007_residue_table1_r-3::T=2073.15:row=r-3:h=b856ca514eab
+    - kems-010-richter-2007::richter_2007_residue_table1_r-3::T=2073.15:row=r-3:h=c3ebc777eb89
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-3::T=2073.15:row=r-3:h=f72e46edd417
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id031
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 71
+    - values
+    - series
+    - 0
+    locator: &id032
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id031
+    locator: *id032
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id031
+    locator: *id032
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id031
+    locator: *id032
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id031
+    locator: *id032
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id031
+    locator: *id032
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-2
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-2
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-2
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-2::T=2073.15:row=r-2:h=18b147319f72
+    - kems-010-richter-2007::richter_2007_residue_table1_r-2::T=2073.15:row=r-2:h=1fe846316ae2
+    - kems-010-richter-2007::richter_2007_residue_table1_r-2::T=2073.15:row=r-2:h=8df9c40c7769
+    - kems-010-richter-2007::richter_2007_residue_table1_r-2::T=2073.15:row=r-2:h=f7448e4dff42
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-2::T=2073.15:row=r-2:h=70f164ad9f25
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id033
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 72
+    - values
+    - series
+    - 0
+    locator: &id034
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id033
+    locator: *id034
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id033
+    locator: *id034
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id033
+    locator: *id034
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id033
+    locator: *id034
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id033
+    locator: *id034
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-18
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-18
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-18
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-18::T=2073.15:row=r-18:h=300ea7c7a34e
+    - kems-010-richter-2007::richter_2007_residue_table1_r-18::T=2073.15:row=r-18:h=58e668969756
+    - kems-010-richter-2007::richter_2007_residue_table1_r-18::T=2073.15:row=r-18:h=60e513b352ae
+    - kems-010-richter-2007::richter_2007_residue_table1_r-18::T=2073.15:row=r-18:h=f0742a3b2c39
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-18::T=2073.15:row=r-18:h=44ecc7b8576b
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id035
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 73
+    - values
+    - series
+    - 0
+    locator: &id036
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id035
+    locator: *id036
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id035
+    locator: *id036
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id035
+    locator: *id036
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id035
+    locator: *id036
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id035
+    locator: *id036
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-4
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-4
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-4
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-4::T=2073.15:row=r-4:h=08d79560781e
+    - kems-010-richter-2007::richter_2007_residue_table1_r-4::T=2073.15:row=r-4:h=782e37eae1f7
+    - kems-010-richter-2007::richter_2007_residue_table1_r-4::T=2073.15:row=r-4:h=a2f0497b79b5
+    - kems-010-richter-2007::richter_2007_residue_table1_r-4::T=2073.15:row=r-4:h=cc672de62520
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-4::T=2073.15:row=r-4:h=b381004b6628
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id037
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 74
+    - values
+    - series
+    - 0
+    locator: &id038
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id037
+    locator: *id038
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id037
+    locator: *id038
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id037
+    locator: *id038
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id037
+    locator: *id038
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id037
+    locator: *id038
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-14
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-14
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-14
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-14::T=2073.15:row=r3-14:h=1bd95f9b1054
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-14::T=2073.15:row=r3-14:h=423c20035619
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-14::T=2073.15:row=r3-14:h=65468d6e768c
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-14::T=2073.15:row=r3-14:h=c8332d74b5a6
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-14::T=2073.15:row=r3-14:h=782a04d74d4d
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id039
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 75
+    - values
+    - series
+    - 0
+    locator: &id040
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id039
+    locator: *id040
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id039
+    locator: *id040
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id039
+    locator: *id040
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id039
+    locator: *id040
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id039
+    locator: *id040
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-1
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-1
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-1
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-1::T=2073.15:row=r2-1:h=309e0da39475
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-1::T=2073.15:row=r2-1:h=47912ba150f7
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-1::T=2073.15:row=r2-1:h=7b22c92d6d88
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-1::T=2073.15:row=r2-1:h=92c550497b45
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-1::T=2073.15:row=r2-1:h=e0738de93569
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id041
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 76
+    - values
+    - series
+    - 0
+    locator: &id042
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id041
+    locator: *id042
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id041
+    locator: *id042
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id041
+    locator: *id042
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id041
+    locator: *id042
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id041
+    locator: *id042
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-7
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-7
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-7
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-7::T=2073.15:row=r-7:h=55fa5df69ee2
+    - kems-010-richter-2007::richter_2007_residue_table1_r-7::T=2073.15:row=r-7:h=9e1dc42f6f15
+    - kems-010-richter-2007::richter_2007_residue_table1_r-7::T=2073.15:row=r-7:h=a5c0b2959a4b
+    - kems-010-richter-2007::richter_2007_residue_table1_r-7::T=2073.15:row=r-7:h=e040aa9e9e0e
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-7::T=2073.15:row=r-7:h=df481ce341c9
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id043
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 77
+    - values
+    - series
+    - 0
+    locator: &id044
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id043
+    locator: *id044
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id043
+    locator: *id044
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id043
+    locator: *id044
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id043
+    locator: *id044
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id043
+    locator: *id044
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r-13
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r-13
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r-13
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r-13::T=2073.15:row=r-13:h=04c13725fd4f
+    - kems-010-richter-2007::richter_2007_residue_table1_r-13::T=2073.15:row=r-13:h=4c392e308b2d
+    - kems-010-richter-2007::richter_2007_residue_table1_r-13::T=2073.15:row=r-13:h=911ce32d42b6
+    - kems-010-richter-2007::richter_2007_residue_table1_r-13::T=2073.15:row=r-13:h=aef368b1d5b6
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - NO_BAND
+    - unsupported
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id045
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - SiO2
+    - observations
+    - 18
+    - values
+    - series
+    - 0
+    locator: &id046
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id045
+    locator: *id046
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id045
+    locator: *id046
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id045
+    locator: *id046
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id045
+    locator: *id046
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id045
+    locator: *id046
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-5
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-5
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-5
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-5::T=2073.15:row=r2-5:h=0183522a85d0
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-5::T=2073.15:row=r2-5:h=57ca8889a968
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-5::T=2073.15:row=r2-5:h=e024164eda18
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-5::T=2073.15:row=r2-5:h=f27e9e9e85bd
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-5::T=2073.15:row=r2-5:h=c27d3fec22c4
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id047
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 82
+    - values
+    - series
+    - 0
+    locator: &id048
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id047
+    locator: *id048
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id047
+    locator: *id048
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id047
+    locator: *id048
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id047
+    locator: *id048
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id047
+    locator: *id048
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-21
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-21
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-21
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-21::T=1973.15:row=r2-21:h=1e48abbd3c56
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-21::T=1973.15:row=r2-21:h=3112e570a2fc
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-21::T=1973.15:row=r2-21:h=5f1d0fa1b306
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-21::T=1973.15:row=r2-21:h=b10e3995fdce
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-21::T=1973.15:row=r2-21:h=69e7b1764e7f
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id049
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 83
+    - values
+    - series
+    - 0
+    locator: &id050
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id049
+    locator: *id050
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id049
+    locator: *id050
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id049
+    locator: *id050
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id049
+    locator: *id050
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id049
+    locator: *id050
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-20
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-20
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-20
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-20::T=1973.15:row=r2-20:h=0f9df39c2ff5
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-20::T=1973.15:row=r2-20:h=409b34bad383
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-20::T=1973.15:row=r2-20:h=87bf0746ffa1
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-20::T=1973.15:row=r2-20:h=a4edd0d322e5
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-20::T=1973.15:row=r2-20:h=59a009593a0b
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id051
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 84
+    - values
+    - series
+    - 0
+    locator: &id052
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id051
+    locator: *id052
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id051
+    locator: *id052
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id051
+    locator: *id052
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id051
+    locator: *id052
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id051
+    locator: *id052
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-18
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-18
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-18
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-18::T=1973.15:row=r2-18:h=17f42501b45e
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-18::T=1973.15:row=r2-18:h=371428157e60
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-18::T=1973.15:row=r2-18:h=cab9ed588bb6
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-18::T=1973.15:row=r2-18:h=eebc2e9257bf
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-18::T=1973.15:row=r2-18:h=3cb2c20cb302
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id053
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 85
+    - values
+    - series
+    - 0
+    locator: &id054
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id053
+    locator: *id054
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id053
+    locator: *id054
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id053
+    locator: *id054
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id053
+    locator: *id054
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id053
+    locator: *id054
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-19
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-19
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-19
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-19::T=1973.15:row=r2-19:h=a02a139c7514
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-19::T=1973.15:row=r2-19:h=bb27f3d96a20
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-19::T=1973.15:row=r2-19:h=c28c21abe986
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-19::T=1973.15:row=r2-19:h=e2cadab93578
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-19::T=1973.15:row=r2-19:h=d7dfde2de71e
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id055
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 86
+    - values
+    - series
+    - 0
+    locator: &id056
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id055
+    locator: *id056
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id055
+    locator: *id056
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id055
+    locator: *id056
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id055
+    locator: *id056
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id055
+    locator: *id056
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-17
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-17
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-17
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-17::T=1973.15:row=r2-17:h=0982c44731e0
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-17::T=1973.15:row=r2-17:h=34fae787704b
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-17::T=1973.15:row=r2-17:h=35555266d04f
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-17::T=1973.15:row=r2-17:h=cb87ba17c8cb
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-17::T=1973.15:row=r2-17:h=cb84ffdae78b
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id057
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 87
+    - values
+    - series
+    - 0
+    locator: &id058
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id057
+    locator: *id058
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id057
+    locator: *id058
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id057
+    locator: *id058
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id057
+    locator: *id058
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id057
+    locator: *id058
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-7
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-7
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-7
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-7::T=1973.15:row=r2-7:h=644269dc6b78
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-7::T=1973.15:row=r2-7:h=70ca1df3b1d1
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-7::T=1973.15:row=r2-7:h=ce6873d90a71
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-7::T=1973.15:row=r2-7:h=e35c690a0df5
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-7::T=1973.15:row=r2-7:h=85ea4e39761f
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id059
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 88
+    - values
+    - series
+    - 0
+    locator: &id060
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id059
+    locator: *id060
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id059
+    locator: *id060
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id059
+    locator: *id060
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id059
+    locator: *id060
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id059
+    locator: *id060
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-3
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-3
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-3
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-3::T=1973.15:row=r2-3:h=790df479c146
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-3::T=1973.15:row=r2-3:h=a0e447d8f5e2
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-3::T=1973.15:row=r2-3:h=b4d531d628d5
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-3::T=1973.15:row=r2-3:h=d94f1cef40bf
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-3::T=1973.15:row=r2-3:h=6a628a9293b8
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id061
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 89
+    - values
+    - series
+    - 0
+    locator: &id062
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id061
+    locator: *id062
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id061
+    locator: *id062
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id061
+    locator: *id062
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id061
+    locator: *id062
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id061
+    locator: *id062
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-10
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-10
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-10
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-10::T=1973.15:row=r2-10:h=145e5722733c
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-10::T=1973.15:row=r2-10:h=786fd0374ae8
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-10::T=1973.15:row=r2-10:h=9a3e93b7d7d5
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-10::T=1973.15:row=r2-10:h=c3805c777e5d
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-10::T=1973.15:row=r2-10:h=d46140e75877
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id063
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 90
+    - values
+    - series
+    - 0
+    locator: &id064
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id063
+    locator: *id064
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id063
+    locator: *id064
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id063
+    locator: *id064
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id063
+    locator: *id064
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id063
+    locator: *id064
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-16
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-16
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-16
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-16::T=1973.15:row=r2-16:h=54fa24a13938
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-16::T=1973.15:row=r2-16:h=60015b63b8d6
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-16::T=1973.15:row=r2-16:h=6ea7d20a3aee
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-16::T=1973.15:row=r2-16:h=954388a2ee34
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-16::T=1973.15:row=r2-16:h=edb974b0087c
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id065
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 91
+    - values
+    - series
+    - 0
+    locator: &id066
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id065
+    locator: *id066
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id065
+    locator: *id066
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id065
+    locator: *id066
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id065
+    locator: *id066
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id065
+    locator: *id066
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-11
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-11
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-11
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-11::T=1973.15:row=r2-11:h=2352c1e6874f
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-11::T=1973.15:row=r2-11:h=4fd224084121
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-11::T=1973.15:row=r2-11:h=73a46235444b
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-11::T=1973.15:row=r2-11:h=82cd7cbebf0a
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-11::T=1973.15:row=r2-11:h=b5383d7d8e69
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id067
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 92
+    - values
+    - series
+    - 0
+    locator: &id068
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id067
+    locator: *id068
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id067
+    locator: *id068
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id067
+    locator: *id068
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id067
+    locator: *id068
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id067
+    locator: *id068
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-12
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-12
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-12
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-12::T=1973.15:row=r2-12:h=225e129aebc4
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-12::T=1973.15:row=r2-12:h=37109350315d
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-12::T=1973.15:row=r2-12:h=a9d0eed9d118
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-12::T=1973.15:row=r2-12:h=fdc731f1f38f
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-12::T=1973.15:row=r2-12:h=e00e2de7aa9a
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id069
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 93
+    - values
+    - series
+    - 0
+    locator: &id070
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id069
+    locator: *id070
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id069
+    locator: *id070
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id069
+    locator: *id070
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id069
+    locator: *id070
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id069
+    locator: *id070
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-2
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-2
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-2
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-2::T=1973.15:row=r2-2:h=24a588a5bc38
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-2::T=1973.15:row=r2-2:h=545dd912e279
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-2::T=1973.15:row=r2-2:h=67335faeefb8
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-2::T=1973.15:row=r2-2:h=b08b3392957d
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-2::T=1973.15:row=r2-2:h=676bcaf3424e
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id071
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 94
+    - values
+    - series
+    - 0
+    locator: &id072
+      table: '1'
+      page: 6
+      published_page: 5549
+      pdf_page_index: 5
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id071
+    locator: *id072
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id071
+    locator: *id072
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id071
+    locator: *id072
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id071
+    locator: *id072
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id071
+    locator: *id072
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-13
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-13
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-13
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-13::T=1873.15:row=r2-13:h=02d855863590
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-13::T=1873.15:row=r2-13:h=166471e1cdbf
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-13::T=1873.15:row=r2-13:h=9c3b96036567
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-13::T=1873.15:row=r2-13:h=adf20fac53a7
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-13::T=1873.15:row=r2-13:h=db801be3d293
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id073
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 95
+    - values
+    - series
+    - 0
+    locator: &id074
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id073
+    locator: *id074
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id073
+    locator: *id074
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id073
+    locator: *id074
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id073
+    locator: *id074
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id073
+    locator: *id074
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-15
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-15
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-15
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-15::T=1873.15:row=r2-15:h=227a72f716c8
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-15::T=1873.15:row=r2-15:h=2c7b760be280
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-15::T=1873.15:row=r2-15:h=dc08b7f6ca1c
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-15::T=1873.15:row=r2-15:h=de389e4f5096
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-15::T=1873.15:row=r2-15:h=77f0cfd547c1
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id075
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 96
+    - values
+    - series
+    - 0
+    locator: &id076
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id075
+    locator: *id076
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id075
+    locator: *id076
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id075
+    locator: *id076
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id075
+    locator: *id076
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id075
+    locator: *id076
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-14
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-14
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-14
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-14::T=1873.15:row=r2-14:h=bbbf970691a4
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-14::T=1873.15:row=r2-14:h=ce9941cdf83e
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-14::T=1873.15:row=r2-14:h=d51590a9f63f
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-14::T=1873.15:row=r2-14:h=f96f3651dbad
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-14::T=1873.15:row=r2-14:h=e7df299b3f8e
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id077
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 97
+    - values
+    - series
+    - 0
+    locator: &id078
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id077
+    locator: *id078
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id077
+    locator: *id078
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id077
+    locator: *id078
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id077
+    locator: *id078
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id077
+    locator: *id078
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-9
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-9
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-9
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-9::T=1873.15:row=r2-9:h=508b0ad3387c
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-9::T=1873.15:row=r2-9:h=9ce83ab4bf4c
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-9::T=1873.15:row=r2-9:h=ba04d766772e
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-9::T=1873.15:row=r2-9:h=fa33e1f29cd2
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-9::T=1873.15:row=r2-9:h=e49739fbe882
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id079
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 98
+    - values
+    - series
+    - 0
+    locator: &id080
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id079
+    locator: *id080
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id079
+    locator: *id080
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id079
+    locator: *id080
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id079
+    locator: *id080
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id079
+    locator: *id080
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r2-8
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r2-8
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r2-8
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-8::T=1873.15:row=r2-8:h=10c16669c6a0
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-8::T=1873.15:row=r2-8:h=915f0d23178d
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-8::T=1873.15:row=r2-8:h=b1aa7cea5169
+    - kems-010-richter-2007::richter_2007_residue_table1_r2-8::T=1873.15:row=r2-8:h=b966c54048bf
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-8::T=1873.15:row=r2-8:h=80d173ce3bab
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id081
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 99
+    - values
+    - series
+    - 0
+    locator: &id082
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id081
+    locator: *id082
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id081
+    locator: *id082
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id081
+    locator: *id082
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id081
+    locator: *id082
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id081
+    locator: *id082
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-2
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-2
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-2
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-2::T=1873.15:row=r3-2:h=24fa62ba9822
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-2::T=1873.15:row=r3-2:h=33961c3b7fec
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-2::T=1873.15:row=r3-2:h=5f31d436539b
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-2::T=1873.15:row=r3-2:h=b232e5dd270d
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-2::T=1873.15:row=r3-2:h=d502425e8aed
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id083
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 100
+    - values
+    - series
+    - 0
+    locator: &id084
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id083
+    locator: *id084
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id083
+    locator: *id084
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id083
+    locator: *id084
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id083
+    locator: *id084
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id083
+    locator: *id084
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-1
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-1
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-1
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-1::T=1873.15:row=r3-1:h=330c87be0173
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-1::T=1873.15:row=r3-1:h=6f7323f64541
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-1::T=1873.15:row=r3-1:h=7a5c89f95e9c
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-1::T=1873.15:row=r3-1:h=effe853dc626
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-1::T=1873.15:row=r3-1:h=847a47163491
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id085
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 101
+    - values
+    - series
+    - 0
+    locator: &id086
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id085
+    locator: *id086
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id085
+    locator: *id086
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id085
+    locator: *id086
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id085
+    locator: *id086
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id085
+    locator: *id086
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-20
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-20
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-20
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-20::T=1873.15:row=r3-20:h=04e69f39e335
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-20::T=1873.15:row=r3-20:h=06603610beac
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-20::T=1873.15:row=r3-20:h=8d34e0e58c4b
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-20::T=1873.15:row=r3-20:h=9f20efd7f50b
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-20::T=1873.15:row=r3-20:h=6dfa765b6ca7
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id087
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 102
+    - values
+    - series
+    - 0
+    locator: &id088
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id087
+    locator: *id088
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id087
+    locator: *id088
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id087
+    locator: *id088
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id087
+    locator: *id088
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id087
+    locator: *id088
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-21
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-21
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-21
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-21::T=1873.15:row=r3-21:h=26cc7292c69f
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-21::T=1873.15:row=r3-21:h=5946395a1273
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-21::T=1873.15:row=r3-21:h=6c62007c0ca3
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-21::T=1873.15:row=r3-21:h=fea362136a3b
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-21::T=1873.15:row=r3-21:h=4d4eff20765b
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id089
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 103
+    - values
+    - series
+    - 0
+    locator: &id090
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id089
+    locator: *id090
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id089
+    locator: *id090
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id089
+    locator: *id090
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id089
+    locator: *id090
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id089
+    locator: *id090
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-4
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-4
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-4
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-4::T=1873.15:row=r3-4:h=51ecbb92ca28
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-4::T=1873.15:row=r3-4:h=ad410eafaed4
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-4::T=1873.15:row=r3-4:h=cc94f6dd4911
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-4::T=1873.15:row=r3-4:h=dc4f69ecbae4
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-4::T=1873.15:row=r3-4:h=b55d8482615e
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id091
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 104
+    - values
+    - series
+    - 0
+    locator: &id092
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id091
+    locator: *id092
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id091
+    locator: *id092
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id091
+    locator: *id092
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id091
+    locator: *id092
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id091
+    locator: *id092
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-7
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-7
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-7
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-7::T=1873.15:row=r3-7:h=4398423bd999
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-7::T=1873.15:row=r3-7:h=9702adc4d365
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-7::T=1873.15:row=r3-7:h=9b9c783fe1f2
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-7::T=1873.15:row=r3-7:h=cc6682ab57d8
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-7::T=1873.15:row=r3-7:h=1ed927e75f11
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id093
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 105
+    - values
+    - series
+    - 0
+    locator: &id094
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id093
+    locator: *id094
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id093
+    locator: *id094
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id093
+    locator: *id094
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id093
+    locator: *id094
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id093
+    locator: *id094
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-19
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-19
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-19
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-19::T=1873.15:row=r3-19:h=34fe3c03713c
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-19::T=1873.15:row=r3-19:h=424c21bb5b1f
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-19::T=1873.15:row=r3-19:h=802d6f6020dd
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-19::T=1873.15:row=r3-19:h=d165d2846343
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-19::T=1873.15:row=r3-19:h=4f24e17c0316
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id095
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 106
+    - values
+    - series
+    - 0
+    locator: &id096
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id095
+    locator: *id096
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id095
+    locator: *id096
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id095
+    locator: *id096
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id095
+    locator: *id096
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id095
+    locator: *id096
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-18
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-18
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-18
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-18::T=1873.15:row=r3-18:h=42a05d376915
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-18::T=1873.15:row=r3-18:h=9cf3d567c4c8
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-18::T=1873.15:row=r3-18:h=c7c4455a9422
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-18::T=1873.15:row=r3-18:h=fa37d9457b17
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-18::T=1873.15:row=r3-18:h=024137f59cdb
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id097
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 107
+    - values
+    - series
+    - 0
+    locator: &id098
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id097
+    locator: *id098
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id097
+    locator: *id098
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id097
+    locator: *id098
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id097
+    locator: *id098
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id097
+    locator: *id098
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-8
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-8
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-8
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-8::T=1873.15:row=r3-8:h=2a58833950ee
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-8::T=1873.15:row=r3-8:h=4774e842abc4
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-8::T=1873.15:row=r3-8:h=846dd32dd94a
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-8::T=1873.15:row=r3-8:h=c37e363e0db9
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-8::T=1873.15:row=r3-8:h=e10e7b743782
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id099
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 108
+    - values
+    - series
+    - 0
+    locator: &id100
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id099
+    locator: *id100
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id099
+    locator: *id100
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id099
+    locator: *id100
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id099
+    locator: *id100
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id099
+    locator: *id100
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+- card_id: cai-r3-5
+  experiment_ids:
+  - 10.1016/j.gca.2007.09.005::experiment::cai-r3-5
+  setup_ref: 10.1016/j.gca.2007.09.005::experiment::cai-r3-5
+  outcomes:
+  - group_id: residue-oxide-vector
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-5::T=1873.15:row=r3-5:h=101fa4cb6469
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-5::T=1873.15:row=r3-5:h=668200cd0530
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-5::T=1873.15:row=r3-5:h=f0e75f1a30ac
+    - kems-010-richter-2007::richter_2007_residue_table1_r3-5::T=1873.15:row=r3-5:h=f77b97a28257
+    required_coordinates: 4
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: total-mass-loss
+    observation_ids:
+    - kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-5::T=1873.15:row=r3-5:h=086e31422ca6
+    required_coordinates: 1
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: final-area
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: magnesium-depletion
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: reduced-magnesium-silicon-flux
+    observation_ids: []
+    required_coordinates: 2
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  - group_id: magnesium-isotope
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-oxide-vector
+    context_ref: &id101
+    - extracts
+    - kems-010-richter-2007
+    - species
+    - Mg
+    - observations
+    - 109
+    - values
+    - series
+    - 0
+    locator: &id102
+      table: '1'
+      page: 7
+      published_page: 5550
+      pdf_page_index: 6
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: total-mass-loss
+    context_ref: *id101
+    locator: *id102
+    blocker: NO_BAND
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: final-area
+    context_ref: *id101
+    locator: *id102
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-depletion
+    context_ref: *id101
+    locator: *id102
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: reduced-magnesium-silicon-flux
+    context_ref: *id101
+    locator: *id102
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  - group_id: magnesium-isotope
+    context_ref: *id101
+    locator: *id102
+    blocker: unsupported
+    note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
+      not extra independent RMS weights.
+  assumptions: []
+run_basis: One card per Table 1 physical sample (36 rows on p.6 and 15 on p.7). Zero high-T hold still includes
+  heating/cooling; starting material row is not a run.
+regime: vacuum_free_evaporation_iridium_loop

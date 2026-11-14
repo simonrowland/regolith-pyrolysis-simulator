@@ -1,0 +1,262 @@
+study_id: kems-026-markova-1984
+work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+source_ids:
+- kems-026-markova-1984
+authoring_revision: t1766-phase-a-2026-11-13
+evidence_label: development_validation
+engine_policy: source_only_no_engine
+review_ref: kems-026-markova-1984.review.yaml
+runs:
+- card_id: kems-026-markova-1984-v
+  experiment_ids:
+  - 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::experiment::V
+  setup_ref: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::experiment::V
+  outcomes:
+  - group_id: cumulative-mass-loss-series
+    observation_ids:
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=1749.15:h=2bb75b6f4085
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=1817.15:h=1e2df5aefc33
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=1913.15:h=dffa571eff58
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=1992.15:h=05f1b996b316
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=2063.15:h=6f28dd35a7cf
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=2082.15:h=d5609741e09f
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=2230.15:h=4add32c65899
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=2303.15:h=cb7ab11a0a92
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=2392.15:h=683d6998475f
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=2473.15:h=7cd40a6d68fd
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::mass_loss_fraction::T=2528.15:h=2009ef1367ca
+    required_coordinates: 11
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: residual-melt-series
+    observation_ids:
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1749.15:h=0a2342ed14ff
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1749.15:h=4377f53ca445
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1749.15:h=6d3d0fa8f3e0
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1749.15:h=b7d5db1adc15
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1749.15:h=e82ceb5b78f8
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1817.15:h=0eb9fc09f487
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1817.15:h=2fa2b7b295ca
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1817.15:h=82b1eed9e945
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1817.15:h=8827d01cc891
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1817.15:h=defeb06041cd
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1913.15:h=051f97a4571f
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1913.15:h=12474282c726
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1913.15:h=4abe5f4edd2e
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1913.15:h=4d10631d5796
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1913.15:h=9da520207495
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1992.15:h=07acb82fb662
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1992.15:h=1e1141da4c70
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1992.15:h=30b669dcfef6
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1992.15:h=634732378df7
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=1992.15:h=85de9a40adba
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2063.15:h=055aff311dbb
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2063.15:h=3f17728359e3
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2063.15:h=6f81e43ec1d4
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2063.15:h=b66278de0573
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2063.15:h=fb303690b3f2
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2082.15:h=3c4c928296d8
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2082.15:h=590cb7f97925
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2082.15:h=79f17d0f6032
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2082.15:h=8d2e11eb1f89
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2082.15:h=f58f7665fb09
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2230.15:h=17347947a907
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2230.15:h=5d49fd2ebf89
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2230.15:h=640ae48aa758
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2230.15:h=9030b60378fa
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2230.15:h=abd0ea2515eb
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2303.15:h=300de145db1c
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2303.15:h=4670808109e6
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2303.15:h=8b73b1d05037
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2303.15:h=c58421fac488
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2303.15:h=ec9beff057d8
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2392.15:h=015614b809ba
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2392.15:h=0d0e8aa1f7c1
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2392.15:h=7646efef67d4
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2392.15:h=78031904f55b
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2392.15:h=ab430bade9d0
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2473.15:h=061b1cc08bf1
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2473.15:h=4630b011865b
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2473.15:h=5e7d2e4f4b92
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2473.15:h=688b72ccf9f8
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2473.15:h=fac7fc8d8903
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2528.15:h=112ad754b1b6
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2528.15:h=3d1bf8aaa1f8
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2528.15:h=4a7e07271064
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2528.15:h=6926163cc239
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::T=2528.15:h=e49f2ed4e0f1
+    required_coordinates: 55
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: ternary-residue-track
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: cumulative-mass-loss-series
+    context_ref: &id001
+    - extracts
+    - kems-026-markova-1984
+    - species
+    - SiO2
+    - observations
+    - 2
+    - values
+    - series
+    locator: &id002
+      page: 2
+      pdf_page_index: 1
+      table: '2'
+      paragraph: V panel, all eleven post-charge rows; T=0 is initial charge
+      published_page: 510
+    blocker: NO_BAND
+    note: Initial T=0 row is setup. Partial pressures are results, never chamber or oxygen inputs. Figure 1 is dependent,
+      not another RMS vote.
+  - group_id: residual-melt-series
+    context_ref: *id001
+    locator: *id002
+    blocker: NO_BAND
+    note: Initial T=0 row is setup. Partial pressures are results, never chamber or oxygen inputs. Figure 1 is dependent,
+      not another RMS vote.
+  - group_id: ternary-residue-track
+    context_ref: *id001
+    locator: *id002
+    blocker: unsupported
+    note: Initial T=0 row is setup. Partial pressures are results, never chamber or oxygen inputs. Figure 1 is dependent,
+      not another RMS vote.
+  assumptions: []
+- card_id: kems-026-markova-1984-vi
+  experiment_ids:
+  - 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::experiment::VI
+  setup_ref: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::experiment::VI
+  outcomes:
+  - group_id: cumulative-mass-loss-series
+    observation_ids:
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=1748.15:h=06030358ec90
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=1765.15:h=e1850b8066ee
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=1905.15:h=d348843a7964
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=1999.15:h=9dacc2283d76
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=2069.15:h=b1d01a8a881b
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=2156.15:h=e9110f31a14b
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=2233.15:h=9533761933bd
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=2311.15:h=0dc6349aa16c
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=2391.15:h=0ecf14c730e5
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=2480.15:h=a80223906199
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::mass_loss_fraction::T=2564.15:h=c7b563f6bfa5
+    required_coordinates: 11
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: residual-melt-series
+    observation_ids:
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1748.15:h=15e4c86acd3a
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1748.15:h=209abd346946
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1748.15:h=33d3b90fbca0
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1748.15:h=991fbe7bed1e
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1748.15:h=a796c60a55c3
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1765.15:h=9852b457512f
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1765.15:h=b5de0ff9fe9e
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1765.15:h=cce5e84a3341
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1765.15:h=f5a68319d38c
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1765.15:h=f722241fb71a
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1905.15:h=0e7e09e54ba2
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1905.15:h=5998a4f44a03
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1905.15:h=6d4248c6ed1d
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1905.15:h=79940f3a4e16
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1905.15:h=9e03ca2d8864
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1999.15:h=36567ae3b9cf
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1999.15:h=41030c382a36
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1999.15:h=b5386072501e
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1999.15:h=ded9c7429f16
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=1999.15:h=e16d279584ac
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2069.15:h=289d3455c804
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2069.15:h=2cd3ae3276d9
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2069.15:h=2f839f2f874c
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2069.15:h=759aba812695
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2069.15:h=c989eb2f9eea
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2156.15:h=1539cddb1339
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2156.15:h=323b6fd985a2
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2156.15:h=66f5eb3d3402
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2156.15:h=c98ab06cc333
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2156.15:h=dfbdb0c28078
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2233.15:h=384555bce72a
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2233.15:h=8416dbe199b7
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2233.15:h=a4690d822b9e
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2233.15:h=d37d9211a17a
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2233.15:h=fada4ec2a11b
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2311.15:h=106c7b2bcc62
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2311.15:h=26028f8d5418
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2311.15:h=278381e1d573
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2311.15:h=9c9d7b725e43
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2311.15:h=eb94d33b190c
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2391.15:h=4380bf5d4eb8
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2391.15:h=59c4f2896d6b
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2391.15:h=60373bed885a
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2391.15:h=66de1a33ba35
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2391.15:h=c105d87c1c92
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2480.15:h=175c73bd0e95
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2480.15:h=9e6722a89608
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2480.15:h=aec5bcf80ad1
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2480.15:h=be6ccad9ab09
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2480.15:h=c0101f65f330
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2564.15:h=17f4fe509892
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2564.15:h=2b99efb7f71d
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2564.15:h=613be4e16c0f
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2564.15:h=73dc6be208ee
+    - kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::T=2564.15:h=be795a6d137d
+    required_coordinates: 55
+    comparator: battery_point
+    independent: true
+    blockers:
+    - NO_BAND
+  - group_id: ternary-residue-track
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: false
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: cumulative-mass-loss-series
+    context_ref: &id003
+    - extracts
+    - kems-026-markova-1984
+    - species
+    - SiO2
+    - observations
+    - 1
+    - values
+    - series
+    locator: &id004
+      page: 2
+      pdf_page_index: 1
+      table: '2'
+      paragraph: VI panel, all eleven post-charge rows; T=0 is initial charge
+      published_page: 510
+    blocker: NO_BAND
+    note: Initial T=0 row is setup. Partial pressures are results, never chamber or oxygen inputs. Figure 1 is dependent,
+      not another RMS vote.
+  - group_id: residual-melt-series
+    context_ref: *id003
+    locator: *id004
+    blocker: NO_BAND
+    note: Initial T=0 row is setup. Partial pressures are results, never chamber or oxygen inputs. Figure 1 is dependent,
+      not another RMS vote.
+  - group_id: ternary-residue-track
+    context_ref: *id003
+    locator: *id004
+    blocker: unsupported
+    note: Initial T=0 row is setup. Partial pressures are results, never chamber or oxygen inputs. Figure 1 is dependent,
+      not another RMS vote.
+  assumptions: []
+run_basis: Two inseparable cumulative-depletion series, V and VI. Physical p.1 describes successive 70-degree, 15-minute
+  steps to complete vaporization; Table 2 records evolving residue, not independent fresh charges.
+regime: stepped_knudsen_effusion

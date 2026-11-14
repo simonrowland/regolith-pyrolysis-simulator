@@ -1,0 +1,3262 @@
+study_id: kems-012-sossi-2019
+work_id: 10.1016/j.gca.2019.06.021
+source_ids:
+- kems-012-sossi-2019
+authoring_revision: t1766-phase-a-2026-11-13
+evidence_label: development_validation
+engine_policy: source_only_no_engine
+review_ref: kems-012-sossi-2019.review.yaml
+runs:
+- card_id: sossi-2019-run-2m-15-07-16c
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16c
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16c
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=898de3cf3b5c
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=bf175d272659
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=1909927a179e
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=cecd82c03eee
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=f33af75bed4c
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=ba4ded0ac42f
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=7ac9738c97c0
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=a6a6630cfab6
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 0
+    locator: &id001
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-15-07-16c
+    printed_components: &id002
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 0
+    - locator
+    locator: *id001
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-2m-15-07-16d
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16d
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16d
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=63c3df853f62
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=07580934a1a1
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=3676acdd36d1
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=8fb91e80d427
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=2426b423f4ab
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=197a1f1d2d83
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=274a70654730
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=a8799d18e0e0
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 1
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-15-07-16d
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-15-07-16g
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16g
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16g
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=248b06b540a9
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=85a976c1d58a
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=d3dec310dc7f
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=0db950fdc8a2
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=c931b13f2088
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=2369e7102282
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=97446e9fa312
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=827dba70bddb
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 2
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-15-07-16g
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-15-07-16h
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16h
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16h
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=3075b68a2c35
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=f731f6632099
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=d626b2434c0f
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=77851cd3660d
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=2f4d2288e092
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=fab000a27158
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=089d72755167
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=579562534edb
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 3
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-15-07-16h
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-15-07-16f
+  experiment_ids: []
+  setup_ref: null
+  outcomes:
+  - group_id: zoning-profile
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - missing_input
+    - unsupported
+  printed_inventory:
+  - group_id: zoning-profile
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-15-07-16f
+    blocker: missing_input
+    note: Printed profile-only run; Table 2 concentration cells blank. No existing run Experiment or observation;
+      do not substitute another charge.
+  assumptions: []
+- card_id: sossi-2019-run-p11-06-18a
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p11-06-18a
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p11-06-18a
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=35e41160c46f
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=29dcc88d1ec6
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=35f49b7921fb
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=ecdc43d28926
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=0ab483251552
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=08b408ecd9e6
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=a586b8887587
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=a7b818e31665
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 4
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: P11-06-18a*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-15-07-16a
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-15-07-16a
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-15-07-16a
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=c8cc40e32937
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=821172723028
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=998f9438a8fa
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=50cef18e4a25
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=809088767cb1
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=9f133d6f415d
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=125685358584
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=6b1ff9594286
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 5
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-15-07-16a*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-15-07-16b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-15-07-16b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-15-07-16b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=12ead2a8bbed
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=784b930cd710
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=99c8e046bd49
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=3fb84b753a42
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=ccc5a6c27230
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=7f3ae7b1a57b
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=daa5b8604f9a
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=9d2cb50efe20
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 6
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-15-07-16b
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-ps6
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps6
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps6
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=7fdf9c935469
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=907436192e8d
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=78af0f8b5f8a
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=a5412b47ed3d
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=73f528e1aaba
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=64a8e7000b16
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=9caf4e7413cf
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=9a757708aa8c
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 7
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS6
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-3m-18-07-16b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-18-07-16b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-18-07-16b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=bbeac9e25da4
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=2ad0b1f37260
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=07be49bb2647
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=a8752d57c76b
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=b8726da7e007
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=28bbfcab6f2e
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=0314c9eea417
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=dedcf6a0d99e
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 8
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 3M-18-07-16b
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-18-07-16a
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-18-07-16a
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-18-07-16a
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=59fe027533e4
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=d7a2878d4dcb
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=90e5add708c7
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=b6c198c7c092
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=0d76903c66e1
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=8da1f1e079e2
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=d67c9c276be6
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=1a6afd51abdf
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 9
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-18-07-16a
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-18-07-16c
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-18-07-16c
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-18-07-16c
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=1edeb9a30b1e
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=c2527de24f03
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=9b18699febf8
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=b6ccf1e686bd
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=44045fbbcf01
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=1bf0ecc5a793
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=5f4b234c57a0
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=456944eb56a7
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 10
+    locator: &id003
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-18-07-16c
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 10
+    - locator
+    locator: *id003
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-1m-ps3
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps3
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps3
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=27178d315b71
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=5c3d147099e5
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=7427b800cb51
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=0ebdd855a790
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=023cb7d12eb6
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=bcbaacaa07d1
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=2f74584d75b2
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f4cce4bf7f38
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 11
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS3
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-ps2
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps2
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps2
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=ac187e141337
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=d84f20739c78
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=5360ab67b645
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=84a2163f844a
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=3500b97d0587
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=de312680f2c4
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=066154a3da00
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=dc9a5cfc01ef
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 12
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS2
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-ps4
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps4
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps4
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=b71974c2cddf
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=0291f910f4b1
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=7f8dbdafa03f
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=af3bc14cf85e
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=f89a07035c64
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=73e66605acd5
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=2a25a1e700fa
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=ea709ac7f138
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 13
+    locator: &id004
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS4
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 13
+    - locator
+    locator: *id004
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-p09-06-18b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p09-06-18b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p09-06-18b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=c860f29b5236
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=07558c9e98a0
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=6384e03246d0
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f35cb9b653bc
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=a895b1e1abd5
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=69f3d5810dcb
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=7547a6a7dfe8
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=155cde545036
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 14
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: P09/06/18b*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-p09-06-18a
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p09-06-18a
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p09-06-18a
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=e06c001f3436
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=2f59a1523d89
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=9381dcfcb4a9
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=d1fac25bd60f
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=679076b98b6d
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=d30027fd1a0e
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=036efacefa32
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f44a4e85386e
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 15
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: P09/06/18a*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-ps5
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps5
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps5
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=ca8d52cb8510
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=4f8d752c6b86
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=725209a4388c
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=599338e3f1b1
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=1725165acc72
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=63ee9877b753
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=80486c4bae7e
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=04bff729c8c5
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 16
+    locator: &id005
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS5
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 16
+    - locator
+    locator: *id005
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-p08-02-17b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p08-02-17b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p08-02-17b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=b67397c68ca9
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=1efb83d75df5
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=39f1b37222c6
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=693e8e2c85df
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=e1e10fdea973
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=45b901adb75b
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=46cc6e11c19f
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f5c31d8669b3
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 17
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: P08-02-17b*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-3m-29-2-16
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-29-2-16
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-29-2-16
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=78327222756c
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=5944965f8ebf
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=1f8189e19c7b
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=1602ca8506e2
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=4714834b9ce0
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=a02cef5aec30
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=08374a241704
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=afb1511c0329
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 18
+    locator: &id006
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 3M-29/2/16*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 18
+    - locator
+    locator: *id006
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-1m-2-3-16
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-2-3-16
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-2-3-16
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=a37162bc7b5d
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=e22c972aae51
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=f23ab8f2d1c7
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=93af4b21bd23
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=5a9241a6df35
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=72d3e3856d10
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=65175305c8b9
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=b051bc4b47e8
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 19
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-2/3/16*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-c18-12-15
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-c18-12-15
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-c18-12-15
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=5c23d4fb8c7f
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=bdb5edc5b046
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=82ec21e6d684
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=29bb1b90366a
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=14027d8afcb3
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=29d92fda9f7f
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=d10779d974e5
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=7fc40efcdb34
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 20
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: C18/12/15*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-ps1
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps1
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps1
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=3ce834a4567c
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=18c84f98946f
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=325eb23ef60b
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=bb3cf1b65ecd
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=be3ba9e1a8b6
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=24c345d61402
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=54d7f38188e0
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=73fcac04a687
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 21
+    locator: &id007
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS1*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 21
+    - locator
+    locator: *id007
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-p09-06-18c
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p09-06-18c
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p09-06-18c
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=2533d38ba316
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=996d9be70867
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=9a1d291bdd9d
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f75418e8ba26
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=e9ef6536c11d
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=bef15936eec6
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f3fadbde14e8
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=b51b6832e0ee
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 22
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: P09/06/18c*
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-c17-12-15a
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-c17-12-15a
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-c17-12-15a
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=785ce69e5da2
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=027cf4b71df0
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=3dab9ba2475f
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=33023ba00a5f
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=89e4eb2f4931
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=ab63afa2f45b
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=4cca68bc31e5
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=52721fedba87
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 23
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: C17/12/15a
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-1-3-16
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-1-3-16
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-1-3-16
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=8fd73ee10996
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=b8206ed7a564
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=5463f433fe5e
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=c435c3dd4a9c
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=a01de3992ce5
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f3323ea26fd4
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=96e37aef82ed
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=be8fc7ed6435
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 24
+    locator: &id008
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-1/3/16
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 24
+    - locator
+    locator: *id008
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-3m-1-3-16
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-1-3-16
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-1-3-16
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=79ee615138fc
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=147248bad5d7
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=960bf9faf692
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=2b53dee03a98
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=40607392acb0
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=4f4dafe5f43b
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f0de0da46afe
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=c4f343bc133b
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 25
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 3M-1/3/16
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-c17-12-15b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-c17-12-15b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-c17-12-15b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=79df7f799c85
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=59574b80ad1b
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=6a082abb59b7
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=3ff636883144
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=a0c3c0f774ab
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=019f7da488a5
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=905cc156ff47
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=a986c2a921f2
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 26
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: C17/12/15b
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-1m-1-3-16b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-1-3-16b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-1-3-16b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=523b7459614c
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=a33d72fe91c8
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=99169a8a97e0
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=0b42c5e7f23f
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=f8d91ff1a49d
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=373c11d1134b
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=88b686ad5bf2
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=ebb36a71c5e7
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 27
+    locator: &id009
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 1M-1/3/16b
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 27
+    - locator
+    locator: *id009
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-3m-29-2-16b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-29-2-16b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-29-2-16b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=b4a27d49d53b
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=a99e759ae525
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=388342bd7c8f
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=11eab6942a9f
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=a36427f65297
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=117ceb13fc33
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=da23173ed9e7
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=4a751c101fec
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 28
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 3M-29/2/16b
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-c17-12-15c
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-c17-12-15c
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-c17-12-15c
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=d27399d58f1f
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=9a57ac024725
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=9264e569eece
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=7d3d49680b9f
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=3f32e7158584
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=f2a29841e94b
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=63ab13eafb3f
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1673.15:h=3fb2a89dd206
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 29
+    locator: &id010
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: C17/12/15c
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 29
+    - locator
+    locator: *id010
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-2m-16-07-16e
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16e
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16e
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=748fc3aa8fa0
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=f54abd7b291b
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=d4ec511e8610
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=51372c900f6b
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=2ee2e6a27e7f
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=019f63611ea3
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=5f8f307ef30f
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=98563fbab2e6
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 30
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16e
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-16-07-16a
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16a
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16a
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=6ec695daf492
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=2a8dcac26399
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=df4c645698e3
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=cb1bb5227a84
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=84319ca19bce
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=a238c26721ce
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=0204ddd4d0fa
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=70e70ba2806f
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 31
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16a
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-16-07-16b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=62502ba2c527
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=490e26ad199f
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=b83f9858d54c
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=96baaaf42a44
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=613d9fc0065b
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=665b795e761f
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=aad394e032b3
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=98f277d15694
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 32
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16b
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-16-07-16c
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16c
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16c
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=84b16886f4bc
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=122e8225f26b
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=c082a69b7442
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=d4666ddcd5ed
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=128ec8b511d1
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=474f6e0973a8
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=ca613ddac31c
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=4cc769d18677
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 33
+    locator: &id011
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16c
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 33
+    - locator
+    locator: *id011
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-3m-2-3-16
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-2-3-16
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-3m-2-3-16
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=c8b7ed75f870
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=72a5d57a4708
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=1f1de7551673
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=fe1a4911d4f0
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=be569ecfc515
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=7f5c715d8ba6
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=d9ab22ca5c17
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=b5f6ade33b00
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 34
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 3M-2/3/16
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-17-07-16a
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-17-07-16a
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-17-07-16a
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=8c2abcabc6c4
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=b6f8d4f9a6c7
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=c01b95aec9a7
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=bffeef5092c4
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=b30e8ce84604
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=373debd8d009
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=1cd0732bd72b
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=3640b8ad0da8
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 35
+    locator: &id012
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-17-07-16a
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 35
+    - locator
+    locator: *id012
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-2m-17-07-16b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-17-07-16b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-17-07-16b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=cf8866c9fe83
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=ebb49138b931
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=8ad044b0f77b
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=7a2cf5e18c53
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=3b8c0eaed66f
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=2918874cf098
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=f0a49adbdf36
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=05b5414b0bf0
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 36
+    locator: &id013
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-17-07-16b
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 36
+    - locator
+    locator: *id013
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-2m-17-07-16c
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-17-07-16c
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-17-07-16c
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=9e2ef97963fe
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=c51970e45ac0
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=c373b58fca2a
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=500ef6a40960
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=c1dba7f9e7bb
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=c9066b7946b8
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=a70550915cde
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1773.15:h=fc5ceb7b4565
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 37
+    locator: &id014
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-17-07-16c
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 37
+    - locator
+    locator: *id014
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-2m-16-07-16f
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16f
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16f
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=52cccce19436
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=fdbf0e1ae51b
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=3968589ce6a1
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=f0ecb2a60631
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=674d41af5506
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=ddbbebf27f4c
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=44d6196feb21
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=e466fe933355
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 38
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16f
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-16-07-16g
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16g
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16g
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=4d11a33a03a0
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=4ffe9d31657c
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=734219389a54
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=6e333fa92641
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=d56f67efde15
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=704c218a0e95
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=0a0ff0693537
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=7c7ef7a1e69c
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 39
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16g
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-p11-06-18b
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p11-06-18b
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-p11-06-18b
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=095e121ef8f4
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=f1aefd6b4abc
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=cbaf506c43ec
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=8950be557d05
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=9b317bade4f4
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=95719da3cdab
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=371edb21ed69
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=0c441b9c26f8
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 40
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: P11-06-18b
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+- card_id: sossi-2019-run-2m-16-07-16h
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16h
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16h
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=242c1cc56a44
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=a09f21ac53f6
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=cc938a22cf74
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=fbff004b895d
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=19f6bcd07899
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=1a1d30b5c849
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=2b6ddd4db11e
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=4634e781d12d
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  - group_id: zoning-profile-or-wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 41
+    locator: &id015
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16h
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  - group_id: zoning-profile-or-wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 41
+    - locator
+    locator: *id015
+    blocker: unsupported
+    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
+      A.'
+  assumptions: []
+- card_id: sossi-2019-run-2m-16-07-16d
+  experiment_ids:
+  - 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16d
+  setup_ref: 10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-16-07-16d
+  outcomes:
+  - group_id: residue-element-vector
+    observation_ids:
+    - kems-012-sossi-2019::sossi_2019_gd_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=f1d3229260fb
+    - kems-012-sossi-2019::sossi_2019_la_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=a885cbef3e6f
+    - kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=4cdc018649ea
+    - kems-012-sossi-2019::sossi_2019_sc_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=1f93eeabae06
+    - kems-012-sossi-2019::sossi_2019_ti_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=a22b502d74e7
+    - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=6e14e65c8ae3
+    - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=d08ec8e99b86
+    - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1823.15:h=457fe87393e2
+    required_coordinates: 22
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
+  printed_inventory:
+  - group_id: residue-element-vector
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 42
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16d
+    printed_components: *id002
+    typed_components:
+    - Gd
+    - La
+    - Mn
+    - Sc
+    - Ti
+    - V
+    - Yb
+    - Zr
+    unadopted_components:
+    - Li
+    - Na
+    - K
+    - Cr
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Mo
+    - Ag
+    - Cd
+    - Pb
+    blocker: unsupported
+    note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
+      transferred to the residue.
+  assumptions: []
+run_basis: One card per Table 2 physical run, including 2M-15-07-16f (profile-only). Starting material and four
+  blank wire runs are controls, not charged runs.
+regime: one_atmosphere_open_furnace_flowing_CO_CO2
+regime_note: Owner inclusion of atmospheric runs; paper also uses 1 bar. Exact pressure history remains a source/typed-input
+  blocker, never a vacuum exclusion.
