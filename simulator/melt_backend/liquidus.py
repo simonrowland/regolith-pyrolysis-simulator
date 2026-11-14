@@ -27,6 +27,8 @@ MAX_LIQUIDUS_SCAN_POINTS = 100_000
 # liquidus fraction to 1 only inside this band. One owner: do not copy
 # the literal. The solid threshold is a different rule and stays separate.
 LIQUIDUS_LIQUID_EPSILON = 1.0e-3
+# Solid-side threshold shared with single-point first-liquid diagnostics.
+LIQUIDUS_SOLID_EPSILON = 1.0e-3
 # The statuses a SAMPLE may refuse with and still be carried out through the
 # finder, so the caller learns WHICH refusal occurred rather than a generic
 # solver failure.
@@ -338,7 +340,7 @@ def find_liquidus_solidus_by_fraction(
     max_T_C: float = 2200.0,
     scan_step_C: float = 50.0,
     tolerance_C: float = 2.0,
-    solid_epsilon: float = 1.0e-3,
+    solid_epsilon: float = LIQUIDUS_SOLID_EPSILON,
     liquid_epsilon: float = LIQUIDUS_LIQUID_EPSILON,
     monotonicity_tolerance: float = 2.0e-2,
     monotone_smoothing_max: float = 5.0e-1,

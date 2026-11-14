@@ -141,7 +141,11 @@ from simulator.lab_schedule import (
     normalize_lab_schedule,
 )
 from simulator.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    PA_PER_BAR,
+    PA_PER_MBAR,
+)
 from simulator.recipe_io import RecipeIOError, load_recipe_patch
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
@@ -1658,6 +1662,192 @@ class PyrolysisRun:
                     },
                 },
             )
+
+            def build_liner_state() -> dict[str, Any] | None:
+                from simulator.furnace_materials import (
+                    InterfaceChemistryRefusal,
+                    load_furnace_materials,
+                    load_interface_chemistry,
+                    load_interface_invariant_table,
+                )
+                from simulator.liner_corrosion import (
+                    LinerCorrosionRefusal,
+                    MageminLinerSampler,
+                    build_liner_state_segment,
+                )
+
+                catalog = load_furnace_materials()
+                material = catalog.get(furnace_material_id)
+                raw_chemistry = (
+                    material.get("interface_chemistry")
+                    if isinstance(material, Mapping)
+                    else None
+                )
+                if not isinstance(raw_chemistry, Mapping):
+                    return None
+
+                condensation_model = getattr(sim, "condensation_model", None)
+                pipe_segments = tuple(
+                    getattr(condensation_model, "pipe_segments", ()) or ()
+                )
+                service_temperature_by_segment: dict[str, float] = {}
+                service_temperature_refusals: dict[str, str] = {}
+                for history in tuple(
+                    getattr(condensation_model, "operating_history", ()) or ()
+                ):
+                    temperatures = (
+                        history.get("pipe_segment_temperatures_C")
+                        if isinstance(history, Mapping)
+                        else None
+                    )
+                    if not isinstance(temperatures, Mapping):
+                        continue
+                    for raw_name, raw_temperature in temperatures.items():
+                        name = str(raw_name)
+                        if not is_declared_real_scalar(raw_temperature):
+                            service_temperature_refusals[name] = (
+                                "liner_service_temperature_invalid"
+                            )
+                            continue
+                        temperature = float(raw_temperature)
+                        if not math.isfinite(temperature):
+                            service_temperature_refusals[name] = (
+                                "liner_service_temperature_invalid"
+                            )
+                            continue
+                        service_temperature_by_segment[name] = max(
+                            temperature,
+                            service_temperature_by_segment.get(name, -math.inf),
+                        )
+                deposit_by_segment = _nested_species_kg_from_segment_species(
+                    getattr(execution.trace, "wall_deposit_by_segment_species_kg", {})
+                )
+                segment_names = sorted(
+                    {str(segment.name) for segment in pipe_segments}
+                    | set(deposit_by_segment)
+                )
+                if not segment_names:
+                    segment_names = ["_run"]
+
+                try:
+                    chemistry = load_interface_chemistry(
+                        furnace_material_id,
+                        catalog=catalog,
+                    )
+                    if chemistry is None:
+                        return None
+                    tier = str(chemistry.get("criterion_tier") or "B").upper()
+                    if tier == "A":
+                        chemistry["invariant_table"] = load_interface_invariant_table(
+                            furnace_material_id,
+                            catalog=catalog,
+                        )
+                except InterfaceChemistryRefusal as exc:
+                    refusal = {"reason": exc.reason, "detail": exc.detail}
+                    return {
+                        "schema": "liner-state-v1",
+                        "segments": {
+                            name: {
+                                "status": "refused",
+                                "refusal": refusal,
+                                "flags": list(raw_chemistry.get("flags", ()) or ()),
+                            }
+                            for name in segment_names
+                        },
+                    }
+
+                segments_by_name = {
+                    str(segment.name): segment for segment in pipe_segments
+                }
+                sampler = MageminLinerSampler() if tier == "B" else None
+                records: dict[str, Any] = {}
+                try:
+                    for name in segment_names:
+                        segment = segments_by_name.get(name)
+                        if segment is None:
+                            records[name] = {
+                                "status": "refused",
+                                "refusal": {
+                                    "reason": "liner_segment_geometry_missing",
+                                },
+                            }
+                            continue
+                        if name in service_temperature_refusals:
+                            records[name] = {
+                                "status": "refused",
+                                "refusal": {
+                                    "reason": service_temperature_refusals[name],
+                                },
+                            }
+                            continue
+                        service_temperature = service_temperature_by_segment.get(name)
+                        if service_temperature is None:
+                            records[name] = {
+                                "status": "refused",
+                                "refusal": {
+                                    "reason": "liner_service_temperature_missing",
+                                },
+                            }
+                            continue
+                        pressure_mbar = getattr(
+                            condensation_model,
+                            "overhead_pressure_mbar",
+                            None,
+                        )
+                        pressure_bar = (
+                            float(pressure_mbar) * PA_PER_MBAR / PA_PER_BAR
+                            if pressure_mbar is not None
+                            else None
+                        )
+                        try:
+                            state = build_liner_state_segment(
+                                chemistry,
+                                deposit_by_segment.get(name, {}),
+                                area_m2=segment.surface_area_m2,
+                                service_temperature_C=service_temperature,
+                                pressure_bar=pressure_bar,
+                                sampler=sampler,
+                            )
+                        except LinerCorrosionRefusal as exc:
+                            records[name] = {
+                                "status": "refused",
+                                "refusal": exc.as_dict(),
+                                "flags": list(raw_chemistry.get("flags", ()) or ()),
+                            }
+                            continue
+                        except Exception as exc:  # noqa: BLE001 - segment is diagnostic
+                            records[name] = {
+                                "status": "refused",
+                                "refusal": {
+                                    "reason": "liner_segment_input_invalid",
+                                    "detail": _safe_exception_text(exc),
+                                },
+                            }
+                            continue
+                        state["status"] = "partial" if state["refusals"] else "ok"
+                        records[name] = state
+                finally:
+                    if sampler is not None:
+                        sampler.close()
+                return {"schema": "liner-state-v1", "segments": records}
+
+            try:
+                liner_state = _json_safe(build_liner_state())
+            except Exception as exc:  # noqa: BLE001 - diagnostic never gates a run
+                liner_state = {
+                    "schema": "liner-state-v1",
+                    "segments": {
+                        "_run": {
+                            "status": "refused",
+                            "refusal": {
+                                "reason": "liner_state_attachment_failed",
+                                "detail": _safe_exception_text(exc),
+                            },
+                        }
+                    },
+                }
+            if liner_state is not None:
+                run_metadata["liner_state"] = liner_state
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
         # ``status='refused'`` returned by the C3 K-shuttle / Na-shuttle

@@ -391,6 +391,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             assert emitted["wall_risk_panel"].get("tick_view") == "compact"
             assert "zones" not in emitted["wall_risk_panel"]
             assert "stage_purity_report" not in emitted
+            assert "liner_state" not in emitted
             assert emitted["per_hour_summary_delta"]["hour"] == emitted["hour"]
             tick_payloads.append(emitted)
             sid = kwargs.get("room")

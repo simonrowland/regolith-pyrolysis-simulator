@@ -141,6 +141,40 @@ furnace_materials:
     source_note: "WARN-tier grounded proxy: Warren et al. 2022 (arXiv:2205.06855) tested molded lunar/martian regolith simulants at 1000/1100/1200 C and reports 1200 C samples were sturdy enough for compression data while lower-temperature samples were brittle; use 1200 C as conservative bootstrap service cap, not a certified refractory hot-face rating."
     # Multiphase bulk - no pure-oxide congruent model applies.
 
+  # Diagnostic material identity for the generated refractory rump. The
+  # composition artifact is intentionally absent until its Studio generator
+  # run has been reviewed; this row has no invented service rating.
+  rump_liner_lunar_mare_low_ti:
+    id: rump_liner_lunar_mare_low_ti
+    display_name: "Lunar mare refractory-rump liner (generated composition required)"
+    max_service_T_C: null
+    enabled: false
+    not_selectable_reason: "rump composition and service envelope are not generated or sourced"
+    source_note: "Sintered body is the simulator's terminal refractory rump; a same-composition glassy enamel is assumed. This is a diagnostic material row, not a rated furnace wall."
+    interface_chemistry:
+      composition: null
+      composition_file: data/generated/liner_compositions/rump_liner_lunar_mare_low_ti.yaml
+      missing_composition_reason: rump_composition_not_generated
+      citation: "Generated terminal-rump oxide report; generator provenance is stored in the referenced artifact."
+      criterion_tier: A
+      invariant_table: null
+      invariant_table_file: data/literature/liner_invariants/rump_liner_lunar_mare_low_ti.yaml
+      density_kg_m3: null
+      reacted_layer_depth_m: null
+      margin_C: null
+      horizon_campaigns: null
+      porosity_fraction: null
+      enamel:
+        composition: same_as_body
+        state: glassy
+      flags:
+        - reacted_layer_depth_assumed
+        - temperature_margin_assumed
+        - campaign_horizon_declared
+        - enamel_glass_state_assumed
+        - infiltration_unmodelled
+        - creep_unmodelled
+
   # Provisional only; not grounded in data/wall_materials.yaml.
   graphite_inert:
     id: graphite_inert
