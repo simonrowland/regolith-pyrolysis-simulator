@@ -40,7 +40,7 @@ experiments:
       published_page: 1470
       pdf_page_index: 1
       figure: '1'
-      note: Figure 1 at 2100 K. Source-oxygen links require TiO/O-series composition centres within 0.046 mol%, the conservative sum of their two ±0.023 mol% 600 dpi x-digitization bounds recorded in each row.
+      note: Figure 1 at 2100 K. Source-oxygen links require the TiO/O composition centres to agree within the sum of the individual 600 dpi x-digitization allowances recorded in their respective composition locators.
     conditions:
       temperature_K:
         state: {tag: value, value: {kind: point, point: '2100'}}
@@ -5847,13 +5847,15 @@ species:
             note: Axis read 11.092 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '3.20186401e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6005,13 +6007,15 @@ species:
             note: Axis read 14.692 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.99279348e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6091,13 +6095,15 @@ species:
             note: Axis read 16.744 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.75400996e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6177,13 +6183,15 @@ species:
             note: Axis read 18.754 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.71558292e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6263,13 +6271,15 @@ species:
             note: Axis read 23.610 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.77585903e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6349,13 +6359,15 @@ species:
             note: Axis read 26.713 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '3.05919906e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6435,13 +6447,15 @@ species:
             note: Axis read 31.991 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.80875588e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.205 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.182 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.205 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.182 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6521,13 +6535,15 @@ species:
             note: Axis read 31.991 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.80875588e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.205 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.182 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.205 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.182 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6607,13 +6623,15 @@ species:
             note: Axis read 33.699 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '3.35073331e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6693,13 +6711,15 @@ species:
             note: Axis read 34.262 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '3.35073331e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6777,6 +6797,22 @@ species:
             page: 2
             figure: '1'
             note: Axis read 36.031 mol% ± 0.122. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.88248419e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.145 mol%, the sum of the TiO composition locator allowance ±0.122 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
+              source O point only when TiO/O composition centres differ by at most
+              0.145 mol%, the sum of the TiO composition locator's
+              ±0.122 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
+              JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
+              Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
+              (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_12']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6851,13 +6887,15 @@ species:
             note: Axis read 37.134 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.99279348e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -6937,13 +6975,15 @@ species:
             note: Axis read 37.155 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.99279348e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -7023,13 +7063,15 @@ species:
             note: Axis read 38.616 mol% ± 0.043. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.90507183e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.115 mol%, the sum of the TiO composition locator allowance ±0.043 mol% and O composition locator allowance ±0.072 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.115 mol%, the sum of the TiO composition locator's
+              ±0.043 mol% x allowance and the O composition
+              locator's ±0.072 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -7109,13 +7151,15 @@ species:
             note: Axis read 39.926 mol% ± 0.052. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.77585903e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.075 mol%, the sum of the TiO composition locator allowance ±0.052 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.075 mol%, the sum of the TiO composition locator's
+              ±0.052 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -7195,13 +7239,15 @@ species:
             note: Axis read 40.887 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.55034440e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -7281,13 +7327,15 @@ species:
             note: Axis read 41.493 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.77585903e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -7367,13 +7415,15 @@ species:
             note: Axis read 43.149 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.15976862e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -7453,13 +7503,15 @@ species:
             note: Axis read 46.428 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.55034440e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
@@ -7539,13 +7591,15 @@ species:
             note: Axis read 49.995 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
         fO2_Pa:
           state: {tag: value, value: '2.79340045e-6'}
-          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi and linked only when the TiO/O composition centres differ by at most 0.046 mol%; each O row records its pixel calibration and marker-centre method."}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Fig. 1 series 5 p(O), digitized at 600 dpi; linked only when the TiO/O composition centres differ by at most 0.046 mol%, the sum of the TiO composition locator allowance ±0.023 mol% and O composition locator allowance ±0.023 mol%; each O row records its pixel calibration and marker-centre method."}
           inference:
             relation: >-
               source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
               source O point only when TiO/O composition centres differ by at most
-              0.046 mol% (the sum of their two ±0.023 mol% x bounds). Convert
-              its plotted atm value to bar first (1 atm=1.01325 bar), then use
+              0.046 mol%, the sum of the TiO composition locator's
+              ±0.023 mol% x allowance and the O composition
+              locator's ±0.023 mol% x allowance. Convert its
+              plotted atm value to bar first (1 atm=1.01325 bar), then use
               JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based on the
               Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against equilibria
               (2)-(4), not calculated from the TiO target.
