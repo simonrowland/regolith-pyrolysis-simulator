@@ -18,11 +18,14 @@ TASK_SCRIPT = Path.home() / ".goal-flight/skill/goalflight_task.py"
 LEDGER_RELATIVE = Path("docs-private/controller-tools/mb-20260923/pending-landings.txt")
 LANDING_GRACE = 1
 SHA_PATTERN = r"(?<![0-9a-f])(?=[0-9a-f]{7,40}(?![0-9a-f]))(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}(?![0-9a-f])"
-HASH = re.compile(SHA_PATTERN, re.IGNORECASE)
-TASK_ID = re.compile(r"\b[bt]-\d+[a-z]?\b", re.IGNORECASE)
+TASK_ID = re.compile(r"\b(?:t-?\d+[a-z]?|b-\d+[a-z]?)\b", re.IGNORECASE)
 SUBJECT_TASK_ID = re.compile(r"(?<![a-z0-9])((?:t-?\d+[a-z]?|b-\d+[a-z]?))(?![a-z0-9])", re.IGNORECASE)
 TIMESTAMP = re.compile(r"^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})")
 BATCH = re.compile(r"\b(?:rides\s+|LANDED\s+)(b\d+)\b", re.IGNORECASE)
+GREEN_TRANSITION = re.compile(
+    rf"\bLANDED\b[^\n]*?\bgreen\s+({SHA_PATTERN})\s*->\s*({SHA_PATTERN})",
+    re.IGNORECASE,
+)
 
 
 def _git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[bytes]:
@@ -40,6 +43,8 @@ def _git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProc
 class GitHistory:
     def __init__(self, root: Path, green: str, since: str | None = None):
         self.root = root
+        self._resolved: dict[str, str | None] = {}
+        self._green_blobs: dict[str, str] | None = None
         self.green = self.resolve(green)
         self.ancestors = set(_git(root, "rev-list", self.green).stdout.decode().splitlines())
         self.since = self.resolve(since) if since and self.is_revision(since) else None
@@ -54,10 +59,12 @@ class GitHistory:
         return bool(self._resolve(value))
 
     def _resolve(self, value: str) -> str | None:
+        if value in self._resolved:
+            return self._resolved[value]
         result = _git(self.root, "rev-parse", "--verify", value + "^{commit}", check=False)
-        if result.returncode:
-            return None
-        return result.stdout.decode().strip()
+        commit = result.stdout.decode().strip() if result.returncode == 0 else None
+        self._resolved[value] = commit
+        return commit
 
     def resolve(self, value: str) -> str:
         commit = self._resolve(value)
@@ -106,23 +113,38 @@ class GitHistory:
         return commit if commit and self.after_since(commit) else None
 
     def changed_files(self, commit: str) -> list[str]:
-        parents = _git(self.root, "rev-list", "--parents", "-n", "1", commit).stdout.decode().split()
-        if len(parents) > 1:
-            args = ["diff", "--no-renames", "--name-only", "-z", parents[1], commit]
-        else:
-            args = ["diff-tree", "--root", "--no-commit-id", "--name-only", "-r", "-z", commit]
-        output = _git(self.root, *args).stdout
+        base_result = _git(self.root, "merge-base", self.green, commit, check=False)
+        if base_result.returncode:
+            return []
+        base = base_result.stdout.decode().strip()
+        output = _git(self.root, "diff", "--no-renames", "--name-only", "-z", base, commit).stdout
         return [os.fsdecode(path) for path in output.split(b"\0") if path]
 
-    def _file_bytes(self, commit: str, path: str) -> bytes | None:
-        result = _git(self.root, "show", f"{commit}:{path}", check=False)
-        return result.stdout if result.returncode == 0 else None
+    def _tree_blobs(self, commit: str) -> dict[str, str]:
+        output = _git(self.root, "ls-tree", "-r", "-z", "--full-tree", commit).stdout
+        blobs: dict[str, str] = {}
+        for entry in output.split(b"\0"):
+            if not entry:
+                continue
+            metadata, path = entry.split(b"\t", 1)
+            _, kind, object_id = metadata.decode().split()
+            if kind == "blob":
+                blobs[os.fsdecode(path)] = object_id
+        return blobs
 
-    def identical_changed_files(self, tip: str) -> tuple[int, int]:
+    def _green_tree_blobs(self) -> dict[str, str]:
+        if self._green_blobs is None:
+            self._green_blobs = self._tree_blobs(self.green)
+        return self._green_blobs
+
+    def identical_range_files(self, tip: str) -> tuple[int, int]:
         files = self.changed_files(tip)
         if not files:
             return 0, 0
-        matches = sum(self._file_bytes(tip, path) == self._file_bytes(self.green, path) for path in files)
+        # Equal Git blob IDs mean the file bytes are equal, without spawning one show per path.
+        tip_blobs = self._tree_blobs(tip)
+        green_blobs = self._green_tree_blobs()
+        matches = sum(tip_blobs.get(path) == green_blobs.get(path) for path in files)
         return matches, len(files)
 
     def evidence(self, task_id: str, tip_text: str | None) -> dict[str, Any] | None:
@@ -135,24 +157,17 @@ class GitHistory:
                 "closeable": True,
                 "explanation": f"recorded tip {tip} is an ancestor of green",
             }
-        subject_commit = self.task_subject_commit(task_id)
-        if subject_commit:
-            return {
-                "kind": "task-subject",
-                "green_commit": subject_commit,
-                "confidence": "high",
-                "closeable": True,
-                "explanation": f"green subject names {task_id}",
-            }
         if tip and self.after_since(tip):
-            matches, total = self.identical_changed_files(tip)
+            matches, total = self.identical_range_files(tip)
             if total and matches == total:
                 return {
-                    "kind": "identical-files",
+                    "kind": "identical-range",
                     "green_commit": self.green,
                     "confidence": "high",
                     "closeable": True,
-                    "explanation": f"all {total} changed files from tip {tip} are byte-identical on green",
+                    "explanation": f"all {total} files in the offer range from tip {tip} are byte-identical on green",
+                    "matched_files": matches,
+                    "changed_files": total,
                 }
             if matches:
                 return {
@@ -161,7 +176,18 @@ class GitHistory:
                     "confidence": "low",
                     "closeable": False,
                     "explanation": f"only {matches} of {total} changed files from tip {tip} match green",
+                    "matched_files": matches,
+                    "changed_files": total,
                 }
+        subject_commit = self.task_subject_commit(task_id)
+        if subject_commit:
+            return {
+                "kind": "task-subject",
+                "green_commit": subject_commit,
+                "confidence": "report-only",
+                "closeable": False,
+                "explanation": f"green subject mentions {task_id}; subject mention only, offered content is unverified",
+            }
         return None
 
 
@@ -209,12 +235,19 @@ def _parse_timestamp(line: str) -> dt.datetime | None:
         return None
 
 
+def _normalize_task_id(task_id: str) -> str:
+    task_id = task_id.lower()
+    if re.match(r"t\d", task_id):
+        return f"t-{task_id[1:]}"
+    return task_id
+
+
 def ledger_events(lines: list[str], since_date: dt.datetime | None = None) -> tuple[list[dict[str, Any]], dict[str, tuple[int, str]]]:
     events: list[dict[str, Any]] = []
     last_lines: dict[str, tuple[int, str]] = {}
     for line_number, line in enumerate(lines, 1):
         id_matches = list(TASK_ID.finditer(line))
-        ids = [match.group(0).lower() for match in id_matches]
+        ids = [_normalize_task_id(match.group(0)) for match in id_matches]
         timestamp = _parse_timestamp(line)
         if not since_date or not timestamp or timestamp >= since_date:
             for task_id in ids:
@@ -224,67 +257,82 @@ def ledger_events(lines: list[str], since_date: dt.datetime | None = None) -> tu
         if not ids:
             continue
         markers = (
-            ("INTAKE", re.compile(r"\bINTAKE\b(?!\s+HOLD)")),
+            ("INTAKE", re.compile(r"\bINTAKE\b(?!\s+HOLD)", re.IGNORECASE)),
             ("BOUNCED", re.compile(r"\bBOUNCED\b", re.IGNORECASE)),
-            ("LANDED", re.compile(r"\bLANDED\b")),
+            ("LANDED", re.compile(r"\bLANDED\b", re.IGNORECASE)),
         )
         for kind, marker_pattern in markers:
-            marker = marker_pattern.search(line)
-            if not marker:
-                continue
-            if kind == "INTAKE":
-                scoped_ids = [match.group(0).lower() for match in id_matches if marker.end() <= match.start() <= marker.end() + 300]
-            elif kind == "BOUNCED":
-                landed_marker = re.search(r"\bLANDED\b", line)
-                if landed_marker and landed_marker.start() < marker.start():
-                    scoped_ids = [match.group(0).lower() for match in id_matches if marker.end() <= match.start() <= marker.end() + 120]
+            for marker in marker_pattern.finditer(line):
+                if kind == "INTAKE":
+                    tail_start = marker.end()
+                    while tail_start < len(line) and (line[tail_start].isspace() or line[tail_start] == ":"):
+                        tail_start += 1
+                    tokens = list(re.finditer(r"[^\s:(),]+", line[tail_start:]))[:2]
+                    token_ranges = [(tail_start + token.start(), tail_start + token.end()) for token in tokens]
+                    scoped_matches = [
+                        match for match in id_matches
+                        if any(start <= match.start() and match.end() <= end for start, end in token_ranges)
+                    ]
+                elif kind == "BOUNCED":
+                    landed_marker = re.search(r"\bLANDED\b", line, re.IGNORECASE)
+                    if landed_marker and landed_marker.start() < marker.start():
+                        scoped_matches = [match for match in id_matches if marker.end() <= match.start() <= marker.end() + 120]
+                    else:
+                        before = [match for match in id_matches if match.end() <= marker.start()]
+                        nearest_before = [max(before, key=lambda match: match.end())] if before else []
+                        after = [match for match in id_matches if marker.end() <= match.start() <= marker.end() + 120]
+                        scoped_matches = nearest_before + (after if not nearest_before else [])
                 else:
-                    before = [match for match in id_matches if match.end() <= marker.start()]
-                    nearest_before = [max(before, key=lambda match: match.end())] if before else []
-                    after = [match for match in id_matches if marker.end() <= match.start() <= marker.end() + 120]
-                    scoped_ids = [match.group(0).lower() for match in nearest_before + (after if not nearest_before else [])]
-            else:
-                scoped_ids = ids
-            for task_id in dict.fromkeys(scoped_ids):
-                after_id = re.search(re.escape(task_id), line, re.IGNORECASE)
-                tail = line[after_id.end():] if after_id else ""
-                sha_match = HASH.search(tail)
-                sha = sha_match.group(0) if sha_match else None
-                landing_match = re.search(rf"\bgreen\s+{SHA_PATTERN}\s*->\s*({SHA_PATTERN})", line, re.IGNORECASE)
-                if kind == "LANDED" and not landing_match:
-                    landing_match = re.search(rf"\bLANDED\b[^\n]*?{SHA_PATTERN}\s*->\s*({SHA_PATTERN})", line, re.IGNORECASE)
-                if kind == "LANDED" and landing_match:
-                    sha = landing_match.group(1)
-                elif kind == "LANDED" and not sha:
-                    marker_hash = HASH.search(line[marker.end():])
-                    sha = marker_hash.group(0) if marker_hash else None
-                if kind == "LANDED" and not sha:
-                    prior_hashes = list(HASH.finditer(line[:marker.start()]))
-                    sha = prior_hashes[-1].group(0) if prior_hashes else None
-                events.append(
-                    {
-                        "line_number": line_number,
-                        "line": line,
-                        "timestamp": timestamp,
-                        "kind": kind,
-                        "task_id": task_id,
-                        "sha": sha,
-                        "batch": (BATCH.search(line).group(1).lower() if BATCH.search(line) else None),
-                        "index": line_number,
-                    }
-                )
+                    scoped_matches = id_matches
+                scoped_by_id = {_normalize_task_id(match.group(0)): match for match in scoped_matches}
+                for task_id, task_match in scoped_by_id.items():
+                    tail = line[task_match.end():]
+                    offer_match = re.match(rf"\s*({SHA_PATTERN})", tail, re.IGNORECASE) if kind == "INTAKE" else None
+                    transition = GREEN_TRANSITION.search(line) if kind == "LANDED" else None
+                    events.append(
+                        {
+                            "line_number": line_number,
+                            "line": line,
+                            "timestamp": timestamp,
+                            "kind": kind,
+                            "task_id": task_id,
+                            "tip": offer_match.group(1) if offer_match else None,
+                            "green_before": transition.group(1) if transition else None,
+                            "green_after": transition.group(2) if transition else None,
+                            "batch": (BATCH.search(line).group(1).lower() if BATCH.search(line) else None),
+                            "index": line_number,
+                        }
+                    )
     return events, last_lines
 
 
-def _content_present(history: GitHistory, task_id: str, tip_text: str | None) -> tuple[bool, str]:
-    evidence = history.evidence(task_id, tip_text)
-    if evidence and evidence["closeable"]:
+def _content_present(history: GitHistory, task_id: str, tip_text: str | None) -> tuple[bool | None, str]:
+    if not tip_text:
+        return None, "no offered tip recorded"
+    tip = history._resolve(tip_text)
+    if tip is None:
+        return None, f"offered tip {tip_text} does not resolve to a commit in this repo"
+    evidence = history.evidence(task_id, tip)
+    if evidence and evidence["closeable"] and evidence["kind"] in {"tip-ancestor", "identical-range"}:
         return True, evidence["explanation"]
     if evidence:
         return False, evidence["explanation"]
-    if tip_text:
-        return False, f"tip {tip_text} has no ancestor, subject, or complete file-content match on green"
-    return False, "no usable tip or task-naming green subject was recorded"
+    return False, f"offered tip {tip_text} has no ancestor or complete offer-range match on green"
+
+
+def _offer_tip_for_event(
+    task_id: str,
+    event: dict[str, Any],
+    task_events: list[dict[str, Any]],
+    latest_tips: dict[str, str | None],
+) -> str | None:
+    offers = [
+        row for row in task_events
+        if row["kind"] == "INTAKE" and row["index"] <= event["index"]
+    ]
+    if offers:
+        return offers[-1]["tip"]
+    return latest_tips.get(task_id)
 
 
 def stranded_rows(
@@ -292,17 +340,24 @@ def stranded_rows(
     lines: list[str],
     history: GitHistory,
     since_date: dt.datetime | None = None,
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], int]:
     events, last_lines = ledger_events(lines, since_date)
     landings: dict[int, dict[str, Any]] = {}
+    unresolved_hashes: set[str] = set()
     for event in events:
-        if event["kind"] != "LANDED" or not event["sha"]:
-            continue
-        # Ledger landing entries commonly abbreviate the green commit SHA.
-        commit = history._resolve(event["sha"])
-        if commit in history.ancestors:
-            landings[event["index"]] = event
+        for field in ("tip", "green_before", "green_after"):
+            sha = event[field]
+            if sha and history._resolve(sha) is None:
+                unresolved_hashes.add(sha)
+        if event["kind"] == "LANDED" and event["green_after"]:
+            # Ledger landing entries commonly abbreviate the destination green SHA.
+            commit = history._resolve(event["green_after"])
+            if commit in history.ancestors:
+                landings[event["index"]] = event
     latest_tips = {item.get("id", "").lower(): recorded_tip(item) for item in items if isinstance(item.get("id"), str)}
+    for tip in latest_tips.values():
+        if tip and history._resolve(tip) is None:
+            unresolved_hashes.add(tip)
     result: list[dict[str, Any]] = []
     by_task: dict[str, list[dict[str, Any]]] = {}
     for event in events:
@@ -314,7 +369,7 @@ def stranded_rows(
             continue
         if latest["kind"] in {"INTAKE", "BOUNCED"}:
             offer = accepted[-1] if accepted else latest
-            tip = offer["sha"] or latest_tips.get(task_id)
+            tip = _offer_tip_for_event(task_id, offer, task_events, latest_tips)
             target_batch = offer["batch"] or latest["batch"]
             target_number = int(target_batch[1:]) if target_batch else None
             later_landings = sum(
@@ -329,11 +384,12 @@ def stranded_rows(
             if later_landings < LANDING_GRACE:
                 continue
             present, proof = _content_present(history, task_id, tip)
-            if not present:
+            if present is not True:
                 line_number, line = last_lines.get(task_id, (latest["line_number"], latest["line"]))
                 result.append(
                     {
                         "task_id": task_id,
+                        "category": "unknown" if present is None else "stranded",
                         "line_number": line_number,
                         "line": line,
                         "why": f"latest ledger event is {latest['kind']}; {later_landings} green landing(s) followed the offer; {proof}",
@@ -344,18 +400,19 @@ def stranded_rows(
                 continue
             if since_date and event["timestamp"] and event["timestamp"] < since_date:
                 continue
-            tip = event["sha"] or latest_tips.get(task_id)
+            tip = _offer_tip_for_event(task_id, event, task_events, latest_tips)
             present, proof = _content_present(history, task_id, tip)
-            if not present:
+            if present is not True:
                 result.append(
                     {
                         "task_id": task_id,
+                        "category": "unknown" if present is None else "stranded",
                         "line_number": event["line_number"],
                         "line": event["line"],
-                        "why": f"ledger marks content LANDED but it is absent from green; {proof}",
+                        "why": f"ledger marks content LANDED; {proof}",
                     }
                 )
-    return sorted(result, key=lambda row: (row["line_number"], row["task_id"]))
+    return sorted(result, key=lambda row: (row["line_number"], row["task_id"])), len(unresolved_hashes)
 
 
 def _load_store() -> list[dict[str, Any]]:
@@ -388,43 +445,61 @@ def _ledger_path(root: Path) -> Path:
     raise RuntimeError(f"landing ledger not found at {path} or {fallback}")
 
 
-def _render_report(green: str, items: list[dict[str, Any]], strong: list[dict[str, Any]], weak: list[dict[str, Any]], stranded: list[dict[str, Any]]) -> str:
-    counts: dict[str, int] = {}
-    for row in strong:
-        counts[row["kind"]] = counts.get(row["kind"], 0) + 1
+def _render_report(
+    green: str,
+    items: list[dict[str, Any]],
+    closeable: list[dict[str, Any]],
+    report_only: list[dict[str, Any]],
+    stranded: list[dict[str, Any]],
+    unresolved_hashes: int,
+) -> str:
+    closeable_counts = {kind: sum(row["kind"] == kind for row in closeable) for kind in ("tip-ancestor", "identical-range")}
+    unknown_count = sum(row["category"] == "unknown" for row in stranded)
+    stranded_count = sum(row["category"] == "stranded" for row in stranded)
     lines = [
         f"Green: {green}",
         f"Open task/bug records scanned: {sum(item.get('done') is not True and item.get('kind') in {'task', 'bug'} for item in items)}",
-        f"Close candidates: {len(strong)}",
+        f"Closeable tip-ancestor: {closeable_counts['tip-ancestor']}",
+        f"Closeable identical-range: {closeable_counts['identical-range']}",
+        f"Report-only subject: {sum(row['kind'] == 'task-subject' for row in report_only)}",
+        f"Unknown: {unknown_count}",
+        f"Stranded: {stranded_count}",
+        f"Unresolved hashes ignored: {unresolved_hashes}",
     ]
-    for kind in ("tip-ancestor", "task-subject", "identical-files"):
-        lines.append(f"  {kind}: {counts.get(kind, 0)}")
-    for row in strong:
+    for row in closeable:
         lines.append(f"  {row['id']} | {row['kind']} | green commit {row['green_commit']} | confidence {row['confidence']} | {row['explanation']}")
-    lines.append(f"Weak content matches refused: {len(weak)}")
-    for row in weak:
+    lines.append(f"Report-only evidence: {len(report_only)}")
+    for row in report_only:
         lines.append(f"  {row['id']} | {row['kind']} | green commit {row['green_commit']} | confidence {row['confidence']} | {row['explanation']}")
-    lines.append(f"Stranded ledger records: {len(stranded)}")
     for row in stranded:
-        lines.append(f"  {row['task_id']} | line {row['line_number']} | {row['why']}")
+        lines.append(f"  {row['category']} | {row['task_id']} | line {row['line_number']} | {row['why']}")
         lines.append(f"    {row['line']}")
     return "\n".join(lines) + "\n"
 
 
-def _apply_close_candidates(candidates: list[dict[str, Any]], done: Callable[[dict[str, Any]], None]) -> list[str]:
+def _apply_close_candidates(
+    candidates: list[dict[str, Any]],
+    done: Callable[[dict[str, Any]], None],
+) -> tuple[list[str], list[dict[str, str]]]:
     applied: list[str] = []
+    refusals: list[dict[str, str]] = []
     for candidate in candidates:
-        if candidate["closeable"] and candidate["kind"] in {"tip-ancestor", "task-subject", "identical-files"}:
+        if not candidate["closeable"] or candidate["kind"] not in {"tip-ancestor", "identical-range"}:
+            continue
+        try:
             done(candidate)
+        except (OSError, RuntimeError) as exc:
+            refusals.append({"id": candidate["id"], "message": str(exc)})
+        else:
             applied.append(candidate["id"])
-    return applied
+    return applied, refusals
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--green", required=True, help="green commit SHA")
     parser.add_argument("--since", help="limit evidence to commits and ledger events at or after an ISO date or green ancestor SHA")
-    parser.add_argument("--apply", action="store_true", help="close only candidates with one of the three complete evidence kinds")
+    parser.add_argument("--apply", action="store_true", help="close candidates only with offered-content proof")
     args = parser.parse_args(argv)
     root = Path(__file__).resolve().parents[1]
     try:
@@ -432,22 +507,31 @@ def main(argv: list[str] | None = None) -> int:
         items = _load_store()
         ledger_path = _ledger_path(root)
         ledger_lines = ledger_path.read_text(encoding="utf-8").splitlines()
-        strong, weak = open_close_candidates(items, history)
-        stranded = stranded_rows(items, ledger_lines, history, history.since_date)
-        sys.stdout.write(_render_report(history.green, items, strong, weak, stranded))
+        closeable, report_only = open_close_candidates(items, history)
+        stranded, unresolved_hashes = stranded_rows(items, ledger_lines, history, history.since_date)
+        sys.stdout.write(_render_report(history.green, items, closeable, report_only, stranded, unresolved_hashes))
         if args.apply:
             def done(candidate: dict[str, Any]) -> None:
                 note = f"{candidate['kind']}: {candidate['explanation']}; green {candidate['green_commit']}"
                 result = subprocess.run(
                     [sys.executable, str(TASK_SCRIPT), "done", candidate["id"], "--resolution", "landed-on-green", "--note", note],
                     cwd=root,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
                     check=False,
                 )
                 if result.returncode:
-                    raise RuntimeError(f"goalflight_task.py done failed for {candidate['id']} (exit {result.returncode})")
+                    message = result.stderr.strip() or result.stdout.strip() or f"exit {result.returncode}"
+                    raise RuntimeError(message)
 
-            applied = _apply_close_candidates(strong + weak, done)
+            applied, refusals = _apply_close_candidates(closeable + report_only, done)
             print(f"Applied landed-on-green to: {', '.join(applied) if applied else '(none)'}")
+            for refusal in refusals:
+                print(f"  {refusal['id']} | {refusal['message']}")
+            print(f"Refusal count: {len(refusals)}")
+            if refusals:
+                return 1
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"reconcile_landing: {exc}", file=sys.stderr)
         return 2
