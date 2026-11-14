@@ -40,8 +40,8 @@ MELT_OXIDE_ACTIVITY_LIMITATION = (
     "the former gamma*X to a=1 step (31.1x for Cr) is absent; when "
     "valid_range_K is set, a temperature outside that interval remains "
     "flux-driving and status-bearing; where composition_domain is set, its "
-    "printed composition support is also status-bearing; both are notices "
-    "only and do not scale or replace the table coefficient"
+    "printed composition support is also status-bearing; each authority "
+    "is a notice only and does not scale or replace the table coefficient"
 )
 MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
     "single_cation_Raoultian_pure_liquid_reference"
