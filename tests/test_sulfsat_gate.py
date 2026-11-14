@@ -43,7 +43,10 @@ from typing import Any, Dict
 
 import pytest
 
-from simulator.oxygen_buffers import qfm_log10_fO2_bar
+from simulator.oxygen_buffers import (
+    FROST_BUFFER_TEMPERATURE_RANGES_K,
+    qfm_log10_fO2_bar,
+)
 import simulator.melt_backend.sulfsat as sulfsat_module
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
@@ -303,6 +306,53 @@ def test_gate_populates_every_field_with_fake_pysulfsat(monkeypatch):
     assert result.S_in_sulfide_ppm == pytest.approx(expected_sulfide)
     # MORB comp is inside the calibration window: no warnings expected.
     assert result.warnings == []
+
+
+@pytest.mark.parametrize(
+    ('T_K', 'extrapolated'),
+    [
+        (846.14, True),
+        (846.15, False),
+        (1473.15, False),
+        (1473.16, True),
+    ],
+)
+def test_qfm_reference_extrapolation_is_flagged_without_changing_values(
+    monkeypatch, T_K, extrapolated
+):
+    fake = _make_fake_pysulfsat(
+        scss_ppm=1500.0, scas_ppm=2200.0, s6_fraction=0.30,
+    )
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=T_K,
+        P_bar=1.0,
+        fO2_log=-9.0,
+        S_input_ppm=1000.0,
+    )
+
+    qfm_flags = [
+        warning for warning in result.warnings
+        if warning.startswith('qfm_reference_extrapolated:')
+    ]
+    qfm_t_min, qfm_t_max = FROST_BUFFER_TEMPERATURE_RANGES_K['QFM']
+    if extrapolated:
+        assert len(qfm_flags) == 1
+        assert 'reason=temperature_outside_certified_band' in qfm_flags[0]
+        assert f'valid_range_K=[{qfm_t_min}, {qfm_t_max}]' in qfm_flags[0]
+        assert 'authority=extrapolated' in qfm_flags[0]
+    else:
+        assert qfm_flags == []
+
+    assert result.SCSS_ppm == 1500.0
+    assert result.SCAS_ppm == 2200.0
+    assert result.S6_fraction == 0.30
+    assert result.S_in_sulfate_ppm == 300.0
+    assert result.S_in_sulfide_ppm == 700.0
 
 
 def test_pysulfsat_failure_is_diagnostic_and_local_helper_errors_propagate(monkeypatch):
