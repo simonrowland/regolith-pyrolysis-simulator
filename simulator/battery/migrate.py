@@ -19934,24 +19934,77 @@ def _row_printed_atmospheres(
     """A run's explicit gas label narrows its experiment-set evidence."""
 
     if isinstance(raw_item, Mapping):
-        for key in ("gas_mix_as_printed", "atmosphere_as_printed"):
-            value = raw_item.get(key)
-            if isinstance(value, str) and value.strip():
-                return (value.strip(),)
+        values = raw_item.get("values")
+        containers = (raw_item, values) if isinstance(values, Mapping) else (raw_item,)
+        for container in containers:
+            for key in (
+                "gas_mix_as_printed",
+                "atmosphere_as_printed",
+                "gas_mixture_as_printed",
+            ):
+                value = container.get(key)
+                if isinstance(value, Mapping):
+                    state = value.get("state")
+                    value = state.get("value") if isinstance(state, Mapping) else None
+                if isinstance(value, str) and value.strip():
+                    return (value.strip(),)
     return tuple(experiment_atmospheres)
 
 
 def _printed_sccm_gas_mixture(
     as_printed: str,
 ) -> tuple[dict[str, Decimal], dict[str, float]] | None:
-    """Parse a printed SCCM gas mixture and component last-digit precision."""
+    """Parse printed flow/ratio gas mixtures to normalized mole fractions."""
 
     normalized = as_printed.replace("₂", "2").replace("₀", "0")
+    ratio = re.fullmatch(
+        r"\s*(\d+(?:\.\d+)?)\s*(CO2|CO|H2O|H2)\s*:\s*"
+        r"(\d+(?:\.\d+)?)\s*(CO2|CO|H2O|H2)\s*",
+        normalized,
+        re.IGNORECASE,
+    )
+    if ratio is not None:
+        first_amount, first_species, second_amount, second_species = ratio.groups()
+        if first_species.upper() == second_species.upper():
+            return None
+        amounts = {
+            first_species.upper(): Decimal(first_amount),
+            second_species.upper(): Decimal(second_amount),
+        }
+        total = sum(amounts.values())
+        if total <= 0:
+            return None
+        # Volume ratio at common T/P is mole ratio. Normalizing the total to
+        # one mole makes the WGS inputs dimensionless mole fractions.
+        return (
+            {name: amount / total for name, amount in amounts.items()},
+            {name: 0.0 for name in amounts},
+        )
+    flow_ratio = re.fullmatch(
+        r"\s*CO2\s*:\s*H2\s*:\s*N2\s*=\s*"
+        r"(\d+(?:\.\d+)?)\s*:\s*(\d+(?:\.\d+)?)\s*:\s*"
+        r"(\d+(?:\.\d+)?)\s*(?:c\.c\.s/min)?\s*",
+        normalized,
+        re.IGNORECASE,
+    )
+    if flow_ratio is not None:
+        amounts = tuple(Decimal(value) for value in flow_ratio.groups())
+        if any(amount < 0 for amount in amounts) or sum(amounts) <= 0:
+            return None
+        total = sum(amounts)
+        # c.c.s/min is a volumetric-flow unit; common T/P makes its ratios
+        # proportional molar flows. N2 is normalized with the whole feed and
+        # then excluded from WGS's reactive species. Because WGS has Δn=0,
+        # ideal-gas N2 dilution cancels from the resulting fO2 ratio.
+        return (
+            dict(zip(("CO2", "H2", "N2"), (amount / total for amount in amounts))),
+            {name: 0.0 for name in ("CO2", "H2", "N2")},
+        )
     pieces = normalized.split("+")
     species_mol: dict[str, Decimal] = {}
     relative_precision: dict[str, float] = {}
     component = re.compile(
-        r"^\s*(CO2|CO|H2O|H2)\s+(\d+(?:\.\d+)?)\s*[×x]\s*"
+        r"^\s*(CO2|CO|H2O|H2|N2|AR)\s+(\d+(?:\.\d+)?)\s*[×x]\s*"
         r"(\d+(?:\.\d+)?)\s*SCCM\s*$",
         re.IGNORECASE,
     )
@@ -19973,7 +20026,11 @@ def _printed_sccm_gas_mixture(
         )
     if len(species_mol) < 2:
         return None
-    return species_mol, relative_precision
+    total = sum(species_mol.values())
+    return (
+        {name: amount / total for name, amount in species_mol.items()},
+        relative_precision,
+    )
 
 
 def _janaf_gas_formation_inputs(
@@ -20338,7 +20395,8 @@ def _bare_log_frame_decision(
 
     if checked:
         expected = "; ".join(
-            f"{name!r}: log10(fO2/bar)={_display_fo2_dex(value)} "
+            f"{name!r}: mismatch={_dec_str(log10_fO2 - value)} dex; "
+            f"expected log10(fO2/bar)={_display_fo2_dex(value)} "
             f"± {_dec_str(tolerance + band)} dex"
             for name, value, band in checked
         )
@@ -20355,7 +20413,7 @@ def _bare_log_frame_decision(
             ),
         )
         return PrintedOxygenDecision(
-            "refusal", State.unknown(_BARE_LOG_SCALE_UNKNOWN), notices=notices
+            "refusal", State.unknown(reason), notices=notices
         )
     if unsupported:
         reason = "gas_mix_fo2_band_unavailable: " + ", ".join(
@@ -22935,6 +22993,68 @@ def _quoted_atmosphere_values(
         and quote.strip()
     ):
         candidates.append(raw_atmosphere.strip())
+    mixture = container.get("gas_mixture_as_printed")
+    mixture_value = (
+        mixture.get("state", {}).get("value")
+        if isinstance(mixture, Mapping)
+        and isinstance(mixture.get("state"), Mapping)
+        else None
+    )
+    components = container.get("gas_components_volume_percent")
+    if (
+        isinstance(mixture_value, str)
+        and mixture_value.strip()
+        and ":" in mixture_value
+        and isinstance(components, Mapping)
+        and components
+    ):
+        total = sum(Decimal(str(value)) for value in components.values())
+        ratio = re.fullmatch(
+            r"\s*(\d+(?:\.\d+)?)(CO2|CO)\s*:\s*"
+            r"(\d+(?:\.\d+)?)(CO2|CO)\s*",
+            mixture_value,
+            re.IGNORECASE,
+        )
+        if (
+            total == Decimal(100)
+            and ratio is not None
+            and all(Decimal(str(value)) >= 0 for value in components.values())
+        ):
+            first_amount, first_species, second_amount, second_species = ratio.groups()
+            first_species, second_species = first_species.upper(), second_species.upper()
+            if first_species == second_species:
+                return tuple(candidates)
+            active_total = sum(
+                Decimal(str(value))
+                for formula, value in components.items()
+                if str(formula).upper() in {first_species, second_species}
+            )
+            ratio_total = Decimal(first_amount) + Decimal(second_amount)
+            if active_total <= 0 or ratio_total <= 0:
+                return tuple(candidates)
+            mole_percent = {
+                first_species: active_total * Decimal(first_amount) / ratio_total,
+                second_species: active_total * Decimal(second_amount) / ratio_total,
+                **{
+                    str(formula).upper(): Decimal(str(value))
+                    for formula, value in components.items()
+                    if str(formula).upper() not in {first_species, second_species}
+                },
+            }
+            # Ratio -> mole fractions: at common T and P, gas volume ratios
+            # equal mole ratios; the percentages supply inert Ar in the total.
+            # Percent × 1 SCCM is proportional molar flow (the percent and
+            # flow units cancel on normalization). For Sossi's 99CO2:1H2,
+            # 92% Ar gives 7.92:0.08:92, normalized by 100; WGS then gives
+            # log fO2=-2.53 at 2173.15 K, matching the printed -2.53 (Table
+            # S1; the log is calculated at 1900 °C). WGS has Δn=0, so ideal
+            # inert dilution cancels from fO2 even though it is in the total.
+            candidates.append(
+                " + ".join(
+                    f"{formula} {value} × 1 SCCM"
+                    for formula, value in mole_percent.items()
+                )
+            )
     return tuple(dict.fromkeys(candidates))
 
 
