@@ -169,6 +169,26 @@ def test_accounting_formula_owner_parses_score_formula_spellings() -> None:
         parse_formula("CaAl.SiCK")
 
 
+def test_accounting_formula_owner_rejects_empty_adduct_segments() -> None:
+    for formula in ("·CuSO4", "CuSO4·", "CuSO4··5H2O"):
+        with pytest.raises(AccountingError):
+            parse_formula(formula)
+
+
+def test_accounting_formula_owner_falls_back_per_isotope_adduct_segment() -> None:
+    assert atoms_parse_formula_else_janaf("CuSO4·5D2O") == (
+        ("Cu", 1.0),
+        ("D", 10.0),
+        ("O", 9.0),
+        ("S", 1.0),
+    )
+    assert atoms_parse_formula_else_janaf("D2O·H2O") == (
+        ("D", 2.0),
+        ("H", 2.0),
+        ("O", 2.0),
+    )
+
+
 def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None:
     """A printed decimal subscript is one species. A hydrate dot still splits.
 

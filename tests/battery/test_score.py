@@ -3420,7 +3420,7 @@ def test_species_formula_parser_accepts_normalized_ascii_dot_adducts() -> None:
 def test_species_formula_parser_accepts_fractional_endmember_subscripts() -> None:
     for formula, canonical in (
         ("NbC.98", "NbC0.98"),
-        ("Fe.9470", "Fe0.9470"),
+        ("MoN.5", "MoN0.5"),
         ("VC.88", "VC0.88"),
         ("PuC.88", "PuC0.88"),
         ("PuC.82", "PuC0.82"),
@@ -3431,6 +3431,24 @@ def test_species_formula_parser_accepts_fractional_endmember_subscripts() -> Non
         )
 
 
+def test_species_formula_parser_refuses_ocr_suspect_terminal_decimals() -> None:
+    for formula in ("W.465", "Fe.9470"):
+        assert parse_species_formula(formula) is None, formula
+
+    # Pankratz table 1174 prints Fe₀.₉₄₇O(c,l): Fe 0.947 and O 1.
+    assert parse_species_formula("Fe0.947O") == (("Fe", 0.947), ("O", 1.0))
+
+
+def test_species_formula_parser_refuses_empty_adduct_segments() -> None:
+    for formula in ("·CuSO4", "CuSO4·", "CuSO4··5H2O", "Br·", "Na•", "P04•··"):
+        assert parse_species_formula(formula) is None, formula
+
+
+def test_species_formula_parser_rejects_phase_exposed_after_charge_removal() -> None:
+    species = Species("Fe0.95O", Phase.G, charge=1)
+    assert parse_species_formula("Fe0.95O[s]+", species=species) is None
+
+
 def test_species_formula_parser_accepts_compound_adduct_and_bullet_dot() -> None:
     for formula in ("3Al2O3.2SiO2", "Na2O.SiO2"):
         assert parse_species_formula(formula) == tuple(
@@ -3438,6 +3456,20 @@ def test_species_formula_parser_accepts_compound_adduct_and_bullet_dot() -> None
         )
     assert parse_species_formula("CuO•CuSO₄") == tuple(
         sorted(parse_formula("CuO·CuSO4").elements.items())
+    )
+
+
+def test_species_formula_parser_preserves_deuterium_in_isotope_hydrates() -> None:
+    assert parse_species_formula("CuSO4·5D2O") == (
+        ("Cu", 1.0),
+        ("D", 10.0),
+        ("O", 9.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("D2O·H2O") == (
+        ("D", 2.0),
+        ("H", 2.0),
+        ("O", 2.0),
     )
 
 
