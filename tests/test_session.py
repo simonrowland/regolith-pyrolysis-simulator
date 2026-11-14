@@ -348,7 +348,9 @@ class _FakeSim:
             pO2_mbar=0.0,
             stir_factor=1.0,
         )
-        self.campaign_mgr = SimpleNamespace(c4_max_temp_C=1670.0, overrides={})
+        self.campaign_mgr = SimpleNamespace(
+            c4_max_temp_C=1670.0, overrides={}, _lab_schedule=lambda _campaign: None,
+        )
         self.c4_max_temp_C = 1670.0
         self._last_backend_error = ""
         self._last_campaign_summary = None

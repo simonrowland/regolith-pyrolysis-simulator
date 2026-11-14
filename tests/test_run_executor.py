@@ -29,7 +29,7 @@ from simulator.session import (
     StepResult,
     drive_session,
 )
-from simulator.state import CampaignPhase, DecisionType
+from simulator.state import CampaignPhase, DecisionType, HourSnapshot
 from simulator.trace import PhysicsTrace
 
 
@@ -134,9 +134,9 @@ def test_run_executor_uses_campaigns_elapsed_override_without_history():
 def test_campaign_transition_history_overrides_campaign_count_fallback():
     session = SimpleNamespace(
         _step_results=[
-            SimpleNamespace(campaign_summary={"campaign": "C0"}),
-            SimpleNamespace(campaign_summary=None),
-            SimpleNamespace(campaign_summary={"campaign": "C1"}),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary={"campaign": "C0"}),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary=None),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary={"campaign": "C1"}),
         ]
     )
 
@@ -149,9 +149,9 @@ def test_campaign_transition_history_overrides_campaign_count_fallback():
 def test_campaign_count_includes_partial_campaign_hours():
     session = SimpleNamespace(
         _step_results=[
-            SimpleNamespace(campaign_summary={"campaign": "C0", "duration_h": 8}),
-            SimpleNamespace(campaign_summary=None),
-            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary={"campaign": "C0", "duration_h": 8}),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary=None),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary=None),
         ],
         simulator=SimpleNamespace(
             melt=SimpleNamespace(campaign=CampaignPhase.C0B),
@@ -176,7 +176,7 @@ def test_campaign_count_resolves_structured_c3_duration():
         _campaign_overrides=lambda _campaign: {},
     )
     session = SimpleNamespace(
-        _step_results=[SimpleNamespace(campaign_summary=None)],
+        _step_results=[SimpleNamespace(snapshot=HourSnapshot(), campaign_summary=None)],
         simulator=SimpleNamespace(
             melt=SimpleNamespace(campaign=CampaignPhase.C3_NA),
             record=SimpleNamespace(path="A_staged"),
@@ -219,9 +219,9 @@ def test_campaign_count_resolves_structured_c5_branch_max_hold():
     # Active hour mid-C5 on branch two: 1 completed campaign + 2/800.
     session_two = SimpleNamespace(
         _step_results=[
-            SimpleNamespace(campaign_summary={"campaign": "C4"}),
-            SimpleNamespace(campaign_summary=None),
-            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary={"campaign": "C4"}),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary=None),
+            SimpleNamespace(snapshot=HourSnapshot(), campaign_summary=None),
         ],
         simulator=SimpleNamespace(
             melt=SimpleNamespace(campaign=CampaignPhase.C5),
@@ -237,7 +237,7 @@ def test_campaign_count_resolves_structured_c5_branch_max_hold():
 
     # Unset branch defaults to branch_one (matches campaigns.py endpoint).
     session_default = SimpleNamespace(
-        _step_results=[SimpleNamespace(campaign_summary=None)],
+        _step_results=[SimpleNamespace(snapshot=HourSnapshot(), campaign_summary=None)],
         simulator=SimpleNamespace(
             melt=SimpleNamespace(campaign=CampaignPhase.C5),
             record=SimpleNamespace(branch=""),
@@ -252,7 +252,7 @@ def test_campaign_count_resolves_structured_c5_branch_max_hold():
 
     # Explicit branch one.
     session_one = SimpleNamespace(
-        _step_results=[SimpleNamespace(campaign_summary=None)],
+        _step_results=[SimpleNamespace(snapshot=HourSnapshot(), campaign_summary=None)],
         simulator=SimpleNamespace(
             melt=SimpleNamespace(campaign=CampaignPhase.C5),
             record=SimpleNamespace(branch="one"),

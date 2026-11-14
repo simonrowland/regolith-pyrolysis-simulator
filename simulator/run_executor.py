@@ -282,7 +282,6 @@ class RunExecutor:
         )
         failure_exc: Exception | None = None
         hours = _coerce_nonnegative_hours(hours)
-        target_hour = sim.melt.hour + hours
         snapshot_start = len(
             tuple(getattr(getattr(sim, "record", None), "snapshots", ()))
         )
@@ -306,6 +305,7 @@ class RunExecutor:
                 operator_decisions=operator_decisions,
                 stop_at_stage0_exit=bool(stop_at_stage0_exit),
             ))
+            target_hour = sim.melt.hour + hours
             while True:
                 # A typed refusal is an infeasible point, not a partially
                 # executed hour. Snapshot both authoritative state surfaces

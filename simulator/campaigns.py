@@ -2815,6 +2815,7 @@ class CampaignManager:
                 log_slope_complete = self._c2a_staged_log_slope_depletion_complete(
                     species=species,
                     evap_flux=evap_flux,
+                    dt_hr=dt_hr,
                     epsilon_per_hr=log_slope_epsilon,
                 )
                 depletion_complete = (
