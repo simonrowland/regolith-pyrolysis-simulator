@@ -51,6 +51,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.score import (
     liquid_model_subsolidus_sample_notice,
+    parse_migration_headline,
     predict_with_engine,
 )
 from simulator.battery.migrate import (
@@ -15757,26 +15758,38 @@ def test_queue_accounting_uses_manifest_eligibility_and_tracks_mutation(
         QueueEntry("w", {}, ["value"], "why", missing_source, "obs-d"),
     ]
 
-    backlog, references, backlog_by_path, references_by_path = _queue_work_counts(
-        queue, tmp_path
-    )
-    assert backlog == {"fixture-eligible": 1, "fixture-unmarked": 1}
-    assert references == {"fixture-reference": 2}
-    assert sum(backlog_by_path.values()) == 2
-    assert sum(references_by_path.values()) == 2
+    counts = _queue_work_counts(queue, tmp_path)
+    assert counts.backlog_by_source == {
+        "fixture-eligible": 1,
+        "fixture-unmarked": 1,
+    }
+    assert counts.reference_by_source == {"fixture-reference": 2}
+    assert sum(counts.backlog_by_path.values()) == 2
+    assert sum(counts.reference_by_path.values()) == 2
 
     manifest_path = compilations / "fixture-reference" / "manifest.yaml"
     false_manifest["compilation_role"]["scoring_eligible"] = True
     manifest_path.write_text(yaml.safe_dump(false_manifest), encoding="utf-8")
-    backlog, references, _backlog_by_path, _references_by_path = _queue_work_counts(
-        queue, tmp_path
-    )
-    assert backlog == {
+    counts = _queue_work_counts(queue, tmp_path)
+    assert counts.backlog_by_source == {
         "fixture-eligible": 1,
         "fixture-reference": 2,
         "fixture-unmarked": 1,
     }
-    assert references == {}
+    assert counts.reference_by_source == {}
+
+
+def test_migration_report_headline_is_accepted_by_scorer(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path / "repo")
+    result = migrate(root, write=True)
+    report = (root / "data" / "battery" / "migration-report.md").read_text(
+        encoding="utf-8"
+    )
+
+    headline = parse_migration_headline(report)
+    assert f"queue size: {len(result.queue)}\n" in report
+    assert headline["queue"] == len(result.queue)
+    assert f"queue backlog: {len(result.queue)}\n" in report
 
 
 def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:

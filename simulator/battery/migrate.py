@@ -4560,6 +4560,14 @@ class MeasuredCounts:
 
 
 @dataclass
+class QueueWorkCounts:
+    backlog_by_source: Counter[str] = field(default_factory=Counter)
+    reference_by_source: Counter[str] = field(default_factory=Counter)
+    backlog_by_path: Counter[str] = field(default_factory=Counter)
+    reference_by_path: Counter[str] = field(default_factory=Counter)
+
+
+@dataclass
 class MigrationResult:
     works: dict[str, Work] = field(default_factory=dict)
     benches: dict[str, Bench] = field(default_factory=dict)
@@ -4580,6 +4588,7 @@ class MigrationResult:
         default_factory=lambda: defaultdict(list)
     )
     queue: list[QueueEntry] = field(default_factory=list)
+    queue_work_counts: QueueWorkCounts | None = None
     source_counts: dict[str, SourceCount] = field(default_factory=dict)
     measured: MeasuredCounts = field(default_factory=MeasuredCounts)
     aliases: dict[str, str] = field(default_factory=dict)
@@ -33383,6 +33392,9 @@ class Migrator:
             validation.issues + tuple(self.result.registry_issues),
             validation.notices,
         )
+        self.result.queue_work_counts = _queue_work_counts(
+            self.result.queue, self.root
+        )
 
     def run(self) -> MigrationResult:
         self.migrate_index_only_sources()
@@ -33584,6 +33596,8 @@ def migration_queue_document(
 
 def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     root = root or REPO_ROOT
+    if result.queue_work_counts is None:
+        result.queue_work_counts = _queue_work_counts(result.queue, root)
     works_dir = root / "data" / "literature" / "works"
     extracts_v2 = root / "data" / "literature" / "extracts-v2"
     observations_v2 = root / "data" / "literature" / "observations-v2"
@@ -33757,7 +33771,7 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
         ),
         battery / "migration-queue.yaml",
     )
-    write_report(result, battery / "migration-report.md", root=root)
+    write_report(result, battery / "migration-report.md")
 
 
 def _store_output_file_bytes(root: Path) -> dict[str, bytes]:
@@ -33818,7 +33832,7 @@ def _store_regeneration_differences(
 
 def _queue_work_counts(
     queue: Iterable[QueueEntry], root: Path
-) -> tuple[Counter[str], Counter[str], Counter[str], Counter[str]]:
+) -> QueueWorkCounts:
     """Count intake backlog and non-scoring reference inputs by manifest source."""
 
     backlog: Counter[str] = Counter()
@@ -33858,12 +33872,15 @@ def _queue_work_counts(
             else backlog_by_path
         )
         path_target[source] += 1
-    return backlog, reference_inputs, backlog_by_path, references_by_path
+    return QueueWorkCounts(
+        backlog_by_source=backlog,
+        reference_by_source=reference_inputs,
+        backlog_by_path=backlog_by_path,
+        reference_by_path=references_by_path,
+    )
 
 
-def write_report(
-    result: MigrationResult, path: Path, *, root: Path | None = None
-) -> None:
+def write_report(result: MigrationResult, path: Path) -> None:
     measured = result.measured
     hard = 0 if result.validation is None else len(result.validation.hard_issues)
     rows_in = sum(c.rows_in for c in result.source_counts.values())
@@ -33876,19 +33893,11 @@ def write_report(
         else "<missing_reason>"
         for observation in unavailable_work
     )
-    root = root or (
-        path.parents[2]
-        if path.parent.name == "battery" and path.parent.parent.name == "data"
-        else path.parent
-    )
-    (
-        backlog_by_source,
-        reference_by_source,
-        queued_by_source,
-        reference_by_path,
-    ) = _queue_work_counts(result.queue, root)
-    backlog_count = sum(backlog_by_source.values())
-    reference_count = sum(reference_by_source.values())
+    queue_work_counts = result.queue_work_counts
+    if queue_work_counts is None:
+        raise ValueError("migration queue work counts are not classified")
+    backlog_count = sum(queue_work_counts.backlog_by_source.values())
+    reference_count = sum(queue_work_counts.reference_by_source.values())
     lines = [
         "# Battery v2.1 migration report",
         "",
@@ -33896,7 +33905,8 @@ def write_report(
         f"records out (observations): {obs_out}",
         f"works: {len(result.works)}",
         f"experiments: {len(result.experiments)}",
-        f"queue size (backlog): {backlog_count}",
+        f"queue size: {len(result.queue)}",
+        f"queue backlog: {backlog_count}",
         f"reference inputs: {reference_count}",
         f"identical-payload dedupe aliases: {len(result.dedupe_aliases)}",
         f"metadata files: {sum(c.metadata_in for c in result.source_counts.values())}",
@@ -33984,10 +33994,10 @@ def write_report(
     lines.extend(["", "## Per source", "", "| source | rows in | observations out | queued backlog | reference inputs |", "|---|---:|---:|---:|---:|"])
     for src, rec in sorted(result.source_counts.items()):
         lines.append(
-            f"| `{src}` | {rec.rows_in} | {rec.observations_out} | {queued_by_source.get(src, 0)} | {reference_by_path.get(src, 0)} |"
+            f"| `{src}` | {rec.rows_in} | {rec.observations_out} | {queue_work_counts.backlog_by_path.get(src, 0)} | {queue_work_counts.reference_by_path.get(src, 0)} |"
         )
     lines.extend(["", "## Reference inputs by source", "", "| source | count |", "|---|---:|"])
-    for src, count in sorted(reference_by_source.items()):
+    for src, count in sorted(queue_work_counts.reference_by_source.items()):
         lines.append(f"| `{src}` | {count} |")
     if result.validation is not None and result.validation.hard_issues:
         hard_census: dict[str, int] = defaultdict(int)
