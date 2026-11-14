@@ -9,6 +9,9 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.fe_redox import (
+    HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL,
+    HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA,
+    HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
     LiquidFeODomain,
     calphad_ferrous_feo_activity_diagnostic,
     holzheid_stoich_feo_gamma_band,
@@ -16,7 +19,7 @@ from simulator.fe_redox import (
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
-from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
+from simulator.oxygen_buffers import Kress91InvalidControls, feo_iw_log10_fO2_bar
 from simulator.state import MOLAR_MASS
 
 
@@ -41,6 +44,131 @@ _IRON_RICH_BASALT_WT = {
     "K2O": 0.5,
 }
 _T_K = 1673.15
+
+
+@pytest.mark.parametrize(
+    ("temperature_C", "multiplier"),
+    HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
+)
+def test_holzheid_gamma_keeps_each_tabulated_interior_value_exact(
+    temperature_C: float,
+    multiplier: float,
+) -> None:
+    band = holzheid_stoich_feo_gamma_band(temperature_C + 273.15)
+    expected_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * multiplier
+    expected_sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * multiplier
+
+    assert band["conversion_multiplier"] == multiplier
+    assert band["central"] == expected_gamma
+    assert band["measurement_sigma"] == expected_sigma
+    assert band["measurement_low"] == expected_gamma - expected_sigma
+    assert band["measurement_high"] == expected_gamma + expected_sigma
+    assert band["conversion_status"] == "interpolated_verified_range"
+    assert band["authority_level"] == "certified"
+    assert band["notice"] is None
+
+
+@pytest.mark.parametrize(
+    ("edge_C", "outside_delta_C"),
+    [(1300.0, -1e-6), (1600.0, 1e-6)],
+)
+def test_holzheid_gamma_is_continuous_and_certified_edges_are_unchanged(
+    edge_C: float,
+    outside_delta_C: float,
+) -> None:
+    at_edge = holzheid_stoich_feo_gamma_band(edge_C + 273.15)
+    just_outside = holzheid_stoich_feo_gamma_band(
+        edge_C + outside_delta_C + 273.15
+    )
+
+    assert at_edge["conversion_status"] == "interpolated_verified_range"
+    assert at_edge["authority_level"] == "certified"
+    assert at_edge["notice"] is None
+    assert just_outside["conversion_status"].startswith("extrapolated_")
+    assert just_outside["authority_level"] == "extrapolated"
+    assert just_outside["central"] == pytest.approx(at_edge["central"], abs=1e-8)
+
+
+def test_holzheid_low_edge_predicts_printed_1600_gamma():
+    low_edge_C, low_multiplier = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[0]
+    low_edge_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * low_multiplier
+    predicted_1600_gamma = math.exp(
+        math.log(low_edge_gamma) * (low_edge_C + 273.15) / (1600.0 + 273.15)
+    )
+
+    assert predicted_1600_gamma == pytest.approx(2.818, abs=0.001)
+    assert predicted_1600_gamma == pytest.approx(2.822, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    ("temperature_C", "printed_gamma", "expected_sigma_ext_log10"),
+    [
+        (1670.0, 2.718, 0.084841284),
+        (1750.0, 2.613, 0.088523374),
+        (1900.0, 2.445, 0.095121568),
+        (2200.0, 2.194, 0.107191610),
+        (950.0, 4.888, 0.081914830),
+        (225.0, 49.2, 0.274968621),
+    ],
+)
+def test_holzheid_regular_solution_extrapolation_and_notice(
+    temperature_C: float,
+    printed_gamma: float,
+    expected_sigma_ext_log10: float,
+) -> None:
+    band = holzheid_stoich_feo_gamma_band(temperature_C + 273.15)
+    notice = band["notice"]
+    assert isinstance(notice, dict)
+    below = temperature_C < HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[0][0]
+    edge_C = (
+        HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[0]
+        if below
+        else HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[-1]
+    )[0]
+    span_C = (
+        HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[-1][0]
+        - HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[0][0]
+    )
+    expected_distance = abs(temperature_C - edge_C) / span_C
+    expected_W_J_mol = 16137.0 if below else 16157.0
+    gamma_digits = 1 if temperature_C == 225.0 else 3
+
+    assert round(band["central"], gamma_digits) == printed_gamma
+    assert band["conversion_status"] == (
+        "extrapolated_below_verified_range"
+        if below
+        else "extrapolated_above_verified_range"
+    )
+    assert band["authority_level"] == "extrapolated"
+    assert notice["kind"] == "out_of_certified_band"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["side"] == ("below" if below else "above")
+    assert notice["edge_used"] == {
+        "temperature_C": edge_C,
+        "temperature_K": edge_C + 273.15,
+    }
+    assert notice["W_J_mol"] == pytest.approx(expected_W_J_mol, abs=1.0)
+    assert notice["distance_outside_span_widths"] == pytest.approx(
+        expected_distance
+    )
+    assert notice["model_scatter_log10"] == pytest.approx(0.0145, abs=0.0002)
+    assert 10.0 ** notice["model_scatter_log10"] - 1.0 < 0.05
+    assert notice["uncertainty_band_log10"] == pytest.approx(
+        expected_sigma_ext_log10, abs=5e-10
+    )
+    assert notice["uncertainty_band"] == band["measurement_sigma"]
+    assert band["measurement_low"] < band["central"] < band["measurement_high"]
+    assert band["measurement_high"] / band["central"] == pytest.approx(
+        band["central"] / band["measurement_low"]
+    )
+
+
+@pytest.mark.parametrize("temperature_K", [math.nan, math.inf, -math.inf, 0.0, -10.0])
+def test_holzheid_gamma_refuses_non_finite_or_non_positive_temperature(
+    temperature_K: float,
+) -> None:
+    with pytest.raises(Kress91InvalidControls, match="finite positive"):
+        holzheid_stoich_feo_gamma_band(temperature_K)
 
 
 def _moles_from_wt_pct(comp_wt: dict[str, float]) -> dict[str, float]:
