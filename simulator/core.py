@@ -16342,7 +16342,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             actual_O2_kg_hr=melt_offgas_O2_kg_hr,
             actual_O2_mol_hr=melt_offgas_O2_kg_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL,
             mre_anode_O2_mol_hr=(
-                self._mre_anode_O2_kg_this_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL),
+                # MRE returns an interval amount: (kg / kg/mol) / h
+                # gives mol/h; 1 mol produced in .25 h is 4 mol/h.
+                self._mre_anode_O2_kg_this_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL
+                / self._step_dt_hr),
             overhead_holdup_mol=self._overhead_holdup_mol(),
             existing_gas=self.overhead,
             headspace_volume_m3=self._headspace_volume_m3(),
