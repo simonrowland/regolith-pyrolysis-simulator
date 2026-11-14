@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import math
+from dataclasses import asdict
 from decimal import Decimal
 from pathlib import Path
 from types import MappingProxyType
@@ -18,8 +19,13 @@ from simulator.battery.residue import (
     _hashimoto_primary_policy,
     _predict_hashimoto_residue_cohort,
 )
-
-
+from simulator.battery.enums import Engine, ExecutionState, Quantity
+from simulator.battery.score import (
+    _HASHIMOTO_SOURCE_ID,
+    _hashimoto_residue_prediction,
+    load_score_context,
+    quantity_token,
+)
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
 STORE = ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
@@ -304,7 +310,7 @@ def _source_data():
 @pytest.mark.nightly
 @pytest.mark.cpu_budget(998)
 @pytest.mark.xdist_group("hashimoto_real_cohort")
-def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
+def test_hashimoto_openimcc_primary_numeric_output_is_pinned(monkeypatch) -> None:
     pytest.importorskip("openimcc")
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
@@ -335,6 +341,57 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         "MgO": "0x1.f179bb173dc7fp+4",
         "CaO": "0x1.c5893f4ff0809p+1",
     }
+
+    context = load_score_context(sources=(_HASHIMOTO_SOURCE_ID,))
+    references = sorted(
+        (
+            observation
+            for observation in context.observations.values()
+            if observation.source_id == _HASHIMOTO_SOURCE_ID
+            and PRIMARY_TABLE3_PREFIX in observation.observation_id
+            and quantity_token(observation.identity)
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ),
+        key=lambda observation: observation.observation_id,
+    )
+    assert len(references) == 120
+    selected_experiment_ids = frozenset(
+        observation.experiment_id for observation in references
+    )
+    monkeypatch.setattr(
+        "simulator.battery.residue._predict_hashimoto_residue_cohort",
+        lambda *_args, **_kwargs: cohort,
+    )
+    cache = {}
+    scored_records = []
+    for reference in references:
+        prediction = _hashimoto_residue_prediction(
+            context,
+            reference,
+            Engine.OPENIMCC,
+            cache,
+            selected_experiment_ids=selected_experiment_ids,
+        )
+        assert prediction.execution.state is ExecutionState.PRODUCED
+        assert prediction.value is not None
+        scored_records.append(
+            {
+                "observation_id": reference.observation_id,
+                "value": str(prediction.value),
+                "notices": [asdict(notice) for notice in prediction.notices],
+            }
+        )
+    scored_digest = hashlib.sha256(
+        json.dumps(
+            scored_records,
+            sort_keys=True,
+            separators=(",", ":"),
+            default=str,
+        ).encode()
+    ).hexdigest()
+    assert scored_digest == (
+        "06be134a152a585c2b5e37e96088c40ce936210e0027847f6136a222aa960ff2"
+    )
 
 
 def test_hashimoto_residue_requires_24_distinct_physical_runs(
