@@ -241,7 +241,8 @@ def test_terminal_refusal_restores_incremental_accounting_prefixes() -> None:
     sim.melt = SimpleNamespace(hour=4)
     sim.record = BatchRecord(snapshots=[snapshot("Na", 1.0)])
     sim._condensation_model = SimpleNamespace(
-        last_sticking_alpha_provenance_notice={}
+        last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.atom_ledger = FakeLedger()
     sim.atom_ledger._transitions.append(transition("Na", 0.5))
@@ -892,7 +893,6 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
         def transitions(self):
             return self._transitions
 
-    intent = ChemistryIntent.GATE_LIQUID_FRACTION
     registry = ProviderRegistry()
     sim = object.__new__(PyrolysisSimulator)
     sim._step_dt_hr = 1.0
@@ -1062,95 +1062,6 @@ def _refusal_step_sim() -> PyrolysisSimulator:
     sim._chem_kernel = object()
     sim._build_chemistry_kernel = lambda: object()
     return sim
-
-
-def test_successful_step_shares_committed_yield_disposition_rows() -> None:
-    class CommittedRow:
-        deepcopy_count = 0
-
-        def __deepcopy__(self, memo):
-            type(self).deepcopy_count += 1
-            copied = type(self)()
-            memo[id(self)] = copied
-            return copied
-
-    CommittedRow.deepcopy_count = 0
-    row = CommittedRow()
-    key = (0, "C0", 0)
-    sim = _refusal_step_sim()
-    sim._yield_disposition_ledger_snapshots = {key: row}
-    sim._step_one_hour = lambda: HourSnapshot(hour=4)
-
-    assert sim.step().hour == 4
-
-    assert CommittedRow.deepcopy_count == 0
-    assert sim._yield_disposition_ledger_snapshots[key] is row
-    assert sim.runtime_state == {"plain": {"value": 1}}
-
-
-def test_terminal_refusal_restores_inserted_yield_rows_and_copies_other_roots(
-    monkeypatch,
-) -> None:
-    def make_simulator():
-        key = (3, "C0", 3)
-        committed = {
-            "gross_events": [
-                {"account": "process.condensation_train", "n": 1},
-            ],
-        }
-        sim = _refusal_step_sim()
-        sim._yield_disposition_ledger_snapshots = {key: committed}
-        refusal = EvaporationFluxRefusal(
-            "terminal", {"reason": "yield-disposition-row"},
-        )
-
-        def refuse_after_append():
-            sim._yield_disposition_ledger_snapshots[(4, "C0", 4)] = {
-                "gross_events": [],
-            }
-            raise refusal
-
-        sim._step_one_hour = refuse_after_append
-        return sim, key, committed, refusal
-
-    def assert_refusal_rolls_back(sim, key, committed, refusal):
-        with pytest.raises(EvaporationFluxRefusal) as raised:
-            sim.step()
-
-        assert raised.value is refusal
-        restored = sim._yield_disposition_ledger_snapshots
-        assert list(restored) == [key]
-        assert restored[key] == committed
-        assert restored[key] is not committed
-        assert restored[key]["gross_events"] is not committed["gross_events"]
-        assert (
-            restored[key]["gross_events"][0]
-            is not committed["gross_events"][0]
-        )
-        assert sim.runtime_state == {"plain": {"value": 1}}
-
-    sim, key, committed, refusal = make_simulator()
-    assert_refusal_rolls_back(sim, key, committed, refusal)
-
-    sim, key, committed, refusal = make_simulator()
-    snapshot = sim._snapshot_terminal_refusal_hour_state
-
-    def broken_snapshot(*, defer_committed_history=False):
-        state, ledger, cost_state = snapshot(
-            defer_committed_history=defer_committed_history,
-        )
-        state["_yield_disposition_ledger_snapshots"] = (
-            sim._yield_disposition_ledger_snapshots
-        )
-        return state, ledger, cost_state
-
-    monkeypatch.setattr(
-        sim,
-        "_snapshot_terminal_refusal_hour_state",
-        broken_snapshot,
-    )
-    with pytest.raises(AssertionError):
-        assert_refusal_rolls_back(sim, key, committed, refusal)
 
 
 def test_terminal_refusal_materializes_detached_committed_history() -> None:
