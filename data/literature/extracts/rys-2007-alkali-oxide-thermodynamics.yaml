@@ -4481,6 +4481,9 @@ species:
           locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4549,6 +4552,9 @@ species:
             table: '4'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4593,6 +4599,9 @@ species:
             table: '5'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4643,6 +4652,9 @@ species:
             table: '6'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4687,6 +4699,9 @@ species:
             table: '7'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4740,6 +4755,9 @@ species:
             table: '8'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4794,6 +4812,9 @@ species:
             table: '9'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4847,6 +4868,9 @@ species:
             table: 10a
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4878,6 +4902,9 @@ species:
             table: 10b
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4908,6 +4935,9 @@ species:
             table: 11a
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4939,6 +4969,9 @@ species:
             table: 11b
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -4972,6 +5005,9 @@ species:
             table: 12a
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -5003,6 +5039,9 @@ species:
             table: 12b
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: Na
             method_class: measured_direct
@@ -5313,11 +5352,12 @@ species:
             table: '1'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: O2
-            method_class: measured_direct
-            evidence_class: measured_direct
-            method: KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).
+            method: "KEMS O2 ion-current intensity was used only when the background was below 50% of measured intensity; otherwise pO2 was calculated from congruent vaporization. This extract lacks the row-specific background classification."
             points:
               - {sample_as_printed: Na2O_1, gas_species: O2, T_K: '1137.158', pressure_Pa: '1.121225', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 1, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}
               - {sample_as_printed: Na2O_1, gas_species: O2, T_K: '1129.007', pressure_Pa: '0.892474', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 2, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}
@@ -5341,11 +5381,12 @@ species:
             table: '2'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: O2
-            method_class: measured_direct
-            evidence_class: measured_direct
-            method: KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).
+            method: "KEMS O2 ion-current intensity was used only when the background was below 50% of measured intensity; otherwise pO2 was calculated from congruent vaporization. This extract lacks the row-specific background classification."
             points:
               - {sample_as_printed: Na2O_2, gas_species: O2, T_K: '1120.856', pressure_Pa: '0.917261', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 2, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}
               - {sample_as_printed: Na2O_2, gas_species: O2, T_K: '1115.761', pressure_Pa: '0.809426', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 3, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}
@@ -5367,11 +5408,12 @@ species:
             table: '3'
           units: Pa
           values:
+            provenance:
+              oxygen_measurement_status: unknown
+              oxygen_measurement_status_reason: 'Ryś §4.1.6 mixes measured and congruent-effusion pO2; row-specific background classification is absent.'
             quantity: partial_pressure
             formula: O2
-            method_class: measured_direct
-            evidence_class: measured_direct
-            method: KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).
+            method: "KEMS O2 ion-current intensity was used only when the background was below 50% of measured intensity; otherwise pO2 was calculated from congruent vaporization. This extract lacks the row-specific background classification."
             points:
               - {sample_as_printed: Na2O_3, gas_species: O2, T_K: '1136.139', pressure_Pa: '0.918253', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 1, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 138, published_page: 126, pdf_page_index: 137, table: '3'}}}, locator: {page: 138, published_page: 126, pdf_page_index: 137, table: '3'}}
               - {sample_as_printed: Na2O_3, gas_species: O2, T_K: '1122.894', pressure_Pa: '0.821976', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 2, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 138, published_page: 126, pdf_page_index: 137, table: '3'}}}, locator: {page: 138, published_page: 126, pdf_page_index: 137, table: '3'}}
