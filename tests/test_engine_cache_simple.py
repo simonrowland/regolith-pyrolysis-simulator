@@ -777,9 +777,10 @@ def test_runtime_identity_is_computed_once_per_engine(
 
 
 @pytest.mark.parametrize(
-    ("engine", "metadata_name", "failure", "reason"),
+    ("engine", "distribution_name", "metadata_name", "failure", "reason"),
     [
         (
+            "openimcc",
             "openimcc",
             "direct_url.json",
             "decode",
@@ -787,12 +788,39 @@ def test_runtime_identity_is_computed_once_per_engine(
         ),
         (
             "openimcc",
+            "openimcc",
+            "direct_url.json",
+            "read",
+            "distribution_metadata_unreadable",
+        ),
+        (
+            "openimcc",
+            "openimcc",
             "direct_url.json",
             "parse",
             "distribution_metadata_invalid",
         ),
-        ("thermoengine", "RECORD", "read", "distribution_metadata_unreadable"),
-        ("vaporock", "RECORD", "decode", "distribution_metadata_unreadable"),
+        (
+            "openimcc",
+            "openimcc",
+            "direct_url.json",
+            "shape",
+            "distribution_metadata_invalid",
+        ),
+        (
+            "thermoengine",
+            "thermoengine",
+            "RECORD",
+            "read",
+            "distribution_metadata_unreadable",
+        ),
+        (
+            "vaporock",
+            "vaporock",
+            "RECORD",
+            "decode",
+            "distribution_metadata_unreadable",
+        ),
     ],
 )
 def test_bad_distribution_metadata_is_reported_without_aborting_engine_open(
@@ -800,29 +828,29 @@ def test_bad_distribution_metadata_is_reported_without_aborting_engine_open(
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
     engine: str,
+    distribution_name: str,
     metadata_name: str,
     failure: str,
     reason: str,
 ) -> None:
-    class Distribution:
-        version = "1.2.3"
-
-        def read_text(self, name: str) -> str | None:
-            assert name == metadata_name
-            if failure == "decode":
-                raise UnicodeDecodeError(
-                    "utf-8", bytes([0xFF]), 0, 1, "invalid start byte"
-                )
-            if failure == "read":
-                raise OSError("injected metadata read failure")
-            return "{"  # invalid direct_url.json
-
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
-    monkeypatch.setattr(
-        engine_cache.importlib.metadata,
-        "distribution",
-        lambda _name: Distribution(),
+    dist_info = tmp_path / f"{distribution_name}-1.2.3.dist-info"
+    dist_info.mkdir()
+    (dist_info / "METADATA").write_text(
+        f"Metadata-Version: 2.1\nName: {distribution_name}\nVersion: 1.2.3\n\n",
+        encoding="utf-8",
     )
+    metadata_path = dist_info / metadata_name
+    if failure == "decode":
+        metadata_path.write_bytes(bytes([0xFF]))
+    elif failure == "read":
+        metadata_path.mkdir()
+    elif failure == "parse":
+        metadata_path.write_text("{", encoding="utf-8")
+    else:
+        metadata_path.write_text("[]", encoding="utf-8")
+
+    monkeypatch.syspath_prepend(str(tmp_path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
     engine_cache.runtime_identity.cache_clear()
     engine_cache.engine_cache_runtime_identities(reset=True)
 
