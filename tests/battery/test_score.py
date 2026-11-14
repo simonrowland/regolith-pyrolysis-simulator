@@ -12146,7 +12146,7 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
 
 
 def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contexts() -> None:
-    """The source-filtered store has Shornikov rows, not every pack source's rows."""
+    """Pack and Shornikov-only lineages resolve in source-filtered contexts."""
 
     openimcc = pytest.importorskip("openimcc")
     from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
@@ -12157,7 +12157,7 @@ def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contex
     )
     shornikov_source = "openimcc-source-ref:Shornikov2017"
     assert shornikov_source in packaged_sources
-    coefficient_sources = (shornikov_source,)
+    coefficient_sources = packaged_sources
     source_context = load_score_context(
         sources=("shornikov-2017-spinel-thermodynamics",)
     )
@@ -12174,29 +12174,31 @@ def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contex
         {experiment.experiment_id: experiment},
     )
 
-    for works, observations, experiments in (
+    contexts = (
         (
             source_context.works,
             source_context.observations,
             source_context.experiments,
         ),
         restricted_stores,
-    ):
-        complete = score_mod.lineage_complete_for(
-            coefficient_sources,
-            works=works,
-            observations=observations,
-            experiments=experiments,
-        )
-        assert complete is True
-        assert resolve_source_relation(
-            reference,
-            coefficient_sources,
-            complete,
-            works=works,
-            observations=observations,
-            experiments=experiments,
-        ) is SourceRelation.SAME_INPUT
+    )
+    for sources in (coefficient_sources, (shornikov_source,)):
+        for works, observations, experiments in contexts:
+            complete = score_mod.lineage_complete_for(
+                sources,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            )
+            assert complete is True
+            assert resolve_source_relation(
+                reference,
+                sources,
+                complete,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            ) is SourceRelation.SAME_INPUT
 
 
 def test_openimcc_canonical_doi_is_a_terminal_source_root() -> None:
@@ -12220,6 +12222,51 @@ def test_openimcc_canonical_doi_is_a_terminal_source_root() -> None:
         ("doi:not-a-canonical-doi",), observations, works, experiments
     )
     assert malformed.failure is AncestryFailure.UNKNOWN_ALIAS
+
+
+def test_registered_doi_work_without_loaded_members_uses_work_identity() -> None:
+    from simulator.battery.validate import (
+        _build_validation_indexes,
+        _resolve_coefficient_sources,
+    )
+
+    doi = "10.1098/rspa.1965.0176"
+    work = replace(F.work("registered-doi-work-identity"), doi=doi)
+    experiment = F.tabulation_experiment(
+        experiment_id="registered-doi-work-identity-exp", work_id=work.work_id
+    )
+    works = {work.work_id: work}
+    experiments = {experiment.experiment_id: experiment}
+    resolved = _resolve_coefficient_sources(
+        (f"doi:{doi}",), {}, works, experiments
+    )
+
+    assert resolved.complete
+    assert resolved.ids == frozenset({work.work_id})
+
+    reference = F.observation(
+        "registered-doi-work-identity-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    indexes = _build_validation_indexes(
+        works,
+        {reference.observation_id: reference},
+        experiments,
+    )
+    reference_lineage = score_mod._reference_lineage_with_work_doi(
+        reference, indexes
+    )
+    assert reference_lineage.complete
+    assert reference_lineage.ids is not None
+    assert work.work_id in reference_lineage.ids
+    assert (
+        score_mod._source_relation_from_lineages(reference_lineage, resolved)
+        is SourceRelation.SAME_INPUT
+    )
 
 
 def test_openimcc_doi_matching_a_registered_work_is_same_source() -> None:

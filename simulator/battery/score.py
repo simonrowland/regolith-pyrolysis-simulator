@@ -5427,7 +5427,7 @@ def _reference_lineage_with_work_doi(
     )
     if doi_source is None:
         return lineage
-    return Ancestry.of(set(lineage.ids) | {doi_source})
+    return Ancestry.of(set(lineage.ids) | {work.work_id, doi_source})
 
 
 def _resolve_source_relation_with_indexes(
