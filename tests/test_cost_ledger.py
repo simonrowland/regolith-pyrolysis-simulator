@@ -607,6 +607,25 @@ def test_cost_rollup_matches_each_fractional_snapshot_without_hour_collisions():
     assert components["turbine"] == 10.0
 
 
+def test_fractional_furnace_cost_integrates_snapshot_exposure():
+    from simulator.state import HourSnapshot
+
+    costs = []
+    for times, duration in (([1.0], 1.0), ([0.25, 0.5, 0.75, 1.0], 0.25)):
+        diagnostic = build_cost_rollup_diagnostic(
+            cost_ledger=CostLedger(),
+            # The public summary already has this schema. Duration belongs
+            # to its matched snapshot, not a new recipe or report field.
+            per_hour=tuple({"hour": hour, "T_C": 1000.0} for hour in times),
+            products_kg={"O2": 1.0},
+            snapshots=tuple(HourSnapshot(hour=hour, duration_h=duration) for hour in times),
+        )
+        costs.append(diagnostic["run_input_cost"]["physical_cost"])
+    assert costs[0] == costs[1]
+    assert costs[1]["furnace_h"] == 1.0
+    assert costs[1]["thermal_flux_h"] == furnace_thermal_flux_hours(1000.0, 1.0)
+
+
 def test_cost_rollup_breakdown_aliases_do_not_double_sum():
     diagnostic = build_cost_rollup_diagnostic(
         cost_ledger=CostLedger(),
