@@ -20113,7 +20113,11 @@ def _bare_log_frame_decision(
         )
 
     state, notice = _bare_log_convention(log10_fO2, temperature_K)
-    if state.is_value:
+    explicit_mix_candidates = any(
+        _printed_sccm_gas_mixture(atmosphere) is not None
+        for atmosphere in candidates
+    )
+    if state.is_value and not explicit_mix_candidates:
         return PrintedOxygenDecision("log", state, notice_reason=notice)
 
     tolerance = max(_last_printed_digit(log10_fO2), Decimal("0.01"))

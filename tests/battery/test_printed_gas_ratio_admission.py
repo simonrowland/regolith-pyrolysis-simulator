@@ -168,7 +168,7 @@ def test_deliberately_wrong_printed_log_is_refused_with_dex_mismatch() -> None:
         experiment["conditions"], experiment["locator"]
     )[0]
     decision = _bare_log_frame_decision(
-        Decimal("-5.00"),
+        Decimal("-30.00"),
         Decimal("2173.15"),
         printed_atmospheres=(atmosphere,),
         total_pressure_pa=Decimal("100000"),
