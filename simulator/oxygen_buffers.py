@@ -547,12 +547,52 @@ FROST_NNO_COEFFICIENTS = (-24930.0, 9.36, 0.046)
 FROST_WM_COEFFICIENTS = (-32807.0, 13.012, 0.083)
 FROST_QFM_ALPHA_COEFFICIENTS = (-26455.3, 10.344, 0.092)
 FROST_QFM_BETA_COEFFICIENTS = (-25096.3, 8.735, 0.110)
+# Frost Table 1 QFM branch support, converted from its printed Celsius rows.
+FROST_QFM_ALPHA_MINIMUM_TEMPERATURE_K = 400.0 + 273.15
+FROST_QFM_REFERENCE_TRANSITION_TEMPERATURE_K = 573.0 + 273.15
+FROST_QFM_BETA_MAXIMUM_TEMPERATURE_K = 1200.0 + 273.15
+FROST_QFM_TRANSITION_PRESSURE_SHIFT_K_PER_BAR = 0.025
 FROST_BUFFER_TEMPERATURE_RANGES_K = {
     "IW": (838.15, 1473.15),
     "NNO": (873.15, 1473.15),
-    "QFM": (846.15, 1473.15),
+    "QFM": (
+        FROST_QFM_REFERENCE_TRANSITION_TEMPERATURE_K,
+        FROST_QFM_BETA_MAXIMUM_TEMPERATURE_K,
+    ),
     "WM": (838.15, 1473.15),
 }
+
+
+def _frost_qfm_branch_domain(
+    T_K: float, P_bar: float
+) -> tuple[str, tuple[float, float, float], tuple[float, float]]:
+    """Return the selected Frost QFM branch, coefficients, and T band."""
+
+    temperature_K = float(T_K)
+    pressure_bar = float(P_bar)
+    beta_low_K, beta_high_K = FROST_BUFFER_TEMPERATURE_RANGES_K["QFM"]
+    # Premise: Frost (1991) Table 1 prints FM-alpha-Q at 400-573 C and
+    # FM-beta-Q at 573-1200 C; the existing QFM selector shifts the quartz
+    # transition by 0.025 C/bar. Algebra: 400 C + 273.15 K/C = 673.15 K,
+    # 1200 C + 273.15 K/C = 1473.15 K; T_transition,K =
+    # (573 C + 273.15 K/C) +
+    # (0.025 K/bar) * P_bar. Units: pressure term is K; both band edges are K.
+    # Sanity: at 1 bar, transition=846.175 K; 800 K selects alpha, 900 K beta.
+    transition_K = (
+        beta_low_K
+        + FROST_QFM_TRANSITION_PRESSURE_SHIFT_K_PER_BAR * pressure_bar
+    )
+    if temperature_K < transition_K:
+        return (
+            "alpha",
+            FROST_QFM_ALPHA_COEFFICIENTS,
+            (FROST_QFM_ALPHA_MINIMUM_TEMPERATURE_K, transition_K),
+        )
+    return (
+        "beta",
+        FROST_QFM_BETA_COEFFICIENTS,
+        (transition_K, beta_high_K),
+    )
 
 
 def _qfm_logfo2_frost(T_K: float, P_bar: float) -> float:
@@ -567,13 +607,11 @@ def _qfm_logfo2_frost(T_K: float, P_bar: float) -> float:
     # B=-26455.3 K, C=0.092 K/bar. Thus every term is dimensionless
     # (log10 units). At 1200 K and 1 bar the beta branch gives -12.1786,
     # the published Frost QFM value and PySulfSat's result at that point.
-    quartz_transition_K = 573.0 + 273.15 + 0.025 * P_bar
-    if T_K < quartz_transition_K:
-        return frost_condensed_buffer_log10_fO2_bar(
-            *FROST_QFM_ALPHA_COEFFICIENTS, T_K, P_bar
-        )
+    _branch, coefficients, _temperature_range_K = _frost_qfm_branch_domain(
+        T_K, P_bar
+    )
     return frost_condensed_buffer_log10_fO2_bar(
-        *FROST_QFM_BETA_COEFFICIENTS, T_K, P_bar
+        *coefficients, T_K, P_bar
     )
 
 

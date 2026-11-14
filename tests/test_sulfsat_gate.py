@@ -44,7 +44,7 @@ from typing import Any, Dict
 import pytest
 
 from simulator.oxygen_buffers import (
-    FROST_BUFFER_TEMPERATURE_RANGES_K,
+    _frost_qfm_branch_domain,
     qfm_log10_fO2_bar,
 )
 import simulator.melt_backend.sulfsat as sulfsat_module
@@ -309,16 +309,20 @@ def test_gate_populates_every_field_with_fake_pysulfsat(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    ('T_K', 'extrapolated'),
+    ('T_K', 'extrapolated', 'expected_branch'),
     [
-        (846.14, True),
-        (846.15, False),
-        (1473.15, False),
-        (1473.16, True),
+        (673.14, True, 'alpha'),
+        (673.15, False, 'alpha'),
+        (800.0, False, 'alpha'),
+        (846.174, False, 'alpha'),
+        (846.175, False, 'beta'),
+        (900.0, False, 'beta'),
+        (1473.15, False, 'beta'),
+        (1473.16, True, 'beta'),
     ],
 )
 def test_qfm_reference_extrapolation_is_flagged_without_changing_values(
-    monkeypatch, T_K, extrapolated
+    monkeypatch, T_K, extrapolated, expected_branch
 ):
     fake = _make_fake_pysulfsat(
         scss_ppm=1500.0, scas_ppm=2200.0, s6_fraction=0.30,
@@ -339,11 +343,19 @@ def test_qfm_reference_extrapolation_is_flagged_without_changing_values(
         warning for warning in result.warnings
         if warning.startswith('qfm_reference_extrapolated:')
     ]
-    qfm_t_min, qfm_t_max = FROST_BUFFER_TEMPERATURE_RANGES_K['QFM']
+    branch, _coefficients, (qfm_t_min, qfm_t_max) = (
+        _frost_qfm_branch_domain(T_K, 1.0)
+    )
+    assert branch == expected_branch
     if extrapolated:
         assert len(qfm_flags) == 1
-        assert 'reason=temperature_outside_certified_band' in qfm_flags[0]
-        assert f'valid_range_K=[{qfm_t_min}, {qfm_t_max}]' in qfm_flags[0]
+        assert 'reason=temperature_outside_evaluated_branch_band' in qfm_flags[0]
+        assert f'branch={expected_branch}' in qfm_flags[0]
+        upper_bracket = ')' if expected_branch == 'alpha' else ']'
+        assert (
+            f'valid_range_K=[{qfm_t_min}, {qfm_t_max}{upper_bracket}'
+            in qfm_flags[0]
+        )
         assert 'authority=extrapolated' in qfm_flags[0]
     else:
         assert qfm_flags == []

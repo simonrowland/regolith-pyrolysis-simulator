@@ -76,7 +76,7 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
 from simulator.oxygen_buffers import (
-    FROST_BUFFER_TEMPERATURE_RANGES_K,
+    _frost_qfm_branch_domain,
     _qfm_logfo2_frost,
 )
 from simulator.feedstock_composition import (
@@ -380,12 +380,16 @@ class SulfSatGate:
             cleaned_comp_wt, T_K=T_K_f
         )
         warnings_list.extend(range_warnings)
-        qfm_t_min, qfm_t_max = FROST_BUFFER_TEMPERATURE_RANGES_K['QFM']
+        qfm_branch, _, (qfm_t_min, qfm_t_max) = (
+            _frost_qfm_branch_domain(T_K_f, P_bar_f)
+        )
         if not qfm_t_min <= T_K_f <= qfm_t_max:
+            upper_bracket = ")" if qfm_branch == "alpha" else "]"
             warnings_list.append(
                 'qfm_reference_extrapolated: '
-                'reason=temperature_outside_certified_band; '
-                f'valid_range_K=[{qfm_t_min}, {qfm_t_max}]; '
+                'reason=temperature_outside_evaluated_branch_band; '
+                f'branch={qfm_branch}; '
+                f'valid_range_K=[{qfm_t_min}, {qfm_t_max}{upper_bracket}; '
                 'authority=extrapolated'
             )
         calibration_status = 'in_range' if in_range else 'out_of_range'
