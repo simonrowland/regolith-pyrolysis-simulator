@@ -19137,7 +19137,9 @@ def test_bare_log_direct_couple_outside_cea_domain_carries_extrapolated_authorit
     assert decision.notice_authority is Authority.EXTRAPOLATED
 
 
-def _printed_wgs_sccm_mix_at_cea_log_fO2(log10_fO2: float) -> str:
+def _printed_wgs_sccm_mix_at_cea_log_fO2(
+    log10_fO2: float,
+) -> tuple[dict[str, float], str]:
     from simulator.chemistry.offgas_fo2 import (
         _log10_K_couple,
         load_buffer_polynomials,
@@ -19159,9 +19161,37 @@ def _printed_wgs_sccm_mix_at_cea_log_fO2(log10_fO2: float) -> str:
         "H2O": 10.0 ** (log10_k_h2 + log10_fO2 / 2.0),
         "H2": 1.0,
     }
-    return " + ".join(
+    atmosphere = " + ".join(
         f"{species} 1.000000000000 × {amount:.12f} SCCM"
         for species, amount in amounts.items()
+    )
+    return amounts, atmosphere
+
+
+def _imposed_wgs_result_with_janaf_band(gas: dict[str, float]):
+    from decimal import Decimal
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
+    )
+    from simulator.chemistry.offgas_fo2 import imposed_fo2, load_buffer_polynomials
+
+    temperature_K = 1682.15
+    gibbs = {
+        formula: float(
+            _janaf_gas_formation_gibbs_J_per_mol(
+                formula, Decimal(str(temperature_K))
+            )
+        )
+        for formula in ("CO", "CO2", "H2", "H2O", "O2")
+    }
+    return imposed_fo2(
+        gas,
+        temperature_K,
+        load_buffer_polynomials(),
+        janaf_formation_gibbs_J_per_mol=gibbs,
+        janaf_gas_constant_J_per_mol_K=float(JANAF_R_J_PER_MOL_K),
     )
 
 
@@ -19169,14 +19199,23 @@ def test_bare_log_accepts_wgs_dependent_mix_with_source_band() -> None:
     from simulator.battery.enums import NoticeKind
     from simulator.battery.migrate import _bare_log_frame_decision
 
-    atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
+    gas, atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
+    result = _imposed_wgs_result_with_janaf_band(
+        {species: float(amount) for species, amount in gas.items()}
+    )
+    assert result.uncertainty_band_dex is not None
+    tolerance = Decimal("0.01")
+    band = Decimal(str(result.uncertainty_band_dex))
+    reported = Decimal(str(result.log10_fO2)) + tolerance + band / 2
     decision = _bare_log_frame_decision(
-        Decimal("-0.30"),
+        reported,
         Decimal("1682.15"),
         printed_atmospheres=(atmosphere,),
     )
 
-    # Mutation: route this WGS mix to the unavailable branch and acceptance fails.
+    # Mutation: remove the WGS allowance; this just-outside-tolerance value is refused.
+    difference = reported - Decimal(str(result.log10_fO2))
+    assert tolerance < difference < tolerance + band
     assert decision.state.is_value
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
     assert atmosphere in decision.notice_reason
@@ -19188,7 +19227,7 @@ def test_bare_log_wgs_mismatch_keeps_the_possible_misprint_notice() -> None:
     from simulator.battery.enums import NoticeKind
     from simulator.battery.migrate import _bare_log_frame_decision
 
-    atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
+    _, atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
     decision = _bare_log_frame_decision(
         Decimal("-1.00"),
         Decimal("1682.15"),
