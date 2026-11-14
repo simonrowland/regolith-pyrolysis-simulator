@@ -633,19 +633,6 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
             1673.15: True,
         },
     },
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75": {
-        "pack_alias": "default",
-        "model_id": "IMCC-SF04-D066",
-        "pack_version": "1.0.3-d066-v1",
-        "gamma_ko0_5_by_temperature_K": {
-            1473.15: "1.67e-6",
-            1673.15: "9.44e-6",
-        },
-        "kcaal_si2o7_active_by_temperature_K": {
-            1473.15: False,
-            1673.15: False,
-        },
-    },
     "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0": {
         "pack_alias": "default",
         "model_id": "IMCC-SF04-D066",
