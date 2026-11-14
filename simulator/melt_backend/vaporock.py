@@ -108,6 +108,7 @@ returns bare oxide names.
 from __future__ import annotations
 
 import enum
+from concurrent.futures import TimeoutError as FutureTimeoutError
 import importlib
 import inspect
 import math
@@ -115,6 +116,7 @@ import os
 import re
 import tempfile
 import threading
+import time
 import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
@@ -2513,11 +2515,37 @@ class VapoRockBackend(MeltBackend):
         }
         if include_oxide_activities:
             request['include_oxide_activities'] = True
+        future_timeout_s = WarmEngineWorker._caller_future_timeout_s(
+            self._warm_call_timeout_s,
+            self._worker_startup_timeout_s,
+        )
+        request_started_at = time.monotonic()
         future = pool.submit(
             request, timeout_s=self._warm_call_timeout_s
         )
         try:
-            payload = future.result()
+            # The pool call wall starts after READY; this outer wall also
+            # covers a cold restart and its bounded cleanup.
+            payload = future.result(timeout=future_timeout_s)
+        except FutureTimeoutError as exc:
+            future.cancel()
+            timeout = EngineWorkerTimeout(
+                'VapoRock warm pool',
+                future_timeout_s,
+                phase='job',
+            )
+            WarmEngineWorker._annotate_request_failure(
+                timeout,
+                None,
+                request,
+                request_started_at,
+                slot=None,
+            )
+            pool._abort_request(
+                future,
+                diagnostic_detail=timeout.diagnostic,
+            )
+            raise VapoRockCallError(timeout) from exc
         except EngineWorkerRemoteError as exc:
             if exc.exc_name != 'VapoRockCallError':
                 raise

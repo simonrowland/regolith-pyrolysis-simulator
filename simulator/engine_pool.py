@@ -739,6 +739,50 @@ class WarmEngineWorker:
         self._pool_call_abort_event: threading.Event | None = None
         self._active_frame_readers: dict[int, int] = {}
         self._close_after_frame_read: set[int] = set()
+        self._pool_slot: int | None = None
+
+    @staticmethod
+    def _request_kind(request: Any) -> str:
+        if isinstance(request, Mapping):
+            for key in ('kind', 'request_kind', 'operation', 'op', 'action'):
+                value = request.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value.strip()
+            fields = ','.join(sorted(str(key) for key in request))
+            return f'mapping[{fields}]' if fields else 'mapping'
+        return type(request).__qualname__
+
+    @staticmethod
+    def _annotate_request_failure(
+        error: EngineWorkerDied | EngineWorkerTimeout,
+        process: Any,
+        request: Any,
+        started_at: float,
+        *,
+        slot: int | None,
+    ) -> None:
+        exit_code = getattr(process, 'exitcode', None)
+        if (
+            isinstance(error, EngineWorkerDied)
+            and error.returncode is None
+            and exit_code is not None
+        ):
+            error.returncode = int(exit_code)
+        pid = _process_pid(process)
+        request_kind = WarmEngineWorker._request_kind(request)
+        elapsed_s = max(0.0, time.monotonic() - started_at)
+        error.slot = slot
+        error.backend_pid = pid
+        error.exit_code = None if exit_code is None else int(exit_code)
+        error.last_request_kind = request_kind
+        error.elapsed_s = elapsed_s
+        error.diagnostic = (
+            f'slot={slot if slot is not None else "unknown"} '
+            f'backend_pid={pid if pid is not None else "unknown"} '
+            f'exit_code={exit_code if exit_code is not None else "none"} '
+            f'last_request_kind={request_kind} elapsed_s={elapsed_s:.3f}'
+        )
+        error.add_note(error.diagnostic)
 
     def _begin_pool_call(self) -> threading.Event:
         """Install the cancellation token before the pool enters ``call``."""
@@ -961,7 +1005,10 @@ class WarmEngineWorker:
                 with reply_lock:
                     outcome = reply
                 if outcome is not None:
-                    receiver.join()
+                    # recv already produced the reply; this join only waits
+                    # for reader bookkeeping, so it cannot extend the reply
+                    # deadline if cleanup is contended.
+                    receiver.join(timeout=ENGINE_WORKER_CANCEL_POLL_S)
                     completed_at, message, receive_error = outcome
                     # A complete receipt at the deadline is on time.
                     if completed_at <= deadline:
@@ -1009,6 +1056,16 @@ class WarmEngineWorker:
                     ENGINE_WORKER_CANCEL_POLL_S,
                     remaining,
                 ))
+                with reply_lock:
+                    outcome = reply
+                if outcome is None and not process.is_alive():
+                    if phase == 'initialization':
+                        raise EOFError(
+                            f'{self.name} worker exited before its ready frame'
+                        )
+                    raise EOFError(
+                        f'{self.name} worker exited without a result'
+                    )
             if debug_timeout_s is not None:
                 _pool_debug(
                     f'{self.name}: reply receive timeout after '
@@ -1026,7 +1083,9 @@ class WarmEngineWorker:
                 phase=phase,
             )
         finally:
-            if receiver.is_alive():
+            with reply_lock:
+                reply_received = reply is not None
+            if receiver.is_alive() and not reply_received:
                 self._discard_current(
                     diagnostic=False,
                     expected_process=process,
@@ -1442,6 +1501,10 @@ class WarmEngineWorker:
                     )
                 if parent.poll(min(ENGINE_WORKER_CANCEL_POLL_S, remaining)):
                     break
+                if not process.is_alive():
+                    raise EOFError(
+                        f'{self.name} worker exited before its ready frame'
+                    )
             message = self._receive_frame_with_deadline(
                 parent,
                 process,
@@ -1596,6 +1659,7 @@ class WarmEngineWorker:
                 timeout,
                 phase='job',
             )
+        request_started_at = time.monotonic()
         try:
             with self._state_lock:
                 if abort_event is not None and abort_event.is_set():
@@ -1670,6 +1734,10 @@ class WarmEngineWorker:
                     min(ENGINE_WORKER_CANCEL_POLL_S, poll_remaining)
                 ):
                     break
+                if not process.is_alive():
+                    raise EOFError(
+                        f'{self.name} worker exited without a result'
+                    )
             message = self._receive_frame_with_deadline(
                 connection,
                 process,
@@ -1679,6 +1747,18 @@ class WarmEngineWorker:
                 abort_event=abort_event,
                 debug_timeout_s=remaining,
             )
+        except EngineWorkerTimeout as exc:
+            self._annotate_request_failure(
+                exc, process, request, request_started_at,
+                slot=self._pool_slot,
+            )
+            raise
+        except EngineWorkerDied as exc:
+            self._annotate_request_failure(
+                exc, process, request, request_started_at,
+                slot=self._pool_slot,
+            )
+            raise
         except TimeoutError:
             raise
         except (BrokenPipeError, EOFError, OSError) as exc:
@@ -1690,11 +1770,16 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=connection,
             )
-            raise EngineWorkerDied(
+            error = EngineWorkerDied(
                 'call',
                 f'{self.name} worker exited without a result',
                 returncode=getattr(process, 'exitcode', None),
-            ) from exc
+            )
+            self._annotate_request_failure(
+                error, process, request, request_started_at,
+                slot=self._pool_slot,
+            )
+            raise error from exc
         with self._state_lock:
             current = (
                 not self.disabled
@@ -1704,11 +1789,16 @@ class WarmEngineWorker:
         if not current:
             # The result arrived after the slot was dropped. Same death
             # as a mid-call EOF: the pool owns it.
-            raise EngineWorkerDied(
+            error = EngineWorkerDied(
                 'call',
                 f'{self.name} worker exited without a result',
                 returncode=getattr(process, 'exitcode', None),
             )
+            self._annotate_request_failure(
+                error, process, request, request_started_at,
+                slot=self._pool_slot,
+            )
+            raise error
         if message[0] == 'ok':
             return message[1]
         if message[0] == 'timeout':
@@ -1722,11 +1812,16 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=connection,
             )
-            raise EngineWorkerTimeout(
+            error = EngineWorkerTimeout(
                 worker_name,
                 timeout_s,
                 phase=phase,
             )
+            self._annotate_request_failure(
+                error, process, request, request_started_at,
+                slot=self._pool_slot,
+            )
+            raise error
         _tag, exc_name, detail, remote_traceback, *metadata = message
         failure_disposition = metadata[0] if metadata else None
         _pool_debug(
@@ -2746,6 +2841,9 @@ class EngineWorkerPool:
         self._queue: queue.Queue[Any] = queue.Queue()
         self._worker_factory = worker_factory
         self._workers = [worker_factory(index) for index in range(max(1, size))]
+        for index, worker in enumerate(self._workers):
+            if isinstance(worker, WarmEngineWorker):
+                worker._pool_slot = index
         self._threads: list[threading.Thread] = []
         self._active_requests: dict[
             Future,
@@ -2976,6 +3074,7 @@ class EngineWorkerPool:
             if self._closed or self._workers[index] is not worker:
                 return worker
             replacement = self._worker_factory(index)
+            replacement._pool_slot = index
             self._workers[index] = replacement
             return replacement
 

@@ -3092,19 +3092,24 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         future_timeout_s,
                         float(call_timeout_s),
                     )
+                request = {
+                    'bulk_projection': bulk_projection,
+                    'temperature_C': temperature_C,
+                    'pressure_kbar': pressure_kbar,
+                    'fO2_log': fO2_log,
+                    # The pool's job wall starts after worker startup;
+                    # Future.result below also bounds queue/startup waits.
+                    # This subprocess wall is secondary containment for
+                    # platforms without process-group cleanup.
+                    'call_timeout_s': timeout_s + 0.5,
+                    'capture_native_activities': capture_native_activities,
+                }
+                request_started_at = time.monotonic()
                 try:
-                    future = self._subprocess_pool.submit({
-                        'bulk_projection': bulk_projection,
-                        'temperature_C': temperature_C,
-                        'pressure_kbar': pressure_kbar,
-                        'fO2_log': fO2_log,
-                        # The pool's job wall starts after worker startup;
-                        # Future.result below also bounds queue/startup waits.
-                        # This subprocess wall is secondary containment for
-                        # platforms without process-group cleanup.
-                        'call_timeout_s': timeout_s + 0.5,
-                        'capture_native_activities': capture_native_activities,
-                    }, timeout_s=timeout_s)
+                    future = self._subprocess_pool.submit(
+                        request,
+                        timeout_s=timeout_s,
+                    )
                     try:
                         return future.result(timeout=future_timeout_s)
                     except EngineWorkerTimeout as timeout:
@@ -3139,14 +3144,24 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 fO2_log=fO2_log,
                             )
                         )
-                        self._subprocess_pool._abort_request(
-                            future,
-                            diagnostic_detail=diagnostic_detail,
-                        )
                         timeout = EngineWorkerTimeout(
                             'MAGEMin subprocess pool',
                             future_timeout_s,
                             phase='job',
+                        )
+                        WarmEngineWorker._annotate_request_failure(
+                            timeout,
+                            None,
+                            request,
+                            request_started_at,
+                            slot=None,
+                        )
+                        self._subprocess_pool._abort_request(
+                            future,
+                            diagnostic_detail=(
+                                f'{timeout.diagnostic}; MAGEMin request: '
+                                f'{diagnostic_detail}'
+                            ),
                         )
                         self._attach_magemin_timeout_diagnostic(
                             timeout,
