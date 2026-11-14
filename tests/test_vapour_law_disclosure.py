@@ -2584,6 +2584,9 @@ def test_disclosure_survives_every_publication_point(
     cli.session = _probe_session(use_fe=True)
     cli.started = True
     frame = cli._advance(["1"])
+    cli_disclosure_bytes = json.dumps(
+        frame["law_disclosures"], separators=(",", ":")
+    ).encode("utf-8")
     _assert_fe_disclosure(
         frame["law_disclosures"][0],
         law_id=_FE_ASSOCIATION_LAW_ID,
@@ -2624,6 +2627,10 @@ def test_disclosure_survives_every_publication_point(
         law_id=_FE_ASSOCIATION_LAW_ID,
         count=1,
     )
+    runner_disclosure_bytes = json.dumps(
+        payload["run_metadata"]["law_disclosures"], separators=(",", ":")
+    ).encode("utf-8")
+    assert cli_disclosure_bytes == runner_disclosure_bytes
     publications["runner report"] = tuple(
         dict(item) for item in payload["run_metadata"]["law_disclosures"]
     )
@@ -2907,6 +2914,89 @@ def test_disclosure_survives_every_publication_point(
         _assert_fe_disclosure(
             rows[0], law_id=_FE_ASSOCIATION_LAW_ID, count=rows[0]["evaluation_count"]
         )
+    residue_rows = _serialized_residue_route_publications(monkeypatch)
+    expected_residue_publications = {
+        (route, quantity)
+        for route in ("hashimoto", "knudsen", "sossi")
+        for quantity in (
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            Quantity.ELEMENT_RETENTION_RATIO,
+        )
+    }
+    assert set(residue_rows) == expected_residue_publications
+    for row in residue_rows.values():
+        assert row["provenance"]["law_disclosures"][0]["law_id"] == (
+            _FE_ASSOCIATION_LAW_ID
+        )
+
+
+@pytest.mark.parametrize(
+    "raw_disclosures",
+    ([{}], [{"law_id": _FE_ASSOCIATION_LAW_ID}]),
+)
+def test_scoring_refuses_incomplete_residue_disclosures(
+    monkeypatch, raw_disclosures
+) -> None:
+    """The public scorer refuses malformed stored laws with a typed result."""
+
+    from decimal import Decimal
+    import json
+    from types import SimpleNamespace
+
+    from simulator.battery.enums import (
+        Engine,
+        EvidenceClass,
+        ExecutionState,
+        MethodToken,
+        Phase,
+        Quantity,
+        RefusalReason,
+    )
+    from simulator.battery.records import Identity, Species, State
+    from simulator.battery.score import predict_with_engine
+    from tests.battery import factories as F
+    import simulator.battery.residue as residue
+
+    experiment = F.tabulation_experiment(
+        experiment_id="malformed-disclosure",
+        work_id="malformed-disclosure-work",
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION,
+        T_K=Decimal("1800"),
+    )
+    identity = Identity(
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        species=Species("Fe", Phase.G),
+        temperature_K=State.of(Decimal("1800")),
+    )
+    observation = F.observation(
+        "malformed-disclosure-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="no-extract-for-malformed-disclosure-test",
+    )
+    monkeypatch.setattr(
+        residue,
+        "predict_mass_loss_fraction",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            mass_loss_fraction=0.25,
+            engine_flags=(),
+            engine_metadata={
+                "law_disclosures": json.dumps(raw_disclosures),
+                "alpha_sources": "[]",
+            },
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation, experiment=experiment
+    )
+
+    assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == "law_disclosures_unknown"
+    assert prediction.value is None
 
 
 def _memo_host(calls: list[str]):
@@ -5431,6 +5521,239 @@ def _knudsen_extent_inputs():
     return context, reference
 
 
+def _serialized_residue_route_publications(monkeypatch):
+    """Exercise both quantities through each residue prediction serializer."""
+
+    from dataclasses import replace
+    from decimal import Decimal
+    from types import SimpleNamespace
+
+    from simulator.battery.enums import (
+        Engine,
+        EvidenceClass,
+        ExecutionState,
+        Phase,
+        Quantity,
+    )
+    from simulator.battery.records import Identity, Located, Locator, Species, State
+    from simulator.battery.score import (
+        _HASHIMOTO_SOURCE_ID,
+        _SOSSI_SOURCE_ID,
+        _hashimoto_residue_prediction,
+        _knudsen_residue_prediction,
+        _residue_prediction_cache_key,
+        _sossi_residue_prediction,
+        candidate_observation,
+        to_plain,
+    )
+    from tests.battery import factories as F
+    import simulator.battery.residue as residue
+
+    engine = Engine.INTERNAL_ANALYTICAL
+    disclosure = _owner_law(_FE_ASSOCIATION_LAW_ID, count=1)
+    definition = Located(
+        State.of(
+            {
+                "definition": "mass_retention",
+                "quote": "synthetic printed retention definition",
+                "page": 1,
+            }
+        ),
+        locator=Locator(page=1, section="test"),
+    )
+    quantity_kinds = (
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+    )
+
+    def reference(route, quantity, formula, source_id, experiment_id):
+        identity = Identity(
+            quantity=quantity,
+            species=Species(formula, Phase.L),
+            subtype=State.of(
+                "concentration_retention"
+                if quantity is Quantity.ELEMENT_RETENTION_RATIO
+                else "oxide_wt_percent"
+            ),
+            temperature_K=State.of(Decimal("2100")),
+        )
+        row = F.observation(
+            f"{route}-{quantity.value}",
+            experiment_id,
+            identity,
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=source_id,
+        )
+        if quantity is Quantity.ELEMENT_RETENTION_RATIO:
+            row = replace(
+                row,
+                point_conditions={
+                    "fm_definition": definition,
+                    "sample_area_or_geometry": "synthetic exposed area",
+                    "fO2_log": -10.0,
+                },
+            )
+        return row
+
+    rows = {}
+
+    def publish(route, quantity, row, prediction):
+        assert prediction.execution.state is ExecutionState.PRODUCED, (
+            prediction.refusal_detail
+        )
+        assert prediction.law_disclosures
+        candidate = candidate_observation(row, prediction)
+        serialized = to_plain(candidate)
+        assert serialized["provenance"]["law_disclosures"] == [
+            dict(item) for item in prediction.law_disclosures
+        ]
+        rows[(route, quantity)] = serialized
+
+    for quantity in quantity_kinds:
+        hashimoto_formula = (
+            "Fe"
+            if quantity is Quantity.ELEMENT_RETENTION_RATIO
+            else "FeO"
+        )
+        hashimoto_reference = reference(
+            "hashimoto",
+            quantity,
+            hashimoto_formula,
+            _HASHIMOTO_SOURCE_ID,
+            "run",
+        )
+        primary = _hashimoto_arm_row(
+            "run",
+            _HASHIMOTO_PRIMARY_ARM,
+            {"FeO": 10.0, "MgO": 20.0},
+            (disclosure,),
+        )
+        primary.initial_inventory_mol = {"FeO": 1.0, "MgO": 1.0}
+        primary.primary_inventory_mol = {"FeO": 0.5, "MgO": 1.0}
+        primary.provenance.update(
+            {
+                "duration_s": 60.0,
+                "temperature_K": 2100.0,
+                "oxygen_boundary": -10.0,
+                "starting_preform_mm": {
+                    "length": 1.0,
+                    "width": 1.0,
+                    "thickness": 1.0,
+                },
+                "total_pressure_Pa": 101325.0,
+            }
+        )
+        production = _hashimoto_arm_row(
+            "run",
+            _HASHIMOTO_PRODUCTION_ARM,
+            {"FeO": 10.0, "MgO": 20.0},
+            (),
+        )
+        cache_key = _residue_prediction_cache_key(
+            _HASHIMOTO_SOURCE_ID, engine
+        )
+        hashimoto_cache = {
+            cache_key: {
+                f"run::{_HASHIMOTO_PRIMARY_ARM}": primary,
+                f"run::{_HASHIMOTO_PRODUCTION_ARM}": production,
+            }
+        }
+        with disclosure_scope(inherit=False):
+            prediction = _hashimoto_residue_prediction(
+                None, hashimoto_reference, engine, hashimoto_cache
+            )
+        publish("hashimoto", quantity, hashimoto_reference, prediction)
+
+        knudsen_quantity_formula = (
+            "Fe"
+            if quantity is Quantity.ELEMENT_RETENTION_RATIO
+            else "FeO"
+        )
+        knudsen_context, base_knudsen_reference = _knudsen_extent_inputs()
+        knudsen_reference = reference(
+            "knudsen",
+            quantity,
+            knudsen_quantity_formula,
+            "synthetic-knudsen",
+            base_knudsen_reference.experiment_id,
+        )
+        locator = base_knudsen_reference.locator
+        experiment = knudsen_context.experiments[
+            base_knudsen_reference.experiment_id
+        ]
+        experiment = replace(
+            experiment,
+            thermal_schedule=replace(
+                experiment.thermal_schedule,
+                total_duration_s=Located(State.of(Decimal("60")), locator),
+            ),
+            pressure_environment=replace(
+                experiment.pressure_environment,
+                total_pressure_Pa=Located(State.of(Decimal("1")), locator),
+                sweep_gas=Located(State.of("argon"), locator),
+            ),
+        )
+        knudsen_context = replace(
+            knudsen_context,
+            experiments={base_knudsen_reference.experiment_id: experiment},
+        )
+        monkeypatch.setattr(
+            residue,
+            "predict_knudsen_residue_composition",
+            lambda *_args, **_kwargs: {
+                "law_disclosures": [dict(disclosure)],
+                "notices": (),
+                "initial_inventory_mol": {"FeO": 1.0, "MgO": 1.0},
+                "final_inventory_mol": {"FeO": 0.5, "MgO": 1.0},
+                "composition_wt_pct": {"FeO": 10.0},
+                "final_bulk_mass_adjustment_kg": 0.0,
+            },
+        )
+        with disclosure_scope(inherit=False):
+            prediction = _knudsen_residue_prediction(
+                knudsen_context, knudsen_reference, engine
+            )
+        publish("knudsen", quantity, knudsen_reference, prediction)
+
+        sossi_reference = reference(
+            "sossi",
+            quantity,
+            "Mn",
+            _SOSSI_SOURCE_ID,
+            "sossi-source::run",
+        )
+        sossi_row = SimpleNamespace(
+            experiment_id=sossi_reference.experiment_id,
+            primary_element_ppm={"Mn": 50.0},
+            sensitivity_band_ppm={"Mn": (40.0, 60.0)},
+            channel_missing_elements=(),
+            provenance={
+                "law_disclosures": [dict(disclosure)],
+                "code_revision": "test",
+                "duration_s": 60.0,
+                "temperature_K": 2100.0,
+                "buffered_fO2_log": -10.0,
+                "initial_inventory_mol": {"MnO": 1.0},
+                "integrated_inventory_mol": {"MnO": 0.5},
+                "total_pressure_Pa": 101325.0,
+                "geometry_policy_id": "test-geometry",
+                "buffer_oxygen_exchange_mol_by_geometry": {},
+            },
+        )
+        sossi_key = _residue_prediction_cache_key(_SOSSI_SOURCE_ID, engine)
+        with disclosure_scope(inherit=False):
+            prediction = _sossi_residue_prediction(
+                None,
+                sossi_reference,
+                engine,
+                {sossi_key: {"run": sossi_row}},
+            )
+        publish("sossi", quantity, sossi_reference, prediction)
+
+    return rows
+
+
 def _exercise_knudsen_result(_tmp_path, monkeypatch) -> None:
     """Warm the Knudsen result through ``_knudsen_residue_prediction``."""
 
@@ -5767,6 +6090,8 @@ def test_every_published_extrapolation_class_is_disclosed(
     """
 
     diagnostic_key = dict(PUBLISHED_EXTRAPOLATION_CLASSES)[publication_class]
+    from simulator.vapour_rail.run_disclosure import resolve_law_id
+
     result, snapshot = _mixed_extrapolation_dispatch()
     assert result.status == "ok"
     diagnostic = result.diagnostic or {}
@@ -5858,11 +6183,11 @@ def test_every_published_extrapolation_class_is_disclosed(
     assert "Mg" in gas_species
     assert "Ca" in gas_species
     for species in published:
-        law_id = f"{species}:ellingham"
+        law_id = resolve_law_id(species_id=species, family="ellingham")
         rows = [item for item in snapshot if item.get("law_id") == law_id]
         if len(rows) != 1:
             problems.append(
-                f"{species}: laws {[item.get('law_id') for item in snapshot if str(item.get('law_id') or '').startswith(species + ':')]}"
+                f"{species}: laws {[item.get('law_id') for item in snapshot]}"
             )
             continue
         row = rows[0]
@@ -5889,8 +6214,9 @@ def test_every_published_extrapolation_class_is_disclosed(
         item for item in snapshot if item["law_id"] == _FE_ASSOCIATION_LAW_ID
     ]
     assert len(fe_association) == 1
+    # This setup issues one dispatch, which evaluates the Fe association law once.
     _assert_fe_disclosure(
-        fe_association[0], law_id=_FE_ASSOCIATION_LAW_ID, count=2
+        fe_association[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1
     )
     assert "Mg:ellingham" in law_ids
     assert "Mg2:nasa_cea_9" in law_ids
