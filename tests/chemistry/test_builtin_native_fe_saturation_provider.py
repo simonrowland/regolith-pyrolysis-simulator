@@ -17,7 +17,8 @@ from simulator.chemistry.kernel.validation import (
     validate_atom_balance,
     validate_proposal_accounts,
 )
-from simulator.state import CampaignPhase
+from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+from simulator.state import CampaignPhase, PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 from tests.chemistry.conftest import _atom_check, _build_sim
 
 
@@ -285,6 +286,18 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         feedstocks_data,
         setpoints_data,
     )
+    routed_fe_accounts = (
+        "process.overhead_gas",
+        "process.condensation_train",
+        "terminal.offgas",
+        "process.condensation_retained_holdup",
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+    )
+    before_routed_fe_kg = {
+        account: sim.atom_ledger.kg_by_account(account).get("Fe", 0.0)
+        for account in routed_fe_accounts
+    }
     before = {
         account: dict(sim.atom_ledger.mol_by_account(account))
         for account in DECLARED_ACCOUNTS
@@ -351,16 +364,15 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
     if feedstock_id == "lunar_mare_low_ti":
         accounts = {
             account: sim.atom_ledger.kg_by_account(account)
-            for account in (
-                "process.overhead_gas",
-                "process.condensation_train",
-                "process.wall_deposit_segment_stage_0_to_stage_1",
-                "process.wall_deposit_segment_stage_1_to_stage_2",
-            )
+            for account in routed_fe_accounts
         }
+        # d-402 solid-wall equilibrium can capture Fe into the Stage-4
+        # cartridge residue; include that explicit sink with gas, train,
+        # and segment deposits so this pin still measures the vapor pool.
         routed_fe_kg = sum(
             float(species_kg.get("Fe", 0.0) or 0.0)
-            for species_kg in accounts.values()
+            - before_routed_fe_kg[account]
+            for account, species_kg in accounts.items()
         )
         assert routed_fe_kg == pytest.approx(
             golden["native_vapor_Fe_kg"],
