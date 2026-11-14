@@ -148,11 +148,12 @@ def _score_context_for_source(
     repo_root: Path,
     migrated_root: Path,
     scratch_root: Path,
+    context_sources: Sequence[str] | None,
 ) -> Any:
     overlay_root = _score_overlay_root(
         source_id, repo_root, migrated_root, scratch_root
     )
-    corpus = load_score_context(overlay_root)
+    corpus = load_score_context(overlay_root, sources=context_sources)
     migrated = load_score_context(migrated_root, sources=(source_id,))
     return replace(
         corpus,
@@ -323,10 +324,14 @@ def build_source_report(
     source_id: str,
     *,
     engines: Sequence[Engine] | None = None,
+    context_sources: Sequence[str] | None = None,
     repo_root: Path = ROOT,
     scratch_out_dir: Path | None = None,
 ) -> dict[str, object]:
-    """Migrate one extract, then score it against the full-corpus context."""
+    """Migrate one extract, then score it against its selected corpus context.
+
+    ``context_sources=None`` loads the full corpus, as used by the CLI.
+    """
 
     if scratch_out_dir is None:
         out_root = Path(tempfile.mkdtemp(prefix=f"source-battery-report-{source_id}-"))
@@ -345,6 +350,7 @@ def build_source_report(
         repo_root=repo_root,
         migrated_root=out_root,
         scratch_root=out_root,
+        context_sources=context_sources,
     )
     candidates, residuals = _score_source(context, source_id, engines=engines)
     admitted = sorted(
@@ -466,10 +472,14 @@ def main(argv: list[str] | None = None) -> int:
     engines = None if args.engines is None else tuple(Engine(item) for item in args.engines)
     if args.json:
         with contextlib.redirect_stdout(sys.stderr):
-            report = build_source_report(args.source_id, engines=engines)
+            report = build_source_report(
+                args.source_id, engines=engines, context_sources=None
+            )
         print(json.dumps(report, indent=2, ensure_ascii=False))
     else:
-        report = build_source_report(args.source_id, engines=engines)
+        report = build_source_report(
+            args.source_id, engines=engines, context_sources=None
+        )
         print(_markdown(report))
     return 0
 

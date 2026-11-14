@@ -5,6 +5,7 @@ from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -36,6 +37,8 @@ def test_oxide_identity_missing_crystal_polymorph_is_typed_unknown() -> None:
 def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
     tmp_path: Path, monkeypatch
 ) -> None:
+    source_id = "kems-010-richter-2007"
+    context_sources = (source_id,)
     scored_residuals = []
     production_score_store = source_battery_report.score_store
     production_load_score_context = source_battery_report.load_score_context
@@ -57,8 +60,9 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
     )
     monkeypatch.setattr(source_battery_report, "score_store", capture_score)
     report = source_battery_report.build_source_report(
-        "kems-010-richter-2007",
+        source_id,
         engines=(Engine.INTERNAL_ANALYTICAL,),
+        context_sources=context_sources,
         scratch_out_dir=tmp_path / "source-report",
     )
 
@@ -76,8 +80,7 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
     ]
     assert [row.reference for row in scored_residuals] == expected_ids
     assert report["scoring"]["engine_observation_events"] == 2
-    assert None in loaded_sources
-    assert ("kems-010-richter-2007",) in loaded_sources
+    assert loaded_sources == [context_sources, context_sources]
     overlay_store = (
         Path(report["scratch_out_dir"])
         / "score-context/data/literature/extracts-v2/kems-010-richter-2007.yaml"
@@ -130,9 +133,11 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
 
 
 def test_landed_extract_without_rows_is_reported_explicitly(tmp_path: Path) -> None:
+    source_id = "yang-2025-na2o-cao-silica-thermodynamics"
     report = source_battery_report.build_source_report(
-        "yang-2025-na2o-cao-silica-thermodynamics",
+        source_id,
         engines=(Engine.INTERNAL_ANALYTICAL,),
+        context_sources=(source_id,),
         scratch_out_dir=tmp_path / "empty-source-report",
     )
 
@@ -147,6 +152,9 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
     import simulator.battery.score as score_module
 
     source_id = "report-target"
+    # The target and these two independent sources are the complete context
+    # needed to derive the n_sources=3 decision band.
+    context_sources = (source_id, "independent-a", "independent-b")
     experiment = F.tabulation_experiment("report-band-experiment", "report-work")
     work = F.work("report-work")
     identity = F.oxide_identity(
@@ -175,11 +183,7 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
             evidence=EvidenceClass.COMPILATION_ASSESSED,
             source_id=source,
         )
-        for source, value in (
-            (source_id, "10"),
-            ("independent-a", "9"),
-            ("independent-b", "11"),
-        )
+        for source, value in zip(context_sources, ("10", "9", "11"), strict=True)
     )
     context = ScoreContext(
         works={work.work_id: work},
@@ -273,17 +277,48 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
     assert source_only[0].numeric.decision_band is None
 
 
-def test_json_cli_keeps_progress_out_of_stdout(
-    monkeypatch: pytest.MonkeyPatch, capsys
+def test_json_cli_uses_full_context_and_keeps_progress_out_of_stdout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys
 ) -> None:
-    def report_with_progress(_source_id, *, engines=None):
-        print("score progress 1/1 residuals")
-        return {"source_id": "fixture-source"}
+    context_sources_requested = []
 
+    def capture_context_builder(
+        _source_id,
+        *,
+        repo_root,
+        migrated_root,
+        scratch_root,
+        context_sources,
+    ):
+        context_sources_requested.append(context_sources)
+
+    def score_with_progress(_context, _source_id, *, engines):
+        print("score progress 1/1 residuals")
+        return (), ()
+
+    def temporary_report_dir(*, prefix):
+        path = tmp_path / prefix
+        path.mkdir()
+        return str(path)
+
+    monkeypatch.setattr(source_battery_report, "_isolated_source_root", lambda *_: None)
     monkeypatch.setattr(
-        source_battery_report, "build_source_report", report_with_progress
+        source_battery_report,
+        "migrate",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            validation=SimpleNamespace(hard_issues=()),
+            source_counts={},
+            observations=(),
+        ),
     )
+    monkeypatch.setattr(source_battery_report, "write_outputs", lambda *_: None)
+    monkeypatch.setattr(
+        source_battery_report, "_score_context_for_source", capture_context_builder
+    )
+    monkeypatch.setattr(source_battery_report, "_score_source", score_with_progress)
+    monkeypatch.setattr(source_battery_report.tempfile, "mkdtemp", temporary_report_dir)
     assert source_battery_report.main(["fixture-source", "--json"]) == 0
     captured = capsys.readouterr()
+    assert context_sources_requested == [None]
     assert json.loads(captured.out) == {"source_id": "fixture-source"}
     assert "score progress 1/1 residuals" in captured.err
