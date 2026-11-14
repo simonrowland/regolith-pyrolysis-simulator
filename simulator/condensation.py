@@ -4829,13 +4829,7 @@ class CondensationModel:
                     (item for item in outcomes if item.get('status') == 'refused'),
                     None,
                 )
-                domain_outcome = next(
-                    (
-                        item for item in outcomes
-                        if item.get('status') in {'extrapolated', 'status_bearing'}
-                    ),
-                    None,
-                )
+                domain_outcome = _least_authoritative_wall_domain(outcomes)
                 # Keep the local refusal in stage_outcomes without erasing
                 # extrapolation evidence from the stages that did run.
                 if domain_outcome is not None:
@@ -4854,11 +4848,31 @@ class CondensationModel:
                                 if domain_outcome.get('status') == 'extrapolated'
                                 else 'status_bearing',
                             ),
-                            'reason': domain_outcome['reason'],
+                            'reason': (
+                                domain_outcome.get(
+                                    'wall_saturation_pressure_reason'
+                                )
+                                or domain_outcome['reason']
+                            ),
                             'stage_outcomes': list(outcomes),
                         })
                         if domain_outcome.get('valid_range_K') is not None:
                             authority['valid_range_K'] = domain_outcome['valid_range_K']
+                        notices_by_stage = [
+                            {
+                                'stage_number': item.get('stage_number'),
+                                'notice': copy.deepcopy(dict(notice)),
+                            }
+                            for item in outcomes
+                            for notice in item.get(
+                                'wall_saturation_pressure_notices', (),
+                            )
+                            if isinstance(notice, Mapping)
+                        ]
+                        if notices_by_stage:
+                            authority['wall_saturation_pressure_notices'] = (
+                                notices_by_stage
+                            )
                 if species in condensation_refusals_by_species:
                     existing = condensation_refusals_by_species[species]
                     if isinstance(existing, dict):
@@ -5616,6 +5630,29 @@ class CondensationModel:
         wall_pO2_Pa: float | None = None,
     ) -> float:
         """Equilibrium-capped kinetic capture integrated over the stage band."""
+
+        band_notices: list[dict[str, Any]] = []
+
+        def _band_wall_authority_fields() -> dict[str, Any]:
+            least_authoritative = _least_authoritative_wall_domain(
+                band_notices,
+            )
+            if least_authoritative is None:
+                return {}
+            return {
+                'authority_level': least_authoritative['authority_level'],
+                'wall_saturation_pressure_reason': str(
+                    least_authoritative.get('reason')
+                    or 'wall_saturation_pressure_non_authoritative'
+                ),
+                'valid_range_K': copy.deepcopy(
+                    least_authoritative.get('valid_range_K')
+                ),
+                'wall_saturation_pressure_notices': copy.deepcopy(
+                    band_notices
+                ),
+            }
+
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
                 efficiency_outcomes.append({
@@ -5626,6 +5663,7 @@ class CondensationModel:
                     'stage_number': int(stage.stage_number),
                     'T_cond_C': float(T_cond_C),
                     'eta': 0.0,
+                    **_band_wall_authority_fields(),
                     **detail,
                 })
             return 0.0
@@ -5683,7 +5721,6 @@ class CondensationModel:
         if area == 0.0:
             return _mint_zero('no_configured_capture_area')
 
-        midpoint_T_K = _stage_midpoint_temperature_K(stage)
         lo_C, hi_C = _stage_temp_band_C(stage)
         width_C = hi_C - lo_C
         sample_count = 1 if width_C == 0.0 else HKL_BAND_SAMPLES
@@ -5787,6 +5824,9 @@ class CondensationModel:
                         'saturation_pressure_unavailable',
                     ),
                 )
+            wall_notice = diagnostic.get('wall_saturation_pressure_notice')
+            if isinstance(wall_notice, Mapping):
+                band_notices.append(copy.deepcopy(dict(wall_notice)))
             if not math.isfinite(flux) or flux < 0.0:
                 raise ValueError(
                     f'condensation efficiency for {species} in stage '
@@ -5910,26 +5950,10 @@ class CondensationModel:
             if segment is not None:
                 _, _, pressure_pa = segment
         eta = (p_in - pressure_pa) / p_in
-        notice = notices.get(f'{species}#wall:{midpoint_T_K}')
-        if not isinstance(notice, Mapping):
-            notice = next((
-                value for key, value in notices.items()
-                if str(key).split('#', 1)[0] == species
-                and isinstance(value, Mapping)
-                and value.get('temperature_K') == midpoint_T_K
-            ), None)
-        if isinstance(notice, Mapping) and efficiency_outcomes is not None:
-            authority_level = str(
-                notice.get('authority_level')
-                or ('extrapolated' if notice.get('status') == 'extrapolated'
-                    else 'status_bearing')
-            )
-            notice_status = str(notice.get('status') or authority_level)
-            outcome_status = (
-                notice_status
-                if notice_status in {'status_bearing', 'extrapolated'}
-                else 'extrapolated'
-            )
+        notice = _least_authoritative_wall_domain(band_notices)
+        if notice is not None and efficiency_outcomes is not None:
+            authority_level = str(notice['authority_level'])
+            outcome_status = authority_level
             efficiency_outcomes.append({
                 **notice,
                 'status': outcome_status,
@@ -5938,6 +5962,7 @@ class CondensationModel:
                 'output_status': 'status_bearing', 'species': species,
                 'stage_number': int(stage.stage_number), 'T_cond_C': T_cond_C,
                 'flowing_pressure_pa': p_in, 'eta': eta,
+                **_band_wall_authority_fields(),
             })
         return eta
 
@@ -6628,6 +6653,31 @@ def _stage_material_config(
 def _stage_temp_band_C(stage: CondensationStage) -> tuple[float, float]:
     lo_C, hi_C = stage.temp_range_C
     return float(lo_C), float(hi_C)
+
+
+def _least_authoritative_wall_domain(
+    outcomes: Sequence[Mapping[str, Any]],
+) -> Mapping[str, Any] | None:
+    """Select the weakest wall-thermochemistry domain used by a result."""
+
+    severity = {
+        'authoritative': 0,
+        'status_bearing': 1,
+        'extrapolated': 2,
+    }
+    candidates = [
+        outcome for outcome in outcomes
+        if str(
+            outcome.get('authority_level') or outcome.get('status') or ''
+        ) in severity
+    ]
+    return max(
+        candidates,
+        key=lambda outcome: severity[str(
+            outcome.get('authority_level') or outcome.get('status') or ''
+        )],
+        default=None,
+    )
 
 
 def _ordered_stage_band_C(stage: CondensationStage) -> tuple[float, float]:

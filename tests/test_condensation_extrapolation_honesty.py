@@ -27,6 +27,97 @@ def _stage3_unavailable_psat_model():
     return model
 
 
+def _interval_straddling_wall_route(*, committed_o2: bool, two_stages: bool = False):
+    from tests.chemistry.test_rail_debit_chokepoint import _carrier_record
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+    )
+
+    model = _stage3_unavailable_psat_model()
+    model.pipe_segments = []
+    stage3 = next(stage for stage in model.train.stages if stage.stage_number == 3)
+    stage3.temp_range_C = (20.0, 80.0)
+    model.train.collection_route["stage3_route"] = "through"
+    if two_stages:
+        stage1 = next(stage for stage in model.train.stages if stage.stage_number == 1)
+        stage1.temp_range_C = (100.0, 120.0)
+        model.train.stages = [stage1, stage3]
+    else:
+        model.train.stages = [stage3]
+    model.retained_vapor_mol = {"O2": 0.0} if committed_o2 else {}
+    return model.route(
+        EvaporationFlux(
+            species_kg_hr={"SiO": 1.0},
+            total_kg_hr=1.0,
+            carrier_authority_by_species=_carrier_record(
+                "SiO", VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+            ),
+        ),
+        MeltState(temperature_C=1500.0),
+    )
+
+
+def test_interval_straddling_band_downgrades_known_o2_route_authority():
+    result = _interval_straddling_wall_route(committed_o2=True)
+    capture = result.condensed_by_stage_species["stage_3_sio_zone"]["SiO"]
+    assert capture == pytest.approx(0.9992791217271582, rel=0.0, abs=1e-15)
+
+    authority = result.condensation_authority_by_species["SiO"]
+    assert authority["authoritative_for_condensation"] is False
+    assert authority["authority_level"] == "extrapolated"
+    stage_outcome = next(
+        item for item in authority["stage_outcomes"]
+        if item["stage_number"] == 3
+    )
+    notices = stage_outcome["wall_saturation_pressure_notices"]
+    extrapolated = [
+        notice for notice in notices
+        if notice.get("authority_level") == "extrapolated"
+    ]
+    # The band spans 293.15–353.15 K; 60 K / 33 gives 1.818 K per strip,
+    # leaving four midpoint strips below the 300 K wall-law bound. That count
+    # falls to zero when the band starts at or above the bound.
+    assert len(notices) == len(extrapolated) == 4
+    assert authority["valid_range_K"] == extrapolated[0]["valid_range_K"]
+
+
+def test_unknown_o2_interval_straddling_records_bound_and_extrapolated_strips():
+    result = _interval_straddling_wall_route(committed_o2=False)
+    authority = result.condensation_authority_by_species["SiO"]
+    assert authority["authority_level"] == "extrapolated"
+    stage_outcome = next(
+        item for item in authority["stage_outcomes"]
+        if item["stage_number"] == 3
+    )
+    notices = stage_outcome["wall_saturation_pressure_notices"]
+    assert len(notices) == 33  # The 20–80 C band integrates all 33 strips.
+    assert any(
+        notice.get("reason") == "wall_pO2_unknown_pO2_free_route_used"
+        for notice in notices
+    )
+    assert any(
+        notice.get("authority_level") == "extrapolated"
+        and "wall_pO2_unknown_pO2_free_route_used" in notice.get("notices", ())
+        for notice in notices
+    )
+
+
+def test_route_authority_uses_least_authoritative_stage():
+    result = _interval_straddling_wall_route(
+        committed_o2=False, two_stages=True,
+    )
+    authority = result.condensation_authority_by_species["SiO"]
+    outcomes_by_stage = {
+        item["stage_number"]: item
+        for item in authority["stage_outcomes"]
+        if item["stage_number"] in {1, 3}
+    }
+    assert outcomes_by_stage[1]["authority_level"] == "status_bearing"
+    assert outcomes_by_stage[3]["authority_level"] == "extrapolated"
+    assert authority["authority_level"] == "extrapolated"
+    assert authority["valid_range_K"] == outcomes_by_stage[3]["valid_range_K"]
+
+
 def test_stage3_unknown_po2_predicts_flagged_capture():
     model = _stage3_unavailable_psat_model()
     outcomes = []
