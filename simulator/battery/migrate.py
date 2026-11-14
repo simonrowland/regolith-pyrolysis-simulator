@@ -23048,11 +23048,12 @@ def _quoted_atmosphere_values(
             # Ratio -> mole fractions: at common T and P, gas volume ratios
             # equal mole ratios; the percentages supply inert Ar in the total.
             # Percent × 1 SCCM is proportional molar flow (the percent and
-            # flow units cancel on normalization). For Sossi's 99CO2:1H2,
-            # 92% Ar gives 7.92:0.08:92, normalized by 100; WGS then gives
-            # log fO2=-2.53 at 2173.15 K, matching the printed -2.53 (Table
-            # S1; the log is calculated at 1900 °C). WGS has Δn=0, so ideal
-            # inert dilution cancels from fO2 even though it is in the total.
+            # flow units cancel on normalization). For admitted Sossi
+            # 10CO2:90H2, 92% Ar gives 0.8:7.2:92, normalized by 100;
+            # WGS then gives log fO2=-7.8632 at 2173.15 K, against printed
+            # -7.86 (Table S1, 1900 °C), within tolerance plus band. WGS has
+            # Δn=0, so ideal inert dilution cancels from fO2 even though it
+            # is included in the total.
             candidates.append(
                 " + ".join(
                     f"{formula} {value} × 1 SCCM"
