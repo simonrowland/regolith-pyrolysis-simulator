@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Iterable, Iterator, Mapping, Sequence
+from typing import Any, Callable, Iterable, Iterator, Mapping, Sequence
 
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -1158,9 +1158,12 @@ def _janaf_sidecar_hashes(path: Path = SIDECAR_PATH) -> dict[str, str]:
 
 def _checked_compiled_table_document(
     table_id: str,
+    *,
+    document_loader: Callable[[Path], dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], str]:
     """Load one compiled JANAF table after checking its raw-source hash."""
-    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    loader = load_table_document if document_loader is None else document_loader
+    document = loader(TABLES_DIR / f"{table_id}.yaml")
     extraction = document.get("extraction")
     table = document.get("table")
     if not isinstance(extraction, Mapping) or not isinstance(table, Mapping):

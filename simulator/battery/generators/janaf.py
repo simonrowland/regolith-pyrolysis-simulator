@@ -71,7 +71,7 @@ from simulator.reference_data.janaf import (
     NON_DATA_MARKER_REASON,
     REFUSED_LAYOUT_KIND,
     TABLES_DIR,
-    _checked_compiled_table_document as _checked_fusion_table_document,
+    _checked_compiled_table_document,
     _janaf_sidecar_hashes as _sidecar_hashes,
     _interpolate_formation_gibbs,
     _interpolate_table_points,
@@ -2988,6 +2988,13 @@ _ACCEPTED_MELTING_K = {
     # JANAF Cr-014/Cr-015 print CRYSTAL <--> LIQUID at 2603 K.
     "Cr2O3": Decimal("2603"),
 }
+
+
+def _checked_fusion_table_document(table_id: str) -> tuple[dict[str, Any], str]:
+    """Check a JANAF table using this caller's loader at the owner boundary."""
+    return _checked_compiled_table_document(
+        table_id, document_loader=load_table_document
+    )
 
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))
