@@ -191,3 +191,61 @@ def test_participating_provider_controls_receive_real_dt(campaign, monkeypatch):
     assert execution.status in {"ok", "refused"}, execution.error_message
     assert observed, campaign
     assert all(dt == 0.25 for _, dt in observed), observed
+
+
+def test_live_depletion_owner_receives_the_interval(monkeypatch):
+    from simulator.core import PyrolysisSimulator
+
+    durations = []
+    calculate = PyrolysisSimulator._analytic_evaporation_depletion_rates
+
+    def record_interval(sim, *args, **kwargs):
+        durations.append(kwargs["dt_hr"])
+        return calculate(sim, *args, **kwargs)
+
+    monkeypatch.setattr(PyrolysisSimulator, "_analytic_evaporation_depletion_rates", record_interval)
+    session = _isothermal_session(0.25)
+    execution = RunExecutor().execute_session(session, hours=0.25)
+    assert execution.status == "ok", execution.error_message
+    assert durations
+    assert set(durations) == {0.25}
+
+
+def test_missing_depletion_dt_mutation_is_rejected(monkeypatch):
+    from simulator.core import PyrolysisSimulator
+
+    apply = PyrolysisSimulator._apply_analytic_evaporation_depletion
+
+    def omit_duration(sim, flux, dt_hr=1.0):
+        return apply(sim, flux)
+
+    monkeypatch.setattr(PyrolysisSimulator, "_apply_analytic_evaporation_depletion", omit_duration)
+    with pytest.raises(AssertionError):
+        test_live_depletion_owner_receives_the_interval(monkeypatch)
+
+
+def test_missing_energy_dt_mutation_is_rejected(monkeypatch):
+    from simulator.energy import EnergyTracker
+
+    calculate = EnergyTracker.calculate_hour
+
+    def omit_duration(tracker, *args, **kwargs):
+        kwargs.pop("dt_hr", None)
+        return calculate(tracker, *args, **kwargs)
+
+    monkeypatch.setattr(EnergyTracker, "calculate_hour", omit_duration)
+    with pytest.raises(AssertionError):
+        test_rate_energy_scales_with_elapsed_time_without_rescaling_mre_energy()
+
+
+def test_reverting_to_hourly_step_breaks_unchanged_exact_stop(monkeypatch):
+    from simulator.core import PyrolysisSimulator
+
+    step = PyrolysisSimulator.step
+
+    def hourly_only(sim, dt_hr=1.0):
+        return step(sim)
+
+    monkeypatch.setattr(PyrolysisSimulator, "step", hourly_only)
+    with pytest.raises(AssertionError):
+        test_exact_stop_uses_physical_elapsed_time(77.4, "helper")
