@@ -146,7 +146,7 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
             )
         )
     start = chunk_index * 5
-    assert False, decision_table[start : start + 5]
+    assert False, "\n".join(",".join(row) for row in decision_table[start : start + 5])
 
 
 def test_inert_n2_dilution_is_in_the_total_but_cancels_and_ratio_mutation_moves_fo2() -> None:
