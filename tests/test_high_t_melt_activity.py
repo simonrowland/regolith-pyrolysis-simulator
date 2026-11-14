@@ -2537,9 +2537,11 @@ def test_openimcc_parent_fallback_propagates_to_diagnostics_and_run_notice(
     sim._note_high_t_melt_activity_fallback(
         authority, result.diagnostic["vapor_pressure_numerator_provenance"],
     )
-    run_notice = sim.high_t_melt_activity_run_notice()
-    assert run_notice["reason"] == warning_code
-    assert any(item.get("code") == warning_code for item in run_notice["notices"])
+    table_notice = sim.high_t_melt_activity_table_fallback_run_notice()
+    assert table_notice is not None
+    assert table_notice["affected_tick_count"] == 1
+    assert "SiO2" in table_notice["affected_parent_oxides"]
+    assert sim.high_t_melt_activity_run_notice() is None
 
 
 def test_openimcc_parent_fallback_warning_reaches_residual_activity_row() -> None:
@@ -2731,7 +2733,7 @@ def test_table_fallback_only_renders_separate_summary_notice(monkeypatch) -> Non
     table_fallback = {
         "melt_activity_fallback": True,
         "melt_activity_flag": "openimcc_parent_activity_missing_table_fallback",
-        "melt_activity_parent_oxide": "SiO2",
+        "melt_activity_parent_oxide": "FeO",
     }
     sim._note_high_t_melt_activity_fallback(
         {"notices": []}, {"SiO": table_fallback, "SiO2": dict(table_fallback)}
@@ -2751,8 +2753,8 @@ def test_table_fallback_only_renders_separate_summary_notice(monkeypatch) -> Non
     )
     notice = sim.high_t_melt_activity_table_fallback_run_notice()
     sentence = (
-        "OpenIMCC gave no usable activity for SiO2 on 1 tick; "
-        "fallback activities came from the melt-oxide coefficient table."
+        "OpenIMCC gave no usable activity for FeO on 1 tick; "
+        "the built-in melt-activity model supplied the fallback activities."
     )
     run_metadata = {}
     runner_module._attach_high_t_melt_activity_table_fallback_notice(
@@ -2762,7 +2764,7 @@ def test_table_fallback_only_renders_separate_summary_notice(monkeypatch) -> Non
     assert notice == {
         "kind": "high_t_melt_activity_table_fallback",
         "affected_tick_count": 1,
-        "affected_parent_oxides": ["SiO2"],
+        "affected_parent_oxides": ["FeO"],
     }
     assert report["high_t_melt_activity_table_fallback_notice"] == notice
     assert sentence in report["markdown"]
@@ -2811,49 +2813,73 @@ def test_refusal_only_summary_sentence_is_byte_identical() -> None:
     assert sim.high_t_melt_activity_table_fallback_run_notice() is None
 
 
-def test_mixed_table_fallback_and_refusal_counts_are_separate() -> None:
+def test_mixed_table_fallback_and_refusal_counts_are_separate(monkeypatch) -> None:
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim._high_t_melt_activity_fallback_steps = []
     sim._high_t_melt_activity_table_fallback_ticks = {}
-    sim.melt = SimpleNamespace(hour=3, campaign=CampaignPhase.C2A)
-    sim._note_high_t_melt_activity_fallback(
-        {
-            "fallback_reason": {"code": "imcc_nonconvergence"},
-            "notices": [
-                {"parent": "SiO2", "code": "openimcc_parent_activity_zero_table_fallback"},
-                {"parent": "FeO", "code": "held_effective_gamma"},
-            ],
-        },
-        {
-            "SiO": {
-                "melt_activity_fallback": True,
-                "melt_activity_flag": "openimcc_parent_activity_zero_table_fallback",
-                "melt_activity_parent_oxide": "SiO2",
+    table_flag = "openimcc_parent_activity_zero_table_fallback"
+    for hour, campaign, table_parent, refusal_parent in (
+        (3, CampaignPhase.C2A, "SiO2", "FeO"),
+        (4, CampaignPhase.C4, "FeO", "CaO"),
+    ):
+        table_row = {
+            "melt_activity_fallback": True,
+            "melt_activity_flag": table_flag,
+            "melt_activity_parent_oxide": table_parent,
+        }
+        refusal_row = {
+            "melt_activity_fallback": True,
+            "melt_activity_flag": "held_effective_gamma",
+            "melt_activity_parent_oxide": refusal_parent,
+            "openimcc_refusal": {"code": "imcc_nonconvergence"},
+        }
+        sim.melt = SimpleNamespace(hour=hour, campaign=campaign)
+        sim._note_high_t_melt_activity_fallback(
+            {
+                "fallback_reason": {"code": "imcc_nonconvergence"},
+                "notices": [
+                    {"parent": table_parent, "code": table_flag},
+                    {"parent": refusal_parent, "code": "held_effective_gamma"},
+                ],
             },
-            "SiO2": {
-                "melt_activity_fallback": True,
-                "melt_activity_flag": "openimcc_parent_activity_zero_table_fallback",
-                "melt_activity_parent_oxide": "SiO2",
+            {
+                f"table-{hour}": table_row,
+                f"duplicate-table-{hour}": dict(table_row),
+                f"refusal-{hour}": refusal_row,
             },
-            "Fe": {
-                "melt_activity_fallback": True,
-                "melt_activity_flag": "held_effective_gamma",
-                "melt_activity_parent_oxide": "FeO",
-                "openimcc_refusal": {"code": "imcc_nonconvergence"},
-            },
-        },
-    )
+        )
 
     refusal = sim.high_t_melt_activity_run_notice()
     table = sim.high_t_melt_activity_table_fallback_run_notice()
-    assert refusal["affected_tick_count"] == 1
-    assert refusal["affected_parent_count"] == 1
-    assert refusal["affected_parent_oxides"] == ["FeO"]
+    assert refusal["affected_tick_count"] == 2
+    assert refusal["affected_parent_count"] == 2
+    assert refusal["affected_parent_oxides"] == ["CaO", "FeO"]
+    assert refusal["campaigns"] == ["C2A", "C4"]
     assert table == {
         "kind": "high_t_melt_activity_table_fallback",
-        "affected_tick_count": 1,
-        "affected_parent_oxides": ["SiO2"],
+        "affected_tick_count": 2,
+        "affected_parent_oxides": ["FeO", "SiO2"],
     }
+    monkeypatch.setattr(runner_module, "classify_products", lambda *args, **kwargs: {})
+    monkeypatch.setattr(
+        runner_module,
+        "format_three_product_markdown",
+        lambda *args, **kwargs: "**Class totals**: test",
+    )
+    report = runner_module._product_classification_report(
+        sim, feedstock_id="test", campaign="C2A"
+    )
+    refusal_sentence = (
+        "**High-temperature melt activity**: OpenIMCC refusal `imcc_nonconvergence` "
+        "used a constant-gamma extrapolated prediction for 2 tick(s) and "
+        "2 parent oxide(s), campaigns `C2A, C4`, hours 4-5."
+    )
+    table_sentence = (
+        "OpenIMCC gave no usable activity for FeO, SiO2 on 2 ticks; "
+        "the built-in melt-activity model supplied the fallback activities."
+    )
+    assert report["markdown"].count(refusal_sentence) == 1
+    assert report["markdown"].count(table_sentence) == 1
 
 
 def test_absent_parent_stays_out_of_openimcc_authority() -> None:

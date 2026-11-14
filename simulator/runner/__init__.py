@@ -4064,7 +4064,7 @@ def _high_t_melt_activity_table_fallback_sentence(
     tick_word = "tick" if ticks == 1 else "ticks"
     return (
         f"OpenIMCC gave no usable activity for {parents} on {ticks} {tick_word}; "
-        "fallback activities came from the melt-oxide coefficient table."
+        "the built-in melt-activity model supplied the fallback activities."
     )
 
 
