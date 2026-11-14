@@ -7203,20 +7203,26 @@ def test_studio_requires_host_environment_variable(
     assert "REGOLITH_STUDIO_HOST" in capsys.readouterr().err
 
 
-def test_studio_dispatch_uses_caller_host(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_studio_dispatch_uses_caller_host(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from scripts import battery_score
 
     monkeypatch.setenv("REGOLITH_STUDIO_HOST", "example-studio.invalid")
     monkeypatch.setattr(battery_score.socket, "gethostname", lambda: "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    engine_cache_path = tmp_path / "engine-cache.sqlite"
 
     def record_host(
         _engines: list[str],
         _extra: list[str],
         *,
+        engine_cache_path: Path | None,
         studio_host: str,
         output_directory: Path,
         remote_output_directory: Path,
     ):
+        assert engine_cache_path == tmp_path / "engine-cache.sqlite"
         assert studio_host == "example-studio.invalid"
         assert output_directory.name
         assert remote_output_directory.parts
@@ -7227,7 +7233,15 @@ def test_studio_dispatch_uses_caller_host(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(battery_score, "load_score_context", lambda _root: None)
     monkeypatch.setattr(battery_score, "_run_studio", record_host)
     with pytest.raises(RuntimeError, match="dispatch host recorded"):
-        battery_score.main(["--studio", "--engines", "magemin"])
+        battery_score.main(
+            [
+                "--studio",
+                "--engines",
+                "magemin",
+                "--engine-cache",
+                str(engine_cache_path),
+            ]
+        )
 
 
 def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:
