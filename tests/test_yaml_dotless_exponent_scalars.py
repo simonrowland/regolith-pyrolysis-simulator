@@ -29,10 +29,25 @@ DELIBERATE_PRINTED_SUFFIXES = {
     "_as_printed": "field name declares an exact printed lexeme",
     "_as_published": "field name declares the exact published lexeme",
 }
+EXACT_DECIMAL_STRING_FIELDS = {
+    (
+        "data/literature/extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml",
+        "species.Na2O.observations.0.values.activity.bound_value",
+    ),
+    (
+        "data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml",
+        "species.FeO.observations.0.values.oxygen_partial_pressure.value",
+    ),
+}
 
 
 def _deliberate_printed_string_reason(relative: str, key_path: str) -> str | None:
     """Explain schema fields whose numeric-looking strings are intentional."""
+    if (relative, key_path) in EXACT_DECIMAL_STRING_FIELDS:
+        return (
+            "model-derived exact decimal consumed through Decimal conversion; "
+            "a binary float would discard source precision"
+        )
     parts = key_path.split(".")
     leaf = parts[-1]
     if leaf in DELIBERATE_PRINTED_STRING_FIELDS:
