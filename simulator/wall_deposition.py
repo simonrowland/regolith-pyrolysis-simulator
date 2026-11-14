@@ -463,7 +463,10 @@ def wall_deposit_candidate_for_surface_kg(
             "wall_temperature_K": T_wall_K,
         }
     pressure_notice = rate_diagnostic.get("wall_saturation_pressure_notice")
-    if pressure_notice is not None:
+    if (
+        isinstance(pressure_notice, Mapping)
+        and pressure_notice.get("authority_level") == "extrapolated"
+    ):
         _record_wall_pressure_notice(model, "wall_saturation_pressure_extrapolations_by_species",
             species, str(getattr(segment, "name", "default_pipe")), pressure_notice)
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa
