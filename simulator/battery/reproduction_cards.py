@@ -362,6 +362,8 @@ def group_gate(before: Document, after: Document) -> dict[str, Any]:
             if candidate is None or candidate["band"] != row["band"]:
                 regressions.append(f"{gid}:{oid}:band_or_availability")
                 continue
+            if row["residual"] is not None and candidate["residual"] is None:
+                regressions.append(f"{gid}:{oid}:numeric_availability")
             if row["status"] == "MATCH" and candidate["status"] != "MATCH":
                 regressions.append(f"{gid}:{oid}:outside_band")
             if row["flags"] != candidate["flags"]:
