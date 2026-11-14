@@ -92,7 +92,6 @@ from simulator.battery.migrate import (
     parse_quantity_suffix,
     split_qualified_quantity,
     QUANTITY_ALIASES,
-    QUANTITY_SOURCE_FIELDS,
     _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
@@ -116,9 +115,7 @@ from simulator.battery.migrate import (
     lift_vaporization_reaction_from_ledger_note,
     pressure_from_equipment,
     resolve_equipment_context,
-    select_declared_source,
     to_plain,
-    observation_from_plain,
     work_id_for,
     write_outputs,
 
@@ -4084,7 +4081,7 @@ def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
         for p in (root / "data").rglob("*")
         if p.is_file() and "extracts/fixture-source.yaml" not in p.as_posix()
     }
-    second = migrate(root, write=True)
+    migrate(root, write=True)
     second_bytes = {
         p.relative_to(root): p.read_bytes()
         for p in (root / "data").rglob("*")
@@ -19140,20 +19137,68 @@ def test_bare_log_direct_couple_outside_cea_domain_carries_extrapolated_authorit
     assert decision.notice_authority is Authority.EXTRAPOLATED
 
 
-def test_bare_log_wgs_dependent_mix_remains_typed_refusal() -> None:
+def _printed_wgs_sccm_mix_at_cea_log_fO2(log10_fO2: float) -> str:
+    from simulator.chemistry.offgas_fo2 import (
+        _log10_K_couple,
+        load_buffer_polynomials,
+    )
+
+    temperature_K = 1682.15
+    polynomials = load_buffer_polynomials()
+    log10_k_h2 = _log10_K_couple(polynomials, "H2", temperature_K)
+    log10_k_co = _log10_K_couple(polynomials, "CO", temperature_K)
+
+    # Set H2O/H2 to the requested CEA fO2, then set Q=K_CO/K_H2 so the CEA
+    # water-gas-shift extent is zero and the source prediction is independently
+    # fixed by the production couple resolver.
+    amounts = {
+        "CO2": 10.0 ** (log10_k_co - log10_k_h2) * 10.0 ** (
+            log10_k_h2 + log10_fO2 / 2.0
+        ),
+        "CO": 1.0,
+        "H2O": 10.0 ** (log10_k_h2 + log10_fO2 / 2.0),
+        "H2": 1.0,
+    }
+    return " + ".join(
+        f"{species} 1.000000000000 × {amount:.12f} SCCM"
+        for species, amount in amounts.items()
+    )
+
+
+def test_bare_log_accepts_wgs_dependent_mix_with_source_band() -> None:
+    from simulator.battery.enums import NoticeKind
     from simulator.battery.migrate import _bare_log_frame_decision
 
+    atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
     decision = _bare_log_frame_decision(
         Decimal("-0.30"),
         Decimal("1682.15"),
-        printed_atmospheres=(
-            "CO2 20.0 × 10 SCCM + H2 50.0 × 200 SCCM",
-        ),
+        printed_atmospheres=(atmosphere,),
     )
 
+    # Mutation: route this WGS mix to the unavailable branch and acceptance fails.
+    assert decision.state.is_value
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert atmosphere in decision.notice_reason
+    assert "expected CEA log10(fO2/bar)=-0.3000" in decision.notice_reason
+    assert "wgs_uncertainty_band=" in decision.notice_band
+
+
+def test_bare_log_wgs_mismatch_keeps_the_possible_misprint_notice() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
+    decision = _bare_log_frame_decision(
+        Decimal("-1.00"),
+        Decimal("1682.15"),
+        printed_atmospheres=(atmosphere,),
+    )
+
+    # Mutation: omit the WGS candidate from checked results and this notice assertion fails.
     assert decision.state.is_unknown
-    assert "gas_mix_fo2_band_unavailable" in decision.state.reason
-    assert "WGS-dependent" in decision.state.reason
+    assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
+    assert "possible source misprint" in decision.notices[0].reason
 
 
 def test_direct_gas_couple_without_janaf_uses_mix_band_and_notices(monkeypatch) -> None:
