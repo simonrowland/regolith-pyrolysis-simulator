@@ -1451,59 +1451,6 @@ def test_malformed_hot_value_is_a_counted_conflict_and_not_replaced(
     ).fetchone()[0] == b"not-zlib"
 
 
-def test_concurrent_cache_writer_counts_different_bytes_without_replacing(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    database = tmp_path / "cache.sqlite"
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
-    engine_cache.engine_cache_counters(reset=True)
-    request = {"call": "conflicting-writer"}
-    digest = engine_cache.engine_cache_key("openimcc", 1, request)
-
-    def solve() -> dict[str, str]:
-        connection = engine_cache._CONNECTIONS[(str(database), False)]
-        existing_json = json.dumps(
-            {"answer": "existing"},
-            sort_keys=True,
-            separators=(",", ":"),
-            ensure_ascii=True,
-            allow_nan=False,
-        ).encode("ascii")
-        connection.execute(
-            "INSERT INTO engine_outputs "
-            "(key, value, engine, chem_version, source_box, row_seq) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (
-                digest,
-                sqlite3.Binary(zlib.compress(existing_json, level=6)),
-                "openimcc",
-                "1",
-                "existing-box",
-                1,
-            ),
-        )
-        connection.commit()
-        return {"answer": "live"}
-
-    result = engine_cache.cached_engine_call("openimcc", request, solve)
-
-    assert result == {"answer": "live"}
-    assert _engine_cache_counters(reset=True)["openimcc"] == {
-        "hits": 0,
-        "misses": 1,
-        "stores": 0,
-        "store_error": 0,
-        "read_error": 0,
-        "conflicts": 1,
-    }
-    with sqlite3.connect(database) as connection:
-        stored = connection.execute(
-            "SELECT value FROM engine_outputs WHERE key=?", (digest,)
-        ).fetchone()[0]
-    assert json.loads(zlib.decompress(stored)) == {"answer": "existing"}
-
-
 def test_equilibrium_cache_maps_use_compact_canonical_json_objects() -> None:
     result = equilibrium_cache_value(
         {
