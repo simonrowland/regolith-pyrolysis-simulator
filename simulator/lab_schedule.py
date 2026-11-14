@@ -164,9 +164,23 @@ def interpolate_schedule_points(
     )
 
 
-def schedule_sample_time_h(schedule: Mapping[str, Any], campaign_hour: int) -> float:
+def next_schedule_boundary_h(schedule: Mapping[str, Any], elapsed_h: float) -> float:
+    """Next declared control breakpoint; never add exposure past its endpoint."""
+    boundaries = {float(schedule["duration_h"])}
+    for key in ("melt_temperature_C", "chamber_pressure_mbar"):
+        boundaries.update(float(point["t_h"]) for point in schedule[key])
+    for points in schedule.get("surface_temperature_C", {}).values():
+        boundaries.update(float(point["t_h"]) for point in points)
+    future = [time for time in boundaries if time > elapsed_h]
+    if not future:
+        raise LabScheduleValidationError("lab_schedule_sample_time_outside_declared_window")
+    return min(future)
+
+
+def schedule_sample_time_h(schedule: Mapping[str, Any], campaign_hour: float,
+                           dt_hr: float = 1.0) -> float:
     duration_h = float(schedule["duration_h"])
-    return min(duration_h, max(0.0, float(campaign_hour) + 1.0))
+    return min(duration_h, max(0.0, float(campaign_hour) + dt_hr))
 
 
 def pO2_setpoint_mbar_from_schedule(

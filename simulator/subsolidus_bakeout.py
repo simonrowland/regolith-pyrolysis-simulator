@@ -292,10 +292,6 @@ def handoff_mol_maps(
     return debits, credits
 
 
-# The simulator advances one hour at a time. This is that step length.
-SUBSOLIDUS_STEP_DURATION_HR = 1.0
-
-
 def _finite_nonnegative(value: Any) -> float | None:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None

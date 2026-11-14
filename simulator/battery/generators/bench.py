@@ -810,8 +810,6 @@ def vacuum_pyrolysis_preset(inputs: ConsumerInputs, *, modelling_inputs=None) ->
         points = [{"t_h": float(t / Decimal(3600)), "value": float(T - Decimal("273.15")), "unit": "C"}
                   for t, T in thermal.series]
         duration = points[-1]["t_h"]
-        if not duration.is_integer():
-            raise UnsupportedValue("thermal_path.integer_duration_h_required_by_runner")
         pressure = float(_point(inputs, "run_pressure_boundary") / Decimal(100))
         surfaces = []
         physical_surfaces = inputs.waypoints["surfaces"].selected.value

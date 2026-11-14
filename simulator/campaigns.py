@@ -1304,6 +1304,7 @@ class CampaignManager:
         c4_snapshots: list,
         transport_state: Mapping[str, object] | None,
         current_acquired: bool,
+        dt_hr: float = 1.0,
     ) -> float:
         """Count C4 hours that count against max_target_acquisition_hr.
 
@@ -1334,14 +1335,14 @@ class CampaignManager:
             return 0.0
 
         prior_opportunity = sum(
-            1
+            snapshot.duration_h
             for snapshot in c4_snapshots
             if not self._c4_snapshot_was_transport_hold(snapshot)
         )
         current_counts = current_acquired or not self._c4_current_is_transport_hold(
             transport_state
         )
-        return float(prior_opportunity + int(current_counts))
+        return float(prior_opportunity + (dt_hr if current_counts else 0))
 
     @staticmethod
     def c6_at_hold_target(
@@ -2073,7 +2074,7 @@ class CampaignManager:
 
     def get_temp_target(self, campaign: CampaignPhase,
                         campaign_hour: int,
-                        melt: MeltState) -> Tuple[Optional[float], float]:
+                        melt: MeltState, *, dt_hr: float = 1.0) -> Tuple[Optional[float], float]:
         """
         Get the target temperature and ramp rate for a campaign.
 
@@ -2088,7 +2089,7 @@ class CampaignManager:
         (1575.0 or a materialized target, 5.0), C6 a finite hold and
         ramp, and MRE_BASELINE (1575.0, 20.0).
         """
-        result = self._get_base_temp_target(campaign, campaign_hour, melt)
+        result = self._get_base_temp_target(campaign, campaign_hour, melt, dt_hr=dt_hr)
         target_T, ramp_rate = self._apply_ramp_override(campaign, result[0], result[1])
         if campaign == CampaignPhase.C0:
             prediction = self.c0_exit_prediction
@@ -2122,16 +2123,18 @@ class CampaignManager:
 
     def _get_base_temp_target(self, campaign: CampaignPhase,
                                campaign_hour: int,
-                               melt: MeltState) -> Tuple[Optional[float], float]:
+                               melt: MeltState, *, dt_hr: float = 1.0) -> Tuple[Optional[float], float]:
         """Base temperature targets before runtime overrides."""
         lab_schedule = self._lab_schedule(campaign)
         if lab_schedule is not None:
-            sample_time_h = schedule_sample_time_h(lab_schedule, campaign_hour)
+            sample_time_h = schedule_sample_time_h(lab_schedule, campaign_hour, dt_hr)
             target = interpolate_schedule_points(
                 lab_schedule['melt_temperature_C'],
                 sample_time_h,
             )
-            return (target, abs(float(target) - float(melt.temperature_C)))
+            # A schedule declares endpoint temperature, not a per-tick rise:
+            # rate = delta T / dt [C/h]; e.g. 10 C in .25 h is 40 C/h.
+            return (target, abs(float(target) - float(melt.temperature_C)) / dt_hr)
 
         thermal_window = self._thermal_window_temp_target(campaign, melt)
         if thermal_window is not None:
@@ -2425,10 +2428,10 @@ class CampaignManager:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _completed_campaign_hour_for_endpoint(melt: MeltState) -> float:
+    def _completed_campaign_hour_for_endpoint(melt: MeltState, dt_hr: float = 1.0) -> float:
         # check_endpoint runs after the hour's work and before core increments
         # campaign_hour, so hard duration caps must include the current hour.
-        return float(melt.campaign_hour) + 1.0
+        return float(melt.campaign_hour) + dt_hr
 
     @staticmethod
     def _evap_total_signal_armed(
@@ -2574,6 +2577,7 @@ class CampaignManager:
                        train: CondensationTrain,
                        record: BatchRecord,
                        *,
+                       dt_hr: float = 1.0,
                        transport_state: Mapping[str, object] | None = None,
                        ) -> bool:
         """
@@ -2608,7 +2612,7 @@ class CampaignManager:
         Returns True if the campaign should end.
         """
         campaign = melt.campaign
-        completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
+        completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt, dt_hr)
 
         # Check user-specified max_hours override first. C6 handles this as a
         # hold-acquisition refusal below so the wall clock cannot claim a
@@ -2798,7 +2802,7 @@ class CampaignManager:
             endpoint = stage.get('endpoint', {})
             if not isinstance(endpoint, Mapping):
                 endpoint = {}
-            stage_elapsed_h = melt.campaign_hour - self._c2a_staged_stage_start_hour + 1
+            stage_elapsed_h = melt.campaign_hour - self._c2a_staged_stage_start_hour + dt_hr
             duration_h = max(1, int(self._float(stage.get('duration_h'), 1.0)))
             min_hold_h = self._float(
                 endpoint.get('min_hold_h', endpoint.get('min_hold_hr')),
@@ -2874,7 +2878,9 @@ class CampaignManager:
                 if final_stage:
                     return True
                 self._c2a_staged_stage_idx = stage_idx + 1
-                self._c2a_staged_stage_start_hour = melt.campaign_hour + 1
+                self._c2a_staged_stage_start_hour = melt.campaign_hour + (
+                    1 if dt_hr == 1.0 else dt_hr
+                )
                 self._c2a_staged_peak_flux_by_species = {}
                 self._c2a_staged_cumulative_yield_mol_by_species = {}
                 self._c2a_staged_last_log_slope_by_species = {}
@@ -3006,6 +3012,7 @@ class CampaignManager:
                     c4_snapshots=c4_snapshots,
                     transport_state=transport_state,
                     current_acquired=current_acquired,
+                    dt_hr=dt_hr,
                 )
                 # Held-hours bound (b-147 dual C4-review P1, 2026-08-07): the
                 # opportunity clock excludes transport-hold hours, so a
@@ -3081,18 +3088,19 @@ class CampaignManager:
                 <= window_high_C
             ]
             completed_window_hr = float(
-                len(prior_in_window) + int(current_in_window)
+                sum(snapshot.duration_h for snapshot in prior_in_window)
+                + (dt_hr if current_in_window else 0)
             )
             if prior_acquisition_indexes:
                 acquisition_completed_hour = (
                     completed_campaign_hour
-                    - len(c4_snapshots)
-                    + prior_acquisition_indexes[0]
+                    - sum(snapshot.duration_h for snapshot in c4_snapshots)
+                    + sum(snapshot.duration_h for snapshot in c4_snapshots[:prior_acquisition_indexes[0]])
                 )
             else:
                 acquisition_completed_hour = completed_campaign_hour
             process_elapsed_hr = (
-                completed_campaign_hour - acquisition_completed_hour + 1.0
+                completed_campaign_hour - acquisition_completed_hour + dt_hr
             )
 
             signal_armed = any(
@@ -3230,7 +3238,7 @@ class CampaignManager:
                     unit='A',
                 )
                 if current_A < threshold_A:
-                    melt.mre_low_current_hours += 1
+                    melt.mre_low_current_hours += 1 if dt_hr == 1.0 else dt_hr
                 else:
                     melt.mre_low_current_hours = 0
             else:
@@ -3242,7 +3250,7 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C6:
             hold_target_C, _ = self.get_temp_target(
-                campaign, melt.campaign_hour, melt)
+                campaign, melt.campaign_hour, melt, dt_hr=dt_hr)
             at_hold_target = self.c6_at_hold_target(
                 hold_target_C,
                 melt.temperature_C,
@@ -3272,8 +3280,8 @@ class CampaignManager:
                     return True
             if not at_hold_target:
                 return False
-            completed_hold_hr = 1 + sum(
-                1
+            completed_hold_hr = dt_hr + sum(
+                snapshot.duration_h
                 for snapshot in record.snapshots
                 if snapshot.campaign == CampaignPhase.C6
                 and snapshot.c6_at_hold_target
@@ -3320,7 +3328,7 @@ class CampaignManager:
                 and melt.mre_current_A < threshold_A
                 and signal_armed
             ):
-                melt.mre_low_current_hours += 1
+                melt.mre_low_current_hours += 1 if dt_hr == 1.0 else dt_hr
             else:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:

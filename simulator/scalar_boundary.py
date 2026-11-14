@@ -44,16 +44,19 @@ def is_finite(value: Any) -> bool:
     return finite_float(value) is not None
 
 
-def coerce_nonnegative_hours(value: Any) -> int:
+def coerce_nonnegative_hours(value: Any) -> int | float:
     """Admit a caller's elapsed-hour budget at execution boundaries."""
     if not is_declared_real_scalar(value, allow_numeric_str=True):
         raise TypeError(
             f"hours must be int, float, or str, not {type(value).__name__}"
         )
-    hours = int(value)
+    hours = float(value)
+    if not math.isfinite(hours):
+        raise ValueError("hours must be finite")
     if hours < 0:
         raise ValueError("hours must be non-negative")
-    return hours
+    # Keep historical whole-hour JSON byte-identical (1, rather than 1.0).
+    return int(hours) if hours.is_integer() else hours
 
 
 __all__ = ("finite_float", "is_declared_real_scalar", "is_finite")

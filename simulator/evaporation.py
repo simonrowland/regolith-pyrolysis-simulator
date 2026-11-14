@@ -4308,12 +4308,12 @@ class EvaporationMixin:
             # Premise: the ledger delta spans this tick's full vapor credit and
             # every committed removal (baffle, wall, or retained holdup).
             # Algebra: free-vapor delta = (before + evolved - removals) - before
-            # = evolved - removals. Unit check: kg - kg = kg per one-hour tick,
-            # numerically kg/hr. Sanity: zero removal leaves the evolved rate;
+            # = evolved - removals. Rate = delta[kg]/dt[h]: .25 kg in .25 h
+            # is 1 kg/h. Sanity: zero removal leaves the evolved rate;
             # complete committed removal leaves zero, independent of diagnostics.
             residual_species_kg_hr[species] = max(
                 0.0, overhead_after_kg - overhead_before_kg,
-            )
+            ) / self._step_dt_hr
 
         self._apply_organic_tar_wall_deposit()
         self._sync_oxygen_kg_counters()
@@ -4431,7 +4431,7 @@ class EvaporationMixin:
 
         condensed_kg = max(
             0.0, rate_kg_hr - remaining_kg_hr,
-        )
+        ) * self._step_dt_hr
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
         )
@@ -4444,7 +4444,7 @@ class EvaporationMixin:
 
         return {
             'credited_condensed_kg': float(credited_condensed_kg),
-            'remaining_kg': float(max(0.0, remaining_kg_hr)),
+            'remaining_kg': float(max(0.0, remaining_kg_hr)) * self._step_dt_hr,
             'evaporation_transition': evaporation_transition,
         }
 
@@ -4460,7 +4460,7 @@ class EvaporationMixin:
             return {}
         fe_formula = resolve_species_formula('Fe', self.species_formula_registry)
         fe_molar_mass = fe_formula.molar_mass_kg_per_mol()
-        rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
+        rate_kg_hr = native_fe_vapor_mol * fe_molar_mass / self._step_dt_hr
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()
         self._configure_condensation_operating_conditions(evap_flux)
@@ -4475,7 +4475,8 @@ class EvaporationMixin:
                 raise AccountingError(
                     "native Fe metal partition returned unphysical remaining vapor mass"
                 )
-            condensed_kg = max(0.0, rate_kg_hr - remaining_kg)
+            remaining_kg *= self._step_dt_hr
+            condensed_kg = max(0.0, rate_kg_hr * self._step_dt_hr - remaining_kg)
             fe_row = dict(
                 (self.vapor_pressures.get('metals', {}) or {}).get('Fe') or {}
             )
@@ -4522,7 +4523,7 @@ class EvaporationMixin:
             return {
                 'native_fe_vapor_route_status': route_status,
                 'native_fe_vapor_mol': native_fe_vapor_mol,
-                'native_fe_vapor_kg': rate_kg_hr,
+                'native_fe_vapor_kg': rate_kg_hr * self._step_dt_hr,
                 'native_fe_overhead_o2_mol': 0.0,
                 'native_fe_vapor_feo_debit_mol': 0.0,
                 'native_fe_overhead_fe_mol_before_condensation': native_fe_vapor_mol,
@@ -4589,6 +4590,8 @@ class EvaporationMixin:
         condensed_kg: float,
         sp_data: dict,
         route_result,
+        *,
+        dt_hr: float | None = None,
     ) -> float:
         """Dispatch CONDENSATION_ROUTE through the kernel + commit.
 
@@ -4648,7 +4651,7 @@ class EvaporationMixin:
                         {},
                     )
                 ),
-                'dt_hr': 1.0,
+                'dt_hr': self._step_dt_hr if dt_hr is None else dt_hr,
             },
         )
         if kernel_result.transition is None:
@@ -4833,7 +4836,8 @@ class EvaporationMixin:
             return (0.0, None) if return_transition else 0.0
 
         parent_oxide = stoich['parent_oxide']
-        rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
+        # Amount = rate[kg/h] * dt[h]; 4 kg/h over .25 h is 1 kg.
+        rate_kg_per_tick = rate_kg_hr * self._step_dt_hr
         oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
         product_kg = rate_kg_per_tick
 
@@ -4854,7 +4858,7 @@ class EvaporationMixin:
                 f"condensation route for {species!r} returned "
                 "unphysical remaining vapor mass"
             )
-        remaining_kg = max(0.0, remaining_kg_hr) * 1.0
+        remaining_kg = max(0.0, remaining_kg_hr) * self._step_dt_hr
         if remaining_kg > product_kg + 1e-12:
             raise AccountingError(
                 f"condensation route for {species!r} exceeds credited vapor"
@@ -4870,7 +4874,7 @@ class EvaporationMixin:
                 'sp_data': dict(sp_data or {}),
                 'rate_kg_hr': float(rate_kg_hr),
                 'remaining_kg_hr': float(remaining_kg_hr),
-                'dt_hr': 1.0,
+                'dt_hr': self._step_dt_hr,
                 'available_kg': float(available_kg),
             },
         )
@@ -4886,7 +4890,7 @@ class EvaporationMixin:
             'sp_data': dict(sp_data or {}),
             'rate_kg_hr': float(rate_kg_hr),
             'remaining_kg_hr': float(remaining_kg_hr),
-            'dt_hr': 1.0,
+            'dt_hr': self._step_dt_hr,
             'available_kg': float(available_kg),
         }
         transition = self._commit_proposal(

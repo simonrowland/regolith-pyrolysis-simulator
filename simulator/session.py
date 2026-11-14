@@ -26,8 +26,10 @@ from simulator.backends import (
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
-from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.lab_schedule import (
+    LAB_SCHEDULE_OVERRIDE_KEY, next_schedule_boundary_h, normalize_lab_schedule,
+)
+from simulator.scalar_boundary import coerce_nonnegative_hours, is_declared_real_scalar
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 from simulator.state import (
     DecisionPoint,
@@ -197,7 +199,7 @@ class SimSessionConfig:
     campaign: str = "C0"
     backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     backend_policy: BackendSelectionPolicy = BackendSelectionPolicy.RUNNER_STRICT
-    hours: int = 0
+    hours: float = 0
     mass_kg: float = 1000.0
     additives_kg: Mapping[str, float] = field(default_factory=dict)
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None = None
@@ -216,8 +218,12 @@ class SimSessionConfig:
     campaigns_elapsed: float = 1.0
     imcc_activity_shadow: bool = False
     high_t_melt_activity: str | None = None
+    dt_hr: float = 1.0
 
     def __post_init__(self) -> None:
+        coerce_nonnegative_hours(self.hours)
+        if coerce_nonnegative_hours(self.dt_hr) <= 0:
+            raise ValueError("dt_hr must be positive")
         # Fold legacy analytical aliases onto the canonical
         # `internal-analytical` token before serialization and translation.
         object.__setattr__(
@@ -521,7 +527,7 @@ class SimSession:
         sim.validate_lab_surface_temperature_resolver()
         return self
 
-    def advance(self) -> StepResult:
+    def advance(self, dt_hr: float = 1.0) -> StepResult:
         """Run exactly one policy-free simulator step."""
 
         sim = self._require_sim()
@@ -531,7 +537,7 @@ class SimSession:
             )
         if sim.is_complete():
             raise RuntimeError("cannot advance a complete session")
-        snapshot = sim.step()
+        snapshot = sim.step() if dt_hr == 1.0 else sim.step(dt_hr=dt_hr)
         campaign_summary = getattr(sim, "_last_campaign_summary", None)
         backend_error = str(getattr(sim, "_last_backend_error", "") or "")
         sim._last_campaign_summary = None
@@ -865,7 +871,7 @@ def drive_auto_apply(
 
 def drive_session(
     session: SimSession,
-    hours: int,
+    hours: float,
     policy: DecisionPolicy,
     *,
     operator_decisions: list[dict[str, Any]] | None = None,
@@ -873,9 +879,12 @@ def drive_session(
 ) -> Iterable[StepResult]:
     """Drive a session under a policy outside ``advance()``."""
 
-    if not is_declared_real_scalar(hours, allow_numeric_str=True):
-        raise TypeError(f"hours must be numeric, not {type(hours).__name__}")
-    for _ in range(int(hours)):
+    remaining = coerce_nonnegative_hours(hours)
+    target_hour = session.simulator.melt.hour + remaining
+    dt_hr = coerce_nonnegative_hours(getattr(getattr(session, "_config", None), "dt_hr", 1.0))
+    if dt_hr <= 0:
+        raise ValueError("dt_hr must be positive")
+    while remaining > 0:
         if stop_at_stage0_exit and _at_stage0_exit(session):
             return
         if session.is_complete():
@@ -900,7 +909,15 @@ def drive_session(
                 return
         elif decision is not None:
             raise ValueError(f"unsupported decision policy {policy!r}")
-        result = session.advance()
+        interval = min(dt_hr, remaining)
+        sim = session.simulator
+        schedule = sim.campaign_mgr._lab_schedule(sim.melt.campaign)
+        if schedule is not None:
+            interval = min(interval, next_schedule_boundary_h(
+                schedule, float(sim.melt.campaign_hour)
+            ) - float(sim.melt.campaign_hour))
+        result = session.advance() if interval == 1.0 else session.advance(dt_hr=interval)
+        remaining = target_hour - sim.melt.hour
         yield result
         if stop_at_stage0_exit and _at_stage0_exit(session):
             return

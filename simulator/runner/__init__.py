@@ -143,7 +143,7 @@ from simulator.lab_schedule import (
 from simulator.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, load_recipe_patch
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import coerce_nonnegative_hours, is_declared_real_scalar
 from simulator.session import (
     SimSession,
     SimSessionConfig,
@@ -419,7 +419,7 @@ def _load_mre_preset_run_spec(
     }
     return MREPresetRunSpec(
         feedstock_id=program.feedstock_id,
-        hours=int(program.duration_h),
+        hours=coerce_nonnegative_hours(program.duration_h),
         mass_kg=program.mass_kg,
         provenance=provenance,
         document=copy.deepcopy(dict(document)),
@@ -563,14 +563,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         f"pair.{requested_leg}.duration_h",
         provenance,
     )
-    hours = int(duration_h)
-    if not math.isclose(duration_h, float(hours), rel_tol=0.0, abs_tol=1e-9):
-        raise PresetRunnerError(
-            "malformed_preset: "
-            f"pair.{requested_leg}.duration_h={duration_h!r} cannot map "
-            "losslessly to runner integer --hours",
-            provenance=provenance,
-        )
+    hours = coerce_nonnegative_hours(duration_h)
 
     digests = preset.get("digests")
     if isinstance(digests, Mapping):
@@ -1000,7 +993,8 @@ class PyrolysisRun:
 
     feedstock_id: str
     campaign: str = "C0"
-    hours: int = 24
+    hours: float = 24
+    dt_hr: float = 1.0
     engines: dict[str, str] = field(default_factory=dict)
     additives_kg: dict[str, float] = field(default_factory=dict)
     mass_kg: float = 1000.0
@@ -1049,11 +1043,15 @@ class PyrolysisRun:
             raise TypeError(
                 f"hours must be int, float, or str, not {type(self.hours).__name__}"
             )
-        hours = int(self.hours)
-        if hours < 0:
+        try:
+            self.hours = coerce_nonnegative_hours(self.hours)
+        except ValueError as exc:
             raise RunnerError(
-                f"invalid hours: hours must be >= 0; got {hours}"
-            )
+                f"invalid hours: hours must be >= 0 and finite; got {self.hours}"
+            ) from exc
+        self.dt_hr = float(coerce_nonnegative_hours(self.dt_hr))
+        if self.dt_hr <= 0:
+            raise RunnerError('dt_hr must be positive')
         overrides = _canonical_runtime_campaign_overrides(
             runtime_campaign_overrides=self.runtime_campaign_overrides,
             setpoints_overrides=self.setpoints_overrides,
@@ -1112,7 +1110,7 @@ class PyrolysisRun:
             ) as exc:
                 execution = RunExecutor().execute_session(
                     session,
-                    hours=int(self.hours),
+                    hours=self.hours,
                     initial_refusal=exc,
                 )
             else:
@@ -1120,7 +1118,7 @@ class PyrolysisRun:
                 self._apply_sio_pre_run_controls(session.simulator)
                 execution = RunExecutor().execute_session(
                     session,
-                    hours=int(self.hours),
+                    hours=self.hours,
                 )
         else:
             config = self._session_config()
@@ -1138,7 +1136,7 @@ class PyrolysisRun:
     def _run_session(self, session: SimSession) -> dict:
         self._apply_lab_area_bridge(session.simulator, self._lab_area_bridge())
         self._apply_sio_pre_run_controls(session.simulator)
-        execution = RunExecutor().execute_session(session, hours=int(self.hours))
+        execution = RunExecutor().execute_session(session, hours=self.hours)
         document = self._build_output(execution)
         self._capture_target_inventory_side_channel(execution)
         execution.session._set_result_document(document)
@@ -1290,7 +1288,8 @@ class PyrolysisRun:
             backend_name=self.backend_name,
             reduced_real_cache=self.reduced_real_cache,
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
-            hours=int(self.hours),
+            hours=self.hours,
+            dt_hr=self.dt_hr,
             mass_kg=mass_kg,
             additives_kg=additives_kg,
             runtime_campaign_overrides=runtime_overrides,
@@ -1412,7 +1411,7 @@ class PyrolysisRun:
             "schema_version": RUNNER_SCHEMA_VERSION,
             "feedstock_id": self.feedstock_id,
             "campaign": self.campaign,
-            "hours_requested": int(self.hours),
+            "hours_requested": self.hours,
             "hours_completed": _execution_hours_completed(execution),
             "mass_kg": float(self.mass_kg),
             "additives_kg": {
@@ -2128,7 +2127,7 @@ def _worst_execution_mass_balance_pct(execution: RunExecution) -> float | None:
             )
 
     if not values:
-        completed_hours = int(
+        completed_hours = float(
             getattr(getattr(execution, "simulator", None), "melt", None).hour
             if getattr(getattr(execution, "simulator", None), "melt", None)
             is not None
@@ -4642,7 +4641,7 @@ def build_sio_yield_report(
     base_run = PyrolysisRun(
         feedstock_id=feedstock_id,
         campaign=campaign,
-        hours=int(hours),
+        hours=hours,
         mass_kg=mass_kg,
         backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         track="pyrolysis",
@@ -5772,7 +5771,7 @@ def _execution_hours_completed(execution: RunExecution | None) -> Any:
     if execution is None:
         return 0
     return _safe_failure_value(
-        lambda: int(execution.simulator.melt.hour),
+        lambda: execution.simulator.melt.hour,
         section="run_metadata.hours_completed",
     )
 

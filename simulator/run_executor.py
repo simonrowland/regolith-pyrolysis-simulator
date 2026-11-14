@@ -144,7 +144,10 @@ def _campaigns_elapsed_from_session_history(
         ),
         default=-1,
     )
-    active_campaign_hours = len(step_results) - last_completed_index - 1
+    active_campaign_hours = sum(
+        result.snapshot.duration_h
+        for result in step_results[last_completed_index + 1:]
+    )
     if active_campaign_hours:
         sim = getattr(session, "simulator", None)
         campaign_mgr = getattr(sim, "campaign_mgr", None)
@@ -252,7 +255,7 @@ class RunExecutor:
         self,
         session: SimSession,
         *,
-        hours: int,
+        hours: float,
         stop_at_stage0_exit: bool | None = None,
         initial_refusal: (
             CampaignPressureSetpointRefusal
@@ -279,6 +282,7 @@ class RunExecutor:
         )
         failure_exc: Exception | None = None
         hours = _coerce_nonnegative_hours(hours)
+        target_hour = sim.melt.hour + hours
         snapshot_start = len(
             tuple(getattr(getattr(sim, "record", None), "snapshots", ()))
         )
@@ -426,7 +430,7 @@ class RunExecutor:
                 elif pending_decision is not None:
                     status = "partial"
                     reason = "pending_decision"
-                elif sim.melt.hour < hours:
+                elif sim.melt.hour < target_hour:
                     status = "partial"
         except (
             KnudsenRegimeRefusal,

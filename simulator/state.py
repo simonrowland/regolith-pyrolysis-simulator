@@ -545,8 +545,8 @@ class MeltState:
 
     # --- Process state ---
     campaign: CampaignPhase = CampaignPhase.IDLE
-    hour: int = 0                   # Hours since batch start
-    campaign_hour: int = 0          # Hours since current campaign started
+    hour: float = 0                 # Elapsed hours since batch start
+    campaign_hour: float = 0        # Elapsed hours since current campaign started
 
     # --- Stirring ---
     stir_state: 'StirState' = field(default_factory=StirState)
@@ -1076,7 +1076,7 @@ class HourSnapshot:
     One of these is recorded every simulation step.
     The full history of snapshots constitutes the batch record.
     """
-    hour: int = 0
+    hour: float = 0
     duration_h: float = 1.0
     campaign: CampaignPhase = CampaignPhase.IDLE
 
