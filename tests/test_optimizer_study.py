@@ -7357,6 +7357,18 @@ def _count_launch(self, launch):
     _record_perf_event("engine_launch")
     return _own_launch(self, launch)
 WarmEngineWorker._own_launch = _count_launch
+
+from simulator.melt_backend.magemin import MAGEMinBackend
+_magemin_initialize = MAGEMinBackend.initialize
+def _count_magemin_initialize(self, *args, **kwargs):
+    _record_perf_event("magemin_initialize")
+    return _magemin_initialize(self, *args, **kwargs)
+MAGEMinBackend.initialize = _count_magemin_initialize
+_magemin_equilibrate = MAGEMinBackend.equilibrate
+def _count_magemin_equilibrate(self, *args, **kwargs):
+    _record_perf_event("magemin_equilibrate")
+    return _magemin_equilibrate(self, *args, **kwargs)
+MAGEMinBackend.equilibrate = _count_magemin_equilibrate
 """,
         encoding="utf-8",
     )
@@ -7401,8 +7413,12 @@ WarmEngineWorker._own_launch = _count_launch
         events[event] = events.get(event, 0) + 1
     # Green's evaluator profile records six legacy_view calls: four from
     # compatibility projections, one simulator initialization, and one
-    # legacy adapter lookup. Pin that work-unit count and its one engine
-    # launch; b-906 added 163 calls in _legacy_vapour_row before this fix.
+    # legacy adapter lookup. It also initializes MAGEMin once and performs
+    # one liquidus scan: find_liquidus_solidus_by_fraction samples 37 grid
+    # points from 400-2200 C, then the two 50 C brackets add 11 midpoint
+    # samples to reach 2 C for this fixture, totaling 48 equilibrates.
+    # Pin those work units and the one engine launch; b-906 added 163 calls
+    # in _legacy_vapour_row and a second forecast-owned liquidus scan.
     evaluator_pids = [
         pid
         for pid, events in events_by_pid.items()
@@ -7410,6 +7426,8 @@ WarmEngineWorker._own_launch = _count_launch
     ]
     assert len(evaluator_pids) == 1, events_by_pid
     assert events_by_pid[evaluator_pids[0]].get("engine_launch", 0) == 1
+    assert events_by_pid[evaluator_pids[0]].get("magemin_initialize", 0) == 1
+    assert events_by_pid[evaluator_pids[0]].get("magemin_equilibrate", 0) == 48
     assert (out_dir / "pareto.json").exists()
     # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
     # 20 C. Seed 7's liner is now about 822 C; the same unit coordinate on

@@ -14685,6 +14685,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         context = type(self).__new__(type(self))
         try:
+            # C0 forecasts sweep temperature on a detached copy of this same
+            # melt composition. Resolve the gate curve through its owner
+            # before copying state so the forecast's redox-capacity reads use
+            # the run's validated curve memo and preserve its notice path.
+            self._melt_redox_liquidus_gate_record()
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
             if self.backend is not None:
