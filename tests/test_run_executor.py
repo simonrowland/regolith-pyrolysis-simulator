@@ -103,11 +103,12 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
 
     assert execution.status == "ok"
     assert len(execution.snapshots) == 2
-    # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
-    # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
-    # the laptop and studio-3, so this digest is not a laptop re-run.
+    # Controller seq 2, Mac-Studio-256-1: type-only change from integer 0
+    # to float 0.0 in the three zero energy sinks of these two hourly rows.
+    # Values are identical; the thermal-budget owner now initializes floats.
+    # Studio-measured payload digest; the ledger digest below is unchanged.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "db9b5ffda079b4886252281c2fabad6413ac60c76a29f175b799188fb8696e3a"
+        "001ec1a0c266c90bd2856fabd31c90feaa1915c98eeee84d728ea2f4f2a47223"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

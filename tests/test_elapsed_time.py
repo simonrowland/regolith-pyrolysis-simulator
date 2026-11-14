@@ -4,6 +4,7 @@ These are numerical integration checks, not experimental accuracy budgets.
 The operator split is first order; Richardson differences must decrease on
 halving dt. Equal segmentation uses the same internal mesh throughout.
 """
+import json
 import math
 
 import pytest
@@ -129,7 +130,7 @@ def test_first_order_campaign_refinement():
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS[:2], ids=lambda s: s["name"])
-def test_explicit_hour_is_byte_identical_to_ordinary_hourly_run(scenario):
+def test_hourly_bytes_preserve_values_with_reviewed_float_zero_sinks(scenario):
     kwargs = {key: scenario[key] for key in (
         "feedstock_id", "campaign", "hours", "additives_kg"
     )}
@@ -143,7 +144,19 @@ def test_explicit_hour_is_byte_identical_to_ordinary_hourly_run(scenario):
     )
     ordinary = PyrolysisRun(**kwargs).run()
     explicit = PyrolysisRun(**kwargs, dt_hr=1.0).run()
-    expected = (FIXTURES_DIR / scenario["fixture"]).read_bytes()
+    historical = json.loads((FIXTURES_DIR / scenario["fixture"]).read_bytes())
+    # Controller review seq 2 permits exactly this type-only serialization
+    # correction at the thermal-budget owner. Every other byte stays pinned.
+    for row in historical["per_hour_summary"]:
+        sinks = row["energy_evaporation_breakdown_kWh"]
+        for key in (
+            "evaporation_enthalpy_sink",
+            "product_vapor_enthalpy_sink",
+            "reaction_disproportionation_enthalpy_sink",
+        ):
+            if sinks[key] == 0:
+                sinks[key] = 0.0
+    expected = json_bytes(historical)
     assert json_bytes(ordinary) == expected
     assert json_bytes(explicit) == expected
 

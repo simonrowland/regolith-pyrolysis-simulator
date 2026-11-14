@@ -380,8 +380,10 @@ def evaporation_enthalpy_budget(
         dissociation_by_species[species] = dissociation_kWh
         sources[f"dissociation:{species}"] = oxide_coeff.source
 
-    latent_kWh = sum(latent_by_species.values())
-    dissociation_kWh = sum(dissociation_by_species.values())
+    # An empty vapor batch still reports energy in floating kWh. Starting
+    # at 0.0 keeps the three zero sinks typed consistently before dt scaling.
+    latent_kWh = sum(latent_by_species.values(), 0.0)
+    dissociation_kWh = sum(dissociation_by_species.values(), 0.0)
     evaporation_thermal_kWh = latent_kWh + dissociation_kWh
     return {
         "schema": "evaporation_enthalpy_budget.v0",
