@@ -334,26 +334,22 @@ def _internal_analytical_identity() -> str:
 
 
 def _compute_runtime_identity(engine_id: str) -> str:
-    try:
-        if engine_id in {"alphamelts", "magemin"}:
-            return _native_binary_identity(engine_id)
-        if engine_id == "openimcc":
-            return _openimcc_dist_identity()
-        if engine_id == "internal-analytical":
-            return _internal_analytical_identity()
-        if engine_id == "thermoengine":
-            return _distribution_identity(("ThermoEngine", "thermoengine"))
-        if engine_id == "vaporock":
-            return _distribution_identity(("VapoRock", "vaporock"))
-    except Exception:
-        return "unavailable"
+    if engine_id in {"alphamelts", "magemin"}:
+        return _native_binary_identity(engine_id)
+    if engine_id == "openimcc":
+        return _openimcc_dist_identity()
+    if engine_id == "internal-analytical":
+        return _internal_analytical_identity()
+    if engine_id == "thermoengine":
+        return _distribution_identity(("ThermoEngine", "thermoengine"))
+    if engine_id == "vaporock":
+        return _distribution_identity(("VapoRock", "vaporock"))
+    raise ValueError(f"unknown engine {engine_id!r}")
 
 
 @lru_cache(maxsize=None)
 def runtime_identity(engine_id: str) -> str:
     """Return the one per-process runtime identity captured at engine open."""
-    if engine_id not in ENGINE_CHEMISTRY_VERSION:
-        raise ValueError(f"unknown engine {engine_id!r}")
     return _compute_runtime_identity(engine_id)
 
 
