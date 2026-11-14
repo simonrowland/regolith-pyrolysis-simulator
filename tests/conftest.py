@@ -1,73 +1,85 @@
 from __future__ import annotations
 
 import inspect
+import os
 from pathlib import Path
 from typing import Any
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 
 from signature_double_guard import (
-    allowlist_key_for_node,
-    has_positional_method_receiver,
+    check_patch_signature,
     read_allowlist,
     resolve_target_string,
-    signature_mismatch,
 )
 
 
 _ALLOWLIST = Path(__file__).parent / "data" / "signature_double_allowlist.txt"
 _ALLOWED_SIGNATURE_MISMATCHES = read_allowlist(_ALLOWLIST)
+_ORIGINAL_SETATTR = MonkeyPatch.setattr
+_SETATTR_SIGNATURE = inspect.signature(_ORIGINAL_SETATTR)
+_CURRENT_NODEID: str | None = None
+_SIGNATURE_LOOKUP_SKIPS = 0
+_COLLECT_SIGNATURES = os.environ.get("SIGNATURE_DOUBLE_GUARD_COLLECT") == "1"
+_COLLECTED_SIGNATURE_MISMATCHES: dict[str, str] = {}
 
 
-@pytest.fixture(autouse=True)
-def monkeypatch_doubles_accept_production_signature(monkeypatch, request):
-    """Reject test doubles that cannot accept calls valid for the patched function."""
-    original_setattr = monkeypatch.setattr
-    setter_signature = inspect.signature(original_setattr)
-    allowed = _ALLOWED_SIGNATURE_MISMATCHES
-    config = request.config
-    config._signature_double_guard_skips = getattr(
-        config, "_signature_double_guard_skips", 0
-    )
-
-    def guarded_setattr(*args: Any, **kwargs: Any) -> Any:
-        bound = setter_signature.bind(*args, **kwargs)
+def _guarded_setattr(self: MonkeyPatch, *args: Any, **kwargs: Any) -> Any:
+    global _SIGNATURE_LOOKUP_SKIPS
+    bound = _SETATTR_SIGNATURE.bind(self, *args, **kwargs)
+    if _CURRENT_NODEID is not None:
         target = bound.arguments["target"]
         name = bound.arguments.get("name")
         replacement = bound.arguments.get("value")
         try:
             if isinstance(target, str) and "value" not in bound.arguments:
                 replacement = name
-                target, name, production = resolve_target_string(target)
-                positional_receiver = has_positional_method_receiver(target, name)
-            else:
-                production = getattr(target, name)
-                positional_receiver = has_positional_method_receiver(target, name)
-        except (AttributeError, ImportError, LookupError, ModuleNotFoundError):
-            return original_setattr(*args, **kwargs)
-
-        mismatch, skipped = signature_mismatch(
-            production,
-            replacement,
-            positional_receiver=positional_receiver,
-        )
-        if skipped:
-            config._signature_double_guard_skips += 1
-        elif mismatch:
-            key = allowlist_key_for_node(request.node.nodeid, production)
-            if key not in allowed:
-                raise AssertionError(
-                    f"test double for {key} is incompatible with the production signature: "
-                    f"{mismatch}"
+                target, name = resolve_target_string(target)
+            elif not isinstance(name, str):
+                target = None
+            if target is not None:
+                skipped = check_patch_signature(
+                    target,
+                    name,
+                    replacement,
+                    _CURRENT_NODEID,
+                    _ALLOWED_SIGNATURE_MISMATCHES,
+                    _COLLECTED_SIGNATURE_MISMATCHES
+                    if _COLLECT_SIGNATURES
+                    else None,
                 )
-        return original_setattr(*args, **kwargs)
+                if skipped:
+                    _SIGNATURE_LOOKUP_SKIPS += 1
+        except (AttributeError, ImportError, LookupError, ModuleNotFoundError):
+            pass
+    return _ORIGINAL_SETATTR(self, *args, **kwargs)
 
-    monkeypatch.setattr = guarded_setattr
-    yield
+
+# Patching the class covers the injected fixture, context() objects, and fresh
+# MonkeyPatch instances with the same production-signature rule.
+MonkeyPatch.setattr = _guarded_setattr
+
+
+@pytest.fixture(autouse=True)
+def signature_guard_test_context(request):
+    global _CURRENT_NODEID
+    previous = _CURRENT_NODEID
+    _CURRENT_NODEID = request.node.nodeid
+    try:
+        yield
+    finally:
+        _CURRENT_NODEID = previous
 
 
 def pytest_sessionfinish(session, exitstatus):
-    skipped = getattr(session.config, "_signature_double_guard_skips", 0)
-    session.config.pluginmanager.get_plugin("terminalreporter").write_line(
-        f"signature double guard: {skipped} unavailable signature lookup(s) skipped"
-    )
+    reporter = session.config.pluginmanager.get_plugin("terminalreporter")
+    if reporter is not None:
+        reporter.write_line(
+            "signature double guard: "
+            f"{_SIGNATURE_LOOKUP_SKIPS} unavailable signature lookup(s) skipped"
+        )
+        if _COLLECT_SIGNATURES:
+            reporter.write_line("signature double guard collected allowlist entries:")
+            for key, reason in sorted(_COLLECTED_SIGNATURE_MISMATCHES.items()):
+                reporter.write_line(f"{key} # {reason}")
