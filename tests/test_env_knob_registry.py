@@ -50,7 +50,6 @@ KNOWN_INTERNAL_ENV = {
     "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR": "Internal worker output handoff path.",
     "REGOLITH_PARSED_YAML_CACHE_DIR": "Selects the implementation cache directory for parsed YAML.",
     "REGOLITH_PARSED_YAML_CACHE": "Toggles the process-shared parsed-YAML disk cache in simulator.yaml_cache; enabled by default.",
-    "REGOLITH_PARSED_YAML_CACHE_MAX_BYTES": "Sets the parsed-YAML cache cap in integer bytes (default 1610612736, 1.5 GiB); accepts a non-negative integer or literal 'off' (no size-based eviction). Zero removes prior entries at a sweep while retaining the just-written entry. Invalid values raise ValueError naming this variable. The separate REGOLITH_PARSED_YAML_CACHE=off switch still disables the cache.",
     "REGOLITH_REPO_ROOT": "Overrides the repository path for an internal cache validation script.",
     "REGOLITH_STUDIO_HOST": "Labels the Studio host in an internal battery scoring report.",
     "REGOLITH_THERMOENGINE_LOG_DIR": "Routes native engine diagnostics to a log directory.",
