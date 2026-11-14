@@ -25706,6 +25706,9 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
+        extract_notices = tuple(
+            _notice_from_plain(notice) for notice in (obs.get("notices") or ())
+        )
         context = source_context or {}
         closure_components_by_observation = context.get(
             "same_row_composition_closure_components"
@@ -28329,7 +28332,11 @@ class Migrator:
                     source_derivation=source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
-                    notices=(*point_notices, *ambient_pressure_notices),
+                    notices=(
+                        *extract_notices,
+                        *point_notices,
+                        *ambient_pressure_notices,
+                    ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
                     parent_values=values,
@@ -28457,6 +28464,7 @@ class Migrator:
                         phase_provenance=phase_provenance,
                         identity_provenance=identity_provenance,
                         notices=(
+                            *extract_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28595,6 +28603,7 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
+                        *extract_notices,
                         *(
                             ()
                             if total_iron_notice is None
@@ -28794,6 +28803,7 @@ class Migrator:
                         source_derivation=source_derivation,
                         phase_provenance=sample_source_provenance,
                         notices=(
+                            *extract_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28855,7 +28865,7 @@ class Migrator:
             elif obs.get("uncertainty"):
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
-        observation_notices: list[Notice] = []
+        observation_notices: list[Notice] = list(extract_notices)
         if ambient_pressure_notice is not None:
             observation_notices.append(ambient_pressure_notice)
         if obs.get("standard_pressure") == "not_printed":

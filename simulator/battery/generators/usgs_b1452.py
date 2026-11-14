@@ -1452,7 +1452,17 @@ def _observation(
     }
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
         known["reaction"], known["formation_elements"] = _basis_states(species, basis)
-    identity = fill_identity(quantity, species, **known)
+    identity_quantity: Quantity | State[Quantity] = quantity
+    if (
+        basis == "from_the_oxides"
+        and species.formula == "3Al2O3.2SiO2"
+        and quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
+    ):
+        identity_quantity = State.unknown(
+            "No quantity token represents formation from simple oxides; "
+            f"{quantity.value} denotes formation from the elements."
+        )
+    identity = fill_identity(identity_quantity, species, **known)
     published_page, pdf_page = _pages(record)
     unit = _page_units(token.table_kind, token.column)
     source_path = f"{SOURCE_PATH_PREFIX}/{record_id}.json"
