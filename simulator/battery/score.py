@@ -4666,7 +4666,9 @@ def fusion_comparison_reference(
     Crystal activities move onto the liquid endmember by the JANAF fusion
     energy. Iron-saturated Fe(1-x)O(l) activities, including Distin's
     tabulated oxygen ratio, move onto stoichiometric FeO(l) by the Darken
-    & Gurry factor f divided by the owned Temkin Fe2+ fraction N0.
+    & Gurry factor f alone (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)
+    from the measured Fe/oxide equilibrium and JANAF). N0 parameterises the
+    iron-saturation composition and its d-333 band; it is not a second divisor.
     """
 
     iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
