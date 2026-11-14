@@ -47,8 +47,15 @@ def _sim(setpoints=None):
 def _assert_stage3_single_stream_oxygen_basis(model, result, committed_o2_mol):
     from simulator.physical_constants import PA_PER_BAR
 
-    assert "O2" in model.wall_species_partial_pressures_pa
-    stream_po2_bar = model.wall_species_partial_pressures_pa["O2"] / PA_PER_BAR
+    partial_pressures = model.wall_species_partial_pressures_pa
+    if committed_o2_mol == 0.0:
+        # d-402: zero-flow O2 is N/A; a complete stream may omit it or carry
+        # an explicit zero, but neither supplies oxygen to the reactive route.
+        assert partial_pressures.get("O2", 0.0) == 0.0
+        stream_po2_bar = 0.0
+    else:
+        assert "O2" in partial_pressures
+        stream_po2_bar = partial_pressures["O2"] / PA_PER_BAR
     for reaction in result.stage3_reactive_alkali_by_species.values():
         available_o2_mol = reaction["available_oxygen_mol"]
         assert 0.0 <= available_o2_mol <= committed_o2_mol + 1e-15
@@ -59,7 +66,8 @@ def _assert_stage3_single_stream_oxygen_basis(model, result, committed_o2_mol):
             assert reaction["pO2_bar"] == 0.0
         else:
             assert reaction["pO2_bar"] == pytest.approx(stream_po2_bar)
-        assert reaction["pO2_source"] == "stream_dalton_o2_partial"
+        if committed_o2_mol > 0.0:
+            assert reaction["pO2_source"] == "stream_dalton_o2_partial"
 
 
 @pytest.mark.parametrize("missing", [
