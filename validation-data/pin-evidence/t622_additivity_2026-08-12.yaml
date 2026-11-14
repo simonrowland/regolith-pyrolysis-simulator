@@ -9,9 +9,9 @@ method:
   compiler_common_mode: false
   source_activity: 1.0
   temperature_positions:
-  - low
-  - mid
-  - high
+  - all evaluator segment edges
+  - each evaluator segment midpoint
+  - valid-range low/mid/high when no segments
   pO2_grid_bar:
   - 1.0e-30
   - 1.0e-09
@@ -36,15 +36,15 @@ species_delta:
 preexisting_equivalence:
   compiled_species_compared: 229
   evaluator_species_compared: 215
-  evaluation_cases_compared: 2580
-  baseline_exceptions: 0
-  candidate_exceptions: 0
+  evaluation_cases_compared: 7484
+  baseline_exceptions: 240
+  candidate_exceptions: 240
   compiled_dataclasses_exact: true
   evaluation_results_and_exceptions_exact: true
-  baseline_compiled_dataclasses_sha256: 1dafea4c57a1a2577df7b675d686a59372622eed78aeb97debcd9027b1316e9d
-  candidate_compiled_dataclasses_sha256: 1dafea4c57a1a2577df7b675d686a59372622eed78aeb97debcd9027b1316e9d
-  baseline_evaluation_grid_sha256: 9ae7d758573fc043667b74e766ae4516fa82e113753fb2602ceb06652617debf
-  candidate_evaluation_grid_sha256: 9ae7d758573fc043667b74e766ae4516fa82e113753fb2602ceb06652617debf
+  baseline_compiled_dataclasses_sha256: 466500f0cd07b3a3b1a0cd0c13f965f455013d7290592087f56d66d717c70932
+  candidate_compiled_dataclasses_sha256: 466500f0cd07b3a3b1a0cd0c13f965f455013d7290592087f56d66d717c70932
+  baseline_evaluation_grid_sha256: d472a233ea4ec97ba766245a591d3168e47297ed379aa5bcfaf92fa2baa3e306
+  candidate_evaluation_grid_sha256: d472a233ea4ec97ba766245a591d3168e47297ed379aa5bcfaf92fa2baa3e306
 t583_coverage:
   status_only_distinct_species: 151
   status_only_ledger_pair_compositions: 250
@@ -54,8 +54,8 @@ t583_coverage:
   total_t583_compositions_covered: 251
 added_species_digests:
   CoO_gas:
-    compiled_dataclass_sha256: e67d61d5bfb69ffaa29bbc9ad1b75cb35df8dea8413eac236c30babc9456aea7
-    evaluation_grid_sha256: 57a55657298c6e827c29ba4a84fb898be5c57c058fcf55696baa851b384d2b56
+    compiled_dataclass_sha256: ccb0d5b6a797d1c16a36ce2ddb0661fa9745d69548d7d9a3ea55ae1ff90144c7
+    evaluation_grid_sha256: 64bca3600d49ceaa27025d15da94430b62d0a3b74763ac5aae5e2d26a5ec1e26
   MnO_gas:
-    compiled_dataclass_sha256: 111c524c851c396ede774d005f43e92a66a44336535c04e5feb81e1a97e34a2f
-    evaluation_grid_sha256: 8e2a3a9dd2774277dac63d77aa200d5cc24ad73cbfba27ed5e93beced0492e89
+    compiled_dataclass_sha256: 1b981cd2a8752e9a9a55989348e1542aaafa1ab11f07238b2b0720dbc454e1aa
+    evaluation_grid_sha256: 1a2b2bba15e87739b2b233c7eb6cd6bf24602f63e7f38b08472172a9eb2f0dfb
