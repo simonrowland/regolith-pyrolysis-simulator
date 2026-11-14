@@ -1077,9 +1077,9 @@ def test_route_judges_na_on_pressure_after_upstream_fe_capture(sodium_saturation
 
 # Invariant: the partial on a hot-wall judgement is the partial of the
 # mixture that arrives at that segment. Inlet pressure is not reused after
-# capture. Na at 500 C uses the Browning-Potter production owner; Fe
-# uses _saturation_oracle, the same production resolver as the diagnostic.
-# The independent Dalton projection preserves the arriving-mixture invariant.
+# capture. _saturation_oracle pins every species/wall pair with the production
+# resolver; Na at 500 C also checks the sodium-owner fixture. The independent
+# Dalton projection preserves the arriving-mixture invariant.
 _NO_WALL_SATURATION_SPECIES = frozenset({"CrO2"})
 _ARRIVING_CAPTURES = ("none", "partner_90", "self_gone")
 _ENRICHED_PARTIAL_PA = 1000.0 * 0.1 / 0.28
@@ -1185,18 +1185,12 @@ def test_every_hot_wall_judgement_uses_the_arriving_partial(
         assert "wall_after" in by_segment
         judged_names = ("wall_inlet", "wall_after")
 
-    if species == "Fe":
-        # d-384: same owner the diagnostic calls. A hand Antoine number
-        # would keep the pure-Fe line d-383 replaces.
-        pinned_psat, pinned_known, _extrapolated = _saturation_oracle(
-            species, wall_C
-        )
-    elif species == "Na" and wall_C == 500.0:
-        pinned_psat = sodium_saturation_500_c.pressure_pa
-        pinned_known = True
-    else:
-        pinned_psat = None
-        pinned_known = False
+    pinned_psat, pinned_known, _extrapolated = _saturation_oracle(
+        species, wall_C
+    )
+    if species == "Na" and wall_C == 500.0:
+        assert pinned_known
+        assert pinned_psat == pytest.approx(sodium_saturation_500_c.pressure_pa)
     for name in judged_names:
         judgement = by_segment[name]
         where = f"{species} {wall_C} {capture} {name}"
