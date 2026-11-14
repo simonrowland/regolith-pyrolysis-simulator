@@ -36,6 +36,10 @@ from simulator.state import (
     MOLAR_MASS,
     MeltState,
 )
+from tests.condensation_test_support import (
+    assert_pfree_wall_prediction,
+    assert_synthetic_sio_route_authority,
+)
 
 
 pytestmark = pytest.mark.usefixtures("production_configured_condensation_route")
@@ -47,25 +51,6 @@ GOLDENS = (
     ("lunar_mare_low_ti", "lunar_mare_low_ti_c2a.json"),
     ("mars_basalt", "mars_basalt_c2a.json"),
 )
-
-
-def _assert_synthetic_sio_route_authority(route) -> None:
-    authority = route.condensation_authority_by_species["SiO"]
-    stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
-        "stage_outcomes", []
-    )
-    # t-1217: carrier authority cannot certify extrapolated stage-surface saturation.
-    assert authority["status"] == "status_bearing"
-    assert authority["carrier_authority"]["pressure"] == {
-        "kind": "value",
-        "pa": 100.0,
-        "valid_range_K": [1323.0, 1324.0],
-    }
-    # The empty-fit extrapolation is not the wall law. A covered species
-    # either evaluates Psat or refuses wall_pO2_required.
-    assert "antoine_psat_unavailable_at_T" not in {
-        outcome["reason"] for outcome in stage_outcomes
-    }
 
 
 def test_sio_alpha_provenance_receipt_and_fixtures_refuse_evaporation_label():
@@ -702,7 +687,7 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
             assert event["reason"]
 
 
-def test_c2a_wall_saturation_refusal_events_are_deterministic():
+def test_c2a_wall_saturation_prediction_flags_are_deterministic():
     events_by_run = []
     for _ in range(2):
         report, _ = build_sio_yield_report(
@@ -711,13 +696,20 @@ def test_c2a_wall_saturation_refusal_events_are_deterministic():
             include_diagnostics=True,
             allow_unmeasured_alpha_fallback=True,
         )
-        refusals = report["fouling_rate"]["sticking_alpha_authority"].get(
+        wall_authority = report["fouling_rate"]["sticking_alpha_authority"]
+        # d-402 routes the pO2-free wall bound as a flagged prediction; d-019
+        # keeps out-of-range thermochemistry visible instead of refusing it.
+        refusals = wall_authority.get(
             "wall_saturation_pressure_refusals_by_species", {}
+        )
+        assert not refusals
+        extrapolations = wall_authority.get(
+            "wall_saturation_pressure_extrapolations_by_species", {}
         )
         events_by_run.append(
             tuple(
-                (species, segment, record)
-                for species, by_segment in refusals.items()
+                (species, segment, json.dumps(record, sort_keys=True))
+                for species, by_segment in extrapolations.items()
                 for segment, record in by_segment.items()
             )
         )
@@ -765,7 +757,7 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
         MeltState(),
     )
 
-    _assert_synthetic_sio_route_authority(route)
+    assert_synthetic_sio_route_authority(route)
     assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
     assert 0.0 < route.condensed_by_stage_species[
         "stage_4_alkali_mg_cyclone"]["SiO"] < 0.95
@@ -950,21 +942,16 @@ def test_wall_deposit_does_not_use_the_reactive_psat_zero_backstop():
         melt,
     )
 
-    authority = route.condensation_authority_by_species["SiO"]
-    assert authority["authoritative_for_condensation"] is False
-    outcomes = route.condensation_refusals_by_species["SiO"].get(
-        "stage_outcomes", []
-    )
-    assert any(
-        "wall_pO2_required" in str(outcome.get("reason", ""))
-        for outcome in outcomes
-    )
-    # Default stage 3 is divert and the SiO partial map has no O2 key.
-    # The retired backstop deposited the whole local pressure. The law
-    # refuses, so the parcel stays in the vapour.
-    assert route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
-    assert route.condensed_for_species("SiO") == pytest.approx(0.0)
-    assert route.remaining_by_species["SiO"] == pytest.approx(1.0)
+    # d-402 uses a status-bearing pO2-free bound instead of treating missing
+    # wall oxygen as zero or refusing all SiO capture.
+    assert_pfree_wall_prediction(route, "SiO")
+    wall_sio = route.wall_deposit_by_species.get("SiO", 0.0)
+    assert wall_sio > 0.0
+    assert (
+        route.condensed_for_species("SiO")
+        + wall_sio
+        + route.remaining_by_species["SiO"]
+    ) == pytest.approx(1.0)
 
 
 def test_cold_liner_routes_sio_to_wall_deposit_bucket():
@@ -980,7 +967,9 @@ def test_cold_liner_routes_sio_to_wall_deposit_bucket():
         melt,
     )
 
-    assert route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
+    # d-402 permits this predicted capture while keeping its authority flagged.
+    assert_pfree_wall_prediction(route, "SiO")
+    assert route.wall_deposit_by_species.get("SiO", 0.0) > 0.0
     destinations = (
         route.condensed_for_species("SiO")
         + route.wall_deposit_by_species.get("SiO", 0.0)
@@ -1012,10 +1001,11 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate(stage3_route):
         melt,
     )
 
-    # The pipe partial map in this test has SiO and no O2. The law refuses
-    # wall_pO2_required. The retired backstop captured the whole parcel.
+    # d-402's bound keeps capture status-bearing; the direct carrier map
+    # isolates the cold-wall sticking notice without making product mass
+    # authoritative.
     wall_sio = route.wall_deposit_by_species.get("SiO", 0.0)
-    assert wall_sio == 0.0
+    assert wall_sio > 0.0
     assert (
         route.condensed_for_species("SiO")
         + wall_sio
@@ -1135,8 +1125,8 @@ def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit(
     hot_route = hot.route(flux, melt)
     cold_route = cold.route(flux, melt)
 
-    _assert_synthetic_sio_route_authority(hot_route)
-    _assert_synthetic_sio_route_authority(cold_route)
+    assert_synthetic_sio_route_authority(hot_route)
+    assert_synthetic_sio_route_authority(cold_route)
     # Cold spots are deliberate wall-deposit accounting signals, not refusals.
     assert not hot_route.cold_spot_warnings
     assert cold_route.cold_spot_warnings
@@ -1147,10 +1137,12 @@ def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit(
         f["species"] == "SiO"
         for f in cold.last_cold_spot_diagnostic["findings"]
     )
-    # No O2 key in the segment map, so neither temperature deposits SiO.
-    # The cold-spot flag above is the temperature finding. It is not a deposit.
-    assert cold_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
-    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
+    # d-402 evaluates the cold spot with the wall law; upstream depletion means
+    # its aggregate deposit can be lower than the all-hot pipe's total.
+    assert_pfree_wall_prediction(cold_route, "SiO")
+    assert cold_route.wall_deposit_by_species.get("SiO", 0.0) != pytest.approx(
+        hot_route.wall_deposit_by_species.get("SiO", 0.0), rel=1e-6
+    )
 
 
 def test_cached_condensation_model_uses_updated_liner_temperature(
@@ -1172,28 +1164,16 @@ def test_cached_condensation_model_uses_updated_liner_temperature(
     )
     hot_route = model.route(flux, melt)
 
-    _assert_synthetic_sio_route_authority(cold_route)
-    _assert_synthetic_sio_route_authority(hot_route)
-    # Neither visit has an O2 partial, so the wall law deposits nothing.
-    # The refreshed liner is the temperature the law refuses at:
-    # 1650 + 273.15 = 1923.15 K.
-    assert cold_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
-    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
-    hot_wall_keys = [
-        key for key in hot_route.antoine_extrapolations if key.startswith("SiO#wall:")
-    ]
-    cold_wall_keys = [
-        key for key in cold_route.antoine_extrapolations if key.startswith("SiO#wall:")
-    ]
-    assert hot_wall_keys
-    assert set(hot_wall_keys) != set(cold_wall_keys)
-    refreshed = [
-        hot_route.antoine_extrapolations[key]
-        for key in hot_wall_keys
-        if key.endswith("1923.15")
-    ]
-    assert refreshed
-    assert "reason=wall_pO2_required" in refreshed[0]["reason"]
+    assert_synthetic_sio_route_authority(cold_route)
+    assert_synthetic_sio_route_authority(hot_route)
+    # Both visits use the flagged pO2-free bound, and changing the liner
+    # temperature changes saturation and therefore deposited SiO.
+    assert_pfree_wall_prediction(cold_route, "SiO")
+    assert_pfree_wall_prediction(hot_route, "SiO")
+    cold_wall_sio = cold_route.wall_deposit_by_species.get("SiO", 0.0)
+    hot_wall_sio = hot_route.wall_deposit_by_species.get("SiO", 0.0)
+    assert cold_wall_sio > 0.0
+    assert cold_wall_sio > hot_wall_sio
 
 
 def test_knudsen_regime_factor_rises_toward_ballistic():
