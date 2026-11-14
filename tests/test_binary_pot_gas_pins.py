@@ -365,3 +365,38 @@ def test_binary_pot_gas_pin_inputs_cover_both_paths_without_low_t_interval_flags
         for pin in _GOLDEN.values()
         for _, reason in pin["flags"]
     )
+
+
+def test_openimcc_cell_balance_adapter_uses_current_channel_metadata() -> None:
+    pytest.importorskip("openimcc")
+    from openimcc import load_gas_datapack
+    from openimcc.gas import gas_channel_metadata
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _openimcc_gas_channels_and_omission_notices,
+        _openimcc_oxygen_balance_species_metadata,
+    )
+
+    parents = ("Al2O3", "SiO2")
+    activities = {parent: 1.0 for parent in parents}
+    gas_pack = load_gas_datapack()
+    channels, _notices = _openimcc_gas_channels_and_omission_notices(
+        parents, gas_pack
+    )
+    metadata = gas_channel_metadata(
+        activities, 2000.0, gas_pack, parent_oxides=parents
+    )
+    adapted = _openimcc_oxygen_balance_species_metadata(
+        activities, 2000.0, gas_pack, channels, parent_oxides=parents
+    )
+
+    for species in ("AlSiO", "Si2O2"):
+        assert species in adapted
+        assert adapted[species].oxygen_atoms == metadata[species].oxygen_atoms
+        assert adapted[species].parent_oxygen_demand == (
+            metadata[species].parent_oxygen_demand
+        )
+        assert adapted[species].pO2_exponent == metadata[species].neutral_pO2_exponent
+    assert adapted["AlSiO"].parent_oxygen_demand == pytest.approx(3.5)
+    assert adapted["AlSiO"].pO2_exponent == pytest.approx(-1.25)
+    assert adapted["Si2O2"].parent_oxygen_demand == pytest.approx(4.0)
+    assert adapted["Si2O2"].pO2_exponent == pytest.approx(-1.0)
