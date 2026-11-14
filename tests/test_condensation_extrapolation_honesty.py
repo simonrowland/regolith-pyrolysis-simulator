@@ -392,18 +392,16 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
             assert record["authority_level"] == "extrapolated"
             assert tuple(record["valid_range_K"]) == (864.0, 2499.0)
             assert "24%" in str(record.get("notice") or "")
-        assert "Al2" in refused
-        # Al2 has no reactive-product backstop, so reactivity metadata is not
-        # applicable.  Its real reversible wall route instead refuses because
-        # the available reaction-term source is not a wall saturation curve.
+        assert "Al2" not in refused
+        # d-019 predicts Al2 wall saturation by continuing the nearest cited
+        # thermochemistry record and carries the out-of-range authority flag.
+        al2_wall = wall["wall_saturation_pressure_extrapolations_by_species"]["Al2"]
         assert any(
-            "no extrapolation available" in record["reason"]
-            and record.get("refusal_type") == "WallSaturationPressureRefusal"
-            for record in refused["Al2"].values()
-        ), [
-            (record["reason"], record.get("refusal_type"))
-            for record in refused["Al2"].values()
-        ]
+            record["authority_level"] == "extrapolated"
+            and record["reason"] == "wall_condensation_thermo_extrapolated"
+            and record["valid_range_K"]
+            for record in al2_wall.values()
+        ), al2_wall
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
