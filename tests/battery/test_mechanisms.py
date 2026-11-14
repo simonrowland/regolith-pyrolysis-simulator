@@ -1443,6 +1443,30 @@ def test_model_derived_prose_method_without_named_references_fails() -> None:
     ]
 
 
+def test_model_derived_unavailable_without_lineage_is_counted_notice() -> None:
+    observation = _model_derived_without_raw_parent()
+    observation = replace(
+        observation,
+        value=Value(
+            kind=ValueKind.UNAVAILABLE,
+            unavailable_reason="not printed",
+        ),
+        derived_from=None,
+        derivation=None,
+    )
+    report = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    )
+
+    assert report.hard_issues == ()
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in report.notices
+    ] == [
+        ("model_derived_provenance_unrecorded_unavailable", "janaf-4th", 1)
+    ]
+
+
 def test_model_derived_unprinted_inputs_requires_named_references() -> None:
     observation = _model_derived_without_raw_parent(
         declaration=Located(
