@@ -2695,7 +2695,9 @@ def test_increment_and_frame_repairs_migrate_unavailable():
         migrator = Migrator(root=ROOT, index={}, aliases={})
         migrator._migrate_extract(path)
         migrator.finalize()
-        for observation_id in expected:
+        for observation_id, (_, _, reference, _) in expected.items():
+            source_row = rows[observation_id]
+            values = source_row["values"]
             migrated = [
                 row
                 for key, row in migrator.result.observations.items()
@@ -2703,8 +2705,6 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 or key.startswith(f"{source_id}::{observation_id}::")
             ]
             if not migrated:
-                source_row = rows[observation_id]
-                values = source_row["values"]
                 assert (
                     source_row.get("type") in {"figure_record", "figure"}
                     or "deferred" in str(values.get("digitisation", ""))
@@ -2713,6 +2713,11 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 continue
             assert all(not row.identity.quantity.is_value for row in migrated)
             assert all(row.value.kind.value == "unavailable" for row in migrated)
+            if observation_id == "bey80_k2si2o5_reference_glass_S_table6":
+                assert source_row["type"] == "heat_capacity_and_heat_content_series"
+                assert values["reference_state_as_printed"] == (
+                    "entropy increment from 298.15 K"
+                )
             if reference == "formation from simple oxides":
                 declared_reason = values["schema_gap"]
                 assert all(
