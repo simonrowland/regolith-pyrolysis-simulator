@@ -6,6 +6,7 @@ import functools
 import importlib
 import inspect
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +19,8 @@ def _python_callable(value: Any) -> bool:
     return inspect.isfunction(value) or inspect.ismethod(value)
 
 
-def _signature(value: Any, *, replacement: bool = False) -> inspect.Signature:
+@lru_cache(maxsize=4096)
+def _cached_signature(value: Any, replacement: bool) -> inspect.Signature:
     if isinstance(value, staticmethod):
         value = value.__func__
     elif isinstance(value, classmethod):
@@ -26,6 +28,14 @@ def _signature(value: Any, *, replacement: bool = False) -> inspect.Signature:
     if replacement:
         return inspect.signature(value, follow_wrapped=False)
     return inspect.signature(value)
+
+
+def _signature(value: Any, *, replacement: bool = False) -> inspect.Signature:
+    try:
+        hash(value)
+    except TypeError:
+        return _cached_signature.__wrapped__(value, replacement)
+    return _cached_signature(value, replacement)
 
 
 def _is_signature_callable(value: Any) -> bool:
@@ -69,6 +79,14 @@ def signature_mismatch(
     ), False
 
 
+@lru_cache(maxsize=4096)
+def _cached_signature_mismatch(
+    production: inspect.Signature,
+    replacement: inspect.Signature,
+) -> str | None:
+    return _compare_signatures(production, replacement)
+
+
 def signature_mismatch_for_signatures(
     production: inspect.Signature,
     replacement: inspect.Signature,
@@ -79,6 +97,18 @@ def signature_mismatch_for_signatures(
     and each optional name. Variadic parameters add unbounded names, so their
     presence and collisions with replacement parameters are checked too.
     """
+    try:
+        hash(production)
+        hash(replacement)
+    except TypeError:
+        return _compare_signatures(production, replacement)
+    return _cached_signature_mismatch(production, replacement)
+
+
+def _compare_signatures(
+    production: inspect.Signature,
+    replacement: inspect.Signature,
+) -> str | None:
     production_parameters = tuple(production.parameters.values())
     replacement_parameters = tuple(replacement.parameters.values())
     production_varargs = any(
@@ -287,6 +317,7 @@ def check_patch_signature(
     nodeid: str,
     allowed: dict[str, str],
     collected: dict[str, str] | None = None,
+    fail_unlisted: bool = True,
 ) -> bool:
     production, mismatch, skipped = patch_signature_mismatch(
         target, name, replacement
@@ -296,8 +327,7 @@ def check_patch_signature(
     key = allowlist_key_for_node(nodeid, production, replacement)
     if collected is not None:
         collected[key] = mismatch
-        return False
-    if key not in allowed:
+    if fail_unlisted and key not in allowed:
         raise AssertionError(
             f"test double for {key} is incompatible with the production signature: "
             f"{mismatch}"

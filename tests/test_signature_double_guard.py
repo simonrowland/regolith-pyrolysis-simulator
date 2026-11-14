@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import inspect
 import subprocess
 from functools import wraps
 from pathlib import Path
@@ -9,10 +10,14 @@ from types import SimpleNamespace
 import pytest
 
 from signature_double_guard import (
+    _cached_signature_mismatch,
+    _cached_signature,
+    _signature,
     allowlist_key_for_node,
     check_patch_signature,
     read_allowlist,
     signature_mismatch,
+    signature_mismatch_for_signatures,
 )
 
 
@@ -68,6 +73,34 @@ def test_guard_ignores_builtins():
 
     assert not skipped
     assert mismatch is None
+
+
+def test_signature_objects_are_cached_by_callable_and_role():
+    def production(value):
+        return value
+
+    before = _cached_signature.cache_info()
+    first = _signature(production)
+    second = _signature(production)
+    after = _cached_signature.cache_info()
+
+    assert first is second
+    assert after.misses == before.misses + 1
+    assert after.hits == before.hits + 1
+
+
+def test_signature_comparison_is_cached_by_signature_pair():
+    production = inspect.signature(_all_keyword_calls)
+    replacement = inspect.signature(lambda left: left)
+    before = _cached_signature_mismatch.cache_info()
+
+    first = signature_mismatch_for_signatures(production, replacement)
+    second = signature_mismatch_for_signatures(production, replacement)
+    after = _cached_signature_mismatch.cache_info()
+
+    assert first == second
+    assert after.misses == before.misses + 1
+    assert after.hits == before.hits + 1
 
 
 def test_instance_patch_uses_the_bound_production_signature(monkeypatch):
@@ -165,7 +198,7 @@ def test_waiver_covers_only_its_exact_replacement_signature():
     collected = {}
 
     assert not check_patch_signature(
-        target, "run", approved, nodeid, {}, collected
+        target, "run", approved, nodeid, {}, collected, fail_unlisted=False
     )
     assert approved_key in collected
     assert not check_patch_signature(

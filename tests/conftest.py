@@ -24,6 +24,13 @@ _SIGNATURE_LOOKUP_SKIPS = 0
 _COLLECT_SIGNATURES = os.environ.get("SIGNATURE_DOUBLE_GUARD_COLLECT") == "1"
 _COLLECT_FILE = os.environ.get("SIGNATURE_DOUBLE_GUARD_COLLECT_FILE")
 _COLLECTED_SIGNATURE_MISMATCHES: dict[str, str] = {}
+_FAIL_UNLISTED_VALUE = os.environ.get("SIGNATURE_DOUBLE_GUARD_FAIL_UNLISTED")
+if _FAIL_UNLISTED_VALUE is None:
+    _FAIL_UNLISTED = not _COLLECT_SIGNATURES
+elif _FAIL_UNLISTED_VALUE in {"0", "1"}:
+    _FAIL_UNLISTED = _FAIL_UNLISTED_VALUE == "1"
+else:
+    raise RuntimeError("SIGNATURE_DOUBLE_GUARD_FAIL_UNLISTED must be 0 or 1")
 
 if _COLLECT_SIGNATURES and not _COLLECT_FILE:
     raise RuntimeError(
@@ -54,6 +61,7 @@ def _guarded_setattr(self: MonkeyPatch, *args: Any, **kwargs: Any) -> Any:
                     _COLLECTED_SIGNATURE_MISMATCHES
                     if _COLLECT_SIGNATURES
                     else None,
+                    _FAIL_UNLISTED,
                 )
                 if skipped:
                     _SIGNATURE_LOOKUP_SKIPS += 1
