@@ -20,6 +20,7 @@ from simulator.liner_corrosion import (
     contaminated_interface_composition,
     contamination_mixing_fractions,
     corrosion_campaign_recurrence,
+    first_liquid_tier_a,
     load_liner_corrosion_invariants,
     magemin_request_cache_key,
     post_onset_dissolution_ratio,
@@ -231,13 +232,24 @@ def test_mixing_closed_form_and_reacted_depth_sensitivity():
         area_m2=1.0,
         reacted_layer_depth_m=1.0,
     )
-    assert fractions["Na"] == pytest.approx(na_oxide_kg / total_kg)
     mixed = contaminated_interface_composition(
         {"SiO2": 60.0, "Al2O3": 40.0},
         {"Na": 5.0},
         density_kg_m3=2.0,
         area_m2=1.0,
         reacted_layer_depth_m=1.0,
+    )
+    assert fractions["Na"] == pytest.approx(na_oxide_kg / total_kg)
+    assert mixed["mixing_fraction_by_species"]["Na"] == pytest.approx(
+        na_oxide_kg / total_kg
+    )
+    assert mixed["composition_wt_pct"]["Na2O"] / 100.0 == pytest.approx(
+        mixed["mixing_fraction_by_species"]["Na"]
+    )
+    # Independent closed form: 5 kg Na -> M(Na2O)/(2 M(Na)) kg Na2O;
+    # f = M/(rho*A*h + sum M), with rho*A*h = 2 kg.
+    assert mixed["mixing_fraction_by_species"]["Na"] == pytest.approx(
+        na_oxide_kg / (2.0 + na_oxide_kg)
     )
     assert mixed["composition_wt_pct"]["Na2O"] == pytest.approx(
         100.0 * na_oxide_kg / total_kg
@@ -300,10 +312,39 @@ def test_onset_is_monotone_in_deposit_and_reacted_depth_and_bounds_ordered():
 
 def test_recurrence_reduces_to_linear_when_sticking_branches_match():
     result = _recurrence(inert_na=0.5, reactive_na=0.5)
-    assert result["campaigns_to_runaway"][0] == result["campaigns_to_runaway"][1]
-    assert result["coupled_campaigns_to_runaway"] == result[
-        "campaigns_to_runaway"
-    ][0]
+    # The phi fixture turns on above 5 wt% Na2O. For rho*A*h=1 kg, that
+    # threshold needs 1*(0.05/0.95)/(M(Na2O)/(2*M(Na))) kg Na, below one
+    # campaign's 0.5 kg D. Thus N=1 and N*D=0.5 kg by direct arithmetic.
+    assert result["campaigns_to_runaway"] == [1, 1]
+    assert result["coupled_campaigns_to_runaway"] == 1
+    assert result["branch_end_deposit_kg_by_species"] == {
+        "reactive_upper_bound": {"Na": 0.5},
+        "inert": {"Na": 0.5},
+        "coupled": {"Na": 0.5},
+    }
+
+
+def test_reactive_branch_refusal_keeps_the_inert_campaign_bound():
+    result = corrosion_campaign_recurrence(
+        {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+        {},
+        {"Na": 0.2},
+        None,
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+        temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+        margin_C=0.0,
+        horizon=100,
+        sampler=_phi_from_na2o,
+    )
+
+    assert result["campaigns_to_runaway"] == [None, 1]
+    assert result["reactive_branch_refusal"]["reason"] == (
+        "reactive_deposit_branch_missing"
+    )
+    assert result["branch_end_deposit_kg_by_species"]["inert"] == {"Na": 0.2}
 
 
 def test_tier_a_uses_invariant_table_and_refuses_uncovered_fields():
@@ -335,6 +376,45 @@ def test_tier_a_uses_invariant_table_and_refuses_uncovered_fields():
             margin_C=0.0,
         )
     assert refused.value.reason == "liner_invariant_table_missing"
+
+
+def test_tier_a_loader_rows_are_consumed_without_interpolating_source_points():
+    table = load_interface_invariant_table(
+        "source-backed",
+        catalog={
+            "source-backed": {
+                "interface_chemistry": {
+                    "composition": {"CaO": 59.0, "Al2O3": 41.0},
+                    "citation": "Morey 1964, Table 6",
+                    "invariant_table": {
+                        "loader": "liner_corrosion_source_extracts",
+                        "subsystems": ["CaO-Al2O3"],
+                    },
+                }
+            }
+        },
+    )
+    assert first_liquid_tier_a(
+        table,
+        {"CaO": 59.0, "Al2O3": 41.0},
+    ) == 1535.0
+
+
+def test_tier_a_fe_aluminate_gap_is_a_typed_refusal_that_names_the_gap():
+    with pytest.raises(LinerCorrosionRefusal) as refused:
+        tier_a_first_liquid_onset(
+            {
+                "invariants": [],
+                "acquisition_gaps": {
+                    "FeO-CaO-Al2O3": "no source-located values are digitized"
+                },
+            },
+            {"FeO": 20.0, "CaO": 40.0, "Al2O3": 40.0},
+            service_temperature_C=1500.0,
+            margin_C=0.0,
+        )
+    assert refused.value.reason == "liner_tier_a_acquisition_gap"
+    assert "FeO-CaO-Al2O3" in refused.value.detail
 
 
 def test_tier_a_invariant_signal_runs_the_campaign_recurrence_without_engine_pressure():
