@@ -8,7 +8,7 @@ import yaml
 
 from scripts import derive_rump_liner_composition as generator
 from simulator.diagnostics import achieved_melt_bakeout
-from simulator.runner import _completed_runner_status
+from simulator.run_executor import completed_runner_status
 
 
 def test_achieved_bakeout_uses_committed_melt_history():
@@ -57,19 +57,19 @@ def test_terminal_rump_keeps_bare_species_separate_from_oxide_normalization():
 
 
 def test_completed_campaign_sequence_status_is_exact_and_does_not_require_full_hours():
-    assert _completed_runner_status("ok", "", sequence_complete=True) is True
-    assert _completed_runner_status(
+    assert completed_runner_status("ok", "", sequence_complete=True) is True
+    assert completed_runner_status(
         "partial", "", sequence_complete=True
     ) is True
-    assert _completed_runner_status("ok", "", sequence_complete=False) is False
-    assert _completed_runner_status(
+    assert completed_runner_status("ok", "", sequence_complete=False) is False
+    assert completed_runner_status(
         "partial", "", sequence_complete=False
     ) is False
-    assert _completed_runner_status(
+    assert completed_runner_status(
         "ok", "stage0_exit", sequence_complete=True
     ) is False
-    assert _completed_runner_status("partial", "stage0_exit", sequence_complete=True) is False
-    assert _completed_runner_status(
+    assert completed_runner_status("partial", "stage0_exit", sequence_complete=True) is False
+    assert completed_runner_status(
         "ok", "stage0_exit_extra", sequence_complete=True
     ) is False
 
