@@ -435,11 +435,11 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     assert status["counts"]["sources"] == 2338
     assert status["counts"]["by_stage"] == {
         "located": 206,
-        "inbox": 1251,
+        "inbox": 1250,
         "in_progress": 192,
         "ingested_partial": 183,
         "ingested_complete": 149,
-        "unknown": 357,
+        "unknown": 358,
     }
 
 
@@ -596,6 +596,36 @@ def test_source_status_compilation_not_inbox_with_control(tmp_path, monkeypatch)
     inbox_ids = [row["source_id"] for row in status["sources"] if row["stage"] == "inbox"]
     assert control in inbox_ids
     assert compilation not in inbox_ids
+
+
+def test_source_status_covered_by_alias_exclusion_and_missing_target_refusal(tmp_path, monkeypatch):
+    root, corpus = _status_tree(tmp_path, monkeypatch)
+    source_id = "fixture-appendix"
+    target_id = "fixture-main-paper"
+    raw = corpus / "raw" / source_id
+    raw.mkdir(parents=True)
+    (raw / f"{source_id}.pdf").write_bytes(b"%PDF-1.4 fixture\n")
+    _write_yaml(root / "data/literature/extracts" / f"{target_id}.yaml", _extract_v1(target_id))
+    declaration = {
+        source_id: {
+            "covered_by": target_id,
+            "note": "The appendix adds no distinct numeric rows (189/189 rows match Tables AI-AXX).",
+        }
+    }
+    _write_yaml(root / "data/literature/source_aliases.yaml", declaration)
+
+    rows, status = _status_rows(root)
+    assert rows[source_id]["stage"] == "unknown"
+    assert rows[source_id]["inbox_exclusion_reason"] == (
+        "covered_by: source is covered by fixture-main-paper; "
+        "The appendix adds no distinct numeric rows (189/189 rows match Tables AI-AXX)."
+    )
+    assert source_id not in [row["source_id"] for row in status["sources"] if row["stage"] == "inbox"]
+
+    declaration[source_id]["covered_by"] = "missing-target"
+    _write_yaml(root / "data/literature/source_aliases.yaml", declaration)
+    with pytest.raises(ValueError, match="not a known source with an extract"):
+        builder.build_source_status(root)
 
 
 def test_source_status_partial_vs_complete_boundary(tmp_path, monkeypatch):
