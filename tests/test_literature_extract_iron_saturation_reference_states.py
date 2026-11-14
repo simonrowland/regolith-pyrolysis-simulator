@@ -2,6 +2,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.battery.enums import Authority, Quantity
 from simulator.battery.records import Located, StandardState
@@ -9,6 +10,7 @@ from simulator.battery.score import iron_saturation_composition, temperature_of
 from tests.battery.test_migrate import _migrate_real_extract
 
 
+ROOT = Path(__file__).resolve().parents[1]
 SOURCE_COUNTS = {
     "distin-1971-ferrous-silicate-melts": 24,
     "roeder-1974-iron-activity-olivine-basaltic-liquids": 90,
@@ -27,7 +29,7 @@ def _isolated_migration(tmp_path: Path, source_id: str):
     return _migrate_real_extract(
         tmp_path / source_id,
         f"{source_id}.yaml",
-        write=False,
+        write=True,
         use_repository_index_row=True,
     )
 
@@ -39,6 +41,45 @@ def test_reference_sources_migrate_in_isolation_with_conditions(
     result = _isolated_migration(tmp_path, source_id)
     assert len(result.observations) == expected_count
     assert not result.validation.hard_issues
+    baseline_path = ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml"
+    isolated_path = (
+        tmp_path
+        / source_id
+        / "tree/data/literature/extracts-v2"
+        / f"{source_id}.yaml"
+    )
+    baseline_doc = yaml.safe_load(baseline_path.read_text(encoding="utf-8"))
+    isolated_doc = yaml.safe_load(isolated_path.read_text(encoding="utf-8"))
+    baseline_rows = {
+        row["observation_id"]: row for row in baseline_doc["observations"]
+    }
+    isolated_rows = {
+        row["observation_id"]: row for row in isolated_doc["observations"]
+    }
+    assert set(isolated_rows) == set(baseline_rows)
+    changed_reference_states = set()
+    # Mutation: removing a reference-state payload removes this row-by-row v2 diff.
+    for observation_id, before in baseline_rows.items():
+        after = isolated_rows[observation_id]
+        changed_fields = {
+            key
+            for key in before.keys() | after.keys()
+            if before.get(key) != after.get(key)
+        }
+        if (
+            before["identity"]["reference_state"]
+            != after["identity"]["reference_state"]
+        ):
+            changed_reference_states.add(observation_id)
+            assert changed_fields == {"identity"}
+        else:
+            assert changed_fields == set()
+    quoted_stoich_count = (
+        1
+        if source_id == "doyle-1988-feo-activity-multicomponent-magma"
+        else 0
+    )
+    assert len(changed_reference_states) == expected_count - quoted_stoich_count
     temperature_key = TEMPERATURE_CONDITION[source_id]
     typed = 0
     # Mutation: remove a source's typed state or located temperature coordinate and this fails.
