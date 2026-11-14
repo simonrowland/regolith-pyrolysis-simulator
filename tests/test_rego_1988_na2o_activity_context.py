@@ -1,15 +1,17 @@
 import csv
 from copy import deepcopy
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
 import yaml
 
+from simulator.battery.enums import Quantity
+from tests.battery.factories import migrate_one_extract
 
-EXTRACT = (
-    Path(__file__).resolve().parents[1]
-    / "data/literature/extracts/rego-1988-silicate-na2o-activities.yaml"
-)
+
+ROOT = Path(__file__).resolve().parents[1]
+EXTRACT = ROOT / "data/literature/extracts/rego-1988-silicate-na2o-activities.yaml"
 AUDIT = EXTRACT.with_name("rego-1988-silicate-na2o-activities-figure-audit.csv")
 FIGURE_CROPS = {
     "3": EXTRACT.with_name("rego-1988-silicate-na2o-activities-fig3-600dpi.png"),
@@ -428,3 +430,96 @@ def test_rego_1988_figure_csv_or_yaml_mutation_fails() -> None:
     with pytest.raises(AssertionError):
         pin = FIGURE_PINS[mutated_rows[0]["point_id"]]
         assert (mutated_rows[0]["read1_x_px"], mutated_rows[0]["read1_y_px"]) == pin["read1"]
+
+
+TABLE_I_ACTIVITY_PINS = {
+    "rego_1988_table_i_cao_sio2_x060": ("-0.057", "0.877"),
+    "rego_1988_table_i_na2o_sio2_x060": ("-0.982", "0.104"),
+    "rego_1988_table_i_cao_sio2_x065": ("0.023", "1.05"),
+    "rego_1988_table_i_na2o_sio2_x065": ("-0.644", "0.227"),
+    "rego_1988_table_i_cao_sio2_x070": ("0.050", "1.12"),
+    "rego_1988_table_i_na2o_sio2_x070": ("-0.401", "0.397"),
+    "rego_1988_table_i_cao_sio2_x075": ("0.072", "1.18"),
+    "rego_1988_table_i_na2o_sio2_x075": ("-0.233", "0.585"),
+}
+
+
+def _assert_rego_table_i_sibling_links(observations: list[dict]) -> dict[str, dict]:
+    by_id = {row["observation_id"]: row for row in observations}
+    for base_id in TABLE_I_ACTIVITY_PINS:
+        activity_id = f"{base_id}_activity"
+        input_id = f"{base_id}_printed_log_input"
+        assert activity_id in by_id
+        assert input_id in by_id
+        assert by_id[activity_id]["derived_from"] == [input_id]
+    return by_id
+
+
+def test_rego_table_i_log_activity_siblings_resolve_and_round_to_printed_precision() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    observations = extract["species"]["SiO2"]["observations"]
+    by_id = _assert_rego_table_i_sibling_links(observations)
+    assert len(observations) == 16
+
+    for base_id, (printed, linear) in TABLE_I_ACTIVITY_PINS.items():
+        activity_id = f"{base_id}_activity"
+        input_id = f"{base_id}_printed_log_input"
+        activity = by_id[activity_id]
+        printed_log = by_id[input_id]
+        assert printed_log["values"]["value_as_printed"] == printed
+        assert printed_log["values"]["quantity"] == "activity"
+        assert printed_log["values"]["admission_status"] == "typed_refusal"
+        assert activity["values"]["value_as_printed"] == printed
+        assert activity["values"]["activity"] == linear
+        assert activity["locator"]["page"] == printed_log["locator"]["page"] == 5
+        assert activity["locator"]["published_page"] == printed_log["locator"]["published_page"] == 659
+        assert activity["locator"]["table"] == printed_log["locator"]["table"] == "I"
+        assert activity["point_conditions"]["T_C"]["state"]["value"] == "1400"
+        assert activity["point_conditions"]["composition"]["state"]["tag"] == "value"
+        with localcontext() as context:
+            context.prec = 28
+            exact_activity = Decimal(10) ** Decimal(printed)
+            stored_activity = Decimal(linear)
+            half_unit_at_three_significant_figures = Decimal("0.5") * (
+                Decimal(10) ** (stored_activity.adjusted() - 2)
+            )
+            assert abs(stored_activity - exact_activity) <= half_unit_at_three_significant_figures
+
+    # Mutation proof: the contract rejects an orphaned linear value if its
+    # derived_from link is deleted.
+    mutated = deepcopy(observations)
+    mutated[0].pop("derived_from")
+    with pytest.raises(AssertionError):
+        _assert_rego_table_i_sibling_links(mutated)
+
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
+    migrator.finalize()
+    migrated = {
+        observation_id.rsplit("::", 1)[-1]: observation
+        for observation_id, observation in migrator.result.observations.items()
+        if observation.source_id == "rego-1988-silicate-na2o-activities"
+        and observation_id.rsplit("::", 1)[-1].startswith("rego_1988_table_i_")
+    }
+    assert len(migrated) == 16
+    for base_id, (printed, linear) in TABLE_I_ACTIVITY_PINS.items():
+        activity_id = f"{base_id}_activity"
+        input_id = f"{base_id}_printed_log_input"
+        activity = migrated[activity_id]
+        printed_log = migrated[input_id]
+        parent_id = activity.derived_from[0]
+        assert parent_id in migrator.result.observations
+        assert parent_id.rsplit("::", 1)[-1] == input_id
+        assert Decimal(str(activity.value.point)) == Decimal(linear)
+        assert activity.identity.quantity.is_value
+        assert activity.identity.quantity.value is Quantity.ACTIVITY
+        assert printed_log.value.kind.value == "unavailable"
+        assert printed_log.identity.quantity.is_value
+        assert printed_log.identity.quantity.value is Quantity.ACTIVITY
+        assert printed_log.admission.status.value == "rejected"
+        for observation in (activity, printed_log):
+            assert observation.identity.temperature_K.is_value
+            assert observation.identity.composition.is_value
+            assert observation.point_conditions["T_C"].state.is_value
+            assert observation.point_conditions["T_C"].locator.page == 5
+            assert observation.point_conditions["composition"].state.is_value
+            assert observation.point_conditions["composition"].locator.table == "I"
