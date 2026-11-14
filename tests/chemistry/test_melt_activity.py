@@ -32,22 +32,75 @@ _TABLE2_RANGE = {
 }
 
 
-def test_limitation_does_not_claim_cited_point_or_universal_domain_status() -> None:
+def test_limitation_does_not_claim_cited_point_or_universal_gamma_model() -> None:
     text = MELT_OXIDE_ACTIVITY_LIMITATION
     assert "cited table coefficient" not in text
     assert "geometric midpoint" in text
-    assert "valid_range_K is unset" in text
     assert "status-bearing" in text
+    assert "does not scale or replace" in text
 
 
-def test_table2_range_rows_remain_geometric_midpoints_without_domains() -> None:
+def test_table2_range_rows_remain_geometric_midpoints_with_source_domains() -> None:
+    temperature_ranges = {
+        "CaO": (1873.0, 1873.0),
+        "Al2O3": (1573.0, 1773.0),
+        "SiO2": (1573.0, 1773.0),
+        "TiO2": (1573.0, 1773.0),
+        "Cr2O3": (1773.0, 1773.0),
+        "MgO": (1873.0, 1873.0),
+        "MnO": (1873.0, 1873.0),
+    }
     for parent, (low, high) in _TABLE2_RANGE.items():
         coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent]
         geometric = math.sqrt(low * high)
         assert coeff.gamma == pytest.approx(geometric, rel=0.03)
-        assert coeff.valid_range_K is None
+        assert coeff.valid_range_K == temperature_ranges[parent]
         assert "geometric midpoint" in coeff.citation
         assert "DOI" in coeff.citation
+
+
+@pytest.mark.parametrize(
+    ("parent", "temperature_range"),
+    [
+        ("CaO", (1873.0, 1873.0)),
+        ("Al2O3", (1573.0, 1773.0)),
+        ("SiO2", (1573.0, 1773.0)),
+        ("TiO2", (1573.0, 1773.0)),
+        ("Cr2O3", (1773.0, 1773.0)),
+        ("MgO", (1873.0, 1873.0)),
+        ("MnO", (1873.0, 1873.0)),
+    ],
+)
+def test_melt_midpoint_gamma_domain_flags_outside_only(parent, temperature_range):
+    low, high = temperature_range
+    for temperature in {low - 1.0, low, high, high + 1.0}:
+        payload = melt_oxide_gamma_domain_authority(parent, temperature)
+        assert payload is not None
+        assert payload["gamma_domain_K"] == temperature_range
+        assert payload["authority_status"] == (
+            "out_of_gamma_domain"
+            if temperature < low or temperature > high
+            else "in_domain"
+        )
+
+    # The domain notice describes the table coefficient's support. It does
+    # not change the activity evaluated by the existing constant-gamma rule.
+    in_domain = melt_oxide_activity(
+        parent,
+        {},
+        cation_mol_fraction={parent: 0.2},
+        temperature_K=low,
+    )
+    out_of_domain = melt_oxide_activity(
+        parent,
+        {},
+        cation_mol_fraction={parent: 0.2},
+        temperature_K=low - 1.0,
+    )
+    assert in_domain is not None and out_of_domain is not None
+    assert in_domain.activity == out_of_domain.activity
+    assert out_of_domain.warning is not None
+    assert f"valid_range_K=[{low:g}, {high:g}]" in out_of_domain.warning
 
 
 def test_na_and_k_remain_cited_point_anchors_with_domains() -> None:
@@ -86,7 +139,9 @@ def test_gamma_domain_authority_in_domain_anchor_still_labels_na() -> None:
     assert payload is not None
     assert payload["authority_status"] == "in_domain"
     assert payload["gamma"] == pytest.approx(1.0e-3)
-    assert melt_oxide_gamma_domain_authority("CaO", 1873.0) is None
+    ca = melt_oxide_gamma_domain_authority("CaO", 1873.0)
+    assert ca is not None
+    assert ca["authority_status"] == "in_domain"
 
 
 @pytest.mark.parametrize("x_value", [-0.1, float("nan"), float("inf"), 1.5])

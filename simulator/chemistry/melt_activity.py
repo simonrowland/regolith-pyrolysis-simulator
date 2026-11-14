@@ -39,8 +39,8 @@ MELT_OXIDE_ACTIVITY_LIMITATION = (
     "MC-5); as X approaches 1 the shell enforces Raoultian a->1 continuously so "
     "the former gamma*X to a=1 step (31.1x for Cr) is absent; when "
     "valid_range_K is set, a temperature outside that interval remains "
-    "flux-driving and status-bearing; when valid_range_K is unset, this module "
-    "attaches no in_domain/out_of_gamma_domain payload"
+    "flux-driving and status-bearing; the gamma-domain authority is a notice "
+    "only and does not scale or replace the table coefficient"
 )
 MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
     "single_cation_Raoultian_pure_liquid_reference"
@@ -100,9 +100,8 @@ class MeltOxideActivityCoefficient:
 #   units: gamma dimensionless; sqrt of a product of gammas is dimensionless.
 #   sanity: CaO sqrt(0.001*0.15)=0.012247 -> 0.012; AlO1.5 sqrt(0.28*0.37)
 #           =0.321870 -> 0.322; CrO1.5 sqrt(23*42)=31.080541 -> 31.1.
-# Table 2 temperature support is recorded in each citation; it is not
-# copied into valid_range_K for those seven rows (that would start attaching
-# domain-authority payloads on currently unlabeled temperatures).
+# Table 2's temperature column is the support recorded for each midpoint row;
+# the domain-authority payload carries it without changing the table value.
 MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
     "Na2O": MeltOxideActivityCoefficient(
         "Na2O",
@@ -137,6 +136,8 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "runtime 0.012 is the rounded geometric midpoint of the printed CaO "
         "range ~0.001-0.15 at 1873 K (CMAS basicity 0.55-0.65; Beckett 2002), "
         "not a single Table 2 coefficient",
+        valid_range_K=(1873.0, 1873.0),
+        anchor_T_K=1873.0,
     ),
     "Al2O3": MeltOxideActivityCoefficient(
         "Al2O3",
@@ -147,6 +148,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "runtime 0.322 is the rounded geometric midpoint of the printed "
         "AlO1.5 range 0.28-0.37 at 1573-1773 K (CMAS An-Di; Ghiorso & Sack "
         "1995), not a single Table 2 coefficient",
+        valid_range_K=(1573.0, 1773.0),
     ),
     "SiO2": MeltOxideActivityCoefficient(
         "SiO2",
@@ -157,6 +159,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "runtime 1.0 is the rounded geometric midpoint of the printed SiO2 "
         "range 0.9-1.1 at 1573-1773 K (CMAS An-Di; Ghiorso & Sack 1995), not "
         "a single Table 2 coefficient",
+        valid_range_K=(1573.0, 1773.0),
     ),
     "TiO2": MeltOxideActivityCoefficient(
         "TiO2",
@@ -167,6 +170,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "runtime 1.60 is the rounded geometric midpoint of the printed TiO2 "
         "range 1.5-1.7 at 1573-1773 K (CMAS; Ghiorso & Sack 1995), not a "
         "single Table 2 coefficient",
+        valid_range_K=(1573.0, 1773.0),
     ),
     "Cr2O3": MeltOxideActivityCoefficient(
         "Cr2O3",
@@ -177,6 +181,8 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "runtime 31.1 is the rounded geometric midpoint of the printed "
         "CrO1.5 range 23-42 at 1773 K (CAS; Pretorius & Muan 1992), not a "
         "single Table 2 coefficient",
+        valid_range_K=(1773.0, 1773.0),
+        anchor_T_K=1773.0,
     ),
     "MgO": MeltOxideActivityCoefficient(
         "MgO",
@@ -187,6 +193,8 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "runtime 1.0 is the geometric midpoint of the printed MgO range "
         "~0.25-4 at 1873 K (CMAS basicity 0.55-0.65; Beckett 2002), not a "
         "single Table 2 coefficient",
+        valid_range_K=(1873.0, 1873.0),
+        anchor_T_K=1873.0,
     ),
     "MnO": MeltOxideActivityCoefficient(
         "MnO",
@@ -197,6 +205,8 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "runtime 1.90 is the rounded geometric midpoint of the printed CAS "
         "MnO range 0.5-7.2 at 1873 K (Ohta & Suito 1995), not the FCMS(P) "
         "row 0.7-3.5 at 1823-1923 K and not a single Table 2 coefficient",
+        valid_range_K=(1873.0, 1873.0),
+        anchor_T_K=1873.0,
     ),
 }
 
