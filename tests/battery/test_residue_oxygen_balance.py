@@ -507,11 +507,10 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
             unity.pO2_bar, rel=1.0e-9
         )
 
-    # openimcc 4fe8eaf refit the CaO(l) continuation used by this Hashimoto
-    # probe; at 30c51c8 the alpha=1 and 0.25 results were 0.8286161505495706 Pa
-    # and 0.3003449996328013 Pa. At 9c327c2 the alpha=0.25 result is
-    # 0.3351602002897091 Pa after adding Si2O2(g).
-    # The two engines still use their own melt channel pressures for both arms.
+    # At 9c327c2 the OpenIMCC alpha=1 and 0.25 results are 0.9211160035391689
+    # Pa and 0.3351602002897091 Pa after adding Si2O2(g). The internal
+    # analytical pressure model uses the package's O(g) coproduct factor, so
+    # its corresponding values move with that packaged gas table as well.
     assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.35134320e147dp-17"
     assert (
         solved["openimcc"][1.0].pO2_bar * PA_PER_BAR
@@ -520,10 +519,10 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
         0.3351602002897091, rel=2.0e-5
     )
     assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
-        1.025329, rel=2.0e-5
+        0.9588653772116605, rel=2.0e-5
     )
     assert solved["internal-analytical"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.374487, rel=2.0e-5
+        0.3493939413217713, rel=2.0e-5
     )
 
     # Replacing either engine's root by the other's does not close that engine's
