@@ -25,6 +25,7 @@ from simulator.condensation import (
 from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.physical_constants import PA_PER_BAR
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.volatile_properties import _catalog as _volatile_runtime_catalog
 from simulator.vapour_rail.catalog import (
@@ -33,7 +34,7 @@ from simulator.vapour_rail.catalog import (
     compile_vapour_rail_catalog,
     validate_species_catalog,
 )
-from simulator.vapour_rail.channels import CHANNEL_O2
+from simulator.vapour_rail.channels import CHANNEL_O2, is_dioxygen_formula
 from tests.git_history import require_git_history
 
 
@@ -66,6 +67,29 @@ PINNED_CATALOG_FIXTURE_SHA256 = {
         "fefcd5fa2f3f1ba60c3255504dc33c7e710dbb1f0a60fedff433ef14c7826f5d"
     ),
 }
+_NOT_OWNER_PA_PER_BAR = 1.0e5
+
+
+@pytest.mark.parametrize(
+    ("formula", "expected"),
+    [
+        pytest.param("O2", True, id="bare-dioxygen"),
+        pytest.param("O2(g)", True, id="gas-phase"),
+        pytest.param("O2(g,ideal)", True, id="standard-state"),
+        pytest.param("O2(foo)(bar)", True, id="multiple-suffixes"),
+        pytest.param(" O2 (g)", True, id="trim-base-whitespace"),
+        pytest.param("O3", False, id="trioxygen"),
+        pytest.param("O", False, id="atomic-oxygen"),
+        pytest.param("O2-", False, id="charged-oxygen"),
+        pytest.param("O2 junk", False, id="junk-after-base"),
+    ],
+)
+def test_dioxygen_formula_uses_base_before_first_suffix(
+    formula: str, expected: bool
+) -> None:
+    assert is_dioxygen_formula(formula) is expected
+
+
 COLLISION_GASES = {
     "Al2O3_gas",
     "CaO_gas",
@@ -129,6 +153,190 @@ def _load_t609_proof():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _load_temp_module(tmp_path: Path, name: str, source: str):
+    path = tmp_path / f"{name}.py"
+    path.write_text(source, encoding="utf-8")
+    spec = importlib.util.spec_from_file_location(name, path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_additivity_proof_canonicalizes_owned_numeric_constants_from_module(
+    tmp_path: Path,
+) -> None:
+    proof = _load_t609_proof()
+    module = _load_temp_module(
+        tmp_path,
+        "proof_owned_constant_positive",
+        "from simulator.physical_constants import PA_PER_BAR\n"
+        "_NOT_OWNER_PA_PER_BAR = 1.0e5\n"
+        "def owner(value):\n"
+        "    return value * PA_PER_BAR\n"
+        "def literal(value):\n"
+        "    return value * 1.0e5\n"
+        "def changed(value):\n"
+        "    return value * 1.0e4\n"
+        "def unrelated(value):\n"
+        "    return value * _NOT_OWNER_PA_PER_BAR\n",
+    )
+    for function in (module.literal, module.changed, module.unrelated):
+        function.__qualname__ = module.owner.__qualname__
+
+    canonical = proof._canonical(module.owner)
+    assert canonical == proof._canonical(module.literal)
+    assert canonical != proof._canonical(module.changed)
+    assert canonical != proof._canonical(module.unrelated)
+
+
+@pytest.mark.parametrize(
+    ("case", "source"),
+    [
+        pytest.param(
+            "sibling_mutator",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    global PA_PER_BAR\n"
+            "    PA_PER_BAR = 7.0\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="sibling-mutator",
+        ),
+        pytest.param(
+            "globals_delete",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    del globals()['PA_PER_BAR']\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="globals-delete",
+        ),
+        pytest.param(
+            "globals_assignment",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    globals()['PA_PER_BAR'] = 7.0\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="globals-assignment",
+        ),
+        pytest.param(
+            "exec_mutation",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    exec('global PA_PER_BAR; PA_PER_BAR = 7.0')\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="exec-mutation",
+        ),
+        pytest.param(
+            "eval_mutation",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    eval(\"globals().__setitem__('PA_PER_BAR', 7.0)\")\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="eval-mutation",
+        ),
+        pytest.param(
+            "dynamic_helper",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "dynamic = {'__name__': 'dynamic_constant_helper', 'PA_PER_BAR': PA_PER_BAR}\n"
+            "exec('def owner(value):\\n return value * PA_PER_BAR\\n'\n"
+            "     'def literal(value):\\n return value * 1.0e5', dynamic)\n",
+            id="dynamic-helper",
+        ),
+        pytest.param(
+            "inlined_comprehension",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def owner(items):\n"
+            "    return [(globals().__setitem__('PA_PER_BAR', 7.0), value * PA_PER_BAR)[1] for value in items]\n"
+            "def literal(items):\n"
+            "    return [(globals().__setitem__('PA_PER_BAR', 7.0), value * 1.0e5)[1] for value in items]\n",
+            id="inlined-comprehension",
+        ),
+    ],
+)
+def test_additivity_proof_keeps_unstable_module_constant_loads_exact(
+    tmp_path: Path, case: str, source: str
+) -> None:
+    proof = _load_t609_proof()
+    module = _load_temp_module(tmp_path, f"proof_unstable_{case}", source)
+    owner = module.owner if case != "dynamic_helper" else module.dynamic["owner"]
+    literal = module.literal if case != "dynamic_helper" else module.dynamic["literal"]
+    literal.__qualname__ = owner.__qualname__
+
+    assert proof._canonical(owner) != proof._canonical(literal)
+
+
+def test_additivity_proof_does_not_normalize_class_local_load_name() -> None:
+    proof = _load_t609_proof()
+    shadowed_namespace = {
+        "__name__": __name__,
+        "PA_PER_BAR": PA_PER_BAR,
+        "_CLASS_SHADOW_VALUE": 7.0,
+    }
+    literal_namespace = dict(shadowed_namespace)
+    exec(
+        "def evaluate():\n"
+        "    class C:\n"
+        "        PA_PER_BAR = _CLASS_SHADOW_VALUE\n"
+        "        result = PA_PER_BAR\n"
+        "    return C.result\n",
+        shadowed_namespace,
+    )
+    exec(
+        "def evaluate():\n"
+        "    class C:\n"
+        "        PA_PER_BAR = _CLASS_SHADOW_VALUE\n"
+        "        result = 1.0e5\n"
+        "    return C.result\n",
+        literal_namespace,
+    )
+    assert proof._canonical(shadowed_namespace["evaluate"]) != proof._canonical(
+        literal_namespace["evaluate"]
+    )
+
+
+def test_additivity_proof_does_not_normalize_rebound_global() -> None:
+    proof = _load_t609_proof()
+
+    def rebound_global(value: float) -> float:
+        global PA_PER_BAR
+        PA_PER_BAR = 7.0
+        return value * PA_PER_BAR
+
+    def rebound_literal(value: float) -> float:
+        global PA_PER_BAR
+        PA_PER_BAR = 7.0
+        return value * 1.0e5
+
+    rebound_literal.__qualname__ = rebound_global.__qualname__
+    assert proof._canonical(rebound_global) != proof._canonical(rebound_literal)
 
 
 def _family_species_ids(text: str) -> set[str]:
