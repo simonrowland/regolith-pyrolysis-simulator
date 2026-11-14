@@ -28,9 +28,22 @@ from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterable,
+    Iterator,
+    Literal,
+    Mapping,
+    Protocol,
+    Sequence,
+)
 
 import yaml
+
+if TYPE_CHECKING:
+    from simulator.diagnostic_helpers.binary_pot_battery import Po2Request
 
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.enums import (
@@ -1116,9 +1129,9 @@ def parse_species_formula(
 
     The baseline ``formula_composition`` result is returned unchanged. Its
     source-derived extension accepts element symbols with numeric counts,
-    nested ``()[]{}`` groups, hydrate segments (including fractional or
-    decimal water multipliers) separated by a middle dot, TeX math wrappers /
-    ``\\text{}``, and TeX or Unicode subscripts. Newly normalized terminal
+    nested ``()[]{}`` groups, hydrate and compound-adduct segments (including
+    decimal subscripts), TeX math wrappers / ``\\text{}``, and TeX or Unicode
+    subscripts. Newly normalized terminal
     phase or polymorph labels require a matching existing species axis, as in
     ``$AsCl_3(g)$`` and ``$Fe(α)$``. A terminal bracket phase label that the
     accounting parser would strip, as in ``Fe2O3[s]``, uses that same axis
@@ -1139,13 +1152,9 @@ def parse_species_formula(
         return None
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
+    text = text.replace("•", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
     text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
-    # formula_composition reads the ASCII-dot water-adduct separator as a
-    # decimal count. Refuse that normalized form first; raw fast-path results
-    # and explicit middle-dot hydrates stay unchanged.
-    if "·" not in text and re.search(r"\.\d+H2O", text):
-        return None
     phase_labels = {
         "c": Phase.CR,
         "cr": Phase.CR,
@@ -1246,7 +1255,36 @@ def parse_species_formula(
     if parsed is not None:
         return parsed
     if "." in text:
-        return None
+        # ASCII periods are used for both decimal subscripts and oxide adducts.
+        # Only treat them as adduct separators when every segment has oxygen;
+        # otherwise an OCR period between arbitrary formula-like fragments
+        # (for example, ``CaAl.SiCK``) would become a false stoichiometry.
+        adduct_segments = re.split(r"\.(?=\d*[A-Z])", text)
+        if len(adduct_segments) > 1 and all("O" in part for part in adduct_segments):
+            try:
+                from simulator.accounting.formulas import (
+                    parse_formula as accounting_parse_formula,
+                )
+
+                parsed_formula = accounting_parse_formula(text)
+            except ValueError:
+                return None
+            return tuple(
+                sorted(
+                    (str(symbol), float(count))
+                    for symbol, count in parsed_formula.elements.items()
+                )
+            )
+        # Published decimal subscripts may omit the leading zero.
+        normalized = re.sub(
+            r"(?<=[A-Za-z])\.(?=\d+(?:$|O(?:$|\d|[A-Z(])))", "0.", text
+        )
+        if normalized == text:
+            return None
+        text = normalized
+        parsed = formula_composition(text)
+        if parsed is not None:
+            return parsed
     try:
         from simulator.accounting.formulas import parse_formula
 
