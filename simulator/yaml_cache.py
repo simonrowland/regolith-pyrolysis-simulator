@@ -264,12 +264,16 @@ def load_cached_safe_yaml(
 
 
 def _cache_enabled() -> bool:
-    value = os.environ.get(_CACHE_ENABLED_ENV, "").strip().casefold()
+    value = _cache_setting(_CACHE_ENABLED_ENV, "").strip().casefold()
     return value not in {"0", "false", "no", "off"}
 
 
+def _cache_setting(name: str, default: str | None = None) -> str | None:
+    return os.environ.get(name, default)
+
+
 def _cache_max_bytes() -> int | None:
-    value = os.environ.get(_CACHE_MAX_BYTES_ENV)
+    value = _cache_setting(_CACHE_MAX_BYTES_ENV)
     if value is None:
         return _DEFAULT_CACHE_MAX_BYTES
     if value == "off":
