@@ -15453,6 +15453,21 @@ def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
         unit = raw.get("units") or raw.get("unit") or raw.get("units_as_published")
         if unit not in (None, ""):
             return str(unit)
+    if (
+        key == "heat_content"
+        and payload.get("table_kind") == "heat_content_and_entropy"
+    ):
+        labels = payload.get("column_labels_as_published")
+        if isinstance(labels, (list, tuple)):
+            heat_headers = [
+                str(label)
+                for label in labels
+                if str(label).strip().startswith("HT-H")
+            ]
+            if heat_headers and len(set(heat_headers)) == 1:
+                _heading, separator, printed_unit = heat_headers[0].rpartition(",")
+                if separator and printed_unit.strip():
+                    return printed_unit.strip()
     for units_key in ("units_as_published", "units"):
         units = payload.get(units_key)
         if isinstance(units, Mapping):
