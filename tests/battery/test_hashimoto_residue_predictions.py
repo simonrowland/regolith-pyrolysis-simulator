@@ -372,7 +372,9 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned(monkeypatch) -> Non
             cache,
             selected_experiment_ids=selected_experiment_ids,
         )
-        assert prediction.execution.state is ExecutionState.PRODUCED
+        assert prediction.execution.state is ExecutionState.PRODUCED, (
+            prediction.refusal_detail
+        )
         assert prediction.value is not None
         scored_records.append(
             {
