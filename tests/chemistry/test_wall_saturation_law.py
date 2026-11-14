@@ -9,11 +9,15 @@ published values, and the mass-action identity uses
 from __future__ import annotations
 
 import math
+import json
+import os
+import shutil
 from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 from simulator.reference_data.nasa_glenn import COMPILATION_ROOT, load_record_document
@@ -608,6 +612,113 @@ def test_collapsed_interval_does_not_change_si_gibbs() -> None:
     assert nasa_record_g_over_rt("NG-1858", _T_K) == g_over_rt
     # Ca(a) has the same collapsed first interval and still evaluates.
     assert math.isfinite(nasa_record_g_over_rt("NG-1366", 400.0))
+
+
+@pytest.mark.parametrize(
+    ("thermo", "record_id", "source_path", "root_name"),
+    (
+        (
+            "nasa",
+            "NG-1858",
+            COMPILATION_ROOT / "records" / "NG-1858.json",
+            "COMPILATION_ROOT",
+        ),
+        (
+            "janaf",
+            "Cr-010",
+            TABLES_DIR / "Cr-010.yaml",
+            "TABLES_DIR",
+        ),
+    ),
+)
+def test_record_state_cache_tracks_path_and_file_version(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    thermo: str,
+    record_id: str,
+    source_path: Path,
+    root_name: str,
+) -> None:
+    """Parsed records may be reused; source identity and temperature stay live."""
+
+    from simulator.vapour_rail import wall_saturation as wall_module
+
+    relative_path = source_path.relative_to(
+        COMPILATION_ROOT if thermo == "nasa" else TABLES_DIR
+    )
+    root_a = tmp_path / "a"
+    root_b = tmp_path / "b"
+    target_a = root_a / relative_path
+    target_b = root_b / relative_path
+    target_a.parent.mkdir(parents=True)
+    target_b.parent.mkdir(parents=True)
+    shutil.copy2(source_path, target_a)
+    shutil.copy2(source_path, target_b)
+
+    loader_name = "load_record_document" if thermo == "nasa" else "load_table_document"
+    original_loader = getattr(wall_module, loader_name)
+    loaded_paths: list[Path] = []
+
+    def counted_loader(path: Path) -> dict[str, object]:
+        loaded_paths.append(path)
+        return original_loader(path)
+
+    monkeypatch.setattr(wall_module, loader_name, counted_loader)
+    monkeypatch.setattr(wall_module, root_name, root_a)
+
+    def evaluate(temperature_K: float) -> float:
+        state = (
+            wall_module._nasa_record_state(record_id, temperature_K)
+            if thermo == "nasa"
+            else wall_module._janaf_record_state(record_id, temperature_K)
+        )
+        return state[0]
+
+    first_temperature_K, second_temperature_K = 1323.15, 1573.15
+    first = evaluate(first_temperature_K)
+    assert evaluate(second_temperature_K) != first
+    assert loaded_paths == [target_a]
+
+    # Same record ID and file metadata in a different root is a different source.
+    monkeypatch.setattr(wall_module, root_name, root_b)
+    assert evaluate(first_temperature_K) == first
+    assert loaded_paths == [target_a, target_b]
+
+    before = target_b.stat()
+    document = original_loader(target_b)
+    if thermo == "nasa":
+        interval = next(
+            item
+            for item in document["intervals"]
+            if item["T_min_K"]["value"] < item["T_max_K"]["value"]
+        )
+        interval["b2"]["value"] = float(interval["b2"]["value"]) + 1.0
+        target_b.write_text(json.dumps(document), encoding="utf-8")
+    else:
+        table = document["table"]
+        rows = [
+            item
+            for item in table["values"]
+            if item["temperature"].get("value") is not None
+            and item["formation_gibbs_energy"].get("value") is not None
+        ]
+        row = min(
+            rows,
+            key=lambda item: abs(
+                float(item["temperature"]["value"]) - first_temperature_K
+            ),
+        )
+        row["formation_gibbs_energy"]["value"] = (
+            float(row["formation_gibbs_energy"]["value"]) + 1.0
+        )
+        target_b.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    os.utime(
+        target_b,
+        ns=(before.st_atime_ns, before.st_mtime_ns + 1_000_000),
+    )
+
+    assert evaluate(first_temperature_K) != first
+    assert loaded_paths == [target_a, target_b, target_b]
 
 
 def test_cro_janaf_log_sits_beside_nasa() -> None:
