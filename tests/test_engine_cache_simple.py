@@ -776,6 +776,81 @@ def test_runtime_identity_is_computed_once_per_engine(
     assert calls == Counter(dict.fromkeys(engine_cache.ENGINE_CHEMISTRY_VERSION, 1))
 
 
+@pytest.mark.parametrize(
+    ("engine", "metadata_name", "failure", "reason"),
+    [
+        (
+            "openimcc",
+            "direct_url.json",
+            "decode",
+            "distribution_metadata_unreadable",
+        ),
+        (
+            "openimcc",
+            "direct_url.json",
+            "parse",
+            "distribution_metadata_invalid",
+        ),
+        ("thermoengine", "RECORD", "read", "distribution_metadata_unreadable"),
+        ("vaporock", "RECORD", "decode", "distribution_metadata_unreadable"),
+    ],
+)
+def test_bad_distribution_metadata_is_reported_without_aborting_engine_open(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    engine: str,
+    metadata_name: str,
+    failure: str,
+    reason: str,
+) -> None:
+    class Distribution:
+        version = "1.2.3"
+
+        def read_text(self, name: str) -> str | None:
+            assert name == metadata_name
+            if failure == "decode":
+                raise UnicodeDecodeError(
+                    "utf-8", bytes([0xFF]), 0, 1, "invalid start byte"
+                )
+            if failure == "read":
+                raise OSError("injected metadata read failure")
+            return "{"  # invalid direct_url.json
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setattr(
+        engine_cache.importlib.metadata,
+        "distribution",
+        lambda _name: Distribution(),
+    )
+    engine_cache.runtime_identity.cache_clear()
+    engine_cache.engine_cache_runtime_identities(reset=True)
+
+    try:
+        identity = engine_cache.runtime_identity(engine)
+        assert isinstance(identity, engine_cache.RuntimeIdentityUnknown)
+        assert identity.engine_id == engine
+        assert identity.reason == reason
+        assert metadata_name in identity.detail
+
+        with caplog.at_level("WARNING", logger=engine_cache.__name__):
+            assert engine_cache.record_engine_open(engine) is None
+
+        warnings = [
+            record.getMessage()
+            for record in caplog.records
+            if "runtime identity unknown" in record.getMessage()
+        ]
+        assert len(warnings) == 1
+        assert reason in warnings[0]
+        assert engine_cache.engine_cache_runtime_identities()[engine].startswith(
+            f"runtime_identity_unknown:{reason}:"
+        )
+    finally:
+        engine_cache.runtime_identity.cache_clear()
+        engine_cache.engine_cache_runtime_identities(reset=True)
+
+
 def test_native_identity_hashes_once_per_process_without_a_stat_pin(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
