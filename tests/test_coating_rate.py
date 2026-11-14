@@ -304,13 +304,17 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
     candidate = wall_deposit_candidate_for_surface_kg(model, **kwargs)
     # d-402 uses the wall-reaction equilibrium; malformed legacy source-fit
     # coefficients do not change its pressure or erase the unknown-pO2 flag.
-    assert isinstance(candidate, float) and candidate > 0.0
+    # At 2073.15 K the pO2-free Psat exceeds the 100 Pa parcel pressure, so
+    # the physical result is a clean zero candidate, not a full-pressure sink.
+    assert isinstance(candidate, float) and candidate == 0.0
     diagnostic = model.last_wall_deposition_rate_shadow_candidate[
         "default_pipe"
     ][species]
     assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(
         expected.pressure_Pa
     )
+    assert expected.pressure_Pa > diagnostic["species_partial_pressure_pa"]
+    assert diagnostic["supersaturated"] is False
     notice = diagnostic["wall_saturation_pressure_notice"]
     assert notice["reason"] == "wall_pO2_unknown_pO2_free_route_used"
     assert notice["authority_level"] == "status_bearing"
@@ -344,13 +348,14 @@ def test_sio_legacy_antoine_pole_is_not_the_wall_refusal(monkeypatch) -> None:
         melt_temperature_C=1800.0, wall_temperature_C=1800.0,
         surface_area_m2=1.0,
     )
-    assert isinstance(candidate, float) and candidate > 0.0
+    assert isinstance(candidate, float) and candidate == 0.0
     diagnostic = model.last_wall_deposition_rate_shadow_candidate[
         "default_pipe"
     ]["SiO"]
     assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(
         expected.pressure_Pa
     )
+    assert diagnostic["supersaturated"] is False
     assert diagnostic["wall_saturation_pressure_notice"]["reason"] == (
         "wall_pO2_unknown_pO2_free_route_used"
     )
