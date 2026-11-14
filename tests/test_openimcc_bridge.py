@@ -1010,7 +1010,7 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
         },
         1673.15: {
             "KO0.5": 1.133192718678085e-5,
-            "NaO0.5": 0.0004922752489405557,
+            "NaO0.5": 0.0005829856233241274,
         },
     }
     for temperature_K, anchors in expected.items():

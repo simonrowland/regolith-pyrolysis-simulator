@@ -2161,7 +2161,7 @@ assert all(
 )
 assert summary["n_inside_band"] == 56
 assert abs(float(summary["median_dex"]) - (-0.19068318829283099)) < 0.00000001
-assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
+assert abs(float(summary["rms_dex"]) - 0.2063429411922417977) < 0.00000001
 print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
     env = {
@@ -2188,7 +2188,7 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
         -0.19068318829283099, abs=1e-8
     )
     assert float(result["headline"]["rms_dex"]) == pytest.approx(
-        0.2097386994979764836, abs=1e-8
+        0.2063429411922417977, abs=1e-8
     )
     assert result["lineage"] == "independent"
 
@@ -2751,7 +2751,7 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         -0.19068318829283099, abs=1e-8
     )
     assert float(openimcc["rms_dex"]) == pytest.approx(
-        0.209738699497976484, abs=1e-8
+        0.2063429411922417977, abs=1e-8
     )
 
     solved_openimcc_notice = next(

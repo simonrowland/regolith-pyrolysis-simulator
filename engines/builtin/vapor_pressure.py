@@ -615,8 +615,8 @@ _PROJECTED_COMPOSITION_WARNING_TIERS = (
 # The Zhang anchor passes composition_kg in oxide wt% (the eight supported
 # oxides from the bridge test); the bridge converts that mass basis to moles.
 # Activity and mole fraction are both dimensionless, so their ratio Gamma is
-# dimensionless too. This reproduces the wording-file sanity values: D066 is
-# 1.67e-6 / 9.44e-6 and published-core is 3.5e-9 / 2.4e-8 at 1473 / 1673 K.
+# dimensionless too. The packaged default v4 evaluates to 2.1891401806319048e-6 /
+# 1.133192718678085e-5 and published-core to 3.5e-9 / 2.4e-8 at 1473 / 1673 K.
 # The content digest keys each evaluation so packs sharing a model id cannot
 # reuse one another's numbers.
 _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
@@ -640,6 +640,19 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
         "gamma_ko0_5_by_temperature_K": {
             1473.15: "1.67e-6",
             1673.15: "9.44e-6",
+        },
+        "kcaal_si2o7_active_by_temperature_K": {
+            1473.15: False,
+            1673.15: False,
+        },
+    },
+    "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0": {
+        "pack_alias": "default",
+        "model_id": "IMCC-SF04-D066",
+        "pack_version": "1.0.6-d066-v4",
+        "gamma_ko0_5_by_temperature_K": {
+            1473.15: "2.1891401806319048e-06",
+            1673.15: "1.133192718678085e-05",
         },
         "kcaal_si2o7_active_by_temperature_K": {
             1473.15: False,
@@ -2832,7 +2845,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # Lazy import: simulator.state pulls in simulator/__init__ which
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
-        from simulator.state import GAS_CONSTANT
+        from simulator.state import GAS_CONSTANT as STATE_GAS_CONSTANT
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
             REACTION_PLANE_TRANSPORT_HEADSPACE,
@@ -3769,7 +3782,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, T_K)
             # K_decomp = exp(dG_f * 1000 / (R * T))
             try:
-                K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
+                K_decomp = math.exp(
+                    dG_f_kJ * 1000.0 / (STATE_GAS_CONSTANT * T_K)
+                )
             except OverflowError as exc:
                 raise VaporPressureComputationError(
                     "vapor_pressure_nonfinite: "
