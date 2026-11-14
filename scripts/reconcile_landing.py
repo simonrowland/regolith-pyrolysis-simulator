@@ -294,11 +294,14 @@ def stranded_rows(
     since_date: dt.datetime | None = None,
 ) -> list[dict[str, Any]]:
     events, last_lines = ledger_events(lines, since_date)
-    landings = {
-        event["index"]: event
-        for event in events
-        if event["kind"] == "LANDED" and event["sha"] and event["sha"] in history.ancestors
-    }
+    landings: dict[int, dict[str, Any]] = {}
+    for event in events:
+        if event["kind"] != "LANDED" or not event["sha"]:
+            continue
+        # Ledger landing entries commonly abbreviate the green commit SHA.
+        commit = history._resolve(event["sha"])
+        if commit in history.ancestors:
+            landings[event["index"]] = event
     latest_tips = {item.get("id", "").lower(): recorded_tip(item) for item in items if isinstance(item.get("id"), str)}
     result: list[dict[str, Any]] = []
     by_task: dict[str, list[dict[str, Any]]] = {}
