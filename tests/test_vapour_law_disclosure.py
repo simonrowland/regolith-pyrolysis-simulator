@@ -1257,6 +1257,7 @@ def _floor_activity_dispatch(
             x_single_cation=activity,
             activity=activity,
             citation="test activity injection",
+            effective_gamma=1.0,
         )
 
     request = IntentRequest(
