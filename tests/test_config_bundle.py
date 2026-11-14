@@ -251,7 +251,7 @@ def test_parsed_yaml_cache_obeys_byte_cap_after_many_writes(
     assert total_bytes <= target_bytes
 
 
-def test_fresh_process_first_cache_write_sweeps_old_entries(
+def test_first_write_in_fresh_process_evicts_over_cap(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -264,63 +264,42 @@ def test_fresh_process_first_cache_write_sweeps_old_entries(
     for index in range(12):
         load_cached_safe_yaml(_unique_cache_payload(index))
     prior_entries = sorted(cache_root.rglob("*.pickle"))
-    prior_entry_paths = [str(path) for path in prior_entries]
     cap_bytes = prior_entries[0].stat().st_size * 4
     assert sum(path.stat().st_size for path in prior_entries) > cap_bytes
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", str(cap_bytes))
 
     child = """
-import json
 import os
 from hashlib import sha256
 from pathlib import Path
 
-prior_entry_paths = __PRIOR_ENTRY_PATHS__
-
 root = Path(os.environ["REGOLITH_PARSED_YAML_CACHE_DIR"])
-
-def snapshot_entries():
-    return sorted(
-        (str(path), path.stat().st_size)
-        for path in root.rglob("*.pickle")
-    )
-
+os.environ["REGOLITH_PARSED_YAML_CACHE"] = "off"
+# Package import loads optimize_costs.yaml through cost_energy's cache call.
 import simulator.yaml_cache as cache
-entries_before_load = snapshot_entries()
+os.environ.pop("REGOLITH_PARSED_YAML_CACHE", None)
 writes_before = cache._CACHE_WRITES_SINCE_EVICTION
-prior_present_before_load = [
-    path for path in prior_entry_paths if Path(path).exists()
-]
+assert writes_before == cache._CACHE_EVICTION_WRITE_INTERVAL, writes_before
 payload = f"value: item-{1000:064d}\\n".encode("ascii")
 cache.load_cached_safe_yaml(payload)
-entries_after_load = snapshot_entries()
+entries = sorted(
+    (str(path), path.stat().st_size)
+    for path in root.rglob("*.pickle")
+)
 writes_after = cache._CACHE_WRITES_SINCE_EVICTION
 max_bytes = int(os.environ["REGOLITH_PARSED_YAML_CACHE_MAX_BYTES"])
-prior_present_after_load = [
-    path for path in prior_entry_paths if Path(path).exists()
-]
 diagnostics = {
-    "entries_before_load": entries_before_load,
+    "entries": entries,
     "writes_before": writes_before,
-    "entries_after_load": entries_after_load,
     "writes_after": writes_after,
-    "prior_present_before_load": prior_present_before_load,
-    "prior_present_after_load": prior_present_after_load,
     "cap_bytes": max_bytes,
     "target_bytes": cache._cache_eviction_target_bytes(max_bytes),
 }
-print(json.dumps(diagnostics, sort_keys=True))
-# Importing the package may perform the process's first cache write.
-if writes_before < cache._CACHE_EVICTION_WRITE_INTERVAL:
-    assert len(prior_present_before_load) < len(prior_entry_paths), diagnostics
-else:
-    total_after_load = sum(size for _path, size in entries_after_load)
-    assert writes_after == 0, diagnostics
-    assert (
-        total_after_load <= cache._cache_eviction_target_bytes(max_bytes)
-    ), diagnostics
+total_bytes = sum(size for _path, size in entries)
+assert writes_after == 0, diagnostics
+assert total_bytes <= cache._cache_eviction_target_bytes(max_bytes), diagnostics
 assert cache._cache_path(sha256(payload).hexdigest()).exists()
-""".replace("__PRIOR_ENTRY_PATHS__", repr(prior_entry_paths))
+"""
     subprocess.run(
         [sys.executable, "-c", child],
         check=True,
