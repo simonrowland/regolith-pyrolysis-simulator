@@ -4625,6 +4625,94 @@ def test_shuttle_bakeout_cycle_counter_waits_for_successful_hour(
     assert sim._poisoned_hour is None
 
 
+def _bakeout_cycle_trace(sim, dt_hr):
+    sim._step_dt_hr = dt_hr
+    sim._shuttle_phase = ''
+    bakeout_entries = []
+    scheduled_increments = []
+    campaign_hour = 0.0
+    for _ in range(round(12.0 / dt_hr)):
+        sim.melt.campaign_hour = campaign_hour
+        sim._pending_shuttle_bakeout_cycle_increment = ''
+        previous_phase = sim._shuttle_phase
+        sim._step_shuttle()
+        if previous_phase != 'bakeout' and sim._shuttle_phase == 'bakeout':
+            bakeout_entries.append(campaign_hour)
+        if sim._pending_shuttle_bakeout_cycle_increment:
+            scheduled_increments.append(
+                (campaign_hour, sim._pending_shuttle_bakeout_cycle_increment)
+            )
+        campaign_hour += dt_hr
+    return bakeout_entries, scheduled_increments
+
+
+def _assert_bakeout_schedule(sim, campaign, dt_hr):
+    bakeout_entries, scheduled = _bakeout_cycle_trace(sim, dt_hr)
+    assert len(bakeout_entries) == 2
+    assert len(scheduled) == len(bakeout_entries)
+    assert [cycle for _, cycle in scheduled] == [campaign] * 2
+    assert [hour for hour, _ in scheduled] == pytest.approx(bakeout_entries)
+    if dt_hr == 1.0:
+        assert bakeout_entries == [3.0, 9.0]
+
+
+def _make_bakeout_cycle_sim(
+    campaign, vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=False,
+    )
+    sim.start_campaign(CampaignPhase[campaign])
+    sim.record.path = 'A'
+    monkeypatch.setattr(sim, '_transfer_condensed_species', lambda *_args: 0.0)
+    monkeypatch.setattr(sim, '_top_up_c3_alkali_credit', lambda *_args: 0.0)
+    monkeypatch.setattr(sim, '_freeze_gate_enabled', lambda: False)
+    monkeypatch.setattr(sim, '_shuttle_inject_K', lambda **_kwargs: None)
+    monkeypatch.setattr(sim, '_shuttle_inject_Na', lambda **_kwargs: None)
+    return sim
+
+
+@pytest.mark.parametrize('campaign', ['C3_K', 'C3_NA'])
+@pytest.mark.parametrize('dt_hr', [1.0, 0.4, 1 / 60])
+def test_shuttle_bakeout_counter_tracks_each_phase_entry(
+    campaign, dt_hr, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch,
+):
+    sim = _make_bakeout_cycle_sim(
+        campaign, vapor_pressure_data, feedstocks_data, setpoints_data,
+        monkeypatch,
+    )
+    _assert_bakeout_schedule(sim, campaign, dt_hr)
+
+
+@pytest.mark.parametrize(('campaign', 'dt_hr'), [
+    ('C3_K', 0.4),
+    ('C3_NA', 1 / 60),
+])
+def test_restoring_exact_hour_bakeout_trigger_fails(
+    campaign, dt_hr, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch,
+):
+    sim = _make_bakeout_cycle_sim(
+        campaign, vapor_pressure_data, feedstocks_data, setpoints_data,
+        monkeypatch,
+    )
+    current_step_shuttle = sim._step_shuttle
+
+    def exact_hour_mutation():
+        current_step_shuttle()
+        sim._pending_shuttle_bakeout_cycle_increment = (
+            campaign
+            if sim._shuttle_phase == 'bakeout'
+            and sim.melt.campaign_hour % 6 == 3
+            else ''
+        )
+
+    monkeypatch.setattr(sim, '_step_shuttle', exact_hour_mutation)
+    with pytest.raises(AssertionError):
+        _assert_bakeout_schedule(sim, campaign, dt_hr)
+
+
 def test_partial_commit_poison_survives_hostile_exception_formatting(
     monkeypatch,
     vapor_pressure_data,
