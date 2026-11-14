@@ -18,6 +18,12 @@ import yaml
 
 _CACHE_ENV = "REGOLITH_PARSED_YAML_CACHE_DIR"
 _CACHE_ENABLED_ENV = "REGOLITH_PARSED_YAML_CACHE"
+_CACHE_MAX_BYTES_ENV = "REGOLITH_PARSED_YAML_CACHE_MAX_BYTES"
+_DEFAULT_CACHE_MAX_BYTES = 1536 * 1024 * 1024
+# The first write triggers a sweep for short-lived processes; later full-root
+# sweeps every 32 writes keep hits scan-free and bound growth between scans.
+_CACHE_EVICTION_WRITE_INTERVAL = 32
+_CACHE_WRITES_SINCE_EVICTION = _CACHE_EVICTION_WRITE_INTERVAL
 _CACHE_FORMAT = 3
 _YAML12_SCHEMA_ID = "yaml12-core-boolean-resolver-v1"
 _CACHE_MISS = object()
@@ -231,7 +237,10 @@ def load_cached_safe_yaml(
 
     The pickle value preserves the safe loader's Python types and YAML aliases.
     Set ``REGOLITH_PARSED_YAML_CACHE=off`` to bypass the process-shared cache;
-    ``REGOLITH_PARSED_YAML_CACHE_DIR`` selects its private root.
+    ``REGOLITH_PARSED_YAML_CACHE_DIR`` selects its private root, and
+    ``REGOLITH_PARSED_YAML_CACHE_MAX_BYTES`` sets its byte cap (default 1.5 GiB).
+    A value of ``0`` keeps only the entry just written at each sweep; the literal
+    ``off`` removes the byte cap while leaving the cache enabled.
     """
 
     raw = payload.encode("utf-8") if isinstance(payload, str) else payload
@@ -241,6 +250,7 @@ def load_cached_safe_yaml(
     if not _cache_enabled():
         return yaml.load(payload, Loader=YAML12SafeLoader)
 
+    max_bytes = _cache_max_bytes()
     loader_identity = _loader_identity()
     cache_path = _cache_path(digest, loader_identity)
     cached = _read_cache(cache_path, digest, loader_identity)
@@ -249,12 +259,32 @@ def load_cached_safe_yaml(
 
     parsed = yaml.load(payload, Loader=YAML12SafeLoader)
     _write_cache(cache_path, digest, loader_identity, parsed)
+    _evict_after_write(cache_path, max_bytes)
     return parsed
 
 
 def _cache_enabled() -> bool:
     value = os.environ.get(_CACHE_ENABLED_ENV, "").strip().casefold()
     return value not in {"0", "false", "no", "off"}
+
+
+def _cache_max_bytes() -> int | None:
+    value = os.environ.get(_CACHE_MAX_BYTES_ENV)
+    if value is None:
+        return _DEFAULT_CACHE_MAX_BYTES
+    if value == "off":
+        return None
+    try:
+        max_bytes = int(value, 10)
+    except ValueError as exc:
+        raise ValueError(
+            f"{_CACHE_MAX_BYTES_ENV} must be a non-negative integer or 'off'"
+        ) from exc
+    if max_bytes < 0:
+        raise ValueError(
+            f"{_CACHE_MAX_BYTES_ENV} must be a non-negative integer or 'off'"
+        )
+    return max_bytes
 
 
 def _loader_identity() -> str:
@@ -376,6 +406,11 @@ def _read_cache(path: Path, content_sha256: str, loader_identity: str) -> Any:
         return _CACHE_MISS
     if "value" not in envelope:
         return _CACHE_MISS
+    try:
+        os.utime(path, None)
+    except OSError:
+        # A concurrent evictor may unlink the entry after it was read.
+        pass
     return envelope["value"]
 
 
@@ -409,3 +444,69 @@ def _write_cache(
                 temp_path.unlink()
             except OSError:
                 pass
+
+
+def _evict_after_write(path: Path, max_bytes: int | None) -> None:
+    global _CACHE_WRITES_SINCE_EVICTION
+    _CACHE_WRITES_SINCE_EVICTION += 1
+    if _CACHE_WRITES_SINCE_EVICTION < _CACHE_EVICTION_WRITE_INTERVAL:
+        return
+    _CACHE_WRITES_SINCE_EVICTION = 0
+
+    # The cache path is root/version/loader-token/format/file.pickle.
+    try:
+        _evict_cache(
+            root=path.parents[3],
+            just_written=path,
+            max_bytes=max_bytes,
+        )
+    except OSError:
+        # Cache cleanup must not turn a successful YAML parse into a failure.
+        pass
+
+
+def _evict_cache(
+    *,
+    root: Path,
+    just_written: Path,
+    max_bytes: int | None,
+) -> None:
+    if max_bytes is None:
+        return
+
+    entries: list[tuple[int, Path, int]] = []
+    try:
+        for path in root.rglob("*.pickle"):
+            try:
+                metadata = path.lstat()
+            except OSError:
+                continue
+            if stat.S_ISREG(metadata.st_mode):
+                entries.append((metadata.st_mtime_ns, path, metadata.st_size))
+    except OSError:
+        return
+
+    total_bytes = sum(size for _mtime_ns, _path, size in entries)
+    target_bytes = _cache_eviction_target_bytes(max_bytes)
+    if total_bytes <= target_bytes:
+        return
+
+    entries.sort(key=lambda entry: (entry[0], str(entry[1])))
+    for _mtime_ns, path, size in entries:
+        if total_bytes <= target_bytes:
+            break
+        if path == just_written:
+            continue
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            # Another process removed the entry after the directory scan.
+            total_bytes -= size
+        except OSError:
+            continue
+        else:
+            total_bytes -= size
+
+
+def _cache_eviction_target_bytes(max_bytes: int) -> int:
+    return max_bytes * 9 // 10
