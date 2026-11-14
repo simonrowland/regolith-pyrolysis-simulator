@@ -15,6 +15,8 @@ import pytest
 from simulator import evaporation as evaporation_module
 from simulator import engine_binding_admission as admission_module
 from simulator import engine_binding_admission
+from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.ledger import AtomLedger
 import simulator.fe_redox as fe_redox_module
 from simulator.chemistry.kernel import (
     CapabilityProfile,
@@ -3516,6 +3518,88 @@ def test_keyed_freeze_gate_memo_hits_without_local_slot_and_keeps_redox_key(
     assert key_a != key_b
     assert second['curve'] != first['curve']
     assert len(calls) == 2
+
+
+def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    alumina_mol = 100.0 / resolve_species_formula(
+        'Al2O3',
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        {'Al2O3': alumina_mol},
+        source='b-1225 cache refusal pin',
+        material_origin='feedstock',
+    )
+    sim.atom_ledger = ledger
+    key = _freeze_gate_key_for_current_state(sim)
+    assert key.magemin_domain_reason == 'magemin_domain_sio2_below_min'
+    cached_record = gate_curve_memo_record(
+        {
+            'source': 'gate_liquid_fraction:test-cache',
+            'status': 'ok',
+            'solidus_T_C': 900.0,
+            'liquidus_T_C': 1300.0,
+            'path': ((900.0, 0.0), (1300.0, 1.0)),
+        },
+        None,
+        (),
+        'live',
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': key,
+        **cached_record,
+    }
+    sim._freeze_gate_shared_curve_cache = {key: cached_record}
+    sim._freeze_gate_liquid_fraction_curve_memo = {key: cached_record}
+
+    class ReplaySpy:
+        replay_enabled = True
+
+        def __init__(self):
+            self.calls = 0
+
+        def replay_gate_curve(self, *_args, **_kwargs):
+            self.calls += 1
+            return cached_record['curve']
+
+    store = ReplaySpy()
+    monkeypatch.setattr(sim, '_pt0_store', lambda: store, raising=False)
+    live_dispatch_calls = []
+
+    def fail_live_dispatch(*_args, **_kwargs):
+        live_dispatch_calls.append(True)
+        raise RuntimeError('live gate dispatch reached')
+
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_from_gate_dispatch',
+        fail_live_dispatch,
+    )
+    with pytest.raises(RuntimeError, match='live gate dispatch reached'):
+        sim._freeze_gate_curve_record()
+    assert store.calls == 0
+    assert live_dispatch_calls == [True]
+
+    def fail_live_record(**_kwargs):
+        raise RuntimeError('live gate record reached')
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', fail_live_record)
+    with pytest.raises(RuntimeError, match='live gate record reached'):
+        sim._melt_redox_liquidus_gate_record()
 
 
 def test_absolute_redox_states_keep_freeze_gate_cache_reuse(
