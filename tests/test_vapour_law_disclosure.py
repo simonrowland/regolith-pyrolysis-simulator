@@ -478,6 +478,10 @@ def test_battery_rows_stamp_the_active_disclosure() -> None:
         assert f"@_isolated_law_disclosure\ndef {name}(" in source
     assert source.count("_stamp_law_disclosure_metadata(") == 3
 
+    unmeasured: dict[str, str] = {}
+    _stamp_law_disclosure_metadata(unmeasured)
+    assert "law_disclosures" not in unmeasured
+
     with disclosure_scope(inherit=False):
         empty: dict[str, str] = {}
         _stamp_law_disclosure_metadata(empty)

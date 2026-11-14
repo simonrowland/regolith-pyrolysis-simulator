@@ -34,16 +34,17 @@ _SECONDS_PER_HOUR = 3_600.0
 
 
 def _stamp_law_disclosure_metadata(metadata: dict[str, str]) -> None:
-    """Publish the active run disclosure on a battery row. Empty stays absent."""
+    """Publish the measured active disclosure, including an empty snapshot."""
 
-    from simulator.vapour_rail.run_disclosure import active_snapshot
+    from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot
 
+    if active_registry() is None:
+        return
     snapshot = active_snapshot()
-    if snapshot:
-        metadata["law_disclosures"] = json.dumps(
-            [dict(item) for item in snapshot],
-            sort_keys=True,
-        )
+    metadata["law_disclosures"] = json.dumps(
+        [dict(item) for item in snapshot],
+        sort_keys=True,
+    )
 
 
 def _isolated_law_disclosure(fn):
