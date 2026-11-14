@@ -148,7 +148,9 @@ def test_table_1_residue_uncertainties_migrate_from_each_printed_sigma(
             assert elapsed.locator is not None
         return migrator
 
-    def residue_uncertainty(migrator: Migrator, row: str, formula: str) -> str:
+    def residue_uncertainty(
+        migrator: Migrator, row: str, formula: str
+    ) -> tuple[str, str | None]:
         observation = next(
             item
             for item in migrator.result.observations.values()
@@ -156,19 +158,41 @@ def test_table_1_residue_uncertainties_migrate_from_each_printed_sigma(
             and item.identity.species.formula == formula
         )
         assert observation.uncertainty.kind.value == "printed"
-        return observation.uncertainty.verbatim["sigma"]
+        return (
+            observation.uncertainty.verbatim["sigma"],
+            observation.uncertainty.verbatim.get("confidence_level"),
+        )
 
     original = migrated(EXTRACT)
-    assert residue_uncertainty(original, "FUN1-3", "MgO") == "0.31"
-    assert residue_uncertainty(original, "FUN2-10", "CaO") == "0.10"
+    assert residue_uncertainty(original, "FUN1-3", "MgO") == (
+        "0.31",
+        "not_stated",
+    )
+    assert residue_uncertainty(original, "FUN2-10", "CaO") == (
+        "0.10",
+        "not_stated",
+    )
 
     fun1_mgo["sigma"] = "0.99"
     fun2_cao["sigma"] = "0.77"
+    fun1_observation = next(
+        observation
+        for observation in document["species"]["SiO2"]["observations"]
+        if observation["observation_id"]
+        == "mendybaev_2013_table1_fun1_residue_composition_series"
+    )
+    fun1_observation["uncertainty"]["confidence_level"] = "one_sigma"
     mutated_extract = tmp_path / EXTRACT.name
     mutated_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
     mutated = migrated(mutated_extract)
-    assert residue_uncertainty(mutated, "FUN1-3", "MgO") == "0.99"
-    assert residue_uncertainty(mutated, "FUN2-10", "CaO") == "0.77"
+    assert residue_uncertainty(mutated, "FUN1-3", "MgO") == (
+        "0.99",
+        "one_sigma",
+    )
+    assert residue_uncertainty(mutated, "FUN2-10", "CaO") == (
+        "0.77",
+        "not_stated",
+    )
 
 
 def test_all_deferred_figure_records_have_separate_captions() -> None:
