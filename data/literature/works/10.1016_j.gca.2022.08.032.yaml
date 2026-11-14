@@ -82,7 +82,9 @@ experiments:
           interval_high: '0.00001'
           approximate: false
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
         note: Printed 5-10 mg; unit conversion only.
       inference:
@@ -96,7 +98,9 @@ experiments:
               tag: value
               value: '5'
             locator:
-              page: 152
+              page: 3
+              published_page: 152
+              pdf_page_index: 2
               section: 2.2 Experimental conditions
               note: Printed 5-10 mg; unit conversion only.
         - - original_high
@@ -104,7 +108,9 @@ experiments:
               tag: value
               value: '10'
             locator:
-              page: 152
+              page: 3
+              published_page: 152
+              pdf_page_index: 2
               section: 2.2 Experimental conditions
               note: Printed 5-10 mg; unit conversion only.
         - - factor
@@ -112,7 +118,9 @@ experiments:
               tag: value
               value: '1000000'
             locator:
-              page: 152
+              page: 3
+              published_page: 152
+              pdf_page_index: 2
               section: 2.2 Experimental conditions
               note: Printed 5-10 mg; unit conversion only.
         output_unit: kg
@@ -122,7 +130,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 151
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         table: '1'
         note: Fourteen synthetic and natural compositions; no single series composition.
     form:
@@ -130,14 +140,18 @@ experiments:
         tag: value
         value: Powder suspended on platinum wire loop with paraffin oil
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
     characterization:
       state:
         tag: value
         value: Quenched glasses analyzed by EPMA and, for low S, SIMS
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.3 Analyses
     pretreatment:
       state:
@@ -145,7 +159,9 @@ experiments:
         value: Oxide and carbonate powders crushed under ethanol then decarbonated overnight at 1273 K; starting compositions
           reground.
       locator:
-        page: 151
+        page: 2
+        published_page: 151
+        pdf_page_index: 1
         section: 2.1 Starting materials
   conditions:
     temperature_K:
@@ -153,7 +169,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 152
+        page: 4
+        published_page: 153
+        pdf_page_index: 3
         table: '2'
         note: Multiple Table 2 setpoints; no single series setpoint.
   pressure_environment:
@@ -165,7 +183,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
         note: Atmospheric pressure, 1 atm; unit conversion only.
       inference:
@@ -179,7 +199,9 @@ experiments:
               tag: value
               value: '1'
             locator:
-              page: 152
+              page: 3
+              published_page: 152
+              pdf_page_index: 2
               section: 2.2 Experimental conditions
               note: Atmospheric pressure, 1 atm; unit conversion only.
         - - factor
@@ -187,7 +209,9 @@ experiments:
               tag: value
               value: '101325'
             locator:
-              page: 152
+              page: 3
+              published_page: 152
+              pdf_page_index: 2
               section: 2.2 Experimental conditions
               note: Atmospheric pressure, 1 atm; unit conversion only.
         output_unit: Pa
@@ -204,7 +228,9 @@ experiments:
             tag: unknown
             reason: not_published
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
     regime:
       regime_class:
@@ -212,7 +238,9 @@ experiments:
         reason: not_published
   work_id: 10.1016/j.gca.2022.08.032
   locator:
-    page: 152
+    page: 3
+    published_page: 152
+    pdf_page_index: 2
     section: 2.2 Experimental conditions
     note: Series of equilibration experiments; individual Table 2 conditions remain in observations.
   fO2_control:
@@ -224,7 +252,9 @@ experiments:
         tag: value
         value: Air/SO2 ratios 0.11, 0.60, and 4.00; oxidizing fO2 above FMQ, calculated from thermodynamic data
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
   bench_id: 10.1016/j.gca.2022.08.032::bench::gero-vertical-furnace
   equipment_context_id: boulliung-wood-2022-so2-solubility-silicate-melts::context::boulliung_wood_2022_run_conditions
@@ -234,7 +264,9 @@ experiments:
         tag: value
         value: Equilibrated then quenched under the same atmosphere in the cold area at the top of the vertical furnace
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
     setpoints_and_holds:
     - temperature_K:
@@ -246,7 +278,9 @@ experiments:
             interval_high: '1773'
             approximate: false
         locator:
-          page: 152
+          page: 4
+          published_page: 153
+          pdf_page_index: 3
           table: '2'
           note: Printed series span in 50 K increments.
     total_duration_s:
@@ -254,7 +288,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 152
+        page: 4
+        published_page: 153
+        pdf_page_index: 3
         table: '2'
         note: Table gives 10 h at lower temperatures, 8 h at 1723 K, and 6 h at 1773 K; no universal duration.
     cooling_or_quench:
@@ -262,7 +298,9 @@ experiments:
         tag: value
         value: Quenched under the same atmosphere in the cold area at the top of the vertical furnace
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
 benches:
 - id: 10.1016/j.gca.2022.08.032::bench::gero-vertical-furnace
@@ -274,21 +312,27 @@ benches:
       tag: value
       value: Gero vertical furnace HTRV 70-250/18
     locator:
-      page: 152
+      page: 3
+      published_page: 152
+      pdf_page_index: 2
       section: 2.2 Experimental conditions
   detector:
     state:
       tag: value
       value: Cameca SX-Five-FE EPMA and Cameca IMS 1270 E7 SIMS
     locator:
-      page: 152
+      page: 3
+      published_page: 152
+      pdf_page_index: 2
       section: 2.3 Analyses
   heating_method:
     state:
       tag: value
       value: Vertical resistance furnace
     locator:
-      page: 152
+      page: 3
+      published_page: 152
+      pdf_page_index: 2
       section: 2.2 Experimental conditions
   other_facts:
   - name: gas_mix_control
@@ -300,7 +344,9 @@ benches:
           categorical: Tylan mass flow controllers
           approximate: false
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
   - name: sample_support
     value:
@@ -311,7 +357,9 @@ benches:
           categorical: 0.25 mm platinum wire loop on Pt chandelier suspended from silica rod
           approximate: false
       locator:
-        page: 152
+        page: 3
+        published_page: 152
+        pdf_page_index: 2
         section: 2.2 Experimental conditions
 context:
 - observation_id: boulliung_wood_2022_run_conditions
@@ -319,7 +367,9 @@ context:
   type: laboratory_conditions
   locator:
     source_path: corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
-    page: 152
+    page: 4
+    published_page: 153
+    pdf_page_index: 3
     table: '2'
     section: 2.2 Experimental conditions
     note: Every value below is transcribed from the printed Table 2 cell under its column header.
