@@ -22,6 +22,7 @@ from collections import OrderedDict
 from collections.abc import Iterable, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
@@ -97,7 +98,18 @@ _MEMORY_CACHE_MAXSIZE = 4096
 _MEMORY_CACHE: OrderedDict[tuple[str, bytes, bool], Any] = OrderedDict()
 _MEMORY_CACHE_PID = os.getpid()
 _RUNTIME_BACKENDS: dict[str, Any] = {}
-_RUNTIME_IDENTITIES: dict[str, str] = {}
+
+
+@dataclass(frozen=True)
+class RuntimeIdentityUnknown:
+    """A diagnostic identity could not be read from runtime metadata."""
+
+    engine_id: str
+    reason: str
+    detail: str
+
+
+_RUNTIME_IDENTITIES: dict[str, str | RuntimeIdentityUnknown] = {}
 _CACHE_BYPASSED: ContextVar[bool] = ContextVar(
     "regolith_engine_cache_bypassed", default=False
 )
@@ -270,19 +282,42 @@ def _file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _distribution_identity(names: tuple[str, ...]) -> str:
+def _distribution_identity(
+    names: tuple[str, ...],
+) -> str | RuntimeIdentityUnknown:
     for name in names:
         try:
             distribution = importlib.metadata.distribution(name)
         except importlib.metadata.PackageNotFoundError:
             continue
-        record = distribution.read_text("RECORD")
+        try:
+            record = distribution.read_text("RECORD")
+        except (OSError, UnicodeDecodeError) as exc:
+            return RuntimeIdentityUnknown(
+                name,
+                "distribution_metadata_unreadable",
+                f"RECORD: {exc}",
+            )
+        if record is not None and not isinstance(record, str):
+            return RuntimeIdentityUnknown(
+                name,
+                "distribution_metadata_invalid",
+                "RECORD is not text",
+            )
         record_digest = (
             hashlib.sha256(record.encode("utf-8")).hexdigest()
             if record is not None and len(record) <= 2_000_000
             else "unavailable"
         )
-        return f"version:{distribution.version};record-sha256:{record_digest}"
+        try:
+            version = distribution.version
+        except (OSError, UnicodeDecodeError) as exc:
+            return RuntimeIdentityUnknown(
+                name,
+                "distribution_metadata_unreadable",
+                f"version: {exc}",
+            )
+        return f"version:{version};record-sha256:{record_digest}"
     return "unavailable"
 
 
@@ -299,20 +334,52 @@ def _native_binary_identity(engine_id: str) -> str:
     return f"sha256:{digest}"
 
 
-def _openimcc_dist_identity() -> str:
+def _openimcc_dist_identity() -> str | RuntimeIdentityUnknown:
     try:
         distribution = importlib.metadata.distribution("openimcc")
     except importlib.metadata.PackageNotFoundError:
         return "unavailable"
-    direct_url = distribution.read_text("direct_url.json")
+    try:
+        direct_url = distribution.read_text("direct_url.json")
+    except (OSError, UnicodeDecodeError) as exc:
+        return RuntimeIdentityUnknown(
+            "openimcc",
+            "distribution_metadata_unreadable",
+            f"direct_url.json: {exc}",
+        )
     if direct_url:
         try:
-            commit = json.loads(direct_url).get("vcs_info", {}).get("commit_id")
-        except (AttributeError, json.JSONDecodeError):
-            commit = None
+            payload = json.loads(direct_url)
+        except (TypeError, json.JSONDecodeError) as exc:
+            return RuntimeIdentityUnknown(
+                "openimcc",
+                "distribution_metadata_invalid",
+                f"direct_url.json: {exc}",
+            )
+        if not isinstance(payload, Mapping):
+            return RuntimeIdentityUnknown(
+                "openimcc",
+                "distribution_metadata_invalid",
+                "direct_url.json must contain an object",
+            )
+        vcs_info = payload.get("vcs_info", {})
+        if not isinstance(vcs_info, Mapping):
+            return RuntimeIdentityUnknown(
+                "openimcc",
+                "distribution_metadata_invalid",
+                "direct_url.json vcs_info must contain an object",
+            )
+        commit = vcs_info.get("commit_id")
         if commit:
             return f"commit:{commit}"
-    return f"version:{distribution.version}"
+    try:
+        return f"version:{distribution.version}"
+    except (OSError, UnicodeDecodeError) as exc:
+        return RuntimeIdentityUnknown(
+            "openimcc",
+            "distribution_metadata_unreadable",
+            f"version: {exc}",
+        )
 
 
 def _internal_analytical_identity() -> str:
@@ -333,7 +400,7 @@ def _internal_analytical_identity() -> str:
         return "unavailable"
 
 
-def _compute_runtime_identity(engine_id: str) -> str:
+def _compute_runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
     if engine_id in {"alphamelts", "magemin"}:
         return _native_binary_identity(engine_id)
     if engine_id == "openimcc":
@@ -348,7 +415,7 @@ def _compute_runtime_identity(engine_id: str) -> str:
 
 
 @lru_cache(maxsize=None)
-def runtime_identity(engine_id: str) -> str:
+def runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
     """Return the one per-process runtime identity captured at engine open."""
     return _compute_runtime_identity(engine_id)
 
@@ -358,10 +425,20 @@ def record_engine_open(engine_id: str, backend: Any | None = None) -> str | None
     if not os.environ.get("REGOLITH_ENGINE_CACHE"):
         return None
     if engine_id in _RUNTIME_IDENTITIES:
-        return _RUNTIME_IDENTITIES.get(engine_id)
+        identity = _RUNTIME_IDENTITIES[engine_id]
+        return identity if isinstance(identity, str) else None
     if backend is not None:
         _RUNTIME_BACKENDS.setdefault(engine_id, backend)
     identity = runtime_identity(engine_id)
+    if isinstance(identity, RuntimeIdentityUnknown):
+        _RUNTIME_IDENTITIES[engine_id] = identity
+        logging.getLogger(__name__).warning(
+            "engine cache: %s runtime identity unknown (%s; %s)",
+            engine_id,
+            identity.reason,
+            identity.detail,
+        )
+        return None
     _RUNTIME_IDENTITIES[engine_id] = identity
     recorded = ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine_id]
     stored = str(recorded["identity"])
@@ -379,7 +456,15 @@ def record_engine_open(engine_id: str, backend: Any | None = None) -> str | None
 
 
 def engine_cache_runtime_identities(*, reset: bool = False) -> dict[str, str]:
-    identities = dict(_RUNTIME_IDENTITIES)
+    identities = {
+        engine: (
+            identity
+            if isinstance(identity, str)
+            else "runtime_identity_unknown:"
+            f"{identity.reason}:{identity.detail}"
+        )
+        for engine, identity in _RUNTIME_IDENTITIES.items()
+    }
     if reset:
         _RUNTIME_IDENTITIES.clear()
     return identities
