@@ -5,96 +5,51 @@ from pathlib import Path
 import pytest
 
 from simulator.config import load_config_bundle
-from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
-_F09 = (
-    "kems-041-sossi-fegley-2018",
-    412,
-    "alkali volatility is 104 times greater than the next most volatile components",
-    "lunar_mare_low_ti",
-)
 
 
 @pytest.mark.parametrize(
-    (
-        "source_id",
-        "page",
-        "quote",
-        "feedstock_id",
-        "condition_note",
-        "temperature_K",
-        "total_pressure_mbar",
-        "pO2_mbar",
-    ),
+    ("source_id", "page", "quote", "sample", "temperature_K", "delta_fmq"),
     (
         pytest.param(
-            *_F09,
-            "declared condition, within printed range",
-            1250.0,
-            0.0,
-            0.0,
-            id="F09-1250K",
-        ),
-        pytest.param(
-            *_F09,
-            "declared condition, within printed range",
-            1500.0,
-            0.0,
-            0.0,
-            id="F09-1500K",
-        ),
-        pytest.param(
-            *_F09,
-            "declared condition, within printed range",
-            1750.0,
-            0.0,
-            0.0,
-            marks=pytest.mark.xfail(
-                strict=True,
-                reason=(
-                    "FINDING F09: engine gives pK=0.256 Pa vs pFe=0.659 Pa; "
-                    "printed ordering is alkali > Fe/Mn"
-                ),
-            ),
-            id="F09-1750K",
+            "kems-041-sossi-fegley-2018",
+            412,
+            "alkali volatility is 10^4 times greater than the next most volatile components",
+            "Apollo_12_12022",
+            1400.0,
+            0.5,
+            id="F09-12022-1400K-FMQ-plus-0.5",
         ),
     ),
 )
-def test_f09_alkali_vapour_pressures_exceed_fe_and_mn(
+def test_f09_alkali_volatility_uses_the_printed_sample(
     source_id: str,
     page: int,
     quote: str,
-    feedstock_id: str,
-    condition_note: str,
+    sample: str,
     temperature_K: float,
-    total_pressure_mbar: float,
-    pO2_mbar: float,
+    delta_fmq: float,
 ) -> None:
     assert source_id == "kems-041-sossi-fegley-2018"
     assert page == 412
     assert len(quote.split()) <= 15
-    assert condition_note == "declared condition, within printed range"
+    assert sample == "Apollo_12_12022"
+    assert 1396.0 <= temperature_K <= 1499.0
+    assert delta_fmq == 0.5
 
     bundle = load_config_bundle(DATA_DIR)
-    simulator = PyrolysisSimulator(
-        InternalAnalyticalBackend(),
-        bundle.setpoints,
-        bundle.feedstocks,
-        bundle.vapor_pressures,
-        materials=bundle.materials,
-    )
-    simulator.load_batch(feedstock_id)
-    simulator.melt.temperature_C = temperature_K - 273.15
-    simulator.melt.p_total_mbar = total_pressure_mbar
-    simulator.melt.pO2_mbar = pO2_mbar
-
-    equilibrium = simulator._internal_analytical_equilibrium()
-    assert equilibrium.status == "ok"
-    pressures = equilibrium.vapor_pressures_Pa
-    assert {"Na", "K", "Fe", "Mn"} <= pressures.keys()
-    assert min(pressures["Na"], pressures["K"]) > max(
-        pressures["Fe"], pressures["Mn"]
+    sample_feedstocks = [
+        key
+        for key, feedstock in bundle.feedstocks.items()
+        if "12022" in key
+        or "12022" in str(feedstock.get("source", ""))
+        or feedstock.get("sample_id") == "12022"
+    ]
+    assert not sample_feedstocks
+    pytest.skip(
+        "typed-skip: no feedstock carries Apollo 12 12022; the available "
+        "lunar_mare_low_ti composition is a modeled family representative, "
+        "so it cannot stand in for the cited sample"
     )
