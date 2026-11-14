@@ -8,6 +8,8 @@ from copy import deepcopy
 from numbers import Real
 from typing import Any
 
+from simulator.physical_constants import GAS_CONSTANT_10SIG
+
 
 class AlphaSpecError(ValueError):
     """Raised when policy metadata is presented as an executable alpha value."""
@@ -27,7 +29,7 @@ def _evaluate_extracted_arrhenius_alpha(
         ), None
     prefactor = float(alpha_form.get("gamma_o", alpha_form.get("c0")))
     activation = float(alpha_form["E_J_per_mol"])
-    gas_constant = float(alpha_form.get("R_J_per_mol_K") or 8.314462618)
+    gas_constant = float(alpha_form.get("R_J_per_mol_K") or GAS_CONSTANT_10SIG)
     # E [J/mol] / (R [J/(mol K)] * T [K]) is dimensionless. Thus
     # alpha=gamma0*exp(-E/RT) is dimensionless. Linear propagation gives
     # sigma_alpha=abs(alpha)*sigma_E/(RT), also dimensionless. Positive E

@@ -127,14 +127,15 @@ if str(ROOT) not in sys.path:
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
+from simulator.physical_constants import ATM_PA, GAS_CONSTANT_10SIG, PA_PER_BAR  # noqa: E402
 from validate_literature_extracts import (  # noqa: E402
     EXTRACTS_DIR as _VLE_EXTRACTS,
     discover_extracts,
     validate_extract_document,
 )
 
-# Gas constant J/(mol·K) — matches simulator.condensation.GAS_CONSTANT_J_MOL_K.
-R_GAS = 8.314462618
+# Same object as condensation.GAS_CONSTANT_J_MOL_K. Not the full CODATA leaf.
+R_GAS = GAS_CONSTANT_10SIG
 
 
 # ---------------------------------------------------------------------------
@@ -187,9 +188,9 @@ PRESSURE_TO_PA: dict[str, float] = {
     "pascals": 1.0,
     "kpa": 1.0e3,
     "mpa": 1.0e6,
-    "bar": 1.0e5,
+    "bar": PA_PER_BAR,
     "mbar": 1.0e2,
-    "atm": 101325.0,
+    "atm": ATM_PA,
     "torr": 133.322368421,
     "mmhg": 133.322368421,
     "psi": 6894.757293168,

@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:xu-2026-excess-oxygen-magma
       role: pdf
@@ -2154,6 +2154,4035 @@ context:
   work_id: 10.1093/nsr/nwag539
   source_id: xu-2026-excess-oxygen-magma
   species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_1
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_1
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-1 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-1
+      experiment: xu_2026_lvp_1
+      analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
+      source_row: 12
+      element_wt_percent_as_published:
+        Si: '23.31'
+        Ti: '0.61'
+        Al: '7.53'
+        FeT: '8.26'
+        Mg: '4.44'
+        Ca: '8.09'
+        Na: '1.97'
+        K: '0.25'
+        O: '44.07'
+        Cl: '0.63'
+        Pt: '0.00'
+      source_cells:
+        Si: C12
+        Ti: D12
+        Al: E12
+        FeT: F12
+        Mg: G12
+        Ca: H12
+        Na: I12
+        K: J12
+        O: K12
+        Cl: M12
+        Pt: N12
+        total: O12
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.17'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 12
+    - sample_id_as_published: LVP-1
+      experiment: xu_2026_lvp_1
+      analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
+      source_row: 13
+      element_wt_percent_as_published:
+        Si: '23.43'
+        Ti: '0.57'
+        Al: '7.58'
+        FeT: '8.05'
+        Mg: '4.47'
+        Ca: '7.99'
+        Na: '2.04'
+        K: '0.17'
+        O: '43.59'
+        Cl: '0.60'
+        Pt: '0.00'
+      source_cells:
+        Si: C13
+        Ti: D13
+        Al: E13
+        FeT: F13
+        Mg: G13
+        Ca: H13
+        Na: I13
+        K: J13
+        O: K13
+        Cl: M13
+        Pt: N13
+        total: O13
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '98.48'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 13
+    - sample_id_as_published: LVP-1
+      experiment: xu_2026_lvp_1
+      analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
+      source_row: 14
+      element_wt_percent_as_published:
+        Si: '23.45'
+        Ti: '0.56'
+        Al: '7.53'
+        FeT: '8.13'
+        Mg: '4.38'
+        Ca: '8.13'
+        Na: '2.04'
+        K: '0.17'
+        O: '44.15'
+        Cl: '0.63'
+        Pt: '0.00'
+      source_cells:
+        Si: C14
+        Ti: D14
+        Al: E14
+        FeT: F14
+        Mg: G14
+        Ca: H14
+        Na: I14
+        K: J14
+        O: K14
+        Cl: M14
+        Pt: N14
+        total: O14
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.16'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 14
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_1
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_10
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_10
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-10 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-10 (Cpx+Gl)
+      experiment: xu_2026_lvp_10
+      analysis_id_as_published: 'MORB nopt 5 1450 1h-gl9 '
+      source_row: 67
+      element_wt_percent_as_published:
+        Si: '27.13'
+        Ti: '0.88'
+        Al: '8.92'
+        FeT: '0.65'
+        Mg: '3.86'
+        Ca: '7.88'
+        Na: '2.22'
+        K: '0.34'
+        O: '48.71'
+        Cl: '0.03'
+        Pt: '0.00'
+      source_cells:
+        Si: C67
+        Ti: D67
+        Al: E67
+        FeT: F67
+        Mg: G67
+        Ca: H67
+        Na: I67
+        K: J67
+        O: K67
+        Cl: M67
+        Pt: N67
+        total: O67
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.61'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 67
+    - sample_id_as_published: LVP-10 (Cpx+Gl)
+      experiment: xu_2026_lvp_10
+      analysis_id_as_published: 'MORB nopt 5 1450 1h-gl7 '
+      source_row: 68
+      element_wt_percent_as_published:
+        Si: '27.34'
+        Ti: '0.83'
+        Al: '8.87'
+        FeT: '0.69'
+        Mg: '3.98'
+        Ca: '7.73'
+        Na: '1.96'
+        K: '0.38'
+        O: '48.55'
+        Cl: '0.02'
+        Pt: '0.00'
+      source_cells:
+        Si: C68
+        Ti: D68
+        Al: E68
+        FeT: F68
+        Mg: G68
+        Ca: H68
+        Na: I68
+        K: J68
+        O: K68
+        Cl: M68
+        Pt: N68
+        total: O68
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.36'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 68
+    - sample_id_as_published: LVP-10 (Cpx+Gl)
+      experiment: xu_2026_lvp_10
+      analysis_id_as_published: 'MORB nopt 5 1450 1h-gl11 '
+      source_row: 69
+      element_wt_percent_as_published:
+        Si: '27.40'
+        Ti: '0.93'
+        Al: '8.78'
+        FeT: '0.76'
+        Mg: '3.68'
+        Ca: '7.54'
+        Na: '2.06'
+        K: '0.34'
+        O: '48.79'
+        Cl: '0.02'
+        Pt: '0.00'
+      source_cells:
+        Si: C69
+        Ti: D69
+        Al: E69
+        FeT: F69
+        Mg: G69
+        Ca: H69
+        Na: I69
+        K: J69
+        O: K69
+        Cl: M69
+        Pt: N69
+        total: O69
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.30'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 69
+    - sample_id_as_published: LVP-10 (Cpx+Gl)
+      experiment: xu_2026_lvp_10
+      analysis_id_as_published: 'MORB nopt 5 1450 1h-gl4 '
+      source_row: 70
+      element_wt_percent_as_published:
+        Si: '27.06'
+        Ti: '0.88'
+        Al: '8.78'
+        FeT: '0.58'
+        Mg: '3.94'
+        Ca: '7.70'
+        Na: '2.05'
+        K: '0.36'
+        O: '48.56'
+        Cl: '0.02'
+        Pt: '0.03'
+      source_cells:
+        Si: C70
+        Ti: D70
+        Al: E70
+        FeT: F70
+        Mg: G70
+        Ca: H70
+        Na: I70
+        K: J70
+        O: K70
+        Cl: M70
+        Pt: N70
+        total: O70
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.95'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 70
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_10
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_11
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_11
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-11 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-11
+      experiment: xu_2026_lvp_11
+      analysis_id_as_published: 'MORB nopt 5 1600 2min-gl4 '
+      source_row: 71
+      element_wt_percent_as_published:
+        Si: '25.41'
+        Ti: '0.57'
+        Al: '8.07'
+        FeT: '2.93'
+        Mg: '4.88'
+        Ca: '8.12'
+        Na: '2.33'
+        K: '0.23'
+        O: '47.69'
+        Cl: '0.07'
+        Pt: '0.00'
+      source_cells:
+        Si: C71
+        Ti: D71
+        Al: E71
+        FeT: F71
+        Mg: G71
+        Ca: H71
+        Na: I71
+        K: J71
+        O: K71
+        Cl: M71
+        Pt: N71
+        total: O71
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.29'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 71
+    - sample_id_as_published: LVP-11
+      experiment: xu_2026_lvp_11
+      analysis_id_as_published: 'MORB nopt 5 1600 2min-gl15 '
+      source_row: 72
+      element_wt_percent_as_published:
+        Si: '25.57'
+        Ti: '0.63'
+        Al: '8.42'
+        FeT: '2.53'
+        Mg: '4.92'
+        Ca: '8.28'
+        Na: '2.17'
+        K: '0.23'
+        O: '47.78'
+        Cl: '0.04'
+        Pt: '0.00'
+      source_cells:
+        Si: C72
+        Ti: D72
+        Al: E72
+        FeT: F72
+        Mg: G72
+        Ca: H72
+        Na: I72
+        K: J72
+        O: K72
+        Cl: M72
+        Pt: N72
+        total: O72
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.58'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 72
+    - sample_id_as_published: LVP-11
+      experiment: xu_2026_lvp_11
+      analysis_id_as_published: 'MORB nopt 5 1600 2min-gl1 '
+      source_row: 73
+      element_wt_percent_as_published:
+        Si: '25.77'
+        Ti: '0.61'
+        Al: '8.41'
+        FeT: '1.59'
+        Mg: '5.01'
+        Ca: '8.51'
+        Na: '2.43'
+        K: '0.29'
+        O: '47.23'
+        Cl: '0.08'
+        Pt: '0.00'
+      source_cells:
+        Si: C73
+        Ti: D73
+        Al: E73
+        FeT: F73
+        Mg: G73
+        Ca: H73
+        Na: I73
+        K: J73
+        O: K73
+        Cl: M73
+        Pt: N73
+        total: O73
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.94'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 73
+    - sample_id_as_published: LVP-11
+      experiment: xu_2026_lvp_11
+      analysis_id_as_published: 'MORB nopt 5 1600 2min-gl8 '
+      source_row: 74
+      element_wt_percent_as_published:
+        Si: '25.32'
+        Ti: '0.65'
+        Al: '8.14'
+        FeT: '3.15'
+        Mg: '4.80'
+        Ca: '8.32'
+        Na: '2.13'
+        K: '0.18'
+        O: '46.89'
+        Cl: '0.06'
+        Pt: '0.01'
+      source_cells:
+        Si: C74
+        Ti: D74
+        Al: E74
+        FeT: F74
+        Mg: G74
+        Ca: H74
+        Na: I74
+        K: J74
+        O: K74
+        Cl: M74
+        Pt: N74
+        total: O74
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.64'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 74
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_11
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_12
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_12
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-12 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-12 (Cpx+Coe+Gl))
+      experiment: xu_2026_lvp_12
+      analysis_id_as_published: 'MORB+satPtO2 5GPa 1400 1.5h-mid glass2 '
+      source_row: 83
+      element_wt_percent_as_published:
+        Si: '23.35'
+        Ti: '0.92'
+        Al: '9.16'
+        FeT: '0.11'
+        Mg: '5.09'
+        Ca: '9.03'
+        Na: '1.82'
+        K: '0.31'
+        O: '49.19'
+        Cl: '1.76'
+        Pt: '0.11'
+      source_cells:
+        Si: C83
+        Ti: D83
+        Al: E83
+        FeT: F83
+        Mg: G83
+        Ca: H83
+        Na: I83
+        K: J83
+        O: K83
+        Cl: M83
+        Pt: N83
+        total: O83
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.84'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 83
+    - sample_id_as_published: LVP-12 (Cpx+Coe+Gl))
+      experiment: xu_2026_lvp_12
+      analysis_id_as_published: 'MORB+satPtO2 5GPa 1400 1.5h-mid glass3 '
+      source_row: 84
+      element_wt_percent_as_published:
+        Si: '23.62'
+        Ti: '0.94'
+        Al: '9.11'
+        FeT: '0.12'
+        Mg: '4.89'
+        Ca: '8.41'
+        Na: '1.72'
+        K: '0.30'
+        O: '48.49'
+        Cl: '1.87'
+        Pt: '0.00'
+      source_cells:
+        Si: C84
+        Ti: D84
+        Al: E84
+        FeT: F84
+        Mg: G84
+        Ca: H84
+        Na: I84
+        K: J84
+        O: K84
+        Cl: M84
+        Pt: N84
+        total: O84
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.46'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 84
+    - sample_id_as_published: LVP-12 (Cpx+Coe+Gl))
+      experiment: xu_2026_lvp_12
+      analysis_id_as_published: 'MORB+satPtO2 5GPa 1400 1.5h-mid glass4 '
+      source_row: 85
+      element_wt_percent_as_published:
+        Si: '23.40'
+        Ti: '0.90'
+        Al: '9.28'
+        FeT: '0.07'
+        Mg: '5.12'
+        Ca: '8.89'
+        Na: '1.70'
+        K: '0.38'
+        O: '48.85'
+        Cl: '1.71'
+        Pt: '0.00'
+      source_cells:
+        Si: C85
+        Ti: D85
+        Al: E85
+        FeT: F85
+        Mg: G85
+        Ca: H85
+        Na: I85
+        K: J85
+        O: K85
+        Cl: M85
+        Pt: N85
+        total: O85
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.30'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 85
+    - sample_id_as_published: LVP-12 (Cpx+Coe+Gl))
+      experiment: xu_2026_lvp_12
+      analysis_id_as_published: 'MORB+satPtO2 5GPa 1400 1.5h-mid glass5 '
+      source_row: 86
+      element_wt_percent_as_published:
+        Si: '23.54'
+        Ti: '0.96'
+        Al: '9.19'
+        FeT: '0.11'
+        Mg: '5.13'
+        Ca: '8.75'
+        Na: '1.72'
+        K: '0.39'
+        O: '48.57'
+        Cl: '1.88'
+        Pt: '0.09'
+      source_cells:
+        Si: C86
+        Ti: D86
+        Al: E86
+        FeT: F86
+        Mg: G86
+        Ca: H86
+        Na: I86
+        K: J86
+        O: K86
+        Cl: M86
+        Pt: N86
+        total: O86
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.30'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 86
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_12
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_13
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_13
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-13 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-13 (Cpx+Coe+Gl)
+      experiment: xu_2026_lvp_13
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1450 1h 20um 3nA gl-1 '
+      source_row: 95
+      element_wt_percent_as_published:
+        Si: '23.68'
+        Ti: '1.03'
+        Al: '7.59'
+        FeT: '1.37'
+        Mg: '4.14'
+        Ca: '9.06'
+        Na: '1.88'
+        K: '0.41'
+        O: '49.27'
+        Cl: '1.58'
+        Pt: '0.00'
+      source_cells:
+        Si: C95
+        Ti: D95
+        Al: E95
+        FeT: F95
+        Mg: G95
+        Ca: H95
+        Na: I95
+        K: J95
+        O: K95
+        Cl: M95
+        Pt: N95
+        total: O95
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.02'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 95
+    - sample_id_as_published: LVP-13 (Cpx+Coe+Gl)
+      experiment: xu_2026_lvp_13
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1450 1h 17um 3nA gl-2 '
+      source_row: 96
+      element_wt_percent_as_published:
+        Si: '23.36'
+        Ti: '0.90'
+        Al: '7.75'
+        FeT: '1.38'
+        Mg: '4.24'
+        Ca: '9.06'
+        Na: '1.87'
+        K: '0.42'
+        O: '49.51'
+        Cl: '1.53'
+        Pt: '0.20'
+      source_cells:
+        Si: C96
+        Ti: D96
+        Al: E96
+        FeT: F96
+        Mg: G96
+        Ca: H96
+        Na: I96
+        K: J96
+        O: K96
+        Cl: M96
+        Pt: N96
+        total: O96
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.21'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 96
+    - sample_id_as_published: LVP-13 (Cpx+Coe+Gl)
+      experiment: xu_2026_lvp_13
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1450 1h 15um 5nA gl-1 '
+      source_row: 97
+      element_wt_percent_as_published:
+        Si: '23.51'
+        Ti: '0.91'
+        Al: '7.86'
+        FeT: '1.47'
+        Mg: '4.15'
+        Ca: '8.79'
+        Na: '1.74'
+        K: '0.35'
+        O: '49.16'
+        Cl: '1.60'
+        Pt: '0.00'
+      source_cells:
+        Si: C97
+        Ti: D97
+        Al: E97
+        FeT: F97
+        Mg: G97
+        Ca: H97
+        Na: I97
+        K: J97
+        O: K97
+        Cl: M97
+        Pt: N97
+        total: O97
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.54'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 97
+    - sample_id_as_published: LVP-13 (Cpx+Coe+Gl)
+      experiment: xu_2026_lvp_13
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1450 1h 15um 5nA gl-2 '
+      source_row: 98
+      element_wt_percent_as_published:
+        Si: '23.40'
+        Ti: '0.96'
+        Al: '7.84'
+        FeT: '1.40'
+        Mg: '4.16'
+        Ca: '9.00'
+        Na: '1.81'
+        K: '0.42'
+        O: '49.13'
+        Cl: '1.56'
+        Pt: '0.00'
+      source_cells:
+        Si: C98
+        Ti: D98
+        Al: E98
+        FeT: F98
+        Mg: G98
+        Ca: H98
+        Na: I98
+        K: J98
+        O: K98
+        Cl: M98
+        Pt: N98
+        total: O98
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.68'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 98
+    - sample_id_as_published: LVP-13 (Cpx+Coe+Gl)
+      experiment: xu_2026_lvp_13
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1450 1h 15um 5nA gl-3 '
+      source_row: 99
+      element_wt_percent_as_published:
+        Si: '23.56'
+        Ti: '0.90'
+        Al: '7.97'
+        FeT: '1.39'
+        Mg: '4.17'
+        Ca: '8.77'
+        Na: '1.81'
+        K: '0.41'
+        O: '49.49'
+        Cl: '1.50'
+        Pt: '0.14'
+      source_cells:
+        Si: C99
+        Ti: D99
+        Al: E99
+        FeT: F99
+        Mg: G99
+        Ca: H99
+        Na: I99
+        K: J99
+        O: K99
+        Cl: M99
+        Pt: N99
+        total: O99
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.11'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 99
+    - sample_id_as_published: LVP-13 (Cpx+Coe+Gl)
+      experiment: xu_2026_lvp_13
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1450 1h 15um 5nA gl-4 '
+      source_row: 100
+      element_wt_percent_as_published:
+        Si: '23.46'
+        Ti: '0.92'
+        Al: '7.74'
+        FeT: '1.54'
+        Mg: '4.16'
+        Ca: '9.05'
+        Na: '1.84'
+        K: '0.45'
+        O: '48.77'
+        Cl: '1.65'
+        Pt: '0.01'
+      source_cells:
+        Si: C100
+        Ti: D100
+        Al: E100
+        FeT: F100
+        Mg: G100
+        Ca: H100
+        Na: I100
+        K: J100
+        O: K100
+        Cl: M100
+        Pt: N100
+        total: O100
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.57'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 100
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_13
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_14
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_14
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-14 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-14
+      experiment: xu_2026_lvp_14
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1600 2min-1.1 '
+      source_row: 101
+      element_wt_percent_as_published:
+        Si: '25.20'
+        Ti: '0.53'
+        Al: '7.79'
+        FeT: '2.70'
+        Mg: '4.37'
+        Ca: '7.93'
+        Na: '2.25'
+        K: '0.25'
+        O: '48.67'
+        Cl: '0.18'
+        Pt: '0.00'
+      source_cells:
+        Si: C101
+        Ti: D101
+        Al: E101
+        FeT: F101
+        Mg: G101
+        Ca: H101
+        Na: I101
+        K: J101
+        O: K101
+        Cl: M101
+        Pt: N101
+        total: O101
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.86'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 101
+    - sample_id_as_published: LVP-14
+      experiment: xu_2026_lvp_14
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1600 2min-1.2 '
+      source_row: 102
+      element_wt_percent_as_published:
+        Si: '25.45'
+        Ti: '0.52'
+        Al: '7.99'
+        FeT: '3.34'
+        Mg: '4.53'
+        Ca: '7.99'
+        Na: '2.26'
+        K: '0.25'
+        O: '48.11'
+        Cl: '0.15'
+        Pt: '0.00'
+      source_cells:
+        Si: C102
+        Ti: D102
+        Al: E102
+        FeT: F102
+        Mg: G102
+        Ca: H102
+        Na: I102
+        K: J102
+        O: K102
+        Cl: M102
+        Pt: N102
+        total: O102
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.59'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 102
+    - sample_id_as_published: LVP-14
+      experiment: xu_2026_lvp_14
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1600 2min-1.3 '
+      source_row: 103
+      element_wt_percent_as_published:
+        Si: '24.98'
+        Ti: '0.57'
+        Al: '7.88'
+        FeT: '3.57'
+        Mg: '4.46'
+        Ca: '7.79'
+        Na: '2.10'
+        K: '0.25'
+        O: '47.72'
+        Cl: '0.23'
+        Pt: '0.08'
+      source_cells:
+        Si: C103
+        Ti: D103
+        Al: E103
+        FeT: F103
+        Mg: G103
+        Ca: H103
+        Na: I103
+        K: J103
+        O: K103
+        Cl: M103
+        Pt: N103
+        total: O103
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.61'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 103
+    - sample_id_as_published: LVP-14
+      experiment: xu_2026_lvp_14
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1600 2min-1.4 '
+      source_row: 104
+      element_wt_percent_as_published:
+        Si: '24.33'
+        Ti: '0.53'
+        Al: '7.86'
+        FeT: '3.64'
+        Mg: '4.66'
+        Ca: '8.07'
+        Na: '2.04'
+        K: '0.17'
+        O: '48.40'
+        Cl: '0.26'
+        Pt: '0.00'
+      source_cells:
+        Si: C104
+        Ti: D104
+        Al: E104
+        FeT: F104
+        Mg: G104
+        Ca: H104
+        Na: I104
+        K: J104
+        O: K104
+        Cl: M104
+        Pt: N104
+        total: O104
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.96'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 104
+    - sample_id_as_published: LVP-14
+      experiment: xu_2026_lvp_14
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1600 2min-1.5 '
+      source_row: 105
+      element_wt_percent_as_published:
+        Si: '23.84'
+        Ti: '0.59'
+        Al: '8.27'
+        FeT: '3.80'
+        Mg: '4.81'
+        Ca: '8.06'
+        Na: '1.93'
+        K: '0.22'
+        O: '48.40'
+        Cl: '0.28'
+        Pt: '0.04'
+      source_cells:
+        Si: C105
+        Ti: D105
+        Al: E105
+        FeT: F105
+        Mg: G105
+        Ca: H105
+        Na: I105
+        K: J105
+        O: K105
+        Cl: M105
+        Pt: N105
+        total: O105
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.23'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 105
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_14
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_15
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_15
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-15 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-15
+      experiment: xu_2026_lvp_15
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1700-4.3 '
+      source_row: 106
+      element_wt_percent_as_published:
+        Si: '24.46'
+        Ti: '0.65'
+        Al: '8.10'
+        FeT: '2.62'
+        Mg: '4.76'
+        Ca: '7.98'
+        Na: '2.08'
+        K: '0.23'
+        O: '48.99'
+        Cl: '0.37'
+        Pt: '0.00'
+      source_cells:
+        Si: C106
+        Ti: D106
+        Al: E106
+        FeT: F106
+        Mg: G106
+        Ca: H106
+        Na: I106
+        K: J106
+        O: K106
+        Cl: M106
+        Pt: N106
+        total: O106
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.24'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 106
+    - sample_id_as_published: LVP-15
+      experiment: xu_2026_lvp_15
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1700-4.4 '
+      source_row: 107
+      element_wt_percent_as_published:
+        Si: '24.78'
+        Ti: '0.56'
+        Al: '8.00'
+        FeT: '2.64'
+        Mg: '4.88'
+        Ca: '8.25'
+        Na: '2.21'
+        K: '0.25'
+        O: '48.17'
+        Cl: '0.35'
+        Pt: '0.00'
+      source_cells:
+        Si: C107
+        Ti: D107
+        Al: E107
+        FeT: F107
+        Mg: G107
+        Ca: H107
+        Na: I107
+        K: J107
+        O: K107
+        Cl: M107
+        Pt: N107
+        total: O107
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.07'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 107
+    - sample_id_as_published: LVP-15
+      experiment: xu_2026_lvp_15
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1700-1.6 '
+      source_row: 108
+      element_wt_percent_as_published:
+        Si: '24.11'
+        Ti: '0.60'
+        Al: '8.09'
+        FeT: '2.62'
+        Mg: '4.75'
+        Ca: '8.17'
+        Na: '1.97'
+        K: '0.22'
+        O: '48.87'
+        Cl: '0.35'
+        Pt: '0.03'
+      source_cells:
+        Si: C108
+        Ti: D108
+        Al: E108
+        FeT: F108
+        Mg: G108
+        Ca: H108
+        Na: I108
+        K: J108
+        O: K108
+        Cl: M108
+        Pt: N108
+        total: O108
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.77'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 108
+    - sample_id_as_published: LVP-15
+      experiment: xu_2026_lvp_15
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1700-2.2 '
+      source_row: 109
+      element_wt_percent_as_published:
+        Si: '24.55'
+        Ti: '0.55'
+        Al: '8.27'
+        FeT: '2.64'
+        Mg: '4.79'
+        Ca: '8.25'
+        Na: '2.17'
+        K: '0.23'
+        O: '47.87'
+        Cl: '0.38'
+        Pt: '0.00'
+      source_cells:
+        Si: C109
+        Ti: D109
+        Al: E109
+        FeT: F109
+        Mg: G109
+        Ca: H109
+        Na: I109
+        K: J109
+        O: K109
+        Cl: M109
+        Pt: N109
+        total: O109
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.69'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 109
+    - sample_id_as_published: LVP-15
+      experiment: xu_2026_lvp_15
+      analysis_id_as_published: 'MORB+PtO2 5GPa 1700-4.1 '
+      source_row: 110
+      element_wt_percent_as_published:
+        Si: '24.28'
+        Ti: '0.56'
+        Al: '8.02'
+        FeT: '2.59'
+        Mg: '4.86'
+        Ca: '8.35'
+        Na: '2.31'
+        K: '0.30'
+        O: '47.90'
+        Cl: '0.35'
+        Pt: '0.01'
+      source_cells:
+        Si: C110
+        Ti: D110
+        Al: E110
+        FeT: F110
+        Mg: G110
+        Ca: H110
+        Na: I110
+        K: J110
+        O: K110
+        Cl: M110
+        Pt: N110
+        total: O110
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.52'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 110
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_15
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_16
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_16
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-16 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-16
+      experiment: xu_2026_lvp_16
+      analysis_id_as_published: 'MORB nopt 7 1600 5min-2 '
+      source_row: 111
+      element_wt_percent_as_published:
+        Si: '25.30'
+        Ti: '0.66'
+        Al: '8.20'
+        FeT: '1.95'
+        Mg: '4.98'
+        Ca: '8.56'
+        Na: '2.20'
+        K: '0.30'
+        O: '47.20'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C111
+        Ti: D111
+        Al: E111
+        FeT: F111
+        Mg: G111
+        Ca: H111
+        Na: I111
+        K: J111
+        O: K111
+        Cl: M111
+        Pt: N111
+        total: O111
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.66'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 111
+    - sample_id_as_published: LVP-16
+      experiment: xu_2026_lvp_16
+      analysis_id_as_published: 'MORB nopt 7 1600 5min-3 '
+      source_row: 112
+      element_wt_percent_as_published:
+        Si: '25.61'
+        Ti: '0.62'
+        Al: '8.12'
+        FeT: '1.83'
+        Mg: '4.86'
+        Ca: '8.62'
+        Na: '2.10'
+        K: '0.19'
+        O: '47.30'
+        Cl: '0.01'
+        Pt: '0.00'
+      source_cells:
+        Si: C112
+        Ti: D112
+        Al: E112
+        FeT: F112
+        Mg: G112
+        Ca: H112
+        Na: I112
+        K: J112
+        O: K112
+        Cl: M112
+        Pt: N112
+        total: O112
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.34'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 112
+    - sample_id_as_published: LVP-16
+      experiment: xu_2026_lvp_16
+      analysis_id_as_published: 'MORB nopt 7 1600 5min-6 '
+      source_row: 113
+      element_wt_percent_as_published:
+        Si: '25.49'
+        Ti: '0.66'
+        Al: '8.20'
+        FeT: '1.93'
+        Mg: '4.92'
+        Ca: '8.52'
+        Na: '2.37'
+        K: '0.23'
+        O: '47.55'
+        Cl: '0.01'
+        Pt: '0.04'
+      source_cells:
+        Si: C113
+        Ti: D113
+        Al: E113
+        FeT: F113
+        Mg: G113
+        Ca: H113
+        Na: I113
+        K: J113
+        O: K113
+        Cl: M113
+        Pt: N113
+        total: O113
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.26'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 113
+    - sample_id_as_published: LVP-16
+      experiment: xu_2026_lvp_16
+      analysis_id_as_published: 'MORB nopt 7 1600 5min-7 '
+      source_row: 114
+      element_wt_percent_as_published:
+        Si: '25.46'
+        Ti: '0.66'
+        Al: '8.17'
+        FeT: '1.99'
+        Mg: '4.80'
+        Ca: '8.49'
+        Na: '2.15'
+        K: '0.22'
+        O: '47.40'
+        Cl: '0.01'
+        Pt: '0.00'
+      source_cells:
+        Si: C114
+        Ti: D114
+        Al: E114
+        FeT: F114
+        Mg: G114
+        Ca: H114
+        Na: I114
+        K: J114
+        O: K114
+        Cl: M114
+        Pt: N114
+        total: O114
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.12'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 114
+    - sample_id_as_published: LVP-16
+      experiment: xu_2026_lvp_16
+      analysis_id_as_published: 'MORB nopt 7 1600 5min-9 '
+      source_row: 115
+      element_wt_percent_as_published:
+        Si: '25.52'
+        Ti: '0.68'
+        Al: '8.20'
+        FeT: '1.78'
+        Mg: '5.05'
+        Ca: '8.52'
+        Na: '2.18'
+        K: '0.25'
+        O: '47.34'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C115
+        Ti: D115
+        Al: E115
+        FeT: F115
+        Mg: G115
+        Ca: H115
+        Na: I115
+        K: J115
+        O: K115
+        Cl: M115
+        Pt: N115
+        total: O115
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.38'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 115
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_16
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_17
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_17
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-17 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-17 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_17
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1400 1.5h-gl7 '
+      source_row: 130
+      element_wt_percent_as_published:
+        Si: '21.87'
+        Ti: '1.53'
+        Al: '7.22'
+        FeT: '0.97'
+        Mg: '3.80'
+        Ca: '9.69'
+        Na: '1.81'
+        K: '0.66'
+        O: '51.20'
+        Cl: '1.64'
+        Pt: '0.10'
+      source_cells:
+        Si: C130
+        Ti: D130
+        Al: E130
+        FeT: F130
+        Mg: G130
+        Ca: H130
+        Na: I130
+        K: J130
+        O: K130
+        Cl: M130
+        Pt: N130
+        total: O130
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.49'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 130
+    - sample_id_as_published: LVP-17 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_17
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1400 1.5h-gl9 '
+      source_row: 131
+      element_wt_percent_as_published:
+        Si: '21.73'
+        Ti: '1.47'
+        Al: '7.09'
+        FeT: '1.00'
+        Mg: '3.84'
+        Ca: '9.45'
+        Na: '1.69'
+        K: '0.60'
+        O: '51.68'
+        Cl: '1.64'
+        Pt: '0.01'
+      source_cells:
+        Si: C131
+        Ti: D131
+        Al: E131
+        FeT: F131
+        Mg: G131
+        Ca: H131
+        Na: I131
+        K: J131
+        O: K131
+        Cl: M131
+        Pt: N131
+        total: O131
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.20'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 131
+    - sample_id_as_published: LVP-17 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_17
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1400 1.5h-gl10 '
+      source_row: 132
+      element_wt_percent_as_published:
+        Si: '22.47'
+        Ti: '1.43'
+        Al: '7.24'
+        FeT: '1.05'
+        Mg: '3.70'
+        Ca: '9.38'
+        Na: '1.63'
+        K: '0.55'
+        O: '50.55'
+        Cl: '1.61'
+        Pt: '0.00'
+      source_cells:
+        Si: C132
+        Ti: D132
+        Al: E132
+        FeT: F132
+        Mg: G132
+        Ca: H132
+        Na: I132
+        K: J132
+        O: K132
+        Cl: M132
+        Pt: N132
+        total: O132
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.61'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 132
+    - sample_id_as_published: LVP-17 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_17
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1400 1.5h-gl8 '
+      source_row: 133
+      element_wt_percent_as_published:
+        Si: '22.01'
+        Ti: '1.52'
+        Al: '7.16'
+        FeT: '0.97'
+        Mg: '3.93'
+        Ca: '9.75'
+        Na: '1.75'
+        K: '0.60'
+        O: '50.28'
+        Cl: '1.59'
+        Pt: '0.00'
+      source_cells:
+        Si: C133
+        Ti: D133
+        Al: E133
+        FeT: F133
+        Mg: G133
+        Ca: H133
+        Na: I133
+        K: J133
+        O: K133
+        Cl: M133
+        Pt: N133
+        total: O133
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.56'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 133
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_17
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_18
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_18
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-18 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-18 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_18
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1450 1h-gl-1 '
+      source_row: 152
+      element_wt_percent_as_published:
+        Si: '21.56'
+        Ti: '1.64'
+        Al: '7.11'
+        FeT: '1.16'
+        Mg: '4.10'
+        Ca: '10.12'
+        Na: '1.68'
+        K: '0.60'
+        O: '50.28'
+        Cl: '2.27'
+        Pt: '0.00'
+      source_cells:
+        Si: C152
+        Ti: D152
+        Al: E152
+        FeT: F152
+        Mg: G152
+        Ca: H152
+        Na: I152
+        K: J152
+        O: K152
+        Cl: M152
+        Pt: N152
+        total: O152
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.52'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 152
+    - sample_id_as_published: LVP-18 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_18
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1450 1h-gl-2 '
+      source_row: 153
+      element_wt_percent_as_published:
+        Si: '21.42'
+        Ti: '1.55'
+        Al: '7.12'
+        FeT: '1.13'
+        Mg: '4.16'
+        Ca: '10.19'
+        Na: '1.69'
+        K: '0.54'
+        O: '50.04'
+        Cl: '2.30'
+        Pt: '0.00'
+      source_cells:
+        Si: C153
+        Ti: D153
+        Al: E153
+        FeT: F153
+        Mg: G153
+        Ca: H153
+        Na: I153
+        K: J153
+        O: K153
+        Cl: M153
+        Pt: N153
+        total: O153
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.14'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 153
+    - sample_id_as_published: LVP-18 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_18
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1450 1h-gl-3 '
+      source_row: 154
+      element_wt_percent_as_published:
+        Si: '21.49'
+        Ti: '1.54'
+        Al: '7.09'
+        FeT: '1.10'
+        Mg: '4.12'
+        Ca: '10.26'
+        Na: '1.62'
+        K: '0.67'
+        O: '50.37'
+        Cl: '2.25'
+        Pt: '0.00'
+      source_cells:
+        Si: C154
+        Ti: D154
+        Al: E154
+        FeT: F154
+        Mg: G154
+        Ca: H154
+        Na: I154
+        K: J154
+        O: K154
+        Cl: M154
+        Pt: N154
+        total: O154
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.52'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 154
+    - sample_id_as_published: LVP-18 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_18
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1450 1h-gl-4 '
+      source_row: 155
+      element_wt_percent_as_published:
+        Si: '21.72'
+        Ti: '1.63'
+        Al: '7.14'
+        FeT: '1.13'
+        Mg: '4.20'
+        Ca: '10.42'
+        Na: '1.64'
+        K: '0.52'
+        O: '50.27'
+        Cl: '2.33'
+        Pt: '0.00'
+      source_cells:
+        Si: C155
+        Ti: D155
+        Al: E155
+        FeT: F155
+        Mg: G155
+        Ca: H155
+        Na: I155
+        K: J155
+        O: K155
+        Cl: M155
+        Pt: N155
+        total: O155
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.99'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 155
+    - sample_id_as_published: LVP-18 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_18
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1450 1h-gl-5 '
+      source_row: 156
+      element_wt_percent_as_published:
+        Si: '21.45'
+        Ti: '1.61'
+        Al: '7.07'
+        FeT: '1.13'
+        Mg: '4.34'
+        Ca: '10.30'
+        Na: '1.61'
+        K: '0.63'
+        O: '50.19'
+        Cl: '2.24'
+        Pt: '0.06'
+      source_cells:
+        Si: C156
+        Ti: D156
+        Al: E156
+        FeT: F156
+        Mg: G156
+        Ca: H156
+        Na: I156
+        K: J156
+        O: K156
+        Cl: M156
+        Pt: N156
+        total: O156
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.63'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 156
+    - sample_id_as_published: LVP-18 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_18
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1450 1h-gl-6 '
+      source_row: 157
+      element_wt_percent_as_published:
+        Si: '21.85'
+        Ti: '1.67'
+        Al: '7.13'
+        FeT: '1.14'
+        Mg: '4.19'
+        Ca: '10.20'
+        Na: '1.83'
+        K: '0.46'
+        O: '49.68'
+        Cl: '2.34'
+        Pt: '0.11'
+      source_cells:
+        Si: C157
+        Ti: D157
+        Al: E157
+        FeT: F157
+        Mg: G157
+        Ca: H157
+        Na: I157
+        K: J157
+        O: K157
+        Cl: M157
+        Pt: N157
+        total: O157
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.59'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 157
+    - sample_id_as_published: LVP-18 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_18
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1450 1h-gl-9 '
+      source_row: 158
+      element_wt_percent_as_published:
+        Si: '21.92'
+        Ti: '1.53'
+        Al: '7.29'
+        FeT: '1.13'
+        Mg: '4.40'
+        Ca: '10.18'
+        Na: '1.77'
+        K: '0.60'
+        O: '49.06'
+        Cl: '2.25'
+        Pt: '0.00'
+      source_cells:
+        Si: C158
+        Ti: D158
+        Al: E158
+        FeT: F158
+        Mg: G158
+        Ca: H158
+        Na: I158
+        K: J158
+        O: K158
+        Cl: M158
+        Pt: N158
+        total: O158
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.12'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 158
+    - sample_id_as_published: LVP-18 (Cpx+Gt+Coe+Gl
+      experiment: xu_2026_lvp_18
+      analysis_id_as_published: 'MORB+sat PtO2 7GPa 1450 1h-gl-10 '
+      source_row: 159
+      element_wt_percent_as_published:
+        Si: '21.69'
+        Ti: '1.66'
+        Al: '7.26'
+        FeT: '1.06'
+        Mg: '4.32'
+        Ca: '10.36'
+        Na: '1.57'
+        K: '0.56'
+        O: '49.75'
+        Cl: '2.19'
+        Pt: '0.02'
+      source_cells:
+        Si: C159
+        Ti: D159
+        Al: E159
+        FeT: F159
+        Mg: G159
+        Ca: H159
+        Na: I159
+        K: J159
+        O: K159
+        Cl: M159
+        Pt: N159
+        total: O159
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.45'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 159
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_18
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_19
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_19
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-19 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-19
+      experiment: xu_2026_lvp_19
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1600 2min-1 '
+      source_row: 160
+      element_wt_percent_as_published:
+        Si: '25.32'
+        Ti: '0.52'
+        Al: '7.72'
+        FeT: '3.53'
+        Mg: '3.81'
+        Ca: '7.62'
+        Na: '2.02'
+        K: '0.16'
+        O: '48.82'
+        Cl: '0.13'
+        Pt: '0.05'
+      source_cells:
+        Si: C160
+        Ti: D160
+        Al: E160
+        FeT: F160
+        Mg: G160
+        Ca: H160
+        Na: I160
+        K: J160
+        O: K160
+        Cl: M160
+        Pt: N160
+        total: O160
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.70'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 160
+    - sample_id_as_published: LVP-19
+      experiment: xu_2026_lvp_19
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1600 2min-2 '
+      source_row: 161
+      element_wt_percent_as_published:
+        Si: '23.31'
+        Ti: '0.60'
+        Al: '7.60'
+        FeT: '4.95'
+        Mg: '4.53'
+        Ca: '7.79'
+        Na: '1.92'
+        K: '0.16'
+        O: '48.30'
+        Cl: '0.17'
+        Pt: '0.00'
+      source_cells:
+        Si: C161
+        Ti: D161
+        Al: E161
+        FeT: F161
+        Mg: G161
+        Ca: H161
+        Na: I161
+        K: J161
+        O: K161
+        Cl: M161
+        Pt: N161
+        total: O161
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.33'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 161
+    - sample_id_as_published: LVP-19
+      experiment: xu_2026_lvp_19
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1600 2min-3 '
+      source_row: 162
+      element_wt_percent_as_published:
+        Si: '23.11'
+        Ti: '0.57'
+        Al: '7.72'
+        FeT: '5.32'
+        Mg: '4.38'
+        Ca: '7.69'
+        Na: '1.97'
+        K: '0.14'
+        O: '47.45'
+        Cl: '0.18'
+        Pt: '0.00'
+      source_cells:
+        Si: C162
+        Ti: D162
+        Al: E162
+        FeT: F162
+        Mg: G162
+        Ca: H162
+        Na: I162
+        K: J162
+        O: K162
+        Cl: M162
+        Pt: N162
+        total: O162
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '98.51'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 162
+    - sample_id_as_published: LVP-19
+      experiment: xu_2026_lvp_19
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1600 2min-4 '
+      source_row: 163
+      element_wt_percent_as_published:
+        Si: '22.92'
+        Ti: '0.67'
+        Al: '8.29'
+        FeT: '4.93'
+        Mg: '4.75'
+        Ca: '8.02'
+        Na: '1.82'
+        K: '0.17'
+        O: '47.84'
+        Cl: '0.20'
+        Pt: '0.06'
+      source_cells:
+        Si: C163
+        Ti: D163
+        Al: E163
+        FeT: F163
+        Mg: G163
+        Ca: H163
+        Na: I163
+        K: J163
+        O: K163
+        Cl: M163
+        Pt: N163
+        total: O163
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.68'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 163
+    - sample_id_as_published: LVP-19
+      experiment: xu_2026_lvp_19
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1600 2min-5 '
+      source_row: 164
+      element_wt_percent_as_published:
+        Si: '23.01'
+        Ti: '0.61'
+        Al: '7.94'
+        FeT: '7.32'
+        Mg: '4.57'
+        Ca: '7.67'
+        Na: '1.84'
+        K: '0.24'
+        O: '46.80'
+        Cl: '0.28'
+        Pt: '0.19'
+      source_cells:
+        Si: C164
+        Ti: D164
+        Al: E164
+        FeT: F164
+        Mg: G164
+        Ca: H164
+        Na: I164
+        K: J164
+        O: K164
+        Cl: M164
+        Pt: N164
+        total: O164
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.46'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 164
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_19
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_2
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_2
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-2 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-2
+      experiment: xu_2026_lvp_2
+      analysis_id_as_published: 'MORB+PtO2 0.5Gpa 1400 5min-1 '
+      source_row: 15
+      element_wt_percent_as_published:
+        Si: '24.28'
+        Ti: '0.60'
+        Al: '7.83'
+        FeT: '6.12'
+        Mg: '4.60'
+        Ca: '8.04'
+        Na: '2.08'
+        K: '0.20'
+        O: '45.90'
+        Cl: '0.13'
+        Pt: '0.01'
+      source_cells:
+        Si: C15
+        Ti: D15
+        Al: E15
+        FeT: F15
+        Mg: G15
+        Ca: H15
+        Na: I15
+        K: J15
+        O: K15
+        Cl: M15
+        Pt: N15
+        total: O15
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.79'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 15
+    - sample_id_as_published: LVP-2
+      experiment: xu_2026_lvp_2
+      analysis_id_as_published: 'MORB+PtO2 0.5Gpa 1400 5min-5 '
+      source_row: 16
+      element_wt_percent_as_published:
+        Si: '24.14'
+        Ti: '0.59'
+        Al: '7.86'
+        FeT: '6.41'
+        Mg: '4.43'
+        Ca: '8.21'
+        Na: '2.02'
+        K: '0.20'
+        O: '46.03'
+        Cl: '0.12'
+        Pt: '0.07'
+      source_cells:
+        Si: C16
+        Ti: D16
+        Al: E16
+        FeT: F16
+        Mg: G16
+        Ca: H16
+        Na: I16
+        K: J16
+        O: K16
+        Cl: M16
+        Pt: N16
+        total: O16
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.08'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 16
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_2
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_20
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_20
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-20 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-20
+      experiment: xu_2026_lvp_20
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1700 2min-2 '
+      source_row: 165
+      element_wt_percent_as_published:
+        Si: '24.74'
+        Ti: '0.64'
+        Al: '8.31'
+        FeT: '2.55'
+        Mg: '4.72'
+        Ca: '8.12'
+        Na: '1.94'
+        K: '0.22'
+        O: '49.22'
+        Cl: '0.19'
+        Pt: '0.06'
+      source_cells:
+        Si: C165
+        Ti: D165
+        Al: E165
+        FeT: F165
+        Mg: G165
+        Ca: H165
+        Na: I165
+        K: J165
+        O: K165
+        Cl: M165
+        Pt: N165
+        total: O165
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.72'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 165
+    - sample_id_as_published: LVP-20
+      experiment: xu_2026_lvp_20
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1700 2min-3 '
+      source_row: 166
+      element_wt_percent_as_published:
+        Si: '25.04'
+        Ti: '0.61'
+        Al: '8.23'
+        FeT: '2.86'
+        Mg: '4.74'
+        Ca: '8.24'
+        Na: '1.90'
+        K: '0.19'
+        O: '48.58'
+        Cl: '0.15'
+        Pt: '0.00'
+      source_cells:
+        Si: C166
+        Ti: D166
+        Al: E166
+        FeT: F166
+        Mg: G166
+        Ca: H166
+        Na: I166
+        K: J166
+        O: K166
+        Cl: M166
+        Pt: N166
+        total: O166
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.53'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 166
+    - sample_id_as_published: LVP-20
+      experiment: xu_2026_lvp_20
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1700 2min-4 '
+      source_row: 167
+      element_wt_percent_as_published:
+        Si: '25.20'
+        Ti: '0.63'
+        Al: '8.23'
+        FeT: '2.82'
+        Mg: '4.66'
+        Ca: '7.99'
+        Na: '1.90'
+        K: '0.21'
+        O: '48.39'
+        Cl: '0.13'
+        Pt: '0.09'
+      source_cells:
+        Si: C167
+        Ti: D167
+        Al: E167
+        FeT: F167
+        Mg: G167
+        Ca: H167
+        Na: I167
+        K: J167
+        O: K167
+        Cl: M167
+        Pt: N167
+        total: O167
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.24'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 167
+    - sample_id_as_published: LVP-20
+      experiment: xu_2026_lvp_20
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1700 2min-2 '
+      source_row: 168
+      element_wt_percent_as_published:
+        Si: '24.74'
+        Ti: '0.64'
+        Al: '8.31'
+        FeT: '2.55'
+        Mg: '4.72'
+        Ca: '8.12'
+        Na: '1.93'
+        K: '0.22'
+        O: '48.70'
+        Cl: '0.19'
+        Pt: '0.06'
+      source_cells:
+        Si: C168
+        Ti: D168
+        Al: E168
+        FeT: F168
+        Mg: G168
+        Ca: H168
+        Na: I168
+        K: J168
+        O: K168
+        Cl: M168
+        Pt: N168
+        total: O168
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.18'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 168
+    - sample_id_as_published: LVP-20
+      experiment: xu_2026_lvp_20
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1700 2min-3 '
+      source_row: 169
+      element_wt_percent_as_published:
+        Si: '25.04'
+        Ti: '0.61'
+        Al: '8.22'
+        FeT: '2.86'
+        Mg: '4.73'
+        Ca: '8.24'
+        Na: '1.90'
+        K: '0.19'
+        O: '47.74'
+        Cl: '0.15'
+        Pt: '0.00'
+      source_cells:
+        Si: C169
+        Ti: D169
+        Al: E169
+        FeT: F169
+        Mg: G169
+        Ca: H169
+        Na: I169
+        K: J169
+        O: K169
+        Cl: M169
+        Pt: N169
+        total: O169
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.68'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 169
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_20
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_21
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_21
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-21 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-21
+      experiment: xu_2026_lvp_21
+      analysis_id_as_published: 'C20 MORB+3%PtO2 7GPa 1700 4min-glass8 '
+      source_row: 170
+      element_wt_percent_as_published:
+        Si: '24.43'
+        Ti: '0.63'
+        Al: '7.88'
+        FeT: '1.57'
+        Mg: '4.66'
+        Ca: '8.41'
+        Na: '2.12'
+        K: '0.24'
+        O: '49.42'
+        Cl: '0.22'
+        Pt: '0.00'
+      source_cells:
+        Si: C170
+        Ti: D170
+        Al: E170
+        FeT: F170
+        Mg: G170
+        Ca: H170
+        Na: I170
+        K: J170
+        O: K170
+        Cl: M170
+        Pt: N170
+        total: O170
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.58'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 170
+    - sample_id_as_published: LVP-21
+      experiment: xu_2026_lvp_21
+      analysis_id_as_published: 'C20 MORB+3%PtO2 7GPa 1700 4min-glass9 '
+      source_row: 171
+      element_wt_percent_as_published:
+        Si: '24.53'
+        Ti: '0.66'
+        Al: '7.90'
+        FeT: '1.59'
+        Mg: '4.65'
+        Ca: '8.31'
+        Na: '2.12'
+        K: '0.28'
+        O: '49.47'
+        Cl: '0.18'
+        Pt: '0.01'
+      source_cells:
+        Si: C171
+        Ti: D171
+        Al: E171
+        FeT: F171
+        Mg: G171
+        Ca: H171
+        Na: I171
+        K: J171
+        O: K171
+        Cl: M171
+        Pt: N171
+        total: O171
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.69'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 171
+    - sample_id_as_published: LVP-21
+      experiment: xu_2026_lvp_21
+      analysis_id_as_published: 'C20 MORB+3%PtO2 7GPa 1700 4min-glass11 '
+      source_row: 172
+      element_wt_percent_as_published:
+        Si: '24.40'
+        Ti: '0.62'
+        Al: '7.96'
+        FeT: '1.50'
+        Mg: '4.66'
+        Ca: '8.45'
+        Na: '2.20'
+        K: '0.28'
+        O: '49.71'
+        Cl: '0.22'
+        Pt: '0.10'
+      source_cells:
+        Si: C172
+        Ti: D172
+        Al: E172
+        FeT: F172
+        Mg: G172
+        Ca: H172
+        Na: I172
+        K: J172
+        O: K172
+        Cl: M172
+        Pt: N172
+        total: O172
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.10'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 172
+    - sample_id_as_published: LVP-21
+      experiment: xu_2026_lvp_21
+      analysis_id_as_published: 'C20 MORB+3%PtO2 7GPa 1700 4min-glass9 '
+      source_row: 173
+      element_wt_percent_as_published:
+        Si: '24.53'
+        Ti: '0.66'
+        Al: '7.91'
+        FeT: '1.59'
+        Mg: '4.65'
+        Ca: '8.31'
+        Na: '2.13'
+        K: '0.28'
+        O: '50.03'
+        Cl: '0.18'
+        Pt: '0.01'
+      source_cells:
+        Si: C173
+        Ti: D173
+        Al: E173
+        FeT: F173
+        Mg: G173
+        Ca: H173
+        Na: I173
+        K: J173
+        O: K173
+        Cl: M173
+        Pt: N173
+        total: O173
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.26'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 173
+    - sample_id_as_published: LVP-21
+      experiment: xu_2026_lvp_21
+      analysis_id_as_published: 'C20 MORB+3%PtO2 7GPa 1700 4min-glass6 '
+      source_row: 174
+      element_wt_percent_as_published:
+        Si: '24.58'
+        Ti: '0.69'
+        Al: '7.92'
+        FeT: '1.23'
+        Mg: '4.72'
+        Ca: '8.62'
+        Na: '2.24'
+        K: '0.24'
+        O: '49.97'
+        Cl: '0.20'
+        Pt: '0.00'
+      source_cells:
+        Si: C174
+        Ti: D174
+        Al: E174
+        FeT: F174
+        Mg: G174
+        Ca: H174
+        Na: I174
+        K: J174
+        O: K174
+        Cl: M174
+        Pt: N174
+        total: O174
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.40'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 174
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_21
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_22
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_22
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-22 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-22
+      experiment: xu_2026_lvp_22
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1800 4min-1 '
+      source_row: 175
+      element_wt_percent_as_published:
+        Si: '23.88'
+        Ti: '0.56'
+        Al: '7.56'
+        FeT: '4.02'
+        Mg: '4.18'
+        Ca: '7.39'
+        Na: '2.06'
+        K: '0.20'
+        O: '50.36'
+        Cl: '0.18'
+        Pt: '0.06'
+      source_cells:
+        Si: C175
+        Ti: D175
+        Al: E175
+        FeT: F175
+        Mg: G175
+        Ca: H175
+        Na: I175
+        K: J175
+        O: K175
+        Cl: M175
+        Pt: N175
+        total: O175
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.44'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 175
+    - sample_id_as_published: LVP-22
+      experiment: xu_2026_lvp_22
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1800 4min-3 '
+      source_row: 176
+      element_wt_percent_as_published:
+        Si: '24.09'
+        Ti: '0.59'
+        Al: '7.56'
+        FeT: '4.02'
+        Mg: '4.07'
+        Ca: '7.30'
+        Na: '1.81'
+        K: '0.18'
+        O: '50.08'
+        Cl: '0.19'
+        Pt: '0.06'
+      source_cells:
+        Si: C176
+        Ti: D176
+        Al: E176
+        FeT: F176
+        Mg: G176
+        Ca: H176
+        Na: I176
+        K: J176
+        O: K176
+        Cl: M176
+        Pt: N176
+        total: O176
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.94'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 176
+    - sample_id_as_published: LVP-22
+      experiment: xu_2026_lvp_22
+      analysis_id_as_published: 'MORB+PtO2 7GPa 1800 4min-4 '
+      source_row: 177
+      element_wt_percent_as_published:
+        Si: '24.23'
+        Ti: '0.55'
+        Al: '7.48'
+        FeT: '3.96'
+        Mg: '4.30'
+        Ca: '7.31'
+        Na: '1.79'
+        K: '0.19'
+        O: '49.44'
+        Cl: '0.18'
+        Pt: '0.05'
+      source_cells:
+        Si: C177
+        Ti: D177
+        Al: E177
+        FeT: F177
+        Mg: G177
+        Ca: H177
+        Na: I177
+        K: J177
+        O: K177
+        Cl: M177
+        Pt: N177
+        total: O177
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.48'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 177
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_22
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_3
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_3
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-3 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-3
+      experiment: xu_2026_lvp_3
+      analysis_id_as_published: 'MORB+PtO2 0.5Gpa 1500 5min-2 '
+      source_row: 17
+      element_wt_percent_as_published:
+        Si: '23.67'
+        Ti: '0.55'
+        Al: '7.57'
+        FeT: '7.46'
+        Mg: '4.45'
+        Ca: '8.08'
+        Na: '1.93'
+        K: '0.18'
+        O: '45.43'
+        Cl: '0.14'
+        Pt: '0.00'
+      source_cells:
+        Si: C17
+        Ti: D17
+        Al: E17
+        FeT: F17
+        Mg: G17
+        Ca: H17
+        Na: I17
+        K: J17
+        O: K17
+        Cl: M17
+        Pt: N17
+        total: O17
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.45'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 17
+    - sample_id_as_published: LVP-3
+      experiment: xu_2026_lvp_3
+      analysis_id_as_published: 'MORB+PtO2 0.5Gpa 1500 5min-3 '
+      source_row: 18
+      element_wt_percent_as_published:
+        Si: '23.46'
+        Ti: '0.63'
+        Al: '7.53'
+        FeT: '7.50'
+        Mg: '4.51'
+        Ca: '7.88'
+        Na: '2.00'
+        K: '0.21'
+        O: '45.72'
+        Cl: '0.16'
+        Pt: '0.07'
+      source_cells:
+        Si: C18
+        Ti: D18
+        Al: E18
+        FeT: F18
+        Mg: G18
+        Ca: H18
+        Na: I18
+        K: J18
+        O: K18
+        Cl: M18
+        Pt: N18
+        total: O18
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.66'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 18
+    - sample_id_as_published: LVP-3
+      experiment: xu_2026_lvp_3
+      analysis_id_as_published: 'MORB+PtO2 0.5Gpa 1500 5min-5 '
+      source_row: 19
+      element_wt_percent_as_published:
+        Si: '23.67'
+        Ti: '0.55'
+        Al: '7.68'
+        FeT: '7.62'
+        Mg: '4.45'
+        Ca: '7.77'
+        Na: '1.93'
+        K: '0.23'
+        O: '45.48'
+        Cl: '0.14'
+        Pt: '0.00'
+      source_cells:
+        Si: C19
+        Ti: D19
+        Al: E19
+        FeT: F19
+        Mg: G19
+        Ca: H19
+        Na: I19
+        K: J19
+        O: K19
+        Cl: M19
+        Pt: N19
+        total: O19
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.51'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 19
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_3
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_4
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_4
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-4 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-4 (Cpx+Gl)
+      experiment: xu_2026_lvp_4
+      analysis_id_as_published: 'MORB nopt 1GPa 1200 3h-gl-1 '
+      source_row: 24
+      element_wt_percent_as_published:
+        Si: '25.50'
+        Ti: '0.72'
+        Al: '9.48'
+        FeT: '4.64'
+        Mg: '2.95'
+        Ca: '6.16'
+        Na: '2.40'
+        K: '0.27'
+        O: '47.50'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C24
+        Ti: D24
+        Al: E24
+        FeT: F24
+        Mg: G24
+        Ca: H24
+        Na: I24
+        K: J24
+        O: K24
+        Cl: M24
+        Pt: N24
+        total: O24
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.63'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 24
+    - sample_id_as_published: LVP-4 (Cpx+Gl)
+      experiment: xu_2026_lvp_4
+      analysis_id_as_published: 'MORB nopt 1GPa 1200 3h-gl-2 '
+      source_row: 25
+      element_wt_percent_as_published:
+        Si: '25.65'
+        Ti: '0.64'
+        Al: '9.50'
+        FeT: '4.34'
+        Mg: '2.81'
+        Ca: '5.77'
+        Na: '2.64'
+        K: '0.33'
+        O: '48.11'
+        Cl: '0.01'
+        Pt: '0.04'
+      source_cells:
+        Si: C25
+        Ti: D25
+        Al: E25
+        FeT: F25
+        Mg: G25
+        Ca: H25
+        Na: I25
+        K: J25
+        O: K25
+        Cl: M25
+        Pt: N25
+        total: O25
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.83'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 25
+    - sample_id_as_published: LVP-4 (Cpx+Gl)
+      experiment: xu_2026_lvp_4
+      analysis_id_as_published: 'MORB nopt 1GPa 1200 3h-gl-3 '
+      source_row: 26
+      element_wt_percent_as_published:
+        Si: '25.99'
+        Ti: '0.68'
+        Al: '10.21'
+        FeT: '4.37'
+        Mg: '2.27'
+        Ca: '5.29'
+        Na: '2.90'
+        K: '0.38'
+        O: '48.23'
+        Cl: '0.03'
+        Pt: '0.05'
+      source_cells:
+        Si: C26
+        Ti: D26
+        Al: E26
+        FeT: F26
+        Mg: G26
+        Ca: H26
+        Na: I26
+        K: J26
+        O: K26
+        Cl: M26
+        Pt: N26
+        total: O26
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.38'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 26
+    - sample_id_as_published: LVP-4 (Cpx+Gl)
+      experiment: xu_2026_lvp_4
+      analysis_id_as_published: 'MORB nopt 1GPa 1200 3h-gl-4 '
+      source_row: 27
+      element_wt_percent_as_published:
+        Si: '25.25'
+        Ti: '0.74'
+        Al: '10.07'
+        FeT: '4.59'
+        Mg: '2.54'
+        Ca: '5.61'
+        Na: '2.61'
+        K: '0.32'
+        O: '48.52'
+        Cl: '0.02'
+        Pt: '0.00'
+      source_cells:
+        Si: C27
+        Ti: D27
+        Al: E27
+        FeT: F27
+        Mg: G27
+        Ca: H27
+        Na: I27
+        K: J27
+        O: K27
+        Cl: M27
+        Pt: N27
+        total: O27
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.26'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 27
+    - sample_id_as_published: LVP-4 (Cpx+Gl)
+      experiment: xu_2026_lvp_4
+      analysis_id_as_published: 'MORB nopt 1GPa 1200 3h-gl-5 '
+      source_row: 28
+      element_wt_percent_as_published:
+        Si: '25.20'
+        Ti: '0.87'
+        Al: '9.65'
+        FeT: '5.01'
+        Mg: '2.81'
+        Ca: '5.69'
+        Na: '2.43'
+        K: '0.34'
+        O: '48.22'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C28
+        Ti: D28
+        Al: E28
+        FeT: F28
+        Mg: G28
+        Ca: H28
+        Na: I28
+        K: J28
+        O: K28
+        Cl: M28
+        Pt: N28
+        total: O28
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.23'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 28
+    - sample_id_as_published: LVP-4 (Cpx+Gl)
+      experiment: xu_2026_lvp_4
+      analysis_id_as_published: 'MORB nopt 1GPa 1200 3h-gl-6 '
+      source_row: 29
+      element_wt_percent_as_published:
+        Si: '25.47'
+        Ti: '0.75'
+        Al: '9.81'
+        FeT: '4.54'
+        Mg: '2.44'
+        Ca: '5.65'
+        Na: '2.58'
+        K: '0.32'
+        O: '47.96'
+        Cl: '0.02'
+        Pt: '0.10'
+      source_cells:
+        Si: C29
+        Ti: D29
+        Al: E29
+        FeT: F29
+        Mg: G29
+        Ca: H29
+        Na: I29
+        K: J29
+        O: K29
+        Cl: M29
+        Pt: N29
+        total: O29
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.64'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 29
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_4
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_5
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_5
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-5 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-1 '
+      source_row: 30
+      element_wt_percent_as_published:
+        Si: '25.91'
+        Ti: '0.68'
+        Al: '8.19'
+        FeT: '1.38'
+        Mg: '5.02'
+        Ca: '8.58'
+        Na: '2.33'
+        K: '0.15'
+        O: '47.39'
+        Cl: '0.01'
+        Pt: '0.21'
+      source_cells:
+        Si: C30
+        Ti: D30
+        Al: E30
+        FeT: F30
+        Mg: G30
+        Ca: H30
+        Na: I30
+        K: J30
+        O: K30
+        Cl: M30
+        Pt: N30
+        total: O30
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.84'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 30
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-2 '
+      source_row: 31
+      element_wt_percent_as_published:
+        Si: '25.67'
+        Ti: '0.66'
+        Al: '8.21'
+        FeT: '1.92'
+        Mg: '4.84'
+        Ca: '8.47'
+        Na: '2.22'
+        K: '0.21'
+        O: '47.49'
+        Cl: '0.01'
+        Pt: '0.01'
+      source_cells:
+        Si: C31
+        Ti: D31
+        Al: E31
+        FeT: F31
+        Mg: G31
+        Ca: H31
+        Na: I31
+        K: J31
+        O: K31
+        Cl: M31
+        Pt: N31
+        total: O31
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.70'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 31
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-3 '
+      source_row: 32
+      element_wt_percent_as_published:
+        Si: '25.43'
+        Ti: '0.63'
+        Al: '8.20'
+        FeT: '2.11'
+        Mg: '4.78'
+        Ca: '8.64'
+        Na: '2.29'
+        K: '0.22'
+        O: '47.92'
+        Cl: '0.01'
+        Pt: '0.01'
+      source_cells:
+        Si: C32
+        Ti: D32
+        Al: E32
+        FeT: F32
+        Mg: G32
+        Ca: H32
+        Na: I32
+        K: J32
+        O: K32
+        Cl: M32
+        Pt: N32
+        total: O32
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.22'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 32
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-4 '
+      source_row: 33
+      element_wt_percent_as_published:
+        Si: '25.42'
+        Ti: '0.59'
+        Al: '8.20'
+        FeT: '3.07'
+        Mg: '4.95'
+        Ca: '8.44'
+        Na: '2.28'
+        K: '0.23'
+        O: '46.84'
+        Cl: '0.01'
+        Pt: '0.00'
+      source_cells:
+        Si: C33
+        Ti: D33
+        Al: E33
+        FeT: F33
+        Mg: G33
+        Ca: H33
+        Na: I33
+        K: J33
+        O: K33
+        Cl: M33
+        Pt: N33
+        total: O33
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.02'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 33
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-5 '
+      source_row: 34
+      element_wt_percent_as_published:
+        Si: '25.13'
+        Ti: '0.61'
+        Al: '8.15'
+        FeT: '3.36'
+        Mg: '4.84'
+        Ca: '7.94'
+        Na: '2.26'
+        K: '0.30'
+        O: '47.04'
+        Cl: '0.00'
+        Pt: '0.02'
+      source_cells:
+        Si: C34
+        Ti: D34
+        Al: E34
+        FeT: F34
+        Mg: G34
+        Ca: H34
+        Na: I34
+        K: J34
+        O: K34
+        Cl: M34
+        Pt: N34
+        total: O34
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.65'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 34
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-6 '
+      source_row: 35
+      element_wt_percent_as_published:
+        Si: '25.14'
+        Ti: '0.62'
+        Al: '8.19'
+        FeT: '3.40'
+        Mg: '4.80'
+        Ca: '8.08'
+        Na: '2.13'
+        K: '0.23'
+        O: '46.81'
+        Cl: '0.02'
+        Pt: '0.00'
+      source_cells:
+        Si: C35
+        Ti: D35
+        Al: E35
+        FeT: F35
+        Mg: G35
+        Ca: H35
+        Na: I35
+        K: J35
+        O: K35
+        Cl: M35
+        Pt: N35
+        total: O35
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.43'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 35
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-7 '
+      source_row: 36
+      element_wt_percent_as_published:
+        Si: '25.27'
+        Ti: '0.64'
+        Al: '8.32'
+        FeT: '3.49'
+        Mg: '4.96'
+        Ca: '8.29'
+        Na: '2.27'
+        K: '0.18'
+        O: '46.47'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C36
+        Ti: D36
+        Al: E36
+        FeT: F36
+        Mg: G36
+        Ca: H36
+        Na: I36
+        K: J36
+        O: K36
+        Cl: M36
+        Pt: N36
+        total: O36
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.88'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 36
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-8 '
+      source_row: 37
+      element_wt_percent_as_published:
+        Si: '25.07'
+        Ti: '0.58'
+        Al: '8.00'
+        FeT: '3.76'
+        Mg: '4.85'
+        Ca: '8.28'
+        Na: '2.20'
+        K: '0.22'
+        O: '46.23'
+        Cl: '0.00'
+        Pt: '0.03'
+      source_cells:
+        Si: C37
+        Ti: D37
+        Al: E37
+        FeT: F37
+        Mg: G37
+        Ca: H37
+        Na: I37
+        K: J37
+        O: K37
+        Cl: M37
+        Pt: N37
+        total: O37
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.21'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 37
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-9 '
+      source_row: 38
+      element_wt_percent_as_published:
+        Si: '25.05'
+        Ti: '0.63'
+        Al: '8.09'
+        FeT: '3.84'
+        Mg: '4.83'
+        Ca: '8.06'
+        Na: '2.10'
+        K: '0.21'
+        O: '46.69'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C38
+        Ti: D38
+        Al: E38
+        FeT: F38
+        Mg: G38
+        Ca: H38
+        Na: I38
+        K: J38
+        O: K38
+        Cl: M38
+        Pt: N38
+        total: O38
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.51'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 38
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-10 '
+      source_row: 39
+      element_wt_percent_as_published:
+        Si: '24.97'
+        Ti: '0.70'
+        Al: '8.22'
+        FeT: '3.85'
+        Mg: '4.83'
+        Ca: '8.22'
+        Na: '2.28'
+        K: '0.21'
+        O: '46.25'
+        Cl: '0.01'
+        Pt: '0.03'
+      source_cells:
+        Si: C39
+        Ti: D39
+        Al: E39
+        FeT: F39
+        Mg: G39
+        Ca: H39
+        Na: I39
+        K: J39
+        O: K39
+        Cl: M39
+        Pt: N39
+        total: O39
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.58'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 39
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-12 '
+      source_row: 40
+      element_wt_percent_as_published:
+        Si: '25.38'
+        Ti: '0.73'
+        Al: '8.10'
+        FeT: '2.47'
+        Mg: '4.97'
+        Ca: '8.56'
+        Na: '2.26'
+        K: '0.27'
+        O: '47.55'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C40
+        Ti: D40
+        Al: E40
+        FeT: F40
+        Mg: G40
+        Ca: H40
+        Na: I40
+        K: J40
+        O: K40
+        Cl: M40
+        Pt: N40
+        total: O40
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.28'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 40
+    - sample_id_as_published: LVP-5
+      experiment: xu_2026_lvp_5
+      analysis_id_as_published: 'MORB nopt 3.4 1600 2min-6 '
+      source_row: 41
+      element_wt_percent_as_published:
+        Si: '25.21'
+        Ti: '0.64'
+        Al: '8.24'
+        FeT: '3.18'
+        Mg: '4.89'
+        Ca: '8.30'
+        Na: '2.26'
+        K: '0.18'
+        O: '47.40'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C41
+        Ti: D41
+        Al: E41
+        FeT: F41
+        Mg: G41
+        Ca: H41
+        Na: I41
+        K: J41
+        O: K41
+        Cl: M41
+        Pt: N41
+        total: O41
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.30'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 41
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_5
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_6
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_6
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-6 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-6
+      experiment: xu_2026_lvp_6
+      analysis_id_as_published: 'MORB in PtO2 3.4 1500 2min big Line 014 '
+      source_row: 42
+      element_wt_percent_as_published:
+        Si: '22.77'
+        Ti: '0.58'
+        Al: '7.86'
+        FeT: '7.17'
+        Mg: '4.83'
+        Ca: '8.27'
+        Na: '1.99'
+        K: '0.18'
+        O: '45.91'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C42
+        Ti: D42
+        Al: E42
+        FeT: F42
+        Mg: G42
+        Ca: H42
+        Na: I42
+        K: J42
+        O: K42
+        Cl: M42
+        Pt: N42
+        total: O42
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.56'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 42
+    - sample_id_as_published: LVP-6
+      experiment: xu_2026_lvp_6
+      analysis_id_as_published: 'MORB in PtO2 3.4 1500 2min big Line 011 '
+      source_row: 43
+      element_wt_percent_as_published:
+        Si: '22.68'
+        Ti: '0.56'
+        Al: '7.92'
+        FeT: '7.80'
+        Mg: '4.63'
+        Ca: '7.80'
+        Na: '1.91'
+        K: '0.21'
+        O: '46.24'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C43
+        Ti: D43
+        Al: E43
+        FeT: F43
+        Mg: G43
+        Ca: H43
+        Na: I43
+        K: J43
+        O: K43
+        Cl: M43
+        Pt: N43
+        total: O43
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.74'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 43
+    - sample_id_as_published: LVP-6
+      experiment: xu_2026_lvp_6
+      analysis_id_as_published: 'MORB in PtO2 3.4 1500 2min big Line 008 '
+      source_row: 44
+      element_wt_percent_as_published:
+        Si: '23.05'
+        Ti: '0.58'
+        Al: '7.63'
+        FeT: '7.97'
+        Mg: '4.39'
+        Ca: '7.71'
+        Na: '2.01'
+        K: '0.17'
+        O: '46.25'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C44
+        Ti: D44
+        Al: E44
+        FeT: F44
+        Mg: G44
+        Ca: H44
+        Na: I44
+        K: J44
+        O: K44
+        Cl: M44
+        Pt: N44
+        total: O44
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.76'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 44
+    - sample_id_as_published: LVP-6
+      experiment: xu_2026_lvp_6
+      analysis_id_as_published: 'MORB+O 3.4 1500 2min-5 '
+      source_row: 45
+      element_wt_percent_as_published:
+        Si: '22.91'
+        Ti: '0.61'
+        Al: '7.63'
+        FeT: '8.11'
+        Mg: '4.35'
+        Ca: '7.93'
+        Na: '1.86'
+        K: '0.17'
+        O: '46.22'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C45
+        Ti: D45
+        Al: E45
+        FeT: F45
+        Mg: G45
+        Ca: H45
+        Na: I45
+        K: J45
+        O: K45
+        Cl: M45
+        Pt: N45
+        total: O45
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.79'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 45
+    - sample_id_as_published: LVP-6
+      experiment: xu_2026_lvp_6
+      analysis_id_as_published: 'MORB in PtO2 3.4 1500 2min big Line 019 '
+      source_row: 46
+      element_wt_percent_as_published:
+        Si: '22.92'
+        Ti: '0.56'
+        Al: '7.62'
+        FeT: '8.37'
+        Mg: '4.50'
+        Ca: '7.74'
+        Na: '1.84'
+        K: '0.19'
+        O: '46.28'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C46
+        Ti: D46
+        Al: E46
+        FeT: F46
+        Mg: G46
+        Ca: H46
+        Na: I46
+        K: J46
+        O: K46
+        Cl: M46
+        Pt: N46
+        total: O46
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.00'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 46
+    - sample_id_as_published: LVP-6
+      experiment: xu_2026_lvp_6
+      analysis_id_as_published: 'MORB in PtO2 3.4 1500 2min big Line 018 '
+      source_row: 47
+      element_wt_percent_as_published:
+        Si: '22.76'
+        Ti: '0.59'
+        Al: '7.58'
+        FeT: '8.19'
+        Mg: '4.57'
+        Ca: '7.94'
+        Na: '2.05'
+        K: '0.16'
+        O: '46.29'
+        Cl: '0.00'
+        Pt: '0.00'
+      source_cells:
+        Si: C47
+        Ti: D47
+        Al: E47
+        FeT: F47
+        Mg: G47
+        Ca: H47
+        Na: I47
+        K: J47
+        O: K47
+        Cl: M47
+        Pt: N47
+        total: O47
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.13'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 47
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_6
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_7
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_7
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-7 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-4 '
+      source_row: 50
+      element_wt_percent_as_published:
+        Si: '22.64'
+        Ti: '0.56'
+        Al: '7.56'
+        FeT: '4.57'
+        Mg: '5.75'
+        Ca: '8.19'
+        Na: '2.36'
+        K: '0.21'
+        O: '47.14'
+        Cl: '0.83'
+        Pt: '0.00'
+      source_cells:
+        Si: C50
+        Ti: D50
+        Al: E50
+        FeT: F50
+        Mg: G50
+        Ca: H50
+        Na: I50
+        K: J50
+        O: K50
+        Cl: M50
+        Pt: N50
+        total: O50
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.81'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 50
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-6 '
+      source_row: 51
+      element_wt_percent_as_published:
+        Si: '22.59'
+        Ti: '0.54'
+        Al: '7.71'
+        FeT: '4.54'
+        Mg: '5.65'
+        Ca: '8.06'
+        Na: '2.13'
+        K: '0.21'
+        O: '47.11'
+        Cl: '0.80'
+        Pt: '0.07'
+      source_cells:
+        Si: C51
+        Ti: D51
+        Al: E51
+        FeT: F51
+        Mg: G51
+        Ca: H51
+        Na: I51
+        K: J51
+        O: K51
+        Cl: M51
+        Pt: N51
+        total: O51
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.40'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 51
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-9 '
+      source_row: 52
+      element_wt_percent_as_published:
+        Si: '22.65'
+        Ti: '0.56'
+        Al: '7.62'
+        FeT: '4.60'
+        Mg: '5.73'
+        Ca: '8.29'
+        Na: '2.21'
+        K: '0.24'
+        O: '47.28'
+        Cl: '0.83'
+        Pt: '0.00'
+      source_cells:
+        Si: C52
+        Ti: D52
+        Al: E52
+        FeT: F52
+        Mg: G52
+        Ca: H52
+        Na: I52
+        K: J52
+        O: K52
+        Cl: M52
+        Pt: N52
+        total: O52
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.01'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 52
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-14 '
+      source_row: 53
+      element_wt_percent_as_published:
+        Si: '22.60'
+        Ti: '0.53'
+        Al: '7.71'
+        FeT: '4.78'
+        Mg: '5.89'
+        Ca: '8.10'
+        Na: '2.30'
+        K: '0.20'
+        O: '47.54'
+        Cl: '0.81'
+        Pt: '0.07'
+      source_cells:
+        Si: C53
+        Ti: D53
+        Al: E53
+        FeT: F53
+        Mg: G53
+        Ca: H53
+        Na: I53
+        K: J53
+        O: K53
+        Cl: M53
+        Pt: N53
+        total: O53
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.53'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 53
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-15 '
+      source_row: 54
+      element_wt_percent_as_published:
+        Si: '22.40'
+        Ti: '0.57'
+        Al: '7.65'
+        FeT: '4.69'
+        Mg: '5.92'
+        Ca: '8.22'
+        Na: '2.19'
+        K: '0.19'
+        O: '47.85'
+        Cl: '0.78'
+        Pt: '0.03'
+      source_cells:
+        Si: C54
+        Ti: D54
+        Al: E54
+        FeT: F54
+        Mg: G54
+        Ca: H54
+        Na: I54
+        K: J54
+        O: K54
+        Cl: M54
+        Pt: N54
+        total: O54
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.49'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 54
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-16 '
+      source_row: 55
+      element_wt_percent_as_published:
+        Si: '22.49'
+        Ti: '0.54'
+        Al: '7.60'
+        FeT: '4.84'
+        Mg: '6.03'
+        Ca: '8.24'
+        Na: '2.21'
+        K: '0.17'
+        O: '46.57'
+        Cl: '0.85'
+        Pt: '0.17'
+      source_cells:
+        Si: C55
+        Ti: D55
+        Al: E55
+        FeT: F55
+        Mg: G55
+        Ca: H55
+        Na: I55
+        K: J55
+        O: K55
+        Cl: M55
+        Pt: N55
+        total: O55
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.71'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 55
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-17 '
+      source_row: 56
+      element_wt_percent_as_published:
+        Si: '22.53'
+        Ti: '0.60'
+        Al: '7.55'
+        FeT: '4.76'
+        Mg: '5.89'
+        Ca: '8.15'
+        Na: '2.07'
+        K: '0.19'
+        O: '47.82'
+        Cl: '0.82'
+        Pt: '0.09'
+      source_cells:
+        Si: C56
+        Ti: D56
+        Al: E56
+        FeT: F56
+        Mg: G56
+        Ca: H56
+        Na: I56
+        K: J56
+        O: K56
+        Cl: M56
+        Pt: N56
+        total: O56
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.47'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 56
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-18 '
+      source_row: 57
+      element_wt_percent_as_published:
+        Si: '22.79'
+        Ti: '0.58'
+        Al: '7.62'
+        FeT: '4.79'
+        Mg: '6.03'
+        Ca: '8.20'
+        Na: '2.26'
+        K: '0.23'
+        O: '47.01'
+        Cl: '0.79'
+        Pt: '0.16'
+      source_cells:
+        Si: C57
+        Ti: D57
+        Al: E57
+        FeT: F57
+        Mg: G57
+        Ca: H57
+        Na: I57
+        K: J57
+        O: K57
+        Cl: M57
+        Pt: N57
+        total: O57
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.46'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 57
+    - sample_id_as_published: LVP-7
+      experiment: xu_2026_lvp_7
+      analysis_id_as_published: 'MORB+PtO2 3.4GPa-2 1600 2min-19 '
+      source_row: 58
+      element_wt_percent_as_published:
+        Si: '22.32'
+        Ti: '0.57'
+        Al: '7.57'
+        FeT: '4.59'
+        Mg: '6.05'
+        Ca: '7.98'
+        Na: '2.09'
+        K: '0.20'
+        O: '47.34'
+        Cl: '0.83'
+        Pt: '0.20'
+      source_cells:
+        Si: C58
+        Ti: D58
+        Al: E58
+        FeT: F58
+        Mg: G58
+        Ca: H58
+        Na: I58
+        K: J58
+        O: K58
+        Cl: M58
+        Pt: N58
+        total: O58
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.73'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 58
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_7
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_s2_run_product_context_lvp_8
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_8
+  locator:
+    table: S2
+    record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; LVP-8 run-product glass analyses
+  values:
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    reason_untyped: The glass analyses are preserved as elemental wt.% context; the measured oxygen is not reconstructed as
+      oxide stoichiometry.
+    analyses_as_published:
+    - sample_id_as_published: LVP-8
+      experiment: xu_2026_lvp_8
+      analysis_id_as_published: 'MORB+1%PtO2 3.4GPa 1700 4min-glass1 '
+      source_row: 59
+      element_wt_percent_as_published:
+        Si: '25.53'
+        Ti: '0.65'
+        Al: '8.13'
+        FeT: '0.49'
+        Mg: '5.02'
+        Ca: '8.91'
+        Na: '2.08'
+        K: '0.26'
+        O: '49.25'
+        Cl: '0.05'
+        Pt: '0.00'
+      source_cells:
+        Si: C59
+        Ti: D59
+        Al: E59
+        FeT: F59
+        Mg: G59
+        Ca: H59
+        Na: I59
+        K: J59
+        O: K59
+        Cl: M59
+        Pt: N59
+        total: O59
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.37'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 59
+    - sample_id_as_published: LVP-8
+      experiment: xu_2026_lvp_8
+      analysis_id_as_published: MORB+1%PtO2 3.4GPa 1700 4min-glass2
+      source_row: 60
+      element_wt_percent_as_published:
+        Si: '25.29'
+        Ti: '0.65'
+        Al: '8.28'
+        FeT: '0.56'
+        Mg: '5.04'
+        Ca: '9.03'
+        Na: '2.09'
+        K: '0.26'
+        O: '48.51'
+        Cl: '0.05'
+        Pt: '0.01'
+      source_cells:
+        Si: C60
+        Ti: D60
+        Al: E60
+        FeT: F60
+        Mg: G60
+        Ca: H60
+        Na: I60
+        K: J60
+        O: K60
+        Cl: M60
+        Pt: N60
+        total: O60
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.78'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 60
+    - sample_id_as_published: LVP-8
+      experiment: xu_2026_lvp_8
+      analysis_id_as_published: MORB+1%PtO2 3.4GPa 1700 4min-glass3
+      source_row: 61
+      element_wt_percent_as_published:
+        Si: '25.06'
+        Ti: '0.63'
+        Al: '8.22'
+        FeT: '0.54'
+        Mg: '4.97'
+        Ca: '8.66'
+        Na: '2.15'
+        K: '0.26'
+        O: '49.42'
+        Cl: '0.05'
+        Pt: '0.05'
+      source_cells:
+        Si: C61
+        Ti: D61
+        Al: E61
+        FeT: F61
+        Mg: G61
+        Ca: H61
+        Na: I61
+        K: J61
+        O: K61
+        Cl: M61
+        Pt: N61
+        total: O61
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '100.00'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 61
+    - sample_id_as_published: LVP-8
+      experiment: xu_2026_lvp_8
+      analysis_id_as_published: MORB+1%PtO2 3.4GPa 1700 4min-glass4
+      source_row: 62
+      element_wt_percent_as_published:
+        Si: '25.03'
+        Ti: '0.71'
+        Al: '7.93'
+        FeT: '0.53'
+        Mg: '5.02'
+        Ca: '9.08'
+        Na: '2.19'
+        K: '0.19'
+        O: '48.67'
+        Cl: '0.04'
+        Pt: '0.00'
+      source_cells:
+        Si: C62
+        Ti: D62
+        Al: E62
+        FeT: F62
+        Mg: G62
+        Ca: H62
+        Na: I62
+        K: J62
+        O: K62
+        Cl: M62
+        Pt: N62
+        total: O62
+      element_wt_percent_unit: wt.% element
+      total_wt_percent_as_published: '99.38'
+      locator:
+        table: S2
+        record: Supplementary Table S2 _ 072226.xlsx; sheet "Table S2"; row 62
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_s2_run_product_context_lvp_8
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
 - observation_id: xu_2026_table1_excess_oxygen_context
   type: measured_table_context
   units: wt.%
@@ -2175,280 +6204,6 @@ context:
     printed_buffer_log_fO2_as_published: log fO2 ≈ 0 for added PtO2 powder (Supplementary Information, High-pressure, high-temperature
       experiments); this is the source-buffer value, not the actual run fO2, which the authors state is more reduced than
       Pt–PtO2.
-    printed_rows:
-    - sample_id_as_published: LVP-1
-      total_wt_percent: '98.9'
-      total_sigma_wt_percent: '0.3'
-      excess_oxygen_wt_percent_as_published: '-0.1'
-      excess_oxygen_1sd_wt_percent: '0.5'
-      T_C: '1400'
-      pressure_as_published: 1 atm
-      redox_condition_as_published: ''
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-1
-    - sample_id_as_published: LVP-2
-      total_wt_percent: '99.9'
-      total_sigma_wt_percent: '0.2'
-      excess_oxygen_wt_percent_as_published: '0.8'
-      excess_oxygen_1sd_wt_percent: '0.2'
-      T_C: '1400'
-      pressure_as_published: 0.5 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-2
-    - sample_id_as_published: LVP-3
-      total_wt_percent: '99.5'
-      total_sigma_wt_percent: '0.2'
-      excess_oxygen_wt_percent_as_published: '-0.2'
-      excess_oxygen_1sd_wt_percent: '0.5'
-      T_C: '1500'
-      pressure_as_published: 0.5 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-3
-    - sample_id_as_published: LVP-4
-      total_wt_percent: '100.0'
-      total_sigma_wt_percent: '0.3'
-      excess_oxygen_wt_percent_as_published: '0.3'
-      excess_oxygen_1sd_wt_percent: '0.4'
-      T_C: '1200'
-      pressure_as_published: 1 GPa
-      redox_condition_as_published: No PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-4
-    - sample_id_as_published: LVP-5
-      total_wt_percent: '99.8'
-      total_sigma_wt_percent: '0.4'
-      excess_oxygen_wt_percent_as_published: '0.4'
-      excess_oxygen_1sd_wt_percent: '0.6'
-      T_C: '1600'
-      pressure_as_published: 3.4 GPa
-      redox_condition_as_published: No PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-5
-    - sample_id_as_published: LVP-6
-      total_wt_percent: '99.8'
-      total_sigma_wt_percent: '0.2'
-      excess_oxygen_wt_percent_as_published: '1.5'
-      excess_oxygen_1sd_wt_percent: '0.2'
-      T_C: '1500'
-      pressure_as_published: 3.4 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-6
-    - sample_id_as_published: LVP-7
-      total_wt_percent: '100.1'
-      total_sigma_wt_percent: '0.2'
-      excess_oxygen_wt_percent_as_published: '2.8'
-      excess_oxygen_1sd_wt_percent: '0.7'
-      T_C: '1600'
-      pressure_as_published: 3.4 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-7
-    - sample_id_as_published: LVP-8
-      total_wt_percent: '99.9'
-      total_sigma_wt_percent: '0.5'
-      excess_oxygen_wt_percent_as_published: '3.6'
-      excess_oxygen_1sd_wt_percent: '0.6'
-      T_C: '1700'
-      pressure_as_published: 3.4 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-8
-    - sample_id_as_published: LVP-10
-      total_wt_percent: '100.3'
-      total_sigma_wt_percent: '0.3'
-      excess_oxygen_wt_percent_as_published: '0.3'
-      excess_oxygen_1sd_wt_percent: '0.2'
-      T_C: '1450'
-      pressure_as_published: 5 GPa
-      redox_condition_as_published: No PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-10
-    - sample_id_as_published: LVP-11
-      total_wt_percent: '100.1'
-      total_sigma_wt_percent: '0.3'
-      excess_oxygen_wt_percent_as_published: '0.2'
-      excess_oxygen_1sd_wt_percent: '0.7'
-      T_C: '1600'
-      pressure_as_published: 5 GPa
-      redox_condition_as_published: No PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-11
-    - sample_id_as_published: LVP-12
-      total_wt_percent: '100.2'
-      total_sigma_wt_percent: '0.8'
-      excess_oxygen_wt_percent_as_published: '3.0'
-      excess_oxygen_1sd_wt_percent: '0.3'
-      T_C: '1400'
-      pressure_as_published: 5 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-12
-    - sample_id_as_published: LVP-13
-      total_wt_percent: '99.9'
-      total_sigma_wt_percent: '0.3'
-      excess_oxygen_wt_percent_as_published: '5.2'
-      excess_oxygen_1sd_wt_percent: '0.4'
-      T_C: '1450'
-      pressure_as_published: 5 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-13
-    - sample_id_as_published: LVP-14
-      total_wt_percent: '100.0'
-      total_sigma_wt_percent: '0.4'
-      excess_oxygen_wt_percent_as_published: '2.5'
-      excess_oxygen_1sd_wt_percent: '0.8'
-      T_C: '1600'
-      pressure_as_published: 5 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-14
-    - sample_id_as_published: LVP-15
-      total_wt_percent: '99.9'
-      total_sigma_wt_percent: '0.3'
-      excess_oxygen_wt_percent_as_published: '3.1'
-      excess_oxygen_1sd_wt_percent: '0.8'
-      T_C: '1700'
-      pressure_as_published: 5 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-15
-    - sample_id_as_published: LVP-16
-      total_wt_percent: '99.5'
-      total_sigma_wt_percent: '0.4'
-      excess_oxygen_wt_percent_as_published: '0.5'
-      excess_oxygen_1sd_wt_percent: '0.4'
-      T_C: '1600'
-      pressure_as_published: 7 GPa
-      redox_condition_as_published: No PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-16
-    - sample_id_as_published: LVP-17
-      total_wt_percent: '100.0'
-      total_sigma_wt_percent: '0.5'
-      excess_oxygen_wt_percent_as_published: '4.7'
-      excess_oxygen_1sd_wt_percent: '1.0'
-      T_C: '1400'
-      pressure_as_published: 7 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-17
-    - sample_id_as_published: LVP-18
-      total_wt_percent: '100.5'
-      total_sigma_wt_percent: '0.3'
-      excess_oxygen_wt_percent_as_published: '5.3'
-      excess_oxygen_1sd_wt_percent: '0.7'
-      T_C: '1450'
-      pressure_as_published: 7 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-18
-    - sample_id_as_published: LVP-19
-      total_wt_percent: '99.5'
-      total_sigma_wt_percent: '0.4'
-      excess_oxygen_wt_percent_as_published: '2.9'
-      excess_oxygen_1sd_wt_percent: '0.8'
-      T_C: '1600'
-      pressure_as_published: 7 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-19
-    - sample_id_as_published: LVP-20
-      total_wt_percent: '100.3'
-      total_sigma_wt_percent: '0.4'
-      excess_oxygen_wt_percent_as_published: '2.6'
-      excess_oxygen_1sd_wt_percent: '0.8'
-      T_C: '1700'
-      pressure_as_published: 7 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-20
-    - sample_id_as_published: LVP-21
-      total_wt_percent: '100.0'
-      total_sigma_wt_percent: '0.4'
-      excess_oxygen_wt_percent_as_published: '5.2'
-      excess_oxygen_1sd_wt_percent: '0.2'
-      T_C: '1700'
-      pressure_as_published: 7 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-21
-    - sample_id_as_published: LVP-22
-      total_wt_percent: '100.0'
-      total_sigma_wt_percent: '0.5'
-      excess_oxygen_wt_percent_as_published: '5.0'
-      excess_oxygen_1sd_wt_percent: '0.6'
-      T_C: '1800'
-      pressure_as_published: 7 GPa
-      redox_condition_as_published: PtO2
-      locator:
-        pdf_page_index: 2
-        page: 3
-        table: '1'
-        row: LVP-22
     text_values_also_published:
     - sample_or_group: 1-atm run
       T_C: '1400'
@@ -2476,6 +6231,1134 @@ context:
         section: Starting materials
       note: Differs from Table 1 starting-composition EO -0.4 wt.% with no SD; preserved separately.
   context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_excess_oxygen_context
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_1
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_1
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-1
+  values:
+    sample_id_as_published: LVP-1
+    total_wt_percent: '98.9'
+    total_sigma_wt_percent: '0.3'
+    excess_oxygen_wt_percent_as_published: '-0.1'
+    excess_oxygen_1sd_wt_percent: '0.5'
+    T_C: '1400'
+    pressure_as_published: 1 atm
+    redox_condition_as_published: ''
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '23.40'
+      Ti: '0.58'
+      Al: '7.55'
+      FeT: '8.15'
+      Mg: '4.43'
+      Ca: '8.07'
+      Na: '2.02'
+      K: '0.20'
+      O: '43.93'
+      Pt: '0.00'
+      Cl: '0.62'
+    element_wt_percent_1sd_as_published:
+      Si: '0.07'
+      Ti: '0.03'
+      Al: '0.03'
+      FeT: '0.11'
+      Mg: '0.05'
+      Ca: '0.07'
+      Na: '0.04'
+      K: '0.05'
+      O: '0.30'
+      Cl: '0.02'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_1
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_10
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_10
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-10
+  values:
+    sample_id_as_published: LVP-10
+    total_wt_percent: '100.3'
+    total_sigma_wt_percent: '0.3'
+    excess_oxygen_wt_percent_as_published: '0.3'
+    excess_oxygen_1sd_wt_percent: '0.2'
+    T_C: '1450'
+    pressure_as_published: 5 GPa
+    redox_condition_as_published: No PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '27.23'
+      Ti: '0.88'
+      Al: '8.84'
+      FeT: '0.67'
+      Mg: '3.87'
+      Ca: '7.71'
+      Na: '2.07'
+      K: '0.35'
+      O: '48.65'
+      Pt: '0.01'
+      Cl: '0.02'
+    element_wt_percent_1sd_as_published:
+      Si: '0.17'
+      Ti: '0.04'
+      Al: '0.07'
+      FeT: '0.07'
+      Mg: '0.13'
+      Ca: '0.14'
+      Na: '0.11'
+      K: '0.02'
+      O: '0.12'
+      Pt: '0.01'
+      Cl: '0.01'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_10
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_11
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_11
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-11
+  values:
+    sample_id_as_published: LVP-11
+    total_wt_percent: '100.1'
+    total_sigma_wt_percent: '0.3'
+    excess_oxygen_wt_percent_as_published: '0.2'
+    excess_oxygen_1sd_wt_percent: '0.7'
+    T_C: '1600'
+    pressure_as_published: 5 GPa
+    redox_condition_as_published: No PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '25.52'
+      Ti: '0.61'
+      Al: '8.26'
+      FeT: '2.55'
+      Mg: '4.90'
+      Ca: '8.31'
+      Na: '2.26'
+      K: '0.23'
+      O: '47.40'
+      Pt: '0.00'
+      Cl: '0.06'
+    element_wt_percent_1sd_as_published:
+      Si: '0.20'
+      Ti: '0.03'
+      Al: '0.18'
+      FeT: '0.69'
+      Mg: '0.09'
+      Ca: '0.16'
+      Na: '0.14'
+      K: '0.05'
+      O: '0.41'
+      Pt: '0.01'
+      Cl: '0.02'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_11
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_12
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_12
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-12
+  values:
+    sample_id_as_published: LVP-12
+    total_wt_percent: '100.2'
+    total_sigma_wt_percent: '0.8'
+    excess_oxygen_wt_percent_as_published: '3.0'
+    excess_oxygen_1sd_wt_percent: '0.3'
+    T_C: '1400'
+    pressure_as_published: 5 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '23.48'
+      Ti: '0.93'
+      Al: '9.18'
+      FeT: '0.10'
+      Mg: '5.06'
+      Ca: '8.77'
+      Na: '1.74'
+      K: '0.34'
+      O: '48.77'
+      Pt: '0.05'
+      Cl: '1.80'
+    element_wt_percent_1sd_as_published:
+      Si: '0.12'
+      Ti: '0.03'
+      Al: '0.07'
+      FeT: '0.02'
+      Mg: '0.11'
+      Ca: '0.26'
+      Na: '0.05'
+      K: '0.05'
+      O: '0.32'
+      Pt: '0.06'
+      Cl: '0.08'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_12
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_13
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_13
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-13
+  values:
+    sample_id_as_published: LVP-13
+    total_wt_percent: '99.9'
+    total_sigma_wt_percent: '0.3'
+    excess_oxygen_wt_percent_as_published: '5.2'
+    excess_oxygen_1sd_wt_percent: '0.4'
+    T_C: '1450'
+    pressure_as_published: 5 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '23.49'
+      Ti: '0.94'
+      Al: '7.79'
+      FeT: '1.42'
+      Mg: '4.17'
+      Ca: '8.95'
+      Na: '1.83'
+      K: '0.41'
+      O: '49.22'
+      Pt: '0.06'
+      Cl: '1.57'
+    element_wt_percent_1sd_as_published:
+      Si: '0.12'
+      Ti: '0.05'
+      Al: '0.13'
+      FeT: '0.06'
+      Mg: '0.04'
+      Ca: '0.14'
+      Na: '0.05'
+      K: '0.03'
+      O: '0.27'
+      Pt: '0.09'
+      Cl: '0.05'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_13
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_14
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_14
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-14
+  values:
+    sample_id_as_published: LVP-14
+    total_wt_percent: '100.0'
+    total_sigma_wt_percent: '0.4'
+    excess_oxygen_wt_percent_as_published: '2.5'
+    excess_oxygen_1sd_wt_percent: '0.8'
+    T_C: '1600'
+    pressure_as_published: 5 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '24.76'
+      Ti: '0.55'
+      Al: '7.96'
+      FeT: '3.41'
+      Mg: '4.57'
+      Ca: '7.97'
+      Na: '2.12'
+      K: '0.23'
+      O: '48.26'
+      Pt: '0.02'
+      Cl: '0.22'
+    element_wt_percent_1sd_as_published:
+      Si: '0.66'
+      Ti: '0.03'
+      Al: '0.19'
+      FeT: '0.43'
+      Mg: '0.17'
+      Ca: '0.12'
+      Na: '0.14'
+      K: '0.03'
+      O: '0.36'
+      Pt: '0.03'
+      Cl: '0.06'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_14
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_15
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_15
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-15
+  values:
+    sample_id_as_published: LVP-15
+    total_wt_percent: '99.9'
+    total_sigma_wt_percent: '0.3'
+    excess_oxygen_wt_percent_as_published: '3.1'
+    excess_oxygen_1sd_wt_percent: '0.8'
+    T_C: '1700'
+    pressure_as_published: 5 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '24.44'
+      Ti: '0.59'
+      Al: '8.10'
+      FeT: '2.62'
+      Mg: '4.81'
+      Ca: '8.20'
+      Na: '2.15'
+      K: '0.24'
+      O: '48.36'
+      Pt: '0.01'
+      Cl: '0.36'
+    element_wt_percent_1sd_as_published:
+      Si: '0.26'
+      Ti: '0.04'
+      Al: '0.11'
+      FeT: '0.02'
+      Mg: '0.06'
+      Ca: '0.14'
+      Na: '0.13'
+      K: '0.03'
+      O: '0.54'
+      Pt: '0.01'
+      Cl: '0.02'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_15
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_16
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_16
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-16
+  values:
+    sample_id_as_published: LVP-16
+    total_wt_percent: '99.5'
+    total_sigma_wt_percent: '0.4'
+    excess_oxygen_wt_percent_as_published: '0.5'
+    excess_oxygen_1sd_wt_percent: '0.4'
+    T_C: '1600'
+    pressure_as_published: 7 GPa
+    redox_condition_as_published: No PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '25.48'
+      Ti: '0.66'
+      Al: '8.18'
+      FeT: '1.89'
+      Mg: '4.92'
+      Ca: '8.54'
+      Na: '2.20'
+      K: '0.24'
+      O: '47.36'
+      Pt: '0.01'
+      Cl: '0.00'
+    element_wt_percent_1sd_as_published:
+      Si: '0.11'
+      Ti: '0.02'
+      Al: '0.04'
+      FeT: '0.09'
+      Mg: '0.10'
+      Ca: '0.05'
+      Na: '0.10'
+      K: '0.04'
+      O: '0.13'
+      Pt: '0.02'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_16
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_17
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_17
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-17
+  values:
+    sample_id_as_published: LVP-17
+    total_wt_percent: '100.0'
+    total_sigma_wt_percent: '0.5'
+    excess_oxygen_wt_percent_as_published: '4.7'
+    excess_oxygen_1sd_wt_percent: '1.0'
+    T_C: '1400'
+    pressure_as_published: 7 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '22.02'
+      Ti: '1.49'
+      Al: '7.18'
+      FeT: '1.00'
+      Mg: '3.82'
+      Ca: '9.57'
+      Na: '1.72'
+      K: '0.60'
+      O: '50.93'
+      Pt: '0.03'
+      Cl: '1.62'
+    element_wt_percent_1sd_as_published:
+      Si: '0.32'
+      Ti: '0.05'
+      Al: '0.07'
+      FeT: '0.04'
+      Mg: '0.10'
+      Ca: '0.18'
+      Na: '0.07'
+      K: '0.04'
+      O: '0.63'
+      Pt: '0.05'
+      Cl: '0.03'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_17
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_18
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_18
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-18
+  values:
+    sample_id_as_published: LVP-18
+    total_wt_percent: '100.5'
+    total_sigma_wt_percent: '0.3'
+    excess_oxygen_wt_percent_as_published: '5.3'
+    excess_oxygen_1sd_wt_percent: '0.7'
+    T_C: '1450'
+    pressure_as_published: 7 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '21.64'
+      Ti: '1.60'
+      Al: '7.15'
+      FeT: '1.12'
+      Mg: '4.23'
+      Ca: '10.25'
+      Na: '1.68'
+      K: '0.57'
+      O: '49.96'
+      Pt: '0.02'
+      Cl: '2.27'
+    element_wt_percent_1sd_as_published:
+      Si: '0.19'
+      Ti: '0.06'
+      Al: '0.08'
+      FeT: '0.03'
+      Mg: '0.11'
+      Ca: '0.10'
+      Na: '0.09'
+      K: '0.07'
+      O: '0.44'
+      Pt: '0.04'
+      Cl: '0.05'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_18
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_19
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_19
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-19
+  values:
+    sample_id_as_published: LVP-19
+    total_wt_percent: '99.5'
+    total_sigma_wt_percent: '0.4'
+    excess_oxygen_wt_percent_as_published: '2.9'
+    excess_oxygen_1sd_wt_percent: '0.8'
+    T_C: '1600'
+    pressure_as_published: 7 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '23.53'
+      Ti: '0.59'
+      Al: '7.85'
+      FeT: '5.21'
+      Mg: '4.41'
+      Ca: '7.76'
+      Na: '1.91'
+      K: '0.17'
+      O: '47.84'
+      Pt: '0.06'
+      Cl: '0.19'
+    element_wt_percent_1sd_as_published:
+      Si: '1.01'
+      Ti: '0.06'
+      Al: '0.27'
+      FeT: '1.36'
+      Mg: '0.36'
+      Ca: '0.16'
+      Na: '0.09'
+      K: '0.04'
+      O: '0.78'
+      Pt: '0.08'
+      Cl: '0.05'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_19
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_2
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_2
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-2
+  values:
+    sample_id_as_published: LVP-2
+    total_wt_percent: '99.9'
+    total_sigma_wt_percent: '0.2'
+    excess_oxygen_wt_percent_as_published: '0.8'
+    excess_oxygen_1sd_wt_percent: '0.2'
+    T_C: '1400'
+    pressure_as_published: 0.5 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '24.21'
+      Ti: '0.59'
+      Al: '7.85'
+      FeT: '6.26'
+      Mg: '4.52'
+      Ca: '8.12'
+      Na: '2.05'
+      K: '0.20'
+      O: '45.96'
+      Pt: '0.04'
+      Cl: '0.13'
+    element_wt_percent_1sd_as_published:
+      Si: '0.10'
+      Al: '0.02'
+      FeT: '0.21'
+      Mg: '0.12'
+      Ca: '0.12'
+      Na: '0.04'
+      O: '0.10'
+      Pt: '0.04'
+      Cl: '0.01'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_2
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_20
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_20
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-20
+  values:
+    sample_id_as_published: LVP-20
+    total_wt_percent: '100.3'
+    total_sigma_wt_percent: '0.4'
+    excess_oxygen_wt_percent_as_published: '2.6'
+    excess_oxygen_1sd_wt_percent: '0.8'
+    T_C: '1700'
+    pressure_as_published: 7 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '24.95'
+      Ti: '0.63'
+      Al: '8.26'
+      FeT: '2.73'
+      Mg: '4.71'
+      Ca: '8.14'
+      Na: '1.91'
+      K: '0.20'
+      O: '48.53'
+      Pt: '0.04'
+      Cl: '0.16'
+    element_wt_percent_1sd_as_published:
+      Si: '0.20'
+      Ti: '0.02'
+      Al: '0.05'
+      FeT: '0.16'
+      Mg: '0.03'
+      Ca: '0.11'
+      Na: '0.02'
+      K: '0.02'
+      O: '0.54'
+      Pt: '0.04'
+      Cl: '0.03'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_20
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_21
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_21
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-21
+  values:
+    sample_id_as_published: LVP-21
+    total_wt_percent: '100.0'
+    total_sigma_wt_percent: '0.4'
+    excess_oxygen_wt_percent_as_published: '5.2'
+    excess_oxygen_1sd_wt_percent: '0.2'
+    T_C: '1700'
+    pressure_as_published: 7 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '24.49'
+      Ti: '0.65'
+      Al: '7.91'
+      FeT: '1.50'
+      Mg: '4.67'
+      Ca: '8.42'
+      Na: '2.16'
+      K: '0.26'
+      O: '49.72'
+      Pt: '0.02'
+      Cl: '0.20'
+    element_wt_percent_1sd_as_published:
+      Si: '0.07'
+      Ti: '0.03'
+      Al: '0.03'
+      FeT: '0.15'
+      Mg: '0.03'
+      Ca: '0.13'
+      Na: '0.05'
+      K: '0.02'
+      O: '0.28'
+      Pt: '0.04'
+      Cl: '0.02'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_21
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_22
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_22
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-22
+  values:
+    sample_id_as_published: LVP-22
+    total_wt_percent: '100.0'
+    total_sigma_wt_percent: '0.5'
+    excess_oxygen_wt_percent_as_published: '5.0'
+    excess_oxygen_1sd_wt_percent: '0.6'
+    T_C: '1800'
+    pressure_as_published: 7 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '24.06'
+      Ti: '0.56'
+      Al: '7.53'
+      FeT: '4.00'
+      Mg: '4.18'
+      Ca: '7.34'
+      Na: '1.89'
+      K: '0.19'
+      O: '49.96'
+      Pt: '0.06'
+      Cl: '0.18'
+    element_wt_percent_1sd_as_published:
+      Si: '0.18'
+      Ti: '0.02'
+      Al: '0.04'
+      FeT: '0.04'
+      Mg: '0.12'
+      Ca: '0.05'
+      Na: '0.15'
+      K: '0.01'
+      O: '0.47'
+      Pt: '0.01'
+      Cl: '0.01'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_22
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_3
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_3
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-3
+  values:
+    sample_id_as_published: LVP-3
+    total_wt_percent: '99.5'
+    total_sigma_wt_percent: '0.2'
+    excess_oxygen_wt_percent_as_published: '-0.2'
+    excess_oxygen_1sd_wt_percent: '0.5'
+    T_C: '1500'
+    pressure_as_published: 0.5 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '23.60'
+      Ti: '0.58'
+      Al: '7.60'
+      FeT: '7.52'
+      Mg: '4.47'
+      Ca: '7.91'
+      Na: '1.95'
+      K: '0.20'
+      O: '45.54'
+      Pt: '0.02'
+      Cl: '0.15'
+    element_wt_percent_1sd_as_published:
+      Si: '0.12'
+      Ti: '0.05'
+      Al: '0.08'
+      FeT: '0.09'
+      Mg: '0.03'
+      Ca: '0.16'
+      Na: '0.04'
+      K: '0.03'
+      O: '0.15'
+      Pt: '0.03'
+      Cl: '0.01'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_3
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_4
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_4
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-4
+  values:
+    sample_id_as_published: LVP-4
+    total_wt_percent: '100.0'
+    total_sigma_wt_percent: '0.3'
+    excess_oxygen_wt_percent_as_published: '0.3'
+    excess_oxygen_1sd_wt_percent: '0.4'
+    T_C: '1200'
+    pressure_as_published: 1 GPa
+    redox_condition_as_published: No PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '25.51'
+      Ti: '0.73'
+      Al: '9.79'
+      FeT: '4.58'
+      Mg: '2.64'
+      Ca: '5.70'
+      Na: '2.59'
+      K: '0.33'
+      O: '48.09'
+      Pt: '0.03'
+      Cl: '0.01'
+    element_wt_percent_1sd_as_published:
+      Si: '0.29'
+      Ti: '0.08'
+      Al: '0.30'
+      FeT: '0.24'
+      Mg: '0.26'
+      Ca: '0.28'
+      Na: '0.18'
+      K: '0.03'
+      O: '0.34'
+      Pt: '0.04'
+      Cl: '0.01'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_4
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_5
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_5
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-5
+  values:
+    sample_id_as_published: LVP-5
+    total_wt_percent: '99.8'
+    total_sigma_wt_percent: '0.4'
+    excess_oxygen_wt_percent_as_published: '0.4'
+    excess_oxygen_1sd_wt_percent: '0.6'
+    T_C: '1600'
+    pressure_as_published: 3.4 GPa
+    redox_condition_as_published: No PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '25.30'
+      Ti: '0.64'
+      Al: '8.18'
+      FeT: '2.99'
+      Mg: '4.88'
+      Ca: '8.32'
+      Na: '2.24'
+      K: '0.22'
+      O: '47.01'
+      Pt: '0.02'
+      Cl: '0.01'
+    element_wt_percent_1sd_as_published:
+      Si: '0.28'
+      Ti: '0.04'
+      Al: '0.08'
+      FeT: '0.82'
+      Mg: '0.08'
+      Ca: '0.22'
+      Na: '0.07'
+      K: '0.04'
+      O: '0.55'
+      Pt: '0.06'
+      Cl: '0.01'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_5
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_6
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_6
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-6
+  values:
+    sample_id_as_published: LVP-6
+    total_wt_percent: '99.8'
+    total_sigma_wt_percent: '0.2'
+    excess_oxygen_wt_percent_as_published: '1.5'
+    excess_oxygen_1sd_wt_percent: '0.2'
+    T_C: '1500'
+    pressure_as_published: 3.4 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '22.85'
+      Ti: '0.58'
+      Al: '7.71'
+      FeT: '7.93'
+      Mg: '4.54'
+      Ca: '7.90'
+      Na: '1.94'
+      K: '0.18'
+      O: '46.20'
+      Pt: '0.00'
+      Cl: '0.00'
+    element_wt_percent_1sd_as_published:
+      Si: '0.14'
+      Ti: '0.02'
+      Al: '0.15'
+      FeT: '0.42'
+      Mg: '0.18'
+      Ca: '0.21'
+      Na: '0.09'
+      K: '0.02'
+      O: '0.14'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_6
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_7
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_7
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-7
+  values:
+    sample_id_as_published: LVP-7
+    total_wt_percent: '100.1'
+    total_sigma_wt_percent: '0.2'
+    excess_oxygen_wt_percent_as_published: '2.8'
+    excess_oxygen_1sd_wt_percent: '0.7'
+    T_C: '1600'
+    pressure_as_published: 3.4 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '22.56'
+      Ti: '0.56'
+      Al: '7.62'
+      FeT: '4.68'
+      Mg: '5.88'
+      Ca: '8.16'
+      Na: '2.20'
+      K: '0.21'
+      O: '47.29'
+      Pt: '0.09'
+      Cl: '0.81'
+    element_wt_percent_1sd_as_published:
+      Si: '0.14'
+      Ti: '0.02'
+      Al: '0.06'
+      FeT: '0.11'
+      Mg: '0.14'
+      Ca: '0.10'
+      Na: '0.10'
+      K: '0.02'
+      O: '0.41'
+      Pt: '0.07'
+      Cl: '0.02'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_7
+  work_id: 10.1093/nsr/nwag539
+  source_id: xu-2026-excess-oxygen-magma
+  species: SiO2
+- observation_id: xu_2026_table1_run_product_context_lvp_8
+  type: measured_table_context
+  units: wt.% element
+  experiment: xu_2026_lvp_8
+  locator:
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    row: LVP-8
+  values:
+    sample_id_as_published: LVP-8
+    total_wt_percent: '99.9'
+    total_sigma_wt_percent: '0.5'
+    excess_oxygen_wt_percent_as_published: '3.6'
+    excess_oxygen_1sd_wt_percent: '0.6'
+    T_C: '1700'
+    pressure_as_published: 3.4 GPa
+    redox_condition_as_published: PtO2
+    analysis_id_as_published: Table 1 sample mean
+    element_wt_percent_unit: wt.% element
+    element_wt_percent_as_published:
+      Si: '25.23'
+      Ti: '0.66'
+      Al: '8.14'
+      FeT: '0.53'
+      Mg: '5.01'
+      Ca: '8.92'
+      Na: '2.13'
+      K: '0.24'
+      O: '48.96'
+      Pt: '0.02'
+      Cl: '0.05'
+    element_wt_percent_1sd_as_published:
+      Si: '0.23'
+      Ti: '0.03'
+      Al: '0.15'
+      FeT: '0.03'
+      Mg: '0.03'
+      Ca: '0.18'
+      Na: '0.05'
+      K: '0.03'
+      O: '0.44'
+      Pt: '0.02'
+      Cl: '0.01'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - oxygen_partial_pressure
+    - oxygen_fugacity
+    reason_untyped: Total is a printed analysis sum and EO is an author-calculated oxygen residual; neither is a compatible
+      phase-component or measured redox token.
+  context_id: xu-2026-excess-oxygen-magma::context::xu_2026_table1_run_product_context_lvp_8
   work_id: 10.1093/nsr/nwag539
   source_id: xu-2026-excess-oxygen-magma
   species: SiO2

@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
+    - asset_id: pdf:kassis-frischat-1981-silicate-glass-vapour
+      role: pdf
+      path: raw/kassis-frischat-1981-silicate-glass-vapour/kassis-frischat-1981-silicate-glass-vapour.pdf
+      sha256:
+        tag: value
+        value: 4e2aae02ad2185e401c46fa0b932323014c60e2f31ea03a11cb1d29a213943c6
+    - asset_id: pdftotext:kassis-frischat-1981-silicate-glass-vapour
+      role: pdftotext
+      path: text/kassis-frischat-1981-silicate-glass-vapour
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:kassis-frischat-1981-silicate-glass-vapour
       role: pdftotext
       path: unknown

@@ -11,11 +11,14 @@ real MAGEMin binary runs end to end when one is built locally.
 
 from __future__ import annotations
 
+import ast
+import io
 import json
 import os
 import re
 import subprocess
 import sys
+import tokenize
 import tempfile
 import threading
 import time
@@ -38,10 +41,17 @@ from simulator.engine_pool import (
 )
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
-from engines.magemin.domain import MAGEMinDomainGate
+from engines.magemin.domain import (
+    MAGEMIN_NATIVE_MELT_ACTIVITIES,
+    MAGEMinDomainGate,
+)
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
+from simulator.melt_backend.base import (
+    LiquidFractionInvalidError,
+    MeltCompositionError,
+    project_melt_to_oxide_projection,
+)
 from simulator.feedstock_composition import FEOT_FROM_FE2O3
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
@@ -3024,6 +3034,20 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert any("H2O" in warning and "MnO" in warning for warning in igad.warnings)
 
 
+def test_magemin_db_projection_preserves_native_feot_input():
+    backend = MAGEMinBackend()
+
+    projected = backend._build_db_bulk_projection(
+        {"SiO2": 60.0, "Al2O3": 30.0, "FeOt": 10.0},
+    )
+
+    assert projected.composition_wt_pct == {
+        "SiO2": 60.0,
+        "Al2O3": 30.0,
+        "FeOt": 10.0,
+    }
+
+
 def test_magemin_db_projection_ume_and_mtl_orders_are_not_ig_shaped():
     backend = MAGEMinBackend()
     composition = {
@@ -3904,26 +3928,29 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     )
     assert result.status == "ok", result.warnings
 
-    projection = backend._build_db_bulk_projection(composition)
+    # Use the same kg-to-normalized-wt%-to-MAGEMin projection as equilibrate().
+    # The raw fixture sums to 99 kg, so passing it straight to the CLI would
+    # compare against a different bulk than the adapter solved.
+    melt_projection = project_melt_to_oxide_projection(
+        composition_kg=composition,
+        composition_mol=None,
+        oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+    )
+    projection = backend._build_db_bulk_projection(
+        melt_projection.oxide_wt_pct
+    )
     pressure_kbar = backend._GPa_to_kbar(
         backend._pressure_bar_to_GPa(pressure_bar)
     )
-    buffer_name, buffer_n, _warnings = backend._resolve_buffer(
-        temperature_C=temperature_C,
-        fO2_log=fO2_log,
+    direct_args, _buffer_name, _buffer_n, _buffer_warnings = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=temperature_C,
+            pressure_kbar=pressure_kbar,
+            fO2_log=fO2_log,
+            capture_native_activities=True,
+        )
     )
-    direct_args = [
-        str(_LIVE_MAGEMIN_BINARY.resolve()),
-        "--Verb=1",
-        "--db=ig",
-        f"--Temp={temperature_C:.6f}",
-        f"--Pres={pressure_kbar:.6f}",
-        "--sys_in=wt",
-        "--Bulk=" + ",".join(f"{value:.6f}" for value in projection.vector),
-        f"--buffer={buffer_name}",
-        f"--buffer_n={buffer_n:.6f}",
-        "--out_matlab=1",
-    ]
     from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
 
     with _magemin_subprocess_slot(20.0):
@@ -3942,10 +3969,11 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
             ).read_text()
 
     direct_fields = backend._parse_subprocess_native_activities(matlab_text)
-    for formula, field in (("MgO", "aMgO"), ("SiO2", "aSiO2")):
+    assert {"MgO", "SiO2"} <= set(MAGEMIN_NATIVE_MELT_ACTIVITIES)
+    for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
         direct_activity = direct_fields[field]
         adapted_activity = result.activity_coefficients[formula]
-        assert abs(adapted_activity - direct_activity) / abs(direct_activity) <= 1e-9
+        assert adapted_activity == direct_activity
     assert result.diagnostics["magemin_solver_status"] == 0
     assert result.diagnostics["magemin_native_phase"]
     assert result.diagnostics["magemin_iterations"] > 0
@@ -4787,10 +4815,57 @@ def test_magemin_qfm_nonpositive_kelvin_behavior_is_bit_pinned():
         MAGEMinBackend._qfm_logfo2_oneill(-273.15)
 
 
+def _executable_source(source: str) -> str:
+    """Source with comments and docstrings removed. Strings in code stay."""
+
+    tree = ast.parse(source)
+    docstring_lines: set[int] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        if not node.body:
+            continue
+        first = node.body[0]
+        if (
+            isinstance(first, ast.Expr)
+            and isinstance(first.value, ast.Constant)
+            and isinstance(first.value.value, str)
+            and first.end_lineno is not None
+        ):
+            docstring_lines.update(range(first.lineno, first.end_lineno + 1))
+    kept: list[str] = []
+    reader = io.StringIO(source).readline
+    for token in tokenize.generate_tokens(reader):
+        if token.type == tokenize.COMMENT:
+            continue
+        if token.type == tokenize.STRING and token.start[0] in docstring_lines:
+            continue
+        if token.type in {
+            tokenize.NL,
+            tokenize.NEWLINE,
+            tokenize.ENCODING,
+            tokenize.ENDMARKER,
+            tokenize.INDENT,
+            tokenize.DEDENT,
+        }:
+            continue
+        kept.append(token.string)
+    return " ".join(kept)
+
+
 def test_oneill_qfm_coefficient_has_one_production_owner():
     repo_root = Path(__file__).resolve().parents[1]
     tracked = subprocess.run(
-        ["git", "ls-files", "--", "simulator", "engines"],
+        [
+            "git",
+            "ls-files",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+            "--",
+            "simulator",
+            "engines",
+        ],
         cwd=repo_root,
         check=True,
         capture_output=True,
@@ -4803,8 +4878,10 @@ def test_oneill_qfm_coefficient_has_one_production_owner():
         if not relative_path.endswith(".py"):
             continue
         source_path = repo_root / relative_path
-        for line in source_path.read_text(encoding="utf-8").splitlines():
-            if coefficient.search(line):
-                occurrences.append(relative_path)
+        if not source_path.is_file():
+            continue
+        source = source_path.read_text(encoding="utf-8")
+        if coefficient.search(_executable_source(source)):
+            occurrences.append(relative_path)
 
-    assert occurrences == ["simulator/chemistry/qfm_oneill.py"]
+    assert occurrences == ["simulator/oxygen_buffers.py"]

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import json
 import math
 import re
 import sys
@@ -669,6 +670,116 @@ def test_live_major_species_admission_green(renderer, flowsheet):
         assert by_sym[sym].outcome == "PASS", (sym, by_sym[sym])
     assert result.ok
     assert all(r.outcome != "FAIL" for r in result.admission_results)
+
+
+def test_live_major_ellingham_output_matches_pinned_baseline(renderer):
+    """Pin the current reducer facts and raw ΔG values before moving the calculation."""
+    from simulator.chemistry.ellingham_graph import dissociation_delta_g
+    from simulator.chemistry.ellingham_thermo import ELLINGHAM_THERMO
+
+    facts = renderer.build_live_major_facts()
+    derived = {
+        element: facts[element]
+        for element in sorted(ELLINGHAM_THERMO)
+        if element in facts
+    }
+    payload = json.dumps(derived, sort_keys=True, separators=(",", ":"))
+    assert hashlib.sha256(payload.encode()).hexdigest() == (
+        "3c16a5bfc982469496ad1f117033b26ff8d37e001f68901bbb47d60edea24170"
+    )
+
+    assert {
+        element: dissociation_delta_g(element, 1873.15).hex()
+        for element in ("Mg", "Ca", "Si", "Mn", "Cr")
+    } == {
+        "Mg": "-0x1.59eb804c3fa90p+9",
+        "Ca": "-0x1.aa23e56a95d71p+9",
+        "Si": "-0x1.1fbaffdb398a0p+9",
+        "Mn": "-0x1.e440b11c6d1e0p+8",
+        "Cr": "-0x1.afd14b7997a5dp+8",
+    }
+
+
+def test_live_major_facts_use_ellingham_graph_calculator(renderer, monkeypatch):
+    from simulator.chemistry import ellingham_graph
+
+    seen: set[str] = set()
+    calculate = ellingham_graph.dissociation_delta_g
+
+    def record(species: str, temperature_K: float) -> float:
+        seen.add(species)
+        return calculate(species, temperature_K)
+
+    monkeypatch.setattr(ellingham_graph, "dissociation_delta_g", record)
+    renderer.build_live_major_facts()
+    assert {"Mg", "Ca", "Si", "Mn", "Cr"} <= seen
+
+
+def test_ellingham_import_failure_omits_facts_and_marks_c6_unavailable(
+    renderer,
+    flowsheet,
+    monkeypatch,
+):
+    import builtins
+
+    original_import = builtins.__import__
+
+    def fail_ellingham_import(name, globals=None, locals=None, fromlist=(), level=0):
+        if name == "simulator.chemistry.ellingham_graph":
+            raise ImportError("forced Ellingham import failure")
+        return original_import(name, globals, locals, fromlist, level)
+
+    monkeypatch.setattr(builtins, "__import__", fail_ellingham_import)
+    unavailable_blocks: dict[str, str] = {}
+    facts = renderer.build_live_major_facts(
+        unavailable_blocks=unavailable_blocks,
+    )
+
+    assert not {"Si", "Mn", "Cr"}.intersection(facts)
+    assert unavailable_blocks == {
+        "c6_magnesiothermic": (
+            "Ellingham calculation unavailable: ImportError: "
+            "forced Ellingham import failure"
+        )
+    }
+    lint = renderer.lint_against_trace_elements(flowsheet)
+    assert (
+        "block c6_magnesiothermic unavailable: "
+        "Ellingham calculation unavailable: ImportError: "
+        "forced Ellingham import failure"
+    ) in lint.warnings
+
+
+def test_ellingham_element_lookup_failure_marks_c6_unavailable(
+    renderer,
+    monkeypatch,
+):
+    from simulator.chemistry import ellingham_graph
+
+    calculate = ellingham_graph._metallothermic_reductant_for_oxide
+
+    def fail_manganese_lookup(element: str, temperature_K: float):
+        if element == "Mn":
+            raise LookupError("forced reducibility lookup failure")
+        return calculate(element, temperature_K)
+
+    monkeypatch.setattr(
+        ellingham_graph,
+        "_metallothermic_reductant_for_oxide",
+        fail_manganese_lookup,
+    )
+    unavailable_blocks: dict[str, str] = {}
+    facts = renderer.build_live_major_facts(
+        unavailable_blocks=unavailable_blocks,
+    )
+
+    assert "Mn" not in facts
+    assert unavailable_blocks == {
+        "c6_magnesiothermic": (
+            "Ellingham calculation unavailable: Mn: LookupError: "
+            "forced reducibility lookup failure"
+        )
+    }
 
 
 def test_deliberate_admission_contradiction_fails(renderer, flowsheet):

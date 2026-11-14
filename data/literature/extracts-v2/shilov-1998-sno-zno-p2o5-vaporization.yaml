@@ -392,136 +392,6 @@ observations:
     pdf_page_index: 1
     table: '1'
   read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_P2_partial_pressures::points:h=01e9231fc66f
-  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: P2
-      phase:
-        tag: unknown
-        reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: value
-      value: '1300'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: P2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: P2
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: point
-    point: '0.59477775'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: shilov-1998-sno-zno-p2o5-vaporization
-  locator:
-    published_page: 402
-    pdf_page_index: 2
-    table: '2'
-  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1300'
-      locator:
-        published_page: 402
-        pdf_page_index: 2
-        table: '2'
-  derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shilov-1998-sno-zno-p2o5-vaporization
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '0.00000587'
-        locator:
-          published_page: 402
-          pdf_page_index: 2
-          table: '2'
-    - - factor
-      - state:
-          tag: value
-          value: '101325'
-        locator:
-          published_page: 402
-          pdf_page_index: 2
-          table: '2'
-    output_unit: Pa
-    references: []
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_P2_partial_pressures::points:h=14ab958f8a76
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -652,6 +522,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_P2_partial_pressures::points:h=288b0e0c4551
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -782,6 +654,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_P2_partial_pressures::points:h=3fe763551598
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -912,6 +786,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_P2_partial_pressures::points:h=4c41d9b0e5c9
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -1042,14 +918,16 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO2_partial_pressures::points:h=499bae677145
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_P2_partial_pressures::points:h=cf0c72b38f2a
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: PO2
+      formula: P2
       phase:
         tag: unknown
         reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
@@ -1083,7 +961,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: PO2
+          formula: P2
           phase:
             tag: value
             value: g
@@ -1093,7 +971,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: PO2
+        component_basis: P2
         reference_pressure_bar: '1'
     reservoir:
       tag: unknown
@@ -1121,7 +999,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.0035159775'
+    point: '0.59477775'
     approximate: false
   uncertainty:
     kind: none
@@ -1157,7 +1035,7 @@ observations:
     - - original
       - state:
           tag: value
-          value: '0.0000000347'
+          value: '0.00000587'
         locator:
           published_page: 402
           pdf_page_index: 2
@@ -1172,6 +1050,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO2_partial_pressures::points:h=6bd614d7b29d
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -1302,6 +1182,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO2_partial_pressures::points:h=74f615bdeb09
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -1432,6 +1314,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO2_partial_pressures::points:h=7e4b6cb0aba9
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -1562,6 +1446,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO2_partial_pressures::points:h=abc41bf08d76
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -1692,7 +1578,9 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO2_partial_pressures::points:h=d656511881d7
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO2_partial_pressures::points:h=b1e6383bd533
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
     quantity:
@@ -1822,14 +1710,16 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO_partial_pressures::points:h=05f5172b2ab8
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO2_partial_pressures::points:h=d8b31aee1281
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: PO
+      formula: PO2
       phase:
         tag: unknown
         reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
@@ -1863,7 +1753,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: PO
+          formula: PO2
           phase:
             tag: value
             value: g
@@ -1873,7 +1763,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: PO
+        component_basis: PO2
         reference_pressure_bar: '1'
     reservoir:
       tag: unknown
@@ -1901,7 +1791,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.61909575'
+    point: '0.0035159775'
     approximate: false
   uncertainty:
     kind: none
@@ -1937,7 +1827,7 @@ observations:
     - - original
       - state:
           tag: value
-          value: '0.00000611'
+          value: '0.0000000347'
         locator:
           published_page: 402
           pdf_page_index: 2
@@ -1952,6 +1842,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO_partial_pressures::points:h=14310518b78b
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -2082,6 +1974,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO_partial_pressures::points:h=1611abea392e
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -2212,6 +2106,140 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO_partial_pressures::points:h=4f87be54509a
+  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: PO
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.61909575'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shilov-1998-sno-zno-p2o5-vaporization
+  locator:
+    published_page: 402
+    pdf_page_index: 2
+    table: '2'
+  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        published_page: 402
+        pdf_page_index: 2
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:shilov-1998-sno-zno-p2o5-vaporization
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000611'
+        locator:
+          published_page: 402
+          pdf_page_index: 2
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 402
+          pdf_page_index: 2
+          table: '2'
+    output_unit: Pa
+    references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO_partial_pressures::points:h=92aab557f282
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -2342,6 +2370,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_PO_partial_pressures::points:h=dc6bd2f3eb12
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -2472,136 +2502,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnO_partial_pressures::points:h=06e43b6faaa8
-  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: SnO
-      phase:
-        tag: unknown
-        reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: value
-      value: '1300'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SnO
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SnO
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: point
-    point: '0.0075284475'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: shilov-1998-sno-zno-p2o5-vaporization
-  locator:
-    published_page: 402
-    pdf_page_index: 2
-    table: '2'
-  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1300'
-      locator:
-        published_page: 402
-        pdf_page_index: 2
-        table: '2'
-  derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shilov-1998-sno-zno-p2o5-vaporization
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '0.0000000743'
-        locator:
-          published_page: 402
-          pdf_page_index: 2
-          table: '2'
-    - - factor
-      - state:
-          tag: value
-          value: '101325'
-        locator:
-          published_page: 402
-          pdf_page_index: 2
-          table: '2'
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnO_partial_pressures::points:h=24b1f76131b7
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -2732,6 +2634,140 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnO_partial_pressures::points:h=616676976218
+  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0075284475'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shilov-1998-sno-zno-p2o5-vaporization
+  locator:
+    published_page: 402
+    pdf_page_index: 2
+    table: '2'
+  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        published_page: 402
+        pdf_page_index: 2
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:shilov-1998-sno-zno-p2o5-vaporization
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000743'
+        locator:
+          published_page: 402
+          pdf_page_index: 2
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 402
+          pdf_page_index: 2
+          table: '2'
+    output_unit: Pa
+    references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnO_partial_pressures::points:h=a048d2193327
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -2862,6 +2898,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnO_partial_pressures::points:h=a51bc89de501
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -2992,6 +3030,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnO_partial_pressures::points:h=c5b80395eadc
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -3122,6 +3162,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO2_partial_pressures::points:h=0828393f531c
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -3252,6 +3294,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO2_partial_pressures::points:h=342cc89be412
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -3382,6 +3426,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO2_partial_pressures::points:h=74df2ff38463
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -3512,6 +3558,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO2_partial_pressures::points:h=8e8a31f51092
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -3642,6 +3690,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO3_partial_pressures::points:h=193daeb03ace
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -3772,6 +3822,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO3_partial_pressures::points:h=5b8fd5b9b1f7
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -3902,6 +3954,140 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO3_partial_pressures::points:h=8395a0977c87
+  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SnPO3
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnPO3
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnPO3
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0039820725'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shilov-1998-sno-zno-p2o5-vaporization
+  locator:
+    published_page: 402
+    pdf_page_index: 2
+    table: '2'
+  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        published_page: 402
+        pdf_page_index: 2
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:shilov-1998-sno-zno-p2o5-vaporization
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000393'
+        locator:
+          published_page: 402
+          pdf_page_index: 2
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 402
+          pdf_page_index: 2
+          table: '2'
+    output_unit: Pa
+    references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO3_partial_pressures::points:h=9c72e317e9ee
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -4032,136 +4218,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO3_partial_pressures::points:h=a5cd89fa23c4
-  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: SnPO3
-      phase:
-        tag: unknown
-        reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: value
-      value: '1300'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SnPO3
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SnPO3
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: point
-    point: '0.0039820725'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: shilov-1998-sno-zno-p2o5-vaporization
-  locator:
-    published_page: 402
-    pdf_page_index: 2
-    table: '2'
-  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1300'
-      locator:
-        published_page: 402
-        pdf_page_index: 2
-        table: '2'
-  derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shilov-1998-sno-zno-p2o5-vaporization
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '0.0000000393'
-        locator:
-          published_page: 402
-          pdf_page_index: 2
-          table: '2'
-    - - factor
-      - state:
-          tag: value
-          value: '101325'
-        locator:
-          published_page: 402
-          pdf_page_index: 2
-          table: '2'
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_SnPO3_partial_pressures::points:h=ba81d1090574
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -4292,6 +4350,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Sn_partial_pressures::points:h=341f1ff9eec9
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -4422,6 +4482,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Sn_partial_pressures::points:h=8bf6f5363ae6
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -4552,6 +4614,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Sn_partial_pressures::points:h=ce558442cda4
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -4682,6 +4746,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Sn_partial_pressures::points:h=d39ca8d88fe7
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -4812,6 +4878,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Zn_partial_pressures::points:h=12dcd74ae696
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -4942,136 +5010,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Zn_partial_pressures::points:h=3ed066cb4274
-  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: Zn
-      phase:
-        tag: unknown
-        reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: value
-      value: '1300'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Zn
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Zn
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: point
-    point: '101.325'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: shilov-1998-sno-zno-p2o5-vaporization
-  locator:
-    published_page: 402
-    pdf_page_index: 2
-    table: '2'
-  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1300'
-      locator:
-        published_page: 402
-        pdf_page_index: 2
-        table: '2'
-  derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:shilov-1998-sno-zno-p2o5-vaporization
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '0.001'
-        locator:
-          published_page: 402
-          pdf_page_index: 2
-          table: '2'
-    - - factor
-      - state:
-          tag: value
-          value: '101325'
-        locator:
-          published_page: 402
-          pdf_page_index: 2
-          table: '2'
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Zn_partial_pressures::points:h=831a97a3b35e
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -5202,6 +5142,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Zn_partial_pressures::points:h=8f45b0ea6e76
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -5332,6 +5274,8 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Zn_partial_pressures::points:h=ebf41d584762
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -5462,6 +5406,140 @@ observations:
           table: '2'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table2_Zn_partial_pressures::points:h=f3a69a2ff318
+  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Zn
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_pyrophosphate_melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Zn
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Zn
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '101.325'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shilov-1998-sno-zno-p2o5-vaporization
+  locator:
+    published_page: 402
+    pdf_page_index: 2
+    table: '2'
+  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        published_page: 402
+        pdf_page_index: 2
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:shilov-1998-sno-zno-p2o5-vaporization
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.001'
+        locator:
+          published_page: 402
+          pdf_page_index: 2
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 402
+          pdf_page_index: 2
+          table: '2'
+    output_unit: Pa
+    references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=0feeef7a4285
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -5616,6 +5694,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=29d33099d22d
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -5770,6 +5850,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=3d8081d07178
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -5924,6 +6006,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=435d6e024cab
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -6078,6 +6162,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=6729510df4ca
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -6232,6 +6318,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=6aaeda6e45ae
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -6386,6 +6474,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=77d1e4ebb9c7
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -6540,6 +6630,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=9acd38f61e08
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -6694,6 +6786,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=bcb7ebb15b44
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -6848,6 +6942,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=c02bce5f2b80
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -7002,6 +7098,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=c4adcf443a34
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -7156,6 +7254,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=ca86acedabab
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -7310,6 +7410,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=cc8ab3e2fad5
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -7464,6 +7566,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=d78cade6accb
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -7618,6 +7722,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=dcbcb95218c7
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -7772,6 +7878,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=e53adab26dd0
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -7926,6 +8034,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=ecc8312d66f6
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -8080,6 +8190,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=ecf340265dc4
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -8234,6 +8346,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=f007f3013cf7
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -8388,6 +8502,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_atomic_oxygen_partial_pressures::T=1300.0:h=fe27ba3bd29b
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -8542,6 +8658,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_molecular_oxygen_partial_pressures::points:h=03b3c1add82f
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -8682,6 +8800,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_molecular_oxygen_partial_pressures::points:h=9429420bdd54
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -8822,6 +8942,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_molecular_oxygen_partial_pressures::points:h=d801cb1debcb
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -8962,6 +9084,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table4_molecular_oxygen_partial_pressures::points:h=fc2c6e166429
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -9102,6 +9226,8 @@ observations:
           table: '4'
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: vapor_over_pyrophosphate_melts
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=08127ba009aa
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -9222,6 +9348,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=19857e440d3d
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -9342,6 +9470,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=20f2d82795f7
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -9462,6 +9592,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=244c952d86e8
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -9582,6 +9714,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=4322fb1eea54
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -9702,7 +9836,9 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=5b440587be0e
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=65e1f09e47e9
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
     quantity:
@@ -9822,6 +9958,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=68496a597a91
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -9942,6 +10080,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=856f9b6a10f6
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -10062,6 +10202,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_P2O5_activities::T=1300.0:h=a57ab6fdd92b
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -10182,118 +10324,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_SnO_activities::T=1300.0:h=1e71bdc98c5b
-  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
-  identity:
-    quantity:
-      tag: value
-      value: activity
-    species:
-      formula: SnO
-      phase:
-        tag: unknown
-        reason: phase string 'melt_in_the_Zn2P2O7_Sn2P2O7_system' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1300'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: A separate activity reference state is not explicitly stated; the activity
-        is calculated according to equilibrium (16), using its constant from [10].'
-    reservoir:
-      tag: not_applicable
-      reason: profile activity does not use reservoir
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity does not use wall
-  value:
-    kind: point
-    point: '0.000346'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: shilov-1998-sno-zno-p2o5-vaporization
-  locator:
-    published_page: 403
-    pdf_page_index: 3
-    table: '5'
-  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1300'
-      locator:
-        published_page: 403
-        pdf_page_index: 3
-        table: '5'
-    xSnO_mol_pct:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '66.7'
-          approximate: false
-      locator:
-        published_page: 403
-        pdf_page_index: 3
-        table: '5'
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:shilov-1998-sno-zno-p2o5-vaporization
-    parameters: []
-    output_unit: dimensionless activity as printed
-    references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_SnO_activities::T=1300.0:h=29dbb0137e81
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -10406,6 +10438,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_SnO_activities::T=1300.0:h=442c8f00291e
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -10518,6 +10552,122 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_SnO_activities::T=1300.0:h=dc01a64deb60
+  experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'melt_in_the_Zn2P2O7_Sn2P2O7_system' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: A separate activity reference state is not explicitly stated; the activity
+        is calculated according to equilibrium (16), using its constant from [10].'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000346'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shilov-1998-sno-zno-p2o5-vaporization
+  locator:
+    published_page: 403
+    pdf_page_index: 3
+    table: '5'
+  read_from: pdf:shilov-1998-sno-zno-p2o5-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        published_page: 403
+        pdf_page_index: 3
+        table: '5'
+    xSnO_mol_pct:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '66.7'
+          approximate: false
+      locator:
+        published_page: 403
+        pdf_page_index: 3
+        table: '5'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shilov-1998-sno-zno-p2o5-vaporization
+    parameters: []
+    output_unit: dimensionless activity as printed
+    references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_SnO_activities::T=1300.0:h=dd98c638be69
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -10630,6 +10780,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_SnO_activities::T=1300.0:h=f87865f7f1dd
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -10742,6 +10894,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_ZnO_activities::T=1300.0:h=1d366d196ec3
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -10854,6 +11008,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_ZnO_activities::T=1300.0:h=50982d88cf43
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -10966,7 +11122,9 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
-- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_ZnO_activities::T=1300.0:h=a002d1925464
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
+- observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_ZnO_activities::T=1300.0:h=53283c60ffdd
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
     quantity:
@@ -11078,6 +11236,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_ZnO_activities::T=1300.0:h=a69cb0b24d96
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -11190,6 +11350,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
 - observation_id: shilov-1998-sno-zno-p2o5-vaporization::shilov_1998_table5_ZnO_activities::T=1300.0:h=caa31cc1a05d
   experiment_id: eb6a71e012533c084fcd9dd1f344fd8446d7b8f299225fa5c564315d9d841994::shilov-1998-sno-zno-p2o5-vaporization
   identity:
@@ -11302,3 +11464,5 @@ observations:
     parameters: []
     output_unit: dimensionless activity as printed
     references: []
+  provenance:
+    printed_phase: melt_in_the_Zn2P2O7_Sn2P2O7_system

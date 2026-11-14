@@ -1,0 +1,814 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  citation: Copland, E. H. & Jacobson, N. S. (2001), "Thermodynamic Activity Measurements with Knudsen Cell Mass Spectrometry",
+    Electrochem. Soc. Interface 10, 28–31, Summer 2001.
+  source_ids:
+  - kems-209-copland-2001
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:kems-209-copland-2001
+      role: pdf
+      path: raw/kems-209-copland-2001/kems-209-copland-2001.pdf
+      sha256:
+        tag: value
+        value: 295c441e2edd75bddee3cc475ee1f9edd0183386144970185e69ce44a7f053cb
+    - asset_id: pdftotext:kems-209-copland-2001
+      role: pdftotext
+      path: text/kems-209-copland-2001
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kems-209-copland-2001
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5::experiment::cu-second-law-check
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    form:
+      state:
+        tag: value
+        value: Copper (vapor pressure standard)
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        figure: '2'
+    container:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        figure: '2'
+        note: Cell material not stated.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        figure: '2'
+        note: No temperatures are printed in words; Fig. 2 1/T(K) axis ticks run 7.2e-4 to 8.6e-4 and were not digitized.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        section: Basic Technique
+        note: No chamber background pressure is printed anywhere in the article.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        section: Critical Experimental Issues
+        note: Knudsen effusion into the vacuum system of the mass spectrometer; no carrier gas is mentioned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  locator:
+    published_page: 29
+    pdf_page_index: 2
+    figure: '2'
+    note: Second law heat of vaporization of copper used as the instrument check (Fig. 2). Run conditions (cell, orifice,
+      T range in words) are not printed; the Fig. 2 1/T axis was not digitized.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 29
+          pdf_page_index: 2
+          figure: '2'
+          note: Not printed for this run.
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Second law heat of vaporization of a vapor pressure standard (Cu) from the slope of ln(I_i T) vs 1/T, compared
+            with the tabulated value; acceptable within 2 kJ/mol of the accepted value
+        locator:
+          published_page: 29
+          pdf_page_index: 2
+          section: Critical Experimental Issues
+          note: Text runs from p. 29 onto p. 30.
+      reference_substance:
+        state:
+          tag: value
+          value: Cu
+        locator:
+          published_page: 29
+          pdf_page_index: 2
+          figure: '2'
+  bench_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5::bench::copland-2001-kcms
+- experiment_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5::experiment::fe-al-ion-current-ratio-1573k
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    form:
+      state:
+        tag: value
+        value: Fe-Al alloys over a range of compositions
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        section: Critical Experimental Issues
+    container:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        figure: '3'
+        note: Cell material not stated.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        figure: '3'
+        note: Printed in the Fig. 3 caption "at 1573 K".
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        figure: '3'
+        note: No chamber background pressure is printed.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        section: Critical Experimental Issues
+        note: Knudsen effusion; no carrier gas is mentioned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    figure: '3'
+    note: Fe and Al activities across the Fe-Al binary at 1573 K by the ion-current ratio (Gibbs-Duhem, Eq. 4) technique,
+      "obtained in our laboratory" (ref. 9, Jacobson & Mehrotra, Met. Trans. 24B, 481 (1993)). Activities are figure-only.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 30
+          pdf_page_index: 3
+          figure: '3'
+          note: Not printed for this run.
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Ion-current ratio technique; the Gibbs-Duhem integration cancels the calibration constant, so no standards
+            are needed
+        locator:
+          published_page: 30
+          pdf_page_index: 3
+          section: Critical Experimental Issues
+      reference_substance:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 30
+          pdf_page_index: 3
+          section: Critical Experimental Issues
+          note: Printed "It requires only measurements of the alloy—no standards are necessary."
+  bench_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5::bench::copland-2001-kcms
+- experiment_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5::experiment::ti-45al-double-cell
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    form:
+      state:
+        tag: value
+        value: Ti-45 a/o Al alloy
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        section: Critical Experimental Issues
+    container:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        section: Critical Experimental Issues
+        note: Cell material not stated.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 31
+        pdf_page_index: 4
+        figure: '4'
+        note: No run temperatures are printed in words; Fig. 4 axes (1/T(K) 0.00055–0.00085, upper T(K) scale 1600–1200) were
+          not digitized.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        section: Critical Experimental Issues
+        note: No chamber background pressure is printed.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 30
+        pdf_page_index: 3
+        section: Critical Experimental Issues
+        note: Knudsen effusion; no carrier gas is mentioned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    section: Critical Experimental Issues
+    note: Al and Ti activities in Ti-45 a/o Al by the multiple (double) cell technique with a secondary in-situ standard (Fig.
+      4, p. 31; ref. 13, Jacobson, Brady & Mehrotra, Oxid. Met. 52, 537 (1999)). Activities are figure-only.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 30
+          pdf_page_index: 3
+          section: Critical Experimental Issues
+          note: Not printed; the text only requires that standard and sample cells "have matched orifices" (p. 30).
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Multiple cell technique with a secondary in-situ standard (pure Cu or Au in the adjacent cell instead of
+            pure Al), corrected to an expected pure-Al ion intensity using an additional run with pure Al in one cell and
+            the Cu or Au standard in the other
+        locator:
+          published_page: 30
+          pdf_page_index: 3
+          section: Critical Experimental Issues
+      reference_substance:
+        state:
+          tag: value
+          value: Cu or Au (secondary in-situ standard)
+        locator:
+          published_page: 30
+          pdf_page_index: 3
+          section: Critical Experimental Issues
+          note: The text says "pure Cu or Au is used"; which of the two was used for the Fig. 4 data is not stated.
+  bench_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5::bench::copland-2001-kcms
+benches:
+- id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5::bench::copland-2001-kcms
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Magnetic-sector Knudsen cell mass spectrometer with multiple adjacent Knudsen cells and a beam shutter (Fig.
+        1, Modified Model 12-90-HT, Spectrumedix, State College, PA)
+    locator:
+      published_page: 28
+      pdf_page_index: 1
+      figure: '1'
+      note: Fig. 1 caption reads "Partial schematic of a Knudsen cell mass spectrometer. (Modified Model 12-90-HT, Spectrumedix,
+        State College, PA.)". The text calls Fig. 1 "a typical Knudsen cell mass spectrometer" and refers to it for the shutter
+        and the adjacent multiple cells; it does not state in words that this is the authors' own instrument, although the
+        Fe-Al data are "obtained in our laboratory" and the double-cell method is described as "We overcome...".
+  method:
+    state:
+      tag: value
+      value: Knudsen cell mass spectrometry (KCMS); dimer/monomer, ion-current ratio (Gibbs-Duhem), and multiple-cell techniques
+        (generic tutorial methods, not all assigned to each plotted run)
+    locator:
+      published_page: 30
+      pdf_page_index: 3
+      section: Critical Experimental Issues
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 29
+      pdf_page_index: 2
+      section: Critical Experimental Issues
+      note: Only the generic guidance is printed ("metallic alloys are studied in refractory ceramic cells (Al2O3, ZrO2, Y2O3,
+        etc.) and ceramics are studied in refractory metal cells (W, Mo, Ir, etc.)"). The cell material used for the Cu, Fe-Al
+        or Ti-Al data is not stated; cell_materials is not populated.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 28
+        pdf_page_index: 1
+        section: Basic Technique
+        note: Only the generic "orifice is small (typically 0.5-2 mm diameter)" and "a Knudsen cell is 1 cm in diameter x
+          1 cm tall" are printed; the orifice of the cells used for Figs. 2–4 is not stated.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 28
+        pdf_page_index: 1
+        section: Basic Technique
+        note: Not printed.
+  detector:
+    state:
+      tag: value
+      value: Electron-impact ionizer, high-voltage accelerating region, magnetic field mass selection, electron multiplier;
+        ion counting preferred
+    locator:
+      published_page: 29
+      pdf_page_index: 2
+      section: Basic Technique
+      note: Generic description of "a mass spectrometer for analysis of high temperature vapor"; not stated as the specific
+        configuration used for Figs. 2–4.
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        section: Critical Experimental Issues
+        note: Only "Typically low energy ionizing electrons are used"; no electron energy is printed.
+    cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        section: Basic Technique
+        note: Eq. (1) P_i = k I_i T / σ_i is printed, but no cross-section values.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        section: Critical Experimental Issues
+        note: Generic "either a pyrometer or thermocouple"; the sensor used for Figs. 2–4 is not stated.
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        pdf_page_index: 2
+        section: Critical Experimental Issues
+        note: Generic "A typical calibration involves slowly varying the temperature through the melting point of a pure metal
+          (e.g., Ag, Au, Cu, etc.)"; not stated for the reported runs.
+  other_facts: []
+context:
+- observation_id: copland_2001_al_emf_comparison
+  type: qualifying_statement_context
+  experiment: ti-45al-double-cell
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    section: Critical Experimental Issues
+  units: verbatim; temperature in K as printed
+  values:
+    method_class: quoted_attributed
+    quantity: cross_method_agreement_statement
+    attribution: Ref. 13, N. S. Jacobson, M. P. Brady and G. M. Mehrotra, Oxid. Met. 52, 537 (1999).
+    emf_temperature_K_as_printed: 1073
+    emf_electrolyte_as_printed: CaF2
+    quote: We found that these data extrapolated to some aAl measurements taken with the EMF technique and a CaF2 electrolyte
+      at 1073 K. An important application of these data is the prediction of the stable surface oxide—TiO2 or Al2O2.
+    note: '"Al2O2" is as printed (presumably Al2O3); kept verbatim. No EMF activity values are printed.'
+  context_id: kems-209-copland-2001::context::copland_2001_al_emf_comparison
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Al
+- observation_id: copland_2001_alumina_solution_scheme
+  type: method
+  locator:
+    published_page: 31
+    pdf_page_index: 4
+    section: Critical Experimental Issues
+    note: Complete scheme (6), cited in the alumina-constituent sentence to ref. 12 (Chatillon 1997); theoretical method relations,
+      not empirical observations.
+  units: verbatim
+  values:
+    method_class: method_only
+    quantity: oxide_activity_relation
+    attribution: Ref. 12, C. Chatillon, High Temperature Materials Chemistry IX, PV 97-39 (1997).
+    pure_reaction_as_printed: Al2O3(pure) = 2Al(g) + 3O(g)
+    pure_equilibrium_constant_as_printed: K = P_Al^2 P_O^3 / 1
+    solution_reaction_as_printed: Al2O3(soln) = 2Al(g-soln) + 3O(g-soln)
+    solution_equilibrium_constant_as_printed: K = P_Al(soln)^2 P_O(soln)^3 / a_Al2O3
+    standard_state: Alumina in solution is compared with pure alumina, whose activity is 1 (the printed denominator); unsubscripted-by-soln
+      pressures and intensities in the final ratio are the pure-alumina reference. No separate physical reference phase or
+      gas standard pressure is printed.
+    relation_as_printed: a_Al2O3 = P²_Al(soln) P³_O(soln) / (P²_Al P³_O) = I²_Al(soln) I³_O(soln) / (I²_Al I³_O)
+    quote: These systems produce mass spectra that are much more complex and the activities must be derived accordingly. Consider
+      a solution with alumina as a constituent (see scheme 6 above). Several groups are actively using the KCMS technique
+      to measure the properties of complex oxide solutions. This type of data are used to develop oxide solution models.
+  context_id: kems-209-copland-2001::context::copland_2001_alumina_solution_scheme
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Al
+- observation_id: copland_2001_background_separation
+  type: apparatus
+  locator:
+    published_page: 29
+    pdf_page_index: 2
+    section: Critical Experimental Issues
+    note: Technique-general.
+  units: verbatim; resolution as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: background_peak_separation
+    neutral_parent_guidance: Identify the neutral precursors of observed ions. Ti vapor above Ti alloys forms Ti+; NiO forms
+      Ni+, NiO+, O2+, and O+. Low-energy ionizing electrons minimize fragmentation and simplify the mass spectrum but reduce
+      sensitivity.
+    magnetic_sector_resolution_as_printed: 1000 or greater
+    quote: The ionizing electron energy can be chosen to limit fragmentation of background hydrocarbons and limit the number
+      of background peaks. A magnetic sector instrument typically has a resolution of 1000 or greater, which allows separation
+      of inorganic peaks from any hydrocarbons. Finally a shutter, as shown in Fig. 1, can be used to interrupt the molecular
+      beam emerging from the cell so the background can be identified and subtracted.
+  context_id: kems-209-copland-2001::context::copland_2001_background_separation
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_cell_material_and_design_guidance
+  type: method
+  locator:
+    published_page: 29
+    pdf_page_index: 2
+    section: Critical Experimental Issues
+    note: Technique-general guidance; the cells used for Figs. 2–4 are not described.
+  units: verbatim
+  values:
+    method_class: quoted_unattributed
+    quantity: cell_material_and_design_guidance
+    sample_to_orifice_area_ratio_min_as_printed: 100
+    sample_form_guidance: Large surface area is readily achieved with powder but may require a larger cell area with liquid.
+      This is generic guidance, not a stated form of the plotted samples.
+    quote: The first requirement is an inert cell. A wide range of refractory-metal and ceramic materials have been used for
+      Knudsen cells. Generally metallic alloys are studied in refractory ceramic cells (Al2O3, ZrO2, Y2O3, etc.) and ceramics
+      are studied in refractory metal cells (W, Mo, Ir, etc.). ... In general this is achieved by a cell with a larger diameter
+      than height and a sample with a large surface area (generally the sample area should be at least one hundred times greater
+      than the orifice area).
+  context_id: kems-209-copland-2001::context::copland_2001_cell_material_and_design_guidance
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_cu_second_law_check
+  type: calibration_check
+  experiment: cu-second-law-check
+  locator:
+    published_page: 29
+    pdf_page_index: 2
+    figure: '2'
+    note: The tabulated value is printed in the caption with a citation to ref. 2 (NIST-JANAF, 4th ed.); the measured value
+      is printed as text inside the plot area. Neither is digitized from the plotted points.
+  units: kJ/mol as printed
+  values:
+    method_class_by_value:
+      measured_dvapH_kJ_per_mol_as_printed_in_plot: author_derived
+      measured_dvapH_uncertainty_kJ_per_mol_as_printed_in_plot: author_derived
+      tabulated_dvapH_kJ_per_mol: quoted_attributed
+    attribution_by_value:
+      tabulated_dvapH_kJ_per_mol: ref. 2, M. W. Chase, Jr., NIST-JANAF Thermochemical Tables, Fourth Edition
+    quantity: second_law_enthalpy_of_vaporization_check
+    evidence_origin: The 332.0 +/- 0.9 result is the printed second-law fit reduction; 331.8 is quoted_attributed to ref.
+      2, M. W. Chase Jr., NIST-JANAF Thermochemical Tables, Fourth Edition (1998); the 2 kJ/mol tolerance is method guidance,
+      not a measured uncertainty.
+    derivation: Slope of ln(I_i T) versus 1/T yields the second-law heat. Numeric slope, raw ion currents, fit inputs and
+      numerical reduction lineage are not published outside the undigitized graph; no raw parent observations are fabricated.
+      Absolute-pressure conversion is not required for this check (p. 30).
+    measured_dvapH_kJ_per_mol_as_printed_in_plot: '332'
+    measured_dvapH_uncertainty_kJ_per_mol_as_printed_in_plot: '0.9'
+    tabulated_dvapH_kJ_per_mol: '331.8'
+    acceptance_window_kJ_per_mol_as_printed: 2
+    plot_annotation: ΔvH(Cu) = 332.0 +/- 0.9 kJ/mol
+    caption: FIG. 2. Second law heat of vaporization for copper. The tabulated value is 331.8 kJ/mol.
+    quote: The best test for proper operation of a Knudsen cell instrument is a simple second law heat of vaporization of
+      a well-characterized vapor pressure standard. This is illustrated in Fig. 2 for copper, where the slope of the line
+      in a plot of ln (IiT) vs. 1/T gives a heat of vaporization. An acceptable heat is within 2 kJ/mol of the accepted value.
+    note: The ± is printed without a stated confidence basis. The ln(IT) vs 1/T points are figure-only.
+  context_id: kems-209-copland-2001::context::copland_2001_cu_second_law_check
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_dimer_monomer_activity_method
+  type: method
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    section: Critical Experimental Issues, equations (2) and (3)
+  units: symbolic activity relation as printed
+  values:
+    method_class: method_only
+    quantity: dimer_monomer_activity_relation
+    method_count_as_printed: Three methods have been developed to circumvent run-to-run machine-constant changes.
+    attribution: Dimer/monomer approach developed by Berkowitz and Chupka, refs. 1 and 7.
+    equilibrium_as_printed: 2A(g) = A2(g)
+    relation_as_printed: a(A) = I°(A) I(A2) / [I°(A2) I(A)]
+    definitions: I°(A) and I°(A2) are intensities over pure element A; I(A) and I(A2) are intensities over the alloy containing
+      A. The text calls both species A(g) in its intensity definitions, although the displayed relation distinguishes A and
+      A2; retained without silently repairing the wording.
+    standard_state: Alloy activity is relative to pure element A under the compared conditions; a physical reference phase
+      is not separately specified.
+    applicability: Requires both species to be readily measurable with a well-established dimer/monomer equilibrium; limited
+      to specific systems.
+  context_id: kems-209-copland-2001::context::copland_2001_dimer_monomer_activity_method
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_fig1_schematic
+  type: figure_only
+  locator:
+    published_page: 28
+    pdf_page_index: 1
+    figure: '1'
+  units: caption verbatim; schematic not digitized
+  values:
+    method_class: figure_only
+    quantity: instrument_schematic
+    labels_as_printed: Ion Beam; To Magnet and Detector; Electron Beam; Filament; Shutter; Molecular Beam; Knudsen Cells
+    caption: FIG. 1. Partial schematic of a Knudsen cell mass spectrometer. (Modified Model 12-90-HT, Spectrumedix, State
+      College, PA.)
+  context_id: kems-209-copland-2001::context::copland_2001_fig1_schematic
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_fig3_fe_al_activities
+  type: figure_only
+  experiment: fe-al-ion-current-ratio-1573k
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    figure: '3'
+  units: caption verbatim; activities not digitized (axes printed as Activity vs Mole Fraction Al, x_Al; Solid and Liquid
+    regions marked)
+  values:
+    method_class: figure_only
+    quantity: activity_vs_composition
+    standard_state: The pure-component convention follows the stated ion-current-ratio method and equation (4); the paper
+      does not separately specify the physical pure reference phase for either plotted Fe or Al activity. Solid/Liquid labels
+      describe alloy regions, not an explicit reference-state declaration.
+    temperature_K: 1573
+    components_plotted_as_printed: Fe; Al
+    caption: FIG. 3. Data obtained for the Fe-Al system at 1573 K by the ion-current ratio technique.
+    quote: An example of some data for the Fe-Al system obtained in our laboratory is shown in Fig. 3. Note the negative deviations
+      from ideality, which are consistent with solution models of this system.
+  context_id: kems-209-copland-2001::context::copland_2001_fig3_fe_al_activities
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Fe
+- observation_id: copland_2001_fig4_ti45al_activities
+  type: figure_only
+  experiment: ti-45al-double-cell
+  locator:
+    published_page: 31
+    pdf_page_index: 4
+    figure: '4'
+    note: Discussion text is on p. 30.
+  units: caption verbatim; activities not digitized (axes printed as Activity, log scale 0.01–1, vs 1/T(K); phase fields α-Ti,
+    α-Ti + γ-TiAl, α-Ti3Al + γ-TiAl marked)
+  values:
+    method_class: figure_only
+    quantity: activity_vs_inverse_temperature
+    standard_state: Al is compared with pure Al by equation (5), with secondary Cu/Au intensities corrected back to pure Al.
+      A pure-component convention for Ti is inferred from the stated activity method; its calibration procedure and the physical
+      pure reference phase of either plotted component are not separately specified.
+    components_plotted_as_printed: Titanium; Aluminum
+    caption: FIG. 4. Data for the Ti-45Al system obtained by the double cell technique.
+    quote: Figure 4 illustrates some recent data on Ti-45 a/o Al. Note that both aAl and aTi are reported. The upper limit
+      of measurement is determined by both the high vapor pressure and the melting point of the alloy. The lower limit is
+      determined by the sensitivity of the instrument. The low vapor pressure of Ti gives only a narrow range for aTi measurement.
+      However aAl can be measured over a wide range.
+  context_id: kems-209-copland-2001::context::copland_2001_fig4_ti45al_activities
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Al
+- observation_id: copland_2001_gibbs_duhem_activity_method
+  type: method
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    section: Critical Experimental Issues, equation (4)
+  units: symbolic relation as printed; ln is natural logarithm
+  values:
+    method_class: method_only
+    quantity: ion_current_ratio_activity_coefficient_relation
+    relation_as_printed: ln γ_A = -∫_(x_A=1)^(x_A) x_A d[ln(I_A^+/I_B^+) - ln(x_A/x_B)]
+    definitions: γ_A is the activity coefficient of A; x_A and x_B are mole fractions of A and B; I_A and I_B are measured
+      ion intensities of A(g) and B(g) over the alloy. The displayed integrand prints x_A, and the ion-current superscripts
+      are positive charges.
+    standard_state: Pure-component normalization at x_A = 1 is implied by the printed integration limit; no separate physical
+      reference phase is specified.
+    applicability: Manipulating Gibbs-Duhem cancels the calibration constant and requires only alloy measurements, without
+      standards; measurable vapor pressures for both components over a composition range are required. Refs. 1 and 8.
+  context_id: kems-209-copland-2001::context::copland_2001_gibbs_duhem_activity_method
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_kcms_operating_range
+  type: method
+  locator:
+    published_page: 28
+    pdf_page_index: 1
+    section: Basic Technique
+    note: Technique-general statements; not tied to a specific run. Filed under Cu only as a container.
+  units: bar, K, cm and mm as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: technique_operating_range_and_typical_cell_geometry
+    history_as_printed: KCMS has been used for nearly fifty years.
+    equilibrium_guidance: A condensed sample in a small Knudsen cell is uniformly heated and held until equilibrium is attained
+      between condensed and vapor phases; vapor is continuously sampled through a small orifice.
+    collimation_as_printed: A beam sampled close to the orifice normal is collimated by one or more apertures and directed
+      to the ionization chamber.
+    pressure_range_bar_as_printed: ~10^-4 to 10^-11
+    temperature_range_K_as_printed: 500-2800
+    typical_cell_size_as_printed: 1 cm in diameter x 1 cm tall
+    typical_orifice_diameter_mm_as_printed: 0.5-2
+    upper_pressure_limit_bar_for_1_mm_orifice_as_printed: ~10^-4
+    lower_pressure_limit_bar_as_printed: ~10^-11
+    quote: All classes of materials can be studied and all constituents of the vapor phase can be measured over a wide range
+      of pressures (~10-4 to 10-11 bar) and temperatures (500-2800 K). ... Typically a Knudsen cell is 1 cm in diameter x
+      1 cm tall with an orifice of well-defined geometry. The orifice is small (typically 0.5-2 mm diameter) to ensure molecular
+      flow is maintained as molecules pass through the orifice, i.e., molecule-wall collisions dominate over molecule-molecule
+      collisions. As a general rule, the orifice dimensions must be kept to less then one tenth of the mean free path of the
+      vapor species, over all experimental conditions. This, in turn, leads to an upper pressure limit of ~10-4 bar for a
+      1 mm orifice. The lower pressure limit is determined by the sensitivity of the instrument and is typically ~10-11 bar.
+  context_id: kems-209-copland-2001::context::copland_2001_kcms_operating_range
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_multiple_cell_activity_method
+  type: method
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    section: Critical Experimental Issues, equation (5)
+  units: symbolic activity relation as printed
+  values:
+    method_class: method_only
+    quantity: multiple_cell_activity_relation
+    history_as_printed: First discussed in 1960 by Büchler and Stauffer (ref. 11); that reference lists a 1966 publication.
+    cell_count_as_printed: Two or more cells are adjacent to each other.
+    relation_as_printed: a_Al = P_Al(soln)/P_Al(pure) = I_Al(soln)/I_Al(pure)
+    definitions: P and I are partial pressure and ion intensity, respectively; ideally pure Al occupies one cell and Ti-Al
+      the other.
+    standard_state: Al in solution is referenced to pure Al; a separate physical reference phase or gas standard pressure
+      is not specified.
+    beam_mixing_guidance: Molecular beams tend to mix. Chatillon's restricted collimation (ref. 12) uses fixed collimating
+      apertures to restrict ion-source vapor to that originating in the cell orifice of interest. The authors use a secondary
+      in-situ pure Cu or Au standard instead of pure Al (ref. 13); an additional pure-Al versus Cu/Au run supplies the correction
+      to expected pure-Al intensity, preserving the pure-Al activity reference. The actual secondary metal and a Ti-specific
+      calibration are not stated for Fig. 4.
+  context_id: kems-209-copland-2001::context::copland_2001_multiple_cell_activity_method
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_pressure_calibration_guidance
+  type: method
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    section: Critical Experimental Issues
+    note: Technique-general guidance on absolute pressure calibration with a standard.
+  units: verbatim
+  values:
+    method_class: quoted_unattributed
+    quantity: absolute_pressure_calibration_guidance
+    quote: 'Reliable vapor pressure data are available for most pure metals and these are excellent standards. However care
+      must be taken to measure the standard and sample vapor pressures under exactly the same conditions: the molecular beam
+      must be directed to the same region in the ion source, and the cells used for the vapor pressure standard and the sample
+      must have matched orifices to ensure the molecular beams are identical. ... maintaining an identical machine constant
+      from run to run involves using a rigidly mounted cell and an isolation valve between the Knudsen cell chamber and the
+      ionizer. ... For most instruments, the machine constant changes from run to run.'
+  context_id: kems-209-copland-2001::context::copland_2001_pressure_calibration_guidance
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_pressure_ion_current_relation
+  type: method
+  locator:
+    published_page: 29
+    pdf_page_index: 2
+    section: Basic Technique, equation (1)
+  units: symbolic relation as printed; no numeric cross sections or machine constant
+  values:
+    method_class: method_only
+    quantity: pressure_ion_current_relation
+    relation_as_printed: P_i = k I_i T / σ_i
+    definitions: I_i is ion intensity; P_i partial pressure; T absolute temperature of the vapor source; σ_i ionization cross
+      section; k machine constant. Absolute pressures require both k and σ_i. The machine constant combines molecular-beam
+      formation, ionization, ion collection, analyzer transmission and detector collection efficiencies.
+    instrument_history_as_printed: Basic components (ionizer, accelerator, ion sorter, detector) remain similar to designs
+      of the 1960s.
+  context_id: kems-209-copland-2001::context::copland_2001_pressure_ion_current_relation
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_temperature_calibration_guidance
+  type: method
+  locator:
+    published_page: 29
+    pdf_page_index: 2
+    section: Critical Experimental Issues
+    note: Technique-general guidance; not stated for the reported runs.
+  units: verbatim
+  values:
+    method_class: quoted_unattributed
+    quantity: temperature_measurement_and_calibration_guidance
+    requirements_as_printed: (1) a constant temperature must be maintained; (2) temperature gradients in the cell must be
+      eliminated; (3) the absolute temperature must be accurately measured.
+    calibration_metals_as_printed: Ag, Au, Cu
+    quote: Temperatures can be measured by either a pyrometer or thermocouple. These measurements must be taken at the cell,
+      either with a black body hole drilled into the cell or a thermocouple tightly coupled to the cell. A typical calibration
+      involves slowly varying the temperature through the melting point of a pure metal (e.g., Ag, Au, Cu, etc.) and observing
+      both the corresponding plateau in vapor pressure and thermal arrest. Temperature calibration must be done frequently
+      for thermocouples as the vacuum and reactive vapor environment can result in rapid changes in wire composition.
+  context_id: kems-209-copland-2001::context::copland_2001_temperature_calibration_guidance
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Cu
+- observation_id: copland_2001_ti_activity_range_note
+  type: qualifying_statement_context
+  experiment: ti-45al-double-cell
+  locator:
+    published_page: 30
+    pdf_page_index: 3
+    section: Critical Experimental Issues
+  units: verbatim
+  values:
+    method_class: quoted_unattributed
+    quantity: measurement_range_limitation
+    quote: The low vapor pressure of Ti gives only a narrow range for aTi measurement.
+    note: Ti activities are in Fig. 4 (figure-only, row copland_2001_fig4_ti45al_activities under Al).
+  context_id: kems-209-copland-2001::context::copland_2001_ti_activity_range_note
+  work_id: 3e8fc0cd58147c4edcf953f098c10244c473c65b769e62e857a9da06ea5397a5
+  source_id: kems-209-copland-2001
+  species: Ti

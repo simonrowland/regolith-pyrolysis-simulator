@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from simulator.battery.enums import (
     ValenceValueForm,
     ValueKind,
 )
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -198,7 +200,9 @@ def test_isolated_migration_binds_all_conditions_and_keeps_printed_fraction() ->
         )
         assert conditions["composition"].state.value == expected_composition
         assert migrated.identity.composition.is_value
-        assert migrated.identity.composition.value == expected_composition
+        assert migrated.identity.composition.value == replace(
+            expected_composition, input_provenance=PRINTED_STARTING_BULK
+        )
 
     assert quantity_unknown == set()
     assert phase_unknown == set()

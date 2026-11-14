@@ -1302,6 +1302,8 @@ PATH_VALUE_KEYS = frozenset(
         "source_pdf",
         "source_pdf_path",
         "original_scan",  # Gibson & Hubbard anchor aliased into source_path
+        "csv",
+        "inventory_csv",
         "table_csv",  # 110 tables/... values
         "table_file",
         "table_path",
@@ -4609,31 +4611,34 @@ def certify_extract_source_fidelity(
     return refusals
 
 
-def _check_fidelity_gate(
-    doc: Mapping[str, Any],
-    *,
-    label: str = "<document>",
-) -> list[str]:
-    """Certification refusals for this extract.
-
-    Schema validation does not emit these. A caller that certifies or promotes
-    the extract treats a non-empty list as a hard refusal. Older trees that
-    only have this helper keep that refusal behaviour.
-    """
-    return certify_extract_source_fidelity(doc, label=label)
-
-
 def load_known_species_ids() -> set[str] | None:
     """Return known U0/manifest ids, or None if the manifest is unavailable."""
     if not U0_MANIFEST.is_file():
         return None
     try:
         doc = yaml.safe_load(U0_MANIFEST.read_text(encoding="utf-8"))
-    except Exception:  # noqa: BLE001
-        return None
+    except Exception as exc:  # noqa: BLE001
+        raise ExtractValidationError(
+            [
+                f"{U0_MANIFEST.name}: failed to load U0 species manifest "
+                f"({type(exc).__name__})"
+            ]
+        ) from exc
     if not isinstance(doc, Mapping):
-        return None
+        raise ExtractValidationError(
+            [
+                f"{U0_MANIFEST.name}: invalid U0 species manifest: "
+                "expected a mapping"
+            ]
+        )
     species = doc.get("species")
+    if not isinstance(species, (list, Mapping)):
+        raise ExtractValidationError(
+            [
+                f"{U0_MANIFEST.name}: invalid U0 species manifest: "
+                "species must be a list or mapping"
+            ]
+        )
     ids: set[str] = set()
     if isinstance(species, list):
         for row in species:
@@ -4807,6 +4812,26 @@ def _check_observation(
                 f"{path}: equipment field {eqf!r} must live under observation.equipment "
                 f"(misplaced top-level key refused)"
             )
+
+    if "standard_pressure" in obs:
+        if obs["standard_pressure"] != "not_printed":
+            errors.append(
+                f"{path}.standard_pressure: must be 'not_printed' when present"
+            )
+        elif (
+            str(obs.get("phase") or "").strip().casefold() in {"g", "gas"}
+            and isinstance(obs.get("values"), Mapping)
+            and obs["values"].get("quantity") == "delta_fG"
+        ):
+            temperature = obs["values"].get("T_K")
+            try:
+                temperature_value = float(temperature)
+                if not math.isfinite(temperature_value) or temperature_value <= 0:
+                    raise ValueError
+            except (OverflowError, TypeError, ValueError):
+                errors.append(
+                    f"{path}.standard_pressure: gas delta_fG rows require a positive row values.T_K"
+                )
 
     if "values" not in obs or obs["values"] is None:
         errors.append(
@@ -5099,14 +5124,21 @@ def _check_fidelity_samples(
             errors.extend(check_fidelity_sample_matches(doc, sample, label=sp))
 
 
+def _extract_experiment_rows(doc: Mapping[str, Any]) -> tuple[object, ...] | None:
+    experiments = doc.get("experiments", ())
+    if isinstance(experiments, Mapping):
+        return tuple(experiments.values())
+    if isinstance(experiments, (list, tuple)):
+        return tuple(experiments)
+    return None
+
+
 def _check_sweep_gases(doc: Mapping[str, Any], label: str, errors: list[str]) -> None:
     from simulator.battery.migrate import _located_from_plain, _sweep_gas_from_plain
     from simulator.battery.validate import validate_sweep_gas
 
-    experiments = doc.get("experiments", ())
-    if isinstance(experiments, Mapping):
-        experiments = experiments.values()
-    elif not isinstance(experiments, (list, tuple)):
+    experiments = _extract_experiment_rows(doc)
+    if experiments is None:
         errors.append(f"{label}: experiments must be a list or mapping")
         return
     for i, experiment in enumerate(experiments):
@@ -5131,10 +5163,8 @@ def _check_gas_ratios(doc: Mapping[str, Any], label: str, errors: list[str]) -> 
     from simulator.battery.migrate import _located_from_plain, _value_or_point_from_plain
     from simulator.battery.records import GasRatio
 
-    experiments = doc.get("experiments", ())
-    if isinstance(experiments, Mapping):
-        experiments = experiments.values()
-    elif not isinstance(experiments, (list, tuple)):
+    experiments = _extract_experiment_rows(doc)
+    if experiments is None:
         return
     for i, experiment in enumerate(experiments):
         if not isinstance(experiment, Mapping):
@@ -5162,6 +5192,42 @@ def _check_gas_ratios(doc: Mapping[str, Any], label: str, errors: list[str]) -> 
                 errors.append(f"{path}.value: empirical Located value requires a locator")
         except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
             errors.append(f"{path}: invalid gas ratio: {exc}")
+
+
+def _check_ambient_pressure_evidence(
+    doc: Mapping[str, Any], label: str, errors: list[str]
+) -> None:
+    from simulator.battery.enums import AmbientPressureEvidenceClass
+
+    experiments = _extract_experiment_rows(doc)
+    if experiments is None:
+        return
+    allowed_classes = {item.value for item in AmbientPressureEvidenceClass}
+    for i, experiment in enumerate(experiments):
+        if (
+            not isinstance(experiment, Mapping)
+            or "ambient_pressure_evidence" not in experiment
+        ):
+            continue
+        path = f"{label}:experiments[{i}].ambient_pressure_evidence"
+        evidence = experiment.get("ambient_pressure_evidence")
+        if not isinstance(evidence, Mapping):
+            errors.append(f"{path}: must be a mapping")
+            continue
+        evidence_class = evidence.get("evidence_class")
+        if not isinstance(evidence_class, str) or evidence_class not in allowed_classes:
+            errors.append(
+                f"{path}.evidence_class: must be one of {sorted(allowed_classes)}, "
+                f"got {evidence_class!r}"
+            )
+        quote = evidence.get("quote")
+        if not isinstance(quote, str) or not quote.strip():
+            errors.append(f"{path}.quote: nonempty verbatim text is required")
+        if not _locator_ok(evidence.get("locator")):
+            errors.append(
+                f"{path}.locator: mapping with at least one of "
+                f"{sorted(LOCATOR_KEYS)} is required"
+            )
 
 
 def validate_extract_document(
@@ -5296,6 +5362,7 @@ def validate_extract_document(
 
     _check_sweep_gases(doc, label, errors)
     _check_gas_ratios(doc, label, errors)
+    _check_ambient_pressure_evidence(doc, label, errors)
 
     # ENFORCED_FOR_NEW: require samples unless source_id is pre-policy allowlisted.
     is_pre_policy = False
@@ -5489,7 +5556,11 @@ def validate_all(
     files = list(paths) if paths is not None else discover_extracts()
     if not files and paths is None:
         errors.append(f"{EXTRACTS_DIR}: no extract YAML files found")
-    known = load_known_species_ids()
+    try:
+        known = load_known_species_ids()
+    except ExtractValidationError as exc:
+        errors.extend(exc.errors)
+        known = None
     for path in files:
         errors.extend(
             validate_extract_file(

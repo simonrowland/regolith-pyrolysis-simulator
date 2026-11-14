@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:shornikov-1997-diopside-vaporization
       role: pdf
@@ -42,7 +42,30 @@ experiments:
   method:
     tag: value
     value: knudsen_effusion
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_stoichiometry
+          components:
+          - - CaO
+            - '1'
+          - - MgO
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+          proxy_flag: initial_charge_only
+          proxy_source: Shornikov et al. (1997), Table 1 and Experimental section
+          analysis_selection_rule: Nominal diopside charge; no row-resolved post-vaporization composition is printed.
+          input_provenance: printed_starting_bulk
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 caption identifies the material as molten CaO · MgO · 2SiO2.
   conditions:
     temperature_K:
       state:
@@ -73,6 +96,360 @@ experiments:
     note: In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from
       molybdenum cells.
   bench_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::bench::shornikov-1997-mo-kems
+- experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-table3-ref22
+  kind: literature
+  method:
+    tag: unknown
+    reason: The cited study's experimental details are not restated in Table 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The row temperature is attached to each quoted observation point.
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's oxygen condition.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '3'
+    note: row=Method II, Ref. [22]
+- experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-table3-ref23
+  kind: literature
+  method:
+    tag: unknown
+    reason: The cited study's experimental details are not restated in Table 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The row temperature is attached to each quoted observation point.
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's oxygen condition.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '3'
+    note: row=Method II, Ref. [23]
+- experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-table3-ref25
+  kind: literature
+  method:
+    tag: unknown
+    reason: The cited study's experimental details are not restated in Table 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The row temperature is attached to each quoted observation point.
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's oxygen condition.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '3'
+    note: row=Methods II, Refs. [25]
+- experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-table3-ref26
+  kind: literature
+  method:
+    tag: unknown
+    reason: The cited study's measurement details are not restated in Table 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The row temperature is attached to each quoted observation point.
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's oxygen condition.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '3'
+    note: row=Method V, Ref. [26]
+- experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-table3-ref29
+  kind: literature
+  method:
+    tag: unknown
+    reason: The cited study's model details are not restated in Table 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The row temperature is attached to each quoted observation point.
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's oxygen condition.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '3'
+    note: row=Method IV, Ref. [29]
+- experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-table3-ref30
+  kind: literature
+  method:
+    tag: unknown
+    reason: The cited study's model details are not restated in Table 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The row temperature is attached to each quoted observation point.
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '3'
+        note: Table 3 does not report the cited study's oxygen condition.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '3'
+    note: row=Method III, Ref. [30]
 benches:
 - id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::bench::shornikov-1997-mo-kems
   work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
@@ -113,4 +490,443 @@ benches:
           1 : 400.'
         section: Experimental
         note: The printed lower bound is 1:400; typed as a lower bound on orifice area divided by vaporization surface area.
+  detector:
+    state:
+      tag: value
+      value: MI-1201 mass spectrometer modified for high-temperature studies
+    locator:
+      page: 1
+      published_page: 174
+      pdf_page_index: 0
+      section: Experimental
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '70'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+    electron_energy_uncertainty_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.2'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+        note: Printed 70.0 ± 0.2 eV; confidence level not stated.
+    ionization_cross_sections:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Experimental
+        note: The paper says oxygen ionization cross sections were calculated by additivity from atomic cross sections but
+          gives no numerical values; experimental conditions are referred to [27].
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Experimental
+        note: The paper reports temperature values but does not identify the sensor.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Experimental
+        note: Experimental conditions are referred to reference [27]; no calibration procedure is stated here.
   other_facts: []
+context:
+- observation_id: shornikov_1997_ca_table1_readiness_1566
+  type: context_only
+  experiment: shornikov-1997-diopside-kems
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '1'
+    row: pCa
+    column: 1566 ± 7 K
+  units: K
+  values:
+    T_K: 1566
+    initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+    measurement_state_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: No post-vaporization composition is reported for this row.
+    run_order_index:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 reports temperatures but no run sequence.
+    depletion_evidence:
+      state:
+        tag: unknown
+        reason: not_published
+      note: unreported
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.
+    vaporization_congruence:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+        note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call
+          it congruent or incongruent.
+    vaporization_statement:
+      state:
+        tag: value
+        value: The vaporization of CaO · MgO · 2SiO2 mainly occurs as the transitions to the gas phase of pure CaO, MgO, and
+          SiO2 oxides.
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+  context_id: shornikov-1997-diopside-vaporization::context::shornikov_1997_ca_table1_readiness_1566
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  source_id: shornikov-1997-diopside-vaporization
+  species: Ca
+- observation_id: shornikov_1997_ca_table1_readiness_1640
+  type: context_only
+  experiment: shornikov-1997-diopside-kems
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '1'
+    row: pCa
+    column: 1640 ± 3 K
+  units: K
+  values:
+    T_K: 1640
+    initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+    measurement_state_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: No post-vaporization composition is reported for this row.
+    run_order_index:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 reports temperatures but no run sequence.
+    depletion_evidence:
+      state:
+        tag: unknown
+        reason: not_published
+      note: unreported
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.
+    vaporization_congruence:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+        note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call
+          it congruent or incongruent.
+  context_id: shornikov-1997-diopside-vaporization::context::shornikov_1997_ca_table1_readiness_1640
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  source_id: shornikov-1997-diopside-vaporization
+  species: Ca
+- observation_id: shornikov_1997_ca_table1_readiness_1688
+  type: context_only
+  experiment: shornikov-1997-diopside-kems
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '1'
+    row: pCa
+    column: 1688 ± 5 K
+  units: K
+  values:
+    T_K: 1688
+    initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+    measurement_state_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: No post-vaporization composition is reported for this row.
+    run_order_index:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 reports temperatures but no run sequence.
+    depletion_evidence:
+      state:
+        tag: unknown
+        reason: not_published
+      note: unreported
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.
+    vaporization_congruence:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+        note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call
+          it congruent or incongruent.
+  context_id: shornikov-1997-diopside-vaporization::context::shornikov_1997_ca_table1_readiness_1688
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  source_id: shornikov-1997-diopside-vaporization
+  species: Ca
+- observation_id: shornikov_1997_ca_table1_readiness_1743
+  type: context_only
+  experiment: shornikov-1997-diopside-kems
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '1'
+    row: pCa
+    column: 1743 ± 8 K
+  units: K
+  values:
+    T_K: 1743
+    initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+    measurement_state_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: No post-vaporization composition is reported for this row.
+    run_order_index:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 reports temperatures but no run sequence.
+    depletion_evidence:
+      state:
+        tag: unknown
+        reason: not_published
+      note: unreported
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.
+    vaporization_congruence:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+        note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call
+          it congruent or incongruent.
+  context_id: shornikov-1997-diopside-vaporization::context::shornikov_1997_ca_table1_readiness_1743
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  source_id: shornikov-1997-diopside-vaporization
+  species: Ca
+- observation_id: shornikov_1997_ca_table1_readiness_1778
+  type: context_only
+  experiment: shornikov-1997-diopside-kems
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '1'
+    row: pCa
+    column: 1778 ± 5 K
+  units: K
+  values:
+    T_K: 1778
+    initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+    measurement_state_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: No post-vaporization composition is reported for this row.
+    run_order_index:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 reports temperatures but no run sequence.
+    depletion_evidence:
+      state:
+        tag: unknown
+        reason: not_published
+      note: unreported
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.
+    vaporization_congruence:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+        note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call
+          it congruent or incongruent.
+  context_id: shornikov-1997-diopside-vaporization::context::shornikov_1997_ca_table1_readiness_1778
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  source_id: shornikov-1997-diopside-vaporization
+  species: Ca
+- observation_id: shornikov_1997_ca_table1_readiness_1862
+  type: context_only
+  experiment: shornikov-1997-diopside-kems
+  locator:
+    page: 2
+    published_page: 175
+    pdf_page_index: 1
+    table: '1'
+    row: pCa
+    column: 1862 ± 4 K
+  units: K
+  values:
+    T_K: 1862
+    initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+    measurement_state_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: No post-vaporization composition is reported for this row.
+    run_order_index:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 reports temperatures but no run sequence.
+    depletion_evidence:
+      state:
+        tag: unknown
+        reason: not_published
+      note: unreported
+      locator:
+        page: 2
+        published_page: 175
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.
+    vaporization_congruence:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 174
+        pdf_page_index: 0
+        section: Results
+        note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call
+          it congruent or incongruent.
+  context_id: shornikov-1997-diopside-vaporization::context::shornikov_1997_ca_table1_readiness_1862
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  source_id: shornikov-1997-diopside-vaporization
+  species: Ca

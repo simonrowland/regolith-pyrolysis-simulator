@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:doyle-1988-feo-activity-multicomponent-magma
       role: pdf
@@ -67,8 +67,8 @@ experiments:
 - experiment_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8::experiment::doyle_1988_feo_activity_measurement
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: quench_equilibration
   sample: {}
   conditions:
     temperature_K:
@@ -93,9 +93,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
   locator:
-    page: 3
-    published_page: 1829
-    pdf_page_index: 2
+    page: 2
+    published_page: 1828
+    pdf_page_index: 1
     section: Experimental and Analytical Methods
 context:
 - observation_id: doyle_1988_table1b_setpoint_0170

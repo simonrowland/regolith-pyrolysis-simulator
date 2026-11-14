@@ -48,7 +48,10 @@ from simulator.lab_geometry import (
     require_lab_pipe_length,
 )
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    STEFAN_BOLTZMANN_7SIG as STEFAN_BOLTZMANN,
+)
 
 
 @dataclass
@@ -602,5 +605,3 @@ class EquipmentDesigner:
         )
 
 
-# Import here to avoid circular dependency
-STEFAN_BOLTZMANN = 5.670374e-8  # W/(m²·K⁴)

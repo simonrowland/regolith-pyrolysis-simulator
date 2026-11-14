@@ -46,6 +46,10 @@ GRID_FIELDS = (
     "method_class",
 )
 NUMERIC_FIELDS = ("T_C", "total_pressure_Pa", "component_amount", "sigma")
+COMPOSITION_UNKNOWN_REASON = (
+    "only elemental wt.% (incl. measured O, excess oxygen) is printed; an oxide basis would "
+    "need assigned valences the measurement contradicts"
+)
 
 
 def _fixture(path: Path) -> list[dict[str, str]]:
@@ -141,11 +145,78 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         for observation in species.get("observations", [])
     }
     assert len(observations) == len(table1) + len(s2) + 1
+
+    contexts = {
+        record["observation_id"]: record
+        for record in document["species"]["SiO2"]["context"]
+    }
+    table1_context = contexts["xu_2026_table1_run_product_context_lvp_1"]
+    assert table1_context["experiment"] == "xu_2026_lvp_1"
+    assert table1_context["units"] == "wt.% element"
+    assert table1_context["locator"]["row"] == "LVP-1"
+    expected_table1_elements = {
+        ("FeT" if row["species_formula"] == "Fe" else row["species_formula"]): row[
+            "component_amount_as_published"
+        ]
+        for row in table1
+        if row["experiment"] == "xu_2026_lvp_1"
+        and row["species_formula"] in {"Si", "Ti", "Al", "Fe", "Mg", "Ca", "Na", "K", "O", "Pt", "Cl"}
+    }
+    assert table1_context["values"]["element_wt_percent_as_published"] == (
+        expected_table1_elements
+    )
+    assert table1_context["values"]["element_wt_percent_unit"] == "wt.% element"
+    assert table1_context["values"]["total_wt_percent"] == "98.9"
+
+    s2_context = contexts["xu_2026_s2_run_product_context_lvp_13"]
+    assert s2_context["experiment"] == "xu_2026_lvp_13"
+    s2_analysis = next(
+        row
+        for row in s2_context["values"]["analyses_as_published"]
+        if row["source_row"] == 100
+    )
+    expected_s2_elements = {
+        ("FeT" if row["species_formula"] == "Fe" else row["species_formula"]): row[
+            "component_amount_as_published"
+        ]
+        for row in s2
+        if row["source_cell"].endswith("100")
+    }
+    assert s2_analysis["element_wt_percent_as_published"] == expected_s2_elements
+    assert s2_analysis["element_wt_percent_as_published"]["O"] == "48.77"
+    assert s2_analysis["element_wt_percent_unit"] == "wt.% element"
+    assert s2_analysis["total_wt_percent_as_published"] == "99.57"
+    assert s2_analysis["source_cells"]["O"] == "K100"
+    assert s2_analysis["source_cells"]["total"] == "O100"
+    migrated_contexts = [
+        context
+        for rows in migrator.result.context_by_work.values()
+        for context in rows
+    ]
+    migrated_s2_context = next(
+        context
+        for context in migrated_contexts
+        if context["observation_id"] == "xu_2026_s2_run_product_context_lvp_13"
+    )
+    assert migrated_s2_context["experiment"] == "xu_2026_lvp_13"
+    migrated_s2_analysis = next(
+        row
+        for row in migrated_s2_context["values"]["analyses_as_published"]
+        if row["source_row"] == 100
+    )
+    assert migrated_s2_analysis["total_wt_percent_as_published"] == "99.57"
+    assert migrated_s2_analysis["element_wt_percent_as_published"]["O"] == "48.77"
+
     for row in table1 + s2:
         observation = observations[row["observation_id"]]
-        assert raw_observations[row["observation_id"]]["values"][
-            "oxygen_source_as_published"
-        ] == row["oxygen_source"]
+        raw_values = raw_observations[row["observation_id"]]["values"]
+        assert raw_values["oxygen_source_as_published"] == row["oxygen_source"]
+        assert raw_values["composition"]["state"] == {
+            "tag": "unknown",
+            "reason": COMPOSITION_UNKNOWN_REASON,
+        }
+        assert observation.identity.composition.is_unknown
+        assert observation.identity.composition.reason == COMPOSITION_UNKNOWN_REASON
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(row["component_amount"])
         assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -167,6 +238,9 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         assert temperature.locator.pdf_page_index == 2
 
         pressure = observation.point_conditions["total_pressure_Pa"]
+        assert pressure.locator is not None
+        assert pressure.locator.page == 3
+        assert pressure.locator.pdf_page_index == 2
         pressure_value = pressure.state.value
         if hasattr(pressure_value, "point"):
             pressure_value = pressure_value.point
@@ -279,9 +353,9 @@ def test_lvp1_table1_redox_cell_is_empty_in_excess_oxygen_context() -> None:
     lvp1_rows = [
         node
         for node in walk(document)
-        if node.get("sample_id_as_published") == "LVP-1"
-        and "redox_condition_as_published" in node
+        if node.get("values", {}).get("sample_id_as_published") == "LVP-1"
+        and "redox_condition_as_published" in node.get("values", {})
         and (node.get("locator") or {}).get("table") == "1"
     ]
     assert len(lvp1_rows) == 1
-    assert lvp1_rows[0]["redox_condition_as_published"] == ""
+    assert lvp1_rows[0]["values"]["redox_condition_as_published"] == ""

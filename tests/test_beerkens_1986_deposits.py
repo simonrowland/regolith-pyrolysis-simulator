@@ -239,11 +239,6 @@ def test_beerkens_1986_render_pins_and_isolated_migration(tmp_path: Path) -> Non
         "beerkens_1986_table1_5_na_volume_ppm",
         "beerkens_1986_table1_5_k_volume_ppm",
         "beerkens_1986_table2_4_water_cooled_paddle_carryover",
-        "beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment",
-        "beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl",
-        "beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate",
-        "beerkens_1986_section4_5_5_na2so4_model_comparator_rate",
-        "beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate",
     )
     assert {
         row.observation_id.split("::", 1)[1].split("::", 1)[0]
@@ -261,14 +256,58 @@ def test_beerkens_1986_render_pins_and_isolated_migration(tmp_path: Path) -> Non
         if row.value.kind.value == "unavailable"
     } == {"declared quantity is unknown; refusing to pick a number"}
 
+    # t-1597 maps printed wall deposit areal rates and converts their units.
+    from simulator.battery.enums import EvidenceClass, Quantity
+
+    expected_wall_rates = {
+        "beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment": (
+            "0.000001055555555555555555555555556",
+            "0.000002888888888888888888888888889",
+            "0.00000325",
+            "0.000004444444444444444444444444444",
+        ),
+        "beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl": (
+            "0.0000007777777777777777777777777778",
+            "0.000001944444444444444444444444444",
+            "0.000002888888888888888888888888889",
+            "0.000003888888888888888888888888889",
+        ),
+        "beerkens_1986_section4_5_5_na2so4_model_comparator_rate": (
+            "0.0000023",
+        ),
+        "beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate": (
+            "0.0000029",
+        ),
+        "beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate": (
+            "0.0000030",
+        ),
+    }
+    for base_id, expected_values in expected_wall_rates.items():
+        matching_rows = [row for row in rows if f"::{base_id}::" in row.observation_id]
+        matching_rows.sort(
+            key=lambda row: (
+                int(row.observation_id.split("::points:row=", 1)[1].split(":", 1)[0])
+                if "::points:row=" in row.observation_id
+                else 0
+            )
+        )
+        assert len(matching_rows) == len(expected_values), base_id
+        assert all(
+            row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.WALL_DEPOSIT_AREAL_RATE
+            for row in matching_rows
+        ), base_id
+        assert all(row.value.kind.value == "point" for row in matching_rows), base_id
+        assert [row.value.point for row in matching_rows] == [
+            Decimal(value) for value in expected_values
+        ], base_id
+
     model_comparator = next(
         row
         for row in rows
         if "beerkens_1986_section4_5_5_na2so4_model_comparator_rate"
         in row.observation_id
     )
-    from simulator.battery.enums import EvidenceClass
-
     assert model_comparator.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
 
     for row in rows:

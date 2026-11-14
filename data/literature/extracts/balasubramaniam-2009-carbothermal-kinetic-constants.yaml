@@ -1,0 +1,1899 @@
+schema_version: literature_extract.v1
+source_id: balasubramaniam-2009-carbothermal-kinetic-constants
+source:
+  citation: Balasubramaniam, R., Gokoglu, S., and Hegde, U. (2009), “Determination of Chemical Kinetic Rate Constants of a
+    Model for Carbothermal Processing of Lunar Regolith Simulant Using Methane,” NASA/TM—2009-215617 (AIAA–2009–1390), NASA
+    Glenn Research Center, Cleveland, Ohio, July 2009. Prepared for the 47th AIAA Aerospace Sciences Meeting, Orlando, Florida,
+    January 5–8, 2009.
+  doi: null
+  report_number: NASA/TM—2009-215617; AIAA–2009–1390
+  year: 2009
+  corpus_asset: raw/balasubramaniam-2009-carbothermal-kinetic-constants/balasubramaniam-2009-carbothermal-kinetic-constants.pdf
+  corpus_sha256: 1b3916b53e1d29db1ae43878278753225982b895a69a00c7d3e7db138649a447
+extraction:
+  method: 300 dpi scan with an Envision OCR text layer. pdftotext -layout used to locate content; Table 1 and every quoted
+    number were read from 110-300 dpi page renders because the OCR layer is corrupted in Table 1 and in the equations. Table
+    1 transcribed in full; figures not digitized.
+  date: '2026-10-05'
+  worker: s37b3-backlog37
+  corpus_tables: tables/balasubramaniam-2009-carbothermal-kinetic-constants/
+review_status: draft
+fidelity_samples:
+- species: JSC-1A
+  observation_id: balasubramaniam_2009_table1_test_04
+  field: oxygen_yield_pct
+  value: 2.0
+  locator:
+    page: 10
+    published_page: 6
+    table: '1'
+    note: Test 4 Oxygen Yield (%) as printed
+- species: JSC-1A
+  observation_id: balasubramaniam_2009_table1_test_10
+  field: average_processing_temperature_as_printed
+  value: 1666**
+  locator:
+    page: 10
+    published_page: 6
+    table: '1'
+    note: Test 10 Average Processing Temperature with the ** pyrometer flag
+- species: JSC-1A
+  observation_id: balasubramaniam_2009_fitted_rate_constants
+  field: melt_reaction_rate_constant_k_m3_per_mol_s
+  value: 4.512e-08
+  locator:
+    page: 10
+    published_page: 6
+    section: III. Results
+    note: k = 4.512 × 10^-8 m3/(moles·s)
+- species: JSC-1A
+  observation_id: balasubramaniam_2009_fitted_rate_constants
+  field: surface_reaction_rate_constant_gamma_m_per_s
+  value: 0.0404
+  locator:
+    page: 10
+    published_page: 6
+    section: III. Results
+    note: γ = 0.0404 m/s
+benches:
+- id: orbitec-ts1-laser-carbothermal-reactor
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: Orbital Technologies Corporation, Monthly Progress Report Number 24 on Carbothermal Reduction of Lunar Regolith,
+        OTC-GS0167-PR-07-24, 31 May 2007 (Ref. 5)
+      for_parameters:
+      - Test Series-1 apparatus and Table 1 test data
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: Test Series-1 data are ORBITEC's; the authors reproduce them in Table 1. The acknowledgments credit Robert Gustafson,
+          ORBITEC, for providing the data.
+  apparatus_family:
+    state:
+      tag: value
+      value: 'ORBITEC carbothermal reduction test reactor: methane flowed over a laser-melted zone of lunar regolith simulant'
+    locator:
+      page: 6
+      published_page: 2
+      pdf_page_index: 5
+      section: I. Introduction
+  heating_method:
+    state:
+      tag: value
+      value: A 200W laser was used to melt the material and maintain it at the chosen operating temperature
+    locator:
+      page: 6
+      published_page: 2
+      pdf_page_index: 5
+      section: I. Introduction
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 7
+      published_page: 3
+      pdf_page_index: 6
+      figure: '1'
+      note: Figure 1 is a sketch only (heat flux, heat shield, methane in, exit gases out, regolith and molten regolith).
+        No container or reactor material is printed.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Pyrometer viewing the melt
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        note: 'Named only in the Table 1 footnote for test 10: the pyrometer may have had an obscured view of the melt.'
+  temperature_calibration:
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        note: No pyrometer calibration or uncertainty is printed.
+experiments:
+- experiment_id: orbitec-ts1-test-01
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 1. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '1'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 2.702 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2123.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '1'
+        note: Target Processing Temperature 1850 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1846 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '62052.82'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '1'
+        note: Processing Pressure 9 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '6.05'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '1'
+        note: Methane Flow Rate 6.05 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its only
+          flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-02
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 2. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '2'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 2.268 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1923.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '2'
+        note: Target Processing Temperature 1650 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1735 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '62052.82'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '2'
+        note: Processing Pressure 9 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '11.56'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '2'
+        note: Methane Flow Rate 11.56 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its
+          only flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-03
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 3. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '3'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 3.845 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2123.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '3'
+        note: Target Processing Temperature 1850 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1890 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '103421.36'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '3'
+        note: Processing Pressure 15 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '11.56'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '3'
+        note: Methane Flow Rate 11.56 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its
+          only flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-04
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 4. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '4'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 8.119 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2123.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '4'
+        note: Target Processing Temperature 1850 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1911 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20684.27'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '4'
+        note: Processing Pressure 3 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '17.18'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '4'
+        note: Methane Flow Rate 17.18 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its
+          only flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-05
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 5. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '5'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 3.587 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2123.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '5'
+        note: Target Processing Temperature 1850 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1913 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '103421.36'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '5'
+        note: Processing Pressure 15 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '11.56'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '5'
+        note: Methane Flow Rate 11.56 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its
+          only flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-06
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 6. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '6'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 2.740 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2023.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '6'
+        note: Target Processing Temperature 1750 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1713 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '62052.82'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '6'
+        note: Processing Pressure 9 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '17.18'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '6'
+        note: Methane Flow Rate 17.18 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its
+          only flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-07
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 7. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '7'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 2.516 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1923.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '7'
+        note: Target Processing Temperature 1650 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1722 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20684.27'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '7'
+        note: Processing Pressure 3 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '6.05'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '7'
+        note: Methane Flow Rate 6.05 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its only
+          flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-08
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 8. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '8'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 1.889 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1923.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '8'
+        note: Target Processing Temperature 1650 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1702 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '103421.36'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '8'
+        note: Processing Pressure 15 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '17.18'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '8'
+        note: Methane Flow Rate 17.18 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its
+          only flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-09
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 9. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '9'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 4.298 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2023.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '9'
+        note: Target Processing Temperature 1750 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1713 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20684.27'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '9'
+        note: Processing Pressure 3 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '11.56'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '9'
+        note: Methane Flow Rate 11.56 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its
+          only flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-10
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 10. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '10'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 3.514 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2023.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '10'
+        note: Target Processing Temperature 1750 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1666** C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '103421.36'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '10'
+        note: Processing Pressure 15 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '6.05'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '10'
+        note: Methane Flow Rate 6.05 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its only
+          flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+- experiment_id: orbitec-ts1-test-11
+  bench_id: orbitec-ts1-laser-carbothermal-reactor
+  method:
+    tag: unknown
+    reason: would_invent
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: I. Introduction
+    note: Table 1 test 11. The paper describes gaseous methane pyrolysis over hot regolith and a 200 W laser; no existing method token represents this published process.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar regolith simulant JSC-1A
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '11'
+        note: Charge mass is not printed. Table 1 'Regolith Processed (g)' = 3.860 is the amount processed in the test, kept
+          in the context row, not a charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: 46.2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Only the SiO2 content (46.2% by weight) is printed, cited to Hill et al. (Ref. 6). No other oxides are printed.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1923.15'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '11'
+        note: Target Processing Temperature 1650 C; unit conversion only (K = C + 273.15). The measured average processing
+          temperature (1640 C as printed) is in the context row.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20684.27'
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '11'
+        note: Processing Pressure 3 psia; unit conversion only (1 psi = 6894.757293168 Pa, rounded to 0.01 Pa).
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CH4
+          flow_sccm:
+            tag: value
+            value: '6.05'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '11'
+        note: Methane Flow Rate 6.05 sccm as printed. Methane is the reactant gas flowed over the melt; sweep_gas is its only
+          flow home. Inlet purity and methane partial pressure are not printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4800'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+        note: The chemical processing time in these tests was 80 min; unit conversion only. Restated in the Conclusion (PDF
+          p. 12).
+species:
+  JSC-1A:
+    observations: []
+    context:
+    - observation_id: balasubramaniam_2009_test_series_1_overview
+      type: experiment_series
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: I. Introduction
+      units: W; min
+      values:
+        quantity: test_series_description
+        method_class: quoted_attributed
+        test_series: ORBITEC Test Series-1 (Ref. 5)
+        simulant: JSC-1A
+        laser_power_W: 200
+        design: Part of ORBITEC's Statistical Experiment Design on the main effects of processing pressure, temperature and
+          methane flow rate, and their interactions
+        chemical_processing_time_min: 80
+        number_of_tests: 11
+        data_provenance: Reproduced in Table 1 from ORBITEC; acknowledgments credit Robert Gustafson, ORBITEC, for providing
+          the data
+        note: number_of_tests counts the rows printed in Table 1.
+    - observation_id: balasubramaniam_2009_table1_test_01
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-01
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '1'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 1
+        target_processing_temperature_C: 1850
+        processing_pressure_psia: 9
+        methane_flow_rate_sccm: 6.05
+        oxygen_produced_g: 0.34
+        oxygen_yield_pct: 12.6
+        carbon_recovered_pct: 79.1
+        average_processing_temperature_C: 1846
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 609
+        regolith_processed_g: 2.702
+        methane_pyrolyzed_pct: 78.1
+        carbon_cap: no cap
+    - observation_id: balasubramaniam_2009_table1_test_02
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-02
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '2'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 2
+        target_processing_temperature_C: 1650
+        processing_pressure_psia: 9
+        methane_flow_rate_sccm: 11.56
+        oxygen_produced_g: 0.302
+        oxygen_yield_pct: 13.3
+        carbon_recovered_pct: 62.0
+        average_processing_temperature_C: 1735
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 597
+        regolith_processed_g: 2.268
+        methane_pyrolyzed_pct: 65.8
+        carbon_cap: formed
+        time_to_form_carbon_cap_min: 55.2
+    - observation_id: balasubramaniam_2009_table1_test_03
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-03
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '3'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 3
+        target_processing_temperature_C: 1850
+        processing_pressure_psia: 15
+        methane_flow_rate_sccm: 11.56
+        oxygen_produced_g: 0.402
+        oxygen_yield_pct: 10.5
+        carbon_recovered_pct: 73.3
+        average_processing_temperature_C: 1890
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 578
+        regolith_processed_g: 3.845
+        methane_pyrolyzed_pct: 74.5
+        carbon_cap: formed
+        time_to_form_carbon_cap_min: 58.9
+    - observation_id: balasubramaniam_2009_table1_test_04
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-04
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '4'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 4
+        target_processing_temperature_C: 1850
+        processing_pressure_psia: 3
+        methane_flow_rate_sccm: 17.18
+        oxygen_produced_g: 0.16
+        oxygen_yield_pct: 2.0
+        carbon_recovered_pct: 75.8
+        average_processing_temperature_C: 1911
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 601
+        regolith_processed_g: 8.119
+        methane_pyrolyzed_pct: 59.6
+        carbon_cap: no cap
+    - observation_id: balasubramaniam_2009_table1_test_05
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-05
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '5'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 5
+        target_processing_temperature_C: 1850
+        processing_pressure_psia: 15
+        methane_flow_rate_sccm: 11.56
+        oxygen_produced_g: 0.342
+        oxygen_yield_pct: 9.5
+        carbon_recovered_pct: 67.7
+        average_processing_temperature_C: 1913
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 525
+        regolith_processed_g: 3.587
+        methane_pyrolyzed_pct: 71.6
+        carbon_cap: formed
+        time_to_form_carbon_cap_min: 60.8
+    - observation_id: balasubramaniam_2009_table1_test_06
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-06
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '6'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 6
+        target_processing_temperature_C: 1750
+        processing_pressure_psia: 9
+        methane_flow_rate_sccm: 17.18
+        oxygen_produced_g: 0.301
+        oxygen_yield_pct: 11.0
+        carbon_recovered_pct: 52.6
+        average_processing_temperature_C: 1713
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 636
+        regolith_processed_g: 2.74
+        methane_pyrolyzed_pct: 56.1
+        carbon_cap: formed
+        time_to_form_carbon_cap_min: 32.1
+    - observation_id: balasubramaniam_2009_table1_test_07
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-07
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '7'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 7
+        target_processing_temperature_C: 1650
+        processing_pressure_psia: 3
+        methane_flow_rate_sccm: 6.05
+        oxygen_produced_g: 0.219
+        oxygen_yield_pct: 8.7
+        carbon_recovered_pct: 76.7
+        average_processing_temperature_C: 1722
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 596
+        regolith_processed_g: 2.516
+        methane_pyrolyzed_pct: 56.7
+        carbon_cap: no cap
+    - observation_id: balasubramaniam_2009_table1_test_08
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-08
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '8'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 8
+        target_processing_temperature_C: 1650
+        processing_pressure_psia: 15
+        methane_flow_rate_sccm: 17.18
+        oxygen_produced_g: 0.295
+        oxygen_yield_pct: 15.6
+        carbon_recovered_pct: 50.1
+        average_processing_temperature_C: 1702
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 612
+        regolith_processed_g: 1.889
+        methane_pyrolyzed_pct: 54.9
+        carbon_cap: formed
+        time_to_form_carbon_cap_min: 16.6
+    - observation_id: balasubramaniam_2009_table1_test_09
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-09
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '9'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 9
+        target_processing_temperature_C: 1750
+        processing_pressure_psia: 3
+        methane_flow_rate_sccm: 11.56
+        oxygen_produced_g: 0.325
+        oxygen_yield_pct: 7.6
+        carbon_recovered_pct: 69.8
+        average_processing_temperature_C: 1713
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 613
+        regolith_processed_g: 4.298
+        methane_pyrolyzed_pct: 59.1
+        carbon_cap: no cap
+    - observation_id: balasubramaniam_2009_table1_test_10
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-10
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '10'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 10
+        target_processing_temperature_C: 1750
+        processing_pressure_psia: 15
+        methane_flow_rate_sccm: 6.05
+        oxygen_produced_g: 0.289
+        oxygen_yield_pct: 8.2
+        carbon_recovered_pct: 83.3
+        average_processing_temperature_C: 1666
+        average_processing_temperature_as_printed: 1666**
+        average_processing_temperature_flag: 'Footnote **: the pyrometer may have had an obscured view of the melt in this
+          test, so the temperatures may not be accurate.'
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 597
+        regolith_processed_g: 3.514
+        methane_pyrolyzed_pct: 77.7
+        carbon_cap: no cap
+    - observation_id: balasubramaniam_2009_table1_test_11
+      type: experiment_run_result
+      experiment: orbitec-ts1-test-11
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '1'
+        source_path: tables/balasubramaniam-2009-carbothermal-kinetic-constants/t1.csv
+        row: '11'
+      units: C; psia; sccm; g; % as printed
+      values:
+        quantity: carbothermal_test_result
+        method_class: measured_quoted
+        evidence_class: third_party_test_data_reproduced_by_authors
+        test_number: 11
+        target_processing_temperature_C: 1650
+        processing_pressure_psia: 3
+        methane_flow_rate_sccm: 6.05
+        oxygen_produced_g: 0.235
+        oxygen_yield_pct: 6.1
+        carbon_recovered_pct: 79.9
+        average_processing_temperature_C: 1640
+        average_processing_temperature_basis: 'Footnote *: calculated before carbon cap formation'
+        maximum_reflector_temperature_C: 638
+        regolith_processed_g: 3.86
+        methane_pyrolyzed_pct: 56.9
+        carbon_cap: no cap
+    - observation_id: balasubramaniam_2009_analysis_assumptions
+      type: method
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+      units: wt%; %
+      values:
+        quantity: data_reduction_assumptions
+        method_class: author_assumption
+        melt_gas_surface_area: Processed regolith assumed hemispherical to determine the melt-gas area
+        JSC1A_maximum_oxygen_yield_pct_assumed: 25
+        JSC1A_SiO2_wt_pct: 46.2
+        JSC1A_SiO2_attribution: Hill et al. (Ref. 6)
+        basis_of_25_pct: Consistent with extraction of all available oxygen from the SiO2 in JSC-1A
+        JSC1_maximum_oxygen_yield_pct_estimate_quoted: 28
+        JSC1_estimate_basis: Reduction of SiO2, FeO and Fe2O3 to Si and Fe, and TiO2 to Ti2O3; estimate attributed to ORBITEC
+          (Ref. 7); printed as approximately 28%
+        conversion_fraction_definition: z = actual oxygen yield in each test / maximum possible oxygen yield
+        note: The 25% and hemispherical-shape inputs are author assumptions, not measurements. The authors print no per-test
+          z, area or beta_0 values.
+    - observation_id: balasubramaniam_2009_model_structure
+      type: method
+      locator:
+        page: 7
+        published_page: 3
+        pdf_page_index: 6
+        section: II. Model
+        note: Sections II.A-II.D; Eq. (1), PDF p. 7; Eqs. (2)-(8), p. 8; Eqs. (9)-(13), p. 9 (published pp. 3-5).
+      units: as printed
+      values:
+        quantity: chemical_conversion_model_structure
+        method_class: model_description
+        surface_reaction: Carbon deposition by a first-order surface reaction in methane; flux = gamma x methane concentration
+          adjacent to the melt surface; all carbon-deposition pathways lumped into one process
+        melt_reaction: Single-step second-order reaction, first order in carbon and in metal oxide; rate = k x carbon concentration
+          x metal-oxide concentration
+        melt_mixing: Well-mixed zone; no spatial gradients; carbon-cap formation not modelled; heat transfer not analysed
+          and treated as uncoupled
+        stoichiometric_coefficient_a_for_SiO2: approximately 0.5 (printed as ≈ 0.5)
+        gas_phase: CSTR (average concentration equals exit concentration), quasi-steady methane balance, constant fraction
+          f of incoming methane pyrolyzed; ideal gas at constant temperature and pressure
+        fit_procedure: k from a non-linear least-squares fit of 1 - z versus y (Eq. 12); gamma then from a least-squares fit
+          to Eq. (13)
+        equations_as_printed: |
+          (1) dα*/dt* = AγC_m/V − kα*β*
+          (2) dβ*/dt* = −akα*β*
+          (3) α = β − 1 + λt
+          (4) β = [2√λ exp(t − λt²/2)] / [2√λ + exp(1/(2λ))√(2π){erf(1/√(2λ)) + erf((tλ − 1)/√(2λ))}]
+          (5) (ṁ_m)_in − (ṁ_m)_out = γAC_m + V_g dC_m/dt*
+          (6) −(ṁ_h)_out = −2γAC_m + V_g dC_h/dt*
+          (7) −(ṁ_co)_out = −(Vβ₀²k/a)αβ + V_g dC_co/dt*
+          (8) (ṁ_m)_in − Ṁ_out = −γAC_m − (Vβ₀²k/a)αβ; Ṁ_out = (ṁ_m)_out + (ṁ_h)_out + (ṁ_co)_out
+          (9) f(ṁ_m)_in = γAC_m = γAρx_m
+          (10) [(1 − f)(ṁ_m)_in]/x_m = (ṁ_m)_in + γAρx_m + (Vβ₀²k/a)αβ
+          (11) X_CO = (Vβ₀/a)[1 − β(t)]
+          (12) [2√(y/k) exp(kβ₀t* − ½ykβ₀²t*²)] / [2√(y/k) + exp(k/(2y))√(2π){erf(√(k/(2y))) + erf(√((k/(2y))(yβ₀t* − 1)))}] = 1 − z
+          (13) γ = [f(1 + f + fβt)/(1 − f)](ṁ_m)_in/(Aρ) + [kVβ₀²/(aAρ)][f/(1 − f)]β(β − 1)
+          Definitions: α = α*/(β₀/a), β = β*/β₀, t = t*/[1/(kβ₀)], λ = aAγC_m/(kVβ₀²); y = aAγC_m/(Vβ₀²) = af(ṁ_m)_in/(Vβ₀²); z is the metal-oxide conversion fraction, z = aX_CO/(Vβ₀). At t* = 0, no carbon is present and the metal-oxide concentration is β₀.
+        CO2_neglected: CO2 production neglected; ORBITEC experiments show CO2 detected is only a few percent of the CO produced
+          (PDF p. 8, published p. 4)
+    - observation_id: balasubramaniam_2009_fitted_rate_constants
+      type: author_model_fit
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: III. Results
+        note: Restated in the Figure 2 and Figure 4 captions (PDF pp. 10-11) and in the Conclusion (PDF p. 12, published p.
+          8).
+      units: m3/(moles·s); m/s
+      values:
+        quantity: best_fit_chemical_kinetic_rate_constants
+        method_class: model_derived
+        admission_status: model_derived
+        melt_reaction_rate_constant_k_m3_per_mol_s: 4.512e-08
+        melt_reaction_rate_constant_k_as_printed: k = 4.512 × 10^-8 m3/(moles·s)
+        surface_reaction_rate_constant_gamma_m_per_s: 0.0404
+        surface_reaction_rate_constant_gamma_as_printed: γ = 0.0404 m/s
+        fit_data: Table 1 (ORBITEC Test Series-1), all 11 tests
+        assumed_constant: k and gamma treated as constants independent of temperature and pressure; T and P enter only through
+          gas density
+        data_range_processing_temperature_C:
+        - 1640
+        - 1913
+        data_range_processing_pressure_psi:
+        - 3
+        - 15
+        data_range_methane_flow_sccm:
+        - 6.05
+        - 17.18
+        processing_time_min: 80
+        uncertainty: No uncertainty is printed for k or gamma
+        note: Author fit to a lumped model; not a measurement. The printed ranges are the authors' summary of the data (Conclusion).
+    - observation_id: balasubramaniam_2009_carbon_cap_and_outlier_interpretation
+      type: author_interpretation
+      locator:
+        page: 11
+        published_page: 7
+        pdf_page_index: 10
+        section: III. Results
+      units: dimensionless
+      values:
+        quantity: carbon_cap_trend_and_outlier
+        method_class: author_interpretation
+        carbon_cap_trend: No carbon cap when the metal-oxide conversion fraction is low; when a cap forms the conversion fraction
+          is high, typically above 0.4
+        conversion_fraction_threshold_typical: 0.4
+        test_4: Appears to be an outlier in the gamma plot (Fig. 4) and follows a different trend in Figs. 2 and 3; amount
+          of regolith processed is high and oxygen yield low relative to other tests
+        colour_coding: 'Green: no cap (tests 1, 4, 7, 9, 10, 11; darker green for 4); blue: slow cap formation (2, 3, 5);
+          red: fast cap formation (6, 8)'
+    - observation_id: balasubramaniam_2009_figure1_figure_only
+      type: figure_only
+      locator:
+        page: 7
+        published_page: 3
+        pdf_page_index: 6
+        figure: '1'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Sketch of the carbothermal process
+        note: Figure inspected on the page image; not digitized.
+    - observation_id: balasubramaniam_2009_figure2_figure_only
+      type: figure_only
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        figure: '2'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Data and best-fit curve for the reaction rate from Test Series-1 (1 - conversion fraction versus y)
+        note: Figure inspected on the page image; not digitized.
+    - observation_id: balasubramaniam_2009_figure3_figure_only
+      type: figure_only
+      locator:
+        page: 11
+        published_page: 7
+        pdf_page_index: 10
+        figure: '3'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Comparison of measured and predicted conversion fraction from Test Series-1
+        note: Figure inspected on the page image; not digitized.
+    - observation_id: balasubramaniam_2009_figure4_figure_only
+      type: figure_only
+      locator:
+        page: 11
+        published_page: 7
+        pdf_page_index: 10
+        figure: '4'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Data and best fit curve for the pyrolysis constant from Test Series-1 (gamma versus test number)
+        note: Figure inspected on the page image; not digitized.
+scope_assessment:
+  observations_scored: 0
+  reason: The source reports carbothermal test outcomes (oxygen produced and yield, carbon recovered, methane pyrolyzed) and
+    two fitted lumped rate constants. None is a vapour pressure, activity, evaporation coefficient, mass-loss or other closed
+    scored type, so all rows are context.
+  not_extracted:
+  - Figure curves (figure-only)

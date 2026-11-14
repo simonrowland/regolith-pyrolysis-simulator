@@ -85,7 +85,16 @@ observations:
         page: 7
         pdf_page_index: 6
         section: Trace element chemistry
-  notices: []
+  notices:
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=NNO offset=-4 calibration=frost_1991_nno_interim_compilation T_K=1398.15
+      P_bar=1.01325 authority=certified band_dex=0.1578 log10_fO2_bar=-12.470704424060367 provenance=compilation_calibration
+      buffer_as_printed=delta_NNO'
+    origin: leuthold-2023-basalt-partition-fo2::leuthold_2023_b62_2_glass_v_1125c_nno_minus4::T=1398.15:h=9d0f9e3919be
+    band: '0.1578'
+    authority: certified
   source_id: leuthold-2023-basalt-partition-fo2
   locator:
     page: 7
@@ -167,6 +176,8 @@ observations:
     parameters: []
     output_unit: µg/g
     references: []
+  provenance:
+    printed_phase: glass
 - observation_id: leuthold-2023-basalt-partition-fo2::leuthold_2023_b62_2_glass_v_1190c_nno_minus4::T=1463.15:h=db2cd5af19ca
   experiment_id: 10.1007/s00410-023-02069-x::experiment::leuthold_2023_b62_2_picrite_gas_mixing_experiments
   identity:
@@ -250,7 +261,16 @@ observations:
         page: 7
         pdf_page_index: 6
         section: Trace element chemistry
-  notices: []
+  notices:
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=NNO offset=-4 calibration=frost_1991_nno_interim_compilation T_K=1463.15
+      P_bar=1.01325 authority=certified band_dex=0.0072 log10_fO2_bar=-11.67858072685644 provenance=compilation_calibration
+      buffer_as_printed=delta_NNO'
+    origin: leuthold-2023-basalt-partition-fo2::leuthold_2023_b62_2_glass_v_1190c_nno_minus4::T=1463.15:h=db2cd5af19ca
+    band: '0.0072'
+    authority: certified
   source_id: leuthold-2023-basalt-partition-fo2
   locator:
     page: 7
@@ -332,3 +352,5 @@ observations:
     parameters: []
     output_unit: µg/g
     references: []
+  provenance:
+    printed_phase: glass

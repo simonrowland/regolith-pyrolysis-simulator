@@ -1,0 +1,1089 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  citation: Shornikov, S. I. (2018). Investigation of thermodynamic properties of spinel solid solutions by Knudsen effusion
+    mass-spectrometric method. Experiment in Geosciences, 24(1), 120–123.
+  source_ids:
+  - shornikov-2018-spinel-solid-solutions-eg
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:shornikov-2018-spinel-solid-solutions-eg
+      role: pdf
+      path: raw/shornikov-2018-spinel-solid-solutions-eg/shornikov-2018-spinel-solid-solutions-eg.pdf
+      sha256:
+        tag: value
+        value: 9545178cd03865e60c947714568601c2b92f90669940933cc41e588a495565bf
+    - asset_id: pdftotext:shornikov-2018-spinel-solid-solutions-eg
+      role: pdftotext
+      path: text/shornikov-2018-spinel-solid-solutions-eg
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2018-spinel-solid-solutions-eg
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6::experiment::shornikov-2018-eg-spinel-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Stoichiometric magnesium and aluminum oxide ratio; stoichiometric spinel sample
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    form:
+      state:
+        tag: value
+        value: Stoichiometric spinel; spinel solid solutions during stationary evaporation
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    characterization:
+      state:
+        tag: value
+        value: X-ray phase and chemical analyses of spinel samples; post-run analysis is not explicitly identified.
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    pretreatment:
+      state:
+        tag: value
+        value: Sintering of active ultrafine powders obtained by joint crystallization of magnesium/aluminum nitrates and
+          sulphates, as well as solid-phase synthesis.
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '2000'
+          interval_high: '2200'
+          approximate: false
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Current experiment
+    note: Series record; individual charges and exact run configurations are not separately identified.
+  apparatus:
+    calibration:
+      pressure_method:
+        state:
+          tag: value
+          value: Hertz–Knudsen equation (3) with Komlev equation (4); partial evaporation coefficients taken from Shornikov
+            (2015)
+        locator:
+          published_page: 122
+          pdf_page_index: 2
+          section: Equations (3)–(4) and coefficient discussion
+          note: Equation (3) and pressure method begin on p. 121/index 1.
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 121
+          pdf_page_index: 1
+          section: Current experiment and preparation
+          note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+      ion_signal_to_pressure_method:
+        state:
+          tag: value
+          value: Complete isothermal evaporation and integrated ion currents, equation (2), determine component amounts; equation
+            (3) converts evaporated amounts to partial pressures.
+        locator:
+          published_page: 121
+          pdf_page_index: 1
+          section: Equations (2)–(3)
+          note: No absolute calibrant or ionization correction is named.
+  bench_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6::bench::shornikov-2018-eg-mi1201
+benches:
+- id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6::bench::shornikov-2018-eg-mi1201
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass-spectrometric method; MI–1201 mass spectrometer
+    locator:
+      published_page: 121
+      pdf_page_index: 1
+      section: Current experiment and preparation
+      note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  method:
+    state:
+      tag: value
+      value: Stationary evaporation; high-temperature modified ion source
+    locator:
+      published_page: 121
+      pdf_page_index: 1
+      section: Current experiment and preparation
+      note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum cell; liner not reported
+    locator:
+      published_page: 121
+      pdf_page_index: 1
+      section: Current experiment and preparation
+      note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 121
+      pdf_page_index: 1
+      section: Current experiment and preparation
+      note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  geometry:
+    orifice_area_m2:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Equation (3)
+        note: s_or is defined but its numerical value is not printed.
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 122
+        pdf_page_index: 2
+        section: After equation (4)
+        note: Diameter/thickness ratio is discussed; no dimensions printed.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 122
+        pdf_page_index: 2
+        section: After equation (4)
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    cross_sections_and_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    multiplier_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    isotope_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  temperature_calibration:
+    sensor_calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  other_facts:
+  - name: cell_liner
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+  - name: ion_source_temperature_capability
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '3000'
+          approximate: false
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment
+        note: Printed up to 3000 K; upper capability limit, not a run setpoint or ionization energy.
+    unit: K
+context:
+- observation_id: shornikov_2018_eg_abstract
+  type: thermodynamic_example
+  locator:
+    published_page: 120
+    pdf_page_index: 0
+    section: Abstract
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: abstract_scientific_context
+    temperature_interval_K:
+    - '2000'
+    - '2200'
+    quote: The partial pressure values of the gas phase components over the spinel solid solutions and its border were determined
+      by the Knudsen effusion mass-spectrometric method in the temperature range 2000–2200 K. The found values of the oxide
+      activities, the Gibbs energy, enthalpy and entropy of formation of solid solutions indicated the minor negative deviations
+      from ideality. The obtained thermodynamic information associated with available in the literature.
+    translation_note: Closing sentence is garbled as printed; no comparison direction is inferred from it.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_abstract
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_activity_comparisons
+  type: thermodynamic_example
+  locator:
+    published_page: 122
+    pdf_page_index: 2
+    section: Right column, Figures 3–4 discussion
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: directional_and_qualifying_statements
+    cited_Al2O3_calculation_interval_K:
+    - '1400'
+    - '2173'
+    current_thermodynamic_function_temperature_K: '2100'
+    quotes:
+    - The MgO activities found at present study (Fig. 3a) are average between the results (Sasamoto et al., 1981; Fujii et
+      al., 2000).
+    - Some excess of the MgO activities (Sakamoto et al. 1981) are due to ignoring of the difference between the partial pressure
+      of oxygen over MgO and the same over the spinel solid solutions in the calculation.
+    - The relatively low values of MgO activities (Fujii et al., 2000) are apparently due to errors in determining the boundary
+      composition positions, which were used in the calculations of the oxide activities in spinel solid solutions.
+    - The calculated Al2O3 activities at 1400–2173 K (Navrotsky et al., 1986) are quite far from the results (Fujii et al.
+      2000) and the results of present study (Fig. 3b). It is probably due to significant calculation errors.
+    - A summary of partial (Δμ_i, ΔH_i, ΔS_i) and integral (ΔG_T, ΔH_T, ΔS_T) thermodynamic functions of spinel solid solutions
+      calculated at present study at 2100 K is given in Fig. 4.
+    - It can be seen their simbanet behavior in dependence on the oxide contents, that is indicate the slight negative deviations
+      from ideality.
+    - It is seen that the integral thermodynamic characteristics are almost unchanged in the spinel solid solutions and their
+      extreme values are in the stoichiometric spinel composition.
+    translation_note: Sakamoto (discussion) versus Sasamoto (caption/references) and 'simbanet' are preserved as printed;
+      causes remain the authors' qualified claims.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_activity_comparisons
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_apparatus_absences
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Current experiment and preparation; all article pp. 120–123 inspected
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: located_unreported_experiment_facts
+    liner:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    sample_purity:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    post_run_composition_analysis:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    cell_reaction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    mass_spectral_interference:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 1
+        section: Current experiment and preparation
+        note: Absences checked across all article text, pp. 120–123; no parameters inherited from the longer sibling.
+    note: Unknown/not published is not an assertion of no liner, no reaction or no interference. The stated X-ray phase and
+      chemical analyses are not explicitly post-run analyses. Silver calibration and an eV value do not appear in this source.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_apparatus_absences
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_boundary_2000
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Right column, prose after equation (2)
+  units: as printed
+  values:
+    method_class: measured_direct
+    quantity: spinel_solid_solution_boundary_composition
+    experiment: shornikov-2018-eg-spinel-series
+    temperature_K: '2000'
+    component: Al2O3
+    mole_percent: '70.40'
+    uncertainty_mole_percent: '0.20'
+    as_printed: 70.40±0.20 mole % Al2O3 at 2000 K
+    coexisting_field: MgAl2O4 + Al2O3
+    basis: Explicitly printed boundary result; no figure coordinate digitization.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_boundary_2000
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_boundary_2100
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Right column, prose after equation (2)
+  units: as printed
+  values:
+    method_class: measured_direct
+    quantity: spinel_solid_solution_boundary_composition
+    experiment: shornikov-2018-eg-spinel-series
+    temperature_K: '2100'
+    component: Al2O3
+    mole_percent: '76.25'
+    uncertainty_mole_percent: '0.20'
+    as_printed: 76.25±0.20 mole % Al2O3 at 2100 K
+    coexisting_field: MgAl2O4 + Al2O3
+    basis: Explicitly printed boundary result; no figure coordinate digitization.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_boundary_2100
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_boundary_2200
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Right column, prose after equation (2)
+  units: as printed
+  values:
+    method_class: measured_direct
+    quantity: spinel_solid_solution_boundary_composition
+    experiment: shornikov-2018-eg-spinel-series
+    temperature_K: '2200'
+    component: Al2O3
+    mole_percent: '84.40'
+    uncertainty_mole_percent: '0.20'
+    as_printed: 84.40±0.20 mole % Al2O3 at 2200 K
+    coexisting_field: MgAl2O4 + Al2O3
+    basis: Explicitly printed boundary result; no figure coordinate digitization.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_boundary_2200
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_clausing_context
+  type: thermodynamic_example
+  locator:
+    published_page: 122
+    pdf_page_index: 2
+    section: After equation (4)
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    attribution:
+      cited_as: Komlev (1964); Shornikov (2015)
+    quantity: clausing_and_evaporation_coefficients
+    clausing_coefficient_upper_limit: '1'
+    quote: Their value does not exceed 1 and depends on the ratio of the effusion orifice diameter to its thickness.
+    coefficient_quote: Taking into account the prevalence of vapor species typical for MgO and Al2O3 and a small amount of
+      MgAlO over spinel, the values of partial evaporation coefficients were taken in (Shornikov, 2015).
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_clausing_context
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_duplicate_of_full_paper
+  type: thermodynamic_example
+  locator:
+    page: 120
+    published_page: 120
+    pdf_page_index: 0
+    section: title_and_abstract
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: duplicate_publication_record
+    duplicate_of: shornikov-2018-spinel-solid-solutions
+    relationship: External corpus comparison identifies overlap with Shornikov's full 2018 Russian Journal of Physical Chemistry
+      A paper. This relationship is not a printed duplicate declaration and imports no values. This source's scientific numbers,
+      equations, captions and experiment facts are carried below with its own page locators and attribution.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_duplicate_of_full_paper
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_equation_1
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Equation (1) and symbol definitions
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: printed_method_relation
+    equation_number: 1
+    relation_as_printed: 2[\mathrm{MgAl_2O_4}]=(\mathrm{Mg})+(\mathrm{MgO})+(\mathrm{Al})+(\mathrm{AlO})+(\mathrm{Al_2O})+3(\mathrm{O})+(\mathrm{O_2})
+    definitions:
+      qualification: Conditional stoichiometric-spinel evaporation reaction omitting the low MgAlO content.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_equation_1
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_equation_2
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Equation (2) and symbol definitions
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: printed_method_relation
+    equation_number: 2
+    relation_as_printed: q_t=q_0\frac{\int_{t=0}^{t}I_i\,dt}{\int_{t=0}^{t=t_0}I_i\,dt}
+    definitions:
+      q_t: Amount of evaporated oxide contained in the spinel solid solution.
+      q_0: Quantity of the ith component whose complete evaporation time is t_0.
+      I_i: Total ion current of the ith melt component, MgO or Al2O3.
+      t: Evaporation time.
+      t_0: Complete evaporation time of the ith component quantity q_0.
+      method: Complete isothermal evaporation (Sidorov et al., 1985).
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_equation_2
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_equation_3
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Equation (3) and symbol definitions
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: printed_method_relation
+    equation_number: 3
+    relation_as_printed: p_i=K_\alpha\frac{q_i}{s_{\rm or}C_{\rm or}t}\sqrt{\frac{2\pi RT}{M_i}}
+    definitions:
+      p_i: Partial pressure of the ith vapor species.
+      q_i: Component quantity evaporated from the effusion cell.
+      M_i: Molecular weight.
+      T: Temperature.
+      C_or: Clausing factor of the effusion orifice.
+      s_or: Effusion orifice area.
+      K_alpha: Correction taking account of evaporation coefficient alpha_i and molecular structure changes on transition
+        to the gas phase from surface area S_v.
+      method: Hertz–Knudsen equation; Shornikov (2002).
+      definition_continuation_locator:
+        published_page: 122
+        pdf_page_index: 2
+        section: First lines, continuing equation (3) definitions
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_equation_3
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_equation_4
+  type: thermodynamic_example
+  locator:
+    published_page: 122
+    pdf_page_index: 2
+    section: Equation (4) and symbol definitions
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    attribution:
+      cited_as: 'Komlev (1964); partial evaporation coefficients: Shornikov (2015)'
+    quantity: printed_method_relation
+    equation_number: 4
+    relation_as_printed: K_\alpha=\frac{1}{C_{\rm or}}+s_{\rm or}\frac{1-C_c\alpha_i}{S_v\alpha_i C_c}
+    definitions:
+      C_c: Clausing coefficient for the effusion cell, associated with vapor-species collisions inside the orifice channel
+        and reverse reflection from its walls.
+      alpha_i: Partial evaporation coefficient of ith component.
+      S_v: Area of emitting surface.
+      coefficient_source: Shornikov (2015); Komlev equation (Komlev, 1964).
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_equation_4
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_equation_5
+  type: thermodynamic_example
+  locator:
+    published_page: 122
+    pdf_page_index: 2
+    section: Equation (5) and symbol definitions
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    attribution:
+      cited_as: Lewis & Randall (1923); Prigogine & Defay (1954); Belton & Fruehan (1971)
+    quantity: printed_method_relation
+    equation_number: 5
+    relation_as_printed: \ln a_{\mathrm{MgO}}=\ln a^*_{\mathrm{MgO}}-\int_{x^*_{\mathrm{Al_2O_3}}}^{x_{\mathrm{Al_2O_3}}}\frac{x_{\mathrm{Al_2O_3}}}{1+x_{\mathrm{Al_2O_3}}}\,d\ln\frac{I_{\mathrm{Al}}I_{\mathrm{AlO}}}{I_{\mathrm{Mg}}^2}
+    definitions:
+      a_MgO_star: MgO activity in stoichiometric spinel at a given temperature.
+      x_Al2O3_star: '0.5'
+      ion_ratio: I_Al I_AlO / I_Mg^2; AlO, not Al2O.
+      standard_state:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 122
+          pdf_page_index: 2
+          section: Equation (5) and definitions
+          note: Pure-solid or pure-liquid standard state is not explicitly stated in this abstract.
+      numerical_anchor_value:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 122
+          pdf_page_index: 2
+          section: Equation (5)
+          note: Anchor and ratio inputs are not numerically tabulated.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_equation_5
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_equation_6
+  type: thermodynamic_example
+  locator:
+    published_page: 122
+    pdf_page_index: 2
+    section: Equation (6) and symbol definitions
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    attribution:
+      cited_as: Lewis & Randall (1923); Prigogine & Defay (1954); Belton & Fruehan (1971)
+    quantity: printed_method_relation
+    equation_number: 6
+    relation_as_printed: \ln a_{\mathrm{Al_2O_3}}=-\int_{x^*_{\mathrm{MgO}}}^{x_{\mathrm{MgO}}}\frac{x_{\mathrm{MgO}}}{1-x_{\mathrm{MgO}}}\,d\ln\frac{I_{\mathrm{Mg}}I_{\mathrm{Al_2O}}}{I_{\mathrm{Al}}^2}
+    definitions:
+      x_MgO_star: MgO content at the boundary composition of the spinel solid solutions and the MgAl2O4 (solid solution) +
+        Al2O3 field.
+      ion_ratio: I_Mg I_Al2O / I_Al^2; Al2O, not AlO.
+      standard_state:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 122
+          pdf_page_index: 2
+          section: Equation (6) and definitions
+          note: Zero integration constant at the lower boundary does not identify a solid or liquid reference phase.
+      activity_method: Lewis (Lewis & Randall, 1923), Gibbs–Duhem (Prigogine & Defay, 1954), proportionality of partial pressures
+        and corresponding ion currents, Belton–Fruehan (Belton & Fruehan, 1971).
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_equation_6
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_experiment_qualifiers
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Current experiment, preparation and evaporation
+  units: as printed
+  values:
+    method_class: measured_direct
+    quantity: current_experiment_context
+    experiment: shornikov-2018-eg-spinel-series
+    temperature_interval_K:
+    - '2000'
+    - '2200'
+    spectrometer: MI–1201
+    modified_ion_source_capability:
+      upper_limit_K: '3000'
+      interpretation: Ion-source capability; not sample temperature or electron energy.
+    preparation_quote: The stoichiometric spinel synthesis was carried out by sintering of active ultrafine powders obtained
+      by the joint crystallization method of nitrates and sulphates of magnesium and aluminum, as well as by solid-phase synthesis.
+    mixture_quote: The mixtures compositions were prepared with stoichiometric ratio of magnesium and aluminum oxides followed
+      by x-ray phase and chemical analyses of spinel samples.
+    apparatus_quote: The design of the developed ion source and the mass spectrometry experiment features are described in
+      detail (Shornikov et al., 2000).
+    method_quote: At present study the thermodynamic data on the properties of spinel solid solutions in the MgAl2O4–Al2O3
+      system were obtained by the Knudsen effusion mass–spectrometric method at stationary evaporation of stoichiometric spinel
+      sample from a molybdenum cell in the temperature range 2000–2200 K.
+    qualifying_quotes:
+    - 'We can omit the MgAlO low contents in the gas phase, and than the stoichiometric spinel evaporation process can be
+      conditionally presented as the following reaction:'
+    - This gives us the opportunity to obtain the compositions of spinel solid solution directly in effusion cell at evaporation
+      due to the Mg preferential evaporation.
+    - Note that the change in the spinel composition during evaporation continued until the compositions located at the boundary
+      of the spinel solid solutions and the "MgAl2O4 + Al2O3" region.
+    - When the boundary composition of the solid spinel solution (x_i^*) is reached, its congruent evaporation was observed.
+    translation_note: The conditional reaction omits low MgAlO; 'and than' and 'spinel residual melt' are printed wording.
+      Congruent evaporation is reported only upon reaching the boundary, not throughout the run.
+    integration_attribution: Complete isothermal evaporation method (Sidorov et al., 1985).
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_experiment_qualifiers
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_figure_1
+  type: thermodynamic_example
+  locator:
+    published_page: 120
+    pdf_page_index: 0
+    section: Figure 1 caption
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: phase_diagram_caption
+    phase_fields:
+      '1': MgO (solid solution)
+      '2': MgO + liquid
+      '3': MgO (solid solution) + MgAl2O4
+      '4': MgAl2O4 (solid solution)
+      '5': MgAl2O4 + liquid
+      '6': MgAl2O4 + liquid
+      '7': MgAl2O4 + Al2O3
+      '8': Al2O3 + liquid
+      '9': liquid
+    boundary_quote: The symbol positions on the boundary of phases of 4 and 7 were defined by the Knudsen effusion mass-spectrometric
+      method at present study.
+    curves: Figure-only; no plot coordinates or axis ticks transcribed as measurements.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_figure_1
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_figure_2
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Figure 2 caption
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: partial_pressure_caption
+    temperature_K: '2100'
+    series:
+      '1': Mg
+      '2': MgO
+      '3': Al
+      '4': AlO
+      '5': Al2O
+      '6': O
+      '7': O2
+      '8': MgAlO
+    caption: The partial pressure values of vapor species over spinel solid solutions at 2100 K.
+    curves: Figure-only; no numerical pressure values digitized.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_figure_2
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_figure_3
+  type: thermodynamic_example
+  locator:
+    published_page: 122
+    pdf_page_index: 2
+    section: Figure 3 caption
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: activities_caption
+    panels:
+      a: MgO
+      b: Al2O3
+    series:
+    - series: '1'
+      temperature_K: '1800'
+      source: Fujii et al. (2000)
+      method: heterogeneous equilibrium
+    - series: '2'
+      temperature_K: '1877'
+      source: Fujii et al. (2000)
+      method: heterogeneous equilibrium
+    - series: '3'
+      temperature_K: '2073'
+      source: Sasamoto et al. (1981)
+      method: Knudsen effusion mass-spectrometric
+    - series: '4'
+      temperature_K: '2173'
+      source: Sasamoto et al. (1981)
+      method: Knudsen effusion mass-spectrometric
+    - series: '5'
+      temperature_K: '2000'
+      source: present study
+      method: Knudsen effusion mass-spectrometric
+    - series: '6'
+      temperature_K: '2100'
+      source: present study
+      method: Knudsen effusion mass-spectrometric
+    - series: '7'
+      temperature_K: '2200'
+      source: present study
+      method: Knudsen effusion mass-spectrometric
+    - series: '8'
+      temperature_K: '1723'
+      source: Navrotsky et al. (1986)
+      method: calculated
+    - series: '9'
+      temperature_K: '1750'
+      source: Navrotsky et al. (1986)
+      method: calculated
+    - series: '10'
+      temperature_K: '1800'
+      source: Navrotsky et al. (1986)
+      method: calculated
+    - series: '11'
+      temperature_K: '1850'
+      source: Navrotsky et al. (1986)
+      method: calculated
+    - series: '12'
+      temperature_K: '1900'
+      source: Navrotsky et al. (1986)
+      method: calculated
+    - series: '13'
+      temperature_K: '1923'
+      source: Navrotsky et al. (1986)
+      method: calculated
+    - series: '14'
+      temperature_K: '2073'
+      source: Navrotsky et al. (1986)
+      method: calculated
+    - series: '15'
+      temperature_K: '2173'
+      source: Navrotsky et al. (1986)
+      method: calculated
+    curves: No activity values or curve coordinates digitized; caption temperatures and series attribution are explicit.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_figure_3
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_figure_4
+  type: thermodynamic_example
+  locator:
+    published_page: 123
+    pdf_page_index: 3
+    section: Figure 4 caption
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: thermodynamic_function_caption
+    temperature_K: '2100'
+    panels:
+      a: Oxide chemical potentials and Gibbs energy
+      b: Oxide partial enthalpies and enthalpy of melt formation
+      c: Oxide partial entropies and entropy of melt formation
+    series:
+      '1': MgO
+      '2': Al2O3
+      '3': 'Integral thermodynamic characteristics: Gibbs energy, enthalpy and entropy of formation of spinel solid solutions,
+        respectively.'
+    boundary_lines: The vertical dashed lines indicate the boundaries of the spinel solid solutions.
+    curves: No numerical thermodynamic-function values digitized.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_figure_4
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_introduction
+  type: thermodynamic_example
+  locator:
+    published_page: 120
+    pdf_page_index: 0
+    section: Introduction, continued first line p. 121/index 1
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    attribution:
+      cited_as: Wark & Boynton (2001); Berezhnoi (1970); Ronchi & Sheindlin (2001); Glushko et al. (1978–1982)
+    quantity: background_context
+    quotes:
+    - CAIs are the earliest object of the Solar system with unusual isotopic characteristics (Wark & Boynton, 2001).
+    - The Fig. 1 shows the adopted MgO–Al2O3 system phase diagram according to the data (Berezhnoi, 1970; Ronchi & Sheindlin,
+      2001), where you can see a wide area of solid solutions.
+    - Evaporation processes and thermodynamic properties of MgO and Al2O3 have been studied in detail (Glushko et al., 1978–1982).
+    gas_over_MgO_as_printed:
+    - O
+    - O2
+    - O3
+    - O4
+    - Mg
+    - MgO
+    - Mg2
+    gas_over_aluminum_oxide_as_printed:
+    - O
+    - O2
+    - O3
+    - O4
+    - Al
+    - AlO
+    - AlO2
+    - Al2
+    - Al2O
+    - Al2O2
+    - Al2O3
+    continuation_locator:
+      published_page: 121
+      pdf_page_index: 1
+      section: First line, continuation of p. 120 gas-species paragraph
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_introduction
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_prior_spinel
+  type: thermodynamic_example
+  locator:
+    published_page: 121
+    pdf_page_index: 1
+    section: Left column, prior studies
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    attribution:
+      cited_as: Shornikov (2017a), evaporation; Shornikov (2017b), stoichiometric-spinel thermodynamics
+    quantity: prior_spinel_thermodynamics
+    evaporation_interval_K:
+    - '1850'
+    - '2250'
+    activities_interval_K:
+    - '1851'
+    - '2298'
+    formation_enthalpy_from_simple_oxides:
+      value: '-12.02'
+      uncertainty: '1.14'
+      unit: kJ/mole
+    formation_entropy_from_simple_oxides:
+      value: '5.03'
+      uncertainty: '0.56'
+      unit: J/(mole·K)
+      note: Positive value; no minus or explicit plus is printed.
+    melting_enthalpy:
+      value: '55.81'
+      uncertainty: '4.62'
+      unit: kJ/mole
+    quotes:
+    - In addition to the listed components of the gas phase, a complex MgAlO gaseous oxide was found in a small amount (Shornikov,
+      2017a).
+    - The melting enthalpy of spinel was equal to 55.81±4.62 kJ/mole (Shornikov, 2017b), that is satisfactorily consistent
+      with literature thermodynamic information.
+    - The information on solid spinel solutions (in contrast to the same on oxides and stoichiometric spinels) is rather scarce
+      and is exhausted by modest results of several experimental investigations.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_prior_spinel
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_publication_support
+  type: thermodynamic_example
+  locator:
+    published_page: 123
+    pdf_page_index: 3
+    section: Funding and footers
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: publication_metadata
+    funding_quote: 'The present study was supported by RAS Presidium’s Program #7 (Experimental and theoretical studies of
+      Solar system objects and star planetary systems. Transients in astrophysics).'
+    funding_program: '7'
+    year: 2018
+    volume: 24
+    issue: 1
+    printed_pages:
+    - 120
+    - 121
+    - 122
+    - 123
+    footer_locators:
+    - published_page: 121
+      pdf_page_index: 1
+      section: Footer
+    - published_page: 123
+      pdf_page_index: 3
+      section: Footer
+    open_licence:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 123
+        pdf_page_index: 3
+        section: Article and references; full four-page scan
+        note: No open redistribution licence or DOI printed; owner-supplied sidecar acquisition statement retained.
+    page_footer_locators:
+    - published_page: 120
+      pdf_page_index: 0
+      section: Page-number footer
+    - published_page: 121
+      pdf_page_index: 1
+      section: Page-number footer
+    - published_page: 122
+      pdf_page_index: 2
+      section: Page-number footer
+    - published_page: 123
+      pdf_page_index: 3
+      section: Page-number footer
+    footer_note: Year, volume and issue are printed in the journal footer on pp. 121 and 123; pp. 120 and 122 carry the institute
+      footer and page number.
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_publication_support
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4
+- observation_id: shornikov_2018_eg_references
+  type: thermodynamic_example
+  locator:
+    published_page: 123
+    pdf_page_index: 3
+    section: Complete references, both columns
+  units: as printed
+  values:
+    method_class: author_estimate
+    quantity: bibliography_as_printed
+    references:
+    - 'Belton G. R., Fruehan R. J. (1971) The determination of activities of mass spectrometry: some additional methods. Met.
+      Trans. B, vol. 2, no. 1, pp. 291–296.'
+    - 'Berezhnoi, A. S. (1970) Multicomponent oxide systems. Kiev: Naukova Dumka, 544 pp.'
+    - 'Glushko V. P., Gurvich L. V., Bergman G. A., Veitz I. V., Medvedev V. A., Khachkuruzov G. A., Yungman V. S. (1978-1982)
+      Thermodynamic properties of individual substances. Moscow: Nauka, vol. 1–4.'
+    - Fujii K., Nagasaka T., Hino M. (2000) Activities of the constituents in spinel solid solution and free energies of formation
+      of MgO, MgO · Al2O3. JISJ Intern., vol. 40, no. 11, pp. 1059–1066.
+    - Komlev G. A. (1964) Determination of the saturated vapor pressure by the effusion method. Russ. J. Phys. Chem., vol.
+      38, no. 11, pp. 2747–2748.
+    - 'Lewis G. N., Randall M. (1923) Thermodynamics and the free energy of chemical substances. New York: McGraw-Hill, 653
+      pp.'
+    - Navrotsky A., Wechsler B. A., Geisinger K. L., Seifert F. (1986) Thermochemistry of MgAl2O4–Al8/3O4 defect spinels.
+      J. Amer. Ceram. Soc., vol. 69, no. 5, pp. 418–422.
+    - 'Prigogine I., Defay R. (1954) Chemical thermodynamics. London: Longman, 543 pp.'
+    - Ronchi C., Sheindlin M. (2001) Melting point of MgO. J. Appl. Phys., vol. 90, no. 7, pp. 3325–3331.
+    - Sasamoto T., Hara H., Sata T. (1981) Mass spectrometric study of the vaporization of magnesium oxide from magnesium
+      aluminate spinel. Bull. Chem. Soc. Japan, vol. 54, no. 11, pp. 3327–3333.
+    - 'Sidorov L. N., Korobov M. V., Zhuravleva L. V. (1985) Mass-spectrometric thermodynamic studies. Moscow: MSU, 208 pp.'
+    - Shornikov S. I., Archakov I. Yu., Chemekova T. Yu. (2000) A mass spectrometric study of vaporization and phase equilibria
+      in the Al2O3-SiO2 system. Russ. J. Phys. Chem., vol. 74, no. 5, pp. 677–683.
+    - Shornikov S. I. (2002) Thermodynamic study of the mullite solid solution region in the Al2O3–SiO2 system by mass spectrometric
+      techniques. Geochem. Int., vol. 40, suppl. 1, pp. S46–S60.
+    - Shornikov S. I. (2015) Vaporization coefficients of oxides contained in the melts of Ca–Al–Inclusions in chondrites.
+      Geochem. Int., vol. 53, no. 12, pp. 1080–1089.
+    - Shornikov S. I. (2017a) Mass spectrometric investigation of evaporation processes of MgAl2O4. Russ. J. Phys. Chem. A,
+      vol. 91, no. 1, pp. 10–16.
+    - 'Shornikov S. I. (2017b) Thermodynamic properties of spinel MgAl2O4: a mass spectrometric study. Russ. J. Phys. Chem.
+      A, vol. 91, no. 2, pp. 287–294.'
+    - 'Wark D., Boynton W. V. (2001) The formation of rims on calcium-aluminum-rich inclusions: step I – Flash heating. Met.
+      Planet. Sci., vol. 36, no. 8, pp. 1135–1166.'
+  context_id: shornikov-2018-spinel-solid-solutions-eg::context::shornikov_2018_eg_references
+  work_id: 38367ae2192cfcbdd654a1e00b4a948721619aa064765a6b18ec4caf822e7df6
+  source_id: shornikov-2018-spinel-solid-solutions-eg
+  species: MgAl2O4

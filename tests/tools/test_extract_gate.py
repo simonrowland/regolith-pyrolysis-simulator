@@ -921,8 +921,9 @@ def test_inherited_transition_composition_applies_to_unmarked_points(
 def test_profile_bound_transition_extracts_pass_migration_gate():
     extracts = Path(__file__).resolve().parents[2] / "data/literature/extracts"
     for source_id, expected_observations in (
-        # d-375 restores NaKAlSi_1 Table 10a row 8 to the migrated count.
-        ("rys-2007-alkali-oxide-thermodynamics", 1002),
+        # d-375 restores NaKAlSi_1 Table 10a row 8. The merged document also
+        # keeps the two Table 9 NaAlSi_6 activity points (1506 and 1487.66 K).
+        ("rys-2007-alkali-oxide-thermodynamics", 1004),
         ("costa-2025-ree-cmas-glass-melt-thermochemistry", 28),
     ):
         path = extracts / f"{source_id}.yaml"
@@ -1040,6 +1041,51 @@ def test_table_coverage_compares_mineru_cells_to_extract_values(tmp_path: Path):
     assert report.tables[0].numeric_cells == 4
     assert report.tables[0].extract_values == 2
     assert report.tables[0].percent < 80
+
+
+def test_bad_table_body_is_reported_without_discarding_other_gate_results(
+    tmp_path: Path, capsys
+):
+    corpus = tmp_path / "corpus"
+    content = [
+        {"type": "table", "table_caption": "Table 1 absent"},
+        {
+            "type": "table",
+            "table_caption": "Table 2 malformed",
+            "table_body": 12,
+        },
+        {
+            "type": "table",
+            "table_caption": "Table 3 numeric",
+            "table_body": "<table><tr><td>0.038</td></tr></table>",
+        },
+    ]
+    content_path = (
+        corpus / "raw/fixture-source/ocr-mineru/page_content_list.json"
+    )
+    content_path.parent.mkdir(parents=True)
+    content_path.write_text(json.dumps(content), encoding="utf-8")
+
+    report = _run_gate(tmp_path, _document(), corpus=corpus)
+    issue = next(item for item in report.findings if item.check == "mineru-table")
+    assert "table 2" in issue.detail
+    assert [(item.table, item.numeric_cells) for item in report.tables] == [
+        ("table 3", 1)
+    ]
+
+    status = extract_gate.main(
+        [
+            str(tmp_path / "fixture-source.yaml"),
+            "--tree",
+            str(REPO_ROOT),
+            "--corpus",
+            str(corpus),
+        ]
+    )
+    output = capsys.readouterr().out
+    assert status == 1
+    assert "HARD mineru-table:" in output
+    assert "TABLE table 3:" in output
 
 
 def test_duplicate_source_identity_is_soft(tmp_path: Path):
@@ -1584,3 +1630,102 @@ def test_tree_import_refuses_missing_migrator_without_fallback(tmp_path: Path, c
     output = capsys.readouterr().out
     assert "HARD tree-import:" in output
     assert "simulator/battery/migrate.py" in output
+
+
+def test_numeric_table_cells_treats_absent_body_as_absence():
+    assert gate._numeric_table_cells(None) is None
+
+
+def test_numeric_table_cells_rejects_present_non_string_body():
+    with pytest.raises(ValueError, match="table body must be text") as exc:
+        gate._numeric_table_cells(12)
+    assert type(exc.value).__name__ == "ExtractTableParseError"
+
+
+def test_numeric_table_cells_rejects_parser_failure(monkeypatch):
+    def fail_feed(_self, _body):
+        raise RuntimeError("injected parser failure")
+
+    monkeypatch.setattr(gate._TableCellParser, "feed", fail_feed)
+
+    with pytest.raises(ValueError, match="failed to parse table body") as exc:
+        gate._numeric_table_cells("<table><tr><td>1</td></tr></table>")
+    assert type(exc.value).__name__ == "ExtractTableParseError"
+
+
+def test_numeric_table_cells_keeps_zero_for_parsed_table_without_numbers():
+    assert gate._numeric_table_cells(
+        "<table><tr><td>FeO</td><td>—</td></tr></table>"
+    ) == 0
+
+
+def test_known_species_ids_missing_manifest_stays_unavailable(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(validator, "U0_MANIFEST", tmp_path / "missing.yaml")
+
+    assert validator.load_known_species_ids() is None
+
+
+def test_known_species_ids_parse_failure_is_typed_validation_error(
+    tmp_path: Path, monkeypatch
+):
+    manifest = tmp_path / "manifest.yaml"
+    manifest.write_text("species: [", encoding="utf-8")
+    monkeypatch.setattr(validator, "U0_MANIFEST", manifest)
+
+    with pytest.raises(validator.ExtractValidationError) as exc:
+        validator.load_known_species_ids()
+
+    assert "failed to load" in exc.value.errors[0]
+    assert manifest.name in exc.value.errors[0]
+    assert str(manifest) not in exc.value.errors[0]
+
+
+def test_known_species_ids_rejects_non_mapping_manifest(
+    tmp_path: Path, monkeypatch
+):
+    manifest = tmp_path / "manifest.yaml"
+    manifest.write_text("[]\n", encoding="utf-8")
+    monkeypatch.setattr(validator, "U0_MANIFEST", manifest)
+
+    with pytest.raises(validator.ExtractValidationError) as exc:
+        validator.load_known_species_ids()
+    assert "expected a mapping" in exc.value.errors[0]
+    assert str(manifest) not in exc.value.errors[0]
+
+
+def test_known_species_ids_io_failure_is_typed_validation_error(
+    tmp_path: Path, monkeypatch
+):
+    manifest = tmp_path / "manifest.yaml"
+    manifest.write_text("species: []\n", encoding="utf-8")
+    monkeypatch.setattr(validator, "U0_MANIFEST", manifest)
+    original_read_text = Path.read_text
+
+    def fail_manifest_read(path: Path, *args, **kwargs):
+        if path == manifest:
+            raise OSError("injected manifest read failure")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_manifest_read)
+
+    with pytest.raises(validator.ExtractValidationError) as exc:
+        validator.load_known_species_ids()
+
+    assert "OSError" in exc.value.errors[0]
+    assert str(manifest) not in exc.value.errors[0]
+
+
+def test_validate_all_reports_manifest_load_failure(
+    tmp_path: Path, monkeypatch
+):
+    manifest = tmp_path / "manifest.yaml"
+    manifest.write_text("species: [", encoding="utf-8")
+    monkeypatch.setattr(validator, "U0_MANIFEST", manifest)
+
+    errors = validator.validate_all(
+        paths=[], check_priority=False, check_fidelity_policy=False
+    )
+
+    assert any("failed to load" in error for error in errors)

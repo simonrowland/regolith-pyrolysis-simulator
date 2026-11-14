@@ -212,6 +212,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_01_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_01
   identity:
@@ -242,6 +244,9 @@ observations:
         - - SiO2
           - '0.8211'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000030093975492762850189571130009138562964889991858144'
     total_pressure_Pa:
       tag: value
       value: '102844.875'
@@ -371,12 +376,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_01_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_01
   identity:
@@ -576,6 +584,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_02_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_02
   identity:
@@ -786,6 +796,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_02_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_02
   identity:
@@ -816,6 +828,9 @@ observations:
         - - SiO2
           - '0.8166'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000297392362480502746554351390932313318942022402544'
     total_pressure_Pa:
       tag: value
       value: '102236.925'
@@ -945,12 +960,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_02_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_02
   identity:
@@ -1150,6 +1168,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_03_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_03
   identity:
@@ -1360,6 +1380,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_03_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_03
   identity:
@@ -1390,6 +1412,9 @@ observations:
         - - SiO2
           - '0.7782'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000029094343436330757375770202877176697572375206254016'
     total_pressure_Pa:
       tag: value
       value: '101122.35'
@@ -1519,12 +1544,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_03_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_03
   identity:
@@ -1724,6 +1752,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_04_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_04
   identity:
@@ -1934,6 +1964,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_04_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_04
   identity:
@@ -1964,6 +1996,9 @@ observations:
         - - SiO2
           - '0.7248'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000029211070875549400442904853285719370369227757394471'
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -2093,12 +2128,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_04_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_04
   identity:
@@ -2298,6 +2336,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_05_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_05
   identity:
@@ -2508,6 +2548,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_05_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_05
   identity:
@@ -2538,6 +2580,9 @@ observations:
         - - SiO2
           - '0.7252'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000027882814271767348752095319595528126173869957325109'
     total_pressure_Pa:
       tag: value
       value: '98994.525'
@@ -2667,12 +2712,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_05_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_05
   identity:
@@ -2872,6 +2920,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_06_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_06
   identity:
@@ -3082,6 +3132,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_06_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_06
   identity:
@@ -3112,6 +3164,9 @@ observations:
         - - SiO2
           - '0.6906'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000029503911861076759237823391063435647829482026936384'
     total_pressure_Pa:
       tag: value
       value: '101831.625'
@@ -3241,12 +3296,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_06_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_06
   identity:
@@ -3446,6 +3504,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_07_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_07
   identity:
@@ -3656,6 +3716,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_07_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_07
   identity:
@@ -3686,6 +3748,9 @@ observations:
         - - SiO2
           - '0.6941'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000029562655324607500459187264381460677225161940778609'
     total_pressure_Pa:
       tag: value
       value: '101932.95'
@@ -3815,12 +3880,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_07_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_07
   identity:
@@ -4020,6 +4088,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_08_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_08
   identity:
@@ -4230,6 +4300,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_08_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_08
   identity:
@@ -4260,6 +4332,9 @@ observations:
         - - SiO2
           - '0.6482'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000028571961855863267574692223209916033325931826818103'
     total_pressure_Pa:
       tag: value
       value: '100210.425'
@@ -4389,12 +4464,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_08_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_08
   identity:
@@ -4594,6 +4672,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_09_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_09
   identity:
@@ -4804,6 +4884,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_09_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_09
   identity:
@@ -4834,6 +4916,9 @@ observations:
         - - SiO2
           - '0.6512'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000028226336465263738648707086243335835304229761822646'
     total_pressure_Pa:
       tag: value
       value: '99602.475'
@@ -4963,12 +5048,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_09_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_09
   identity:
@@ -5168,6 +5256,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_10_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_10
   identity:
@@ -5378,6 +5468,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_10_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_10
   identity:
@@ -5408,6 +5500,9 @@ observations:
         - - SiO2
           - '0.6511'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000028456519703763053421901650029258070673582096612718'
     total_pressure_Pa:
       tag: value
       value: '100007.775'
@@ -5537,12 +5632,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_10_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_10
   identity:
@@ -5742,6 +5840,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_11_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_11
   identity:
@@ -5952,6 +6052,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_11_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_11
   identity:
@@ -5982,6 +6084,9 @@ observations:
         - - SiO2
           - '0.6289'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000028283794641676023128763000569831801355830023339441'
     total_pressure_Pa:
       tag: value
       value: '99703.8'
@@ -6111,12 +6216,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_11_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_11
   identity:
@@ -6316,6 +6424,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_12_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_12
   identity:
@@ -6526,6 +6636,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_12_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_12
   identity:
@@ -6556,6 +6668,9 @@ observations:
         - - SiO2
           - '0.6326'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000029562655324607500459187264381460677225161940778609'
     total_pressure_Pa:
       tag: value
       value: '101932.95'
@@ -6685,12 +6800,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_12_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_12
   identity:
@@ -6890,6 +7008,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_13_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_13
   identity:
@@ -7100,6 +7220,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_13_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_13
   identity:
@@ -7130,6 +7252,9 @@ observations:
         - - SiO2
           - '0.5937'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000029386600200440560712815388844950113522000030324757'
     total_pressure_Pa:
       tag: value
       value: '101628.975'
@@ -7259,12 +7384,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_13_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_13
   identity:
@@ -7464,6 +7592,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_14_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_14
   identity:
@@ -7674,6 +7804,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_14_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_14
   identity:
@@ -7704,6 +7836,9 @@ observations:
         - - SiO2
           - '0.5871'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000028977849685679049853162612724326353201351604775467'
     total_pressure_Pa:
       tag: value
       value: '100919.7'
@@ -7833,12 +7968,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_14_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_14
   identity:
@@ -8038,6 +8176,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_15_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_15
   identity:
@@ -8248,6 +8388,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_15_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_15
   identity:
@@ -8278,6 +8420,9 @@ observations:
         - - SiO2
           - '0.5354'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000029386600200440560712815388844950113522000030324757'
     total_pressure_Pa:
       tag: value
       value: '101628.975'
@@ -8407,12 +8552,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_15_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_15
   identity:
@@ -8612,6 +8760,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_16_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_16
   identity:
@@ -8822,6 +8972,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_16_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_16
   identity:
@@ -8852,6 +9004,9 @@ observations:
         - - SiO2
           - '0.776'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0001893347728251143248264278242743381420339669272713'
     total_pressure_Pa:
       tag: value
       value: '99399.825'
@@ -8981,12 +9136,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_16_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_16
   identity:
@@ -9186,6 +9344,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_17_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_17
   identity:
@@ -9396,6 +9556,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_17_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_17
   identity:
@@ -9426,6 +9588,9 @@ observations:
         - - SiO2
           - '0.7804'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019595369208946117925859425183283253626071239249948'
     total_pressure_Pa:
       tag: value
       value: '101122.35'
@@ -9555,12 +9720,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_17_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_17
   identity:
@@ -9760,6 +9928,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_18_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_18
   identity:
@@ -9970,6 +10140,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_18_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_18
   identity:
@@ -10000,6 +10172,9 @@ observations:
         - - SiO2
           - '0.7767'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019243539309102689910610723572223382965801616943276'
     total_pressure_Pa:
       tag: value
       value: '100210.425'
@@ -10129,12 +10304,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_18_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_18
   identity:
@@ -10334,6 +10512,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_19_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_19
   identity:
@@ -10544,6 +10724,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_19_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_19
   identity:
@@ -10574,6 +10756,9 @@ observations:
         - - SiO2
           - '0.7736'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019321448295479730032868356223589190492150272374248'
     total_pressure_Pa:
       tag: value
       value: '100413.075'
@@ -10703,12 +10888,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_19_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_19
   identity:
@@ -10908,6 +11096,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_20_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_20
   identity:
@@ -11118,6 +11308,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_20_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_20
   identity:
@@ -11148,6 +11340,9 @@ observations:
         - - SiO2
           - '0.7753'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019321448295479730032868356223589190492150272374248'
     total_pressure_Pa:
       tag: value
       value: '100413.075'
@@ -11277,12 +11472,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_20_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_20
   identity:
@@ -11482,6 +11680,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_21_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_21
   identity:
@@ -11692,6 +11892,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_21_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_21
   identity:
@@ -11722,6 +11924,9 @@ observations:
         - - SiO2
           - '0.7782'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019595369208946117925859425183283253626071239249948'
     total_pressure_Pa:
       tag: value
       value: '101122.35'
@@ -11851,12 +12056,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_21_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_21
   identity:
@@ -12056,6 +12264,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_22_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_22
   identity:
@@ -12266,6 +12476,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_22_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_22
   identity:
@@ -12296,6 +12508,9 @@ observations:
         - - SiO2
           - '0.7253'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019282474128304724575971565480795939570240505905886'
     total_pressure_Pa:
       tag: value
       value: '100311.75'
@@ -12425,12 +12640,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_22_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_22
   identity:
@@ -12630,6 +12848,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_23_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_23
   identity:
@@ -12840,6 +13060,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_23_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_23
   identity:
@@ -12870,6 +13092,9 @@ observations:
         - - SiO2
           - '0.7187'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019282474128304724575971565480795939570240505905886'
     total_pressure_Pa:
       tag: value
       value: '100311.75'
@@ -12999,12 +13224,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_23_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_23
   identity:
@@ -13204,6 +13432,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_24_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_24
   identity:
@@ -13414,6 +13644,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_24_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_24
   identity:
@@ -13444,6 +13676,9 @@ observations:
         - - SiO2
           - '0.7207'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019399514673748403335068183488985157956403210243388'
     total_pressure_Pa:
       tag: value
       value: '100615.725'
@@ -13573,12 +13808,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_24_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_24
   identity:
@@ -13778,6 +14016,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_25_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_25
   identity:
@@ -13988,6 +14228,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_25_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_25
   identity:
@@ -14018,6 +14260,9 @@ observations:
         - - SiO2
           - '0.6816'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019282474128304724575971565480795939570240505905886'
     total_pressure_Pa:
       tag: value
       value: '100311.75'
@@ -14147,12 +14392,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_25_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_25
   identity:
@@ -14352,6 +14600,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_26_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_26
   identity:
@@ -14562,6 +14812,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_26_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_26
   identity:
@@ -14592,6 +14844,9 @@ observations:
         - - SiO2
           - '0.6836'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019360461810627571850252720734184569373506137066988'
     total_pressure_Pa:
       tag: value
       value: '100514.4'
@@ -14721,12 +14976,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_26_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_26
   identity:
@@ -14926,6 +15184,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_27_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_27
   identity:
@@ -15136,6 +15396,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_27_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_27
   identity:
@@ -15166,6 +15428,9 @@ observations:
         - - SiO2
           - '0.6791'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019282474128304724575971565480795939570240505905886'
     total_pressure_Pa:
       tag: value
       value: '100311.75'
@@ -15295,12 +15560,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_27_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_27
   identity:
@@ -15500,6 +15768,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_28_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_28
   identity:
@@ -15710,6 +15980,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_28_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_28
   identity:
@@ -15740,6 +16012,9 @@ observations:
         - - SiO2
           - '0.6431'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019321448295479730032868356223589190492150272374248'
     total_pressure_Pa:
       tag: value
       value: '100413.075'
@@ -15869,12 +16144,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_28_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_28
   identity:
@@ -16074,6 +16352,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_29_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_29
   identity:
@@ -16284,6 +16564,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_29_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_29
   identity:
@@ -16314,6 +16596,9 @@ observations:
         - - SiO2
           - '0.6414'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019360461810627571850252720734184569373506137066988'
     total_pressure_Pa:
       tag: value
       value: '100514.4'
@@ -16443,12 +16728,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_29_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_29
   identity:
@@ -16648,6 +16936,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_30_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_30
   identity:
@@ -16858,6 +17148,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_30_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_30
   identity:
@@ -16888,6 +17180,9 @@ observations:
         - - SiO2
           - '0.6391'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019752761100616775353889435999955554053154845108512'
     total_pressure_Pa:
       tag: value
       value: '101527.65'
@@ -17017,12 +17312,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_30_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_30
   identity:
@@ -17222,6 +17520,8 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_31_activity_eq6
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_31
   identity:
@@ -17432,6 +17732,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_31_inputs
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_31
   identity:
@@ -17462,6 +17764,9 @@ observations:
         - - SiO2
           - '0.5934'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.00019792207443466721922872322838760435500992671440872'
     total_pressure_Pa:
       tag: value
       value: '101628.975'
@@ -17591,12 +17896,15 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.total_pressure_Pa
     inputs:
     - pdf:rego-1985-na2o-sio2-transpiration
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: rego-1985-na2o-sio2-transpiration::rego_1985_table1_run_31_pna_eq4
   experiment_id: 10.1007/bf02679722::experiment::rego_1985_run_31
   identity:
@@ -17796,3 +18104,5 @@ observations:
     parameters: []
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: gas
