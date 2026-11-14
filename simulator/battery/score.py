@@ -215,6 +215,7 @@ from simulator.battery.score_report import (
     _condition_hull_lines,
     _e15_markdown_lines,
     _e15_number,
+    _score_shard_failure_report_lines,
     format_element_retention_diagnostics,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
@@ -23797,31 +23798,6 @@ def _render_score_report_from_payloads_legacy(
             + "\n"
         )
     return report
-
-
-def _score_shard_failure_report_lines(
-    failures: Sequence[Mapping[str, object]],
-) -> list[str]:
-    lines = [
-        "## Score shard failures",
-        "",
-        "Failed shards were completed with typed refusals for rows that had no output.",
-        "",
-        "| chunk | engine | refused rows | reason |",
-        "|---:|---|---:|---|",
-    ]
-    for failure in failures:
-        reason = (
-            str(failure.get("reason", ""))
-            .replace("|", "\\|")
-            .replace("`", "\\`")
-            .replace("\n", " ")
-        )
-        lines.append(
-            f"| {failure.get('chunk', '—')} | {failure.get('engine', '—')} | "
-            f"{failure.get('refused_rows', 0)} | `{reason}` |"
-        )
-    return lines
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:

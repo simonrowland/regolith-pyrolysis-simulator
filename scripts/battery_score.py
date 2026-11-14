@@ -46,7 +46,6 @@ from simulator.battery.pins import (  # noqa: E402
 )
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
-    _score_shard_failure_report_lines,
     _render_score_report_from_payloads_legacy,
     _ResidualJsonlRows,
     _count_residuals_jsonl,
@@ -72,6 +71,7 @@ from scripts.battery_cache_equivalence import (  # noqa: E402
     _studio_host,
 )
 from simulator.battery.score_report import (  # noqa: E402
+    _score_shard_failure_report_lines,
     format_nasa9_fit_comparison_stratum,
 )
 from simulator.battery.score_report_data import (  # noqa: E402
