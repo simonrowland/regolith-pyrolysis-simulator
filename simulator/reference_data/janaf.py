@@ -1579,11 +1579,15 @@ def _fusion_missing_gibbs_temperatures(table_id: str) -> tuple[Decimal, ...]:
     return tuple(sorted(missing))
 
 def _interpolate_formation_gibbs(
-    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+    points: tuple[tuple[Decimal, Decimal], ...],
+    temperature_K: Decimal,
+    missing_temperatures: tuple[Decimal, ...] = (),
 ) -> Decimal:
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
         raise ValueError(f"{temperature_K} K is outside the JANAF table range")
-    missing_node = _missing_node_for_interpolation(points, (), temperature_K)
+    missing_node = _missing_node_for_interpolation(
+        points, missing_temperatures, temperature_K
+    )
     if missing_node is not None:
         raise ValueError(
             f"JANAF formation Gibbs interpolation spans missing grid node "

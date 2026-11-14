@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+import pytest
+
 from simulator.battery.generators.janaf import (
     _interpolate_formation_gibbs,
     _janaf_gas_formation_gibbs_J_per_mol,
@@ -15,6 +17,17 @@ def test_mgo_janaf_fusion_gibbs_interpolation_numeric_pin() -> None:
     liquid = ((Decimal("1800"), Decimal("-317.447")), (Decimal("1900"), Decimal("-313.750")))
     assert _interpolate_formation_gibbs(solid, Decimal("1873")) == Decimal("-343.21262")
     assert _interpolate_formation_gibbs(liquid, Decimal("1873")) == Decimal("-314.74819")
+
+
+def test_janaf_interpolation_refuses_declared_missing_grid_node() -> None:
+    points = ((Decimal("300"), Decimal("-1")), (Decimal("400"), Decimal("-2")))
+
+    with pytest.raises(ValueError, match="missing grid node 350 K"):
+        _interpolate_formation_gibbs(
+            points,
+            Decimal("375"),
+            (Decimal("350"),),
+        )
 
 
 def test_mgo_janaf_fusion_enthalpy_uses_printed_3000_k_values() -> None:
