@@ -502,40 +502,105 @@ def test_direct_gas_couple_numeric_outputs_are_pinned_before_extension(polys):
     assert h2.log10_fO2 == pytest.approx(-4.956493206418616, abs=1e-12)
 
 
-def test_direct_couple_owner_combines_mix_precision_and_janaf_cea_spread(polys):
-    from simulator.chemistry.offgas_fo2 import _direct_gas_couple_fo2
+def test_wgs_solver_keeps_a_pinned_direct_couple_value_at_equilibrium(polys):
+    temperature_K = 1682.15
+    h2_moles = 10.0
+    h2o_moles = 2000.0
+    # Choose CO2/CO so the input Q equals the production CEA WGS K. The shift
+    # extent is zero and the result must retain the direct H2/H2O golden value.
+    gas = {
+        "H2": h2_moles,
+        "H2O": h2o_moles,
+        "CO": 1.0,
+        "CO2": (h2o_moles / h2_moles)
+        * 10.0 ** water_gas_shift_log10_K(polys, temperature_K),
+    }
+    result = imposed_fo2(gas, temperature_K, polys)
 
-    resolution = _direct_gas_couple_fo2(
-        {"CO2": 10200.0, "CO": 51.0},
-        {"CO2": 0.00696078431372549, "CO": 0.1196078431372549},
-        1682.15,
-        formation_gibbs_J_per_mol={
-            "CO2": -396340.2515,
-            "CO": -259266.75,
-            "O2": 0.0,
-        },
-        gas_constant_J_per_mol_K=8.31441,
-        polynomials=polys,
+    # Mutation: invert K_CO/K_H2 to K_H2/K_CO; this numeric pin fails.
+    assert result.extent_mol == pytest.approx(0.0, abs=1e-10)
+    assert result.log10_fO2 == pytest.approx(-4.956493206418616, abs=1e-12)
+
+
+def test_imposed_fo2_returns_the_ceajanaf_wgs_source_spread(polys):
+    from decimal import Decimal
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
     )
 
-    assert resolution.log10_fO2 == pytest.approx(-3.908000708059973, abs=1e-12)
-    assert resolution.thermo_spread_dex == pytest.approx(0.0027241502, abs=1e-9)
-    assert resolution.band_dex == pytest.approx(0.109969859183496, abs=1e-9)
-    assert resolution.authority == "certified"
+    temperature_K = 1682.15
+    gas = {"CO2": 0.22, "CO": 1.4, "H2O": 0.35, "H2": 2.0}
+    janaf_gibbs = {
+        formula: float(
+            _janaf_gas_formation_gibbs_J_per_mol(
+                formula, Decimal(str(temperature_K))
+            )
+        )
+        for formula in ("CO2", "CO", "H2O", "H2", "O2")
+    }
 
-
-def test_direct_couple_outside_cea_domain_is_flagged_extrapolated(polys):
-    from simulator.chemistry.offgas_fo2 import _direct_gas_couple_fo2
-
-    resolution = _direct_gas_couple_fo2(
-        {"CO2": 2.0, "CO": 1.0},
-        {"CO2": 0.01, "CO": 0.01},
-        20001.0,
-        polynomials=polys,
+    cea = imposed_fo2(gas, temperature_K, polys)
+    result = imposed_fo2(
+        gas,
+        temperature_K,
+        polys,
+        janaf_formation_gibbs_J_per_mol=janaf_gibbs,
+        janaf_gas_constant_J_per_mol_K=float(JANAF_R_J_PER_MOL_K),
     )
 
-    assert math.isfinite(resolution.log10_fO2)
-    assert resolution.authority == "extrapolated"
+    # Mutation: remove or halve the full source-spread band; these assertions fail.
+    assert result.log10_fO2 == pytest.approx(cea.log10_fO2, abs=1e-12)
+    assert result.uncertainty_band_dex is not None
+    assert result.uncertainty_band_dex == pytest.approx(0.0004895351, abs=2e-9)
+    assert result.as_dict()["uncertainty_band_dex"] == result.uncertainty_band_dex
+
+
+def test_non_wgs_result_omits_the_optional_source_band(polys):
+    result = imposed_fo2({"H2O": 2000.0, "H2": 10.0}, 1682.15, polys)
+
+    # Mutation: serialize a fabricated zero band when no WGS comparison ran.
+    assert result.uncertainty_band_dex is None
+    assert "uncertainty_band_dex" not in result.as_dict()
+
+
+def test_full_element_balance_keeps_free_oxygen_and_co2_limit(polys):
+    from decimal import Decimal
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
+    )
+    from simulator.chemistry.offgas_fo2 import _full_element_balance_fo2
+
+    temperature = Decimal("2173.15")
+    gibbs = {
+        formula: float(_janaf_gas_formation_gibbs_J_per_mol(formula, temperature))
+        for formula in ("CO", "CO2", "H2", "H2O", "O2")
+    }
+    pure = _full_element_balance_fo2(
+        {"CO2": 0.08, "AR": 0.92}, float(temperature), gibbs,
+        float(JANAF_R_J_PER_MOL_K), initial_total_pressure_bar=1.0,
+    )
+    mixture = _full_element_balance_fo2(
+        {"CO2": 0.0792, "H2": 0.0008, "AR": 0.92},
+        float(temperature), gibbs, float(JANAF_R_J_PER_MOL_K),
+        initial_total_pressure_bar=1.0,
+    )
+
+    # NIST-JANAF full balance reproduces the independent Sossi limit check.
+    assert pure.log10_fO2 == pytest.approx(-2.46, abs=0.08)
+    assert mixture.log10_fO2 == pytest.approx(-2.50, abs=0.08)
+    assert mixture.log10_fO2 < pure.log10_fO2
+    # Mutation: dropping 2*pO2 from the oxygen balance leaves exactly the free
+    # oxygen inventory unaccounted for on this real-ratio composition.
+    oxygen_initial = 2 * 0.0792
+    eq = mixture.equilibrium_partial_pressures_bar
+    complete = 2 * eq["CO2"] + eq["CO"] + eq["H2O"] + 2 * eq["O2"]
+    dropped_o2 = 2 * eq["CO2"] + eq["CO"] + eq["H2O"]
+    assert complete == pytest.approx(oxygen_initial, abs=1e-12)
+    assert abs(dropped_o2 - oxygen_initial) > 1e-4
 
 
 def test_non_finite_and_negative_amounts_are_not_treated_as_present(polys):
