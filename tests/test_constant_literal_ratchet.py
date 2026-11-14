@@ -33,7 +33,7 @@ CEILINGS = {
     "gas": 0,
     "bar": 0,
     "atm": 0,
-    "celsius": 86,
+    "celsius": 82,
 }
 
 # path, bare numeric text, family, allowed count, reason
