@@ -4,7 +4,7 @@ import copy
 import hashlib
 import json
 import math
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from decimal import Decimal
 from pathlib import Path
 from types import MappingProxyType
@@ -358,9 +358,20 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned(monkeypatch) -> Non
     selected_experiment_ids = frozenset(
         observation.experiment_id for observation in references
     )
+    experiment_id_by_short_name = {
+        experiment_id.rsplit("::experiment::", 1)[-1]: experiment_id
+        for experiment_id in context.experiments
+    }
+    scorer_cohort = tuple(
+        replace(
+            row,
+            experiment_id=experiment_id_by_short_name[row.experiment_id],
+        )
+        for row in cohort
+    )
     monkeypatch.setattr(
         "simulator.battery.residue._predict_hashimoto_residue_cohort",
-        lambda *_args, **_kwargs: cohort,
+        lambda *_args, **_kwargs: scorer_cohort,
     )
     cache = {}
     scored_records = []
