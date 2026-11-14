@@ -915,7 +915,7 @@ def _build_cost_rollup_diagnostic(
     pumping_context: Mapping[str, Any] | None = None,
     snapshots: tuple[Any, ...] = (),
 ) -> dict[str, Any]:
-    per_hour = _per_hour_with_snapshot_electrical_breakdown(per_hour, snapshots)
+    per_hour = _per_hour_with_snapshot_cost_inputs(per_hour, snapshots)
     summary = cost_ledger.summary()
     furnace_input = _run_furnace_input_cost(per_hour)
     pumping_enabled = isinstance(pumping_context, Mapping)
@@ -1115,12 +1115,16 @@ def _run_furnace_input_cost(per_hour: tuple[dict[str, Any], ...]) -> CostVector:
         temperature_C = _finite(row.get("T_C"), default=math.nan)
         if not math.isfinite(temperature_C):
             continue
-        thermal_flux_h += furnace_thermal_flux_hours(temperature_C, 1.0)
-        furnace_h += 1.0
+        duration_h = coerce_nonnegative_hours(row.get("_duration_h", 1.0))
+        # Furnace occupancy integrates exposure, and K*h integrates absolute
+        # temperature over that exposure. Four .25 h samples at 1000 C give
+        # 1 furnace-h and 1273.15 K*h, exactly one reference-hour sample.
+        thermal_flux_h += furnace_thermal_flux_hours(temperature_C, duration_h)
+        furnace_h += duration_h
     return CostVector(thermal_flux_h=thermal_flux_h, furnace_h=furnace_h)
 
 
-def _per_hour_with_snapshot_electrical_breakdown(
+def _per_hour_with_snapshot_cost_inputs(
     per_hour: tuple[dict[str, Any], ...],
     snapshots: tuple[Any, ...],
 ) -> tuple[dict[str, Any], ...]:
@@ -1142,13 +1146,18 @@ def _per_hour_with_snapshot_electrical_breakdown(
             rows.append(row)
             continue
         augmented = dict(row)
+        snapshot = _snapshot_for_per_hour_row(
+            augmented,
+            index,
+            snapshot_rows,
+            snapshots_by_hour,
+        )
+        # Internal cost input only: ordinary summary rows keep their public
+        # schema. Legacy hourly rows without snapshots retain a 1 h exposure.
+        augmented["_duration_h"] = coerce_nonnegative_hours(
+            getattr(snapshot, "duration_h", 1.0)
+        )
         if not any(field in augmented for field in _AUXILIARY_ELECTRICAL_BREAKDOWN_FIELDS):
-            snapshot = _snapshot_for_per_hour_row(
-                augmented,
-                index,
-                snapshot_rows,
-                snapshots_by_hour,
-            )
             breakdown = _electrical_breakdown_from_snapshot(snapshot)
             if breakdown is not None:
                 augmented["energy_electrical_breakdown_kWh"] = breakdown
