@@ -265,3 +265,37 @@ def test_reverting_to_hourly_step_breaks_unchanged_exact_stop(monkeypatch):
     monkeypatch.setattr(PyrolysisSimulator, "step", hourly_only)
     with pytest.raises(AssertionError):
         test_exact_stop_uses_physical_elapsed_time(77.4, "helper")
+
+
+def test_c6_subhour_ramp_dispatch_and_hold_use_the_same_sample(monkeypatch):
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule
+
+    schedule = dynamic_lab_schedule()
+    schedule.pop("surface_temperature_C")
+    schedule["melt_temperature_C"] = [
+        {"t_h": 0.0, "value": 1200.0, "unit": "C"},
+        {"t_h": 2.0, "value": 1400.0, "unit": "C"},
+    ]
+    session = _run(campaign="C6", hours=0.25, dt_hr=0.25, lab_schedule=schedule)._start_session()
+    sim = session.simulator
+    sim.melt.temperature_C = 1200.0
+    comparisons = []
+    dispatch_temperatures = []
+    predicate = sim.campaign_mgr.c6_at_hold_target
+    thermite = sim._step_thermite
+
+    def compare(target, temperature):
+        comparisons.append((target, temperature))
+        return predicate(target, temperature)
+
+    def dispatch():
+        dispatch_temperatures.append(sim.melt.temperature_C)
+        return thermite()
+
+    monkeypatch.setattr(sim.campaign_mgr, "c6_at_hold_target", compare)
+    monkeypatch.setattr(sim, "_step_thermite", dispatch)
+    snapshot = session.advance(dt_hr=0.25).snapshot
+    assert snapshot.temperature_C == 1225.0
+    assert comparisons[0] == (1225.0, 1225.0)
+    assert dispatch_temperatures == [1225.0]
+    assert snapshot.c6_at_hold_target is True
