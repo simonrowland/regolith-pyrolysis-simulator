@@ -17,7 +17,7 @@ SOURCE_COUNTS = {
     "doyle-1989-tio2-feo-activity-magma": 167,
 }
 TEMPERATURE_CONDITION = {
-    "distin-1971-ferrous-silicate-melts": "T_C",
+    "distin-1971-ferrous-silicate-melts": "temperature_K",
     "roeder-1974-iron-activity-olivine-basaltic-liquids": "T_C",
     "doyle-1988-feo-activity-multicomponent-magma": "temperature_K",
     "doyle-1989-tio2-feo-activity-magma": "T_K",
