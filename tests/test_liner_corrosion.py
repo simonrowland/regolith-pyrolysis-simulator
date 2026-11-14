@@ -502,6 +502,11 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
     lo, hi = segment_state["campaigns_to_runaway"]
     assert isinstance(lo, int) and isinstance(hi, int)
     assert lo <= hi
+    # The fixture onset is 0.1 wt% Na2O. For a new liner the reacted mass is
+    # 1000*pi*0.12*1.0*0.001 kg, so the closed-form Na threshold is
+    # m0*(0.001/0.999)/(M(Na2O)/(2*M(Na))) ~= 2.8e-4 kg. With the measured
+    # inert increment 1e-4 kg/campaign, the independent minimum is N=3.
+    assert hi == 3
     assert run_metadata["liner_state"] == state
     assert segment_state["deposit_inert_kg_by_species"] == {"Na": 1.0e-4}
     assert segment_state["deposit_reactive_kg_by_species"]["Na"] >= 1.0e-4
