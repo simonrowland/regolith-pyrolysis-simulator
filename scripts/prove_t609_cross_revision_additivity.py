@@ -10,12 +10,9 @@ catalog additions cannot change the historic t-609 subject.
 from __future__ import annotations
 
 import argparse
-import ast
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
-import dis
 from enum import Enum
-from functools import lru_cache
 import hashlib
 import inspect
 import json
@@ -24,7 +21,6 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-from types import CodeType
 from typing import Any
 
 import yaml
@@ -52,226 +48,7 @@ def _sha256_file(path: Path) -> str:
     return _sha256_bytes(path.read_bytes())
 
 
-def _global_writes(code: CodeType) -> frozenset[str]:
-    writes: set[str] = set()
-    pending = [code]
-    while pending:
-        current = pending.pop()
-        for instruction in dis.get_instructions(current):
-            if instruction.opname in {"STORE_GLOBAL", "DELETE_GLOBAL"}:
-                writes.add(instruction.argval)
-        pending.extend(
-            value for value in current.co_consts if isinstance(value, CodeType)
-        )
-    return frozenset(writes)
-
-
-_PHYSICAL_CONSTANTS_MODULE = "simulator.physical_constants"
-_OPAQUE_GLOBAL_MUTATION_NAMES = frozenset(
-    {"globals", "vars", "exec", "eval", "compile", "setattr", "delattr"}
-)
-
-
-@lru_cache(maxsize=None)
-def _module_owned_constant_imports(
-    source_path: str, modified_ns: int, size: int
-) -> frozenset[str]:
-    """Return imported physical constants with no static module rebinding."""
-    del modified_ns, size  # They form the cache key and invalidate edited files.
-    try:
-        source = Path(source_path).read_text(encoding="utf-8")
-        tree = ast.parse(source, filename=source_path)
-    except (OSError, SyntaxError, UnicodeError):
-        return frozenset()
-
-    imported: set[str] = set()
-    rebound: set[str] = set()
-    opaque_namespace_access = False
-    importlib_names = {"importlib"}
-    importlib_reload_names: set[str] = set()
-
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                if alias.name == "importlib":
-                    importlib_names.add(alias.asname or "importlib")
-                elif alias.name == "importlib.reload":
-                    importlib_reload_names.add(alias.asname or "reload")
-        elif isinstance(node, ast.ImportFrom) and node.module == "importlib":
-            for alias in node.names:
-                if alias.name == "reload":
-                    importlib_reload_names.add(alias.asname or alias.name)
-
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Name):
-            if node.id in _OPAQUE_GLOBAL_MUTATION_NAMES or node.id == "__dict__":
-                opaque_namespace_access = True
-            if node.id in importlib_reload_names:
-                opaque_namespace_access = True
-            if isinstance(node.ctx, (ast.Store, ast.Del)):
-                rebound.add(node.id)
-        elif isinstance(node, ast.Constant) and node.value == "__dict__":
-            opaque_namespace_access = True
-        elif isinstance(node, ast.Attribute):
-            if node.attr == "__dict__":
-                opaque_namespace_access = True
-            root = node
-            while isinstance(root, ast.Attribute):
-                root = root.value
-            if node.attr == "reload" and isinstance(root, ast.Name):
-                if root.id in importlib_names:
-                    opaque_namespace_access = True
-        elif isinstance(node, (ast.Global, ast.Nonlocal)):
-            rebound.update(node.names)
-        elif isinstance(node, ast.ExceptHandler) and node.name is not None:
-            rebound.add(node.name)
-        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-            rebound.add(node.name)
-        elif isinstance(node, ast.Import):
-            for alias in node.names:
-                bound_name = alias.asname or alias.name.split(".", 1)[0]
-                rebound.add(bound_name)
-        elif isinstance(node, ast.ImportFrom):
-            if any(alias.name == "*" for alias in node.names):
-                # A star import could bind any of the names we are proving.
-                return frozenset()
-            for alias in node.names:
-                bound_name = alias.asname or alias.name
-                if (
-                    node.module == _PHYSICAL_CONSTANTS_MODULE
-                    and node.level == 0
-                    and alias.asname is None
-                ):
-                    imported.add(alias.name)
-                else:
-                    # This also rejects importing the owner value under an
-                    # alias, or binding the candidate name from another owner.
-                    rebound.add(bound_name)
-                    rebound.add(alias.name)
-
-    if opaque_namespace_access:
-        return frozenset()
-    return frozenset(imported - rebound)
-
-
-def _stable_owned_global_names(
-    global_namespace: Mapping[str, Any],
-) -> frozenset[str]:
-    """Return owner globals proven stable by their importing module source."""
-    module_name = global_namespace.get("__name__")
-    module = sys.modules.get(module_name) if isinstance(module_name, str) else None
-    if module is None or vars(module) is not global_namespace:
-        return frozenset()
-
-    filename = global_namespace.get("__file__")
-    if not isinstance(filename, str):
-        return frozenset()
-    try:
-        source_path = Path(filename).resolve(strict=True)
-        if not source_path.is_file():
-            return frozenset()
-        stat = source_path.stat()
-    except (OSError, RuntimeError, ValueError):
-        return frozenset()
-
-    owner = sys.modules.get(_PHYSICAL_CONSTANTS_MODULE)
-    if owner is None:
-        return frozenset()
-    owner_values = vars(owner)
-    stable_imports = _module_owned_constant_imports(
-        str(source_path), stat.st_mtime_ns, stat.st_size
-    )
-    return frozenset(
-        name
-        for name in stable_imports
-        if type(global_namespace.get(name)) in (int, float)
-        and global_namespace.get(name) is owner_values.get(name)
-    )
-
-
-def _canonical_code(
-    code: CodeType,
-    global_namespace: Mapping[str, Any] | None = None,
-    written_globals: frozenset[str] | None = None,
-    stable_owned_globals: frozenset[str] = frozenset(),
-) -> dict[str, Any]:
-    """Fingerprint instructions, normalizing only proven-stable owner globals.
-
-    Replacing a load with a constant is valid only when all four conditions
-    hold: (1) it is ``LOAD_GLOBAL``, since class-local ``LOAD_NAME`` and
-    closure loads have different lookup rules; (2) the globals belong to a
-    loaded module with a resolvable source file, whose whole AST binds the
-    name only through ``from simulator.physical_constants import NAME`` and
-    never assigns, deletes, or declares it in any scope, so sibling functions
-    and other scopes cannot rebind it; (3) that source has no ``globals()``,
-    ``vars()``, ``exec``, ``eval``, ``compile``, ``__dict__``, ``setattr``,
-    ``delattr``, or ``importlib.reload`` use, because those make writes opaque
-    to the AST scan; and (4) at canonicalization time the globals binding is
-    the identical owner object with exact type ``int`` or ``float`` (not
-    ``bool``), while ``tests/test_physical_constant_ownership.py`` pins that
-    owner binding against runtime rebinding. Under these premises the load
-    yields the same numeric value as the literal on every input. The exact
-    finite evaluation grid is supporting evidence, not the proof of
-    equivalence. Jump destinations use instruction indexes because inline
-    cache slots shift byte offsets without changing control flow.
-    """
-    if written_globals is None:
-        written_globals = _global_writes(code)
-    jump_opcodes = set(dis.hasjabs) | set(dis.hasjrel)
-    decoded = tuple(dis.get_instructions(code))
-    offset_to_index = {
-        instruction.offset: index for index, instruction in enumerate(decoded)
-    }
-    instructions = []
-    for instruction in decoded:
-        argument = instruction.argval
-        if instruction.opcode in jump_opcodes:
-            argument = ("TARGET", offset_to_index[argument])
-
-        if instruction.opname == "LOAD_CONST":
-            instructions.append(
-                ("CONST", _canonical(argument, global_namespace, written_globals))
-            )
-            continue
-
-        if instruction.opname == "LOAD_GLOBAL" and global_namespace is not None:
-            name = instruction.argval
-            value = global_namespace.get(name)
-            if (
-                name in stable_owned_globals
-                and name not in written_globals
-            ):
-                instructions.append(
-                    ("CONST", _canonical(value, global_namespace, written_globals))
-                )
-                continue
-
-        instructions.append(
-            (
-                instruction.opname,
-                _canonical(argument, global_namespace, written_globals),
-            )
-        )
-
-    return {
-        "argcount": code.co_argcount,
-        "posonlyargcount": code.co_posonlyargcount,
-        "kwonlyargcount": code.co_kwonlyargcount,
-        "nlocals": code.co_nlocals,
-        "stacksize": code.co_stacksize,
-        "flags": code.co_flags,
-        "instructions": instructions,
-        "varnames": list(code.co_varnames),
-        "freevars": list(code.co_freevars),
-        "cellvars": list(code.co_cellvars),
-    }
-
-
-def _canonical(
-    value: Any,
-    global_namespace: Mapping[str, Any] | None = None,
-    written_globals: frozenset[str] | None = None,
-) -> Any:
+def _canonical(value: Any) -> Any:
     """Return an exact, JSON-safe representation of compiled values."""
 
     if isinstance(value, Enum):
@@ -284,25 +61,12 @@ def _canonical(
         return value
     if isinstance(value, float):
         return {"__float_hex__": value.hex()}
-    if isinstance(value, CodeType):
-        return {
-            "__code__": _canonical_code(
-                value,
-                global_namespace,
-                written_globals,
-                _stable_owned_global_names(global_namespace)
-                if global_namespace is not None
-                else frozenset(),
-            )
-        }
     if is_dataclass(value) and not isinstance(value, type):
         cls = type(value)
         return {
             "__dataclass__": f"{cls.__module__}.{cls.__qualname__}",
             "fields": {
-                field.name: _canonical(
-                    getattr(value, field.name), global_namespace, written_globals
-                )
+                field.name: _canonical(getattr(value, field.name))
                 for field in fields(value)
             },
         }
@@ -310,28 +74,18 @@ def _canonical(
         return {
             "__mapping__": [
                 [
-                    _canonical(key, global_namespace, written_globals),
-                    _canonical(item, global_namespace, written_globals),
+                    _canonical(key),
+                    _canonical(item),
                 ]
                 for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
             ]
         }
     if isinstance(value, tuple):
-        return {
-            "__tuple__": [
-                _canonical(item, global_namespace, written_globals) for item in value
-            ]
-        }
+        return {"__tuple__": [_canonical(item) for item in value]}
     if isinstance(value, list):
-        return {
-            "__list__": [
-                _canonical(item, global_namespace, written_globals) for item in value
-            ]
-        }
+        return {"__list__": [_canonical(item) for item in value]}
     if isinstance(value, (set, frozenset)):
-        items = [
-            _canonical(item, global_namespace, written_globals) for item in value
-        ]
+        items = [_canonical(item) for item in value]
         items.sort(key=_canonical_json)
         return {"__set__": items, "frozen": isinstance(value, frozenset)}
     if isinstance(value, bytes):
@@ -345,26 +99,10 @@ def _canonical(
                 closure.append(_canonical(cell.cell_contents))
             except ValueError:
                 closure.append({"__empty_cell__": True})
-        written_globals = _global_writes(value.__code__)
-        stable_owned_globals = _stable_owned_global_names(value.__globals__)
         return {
             "__function__": f"{value.__module__}.{value.__qualname__}",
-            "code": _canonical_code(
-                value.__code__,
-                value.__globals__,
-                written_globals,
-                stable_owned_globals,
-            ),
-            "defaults": _canonical(
-                value.__defaults__,
-                value.__globals__,
-                written_globals,
-            ),
-            "kwdefaults": _canonical(
-                value.__kwdefaults__,
-                value.__globals__,
-                written_globals,
-            ),
+            "defaults": _canonical(value.__defaults__),
+            "kwdefaults": _canonical(value.__kwdefaults__),
             "closure": closure,
         }
     raise TypeError(
@@ -398,6 +136,78 @@ def _evaluation_or_exception(
             "args": _canonical(exc.args),
         }
     return {"kind": "evaluation", "value": _canonical(result)}
+
+
+def _evaluator_segment_ranges(evaluator: Any) -> tuple[tuple[float, float], ...]:
+    ranges: set[tuple[float, float]] = set()
+    pending = [evaluator]
+    seen: set[int] = set()
+    while pending:
+        value = pending.pop()
+        if value is None or isinstance(
+            value, (str, bytes, bool, int, float, Enum, Path)
+        ):
+            continue
+        identity = id(value)
+        if identity in seen:
+            continue
+        seen.add(identity)
+
+        if inspect.isfunction(value):
+            pending.extend(value.__defaults__ or ())
+            pending.extend((value.__kwdefaults__ or {}).values())
+            for cell in value.__closure__ or ():
+                try:
+                    pending.append(cell.cell_contents)
+                except ValueError:
+                    pass
+        elif is_dataclass(value) and not isinstance(value, type):
+            segments = getattr(value, "segments", None)
+            if segments is not None:
+                ranges.update(
+                    (float(segment.T_min_K), float(segment.T_max_K))
+                    for segment in segments
+                )
+            pending.extend(getattr(value, field.name) for field in fields(value))
+        elif isinstance(value, Mapping):
+            pending.extend(value.values())
+        elif isinstance(value, (tuple, list, set, frozenset)):
+            pending.extend(value)
+    return tuple(sorted(ranges))
+
+
+def _evaluation_temperatures(evaluator: Any) -> tuple[tuple[str, float], ...]:
+    """Build the per-species temperature grid from every evaluator segment.
+
+    Each distinct segment contributes both endpoints and its midpoint; shared
+    endpoints are sampled once. For segments [200, 1000] and [1000, 2000] K,
+    the grid is 200, 600, 1000, 1500, and 2000 K. When an evaluator has no
+    polynomial segments, retain its valid-range low, midpoint, and high.
+    Thermo polynomials are captured by the compiled evaluator's pressure
+    callable, so their dataclass and callable closure values are inspected.
+    """
+    ranges = _evaluator_segment_ranges(evaluator)
+    if not ranges:
+        low, high = evaluator.valid_temperature_K
+        return (("low", low), ("mid", 0.5 * (low + high)), ("high", high))
+
+    valid_low, valid_high = evaluator.valid_temperature_K
+    edges = sorted(
+        {valid_low, valid_high}
+        | {edge for low, high in ranges for edge in (low, high)}
+    )
+    points = [(edge, f"edge-{index}") for index, edge in enumerate(edges)]
+    points.extend(
+        (0.5 * (low + high), f"segment-{index}-mid")
+        for index, (low, high) in enumerate(ranges)
+    )
+    by_temperature: dict[float, str] = {}
+    for temperature_K, label in points:
+        by_temperature.setdefault(temperature_K, label)
+    return tuple(
+        (label, temperature_K)
+        for temperature_K, label in sorted(by_temperature.items())
+    )
 
 
 def _t583_receipt(payload: Mapping[str, Any], catalog: Any) -> dict[str, Any]:
@@ -466,14 +276,8 @@ def _build_snapshot(
         if evaluator is None:
             evaluations[species_id] = []
             continue
-        low, high = evaluator.valid_temperature_K
-        temperatures = (
-            ("low", low),
-            ("mid", 0.5 * (low + high)),
-            ("high", high),
-        )
         cases = []
-        for temperature_label, temperature_K in temperatures:
+        for temperature_label, temperature_K in _evaluation_temperatures(evaluator):
             for pO2_bar in PO2_GRID_BAR:
                 outcome = _evaluation_or_exception(evaluator, temperature_K, pO2_bar)
                 cases.append(
@@ -713,7 +517,11 @@ def _generate_evidence(
             "isolated_python_imports": True,
             "compiler_common_mode": False,
             "source_activity": 1.0,
-            "temperature_positions": ["low", "mid", "high"],
+            "temperature_positions": [
+                "all evaluator segment edges",
+                "each evaluator segment midpoint",
+                "valid-range low/mid/high when no segments",
+            ],
             "pO2_grid_bar": list(PO2_GRID_BAR),
             "comparison": (
                 "exact canonical dataclass values and exception/result values"
