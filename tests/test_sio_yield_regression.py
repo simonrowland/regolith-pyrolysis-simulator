@@ -791,7 +791,7 @@ def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     assert refusal["upstream_authority_status"] == "missing"
     assert refusal["authoritative_for_condensation"] is False
     assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
-    assert "authority_level" not in authority
+    assert authority["authority_level"] == "status_bearing"
     assert (route.condensed_for_species("SiO") + route.wall_deposit_by_species.get("SiO", 0.0)
             + route.remaining_by_species["SiO"]) == pytest.approx(1.0)
 
