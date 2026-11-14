@@ -111,6 +111,7 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+_SEGMENT_MULTIPLIER_RE = re.compile(r"\d+(?:\.\d+|/\d+)?")
 _PHASE_SUFFIX_RE = re.compile(
     r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
     r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
@@ -266,12 +267,13 @@ def atoms_parse_formula_else_janaf(
     Other exceptions propagate.
     """
 
+    cleaned = _clean_formula_text(formula)
     try:
-        parsed = parse_formula(formula)
+        parsed = parse_formula(cleaned)
     except AccountingError:
         from simulator.reference_data.janaf import formula_composition
 
-        return formula_composition(formula)
+        return formula_composition(cleaned)
     return tuple(
         sorted(
             (str(element), float(count))
@@ -584,10 +586,14 @@ def _declared_molar_mass(value: Mapping[str, Any]) -> float | None:
 
 def _clean_formula_text(formula: str) -> str:
     text = re.sub(r"\s+", "", str(formula).strip())
+    text = text.replace("•", "·")
     previous = None
     while text and previous != text:
         previous = text
         text = _PHASE_SUFFIX_RE.sub("", text)
+    text = re.sub(
+        r"(?<=[A-Za-z])\.(?=\d+(?:$|O(?:$|\d|[A-Z(])))", "0.", text
+    )
     return text
 
 
@@ -623,11 +629,11 @@ def _distinct_integer_elements(text: str) -> int | None:
 
 
 def _is_integer_compound_adduct(text: str) -> bool:
-    """True when every ASCII dot separates multi-element integer formulas.
+    """True when every ASCII dot separates oxygen-bearing integer formulas.
 
     Split on '.' and strip one leading integer multiplier from each part
     after the first. It is an adduct only if every part is an
-    integer-subscript formula with at least two distinct elements;
+    oxygen-bearing integer-subscript formula with at least two distinct elements;
     otherwise every dot is a decimal point. ``Al2O3.2SiO2.2H2O``,
     ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
     ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
@@ -645,6 +651,8 @@ def _is_integer_compound_adduct(text: str) -> bool:
         return False
     for index, part in enumerate(parts):
         body = part if index == 0 else _strip_one_leading_integer(part)
+        if "O" not in body:
+            return False
         count = _distinct_integer_elements(body)
         if count is None or count < 2:
             return False
@@ -666,7 +674,7 @@ def _split_formula_segments(formula: str) -> list[str]:
     five waters, and ``2Na2O·CaO·3SiO2`` is three oxides. An ASCII
     dot-string is an adduct only when splitting on '.' and stripping one
     leading integer from each part after the first leaves every part an
-    integer-subscript formula of at least two distinct elements;
+    oxygen-bearing integer-subscript formula of at least two distinct elements;
     otherwise every dot is a decimal point. ``Al2O3.2SiO2.2H2O``,
     ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
     ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
@@ -684,13 +692,23 @@ def _split_formula_segments(formula: str) -> list[str]:
 
 
 def _leading_multiplier(segment: str) -> tuple[float, str]:
-    match = _NUMBER_RE.match(segment)
+    match = _SEGMENT_MULTIPLIER_RE.match(segment)
     if match is None:
         return 1.0, segment
     body = segment[match.end() :]
     if not body:
         raise UnknownSpeciesError(f"formula segment {segment!r} has no body")
-    return float(match.group(0)), body
+    raw_multiplier = match.group(0)
+    if "/" in raw_multiplier:
+        numerator, denominator = raw_multiplier.split("/", 1)
+        if float(denominator) == 0.0:
+            raise AccountingError(f"formula multiplier must be positive in {segment!r}")
+        multiplier = float(numerator) / float(denominator)
+    else:
+        multiplier = float(raw_multiplier)
+    if multiplier <= 0.0:
+        raise AccountingError(f"formula multiplier must be positive in {segment!r}")
+    return multiplier, body
 
 
 def _close_enough(left: float, right: float, absolute: float, relative: float) -> bool:

@@ -1141,9 +1141,10 @@ def parse_species_formula(
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    established = formula_composition(formula)
-    if established is not None:
-        return established
+    if not any(separator in formula for separator in (".", "·", "•")):
+        established = formula_composition(formula)
+        if established is not None:
+            return established
 
     text = formula.strip()
     if text.startswith("$") and text.endswith("$"):
@@ -1152,7 +1153,6 @@ def parse_species_formula(
         return None
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
-    text = text.replace("•", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
     text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
     phase_labels = {
@@ -1211,80 +1211,16 @@ def parse_species_formula(
             return None
         text = text[: charge_annotation.start()]
 
-    if "·" in text:
-        hydrated: defaultdict[str, float] = defaultdict(float)
-        try:
-            from simulator.accounting.formulas import parse_formula
+    if any(separator in text for separator in (".", "·", "•")):
+        from simulator.accounting.formulas import atoms_parse_formula_else_janaf
 
-            # Parse each middle-dot segment separately so hydrate multipliers
-            # such as 1/2 and 6.5 do not collide with period splitting.
-            for segment in text.split("·"):
-                multiplier_match = re.match(
-                    r"^(\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", segment
-                )
-                multiplier = 1.0
-                body = segment
-                if multiplier_match is not None:
-                    number = multiplier_match.group(1)
-                    if "/" in number:
-                        numerator, denominator = number.split("/", 1)
-                        if int(denominator) == 0:
-                            return None
-                        multiplier = int(numerator) / int(denominator)
-                    else:
-                        multiplier = float(number)
-                    body = segment[multiplier_match.end() :]
-                if not body:
-                    return None
-                composition = formula_composition(body)
-                if composition is None:
-                    parsed_body = parse_formula(body, species=body).elements
-                    composition = tuple(
-                        sorted(
-                            (str(symbol), float(count))
-                            for symbol, count in parsed_body.items()
-                        )
-                    )
-                for symbol, count in composition:
-                    hydrated[symbol] += multiplier * count
-        except ValueError:
-            return None
-        return tuple(sorted(hydrated.items()))
+        parsed = atoms_parse_formula_else_janaf(text)
+        if parsed is not None:
+            return parsed
 
     parsed = formula_composition(text)
     if parsed is not None:
         return parsed
-    if "." in text:
-        # ASCII periods are used for both decimal subscripts and oxide adducts.
-        # Only treat them as adduct separators when every segment has oxygen;
-        # otherwise an OCR period between arbitrary formula-like fragments
-        # (for example, ``CaAl.SiCK``) would become a false stoichiometry.
-        adduct_segments = re.split(r"\.(?=\d*[A-Z])", text)
-        if len(adduct_segments) > 1 and all("O" in part for part in adduct_segments):
-            try:
-                from simulator.accounting.formulas import (
-                    parse_formula as accounting_parse_formula,
-                )
-
-                parsed_formula = accounting_parse_formula(text)
-            except ValueError:
-                return None
-            return tuple(
-                sorted(
-                    (str(symbol), float(count))
-                    for symbol, count in parsed_formula.elements.items()
-                )
-            )
-        # Published decimal subscripts may omit the leading zero.
-        normalized = re.sub(
-            r"(?<=[A-Za-z])\.(?=\d+(?:$|O(?:$|\d|[A-Z(])))", "0.", text
-        )
-        if normalized == text:
-            return None
-        text = normalized
-        parsed = formula_composition(text)
-        if parsed is not None:
-            return parsed
     try:
         from simulator.accounting.formulas import parse_formula
 
