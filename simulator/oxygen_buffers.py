@@ -402,7 +402,15 @@ def cco_log10_fO2_interval_for_pressure_range(
     temperature_K: float,
     pressure_bar_range: tuple[float, float],
 ) -> RedoxBufferInterval:
-    """Return an honest interval when overhead pressure is specified as a range."""
+    """Enclose the owner model over a pressure range at fixed temperature.
+
+    Evaluate both requested endpoints and each crossed model boundary. At a
+    boundary coincident with an interval endpoint, include only the one-sided
+    limit facing into the interval; a degenerate interval contains only its
+    point evaluation. Each one-sided limit is evaluated with its owning branch's
+    formula at the exact boundary pressure, not by shifting pressure with
+    ``nextafter``. The fit branch applies only inside its calibrated T range.
+    """
     temperature = _require_finite_positive(temperature_K, "temperature_K")
     if len(pressure_bar_range) != 2:
         raise ValueError("pressure_bar_range must contain exactly two endpoints")
@@ -418,26 +426,50 @@ def cco_log10_fO2_interval_for_pressure_range(
         else "ideal_gas_fallback"
         for validity in (low_validity, high_validity)
     }
+    temperature_in_fit_band = (
+        CCO_TEMPERATURE_RANGE_K[0]
+        <= temperature
+        <= CCO_TEMPERATURE_RANGE_K[1]
+    )
     for boundary_pressure in CCO_PRESSURE_RANGE_BAR:
-        if (
-            not low_p < boundary_pressure < high_p
-            or not CCO_TEMPERATURE_RANGE_K[0]
-            <= temperature
-            <= CCO_TEMPERATURE_RANGE_K[1]
-        ):
+        if not temperature_in_fit_band:
             continue
-        fit_value, _ = _cco_log10_fO2_and_validity(temperature, boundary_pressure)
-        values.append(fit_value)
-        values.append(_closed_co_log10_fO2_bar(temperature, boundary_pressure))
-        branches.update(
-            {CCO_IN_CALIBRATION_VALIDITY, "ideal_gas_fallback"}
-        )
+
+        if low_p < boundary_pressure < high_p:
+            interval_sides = ("below", "above")
+        elif low_p == boundary_pressure and low_p < high_p:
+            interval_sides = ("above",)
+        elif high_p == boundary_pressure and low_p < high_p:
+            interval_sides = ("below",)
+        else:
+            continue
+
+        for side in interval_sides:
+            fit_side = (
+                CCO_PRESSURE_RANGE_BAR[0] < boundary_pressure
+                if side == "below"
+                else boundary_pressure < CCO_PRESSURE_RANGE_BAR[1]
+            )
+            if fit_side:
+                boundary_value, validity = _cco_log10_fO2_and_validity(
+                    temperature, boundary_pressure
+                )
+                branches.add(validity)
+            else:
+                boundary_value = _closed_co_log10_fO2_bar(
+                    temperature, boundary_pressure
+                )
+                branches.add("ideal_gas_fallback")
+            values.append(boundary_value)
 
     reason = "pressure_range_not_certified_point"
     if "ideal_gas_fallback" in branches:
         reason = f"{reason}; {_cco_fit_out_of_band_validity()}"
+    branch_summary = ", ".join(sorted(branches))
     if len(branches) > 1:
-        reason = f"{reason}; mixed branches=[{', '.join(sorted(branches))}]"
+        reason = f"{reason}; mixed branches=[{branch_summary}]"
+    else:
+        reason = f"{reason}; branch=[{branch_summary}]"
     return RedoxBufferInterval(
         low_log10_fO2_bar=min(values),
         high_log10_fO2_bar=max(values),
