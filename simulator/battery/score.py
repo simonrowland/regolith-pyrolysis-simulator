@@ -18603,6 +18603,9 @@ class _PreparedScoreRun:
     observations: Mapping[str, Observation]
     origins: Mapping[str, str]
     live_context: ScoreContext
+    condensed_frame_diagnostics: Mapping[
+        tuple[str, str], dict[str, object]
+    ]
     point_observations_by_experiment: Mapping[str, tuple[Observation, ...]]
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]]
     ratchet_missing: bool
@@ -18769,6 +18772,7 @@ def _prepare_score_run(
         observations=observations,
         origins=origins,
         live_context=live_context,
+        condensed_frame_diagnostics=condensed_frame_diagnostics,
         point_observations_by_experiment=point_observations_by_experiment,
         table_index=table_index,
         ratchet_missing=ratchet_missing,
@@ -19099,7 +19103,9 @@ def _score_store_with_decisions(
                             point_observations=point_observations_by_experiment.get(
                                 point.experiment_id, ()
                             ),
-                            condensed_frame_diagnostics=condensed_frame_diagnostics,
+                            condensed_frame_diagnostics=(
+                                prepared.condensed_frame_diagnostics
+                            ),
                             fo2_mode=(
                                 Fo2Mode.SHARED_LADDER
                                 if intrinsic_redox_activity
@@ -19165,7 +19171,9 @@ def _score_store_with_decisions(
                                     point.experiment_id, ()
                                 ),
                                 predict=scoring_predict,
-                                condensed_frame_diagnostics=condensed_frame_diagnostics,
+                                condensed_frame_diagnostics=(
+                                    prepared.condensed_frame_diagnostics
+                                ),
                                 fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
                                 _validation_indexes=validation_indexes,
                             )

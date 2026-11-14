@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
+from fractions import Fraction
 from functools import partial
 import hashlib
 import json
@@ -9,7 +11,15 @@ from pathlib import Path
 import subprocess
 import time
 
-from simulator.battery.enums import AdmissionStatus, Engine, EvidenceClass
+from simulator.battery.enums import (
+    QUANTITY_UNITS,
+    AdmissionStatus,
+    Engine,
+    EvidenceClass,
+    PerBasis,
+    Phase,
+)
+from simulator.battery.records import Reaction, ReactionTerm, Species, State
 from simulator.battery.score import (
     _partition_score_refs,
     _ResidualJsonlStream,
@@ -58,6 +68,75 @@ def _worker_fixture(experiment_count: int = 30) -> ScoreContext:
     )
 
 
+def _condensed_frame_diagnostic_fixture() -> tuple[ScoreContext, str]:
+    from simulator.battery.generators.janaf import (
+        janaf_condensed_element_gas_delta_fG_kJ_per_mol,
+    )
+
+    temperature = Decimal("1960")
+    source_id = "shornikov-2011-cao-mgo-alumina-melts"
+    experiment_id = "worker-condensed-frame"
+    work = F.work()
+    experiment = F.tabulation_experiment(
+        experiment_id=experiment_id,
+        work_id=work.work_id,
+        T_K=temperature,
+    )
+    calcium_gas = Species("Ca", Phase.G)
+    calcium_liquid = Species("Ca", Phase.L)
+    diagnostic_identity = replace(
+        F.oxide_identity(
+            "Ca", Phase.G, T_K=temperature, metal_formula="Ca"
+        ),
+        per=State.of(PerBasis.MOL_SPECIES),
+        reaction=State.of(
+            Reaction(
+                (
+                    ReactionTerm(calcium_gas, Fraction(1)),
+                    ReactionTerm(calcium_liquid, Fraction(-1)),
+                )
+            )
+        ),
+        formation_elements=State.of((("Ca", calcium_liquid),)),
+    )
+    diagnostic = replace(
+        F.observation(
+            "worker-condensed-frame-calcium-gas",
+            experiment_id,
+            diagnostic_identity,
+            janaf_condensed_element_gas_delta_fG_kJ_per_mol(
+                "Ca", temperature
+            ),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id=source_id,
+        ),
+        locator=F.loc(page=2, table="1"),
+    )
+    target_id = "worker-condensed-frame-calcium-oxide"
+    target = replace(
+        F.observation(
+            target_id,
+            experiment_id,
+            F.cao_identity(Phase.L, T_K=temperature),
+            Decimal("-500"),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id=source_id,
+        ),
+        locator=F.loc(page=2, table="1"),
+    )
+    return (
+        ScoreContext(
+            works={work.work_id: work},
+            experiments={experiment_id: experiment},
+            observations={
+                diagnostic.observation_id: diagnostic,
+                target.observation_id: target,
+            },
+        ),
+        target_id,
+    )
+
+
 def _worker_test_predict(
     engine,
     observation,
@@ -70,7 +149,7 @@ def _worker_test_predict(
         os._exit(17)
     if delay_seconds:
         time.sleep(delay_seconds)
-    from simulator.battery.enums import Authority, ExecutionState, Quantity
+    from simulator.battery.enums import Authority, ExecutionState
     from simulator.battery.identity import quantity_token
     from simulator.battery.records import Execution
     from simulator.battery.score import EnginePrediction
@@ -87,7 +166,7 @@ def _worker_test_predict(
             call_evidence="test:worker_predict",
         ),
         value=Decimal("1"),
-        unit="1" if quantity_token(observation.identity) is Quantity.ACTIVITY else "Pa",
+        unit=QUANTITY_UNITS[quantity_token(observation.identity)],
         authority=Authority.CERTIFIED,
         coefficient_sources=("test",),
         lineage_complete=True,
@@ -139,6 +218,35 @@ def test_parallel_scoring_matches_serial_rows_and_summary(tmp_path: Path) -> Non
     )
     assert parallel_rows == serial_rows
     assert parallel_summary == serial_summary
+
+
+@pytest.mark.parametrize("workers", (1, 2), ids=("serial", "worker"))
+def test_condensed_frame_diagnostics_reach_serial_and_worker_scoring(
+    tmp_path: Path, workers: int
+) -> None:
+    context, target_id = _condensed_frame_diagnostic_fixture()
+    path = tmp_path / f"condensed-frame-{workers}.jsonl"
+
+    written, _metadata = _score_store_to_jsonl(
+        context,
+        path,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=_worker_test_predict,
+        workers=workers,
+    )
+
+    assert written == 2
+    rows = [
+        json.loads(line)
+        for line in path.with_name(path.name + ".partial")
+        .read_text(encoding="utf-8")
+        .splitlines()[1:]
+    ]
+    target = next(row for row in rows if row["reference"] == target_id)
+    assert any(
+        notice["reason"] == "condensed_element_reference_from_janaf"
+        for notice in target["notices"]
+    )
 
 
 def test_parallel_score_slow_shard_completes_without_wall_timeout(
