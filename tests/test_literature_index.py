@@ -450,13 +450,27 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     # The named comparison runs first so an added or dropped extract is
     # reported by filename before this aggregate pin can fail on a bare count.
     assert counts["sources"] == 850
-    extracts_without_pdf = {
-        source["source_id"]
+    # PDF status of every source with extracts, compared by source id against
+    # a checked-in manifest so a changed status is named, and the
+    # extracts_without_pdf count is pinned to that independent expectation
+    # rather than to a recount of the same index (green pinned it as 848).
+    indexed_pdf_status = {
+        source["source_id"]: source["pdf_status"]
         for source in index["sources"]
-        if source["extracts"] and source["pdf_status"] == "ABSENT"
+        if source["extracts"]
     }
+    expected_pdf_status = load_named_manifest(
+        REPO_ROOT / "tests" / "manifests" / "literature_source_pdf_status.jsonl"
+    )
+    assert_named_rows(
+        indexed_pdf_status,
+        expected_pdf_status,
+        label="literature index source PDF status",
+    )
     assert counts["extracts"] == len(indexed_extracts)
-    assert counts["extracts_without_pdf"] == len(extracts_without_pdf)
+    assert counts["extracts_without_pdf"] == sum(
+        status == "ABSENT" for status in expected_pdf_status.values()
+    )
     assert counts["alias_groups_needing_resolution"] == 94
 
     status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
