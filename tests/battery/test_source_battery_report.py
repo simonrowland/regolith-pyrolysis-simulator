@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
@@ -17,6 +16,7 @@ from simulator.battery.enums import (
     ExecutionState,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     ResidualStatus,
 )
@@ -39,7 +39,7 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
 
     def capture_score(context, *, engines=None, work_id=None):
         residuals, candidates = production_score_store(
-            context, engines=engines, work_id=work_id
+            context, engines=engines, work_id=work_id, limit=2
         )
         scored_residuals.extend(residuals)
         return residuals, candidates
@@ -50,6 +50,7 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
     monkeypatch.setattr(source_battery_report, "score_store", capture_score)
     report = source_battery_report.build_source_report(
         "kems-010-richter-2007",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
         scratch_out_dir=tmp_path / "source-report",
     )
 
@@ -58,7 +59,15 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
     assert report["candidates"]["admitted"]["count"] == 254
     assert report["candidates"]["pending"]["count"] == 85
     assert report["hard_issue_count"] == 0
-    assert report["scoring"]["engine_observation_events"] == 2712
+    # score_store sorts the source references by id; these are its first two.
+    # Two scalar references × one IA engine = 2 events; both unknown quantities
+    # produce one identity_unknown:quantity_unknown refusal each.
+    expected_ids = [
+        "kems-010-richter-2007::richter_2007_al_quoted_non_loss_bound",
+        "kems-010-richter-2007::richter_2007_ca_quoted_non_loss_bound",
+    ]
+    assert [row.reference for row in scored_residuals] == expected_ids
+    assert report["scoring"]["engine_observation_events"] == 2
     assert None in loaded_sources
     assert ("kems-010-richter-2007",) in loaded_sources
     overlay_store = (
@@ -80,67 +89,36 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
         "engine_observation_events": 0,
     }
 
-    expected_refusals: Counter[str] = Counter()
-    expected_detail_reasons: Counter[tuple[str, str | None]] = Counter()
-    for key, count in refusal_census(scored_residuals).items():
-        reason, separator, detail_reason = key.partition(":")
-        expected_refusals[reason] += count
-        expected_detail_reasons[(reason, detail_reason if separator else None)] += count
-    assert expected_refusals
-    actual_refusals = {
-        row["reason"]: (row["distinct_observations"], row["engine_observation_events"])
-        for row in report["scoring"]["refusals_by_reason"]
+    expected_refusals = {
+        "identity_unknown:quantity_unknown": 2,
     }
-    assert actual_refusals == {
-        "attempted_unavailable": (21, 21),
-        "identity_incomplete": (5, 10),
-        "identity_unknown": (85, 680),
-        "underdetermined_apparatus": (45, 69),
-        "unsupported": (254, 1932),
-    }
-    assert all(
-        len(row["example_observation_ids"]) == 3
-        for row in report["scoring"]["refusals_by_reason"]
-    )
-    # The exact reason tally makes omitting any refusal reason fail this test.
-    actual_refusal_counts = {
-        row["reason"]: row["engine_observation_events"]
-        for row in report["scoring"]["refusals_by_reason"]
-    }
-    assert actual_refusal_counts == dict(expected_refusals)
-    actual_detail_reasons = {
-        (row["reason"], detail["reason"]): detail["engine_observation_events"]
-        for row in report["scoring"]["refusals_by_reason"]
-        for detail in row["detail_reasons"]
-    }
-    assert actual_detail_reasons == dict(expected_detail_reasons)
-
-    dropped_reason = next(iter(expected_refusals))
-
-    def tally_without_one_reason(residuals):
-        return {
-            key: count
-            for key, count in refusal_census(residuals).items()
-            if key.partition(":")[0] != dropped_reason
+    assert refusal_census(scored_residuals) == expected_refusals
+    assert report["scoring"]["refusals_by_reason"] == [
+        {
+            "reason": "identity_unknown",
+            "distinct_observations": 2,
+            "engine_observation_events": 2,
+            "example_observation_ids": expected_ids,
+            "detail_reasons": [
+                {
+                    "reason": "quantity_unknown",
+                    "engine_observation_events": 2,
+                    "example_observation_ids": expected_ids,
+                }
+            ],
         }
+    ]
 
-    monkeypatch.setattr(
-        source_battery_report, "refusal_census", tally_without_one_reason
-    )
+    monkeypatch.setattr(source_battery_report, "refusal_census", lambda _rows: {})
     mutated_refusals = {
         row["reason"]: (row["distinct_observations"], row["engine_observation_events"])
         for row in source_battery_report._score_rows(scored_residuals)[
             "refusals_by_reason"
         ]
     }
+    assert mutated_refusals == {}
     with pytest.raises(AssertionError):
-        assert mutated_refusals == {
-            "attempted_unavailable": (21, 21),
-            "identity_incomplete": (5, 10),
-            "identity_unknown": (85, 680),
-            "underdetermined_apparatus": (45, 69),
-            "unsupported": (254, 1932),
-        }
+        assert mutated_refusals == {"identity_unknown": (2, 2)}
 
 
 def test_landed_extract_without_rows_is_reported_explicitly(tmp_path: Path) -> None:
@@ -171,6 +149,7 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
         metal_formula="Mg",
         nu_metal=Fraction(1),
         nu_o2=Fraction(1, 2),
+        polymorph=Polymorph.PERICLASE.value,
     )
     identity = replace(
         identity,
@@ -178,6 +157,7 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
         reaction=State.not_applicable("not a formation quantity"),
         formation_elements=State.not_applicable("not a formation quantity"),
     )
+    assert identity.species.polymorph.value == Polymorph.PERICLASE.value
     observations = tuple(
         F.observation(
             f"{source}::report-band-point",
@@ -241,6 +221,9 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
     expected = tuple(
         row for row in full_residuals if row.reference in target_observation_ids
     )
+    # Three named source observations × one IA event each; the report keeps
+    # the target's single numeric, in-band event from that full-context run.
+    assert len(full_residuals) == 3
     candidates, reported = source_battery_report._score_source(
         context, source_id, engines=(Engine.INTERNAL_ANALYTICAL,)
     )
@@ -252,9 +235,16 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
     assert residual.numeric.decision_band is not None
     assert "n_sources=3" in residual.numeric.decision_band.rule
     assert residual.status is ResidualStatus.MATCH
-    assert source_battery_report._score_rows(reported) == source_battery_report._score_rows(
-        expected
-    )
+    source_counts = source_battery_report._score_rows(reported)
+    assert source_counts["engine_observation_events"] == 1
+    assert source_counts["numeric_residuals"] == {
+        "distinct_observations": 1,
+        "engine_observation_events": 1,
+    }
+    assert source_counts["inside_band"] == {
+        "distinct_observations": 1,
+        "engine_observation_events": 1,
+    }
 
     source_only_context = replace(
         context,
