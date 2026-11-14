@@ -119,14 +119,9 @@ def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
 def test_diverted_alkali_sio_numeric_pin():
     """Pin the merged bypass route while the silica cartridge is isolated.
 
-    The Na collector (identity (4, 0)) keeps the film-temperature Na and
-    K hexes. e-NTU bulk temperature moved 0.005226 kg of SiO off that
-    collector and onto the trap: collector SiO 0x1.eb5bad0247ecbp-1, trap
-    SiO 0x1.4a452fdb81350p-5, and their sum is the whole kilogram. The
-    trap applies the same saturation law, so Na and K that pass the
-    collector condense at (4, 1). Stage number 4 is that sum. The hex
-    strings are this production route(), and the three species close
-    against the inlet.
+    d-402 segment equilibrium moves 0.03998600 kg SiO from the K trap
+    (0.04031619 to 0.00033019 kg) to the warmer Na collector (0.95968381
+    to 0.99966981 kg); Na and K remain on the diverted collector/trap route.
     """
     model = _model("divert", hard_gate=False)
     result = model.route(
@@ -139,14 +134,20 @@ def test_diverted_alkali_sio_numeric_pin():
         return {sp: kg.hex() for sp, kg in bucket.items()}
 
     assert hexes(result.capture_kg_by_stage_identity[(4, 0)]) == {
-        "SiO": "0x1.eb5bad0247ecbp-1",
-        "Na": "0x1.6bb536538edccp-11",
-        "K": "0x1.37fba2863fc46p-14",
+        "SiO": "0x1.ffd4b8a80a760p-1",
     }
     assert hexes(result.capture_kg_by_stage_identity[(4, 1)]) == {
-        "SiO": "0x1.4a452fdb81350p-5",
-        "Na": "0x1.a59943ba3757cp-18",
-        "K": "0x1.adca243e7e035p-16",
+        "SiO": "0x1.5a3abfac50000p-12",
+        "Na": "0x1.6f0068d952e7bp-11",
+        "K": "0x1.a36d94567e17ep-14",
+    }
+    assert hexes(result.capture_kg_by_stage_identity[(5, 0)]) == {
+        "Na": "0x1.7f493af82d14fp-43",
+        "K": "0x1.311c0b771993cp-31",
+    }
+    assert hexes(result.capture_kg_by_stage_identity[(6, 0)]) == {
+        "Na": "0x1.72f70896c9c37p-44",
+        "K": "0x1.cd403db064ac0p-38",
     }
     # The public map is keyed by stage key. Stage number 4 is the sum of
     # the Na collector and the K trap, the two surfaces that share it.
@@ -156,13 +157,22 @@ def test_diverted_alkali_sio_numeric_pin():
             stage4[species] = stage4.get(species, 0.0) + kg
     assert hexes(stage4) == {
         "SiO": "0x1.0000000000000p+0",
-        "Na": "0x1.6f0068db034b7p-11",
-        "K": "0x1.a36e2b95df453p-14",
+        "Na": "0x1.6f0068d952e7bp-11",
+        "K": "0x1.a36d94567e17ep-14",
+    }
+    all_captured = {}
+    for bucket in result.condensed_by_stage_species.values():
+        for species, kg in bucket.items():
+            all_captured[species] = all_captured.get(species, 0.0) + kg
+    assert hexes(all_captured) == {
+        "SiO": "0x1.0000000000000p+0",
+        "Na": "0x1.6f0068db8bac7p-11",
+        "K": "0x1.a36e2eb1c4112p-14",
     }
     assert hexes(result.remaining_by_species) == {
         "SiO": "0x0.0p+0",
-        "Na": "0x1.6973dba000000p-70",
-        "K": "0x1.5b8351ab00000p-63",
+        "Na": "0x1.78dc12b000000p-68",
+        "K": "0x1.0d968ba000000p-57",
     }
 
 
