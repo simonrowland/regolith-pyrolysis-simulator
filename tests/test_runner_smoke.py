@@ -831,13 +831,16 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
     # 40 C K trap. c679673f5/85fedcb8e band integration changes the row total
     # from 0.0004975311735864234 to 0.0004974950336209987 kg. The d-344
-    # cartridge (14.7388 m2) and the e-NTU bulk temperature then raise that
-    # hour's live Na+K product to 0.0007693717261912645 kg. The next row
-    # transfers it to reagent, so live product returns to zero while cumulative
-    # condensate and recycled mass retain the capture.
+    # cartridge (14.7388 m2) and e-NTU bulk temperature set the staged capture;
+    # d-402's solid-standard-state saturation changes its hour-8 Na+K product
+    # from 0.0007693717261912645 to 0.0007693717263025855 kg. Comparing the
+    # same kg total gives new - old = +1.113210e-13 kg; if wall-route capture
+    # were unchanged, this difference would be zero. The next row transfers
+    # it to reagent, so live product returns to zero while cumulative
+    # condensate and recycled mass retain it.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0007693717261912645, rel=1e-12, abs=1e-15
-    )
+        0.0007693717263025855, rel=1e-12, abs=1e-15
+    ), f"hour 8 live product species: {rows[7]['product_ledger_kg_at_hour']!r}"
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
         "condensation_train_kg_cumulative",
