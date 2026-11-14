@@ -28,7 +28,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -47,7 +47,7 @@ runs:
     - values
     - series
     - 0
-    locator: &id001
+    locator:
       page: 54
       pdf_page_index: 53
       table: '2'
@@ -102,7 +102,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -114,10 +114,13 @@ runs:
     - series
     - 0
     - locator
-    locator: *id001
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-15-07-16c; Profile column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Profile=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-2m-15-07-16d
   experiment_ids:
@@ -400,16 +403,32 @@ runs:
     blockers:
     - missing_input
     - unsupported
+  - group_id: wire-metal
+    observation_ids: []
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - missing_input
+    - unsupported
   printed_inventory:
   - group_id: zoning-profile
     locator:
       page: 54
       pdf_page_index: 53
       table: '2'
-      paragraph: 2M-15-07-16f
+      paragraph: 2M-15-07-16f; Profile column
     blocker: missing_input
-    note: Printed profile-only run; Table 2 concentration cells blank. No existing run Experiment or observation;
-      do not substitute another charge.
+    note: Table 2 Profile=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
+  - group_id: wire-metal
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-15-07-16f; Metal column
+    blocker: missing_input
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
+      Physical p.13 / folio 12, section 4.3 also names this Pt-wire analysis.
   assumptions: []
 - card_id: sossi-2019-run-p11-06-18a
   experiment_ids:
@@ -972,7 +991,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -991,7 +1010,7 @@ runs:
     - values
     - series
     - 10
-    locator: &id002
+    locator:
       page: 54
       pdf_page_index: 53
       table: '2'
@@ -1047,7 +1066,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -1059,10 +1078,13 @@ runs:
     - series
     - 10
     - locator
-    locator: *id002
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 2M-18-07-16c; Metal column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-1m-ps3
   experiment_ids:
@@ -1265,7 +1287,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -1284,7 +1306,7 @@ runs:
     - values
     - series
     - 13
-    locator: &id003
+    locator:
       page: 54
       pdf_page_index: 53
       table: '2'
@@ -1340,7 +1362,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -1352,10 +1374,13 @@ runs:
     - series
     - 13
     - locator
-    locator: *id003
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS4; Metal column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-p09-06-18b
   experiment_ids:
@@ -1558,7 +1583,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -1577,7 +1602,7 @@ runs:
     - values
     - series
     - 16
-    locator: &id004
+    locator:
       page: 54
       pdf_page_index: 53
       table: '2'
@@ -1633,7 +1658,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -1645,10 +1670,13 @@ runs:
     - series
     - 16
     - locator
-    locator: *id004
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS5; Metal column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-p08-02-17b
   experiment_ids:
@@ -1761,7 +1789,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -1780,7 +1808,7 @@ runs:
     - values
     - series
     - 18
-    locator: &id005
+    locator:
       page: 54
       pdf_page_index: 53
       table: '2'
@@ -1836,7 +1864,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -1848,10 +1876,13 @@ runs:
     - series
     - 18
     - locator
-    locator: *id005
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 3M-29/2/16*; Profile column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Profile=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-1m-2-3-16
   experiment_ids:
@@ -2054,7 +2085,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -2073,7 +2104,7 @@ runs:
     - values
     - series
     - 21
-    locator: &id006
+    locator:
       page: 54
       pdf_page_index: 53
       table: '2'
@@ -2129,7 +2160,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -2141,10 +2172,13 @@ runs:
     - series
     - 21
     - locator
-    locator: *id006
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-PS1*; Metal column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-p09-06-18c
   experiment_ids:
@@ -2347,7 +2381,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -2366,7 +2400,7 @@ runs:
     - values
     - series
     - 24
-    locator: &id007
+    locator:
       page: 54
       pdf_page_index: 53
       table: '2'
@@ -2422,7 +2456,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -2434,10 +2468,13 @@ runs:
     - series
     - 24
     - locator
-    locator: *id007
+    locator:
+      page: 54
+      pdf_page_index: 53
+      table: '2'
+      paragraph: 1M-1/3/16; Metal column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-3m-1-3-16
   experiment_ids:
@@ -2640,7 +2677,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -2659,7 +2696,7 @@ runs:
     - values
     - series
     - 27
-    locator: &id008
+    locator:
       page: 55
       pdf_page_index: 54
       table: '2'
@@ -2715,7 +2752,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -2727,10 +2764,13 @@ runs:
     - series
     - 27
     - locator
-    locator: *id008
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 1M-1/3/16b; Metal column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-3m-29-2-16b
   experiment_ids:
@@ -2843,9 +2883,16 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     observation_ids: []
-    required_coordinates: 2
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: wire-metal
+    observation_ids: []
+    required_coordinates: 1
     comparator: unsupported
     independent: true
     blockers:
@@ -2862,7 +2909,7 @@ runs:
     - values
     - series
     - 29
-    locator: &id009
+    locator:
       page: 55
       pdf_page_index: 54
       table: '2'
@@ -2918,7 +2965,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -2930,10 +2977,32 @@ runs:
     - series
     - 29
     - locator
-    locator: *id009
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: C17/12/15c; Profile column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Profile=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
+  - group_id: wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 29
+    - locator
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: C17/12/15c; Metal column
+    blocker: unsupported
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-2m-16-07-16e
   experiment_ids:
@@ -3226,7 +3295,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -3245,7 +3314,7 @@ runs:
     - values
     - series
     - 33
-    locator: &id010
+    locator:
       page: 55
       pdf_page_index: 54
       table: '2'
@@ -3301,7 +3370,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -3313,10 +3382,13 @@ runs:
     - series
     - 33
     - locator
-    locator: *id010
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16c; Profile column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Profile=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-3m-2-3-16
   experiment_ids:
@@ -3429,7 +3501,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -3448,7 +3520,7 @@ runs:
     - values
     - series
     - 35
-    locator: &id011
+    locator:
       page: 55
       pdf_page_index: 54
       table: '2'
@@ -3504,7 +3576,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -3516,10 +3588,13 @@ runs:
     - series
     - 35
     - locator
-    locator: *id011
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-17-07-16a; Profile column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Profile=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-2m-17-07-16b
   experiment_ids:
@@ -3542,7 +3617,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -3561,7 +3636,7 @@ runs:
     - values
     - series
     - 36
-    locator: &id012
+    locator:
       page: 55
       pdf_page_index: 54
       table: '2'
@@ -3617,7 +3692,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -3629,10 +3704,13 @@ runs:
     - series
     - 36
     - locator
-    locator: *id012
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-17-07-16b; Metal column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-2m-17-07-16c
   experiment_ids:
@@ -3655,7 +3733,7 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
@@ -3674,7 +3752,7 @@ runs:
     - values
     - series
     - 37
-    locator: &id013
+    locator:
       page: 55
       pdf_page_index: 54
       table: '2'
@@ -3730,7 +3808,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: wire-metal
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -3742,10 +3820,13 @@ runs:
     - series
     - 37
     - locator
-    locator: *id013
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-17-07-16c; Metal column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-2m-16-07-16f
   experiment_ids:
@@ -4038,9 +4119,16 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     observation_ids: []
-    required_coordinates: 2
+    required_coordinates: 1
+    comparator: unsupported
+    independent: true
+    blockers:
+    - unsupported
+  - group_id: wire-metal
+    observation_ids: []
+    required_coordinates: 1
     comparator: unsupported
     independent: true
     blockers:
@@ -4057,7 +4145,7 @@ runs:
     - values
     - series
     - 41
-    locator: &id014
+    locator:
       page: 55
       pdf_page_index: 54
       table: '2'
@@ -4113,7 +4201,7 @@ runs:
     blocker: unsupported
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
-  - group_id: zoning-profile-or-wire-metal
+  - group_id: zoning-profile
     context_ref:
     - extracts
     - kems-012-sossi-2019
@@ -4125,10 +4213,32 @@ runs:
     - series
     - 41
     - locator
-    locator: *id014
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16h; Profile column
     blocker: unsupported
-    note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
-      A.'
+    note: Table 2 Profile=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
+  - group_id: wire-metal
+    context_ref:
+    - extracts
+    - kems-012-sossi-2019
+    - species
+    - Mn
+    - observations
+    - 3
+    - values
+    - series
+    - 41
+    - locator
+    locator:
+      page: 55
+      pdf_page_index: 54
+      table: '2'
+      paragraph: 2M-16-07-16h; Metal column
+    blocker: unsupported
+    note: Table 2 Metal=Y. This is a separate required outcome; no Phase A comparator or typed outcome is adopted.
   assumptions: []
 - card_id: sossi-2019-run-2m-16-07-16d
   experiment_ids:
@@ -4220,8 +4330,8 @@ runs:
     note: Table 2 full row is retained in locator quote; blank Ni cells are absence, not zero. No starting SD is
       transferred to the residue.
   assumptions: []
-run_basis: One card per Table 2 physical run, including 2M-15-07-16f (profile-only). Starting material and four
-  blank wire runs are controls, not charged runs.
+run_basis: One card per Table 2 physical run, including 2M-15-07-16f (profile and wire-metal analyses; no bulk concentration
+  vector). Starting material and four blank wire runs are controls, not charged runs.
 regime: one_atmosphere_open_furnace_flowing_CO_CO2
 regime_note: Owner inclusion of atmospheric runs; paper also uses 1 bar. Exact pressure history remains a source/typed-input
   blocker, never a vacuum exclusion.

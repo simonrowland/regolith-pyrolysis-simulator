@@ -419,3 +419,32 @@ def test_four_study_summary_keeps_every_card(store, tmp_path):
     assert summary["n_cards"] == 128
     assert summary["n_pass"] == summary["n_pass_with_flags"] == 0
     assert len(list(tmp_path.glob("*.json"))) == 129
+
+
+def test_sossi_profile_and_wire_metal_markers_are_independent_outcomes():
+    # Rendered Table 2, physical pp.54/55; each Y is pinned by its own column.
+    profiles = {"2m-15-07-16c", "2m-15-07-16f", "3m-29-2-16", "c17-12-15c",
+                "2m-16-07-16c", "2m-17-07-16a", "2m-16-07-16h"}
+    metals = {"2m-15-07-16f", "2m-18-07-16c", "1m-ps4", "1m-ps5", "1m-ps1",
+              "1m-1-3-16", "1m-1-3-16b", "c17-12-15c", "2m-17-07-16b",
+              "2m-17-07-16c", "2m-16-07-16h"}
+    path = ROOT / "data/literature/reproduction-cards/kems-012-sossi-2019.yaml"
+    manifest = yaml.safe_load(path.read_text())
+    review = yaml.safe_load((path.parent / manifest["review_ref"]).read_text())
+    for run in manifest["runs"]:
+        short = run["card_id"].removeprefix("sossi-2019-run-")
+        groups = {group["group_id"]: group for group in run["outcomes"]}
+        assert "zoning-profile-or-wire-metal" not in groups
+        assert ("zoning-profile" in groups) == (short in profiles)
+        assert ("wire-metal" in groups) == (short in metals)
+        for gid, column in (("zoning-profile", "Profile"), ("wire-metal", "Metal")):
+            if gid not in groups:
+                continue
+            assert groups[gid]["required_coordinates"] == 1
+            assert "unsupported" in groups[gid]["blockers"]
+            item = next(item for item in run["printed_inventory"] if item["group_id"] == gid)
+            assert f"{column}=Y" in item["note"]
+            assert f"{column} column" in item["locator"]["paragraph"]
+            assert item["locator"]["table"] == "2"
+            assert item["locator"]["pdf_page_index"] == item["locator"]["page"] - 1
+        assert review["runs"][run["card_id"]]["frozen_run"] == run
