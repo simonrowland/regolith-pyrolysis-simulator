@@ -848,6 +848,25 @@ def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):
                 for item in gibbs
             )
             continue
+        if family == "kelley-1960-usbm-b584" and record == "table-001":
+            parent = f"{family}:{record}"
+            assert parent not in result.observations
+            enthalpy = result.observations[f"{parent}:heat_content"]
+            assert quantity_token(enthalpy.identity) is Quantity.H_MINUS_H298
+            assert enthalpy.value.kind is ValueKind.SERIES
+            assert dict(enthalpy.value.series or ()) == {
+                Decimal("400"): Decimal("2.80328"),
+                Decimal("500"): Decimal("5.6484"),
+                Decimal("600"): Decimal("8.5772"),
+            }
+            # The printed S(T)-S(298.15 K) column is an entropy increment;
+            # Quantity.S has no supported increment subtype, so it stays refused.
+            assert any(
+                entry.observation_id == parent
+                and "entropy_increment" in entry.why
+                for entry in result.queue
+            )
+            continue
         obs = result.observations[f"{family}:{record}"]
         assert obs.value.kind is ValueKind.UNAVAILABLE
         reason = obs.value.unavailable_reason
@@ -860,6 +879,34 @@ def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):
             assert obs.identity.quantity.is_unknown
         else:
             assert "temperature grid" in obs.identity.temperature_K.reason
+
+
+def test_kelley_1960_heat_content_mapping_uses_supported_enthalpy_increment(
+    monkeypatch,
+):
+    from simulator.battery import migrate as migrate_mod
+
+    doc = json.loads(
+        (
+            REPO_ROOT
+            / "data/literature/compilations/kelley-1960-usbm-b584/records/table-001.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert doc["column_labels_as_published"][1] == "HT-H298.15,cal./mole"
+    live = compilation_column_series_from_record(doc)
+    heat = next(item for item in live if item.quantity is Quantity.H_MINUS_H298)
+    assert heat.series_key == "heat_content"
+    assert dict(heat.value.series or ()) == {
+        Decimal("400"): Decimal("2.80328"),
+        Decimal("500"): Decimal("5.6484"),
+        Decimal("600"): Decimal("8.5772"),
+    }
+    # Independent page check: Kelley 1960, printed p. 9 / PDF p. 25,
+    # Table 1 prints 670, 1,350, and 2,050 cal/mole at 400, 500, and 600 K.
+
+    monkeypatch.delitem(migrate_mod._COMPILATION_CELL_QUANTITY, "heat_content")
+    mutant = compilation_column_series_from_record(doc)
+    assert all(item.quantity is not Quantity.H_MINUS_H298 for item in mutant)
 def _p253_gibbs_at_298(result):
     parent = "robie-hemingway-1995-usgs-b2131:high-temperature-p253"
     assert parent not in result.observations

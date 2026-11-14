@@ -12139,6 +12139,7 @@ _COMPILATION_CELL_QUANTITY: dict[str, Quantity] = {
     "entropy_spectrographic_or_molecular_constants": Quantity.S,
     "entropy_other_sources": Quantity.S,
     "entropy_recommended": Quantity.S,
+    "heat_content": Quantity.H_MINUS_H298,
     "enthalpy_increment": Quantity.H_MINUS_H298,
     "log_kf": Quantity.LOG10_KF,
     "log_Kf": Quantity.LOG10_KF,
