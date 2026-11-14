@@ -31,6 +31,8 @@ available; otherwise it refuses wall_pO2_required.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
@@ -516,6 +518,120 @@ def _record_state(
     return _janaf_record_state(record_id, T_K)
 
 
+def _source_file_version(path: Path) -> tuple[int, int, int, int]:
+    stat = path.stat()
+    return stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, stat.st_ino
+
+
+@lru_cache(maxsize=256)
+def _nasa_record_data(
+    path: Path,
+    _version: tuple[int, int, int, int],
+) -> tuple[str, tuple[Nasa9Segment, ...], NasaCeaPolynomial | None]:
+    """Prepared coefficients keyed by the source path and its file version."""
+
+    document = load_record_document(path)
+    phase = str(document.get("phase") or "")
+    intervals = document.get("intervals")
+    if not isinstance(intervals, Sequence) or isinstance(intervals, (str, bytes)):
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing",
+            f"{path.stem} has no intervals",
+        )
+    segments: list[Nasa9Segment] = []
+    for interval in intervals:
+        if not isinstance(interval, Mapping):
+            continue
+        t_min = _published_float(interval.get("T_min_K"), f"{path.stem} T_min_K")
+        t_max = _published_float(interval.get("T_max_K"), f"{path.stem} T_max_K")
+        # Collapsed published intervals are not records. Nasa9Segment rejects
+        # T_min >= T_max. The interval that remains still supplies G.
+        if t_min >= t_max:
+            continue
+        coefficients = interval.get("a_coefficients")
+        if not isinstance(coefficients, Sequence) or len(coefficients) != 7:
+            raise WallSaturationLawRefusal(
+                "wall_condensation_thermo_missing",
+                f"{path.stem} interval is missing 7 a-coefficients",
+            )
+        segments.append(
+            Nasa9Segment(
+                t_min,
+                t_max,
+                tuple(
+                    _published_float(coefficient, f"{path.stem} a")
+                    for coefficient in coefficients
+                ),
+                _published_float(interval.get("b1"), f"{path.stem} b1"),
+                _published_float(interval.get("b2"), f"{path.stem} b2"),
+            )
+        )
+    if not segments:
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing",
+            f"{path.stem} has no non-degenerate interval",
+        )
+    formula = document.get("formula")
+    formula_s = str(formula) if formula is not None else None
+    segments_tuple = tuple(segments)
+    try:
+        polynomial = NasaCeaPolynomial(
+            name=path.stem,
+            family="nasa_cea_9",
+            standard_state=_nasa_standard_state(phase),
+            segments=segments_tuple,
+            formula=formula_s,
+        )
+    except NasaCeaSegmentError:
+        polynomial = None
+    return phase, segments_tuple, polynomial
+
+
+@lru_cache(maxsize=256)
+def _janaf_record_data(
+    path: Path,
+    _version: tuple[int, int, int, int],
+) -> tuple[str, tuple[tuple[float, float], ...]]:
+    """Prepared rows keyed by the source path and its file version."""
+
+    document = load_table_document(path)
+    table = document.get("table")
+    if not isinstance(table, Mapping):
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing",
+            f"{path.stem} has no table",
+        )
+    index = table.get("index_entry")
+    state = ""
+    if isinstance(index, Mapping) and index.get("state") is not None:
+        state = str(index.get("state"))
+    phase = _janaf_phase(state, path.stem)
+    rows = table.get("values")
+    if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing",
+            f"{path.stem} has no values",
+        )
+    points: list[tuple[float, float]] = []
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = row.get("temperature")
+        gibbs = row.get("formation_gibbs_energy")
+        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+            continue
+        if temperature.get("value") is None or gibbs.get("value") is None:
+            continue
+        points.append((float(temperature["value"]), float(gibbs["value"])))
+    if len(points) < 2:
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing",
+            f"{path.stem} has fewer than two formation-Gibbs rows",
+        )
+    points.sort()
+    return phase, tuple(points)
+
+
 def _nasa_record_state(
     record_id: str, T_K: float,
 ) -> tuple[float, str, str, tuple[float, float]]:
@@ -525,76 +641,41 @@ def _nasa_record_state(
             "wall_condensation_thermo_missing",
             f"NASA record {record_id} is not in the corpus",
         )
-    document = load_record_document(path)
-    phase = str(document.get("phase") or "")
-    intervals = document.get("intervals")
-    if not isinstance(intervals, Sequence) or isinstance(intervals, (str, bytes)):
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            f"{record_id} has no intervals",
-        )
-    segments: list[Nasa9Segment] = []
-    for interval in intervals:
-        if not isinstance(interval, Mapping):
-            continue
-        t_min = _published_float(interval.get("T_min_K"), f"{record_id} T_min_K")
-        t_max = _published_float(interval.get("T_max_K"), f"{record_id} T_max_K")
-        # Collapsed published intervals are not records. Nasa9Segment rejects
-        # T_min >= T_max. The interval that remains still supplies G.
-        if t_min >= t_max:
-            continue
-        coefficients = interval.get("a_coefficients")
-        if not isinstance(coefficients, Sequence) or len(coefficients) != 7:
-            raise WallSaturationLawRefusal(
-                "wall_condensation_thermo_missing",
-                f"{record_id} interval is missing 7 a-coefficients",
-            )
-        segments.append(
-            Nasa9Segment(
-                t_min,
-                t_max,
-                tuple(
-                    _published_float(coefficient, f"{record_id} a")
-                    for coefficient in coefficients
-                ),
-                _published_float(interval.get("b1"), f"{record_id} b1"),
-                _published_float(interval.get("b2"), f"{record_id} b2"),
-            )
-        )
-    if not segments:
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            f"{record_id} has no non-degenerate interval",
-        )
-    formula = document.get("formula")
-    formula_s = str(formula) if formula is not None else None
-    try:
-        polynomial = NasaCeaPolynomial(
-            name=record_id,
-            family="nasa_cea_9",
-            standard_state=_nasa_standard_state(phase),
-            segments=tuple(segments),
-            formula=formula_s,
-        )
-    except NasaCeaSegmentError:
-        polynomial = None
-    covering = [
-        segment
-        for segment in segments
-        if segment.T_min_K <= T_K <= segment.T_max_K
-    ]
-    if covering:
-        # A gap elsewhere must not drop the interval that does contain T.
-        # The shared-endpoint rule assigns T to the higher segment.
-        covering.sort(key=lambda segment: segment.T_min_K)
-        segment = covering[-1]
-        if polynomial is not None:
-            try:
-                g_over_rt = polynomial.evaluate(T_K).g_over_RT
-            except NasaCeaDomainError:
-                _cp, _h, _s, g_over_rt = segment.evaluate_ratios(T_K)
-        else:
-            _cp, _h, _s, g_over_rt = segment.evaluate_ratios(T_K)
+    return _nasa_state_for_source(path, _source_file_version(path), T_K)
+
+
+# Many wall reactions share a Gibbs participant at the same T_wall. Keying
+# that evaluated state by source version and temperature avoids repeating the
+# C2A hot-face lookup while retaining live values when either input changes.
+@lru_cache(maxsize=8192)
+def _nasa_state_for_source(
+    path: Path,
+    version: tuple[int, int, int, int],
+    T_K: float,
+) -> tuple[float, str, str, tuple[float, float]]:
+    phase, segments, polynomial = _nasa_record_data(path, version)
+    segment = None
+    if polynomial is not None:
+        try:
+            # The cached polynomial already validates interval coverage. Its
+            # segment lookup keeps the shared-endpoint rule without allocating
+            # a ThermoState for every hot-wall query.
+            segment = polynomial.segment_for(T_K)
+        except NasaCeaDomainError:
+            pass
+    else:
+        covering = [
+            item
+            for item in segments
+            if item.T_min_K <= T_K <= item.T_max_K
+        ]
+        if covering:
+            # A gap elsewhere must not drop the interval that does contain T.
+            # The shared-endpoint rule assigns T to the higher segment.
+            covering.sort(key=lambda item: item.T_min_K)
+            segment = covering[-1]
+    if segment is not None:
+        _cp, _h, _s, g_over_rt = segment.evaluate_ratios(T_K)
         return (
             g_over_rt, phase, "authoritative",
             (segment.T_min_K, segment.T_max_K),
@@ -635,48 +716,23 @@ def _janaf_record_state(
             "wall_condensation_thermo_missing",
             f"JANAF table {table_id} is not in the corpus",
         )
-    document = load_table_document(path)
-    table = document.get("table")
-    if not isinstance(table, Mapping):
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            f"{table_id} has no table",
-        )
-    index = table.get("index_entry")
-    state = ""
-    if isinstance(index, Mapping) and index.get("state") is not None:
-        state = str(index.get("state"))
-    phase = _janaf_phase(state, table_id)
-    rows = table.get("values")
-    if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            f"{table_id} has no values",
-        )
-    points: list[tuple[float, float]] = []
-    for row in rows:
-        if not isinstance(row, Mapping):
-            continue
-        temperature = row.get("temperature")
-        gibbs = row.get("formation_gibbs_energy")
-        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
-            continue
-        if temperature.get("value") is None or gibbs.get("value") is None:
-            continue
-        points.append((float(temperature["value"]), float(gibbs["value"])))
-    if len(points) < 2:
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            f"{table_id} has fewer than two formation-Gibbs rows",
-        )
-    points.sort()
+    return _janaf_state_for_source(path, _source_file_version(path), T_K)
+
+
+@lru_cache(maxsize=8192)
+def _janaf_state_for_source(
+    path: Path,
+    version: tuple[int, int, int, int],
+    T_K: float,
+) -> tuple[float, str, str, tuple[float, float]]:
+    phase, points = _janaf_record_data(path, version)
     valid_range = (points[0][0], points[-1][0])
     authority = (
         "extrapolated"
         if T_K < points[0][0] or T_K > points[-1][0]
         else "authoritative"
     )
-    g_kJ = _linear_bracket(points, T_K, table_id)
+    g_kJ = _linear_bracket(points, T_K, path.stem)
     # kJ/mol → dimensionless G/(RT). 1000 J/kJ. R is J/(mol·K). T is K.
     g_over_rt = (g_kJ * 1000.0) / (R_J_PER_MOL_K * T_K)
     return g_over_rt, phase, authority, valid_range
