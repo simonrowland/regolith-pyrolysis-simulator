@@ -16,6 +16,40 @@ extraction:
   date: '2026-10-20'
   worker: t1374-fig-t1
 review_status: draft
+benches:
+  - id: shornikov-2000-titania-mo-cell
+    identity: {basis: described_in_this_work}
+    cell_materials:
+      - state: {tag: value, value: Mo}
+        locator:
+          page: 2
+          published_page: 1470
+          pdf_page_index: 1
+          equation: '1'
+          note: >-
+            The text on physical page 1 (folio 1469) attributes p(O) to oxygen
+            interaction with the effusion-cell material. Equation (1) on physical
+            page 2 (folio 1470) is (MoO3) = (MoO2) + (O), identifying that
+            material as molybdenum.
+experiments:
+  - experiment_id: shornikov-2000-titania-figure1
+    bench_id: shornikov-2000-titania-mo-cell
+    method: knudsen_effusion
+    locator:
+      page: 2
+      published_page: 1470
+      pdf_page_index: 1
+      figure: '1'
+      note: CaSiO3-CaTiO3 vapor species partial pressures at 2100 K.
+    conditions:
+      temperature_K:
+        state: {tag: value, value: {kind: point, point: '2100'}}
+        locator:
+          page: 2
+          published_page: 1470
+          pdf_page_index: 1
+          figure: '1'
+          note: Figure 1 caption gives 2100 K.
 fidelity_samples:
   - path: species.SiO2.observations[shornikov_2000_f2c_SiO2_2100k].values.points[0].log10_activity
     value: '-1.886'
@@ -5757,6 +5791,7 @@ species:
     observations:
     - observation_id: shornikov_2000_f1_TiO_01
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -5810,6 +5845,19 @@ species:
             page: 2
             figure: '1'
             note: Axis read 11.092 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '3.20186401e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O), digitized from the plotted markers at 600 dpi; the linked O row records the pixel calibration and marker-centre method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2_bar=(pO_bar/Kf(O))^2 from the
+              source O point, converting its plotted atm value to bar first
+              (1 atm=1.01325 bar), using JANAF O-001 at 2100 K
+              (log10 Kf(O)=-2.857). p(O) is based on the Mo-cell equilibrium
+              (MoO3)=(MoO2)+(O), checked against equilibria (2)-(4), not
+              calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_01']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -5828,6 +5876,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_02
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -5881,6 +5930,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 14.042 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.99279348e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_02']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -5899,6 +5959,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_03
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -5952,6 +6013,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 14.692 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.99279348e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_02']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -5970,6 +6042,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_04
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6023,6 +6096,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 16.744 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.75400996e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_03']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6041,6 +6125,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_05
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6094,6 +6179,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 18.754 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.71558292e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_04']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6112,6 +6208,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_06
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6165,6 +6262,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 23.610 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.77585903e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_05']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6183,6 +6291,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_07
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6236,6 +6345,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 26.713 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '3.05919906e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_07']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6254,6 +6374,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_08
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6307,6 +6428,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 31.991 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.80875588e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_08']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6325,6 +6457,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_09
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6378,6 +6511,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 31.991 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.80875588e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_08']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6396,6 +6540,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_10
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6449,6 +6594,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 33.699 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '3.35073331e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_09']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6467,6 +6623,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_11
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6520,6 +6677,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 34.262 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '3.35073331e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_10']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6538,6 +6706,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_12
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6591,6 +6760,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 36.031 mol% ± 0.122. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.88248419e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_12']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6609,6 +6789,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_13
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6662,6 +6843,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 37.134 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.99279348e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_14']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6680,6 +6872,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_14
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6733,6 +6926,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 37.155 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.99279348e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_14']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6751,6 +6955,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_15
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6804,6 +7009,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 38.616 mol% ± 0.043. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.90507183e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_15']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6822,6 +7038,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_16
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6875,6 +7092,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 39.926 mol% ± 0.052. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.77585903e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_16']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6893,6 +7121,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_17
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -6946,6 +7175,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 40.887 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.55034440e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_18']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -6964,6 +7204,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_18
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7017,6 +7258,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 41.493 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.77585903e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_19']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -7035,6 +7287,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_19
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7088,6 +7341,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 43.149 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.15976862e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_20']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -7106,6 +7370,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_20
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7159,6 +7424,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 46.428 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.55034440e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_21']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -7177,6 +7453,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_TiO_21
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7230,6 +7507,17 @@ species:
             page: 2
             figure: '1'
             note: Axis read 49.995 mol% ± 0.023. CaO is 0.5 on the pseudobinary join, not an axis read.
+        fO2_Pa:
+          state: {tag: value, value: '2.79340045e-6'}
+          locator: {page: 2, published_page: 1470, pdf_page_index: 1, figure: '1', note: "Nearest-composition Fig. 1 series 5 p(O); the linked O row records the 600 dpi digitization method."}
+          inference:
+            relation: >-
+              source_oxygen_condition; pO2=(pO/Kf(O))^2 from the source O point
+              using JANAF O-001 at 2100 K (log10 Kf(O)=-2.857). p(O) is based
+              on the Mo-cell equilibrium (MoO3)=(MoO2)+(O), checked against
+              equilibria (2)-(4), not calculated from the TiO target.
+            inputs: ['shornikov-2000-titania-melts::shornikov_2000_f1_O_22']
+            output_unit: Pa
       values:
         quantity: partial_pressure
         method_class: figure_only
@@ -7250,6 +7538,7 @@ species:
     observations:
     - observation_id: shornikov_2000_f1_O_01
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7321,6 +7610,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_02
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7392,6 +7682,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_03
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7463,6 +7754,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_04
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7534,6 +7826,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_05
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7605,6 +7898,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_06
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7676,6 +7970,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_07
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7747,6 +8042,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_08
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7818,6 +8114,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_09
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7889,6 +8186,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_10
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -7960,6 +8258,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_11
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8031,6 +8330,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_12
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8102,6 +8402,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_13
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8173,6 +8474,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_14
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8244,6 +8546,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_15
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8315,6 +8618,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_16
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8386,6 +8690,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_17
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8457,6 +8762,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_18
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8528,6 +8834,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_19
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8599,6 +8906,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_20
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8670,6 +8978,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_21
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470
@@ -8741,6 +9050,7 @@ species:
         render_dpi: 600
     - observation_id: shornikov_2000_f1_O_22
       type: partial_pressure
+      experiment: shornikov-2000-titania-figure1
       locator:
         page: 2
         published_page: 1470

@@ -1,3 +1,6 @@
+from dataclasses import replace
+from decimal import Decimal
+
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT
@@ -124,3 +127,55 @@ def test_figure_extract_migrates_figure_only_observations():
     assert len(result.observations) == 301
     for observation in result.observations.values():
         assert observation.identity.species.formula
+
+    from simulator.battery.score import _source_oxygen_pressure_for_score
+    from simulator.battery.source_oxygen import linked_source_pressure
+
+    tio_rows = [
+        row for row in result.observations.values()
+        if row.source_id == extract["source_id"]
+        and row.observation_id.startswith(
+            f'{extract["source_id"]}::shornikov_2000_f1_TiO_'
+        )
+    ]
+    oxygen_rows = {
+        row.observation_id: row
+        for row in result.observations.values()
+        if row.source_id == extract["source_id"]
+        and row.observation_id.startswith(
+            f'{extract["source_id"]}::shornikov_2000_f1_O_'
+        )
+    }
+    assert len(tio_rows) == 21
+    assert len(oxygen_rows) == 22
+    for row in tio_rows:
+        condition = row.point_conditions["fO2_Pa"]
+        assert condition.state.is_value
+        assert condition.inference is not None
+        assert condition.inference.relation.startswith("source_oxygen_condition;")
+        assert len(condition.inference.inputs) == 1
+        assert row.observation_id not in condition.inference.inputs
+        source_oxygen = oxygen_rows[condition.inference.inputs[0]]
+        assert source_oxygen.identity.species.formula == "O"
+        assert source_oxygen.experiment_id == row.experiment_id
+        assert source_oxygen.locator is not None
+        assert source_oxygen.locator.page == 2
+        assert source_oxygen.locator.published_page == 1470
+        linked = linked_source_pressure(row)
+        assert linked is not None and linked > 0
+        assert row.identity.fO2_Pa.is_value
+        assert row.identity.fO2_Pa.value == linked
+        assert _source_oxygen_pressure_for_score(row) == linked
+
+        mutated = replace(
+            row,
+            value=replace(row.value, point=row.value.point * Decimal("10")),
+        )
+        assert mutated.value.point != row.value.point
+        assert linked_source_pressure(mutated) == linked
+        assert _source_oxygen_pressure_for_score(mutated) == linked
+
+    experiment = result.experiments[tio_rows[0].experiment_id]
+    assert experiment.bench_id is not None
+    bench = result.benches[experiment.bench_id]
+    assert {item.state.value.value for item in bench.cell_materials} == {"Mo"}
