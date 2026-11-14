@@ -28,6 +28,7 @@ from simulator.transport_constants import (
     COLLISION_DIAMETER_SOURCE,
     COLLISION_DIAMETERS_M,
     FREE_MOLECULAR_KNUDSEN_MIN,
+    N2_COLLISION_DIAMETER_M,
     VISCOUS_KNUDSEN_MAX,
 )
 
@@ -553,6 +554,51 @@ def _require_transitional_knudsen(
             "near-viscous values require explicit cross-check mode",
         )
     return knudsen_number
+
+
+def high_edge_knudsen_clause(
+    pressure_pa: float,
+    temperature_K: float,
+    length_m: float,
+) -> tuple[KnudsenRegime, str]:
+    """Regime at one pressure, for the high edge of an approximate band.
+
+    Premise: a hard-sphere gas in a tube. λ = kT / (√2 π d² p), with
+    k = BOLTZMANN and d = N2_COLLISION_DIAMETER_M, and Kn = λ / L.
+    A check at 0.0133 Pa / 1700 K through single_species_mean_free_path_m
+    gives λ ≈ 2.75 m at this project's N2 diameter; the same check at
+    d = 3.7e-10 m is the ≈2.9 m figure. Either way Kn ≫ 1 in a laboratory
+    tube. The high edge is the most continuum-like pressure. The
+    insensitive sentence is returned only when classify_knudsen_regime
+    says free-molecular. A missing length is not invented here.
+    """
+
+    if not math.isfinite(length_m) or length_m <= 0.0:
+        _refuse(
+            "invalid_characteristic_length",
+            "length_m must be finite and > 0",
+        )
+    mean_free_path_m = single_species_mean_free_path_m(
+        pressure_pa,
+        temperature_K,
+        N2_COLLISION_DIAMETER_M,
+    )
+    knudsen_number = mean_free_path_m / length_m
+    regime = classify_knudsen_regime(knudsen_number)
+    if regime is KnudsenRegime.FREE_MOLECULAR:
+        # Wall factor f = Kn / (Kn + 0.01) goes to 1, the gas-film term
+        # drops out, and Hertz-Knudsen dominates. Transitional flow does
+        # not get that sentence.
+        return regime, (
+            "pressure-insensitive regime: at the high edge the flow is "
+            f"free-molecular (Kn={knudsen_number:.6g} at {temperature_K:g} K "
+            f"over L={length_m:g} m); the wall factor Kn/(Kn+0.01) is near 1, "
+            "the gas-film term drops out, and Hertz-Knudsen dominates"
+        )
+    return regime, (
+        f"Kn={knudsen_number:.6g} at the high edge "
+        f"({pressure_pa:g} Pa, {temperature_K:g} K, L={length_m:g} m)"
+    )
 
 
 def classify_knudsen_regime(knudsen_number: float) -> KnudsenRegime:

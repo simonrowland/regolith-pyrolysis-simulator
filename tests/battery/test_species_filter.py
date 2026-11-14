@@ -309,7 +309,11 @@ def test_filtered_cli_keeps_published_artifacts_and_labels_subset(
         "_render_score_report_from_payloads_legacy",
         lambda *_args, **_kwargs: "# Battery score report\n",
     )
-    monkeypatch.setattr(battery_score, "_append_nasa9_fit_comparison_stratum", lambda report, _rows: report)
+    monkeypatch.setattr(
+        battery_score,
+        "format_nasa9_fit_comparison_stratum",
+        lambda report, _rows: report,
+    )
 
     assert battery_score.main(
         [
@@ -401,7 +405,9 @@ def test_unfiltered_cli_preserves_summary_bytes_and_completion_line(
         lambda *_args, **_kwargs: "# Battery score report\n",
     )
     monkeypatch.setattr(
-        battery_score, "_append_nasa9_fit_comparison_stratum", lambda report, _rows: report
+        battery_score,
+        "format_nasa9_fit_comparison_stratum",
+        lambda report, _rows: report,
     )
 
     assert battery_score.main(["--root", str(tmp_path)]) == 0

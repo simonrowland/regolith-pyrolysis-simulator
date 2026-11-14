@@ -9,6 +9,7 @@ import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.records import ApproxPressure, BandBasis
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 from tests.helpers.pdf_text import pdftotext_page_text
@@ -102,9 +103,12 @@ def test_zhang_thesis_residues_migrate_with_species_temperature_and_conditions()
     ]
     assert len(vacuum_residues) == 120
     assert all(
-        observation.identity.total_pressure_Pa.is_unknown
-        and observation.identity.total_pressure_Pa.reason
-        == "source has no located total pressure for this run"
+        observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_value
+        and isinstance(observation.identity.total_pressure_Pa.value, ApproxPressure)
+        and observation.identity.total_pressure_Pa.value.point == Decimal("0.0001")
+        and observation.identity.total_pressure_Pa.value.band_basis
+        is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
         for observation in vacuum_residues
     )
 
