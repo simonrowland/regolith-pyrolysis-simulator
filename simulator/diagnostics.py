@@ -1584,6 +1584,7 @@ def _pressure_coating_pareto_unavailable(
     reason: str,
     *,
     alpha_authority_status_by_species: Mapping[str, str] | None = None,
+    alpha_s_evaluation_by_species: Mapping[str, Any] | None = None,
     wall_notice: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     diagnostic = {
@@ -1609,6 +1610,10 @@ def _pressure_coating_pareto_unavailable(
         diagnostic["alpha_authority_status_by_species"] = dict(
             alpha_authority_status_by_species
         )
+    if alpha_s_evaluation_by_species:
+        diagnostic["alpha_s_evaluation_by_species"] = _plain_mapping(
+            alpha_s_evaluation_by_species
+        )
     _attach_pareto_source_notices(diagnostic["by_species"], wall_notice or {})
     return diagnostic
 
@@ -1631,6 +1636,7 @@ def pressure_coating_pareto_diagnostic(
 
     condensation_model = getattr(sim, "condensation_model", None)
     latest_evap = dict(getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {})
+    alpha_evaluations = latest_evap.get("alpha_s_evaluation_by_species") or {}
     wall_notice = getattr(condensation_model, "last_sticking_alpha_provenance_notice", {}) or {}
     series_by_species = dict(latest_evap.get("evaporation_series_resistance") or {})
     raw_alpha_authority_status_by_species = dict(
@@ -1658,6 +1664,7 @@ def pressure_coating_pareto_diagnostic(
             alpha_authority_status_by_species=(
                 alpha_authority_status_by_species
             ),
+            alpha_s_evaluation_by_species=alpha_evaluations,
         )
     gas_temperature_C = _first_finite(
         knudsen_diagnostic.get("gas_temperature_C"),
@@ -1682,6 +1689,7 @@ def pressure_coating_pareto_diagnostic(
             alpha_authority_status_by_species=(
                 alpha_authority_status_by_species
             ),
+            alpha_s_evaluation_by_species=alpha_evaluations,
         )
     controlling = max(
         (
@@ -1732,6 +1740,7 @@ def pressure_coating_pareto_diagnostic(
             alpha_authority_status_by_species=(
                 alpha_authority_status_by_species
             ),
+            alpha_s_evaluation_by_species=alpha_evaluations,
         )
     gate_pressure_pa = float(controlling["no_warning_pressure_pa"])
     hard_refusal_pressure_pa = float(controlling["hard_refusal_pressure_pa"])
@@ -1953,6 +1962,8 @@ def pressure_coating_pareto_diagnostic(
         diagnostic["alpha_authority_status_by_species"] = (
             alpha_authority_status_by_species
         )
+    if alpha_evaluations:
+        diagnostic["alpha_s_evaluation_by_species"] = _plain_mapping(alpha_evaluations)
     return diagnostic
 
 

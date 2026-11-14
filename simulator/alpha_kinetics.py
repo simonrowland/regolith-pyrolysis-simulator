@@ -99,6 +99,20 @@ def parse_alpha_value(value: Any) -> float | dict[str, Any]:
                 field="temperature_range_K",
                 positive_low=True,
             )
+        if "calibrated_regime" in spec:
+            regime = spec["calibrated_regime"]
+            if not isinstance(regime, Mapping):
+                raise AlphaSpecError("calibrated_regime must be a mapping")
+            if temperature_range is None:
+                raise AlphaSpecError("calibrated_regime requires temperature_range_K")
+            for field in ("carrier_gas", "composition_family"):
+                if not isinstance(regime.get(field), str) or not regime[field].strip():
+                    raise AlphaSpecError(f"calibrated_regime.{field} must be non-empty")
+            _finite_pair(
+                regime.get("pressure_bar"),
+                field="calibrated_regime.pressure_bar",
+                positive_low=True,
+            )
         return spec
     if form != "arrhenius":
         raise AlphaSpecError("correlation form must be 'scalar' or 'arrhenius'")
@@ -154,13 +168,83 @@ def parse_alpha_contract(contract: Any) -> float | dict[str, Any] | None:
             "evaporation_alpha requires value or exact status='no_data'"
         )
     value = parse_alpha_value(contract["value"])
-    if contract.get("status") != ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
+    calibrated_regime = contract.get("calibrated_regime")
+    upper_bound = contract.get("status") == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+    if "calibrated_regime" not in contract and not upper_bound:
         return value
     if isinstance(value, Mapping):
         executable = dict(value)
     else:
         executable = {"form": "scalar", "value": value}
-    executable[ALPHA_AUTHORITY_STATUS_FIELD] = (
-        ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-    )
-    return executable
+    if "calibrated_regime" in contract:
+        executable["calibrated_regime"] = deepcopy(calibrated_regime)
+        executable["temperature_range_K"] = deepcopy(contract.get("T_band_K"))
+    if upper_bound:
+        executable[ALPHA_AUTHORITY_STATUS_FIELD] = ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+    return parse_alpha_value(executable)
+
+
+def evaluate_calibrated_alpha_regime(
+    species: str,
+    temperature_K: float,
+    spec: Mapping[str, Any],
+    context: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Predict with the fitted alpha while identifying unsupported caller regimes."""
+    fit = dict(spec["calibrated_regime"])
+    temperature_band = list(spec["temperature_range_K"])
+    fit["temperature_K"] = temperature_band
+    context = context or {}
+    pressure = context.get("pressure_bar")
+    if (
+        isinstance(pressure, bool)
+        or not isinstance(pressure, Real)
+        or not math.isfinite(pressure)
+    ):
+        pressure = None
+    caller = {
+        "temperature_K": temperature_K,
+        "carrier_gas": context.get("carrier_gas"),
+        "pressure_bar": pressure,
+        "composition_family": context.get("composition_family"),
+    }
+
+    # Fedkin section 4.2 / Fig.4 fits Yu composition 1 at one printed point:
+    # 1723 K and 1e-5 bar air (1 Pa). A point supplies no temperature/pressure
+    # tolerance or composition interpolation. Allow one floating-point ULP
+    # for unit-conversion roundoff only; unknown gas/composition is not a match.
+    # The family is an explicit source identity, never inferred from bulk chemistry.
+    def within_band(value: float | None, band: Sequence[float]) -> bool:
+        return value is not None and (
+            math.nextafter(float(band[0]), -math.inf)
+            <= value
+            <= math.nextafter(float(band[1]), math.inf)
+        )
+
+    mismatches = []
+    if not within_band(temperature_K, temperature_band):
+        mismatches.append("temperature_K")
+    if str(caller["carrier_gas"] or "").casefold() != fit["carrier_gas"].casefold():
+        mismatches.append("carrier_gas")
+    if not within_band(pressure, fit["pressure_bar"]):
+        mismatches.append("pressure_bar")
+    if caller["composition_family"] != fit["composition_family"]:
+        mismatches.append("composition_family")
+    evaluation = {
+        "alpha_s_valid_range_K": temperature_band,
+        "alpha_s_temperature_range_K": temperature_band,
+        "alpha_s_calibrated_regime": fit,
+        "alpha_s_caller_regime": caller,
+        "alpha_s_extrapolated": bool(mismatches),
+    }
+    if mismatches:
+        evaluation.update({
+            "alpha_s_regime_mismatches": mismatches,
+            "alpha_s_extrapolation_reason": "outside_calibrated_regime",
+            "alpha_s_extrapolation_warning": (
+                f"{species} alpha_s scalar coefficient extrapolated beyond "
+                f"calibrated regime {fit}; caller regime {caller}; "
+                f"mismatches: {', '.join(mismatches)}"
+            ),
+        })
+    return evaluation

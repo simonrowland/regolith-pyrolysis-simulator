@@ -59,7 +59,8 @@ BROAD_PROXY_SPECIES = {
     "CrO2",
 }
 
-# Untagged bare-scalar rows that remain admitted. Cr is the same bare-float
+# Untagged rows that remain admitted. K now carries its calibrated regime;
+# Cr is the same bare-float
 # shape as CrO2 but carries NO proxy tag (Pound McCabe-Hudson Paxton
 # pure-solid-Cr measurement family); withdrawing untagged rows is outside
 # this fix's scope.
@@ -115,6 +116,8 @@ def test_measured_view_strips_proxy_rows_for_flux_admission():
         _load_evaporation_alpha_by_species(_raw_data())
     )
     admitted = BROAD_PROXY_SPECIES & set(measured)
+    assert "K" in measured
+    assert "alpha_proxy_tag" not in measured["K"]
     assert not admitted, (
         f"tag {BROAD_PROXY_NOT_INTRINSIC_TAG!r} rows must not satisfy the "
         f"measured-alpha requirement, but loaded: {sorted(admitted)}"

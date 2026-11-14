@@ -917,6 +917,12 @@ families:
             DOI 10.1016/j.gca.2005.08.014, section 4.2 pp.213-214 and Fig.4A;
             model fit Na alpha_e=0.26 +/- 0.05 to Yu et al. 2003 composition 1
           value: 0.26
+          T_band_K: &fedkin_yu2003_fit_temperature [1723, 1723]
+          envelope: [0.21, 0.31]
+          calibrated_regime: &fedkin_yu2003_air_fit
+            carrier_gas: air
+            pressure_bar: [1.0e-5, 1.0e-5]
+            composition_family: Yu2003_composition1
           regime: 1723 K only; 1e-5 bar low-pressure air; Yu et al. 2003 chondrule-analog
             composition 1 (Fedkin Table 2; MnO ignored and olivine/orthopyroxene suppressed
             in the model); not a KEMS measurement or a composition-independent intrinsic alpha
@@ -1154,17 +1160,14 @@ families:
           low-pressure air to Yu et al. 2003 chondrule-analog composition 1 (Fedkin
           Table 2; MnO ignored and olivine/orthopyroxene suppressed in the model);
           not a KEMS measurement or a composition-independent intrinsic alpha
-        T_band_K:
-        - 1723
-        - 1723
+        T_band_K: *fedkin_yu2003_fit_temperature
         envelope:
         - 0.11
         - 0.15
         tier: 2
+        calibrated_regime: *fedkin_yu2003_air_fit
       alpha_domain_and_uncertainty:
-        temperature_K:
-        - 1723
-        - 1723
+        temperature_K: *fedkin_yu2003_fit_temperature
         envelope:
         - 0.11
         - 0.15

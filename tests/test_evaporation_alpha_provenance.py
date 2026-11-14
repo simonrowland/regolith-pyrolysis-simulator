@@ -12,6 +12,7 @@ import yaml
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator import condensation
+from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
 from simulator.chemistry.langmuir_knudsen import grounded_alpha
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -263,7 +264,12 @@ def test_fedkin_air_fit_provenance_reaches_catalog_and_runtime_loaders():
     assert "alpha_fit_only_1723K_1e-5bar_air_Yu2003_composition1" in (
         potassium.acquisition_flag
     )
-    assert _load_evaporation_alpha_by_species(raw)["K"] == pytest.approx(0.13)
+    loaded = _load_evaporation_alpha_by_species(raw)["K"]
+    assert loaded["value"] == pytest.approx(0.13)
+    assert loaded["temperature_range_K"] == [1723, 1723]
+    assert loaded["calibrated_regime"] == dict(
+        potassium.evaporation_alpha["calibrated_regime"]
+    )
     assert _load_evaporation_alpha_envelope_by_species(raw)["K"] == (0.11, 0.15)
 
     # Na retains its analytical ceiling; Fedkin is a competing, conditional fit.
@@ -286,6 +292,67 @@ def test_fedkin_air_fit_provenance_reaches_catalog_and_runtime_loaders():
         assert "model" in text
         assert "sealed-chamber" not in text
         assert "LPSC" not in text
+
+
+@pytest.mark.parametrize("species, expected", [("K", 0.13), ("Na", 0.26)])
+@pytest.mark.parametrize(
+    "temperature, gas, pressure, family, mismatch",
+    [
+        (1723.0, "air", 1e-5, "Yu2003_composition1", None),
+        (1900.0, "vacuum", 0.0, "lunar_mare_low_ti", "temperature_K"),
+        (1500.0, "air", 1e-5, "Yu2003_composition1", "temperature_K"),
+        (1723.0, "H2", 1e-5, "Yu2003_composition1", "carrier_gas"),
+        (1723.0, "air", 9e-5, "Yu2003_composition1", "pressure_bar"),
+        (1723.0, "air", 1e-5, "lunar_mare_low_ti", "composition_family"),
+        (1723.0, None, None, None, "carrier_gas"),
+        (1723.0, "air", math.nextafter(1e-5, math.inf), "Yu2003_composition1", None),
+    ],
+)
+def test_fedkin_fit_predicts_and_flags_its_actual_regime(
+    species, expected, temperature, gas, pressure, family, mismatch,
+):
+    data = _vapor_pressure_data()
+    contract = data["metals"][species]["evaporation_alpha"]
+    if species == "Na":
+        contract = contract["competing_sources"][0]
+    context = {
+        "coefficient_spec": parse_alpha_contract(contract),
+        "carrier_gas": gas,
+        "pressure_bar": pressure,
+        "composition_family": family,
+    }
+    value = condensation.alpha_s(species, temperature, context)
+    evaluation = json.loads(json.dumps(context["alpha_s_evaluation"]))
+
+    assert value.hex() == expected.hex()
+    assert evaluation["alpha_s_extrapolated"] is (mismatch is not None)
+    assert evaluation["alpha_s_calibrated_regime"] == {
+        "temperature_K": [1723, 1723],
+        "carrier_gas": "air",
+        "pressure_bar": [1e-5, 1e-5],
+        "composition_family": "Yu2003_composition1",
+    }
+    assert evaluation["alpha_s_caller_regime"] == {
+        "temperature_K": temperature,
+        "carrier_gas": gas,
+        "pressure_bar": pressure,
+        "composition_family": family,
+    }
+    if mismatch is None:
+        assert "alpha_s_extrapolation_warning" not in evaluation
+    else:
+        assert mismatch in evaluation["alpha_s_regime_mismatches"]
+        warning = evaluation["alpha_s_extrapolation_warning"]
+        assert "calibrated regime" in warning and "caller regime" in warning
+        assert "Yu2003_composition1" in warning
+        assert "1723" in warning and "air" in warning
+
+
+def test_malformed_alpha_fit_regime_is_rejected_at_the_contract_boundary():
+    contract = _vapor_pressure_data()["metals"]["K"]["evaporation_alpha"]
+    contract["calibrated_regime"]["pressure_bar"] = [True, 1e-5]
+    with pytest.raises(AlphaSpecError, match="pressure_bar"):
+        parse_alpha_contract(contract)
 
 
 def test_sossi_sodium_family_withdrawal_reaches_every_runtime_store():
@@ -505,14 +572,14 @@ def test_zhang_2014_catio3_proxy_withdrawn_hkl_upper_bound_posture():
         assert spec["alpha_authority_status"] == "analytical_upper_bound", species
 
 
-def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
+def test_alpha_authority_and_fit_notices_survive_flux_serialization_and_replay():
     raw = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
     alpha_by_species = _load_evaporation_alpha_by_species(raw)
-    species = ("Ca", "Ti")
+    species = ("Ca", "Ti", "K")
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
-            accounts={"process.cleaned_melt": {"CaO": 10.0, "TiO2": 10.0}},
+            accounts={"process.cleaned_melt": {"CaO": 10.0, "TiO2": 10.0, "K2O": 10.0}},
             species_formula_registry={},
         ),
         temperature_C=1700.0,
@@ -520,9 +587,11 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
         fO2_log=None,
         control_inputs={
             "overhead_pressure_pa": 0.0,
+            "carrier_gas": "N2",
+            "composition_family": "lunar_mare_low_ti",
             CONTROL_FLUX_PRESSURES_KEY: {name: 100.0 for name in species},
             "overhead_partials_Pa": {},
-            "molar_mass_kg_mol": {"Ca": 0.040078, "Ti": 0.047867},
+            "molar_mass_kg_mol": {"Ca": 0.040078, "Ti": 0.047867, "K": 0.0390983},
             "stoich_by_species": {
                 "Ca": {
                     "parent_oxide": "CaO",
@@ -534,8 +603,13 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
                     "oxide_per_product_kg": 1.0,
                     "O2_per_product_kg": 0.0,
                 },
+                "K": {
+                    "parent_oxide": "K2O",
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                },
             },
-            "available_oxide_kg": {"Ca": 10.0, "Ti": 10.0},
+            "available_oxide_kg": {"Ca": 10.0, "Ti": 10.0, "K": 10.0},
             "melt_surface_area_m2": 1.0,
             "stir_factor": 1.0,
             "alpha": alpha_by_species,
@@ -548,6 +622,7 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
     assert result.diagnostic["alpha_used_by_species"] == {
         "Ca": pytest.approx(1.0),
         "Ti": pytest.approx(1.0),
+        "K": pytest.approx(0.13),
     }
     assert result.diagnostic["alpha_authority_status_by_species"] == {
         "Ca": "analytical_upper_bound",
@@ -598,7 +673,7 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
         "Ca": "analytical_upper_bound",
         "Ti": "analytical_upper_bound",
     }
-    for name in species:
+    for name in ("Ca", "Ti"):
         assert replay["by_species"][name]["alpha_intrinsic"] == pytest.approx(1.0)
         assert replay["by_species"][name]["alpha_authority_status"] == (
             "analytical_upper_bound"
@@ -618,6 +693,26 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
     assert label["certification_allowed"] is False
     assert label["canonical"]["certification_allowed"] is False
     assert label["alpha_ceiling_species"] == ["Ca", "Ti"]
+
+    evaluation = serialized_flux["alpha_s_evaluation_by_species"]["K"]
+    assert evaluation["alpha_s_extrapolated"] is True
+    assert evaluation["alpha_s_caller_regime"] == {
+        "temperature_K": 1973.15,
+        "carrier_gas": "N2",
+        "pressure_bar": 0.0,
+        "composition_family": "lunar_mare_low_ti",
+    }
+    assert evaluation["alpha_s_extrapolation_warning"] in result.warnings
+    assert replay["alpha_s_evaluation_by_species"]["K"] == evaluation
+    assert artifact["run_metadata"]["pressure_coating_pareto_diagnostic"][
+        "alpha_s_evaluation_by_species"
+    ]["K"] == evaluation
+    unavailable = pressure_coating_pareto_diagnostic(
+        SimpleNamespace(_last_evaporation_flux_diagnostic=serialized_flux),
+        target_species=("K",),
+    )
+    assert unavailable["status"] == "unavailable"
+    assert unavailable["alpha_s_evaluation_by_species"]["K"] == evaluation
 
 
 @pytest.mark.parametrize("species", ("Ca", "Ti"))

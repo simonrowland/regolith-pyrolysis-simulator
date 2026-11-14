@@ -414,7 +414,11 @@ the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a spec
   `α = 0.13 ± 0.02` at 1723 K in 10⁻⁵ bar air for Yu et al. (2003) composition 1
   (GCA 70:213–214, §4.2, Fig. 4B). This is not a KEMS measurement or a universal intrinsic
   coefficient. The supported point is `[1723,1723]` K with envelope `[0.11,0.15]`;
-  the acquisition flag names the gas/composition restriction. It does not inherit the sodium ceiling.
+  runtime carries the temperature, air pressure and composition family into `alpha_s`.
+  A different or unknown caller regime keeps the prediction and emits an extrapolation warning
+  naming the fit and caller regimes. The warning survives the evaporation result and rebuilt
+  pressure/coating report. Only floating-point roundoff is allowed around the printed fit point;
+  no temperature, pressure or composition tolerance is inferred. It does not inherit the sodium ceiling.
 - **Proxy coefficient.** Calcium and titanium use a perovskite (CaTiO₃) proxy; aluminium uses a broad
   conflicting-proxy envelope. These are labelled as proxies, not regolith-melt measurements.
 - **No grounded coefficient.** Chromium, manganese, and the chromium-oxide vapor have no grounded
