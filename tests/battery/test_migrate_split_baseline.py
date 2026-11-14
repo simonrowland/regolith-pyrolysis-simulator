@@ -2,7 +2,11 @@
 
 These pins cover a few representative source shapes before the migrate.py
 codec, composition, and identity moves. Each run migrates one extract row or
-one compilation table through the existing migration entry points.
+one compilation table through the existing migration entry points. They call
+``migrate(..., write=False)`` without ``observation_from_plain`` or
+``load_migrated_store``, select one child per input, and the compilation helper
+stops before ``Migrator.finalize``. This is not whole-store coverage or a
+complete proof for M1-M3.
 """
 
 from __future__ import annotations
@@ -23,6 +27,11 @@ _EXTRACT_ROWS = (
     ("cardiff-2007-vacuum-pyrolysis-gsfc.yaml", "cardiff_2007_table1_fresnel_pyrolysis_log"),
     ("cardiff-2007-vacuum-pyrolysis-gsfc.yaml", "cardiff_2007_fig6_hsc_1e-1_Torr_figure_only"),
     ("cardiff-2007-vacuum-pyrolysis-gsfc.yaml", "cardiff_2007_fig7_hsc_1e-7_Torr_figure_only"),
+    (
+        "kems-026-markova-1984.yaml",
+        "markova_1984_table2_residual_melt_VI_lherzolite",
+        "::mass_loss_fraction::T=2156.15:h=e9110f31a14b",
+    ),
 )
 _COMPILATION = (
     "data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/"
@@ -94,7 +103,15 @@ def _state_output(state: object, axis: str) -> object:
         value = plain["value"]
         plain["value"] = {
             key: value[key]
-            for key in ("amount_basis", "basis", "components", "proxy_flag")
+            for key in (
+                "amount_basis",
+                "basis",
+                "components",
+                "proxy_flag",
+                "proxy_source",
+                "analysis_selection_rule",
+                "input_provenance",
+            )
             if key in value
         }
     return plain
@@ -112,6 +129,7 @@ def _pinned_output(result, observation_id: str) -> dict[str, object]:
             key: {
                 "state": _state_output(value.state, key),
                 "locator": to_plain(value.locator),
+                **({"inference": to_plain(value.inference)} if value.inference else {}),
             }
             for key, value in sorted(observation.point_conditions.items())
         }
@@ -133,14 +151,20 @@ def _pinned_output(result, observation_id: str) -> dict[str, object]:
 
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
     actual = {}
-    for filename, observation_id in _EXTRACT_ROWS:
+    for row in _EXTRACT_ROWS:
+        filename, observation_id, *child_suffix = row
         result, parent_id = _one_extract_row(tmp_path, filename, observation_id)
         candidates = sorted(
             oid for oid in result.observations
             if oid == parent_id or oid.startswith(f"{parent_id}::")
         )
         assert candidates, parent_id
-        migrated_id = candidates[0]
+        migrated_id = (
+            parent_id + child_suffix[0]
+            if child_suffix
+            else candidates[0]
+        )
+        assert migrated_id in candidates, migrated_id
         actual[migrated_id] = _pinned_output(result, migrated_id)
     result, observation_id = _one_compilation_table(tmp_path)
     actual[observation_id] = _pinned_output(result, observation_id)
@@ -1250,4 +1274,8 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
   }
 }
     ''')
+    expected[
+        "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite"
+        "::mass_loss_fraction::T=2156.15:h=e9110f31a14b"
+    ] = {"STUDIO_VALUE_REQUIRED": True}
     assert actual == expected, json.dumps(actual, sort_keys=True, separators=(",", ":"), default=str)
