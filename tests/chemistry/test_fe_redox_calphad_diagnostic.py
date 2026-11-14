@@ -11,12 +11,12 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.fe_redox import (
     LiquidFeODomain,
     calphad_ferrous_feo_activity_diagnostic,
-    feo_iw_log10_fO2_bar,
     holzheid_stoich_feo_gamma_band,
     kress91_ferrous_feo_activity,
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
+from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 from simulator.state import MOLAR_MASS
 
 

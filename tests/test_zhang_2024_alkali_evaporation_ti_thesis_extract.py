@@ -9,6 +9,7 @@ import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.records import ApproxPressure, BandBasis
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 from tests.helpers.pdf_text import pdftotext_page_text
@@ -90,6 +91,48 @@ def test_zhang_thesis_residues_migrate_with_species_temperature_and_conditions()
         assert "duration_min" in conditions, observation.observation_id
         assert conditions["duration_min"].state.is_value
         assert conditions["duration_min"].locator is not None
+
+    vacuum_residues = [
+        observation
+        for observation in source_observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and "total_pressure_Pa" in (observation.point_conditions or {})
+        and "Printed about 10^-6 mbar"
+        in observation.point_conditions["total_pressure_Pa"].locator.note
+    ]
+    assert len(vacuum_residues) == 120
+    assert all(
+        observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_value
+        and isinstance(observation.identity.total_pressure_Pa.value, ApproxPressure)
+        and observation.identity.total_pressure_Pa.value.point == Decimal("0.0001")
+        and observation.identity.total_pressure_Pa.value.band_basis
+        is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+        for observation in vacuum_residues
+    )
+
+    exact_bar = []
+    for observation in source_observations:
+        if not (
+            observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ):
+            continue
+        located = (observation.point_conditions or {}).get("total_pressure_Pa")
+        if (
+            located is not None
+            and located.state.is_value
+            and located.state.value == Decimal("100000")
+        ):
+            exact_bar.append(observation)
+    assert len(exact_bar) == 90
+    assert all(
+        observation.identity.total_pressure_Pa.is_value
+        and observation.identity.total_pressure_Pa.value == Decimal("100000")
+        for observation in exact_bar
+    )
 
     for formula, container in document["species"].items():
         for row in container["observations"]:

@@ -1,0 +1,314 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 3d9fd3bbef0bac5cec9304f54e464d8340f767fde386856088975ba5181d5cb5
+  citation: Watne, Bruce Michael (December 1977). Development of a constant temperature, platinum, atomic absorption furnace
+    and its use in potassium vapor pressure measurements for MHD. PhD dissertation in Chemistry, Montana State University.
+  source_ids:
+  - watne-1977-potassium-vapor-pressure-furnace
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:watne-1977-potassium-vapor-pressure-furnace
+      role: pdf
+      path: raw/watne-1977-potassium-vapor-pressure-furnace/watne-1977-potassium-vapor-pressure-furnace.pdf
+      sha256:
+        tag: value
+        value: 6489d93daa38794747a4fb04c3cb52e0bc044f819b79b44dfd99d1894ff7a572
+    - asset_id: pdftotext:watne-1977-potassium-vapor-pressure-furnace
+      role: pdftotext
+      path: text/watne-1977-potassium-vapor-pressure-furnace
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:watne-1977-potassium-vapor-pressure-furnace
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 3d9fd3bbef0bac5cec9304f54e464d8340f767fde386856088975ba5181d5cb5::watne-1977-potassium-vapor-pressure-furnace
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 3d9fd3bbef0bac5cec9304f54e464d8340f767fde386856088975ba5181d5cb5
+  locator:
+    page: 112
+    table: '12'
+    note: row=Platinum furnace; 1070±10 °C; column=Absorbance; table_row_number=3; table_column_number=4
+context:
+- observation_id: watne_1977_equations_3_to_5_temperature_fits
+  type: calibration_fit_summary
+  units: log absorbance versus reciprocal temperature (K^-1)
+  locator:
+    page: 111
+    section: Potassium vapor pressure calibration
+    equations: 3-5
+  values:
+    quantity_as_printed: log absorbance versus 1/T K for Equations 3-4; NBS log potassium vapor pressure for Equation 5
+    equations:
+    - equation: '3'
+      fit_output_as_printed: log abs = -7950/T + 3.78
+      slope_as_printed: '-7950'
+      intercept_as_printed: '3.78'
+      evidence_class: model_derived
+      parent_observation_ids:
+      - watne_1977_table12_row_05_absorbance
+      - watne_1977_table12_row_06_absorbance
+      - watne_1977_table12_row_07_absorbance
+    - equation: '4'
+      fit_output_as_printed: log abs = -22400/T + 14.1
+      slope_as_printed: '-22400'
+      intercept_as_printed: '14.1'
+      evidence_class: model_derived
+      parent_observation_ids:
+      - watne_1977_table12_row_02_absorbance
+      - watne_1977_table12_row_03_absorbance
+      - watne_1977_table12_row_04_absorbance
+    - equation: '5'
+      fit_output_as_printed: log P_K = -21453/T + 7.4866
+      slope_as_printed: '-21453'
+      intercept_as_printed: '7.4866'
+      evidence_class: quoted_attributed
+      attribution_as_printed: N.B.S.; reference [45].
+    pressure_unit_as_printed: not stated for Equation 5
+  context_id: watne-1977-potassium-vapor-pressure-furnace::context::watne_1977_equations_3_to_5_temperature_fits
+  work_id: 3d9fd3bbef0bac5cec9304f54e464d8340f767fde386856088975ba5181d5cb5
+  source_id: watne-1977-potassium-vapor-pressure-furnace
+  species: K
+- observation_id: watne_1977_figure15_calibration_fits
+  type: calibration_fit_summary
+  units: log absorbance versus reciprocal temperature (K^-1)
+  locator:
+    page: 114
+    figure: '15'
+  values:
+    quantity_as_printed: log absorbance versus 1/T K
+    fits:
+    - furnace: graphite
+      slope_as_printed: '-7950'
+      intercept_as_printed: '3.78'
+      correlation_coefficient_as_printed: '0.70'
+      evidence_class: model_derived
+      parent_observation_ids:
+      - watne_1977_table12_row_05_absorbance
+      - watne_1977_table12_row_06_absorbance
+      - watne_1977_table12_row_07_absorbance
+    - furnace: platinum
+      slope_as_printed: '-22400'
+      intercept_as_printed: '14.1'
+      correlation_coefficient_as_printed: '0.99'
+      evidence_class: model_derived
+      parent_observation_ids:
+      - watne_1977_table12_row_02_absorbance
+      - watne_1977_table12_row_03_absorbance
+      - watne_1977_table12_row_04_absorbance
+    - furnace: NBS
+      slope_as_printed: '-21453'
+      intercept_as_printed: '7.4866'
+      evidence_class: quoted_attributed
+      attribution_as_printed: N.B.S. values, reference [45].
+    note: Fit parameters are the caption values, not digitised curve points. The NBS line is attributed to the cited source.
+  context_id: watne-1977-potassium-vapor-pressure-furnace::context::watne_1977_figure15_calibration_fits
+  work_id: 3d9fd3bbef0bac5cec9304f54e464d8340f767fde386856088975ba5181d5cb5
+  source_id: watne-1977-potassium-vapor-pressure-furnace
+  species: K
+- observation_id: watne_1977_figure18_calibration_fits
+  type: calibration_fit_summary
+  units: log absorbance versus reciprocal temperature (K^-1)
+  locator:
+    page: 133
+    figure: '18'
+  values:
+    quantity_as_printed: log absorbance versus 1/T K
+    fits:
+    - sample_as_printed: Old K2O·9Al2O3-alumina, Table 14
+      furnace: platinum
+      cup_as_printed: Cup C with 0.22 mm hole
+      gas_as_printed: Ar-4%H2
+      slope_as_printed: '-21400'
+      intercept_as_printed: '17.2'
+      correlation_coefficient_as_printed: '0.958'
+      evidence_class: model_derived
+      parent_observation_ids:
+      - watne_1977_table14_row_02_absorbance
+      - watne_1977_table14_row_03_absorbance
+      - watne_1977_table14_row_04_absorbance
+      - watne_1977_table14_row_05_absorbance
+      - watne_1977_table14_row_06_absorbance
+      - watne_1977_table14_row_07_absorbance
+      - watne_1977_table14_row_08_absorbance
+      - watne_1977_table14_row_09_absorbance
+      - watne_1977_table14_row_10_absorbance
+      - watne_1977_table14_row_11_absorbance
+      - watne_1977_table14_row_12_absorbance
+      - watne_1977_table14_row_13_absorbance
+      - watne_1977_table14_row_15_absorbance
+      - watne_1977_table14_row_16_absorbance
+      - watne_1977_table14_row_17_absorbance
+      - watne_1977_table14_row_18_absorbance
+      - watne_1977_table14_row_19_absorbance
+      - watne_1977_table14_row_20_absorbance
+      - watne_1977_table14_row_21_absorbance
+      - watne_1977_table14_row_22_absorbance
+    - sample_as_printed: Renewed K2O·9Al2O3-alumina, Table 15
+      furnace: platinum
+      cup_as_printed: Cup C with 0.22 mm hole
+      gas_as_printed: Ar-4%H2
+      slope_as_printed: '-6600'
+      intercept_as_printed: '-5.42'
+      intercept_caption_text_as_printed: Intercept - 5.42
+      correlation_coefficient_as_printed: '0.977'
+      note: 'The 600 dpi render shows a single hyphen in this intercept, unlike the equals glyphs on the sibling caption lines;
+        retain the printed -5.42. This conflicts with the retained points: their least-squares intercept is +5.428 against
+        the printed slope -6600.'
+      evidence_class: model_derived
+      parent_observation_ids:
+      - watne_1977_table15_row_01_absorbance
+      - watne_1977_table15_row_02_absorbance
+      - watne_1977_table15_row_03_absorbance
+      - watne_1977_table15_row_04_absorbance
+      - watne_1977_table15_row_05_absorbance
+      - watne_1977_table15_row_06_absorbance
+      - watne_1977_table15_row_07_absorbance
+      - watne_1977_table15_row_08_absorbance
+      - watne_1977_table15_row_09_absorbance
+      - watne_1977_table15_row_10_absorbance
+      - watne_1977_table15_row_11_absorbance
+      - watne_1977_table15_row_12_absorbance
+      - watne_1977_table15_row_13_absorbance
+      - watne_1977_table15_row_14_absorbance
+      - watne_1977_table15_row_15_absorbance
+      - watne_1977_table15_row_16_absorbance
+      - watne_1977_table15_row_17_absorbance
+      - watne_1977_table15_row_18_absorbance
+      - watne_1977_table15_row_19_absorbance
+      - watne_1977_table15_row_21_absorbance
+      - watne_1977_table15_row_22_absorbance
+      - watne_1977_table15_row_23_absorbance
+      - watne_1977_table15_row_24_absorbance
+      - watne_1977_table15_row_25_absorbance
+      - watne_1977_table15_row_26_absorbance
+  context_id: watne-1977-potassium-vapor-pressure-furnace::context::watne_1977_figure18_calibration_fits
+  work_id: 3d9fd3bbef0bac5cec9304f54e464d8340f767fde386856088975ba5181d5cb5
+  source_id: watne-1977-potassium-vapor-pressure-furnace
+  species: K
+- observation_id: watne_1977_figure19_calibration_fits
+  type: calibration_fit_summary
+  units: log absorbance versus reciprocal temperature (K^-1)
+  locator:
+    page: 139
+    figure: '19'
+  values:
+    quantity_as_printed: log absorbance versus 1/T K
+    fits:
+    - sample_as_printed: 1.5A Al:K=3:2 April 6, 1976, Table 16 lower-temperature series
+      furnace: platinum
+      cup_as_printed: Cup H with 0.22 mm hole
+      gas_as_printed: Ar-4%H2
+      slope_as_printed: '-9230'
+      intercept_as_printed: '7.40'
+      correlation_coefficient_as_printed: '0.958'
+      evidence_class: model_derived
+      parent_observation_ids:
+      - watne_1977_table16_row_01_absorbance
+      - watne_1977_table16_row_02_absorbance
+      - watne_1977_table16_row_03_absorbance
+      - watne_1977_table16_row_04_absorbance
+      - watne_1977_table16_row_05_absorbance
+      - watne_1977_table16_row_06_absorbance
+      - watne_1977_table16_row_07_absorbance
+      - watne_1977_table16_row_08_absorbance
+      - watne_1977_table16_row_09_absorbance
+      - watne_1977_table16_row_10_absorbance
+      - watne_1977_table16_row_11_absorbance
+      - watne_1977_table16_row_12_absorbance
+      - watne_1977_table16_row_13_absorbance
+      - watne_1977_table16_row_14_absorbance
+      - watne_1977_table16_row_15_absorbance
+      - watne_1977_table16_row_16_absorbance
+      - watne_1977_table16_row_17_absorbance
+      - watne_1977_table16_row_18_absorbance
+      - watne_1977_table16_row_19_absorbance
+      - watne_1977_table16_row_20_absorbance
+      - watne_1977_table16_row_21_absorbance
+      - watne_1977_table16_row_22_absorbance
+      - watne_1977_table16_row_23_absorbance
+      - watne_1977_table16_row_24_absorbance
+      - watne_1977_table16_row_25_absorbance
+      - watne_1977_table16_row_26_absorbance
+    - sample_as_printed: 1.5A Al:K=3:2 April 6, 1976, Table 17 higher-temperature series
+      furnace: platinum
+      cup_as_printed: Cup H with 0.22 mm hole
+      gas_as_printed: Ar-4%H2
+      slope_as_printed: '-13400'
+      intercept_as_printed: '9.26'
+      correlation_coefficient_as_printed: '0.967'
+      evidence_class: model_derived
+      parent_observation_ids:
+      - watne_1977_table17_row_01_absorbance
+      - watne_1977_table17_row_02_absorbance
+      - watne_1977_table17_row_03_absorbance
+      - watne_1977_table17_row_04_absorbance
+      - watne_1977_table17_row_05_absorbance
+      - watne_1977_table17_row_06_absorbance
+      - watne_1977_table17_row_07_absorbance
+      - watne_1977_table17_row_08_absorbance
+      - watne_1977_table17_row_09_absorbance
+      - watne_1977_table17_row_10_absorbance
+      - watne_1977_table17_row_11_absorbance
+      - watne_1977_table17_row_12_absorbance
+      - watne_1977_table17_row_13_absorbance
+      - watne_1977_table17_row_14_absorbance
+      - watne_1977_table17_row_15_absorbance
+  context_id: watne-1977-potassium-vapor-pressure-furnace::context::watne_1977_figure19_calibration_fits
+  work_id: 3d9fd3bbef0bac5cec9304f54e464d8340f767fde386856088975ba5181d5cb5
+  source_id: watne-1977-potassium-vapor-pressure-furnace
+  species: K
+- observation_id: watne_1977_plante_potassium_pressure_calibration_equation_2
+  type: calibration_relation
+  units: pressure unit not stated
+  locator:
+    page: 109
+    equation: '2'
+    section: Potassium vapor pressure calibration
+  values:
+    quantity_as_printed: log potassium vapor pressure over K2O·9Al2O3
+    relation_as_printed: log P_K(K2O·9Al2O3) = -21453/T°K + 7.4866
+    slope_as_printed: '-21453'
+    intercept_as_printed: '7.4866'
+    pressure_unit_as_printed: not stated
+    evidence_class: quoted_attributed
+    method_class: quoted_attributed
+    attribution_as_printed: According to Plante [45].
+    note: This is the cited calibration relation; it is not a pointwise pressure measured by Watne.
+  context_id: watne-1977-potassium-vapor-pressure-furnace::context::watne_1977_plante_potassium_pressure_calibration_equation_2
+  work_id: 3d9fd3bbef0bac5cec9304f54e464d8340f767fde386856088975ba5181d5cb5
+  source_id: watne-1977-potassium-vapor-pressure-furnace
+  species: K

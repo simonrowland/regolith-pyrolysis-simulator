@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
       role: pdf
@@ -899,29 +899,69 @@ context:
   work_id: 10.2475/ajs.s5-13.73.1
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
+- observation_id: greig1927_cao_mgo_siliceous_liquid_bounds
+  type: composition
+  locator:
+    page: 16
+    published_page: 16
+    section: The more siliceous liquid
+  units: wt%
+  values:
+    method_class: author_statement
+    systems:
+      MgO-SiO2:
+        silica_mass_percent_as_printed: '> 98'
+      CaO-SiO2:
+        silica_mass_percent_as_printed: '> 98'
+    temperature_condition_as_printed: just above the temperature of appearance of the second liquid
+    printed_basis: These are bounds on the more siliceous liquid, not exact conjugate compositions.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_cao_mgo_siliceous_liquid_bounds
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
 - observation_id: greig1927_cao_sio2_27p5_liquid_liquidus_text
-  type: thermodynamic_example
+  phase: glass
+  quench_statement:
+    preservation: asserted_altered
+    locator:
+      page: 44
+      published_page: 44
+      note: The droplet was not perfectly quenched; cristobalite formed during chilling.
+  type: phase_composition_reduction_lineage_refused
   locator:
     page: 44
     published_page: 44
-    note: Prose on a Pt-Rh ribbon melt (Fig. 12 discussion)
+    note: Prose prints the approximate liquid composition and its liquidus temperature.
   units: wt%; °C
   values:
-    method_class: author_estimate
-    evidence_class: author_estimate
+    method_class: measured_reduced
+    evidence_class: measured_reduced
+    disposition: The approximate CaO-SiO2 liquid composition is reported in prose for an imperfectly quenched ribbon droplet;
+      no reduction method is specified, and the value is not identified as a conjugate endpoint.
     system: CaO-SiO2
-    statement_as_printed: The composition of the liquid in the case just cited is about 27.5CaO, 72.5SiO2, and the temperature
-      of the liquidus 1698°.
-    composition_mass_percent_approximate:
-      CaO: '27.5'
+    phase_label: glass
+    phase_as_measured: Quenched glass droplet; the source describes its liquid-phase composition before imperfect quenching.
+    composition_mass_percent_as_published:
+      CaO: about 27.5
       SiO2: '72.5'
+    ribbon_temperature_C_as_printed: about 1725
     liquidus_temperature_C_as_printed: 1698
-    approximation_note: Composition printed with "about"; the ribbon was raised to "about 1725°".
+    composition_note: The prose describes the liquid in the cited Pt-Rh ribbon droplet; it does not identify this value as
+      a conjugate endpoint.
+    quench_as_printed: Droplet explicitly not perfectly quenched; cristobalite formed during chilling (page 44).
+    uncertainty_note: Composition is qualified as 'about'; no numeric width or confidence level is stated.
   context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_cao_sio2_27p5_liquid_liquidus_text
   work_id: 10.2475/ajs.s5-13.73.1
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_cao_sio2_high_T_siliceous_glass_index
+  phase: glass
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 20
+      published_page: 20
+      note: Glass was measured after heating; no quench-preservation statement is printed.
   type: characterization
   locator:
     page: 20
@@ -1407,6 +1447,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_ribbon_two_liquids
+  quench_statement:
+    preservation: asserted_altered
+    locator:
+      page: 26
+      published_page: 26
+      figure: 12
+      note: Figure caption says cristobalite formed during quenching.
   type: characterization
   locator:
     page: 20
@@ -1418,6 +1465,13 @@ context:
     composition_mass_percent:
       CaO: 5
       SiO2: 95
+    composition_role:
+      value: initial_charge_only
+      locator:
+        page: 20
+        published_page: 20
+        note: The composition is the mixture melted on the Pt-Rh ribbon, before formation of the resulting liquids.
+      quote: Small amount melted on a Pt-Rh ribbon heated by electric current.
     method: Small amount melted on Pt-Rh ribbon heated by electric current.
     result: Drop of resulting liquids photographed in Fig. 12; two liquids.
   context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_ribbon_two_liquids
@@ -1862,6 +1916,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run12_15cao_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -1886,6 +1947,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run12_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -1932,6 +2000,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run13_15cao_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -1956,6 +2031,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run13_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2002,6 +2084,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run14_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2070,6 +2159,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run2_15cao_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2094,6 +2190,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run2_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2118,6 +2221,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run3_15cao_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2142,6 +2252,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run3_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2166,6 +2283,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run4_15cao_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2190,6 +2314,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run4_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2214,6 +2345,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run5_15cao_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2238,6 +2376,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run5_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2262,6 +2407,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run6_15cao_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2286,6 +2438,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run7_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2310,6 +2469,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run7_5cao_95sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2334,6 +2500,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run8_15mgo_85sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2380,6 +2553,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t3_run8_5cao_95sio2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: cristobalite-two-liquids-t3
   locator:
@@ -2423,6 +2603,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_15mgo_85sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2446,6 +2633,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_15mgo_85sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2469,6 +2663,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_26mgo_74sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2492,6 +2693,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_26mgo_74sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2515,6 +2723,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_2mgo_98sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2538,6 +2753,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_30mgo_70sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2561,6 +2783,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_31mgo_69sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2584,6 +2813,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_31mgo_69sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2607,6 +2843,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_32mgo_68sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2630,6 +2873,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4a_32mgo_68sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2653,6 +2903,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_10cao_90sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2676,6 +2933,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_15cao_85sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2699,6 +2963,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_15cao_85sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2722,6 +2993,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_20cao_80sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2745,6 +3023,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_26p5cao_73p5sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2770,6 +3055,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_26p5cao_73p5sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2793,6 +3085,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_28cao_72sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2816,6 +3115,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_28cao_72sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2839,6 +3145,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_2cao_98sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2862,6 +3175,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_31p8cao_68p2sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2885,6 +3205,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_31p8cao_68p2sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2908,6 +3235,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_35cao_65sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2931,6 +3265,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_35cao_65sio2_q2
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2954,6 +3295,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_35cao_65sio2_q3
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -2978,6 +3326,13 @@ context:
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
 - observation_id: greig1927_t4b_5cao_95sio2_q1
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+      note: Charges were quenched and examined microscopically; no preservation statement is made.
   type: phase_equilibrium_run_products
   experiment: critical-quenches-binary
   locator:
@@ -3147,77 +3502,73 @@ context:
   work_id: 10.2475/ajs.s5-13.73.1
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
-- observation_id: greig1927_t5_cao_siliceous_glass
-  type: composition
-  experiment: critical-quenches-binary
+- observation_id: greig1927_t5_cao_siliceous_glass_raw_indices
+  phase: glass
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 16
+      published_page: 16
+      note: Glass was measured after heating; no quench-preservation statement is printed.
+  type: characterization
   locator:
     page: 19
     published_page: 19
     table: V
-    note: CaO-SiO2 row; footnote 2
-  units: composition wt% (by interpolation); refractive index sodium light; temperature °C
+    note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  units: wt%; refractive index; °C
   values:
-    quantity: conjugate_siliceous_liquid_composition
-    method_class: author_derived
-    evidence_class: author_derived
-    derivation_as_printed: Composition of siliceous glass by interpolation; page 16 states the composition was obtained on
-      the assumption that the index of refraction is a linear function of the composition, and page 18 states the result gives
-      the silica content to better than 0.5 per cent.
+    method_class: measured_tabulated
     system: CaO-SiO2
     temperature_C_as_printed: 1710
-    composition_mass_percent:
-      CaO: '0.6'
-      SiO2: '99.4'
+    phase_as_measured: quenched glass
     refractive_index_sodium_light_as_printed:
       '1710': 1.460+
-      '1744': 1.462—
+      '1744': 1.462−
     reference_glass_refractive_index_as_printed: '1.589'
-    reference_glass_footnote_as_printed: N. L. Bowen. Unpublished data. Glass of composition 37.0CaO 63.0SiO2.
+    reference_glass_composition_wt_pct:
+      CaO: '37.0'
+      SiO2: '63.0'
+    reference_glass_attribution_as_printed: N. L. Bowen, unpublished data; glass composition 37.0CaO, 63.0SiO2.
     silica_glass_refractive_index_as_printed: '1.4584'
     table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica
       or from lime silica is the richer in silica.
-    row_alignment_note: The interpolated composition is printed on the 1710 °C line; no composition is printed for the 1744
-      °C index.
-  uncertainty:
-    note: 'Page 18: silica content of the glass to better than 0.5 per cent.'
-  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass
+    row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices
   work_id: 10.2475/ajs.s5-13.73.1
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2
-- observation_id: greig1927_t5_mgo_siliceous_glass
-  type: composition
-  experiment: critical-quenches-binary
+- observation_id: greig1927_t5_mgo_siliceous_glass_raw_indices
+  phase: glass
+  quench_statement:
+    preservation: not_stated
+    locator:
+      page: 16
+      published_page: 16
+      note: Glass was measured after heating; no quench-preservation statement is printed.
+  type: characterization
   locator:
     page: 19
     published_page: 19
     table: V
-    note: MgO-SiO2 row; footnote 1
-  units: composition wt% (by interpolation); refractive index sodium light; temperature °C
+    note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  units: wt%; refractive index; °C
   values:
-    quantity: conjugate_siliceous_liquid_composition
-    method_class: author_derived
-    evidence_class: author_derived
-    derivation_as_printed: Composition of siliceous glass by interpolation; page 16 states the composition was obtained on
-      the assumption that the index of refraction is a linear function of the composition, and page 18 states the result gives
-      the silica content to better than 0.5 per cent.
+    method_class: measured_tabulated
     system: MgO-SiO2
     temperature_C_as_printed: 1710
-    composition_mass_percent:
-      MgO: '0.8'
-      SiO2: '99.2'
+    phase_as_measured: quenched glass
     refractive_index_sodium_light_as_printed:
       '1710': '1.461'
       '1744': '1.462'
     reference_glass_refractive_index_as_printed: '1.580'
-    reference_glass_footnote_as_printed: E. S. Larsen. This Journal 28, 263-274. 1909. Glass of composition 40.15MgO 59.85SiO2.
+    reference_glass_composition_wt_pct:
+      MgO: '40.15'
+      SiO2: '59.85'
+    reference_glass_attribution_as_printed: E. S. Larsen, 1909; glass composition 40.15MgO, 59.85SiO2.
     silica_glass_refractive_index_as_printed: '1.4584'
-    table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica
-      or from lime silica is the richer in silica.
-    row_alignment_note: The interpolated composition is printed on the 1710 °C line; no composition is printed for the 1744
-      °C index.
-  uncertainty:
-    note: 'Page 18: silica content of the glass to better than 0.5 per cent.'
-  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass
+    row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices
   work_id: 10.2475/ajs.s5-13.73.1
   source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
   species: SiO2

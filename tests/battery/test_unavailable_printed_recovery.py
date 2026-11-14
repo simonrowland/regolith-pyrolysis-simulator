@@ -106,9 +106,7 @@ def test_ichise_table2_activities_are_points_at_printed_values(tmp_path: Path) -
         assert row.point_conditions["fO2_Pa"].state.is_unknown
         assert "total_pressure_Pa" not in row.point_conditions
         assert row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.total_pressure_Pa.reason == (
-            "no total_pressure_Pa mapped from source"
-        )
+        assert row.identity.total_pressure_Pa.reason == "not_published"
         assert row.value.approximate is False
 
 

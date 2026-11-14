@@ -85,6 +85,12 @@ class EngineBindingAdmissionError(RuntimeError):
         )
 
 
+class _GateCurveConfigurationError(ValueError):
+    """A malformed producer configuration prevents safe gate memo reuse."""
+
+    reason = "malformed_gate_curve_configuration"
+
+
 def _detached_exception_copy(exc: Exception) -> Exception:
     """Copy an error for long-lived state without retaining traceback frames."""
     if isinstance(exc, EngineBindingAdmissionError):
@@ -974,8 +980,10 @@ def gate_curve_memo_origin_matches(
             curve,
             **redox_state_kwargs,
         )
-    except Exception:  # noqa: BLE001 - malformed configuration is a miss
-        return False
+    except Exception as exc:  # noqa: BLE001 - malformed configuration refuses
+        raise _GateCurveConfigurationError(
+            "malformed gate-curve configuration prevents memo admission"
+        ) from exc
 
     def normalize_magemin_default(producer_configuration: Any) -> Any:
         if not isinstance(producer_configuration, Mapping):

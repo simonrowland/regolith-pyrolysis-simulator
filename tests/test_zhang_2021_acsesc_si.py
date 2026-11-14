@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 from simulator.battery.migrate import Migrator
+from simulator.battery.records import ApproxPressure, BandBasis
 
 EXTRACT = (
     Path(__file__).resolve().parents[1]
@@ -87,7 +88,15 @@ def test_zhang_si_migrates_percent_and_keeps_unprinted_fo2_unknown() -> None:
         identity = rows[key].identity
         assert identity.temperature_K.is_value
         assert identity.composition.is_value
-        assert identity.total_pressure_Pa.is_unknown
+        # About 10^-6 mbar is an approximate print. Identity carries the band
+        # around 0.0001 Pa. The measured mass-loss fraction itself stays exact.
+        pressure = identity.total_pressure_Pa
+        assert pressure is not None and pressure.is_value
+        assert isinstance(pressure.value, ApproxPressure)
+        assert pressure.value.point == Decimal("0.0001")
+        assert (
+            pressure.value.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+        )
         assert identity.fO2_Pa.is_unknown
 
     residue = rows["zhang_2021_table1_bas1400c60m_residue_composition"]

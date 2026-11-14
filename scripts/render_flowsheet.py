@@ -752,7 +752,22 @@ def _reductant_to_reducibility(reductant_class: str) -> str:
     return mapping.get(rc, rc)
 
 
-def build_live_major_facts() -> dict[str, dict[str, Any]]:
+def _ellingham_unavailable_message(
+    exc: Exception,
+    *,
+    element: str | None = None,
+) -> str:
+    element_context = f"{element}: " if element is not None else ""
+    return (
+        "Ellingham calculation unavailable: "
+        f"{element_context}{type(exc).__name__}: {exc}"
+    )
+
+
+def build_live_major_facts(
+    *,
+    unavailable_blocks: dict[str, str] | None = None,
+) -> dict[str, dict[str, Any]]:
     """Fact rows for majors that can be checked WITHOUT trace_elements.yaml.
 
     Sources:
@@ -809,51 +824,37 @@ def build_live_major_facts() -> dict[str, dict[str, Any]]:
 
     # --- Ellingham-backed Mg/Ca reducibility for tabulated majors ---
     try:
-        from simulator.chemistry.ellingham_thermo import (  # type: ignore
+        from simulator.chemistry.ellingham_graph import (
             ELLINGHAM_THERMO,
-            ellingham_delta_g_kj_per_mol_o2,
+            _metallothermic_reductant_for_oxide,
         )
 
         t_k = 1600.0 + 273.15
-        dg_mg = ellingham_delta_g_kj_per_mol_o2("Mg", t_k)
-        dg_ca = ellingham_delta_g_kj_per_mol_o2("Ca", t_k)
         for el in ELLINGHAM_THERMO:
             if el in facts:
                 continue
             try:
-                dg = ellingham_delta_g_kj_per_mol_o2(el, t_k)
-            except Exception:
+                reductant = _metallothermic_reductant_for_oxide(el, t_k)
+            except Exception as exc:
+                if unavailable_blocks is not None:
+                    unavailable_blocks["c6_magnesiothermic"] = (
+                        _ellingham_unavailable_message(exc, element=el)
+                    )
                 continue
-            # More positive dG than MgO ⇒ oxide less stable ⇒ Mg-reducible
-            if dg > dg_mg + 1.0:
-                facts[el] = {
-                    "element": el,
-                    "reducibility": "mg_reducible",
-                    "reductant_class": "Mg-C6",
-                }
-            elif dg > dg_ca + 1.0:
-                facts[el] = {
-                    "element": el,
-                    "reducibility": "ca_reducible",
-                    "reductant_class": "Ca-calciothermic",
-                }
-            else:
-                # Oxide as stable as or more stable than CaO
-                facts[el] = {
-                    "element": el,
-                    "reducibility": "not_reducible",
-                    "reductant_class": "not-reducible",
-                }
-    except Exception:  # pragma: no cover
-        # Simulator import unavailable — still pin C6/calciothermic process anchors
-        for el in ("Al", "Ti", "Si", "Mn", "Cr"):
-            facts.setdefault(
-                el,
-                {
-                    "element": el,
-                    "reducibility": "mg_reducible",
-                    "reductant_class": "Mg-C6",
-                },
+            reductant_class = {
+                "Mg": "Mg-C6",
+                "Ca": "Ca-calciothermic",
+                None: "not-reducible",
+            }[reductant]
+            facts[el] = {
+                "element": el,
+                "reducibility": _reductant_to_reducibility(reductant_class),
+                "reductant_class": reductant_class,
+            }
+    except Exception as exc:  # pragma: no cover
+        if unavailable_blocks is not None:
+            unavailable_blocks["c6_magnesiothermic"] = (
+                _ellingham_unavailable_message(exc)
             )
 
     # Process-map C6 / calciothermic / crown anchors OVERRIDE pure Ellingham rank
@@ -914,11 +915,14 @@ def load_fact_table(
     trace_path: Path = TRACE_ELEMENTS_YAML,
     *,
     include_live_majors: bool = True,
+    unavailable_blocks: dict[str, str] | None = None,
 ) -> dict[str, dict[str, Any]]:
     """Merged fact table: live majors first, trace_elements overlays (wins)."""
     table: dict[str, dict[str, Any]] = {}
     if include_live_majors:
-        table.update(build_live_major_facts())
+        table.update(
+            build_live_major_facts(unavailable_blocks=unavailable_blocks)
+        )
     for sym, row in load_trace_element_facts(trace_path).items():
         base = dict(table.get(sym) or {})
         base.update(row)
@@ -1138,7 +1142,15 @@ def lint_against_trace_elements(
 
     # --- Admission gate (always runs; degrades to UNKNOWN without facts) ---
     if fact_table is None:
-        fact_table = load_fact_table(trace_path)
+        unavailable_blocks: dict[str, str] = {}
+        fact_table = load_fact_table(
+            trace_path,
+            unavailable_blocks=unavailable_blocks,
+        )
+        warnings.extend(
+            f"block {block_id} unavailable: {reason}"
+            for block_id, reason in unavailable_blocks.items()
+        )
     admission_results = evaluate_all_admissions(data, fact_table)
     n_pass = sum(1 for r in admission_results if r.outcome == OUTCOME_PASS)
     n_fail = sum(1 for r in admission_results if r.outcome == OUTCOME_FAIL)

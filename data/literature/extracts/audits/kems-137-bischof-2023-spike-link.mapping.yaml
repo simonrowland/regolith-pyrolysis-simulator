@@ -1,0 +1,62 @@
+source_id: kems-137-bischof-2023
+source:
+  citation: Bischof et al. (2023), GCA 360, 1–15; DOI 10.1016/j.gca.2023.08.027.
+input_order:
+  primary_machine_text:
+    - text/kems-137-bischof-2023/mineru
+    - text/kems-137-bischof-2023/pdftotext-layout.txt
+    - text/kems-137-bischof-2023 supplement pdftotext-layout
+  render_policy: Rendered physical pages 1, 2, 4, 5, 6, 15, and 16 to confirm the sample form, S1 values, chamber pressure, and run/composition links.
+printed_tables:
+  - printed_table: S1
+    pdf_page: 2
+    printed_rows: 11
+    mapped_columns:
+      - {column: T [K], stored: values.points[].T_K, verification: render}
+      - {column: p(Ga) [Pa], stored: values.points[].p_Pa, species: Ga(g), verification: render}
+      - {column: p(In) [Pa], stored: values.points[].p_Pa, species: In(g), verification: render}
+      - {column: ΔIW, stored: values.points[].delta_IW and point_conditions.fO2_control, verification: render}
+    target_numeric_cells: 44
+    mineru_status: No supplement content-list table is supplied; pdftotext plus page render were used for all cells.
+    row_species_check: The supplement heading labels the series 1_low; the main text links its Ga and In values to run 1_low.
+  - printed_table: '2'
+    pdf_page: 6
+    printed_rows: 3
+    mapped_columns:
+      - {column: Run, stored: experiment FK}
+      - {column: Initial weight [mg], stored: experiment.sample.mass_kg}
+      - {column: Ramp, stored: run sequence note}
+      - {column: Ions measured, stored: species assignment cross-check}
+    target_link: 1_low is the 1000 ppm charge; 3_high is the 10000 ppm charge.
+    render_verification: Physical page 6 confirms row and column assignment.
+  - printed_table: '6'
+    pdf_page: 15
+    mapped_columns:
+      - {column: Start bulk oxides [wt%], stored: separate pre-KEMS measured composition context}
+    printed_total: 99.90 wt%
+    render_verification: Physical page 15 confirms row 1_low and oxide totals.
+  - printed_table: '7'
+    pdf_page: 16
+    mapped_columns:
+      - {column: Start/end Ga and In [ppm], stored: run-level pre/post KEMS analyses}
+    render_verification: Physical page 16 confirms all target start/end cells.
+spike_link:
+  locator: {page: 4, section: '2.1 Sample preparation'}
+  nominal_base_wt_pct: {SiO2: '50.34', Al2O3: '15.40', MgO: '10.80', CaO: '23.46'}
+  1_low_spikes_ppm: {Ga: '1000', In: '1000', Tl: '1000'}
+  spike_basis_note: elemental ppm; added as sesquioxides, as printed
+  source_link: Table 2 plus Supplement Table S1 and the discussion of 1_low; no spike level inferred for other rows.
+  composition_schema_gap: >-
+    The full charge mixes oxide wt% and elemental ppm. AmountBasis has one basis per composition and _percent_pairs reads that single basis
+    (simulator/battery/enums.py::AmountBasis; simulator/battery/migrate.py::_percent_pairs); no exact mixed-basis bulk composition token
+    exists. Preserve both printed bases separately and leave the identity composition typed-refused.
+cell_audit:
+  verification_route: >-
+    Route (b), render, for all 44 Table S1 temperature/pressure/ΔIW numeric cells. The supplement has pdftotext but no MinerU table block.
+    The row/column layout and all cells were checked on physical page 2.
+  conditions: >-
+    Temperature is printed per S1 row. ΔIW is buffer-relative to IW; no absolute fO2 is inferred. The approximate 10^-6 mbar chamber
+    pressure (physical page 5) is retained as a chamber condition; the in-cell total pressure is not derivable.
+  run_sequence: S1 rows 1–11 ascend in temperature during the Table 2 ramp-up; record this in the report, not a row field.
+  depletion: Table 7 reports run-level concentrations and about 40% Ga loss after the 1_low polytherm plus 15 h isotherm; per-point depletion is unreported.
+  congruent_vaporization: No statement located for the An-Di run.

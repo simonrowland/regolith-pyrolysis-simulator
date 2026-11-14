@@ -110,6 +110,8 @@ observations:
         pdf_page_index: 5
         figure: '7'
         note: d-129; upper panel
+  provenance:
+    printed_phase: gas
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_o2_pressure_figure_only
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -220,6 +222,8 @@ observations:
         figure: '7'
         note: 'Upper panel: isothermal O2(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time,
           no numeric point table.'
+  provenance:
+    printed_phase: gas
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_o_pressure_figure_only
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -330,6 +334,8 @@ observations:
         figure: '7'
         note: 'Upper panel: isothermal O(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no
           numeric point table.'
+  provenance:
+    printed_phase: gas
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_kems_geometry_package
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -381,6 +387,8 @@ observations:
     line_range: 220-230
     source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: pdftotext:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_third_law_formation_enthalpy
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -436,6 +444,8 @@ observations:
     note: Third-law standard formation enthalpy for pure solid CaO
     source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: pdftotext:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_b1
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -484,6 +494,8 @@ observations:
     paragraph: Ir Knudsen cell geometry; explicitly not HKL α
     source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: pdftotext:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_MgO_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_quoted
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -532,6 +544,8 @@ observations:
     note: quote=To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in the
       lid of the cell had a diameter of 0.3 mm.
   read_from: pdf:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_MgO_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_mg_pressure_figure_only
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -642,6 +656,8 @@ observations:
         figure: '7'
         note: 'Lower panel: isothermal Mg(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time,
           no numeric point table.'
+  provenance:
+    printed_phase: gas
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o2_pressure_figure_only
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -752,6 +768,8 @@ observations:
         figure: '7'
         note: 'Lower panel: isothermal O2(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time,
           no numeric point table.'
+  provenance:
+    printed_phase: gas
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o_pressure_figure_only
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -860,6 +878,8 @@ observations:
         pdf_page_index: 5
         figure: '7'
         note: d-129; lower panel
+  provenance:
+    printed_phase: gas
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_kems_geometry_psat_package
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -915,6 +935,8 @@ observations:
     note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
     source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: pdftotext:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_MgO
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_third_law_formation_enthalpy
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -970,6 +992,8 @@ observations:
     note: Third-law standard formation enthalpy for pure solid MgO
     source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: pdftotext:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_MgO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:0
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -1056,6 +1080,8 @@ observations:
               table: I
         output_unit: kg
         references: []
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:1
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -1142,6 +1168,8 @@ observations:
               table: I
         output_unit: kg
         references: []
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:0
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -1228,6 +1256,8 @@ observations:
               table: I
         output_unit: kg
         references: []
+  provenance:
+    printed_phase: pure_solid_MgO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:1
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -1314,6 +1344,8 @@ observations:
               table: I
         output_unit: kg
         references: []
+  provenance:
+    printed_phase: pure_solid_MgO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_literature
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -1348,7 +1380,9 @@ observations:
         delta_H_sub_kJ_mol: '5'
         quote: 421 ± 5
       locator:
-        page: 826
+        page: 6
+        published_page: 826
+        pdf_page_index: 5
         table: II
       note: FactSageTM has no printed ±
   evidence:
@@ -1373,6 +1407,8 @@ observations:
     table: II
     source_path: tables/kems-031-halwax-2024/t2.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_Ni
 - observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_this_study
   experiment_id: 10.1007/s11663-024-02995-6::experiment::nickel-calibration-series
   identity:
@@ -1439,6 +1475,8 @@ observations:
         table: II
         note: row=This Study
         source_path: tables/kems-031-halwax-2024/t2.csv
+  provenance:
+    printed_phase: pure_Ni
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iii_ionization_cross_sections
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -1492,6 +1530,8 @@ observations:
     table: III
     source_path: tables/kems-031-halwax-2024/t3.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: calibration_constants
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_1st_measurement
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -1542,6 +1582,8 @@ observations:
     note: row=1st measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_2nd_measurement
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -1592,6 +1634,8 @@ observations:
     note: row=2nd measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_literature_and_factps
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -1668,6 +1712,8 @@ observations:
     table: IV
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_mean
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -1717,6 +1763,8 @@ observations:
     note: row=mean
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_1st_measurement
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -1767,6 +1815,8 @@ observations:
     note: row=1st measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_MgO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_2nd_measurement
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -1817,6 +1867,8 @@ observations:
     note: row=2nd measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_MgO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_literature_and_factps
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -1893,6 +1945,8 @@ observations:
     table: IV
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_MgO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_mean
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -1944,6 +1998,8 @@ observations:
     note: row=mean
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_MgO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_v_huber_holley_ca_composition
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -1999,6 +2055,8 @@ observations:
     table: V
     source_path: tables/kems-031-halwax-2024/t5.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: Ca_metal_sample_ref_11
 - observation_id: kems-031-halwax-2024::halwax_2024_table_vi_liang_cao_solution_reactions
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -2052,6 +2110,8 @@ observations:
     table: VI
     source_path: tables/kems-031-halwax-2024/t6.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_CaO
 - observation_id: kems-031-halwax-2024::halwax_2024_table_vii_shomate_huffman_reactions
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -2109,3 +2169,5 @@ observations:
     table: VII
     source_path: tables/kems-031-halwax-2024/t7.csv
   read_from: tables:kems-031-halwax-2024
+  provenance:
+    printed_phase: pure_solid_MgO

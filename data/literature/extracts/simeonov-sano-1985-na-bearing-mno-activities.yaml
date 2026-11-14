@@ -281,10 +281,17 @@ species:
           table: '1'
           column_header: log C_Mn2+
         units: log manganous capacity as printed
-        attribution: Simeonov and Sano (1985), present work; capacity definition in Eq. (8)
+        derivation:
+          relation: >-
+            The authors state that the middle term of Eq. (8) is experimentally
+            determined and use it to calculate C_Mn2+; the resulting values are
+            reported in Table 1.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, published_page: 1120, pdf_page_index: 4, table: '1', column_header: log C_Mn2+}
         values:
           quantity: printed_table_values_without_compatible_token
-          method_class: quoted_attributed
+          method_class: measured_reduced
           admission_status: typed_refusal
           schema_gap: No existing quantity token represents the printed manganous capacity C_Mn2+.
           reason: Preserve the printed capacity values and definition as context; do not change the schema.

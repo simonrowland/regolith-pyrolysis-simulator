@@ -1,0 +1,344 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.31857/s0016-7525648777-793
+  citation: Yakovlev, O. I., and Shornikov, S. I. (2019). Theoretical Analyses of Chemical and Magnesium and Silica Isotope
+    Fractionation During Vaporization of Ca-Al-Inclusion of Chondrite. Geokhimia, 64(8), 777–793.
+  source_ids:
+  - yakovleva-2019-mg-si-isotope-fractionation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:yakovleva-2019-mg-si-isotope-fractionation
+      role: pdf
+      path: raw/yakovleva-2019-mg-si-isotope-fractionation/yakovleva-2019-mg-si-isotope-fractionation.pdf
+      sha256:
+        tag: value
+        value: a948acf70a08f64e8df86d6830d3d50defb97b4bc0fd868a9b7ca5f9e53d15e2
+    - asset_id: pdftotext:yakovleva-2019-mg-si-isotope-fractionation
+      role: pdftotext
+      path: text/yakovleva-2019-mg-si-isotope-fractionation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yakovleva-2019-mg-si-isotope-fractionation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.31857/s0016-7525648777-793
+experiments: []
+context:
+- observation_id: yakovleva_2019_background_isotope_and_evaporation_ranges
+  type: attributed_background_values
+  locator:
+    published_pages: 777-780
+    section: Introduction, pp. 777-778; oxygen abundance, p. 780 right column after equation (6)
+  units: mixed, as stated
+  values:
+    method_class: quoted_attributed
+    attribution: 'Introduction and background values, not measurements made by this paper: p. 777 cites McKeegan and Davis
+      (2003) for the short-lived isotope systems and Ushikubo et al. (2017) for the oxygen anomaly; p. 778 cites Richter et
+      al. (2002), Williams et al. (2017), and Mendybaev et al. (2010, 2013, 2017) for fractionation and mass loss.'
+    CAI_age_billion_years: '4.567'
+    CAI_age_locator: P. 777, Introduction, left column.
+    oxygen_anomaly_relation: 'P. 777, Introduction: Delta17O = delta17O - 0.52 * delta18O, approximately -24 per mil.'
+    normal_CAIs_typical_mass_dependent_fractionation: 'P. 778, left column: approximately 3 per mil.'
+    FUN_CAIs_example_heavy_isotope_anomalies: 'P. 778, left column: delta25Mg may reach approximately 40 per mil and delta29Si
+      approximately 17 per mil.'
+    cited_experimental_melt_mass_loss: 'P. 778, right column: 30 to 80 percent Mg and Si mass loss; cited experiments are
+      said to produce delta25Mg 6 to 30 per mil and delta29Si 3 to 15 per mil.'
+    cited_short_lived_isotopes: 'P. 777, Introduction: 10Be, 26Al, 41Ca, and 60Fe are named in the discussion of daughter
+      products of short-lived isotopes.'
+    cited_oxygen_abundance: 'P. 780, right column after equation (6): approximately 99 percent of oxygen is 16O.'
+  context_id: yakovleva-2019-mg-si-isotope-fractionation::context::yakovleva_2019_background_isotope_and_evaporation_ranges
+  work_id: 10.31857/s0016-7525648777-793
+  source_id: yakovleva-2019-mg-si-isotope-fractionation
+  species: Mg
+- observation_id: yakovleva_2019_conclusions_and_directional_qualifiers
+  type: author_conclusions
+  locator:
+    published_pages: '791'
+    section: Conclusion
+  units: as stated
+  values:
+    method_class: model_derived
+    attribution: Authors’ conclusions, with experimental comparisons attributed in the text to Richter et al. (2002) and Mendybaev
+      et al. (2013, 2017, 2018).
+    conventional_rayleigh_qualification: Authors call the conventional Rayleigh equation not fully suitable for analyzing
+      fractional isotope evaporation because its “ideal” fractionation factor is constant and reflects only isotope mass differences.
+    alternative_rayleigh_conclusion: The alternative equation incorporates isotope distribution coefficients and their ratio,
+      yielding a fractionation factor that depends on temperature and evaporating-melt composition.
+    chemistry_isotope_coupling: The activity coefficient changes with the evolving chemical environment; the authors say this
+      changes component evaporation rates and therefore melt and vapor compositions.
+    relative_fractionation_conclusion: As CaO accumulates, the MgO activity coefficient increases and the SiO2 activity coefficient
+      decreases; Mg evaporation speeds up while SiO2 evaporation slows, increasing the difference between F_Mg and F_Si and
+      slowing delta29,30Si fractionation relative to delta25,26Mg.
+    mineral_evolution_context: 'P. 791, left column before Conclusion, attributed to Mendybaev et al. (2017): normative residue
+      composition evolves from forsterite-rich (Mg2SiO4) to gehlenite-rich (Ca2Al2SiO7), becoming richer in calcium and more
+      basic. Silicon evaporation and its isotope fractionation relative to magnesium slow as Si activity decreases; declining
+      MgO concentration and rising MgO activity coefficient have opposing effects on MgO activity.'
+  context_id: yakovleva-2019-mg-si-isotope-fractionation::context::yakovleva_2019_conclusions_and_directional_qualifiers
+  work_id: 10.31857/s0016-7525648777-793
+  source_id: yakovleva-2019-mg-si-isotope-fractionation
+  species: Mg
+- observation_id: yakovleva_2019_figure_1_prior_experimental_trends
+  type: figure_only
+  locator:
+    published_pages: '790'
+    figure: '1'
+  units: per mil; temperatures in degrees Celsius; initial CaO in mass percent, as printed
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: Prior experimental isotope-composition trends reproduced from literature; curve/marker coordinates were not
+      digitized.
+    caption: 'Residual-melt delta29Si versus delta25Mg in panel (a) and delta30Si versus delta26Mg in panel (b). Series 1:
+      Mendybaev et al. (2013), 1900 C. Series 2: Mendybaev et al. (2017), 1900 C. Series 3: Richter et al. (2007) and Knight
+      et al. (2009), 1800-1900 C. The text identifies series 3 with the highest initial CaO, 23.1 mass percent, and the weak
+      series 2 trend with the lowest initial CaO, 9.1 mass percent.'
+    caption_initial_sample_normalization: 'P. 790 caption, series 1 and 2: delta^xMg = [(xMg/24Mg)_sample/(xMg/24Mg)_initial
+      - 1]*1000 per mil; delta^xSi = [(xSi/28Si)_sample/(xSi/28Si)_initial - 1]*1000 per mil. Here x is the isotope mass number,
+      not mole fraction. These initial-sample denominators differ from the standard-sample denominators on p. 789.'
+    displayed_axis_ranges: 'Panel (a): delta25Mg 0-70 per mil and delta29Si 0-20 per mil. Panel (b): delta26Mg 0-140 per mil
+      and delta30Si 0-20 per mil.'
+    direction_reported: As isotope enrichment increases, silicon isotope fractionation slows relative to magnesium in the
+      plotted prior experiments.
+  context_id: yakovleva-2019-mg-si-isotope-fractionation::context::yakovleva_2019_figure_1_prior_experimental_trends
+  work_id: 10.31857/s0016-7525648777-793
+  source_id: yakovleva-2019-mg-si-isotope-fractionation
+  species: Mg
+- observation_id: yakovleva_2019_hertz_knudsen_and_speciation_model
+  type: model_equations_and_assumptions
+  locator:
+    published_pages: 779-781
+    equation: 1-6
+  units: J in mol cm^-2 s^-1; P in dyn cm^-2; R in erg mol^-1 K^-1; T in K; m in g mol^-1, as printed on p. 779
+  values:
+    method_class: model_derived
+    attribution: Equations and analysis presented by the authors.
+    equation_1: J_i = phi_i (P_i - P_i_prime) / sqrt(2*pi*R*T*m_i).
+    equation_2_vacuum: J_i = phi_i*P_i / sqrt(2*pi*R*T*m_i), for surrounding-vapor partial pressure approximately zero.
+    evaporation_condensation_equilibrium: 'P_i > P_i_prime: evaporation; P_i_prime > P_i: condensation; equality: equilibrium
+      and zero net rate.'
+    temperature_rate_qualifier: Although the Hertz-Knudsen expression contains T to the minus one-half power, the authors
+      say saturated vapor pressure rises much faster with temperature, so net evaporation rate increases as temperature rises.
+    evaporation_coefficient: phi_i is experimentally determined and no greater than 1. The paper says reported phi_Mg and
+      phi_SiO estimates differ substantially from unity and are contradictory or unreliable; phi should be considered for
+      crystalline evaporation but may be neglected for liquid evaporation, according to the cited literature.
+    vapor_species_sums: P[Si] = pSi + pSiO + pSiO2; P[Mg] = pMg + pMgO.
+    magnesium_rate_sum: 'P. 779, bottom right: J[Mg] = J_Mg + J_MgO = phi_Mg*p_Mg/sqrt(2*pi*R*T*m_Mg) + phi_MgO*p_MgO/sqrt(2*pi*R*T*m_MgO).'
+    dominant_vapor_forms: Above silicate melts, Mg and SiO partial pressures are stated to be about two orders of magnitude
+      greater than those of the other listed Mg- and Si-bearing vapor forms; the authors consequently neglect the other forms
+      in the simplified rate expressions.
+    simplified_element_rates: 'P. 780, left column: J[Mg] = phi_Mg*P_Mg/sqrt(2*pi*R*T*m_Mg); J[Si] = phi_SiO*P_SiO/sqrt(2*pi*R*T*m_SiO).'
+    rate_ratio_equation_3: J[Si]/J[Mg] = (phi_SiO*P_SiO)/(phi_Mg*P_Mg) * sqrt(m_Mg/m_SiO).
+    general_isotope_equation_4: 'P. 780: J_i/J_k = (phi_i*P_i)/(phi_k*P_k) * sqrt(m_k/m_i), with i heavy and k light.'
+    isotope_rate_ratios_equations_5_and_6: 'P. 780: (5) J(25Mg)/J(24Mg) = P(25Mg)/P(24Mg) * sqrt(m_24Mg/m_25Mg) = P(25Mg)/P(24Mg)
+      * sqrt(24/25); (6) J(30SiO)/J(28SiO) = P(30SiO)/P(28SiO) * sqrt(m_28SiO/m_30SiO) approximately equals P(30SiO)/P(28SiO)
+      * sqrt(44/46), treating oxygen as 16O.'
+  context_id: yakovleva-2019-mg-si-isotope-fractionation::context::yakovleva_2019_hertz_knudsen_and_speciation_model
+  work_id: 10.31857/s0016-7525648777-793
+  source_id: yakovleva-2019-mg-si-isotope-fractionation
+  species: Mg
+- observation_id: yakovleva_2019_isotope_standard_and_direction_checks
+  type: isotope_definitions_and_comparisons
+  locator:
+    published_pages: 780-791
+    equation: 4-6; 15-18; unnumbered delta equations on 789
+    figure: '1'
+  units: per mil for delta values; dimensionless for ratios
+  values:
+    method_class: model_derived
+    attribution: Definitions and qualitative comparisons in the present theoretical article; the comparison experiments are
+      cited to prior workers.
+    isotope_pairs: 'Mg: 24Mg, 25Mg, 26Mg. Si: 28Si, 29Si, 30Si. The authors use 16O for the SiO molecular-mass approximation.'
+    measured_standard_state: No activity or activity coefficient measurements are reported. Equations (15)-(18), pp. 783-784,
+      define vapor/melt isotope-ratio relationships. The unnumbered delta equations on p. 789 use standard-sample isotope
+      ratios. Figure 1 series 1 and 2 instead use initial-sample isotope ratios, p. 790 caption.
+    speed_comparison: When Mg evaporates faster than Si, the paper says Mg isotope fractionation is greater; when Si evaporates
+      faster, Si isotope fractionation is greater. As Si evaporation slows, Si isotope fractionation also slows.
+    ratio_and_residue_trend: A larger J[Mg] relative to J[Si] makes F_Mg smaller relative to F_Si during evaporation; the
+      ratio J[Mg]/J[Si] is said to control the comparative efficiency of Mg and Si isotope separation.
+    figure_caption_method: Figure 1 is a reproduction of previously published experimental trends, not a new measurement from
+      this paper. No coordinates were digitized.
+  context_id: yakovleva-2019-mg-si-isotope-fractionation::context::yakovleva_2019_isotope_standard_and_direction_checks
+  work_id: 10.31857/s0016-7525648777-793
+  source_id: yakovleva-2019-mg-si-isotope-fractionation
+  species: Si
+- observation_id: yakovleva_2019_model_scope_and_experiment_facts
+  type: model_scope
+  locator:
+    published_pages: 777-793
+    section: Abstract and model sections
+  units: as stated
+  values:
+    method_class: model_derived
+    attribution: Theoretical analysis by Yakovlev and Shornikov; no new measurements are reported.
+    source_scope: Analytical Hertz-Knudsen evaporation and Rayleigh isotope-fractionation equations for Ca-Al-inclusion melts,
+      followed by qualitative comparison to results published by other workers.
+    experimental_method: Not applicable to the present theoretical analysis.
+    cell_material_and_liner: Not applicable; no experimental cell is used or specified for this model.
+    orifice_diameter_and_channel_length: Not applicable; no effusion apparatus is used or specified.
+    pressure_calibration_and_ionization: Not applicable; no ion-current or measured-pressure conversion is performed.
+    temperature_measurement_or_calibration: Not applicable; temperatures enter equations and cited experiments, but no temperature
+      is measured in this paper.
+    chamber_background_pressure: Not reported as an experimental condition. The idealized vacuum equations set surrounding
+      vapor partial pressure P_i_prime approximately equal to zero.
+    sample_preparation_and_composition: No samples are prepared in this theoretical paper. Mixture compositions shown in Figure
+      1 belong to cited experiments.
+    activities_and_standard_state: No measured oxide activities are reported. In the model a_i = x_i gamma_i, and P_i_zero
+      is the equilibrium vapor pressure over the pure component at the same temperature (Raoult-Henry reference).
+    isotope_activity_standard_state: 'P. 783, left column below the exchange-reaction equilibrium expression: in the standard
+      state, vapor and melt contain only one isotope. This isotope-activity reference is distinct from the pure-component
+      vapor-pressure reference on pp. 787-788.'
+    tables: No numbered data tables or measured-value tables occur in the 17-page article.
+    scan_and_translation: Russian-language article, checked against all 17 page images rendered at 220 dpi. The printed English
+      title on p. 793 is retained as printed; its wording “Chemical and Magnesium and Silica Isotope Fractionation” is grammatically
+      awkward.
+    citation_provenance: P. 777 prints ГЕОХИМИЯ and the author line "О. И. Яковлев^а,*, С. И. Шорников^а,**"; the superscript
+      "а" is the affiliation mark keyed to the Vernadsky Institute line, and the PDF text layer merges it into "Яковлева".
+      The even-page running heads (pp. 778-792) print "ЯКОВЛЕВ, ШОРНИКОВ", the e-mail is yakovlev@geokhi.ru, and p. 793 prints
+      Geokhimia and "O. I. Yakovlev, S. I. Shornikov". The first author is therefore Yakovlev; "yakovleva" in the source_id
+      and observation ids is a legacy intake key taken from the text layer, not the printed name or a transliteration of it
+      (source_id not renamed here). Geochemistry in the former intake citation translated the journal name. The sidecar title
+      is an intake English translation, not the printed English title.
+  context_id: yakovleva-2019-mg-si-isotope-fractionation::context::yakovleva_2019_model_scope_and_experiment_facts
+  work_id: 10.31857/s0016-7525648777-793
+  source_id: yakovleva-2019-mg-si-isotope-fractionation
+  species: Mg
+- observation_id: yakovleva_2019_multicomponent_activity_and_acidity_model
+  type: model_equations_and_directional_claims
+  locator:
+    published_pages: 787-791
+    equations: 26-31
+    figure: '1'
+  units: Activities dimensionless; concentrations in mole fraction unless stated otherwise.
+  values:
+    method_class: model_derived
+    attribution: Theoretical relationships proposed by Yakovlev and Shornikov; supporting activity calculations are attributed
+      to Yakovlev et al. (2017), not reproduced as a data table here.
+    activity_definition: a_i = x_i*gamma_i; equilibrium partial pressure in the model is P_i = P_i_zero*a_i.
+    equation_26_rate_activity_ratio: 'P. 787: J[Si]/J[Mg] proportional to a_SiO2/a_MgO.'
+    activity_modified_hertz_knudsen_equations_27_and_28: 'P. 788: unnumbered J_i = phi_i(P_i_zero*a_i - P_i_prime)/sqrt(2*pi*R*T*m_i);
+      (27) J_i = phi_i(P_i_zero*x_i*gamma_i - P_i_prime)/sqrt(2*pi*R*T*m_i); in vacuum P_i_prime approximately zero, (28)
+      J_i = phi_i*P_i_zero*a_i/sqrt(2*pi*R*T*m_i) = phi_i*P_i_zero*x_i*gamma_i/sqrt(2*pi*R*T*m_i).'
+    equation_29_rate_ratio: 'P. 788: J[Si]/J[Mg] = (phi_SiO*P_SiO_zero*x_SiO2*gamma_SiO2)/(phi_Mg*P_Mg_zero*x_MgO*gamma_MgO)
+      * sqrt(m_Mg/m_SiO).'
+    oxide_system: CaO-MgO-Al2O3-SiO2; SiO2 is classified acidic, Al2O3 amphoteric, and CaO and MgO basic. CaO is described
+      as more strongly basic and more dissociated than MgO.
+    activity_coefficient_temperature_qualifier: 'P. 788: ideal solutions have gamma_i = 1; real-solution activity coefficients
+      can be either greater or less than 1. The authors say real silicate-melt activity coefficients are generally below 1;
+      as temperature rises, intermolecular forces weaken, the melt approaches ideal-solution behavior, gamma tends toward
+      1, and component activity approaches its mole fraction.'
+    activity_pressure_qualifier: For a component with an activity coefficient below 1, transfer to the vapor is described
+      as hindered and its partial pressure above the melt is lowered.
+    equations_30_and_31: 'P. 789, left column: partial ln(gamma_MgO)/partial ln(a_O2_minus) = beta_MgO, with beta_MgO = [Mg2+]/([Mg2+]+[MgO]);
+      partial ln(gamma_SiO2)/partial ln(a_O2_minus) = -lambda_SiO2, with lambda_SiO2 = [SiO3_2minus]/([SiO3_2minus]+[SiO2]).
+      Both are partial derivatives; O2_minus denotes the oxygen ion O^2-, not molecular oxygen. P. 789 defines beta as the
+      degree of dissociation of MgO in the melt and lambda as the degree of association of SiO2 in the melt; the minus sign
+      of lambda_SiO2 means that silica in the melt is not a donor of oxygen ions but their acceptor.'
+    directional_claims: With increasing melt basicity or oxygen-ion activity, gamma_MgO and MgO activity increase while gamma_SiO2
+      and SiO2 activity decrease. As refractory CaO accumulates, Mg evaporation accelerates while SiO2 evaporation slows;
+      the difference between F_Mg and F_Si grows and Si isotope fractionation slows relative to Mg.
+    composition_dependent_exception: 'For melts with more than 35 mass percent SiO2, the paper says SiO2 activity exceeds
+      MgO activity and Si evaporates faster; in MgO-rich melts where MgO activity is higher, Mg evaporates faster. The cited
+      Richter et al. (2002) CAI Type B example is an exception to the simple activity-concentration rule: calculated MgO activity
+      and concentration decrease during evaporation while Mg flux increases.'
+    prior_experimental_threshold: Mendybaev et al. (2017) are cited as finding that the linear Mg-Si isotope-fractionation
+      trend breaks below 15 mass percent MgO.
+    prior_experimental_cause_qualification: The authors say the earlier workers reported the silicon-fractionation slowdown
+      for residues with high total and MgO mass losses but did not explain its cause.
+    isotope_delta_definitions: 'P. 789, unnumbered equations, right column: delta^xMg = [(xMg/24Mg)_sample/(xMg/24Mg)_standard
+      - 1]*1000 per mil, x = 25 or 26; delta^xSi = [(xSi/28Si)_sample/(xSi/28Si)_standard - 1]*1000 per mil, x = 29 or 30.
+      Here x is the isotope mass number. The p. 790 caption instead normalizes plotted series 1 and 2 to initial-sample isotope
+      ratios.'
+    isotope_rate_residue_proportion: 'P. 790, left column: J[Si]/J[Mg] proportional to F_Mg/F_Si proportional to (delta^jSi/delta^iMg)^L.'
+  context_id: yakovleva-2019-mg-si-isotope-fractionation::context::yakovleva_2019_multicomponent_activity_and_acidity_model
+  work_id: 10.31857/s0016-7525648777-793
+  source_id: yakovleva-2019-mg-si-isotope-fractionation
+  species: Mg
+- observation_id: yakovleva_2019_rayleigh_equations_and_caveats
+  type: isotope_model_and_limitations
+  locator:
+    published_pages: 780-787
+    equation: 7-25
+  units: dimensionless isotope ratios and fractions
+  values:
+    method_class: model_derived
+    attribution: Authors compare the conventional Rayleigh form with their alternative derivation.
+    notation: L = melt; V = vapor; 0L = initial melt; x = mole fraction; n = isotope moles; N = total moles; prime/double_prime
+      distinguish light/heavy distribution coefficients. The heavy isotope changes from 26Mg in (14)-(18) to 25Mg in (23)-(25),
+      as printed.
+    conventional_equation_7: 'P. 780: R/R0 = F^(alpha-1), with F the fraction of the element remaining in the melt, 1 > F
+      > 0, heavy isotope in the numerator of R and R0, and R/R0 > 1. The text dates the Rayleigh distillation equation to
+      1896.'
+    isotope_equation_8: 'P. 780: (x_25Mg/x_24Mg)^L / (x_25Mg/x_24Mg)^0L = F_Mg^(alpha-1).'
+    conventional_assumptions: 'P. 782: the conventional form derived from Hertz-Knudsen uses a constant ideal isotope fractionation
+      factor determined only by isotope mass ratio, independent of evolving residue composition; the residue is isotopically
+      homogeneous and continuously mixed; melt and vapor are in thermodynamic equilibrium, but vapor is continually and instantaneously
+      removed without further contact with the residue. The authors argue this cannot represent factor changes with temperature
+      or melt composition.'
+    equations_9_and_10: 'P. 781: (9) (J_i/J_k)/(P_i/P_k) = sqrt(m_k/m_i); (10) (x_i/x_k)^V/(x_i/x_k)^L = sqrt(m_k/m_i). The
+      substitutions are J_i/J_k = (x_i/x_k)^V, P_i/P_k = (x_i/x_k)^L, and P_i proportional to x_i^L.'
+    factor_equation_11: 'P. 781: alpha_ik = alpha_ik^Eq * alpha_ik^Kin; alpha_ik^Eq = (x_i/x_k)^L/(x_i/x_k)^V; (11) alpha_ik^Kin
+      = (phi_i/phi_k)*sqrt(m_k/m_i). The equilibrium-factor convention here is reciprocal to the later (18); both are retained
+      as printed.'
+    kinetic_factor_equation_12: 'P. 781: assuming alpha_ik^Eq approximately 1 and phi_i/phi_k = 1, (12) alpha_ik approximately
+      equals alpha_ik^Kin = sqrt(m_k/m_i).'
+    conventional_equation_13_and_richter_form: 'P. 781: (13) R/R0 approximately equals F^(sqrt(m_k/m_i)-1). The unnumbered
+      Richter form is R_ik/R_ik,0 = F_k^(alpha_ik-1), with k the most abundant isotope, 24Mg or 28Si. Since i is heavier than
+      k, m_k/m_i < 1; greater departure of alpha from 1 gives more effective separation.'
+    ideal_and_experimental_comparisons: 'P. 782, left column: ideal potassium factor (39/41)^0.5 versus experimental (39/41)^0.43,
+      attributed to Richter et al. (2011); experimentally, alpha_Mg and alpha_Si are considerably closer to 1 than the ideal
+      factors sqrt(24/25) and sqrt(44/45) (silica evaporating from the melt as SiO), attributed to Davis et al. (1990), Wang
+      et al. (2001), Richter et al. (2002) and Knight et al. (2009). Equation (6), p. 780, uses sqrt(44/46) for the 30SiO/28SiO
+      pair; with 16O, 44/45/46 are the 28SiO/29SiO/30SiO masses, and the paper does not state which Si isotope pair sqrt(44/45)
+      refers to. Both values are kept as printed; the print does not contradict itself. P. 782, right column discusses phi_i/phi_k
+      not equal to 1 as a proposed explanation.'
+    exchange_reaction_and_activity_equilibrium: 'P. 783: 26Mg^L + 24Mg^V = 26Mg^V + 24Mg^L; K_a = exp(-DeltaG_zero/(R*T))
+      = (a_26Mg^V*a_24Mg^L)/(a_26Mg^L*a_24Mg^V) = [(x_26Mg^V*x_24Mg^L)/(x_26Mg^L*x_24Mg^V)]*[(gamma_26Mg^V*gamma_24Mg^L)/(gamma_26Mg^L*gamma_24Mg^V)]
+      = K_x*K_gamma. Thus K_x = exp(-DeltaG_zero/(R*T))*(gamma_26Mg^L*gamma_24Mg^V)/(gamma_26Mg^V*gamma_24Mg^L). DeltaG_zero
+      = f(T,P); composition enters through K_gamma. gamma_24Mg^L approximately gamma_26Mg^L and gamma_24Mg^V approximately
+      gamma_26Mg^V imply K_gamma approximately 1.'
+    equations_14_and_15: 'P. 783: (14) K_x = exp(-DeltaG_zero/(R*T)) = (x_26Mg^V*x_24Mg^L)/(x_26Mg^L*x_24Mg^V); (15) (x_26Mg^V*x_24Mg^L)/(x_26Mg^L*x_24Mg^V)
+      = (x_26Mg/x_24Mg)^V/(x_26Mg/x_24Mg)^L = K_D.'
+    equations_16_and_17: 'P. 783: (16) K_D = (x_26Mg/x_24Mg)^V/(x_26Mg/x_24Mg)^L = (x_26Mg^V/x_26Mg^L)/(x_24Mg^V/x_24Mg^L)
+      = K_d_double_prime/K_d_prime; K_d_prime = x_24Mg^V/x_24Mg^L and K_d_double_prime = x_26Mg^V/x_26Mg^L. (17) K_D = (x_26Mg/x_24Mg)^V/(x_26Mg/x_24Mg)^L
+      = exp(-DeltaG_zero/(R*T)).'
+    equation_18_and_rate_constants: 'P. 784: (18) alpha = (x_26Mg/x_24Mg)^V/(x_26Mg/x_24Mg)^L; K_x = exp(-DeltaG_zero/(R*T))
+      = k_forward/k_reverse; K_x = K_D = alpha. Even alpha approximately 1 can produce substantial cumulative separation when
+      relatively large amounts of melt enter the vapor.'
+    initial_mole_balance: 'P. 784, right column: K_d_prime = x_24Mg^V/x_24Mg^L; x_24Mg^V = K_d_prime*x_24Mg^L; x_24Mg^0L =
+      n_24Mg^0L/N^0L; N^0L = N^L + N^V.'
+    equations_19_and_20_and_melt_fraction: 'P. 785: F = N^L/N^0L, decreasing from 1 initially to 0 at complete evaporation;
+      1-F = N^V/N^0L. (19) x_24Mg^L = n_24Mg^L/N^L; n_24Mg^L = N^L*x_24Mg^L. (20) x_24Mg^V = (-dn_24Mg^L)/(-dN^L) = dn_24Mg^V/dN^V.'
+    differential_derivation: 'P. 785: dn_24Mg^L = N^L*dx_24Mg^L + x_24Mg^L*dN^L; dn_24Mg^L/dN^L = (N^L/dN^L)*dx_24Mg^L + x_24Mg^L;
+      the left side is expression (20), i.e. x_24Mg^V, which can be written x_24Mg^V = K_D_prime*x_24Mg^L (printed K''_D,
+      capital-D subscript, left column; the following lines and equation (21) print K''_d, carried as K_d_prime; the paper
+      does not comment on the subscript change); hence K_d_prime*x_24Mg^L = (N^L/dN^L)*dx_24Mg^L + x_24Mg^L; x_24Mg^L*(K_d_prime-1)
+      = (N^L/dN^L)*dx_24Mg^L; dx_24Mg^L/x_24Mg^L = (K_d_prime-1)*dN^L/N^L; dln(x_24Mg^L) = (K_d_prime-1)*dln(N^L).'
+    integration_and_equation_21: 'P. 785: integral from x_24Mg^0L to x_24Mg^L of dln(x_24Mg^L) = (K_d_prime-1)*integral from
+      N^0L to N^L of dln(N^L); ln(x_24Mg^L/x_24Mg^0L) = (K_d_prime-1)*ln(N^L/N^0L) = (K_d_prime-1)*ln(F); (21) x_24Mg^L/x_24Mg^0L
+      = F^(K_d_prime-1).'
+    equations_22_and_23: 'P. 786: replacing total residue fraction F by Mg residue fraction F_Mg gives (22) x_24Mg^L/x_24Mg^0L
+      = F_Mg^(K_d_prime-1); (23) x_25Mg^L/x_25Mg^0L = F_Mg^(K_d_double_prime-1), where K_d_double_prime = x_25Mg^V/x_25Mg^L.
+      Prior-worker notation instead uses F_24Mg and F_Si or F_28Si.'
+    equations_24_and_25: 'P. 786: (24) x_25Mg^L/x_24Mg^L = (x_25Mg^0L/x_24Mg^0L)*F_Mg^(K_d_double_prime-K_d_prime); alpha
+      = (x_25Mg/x_24Mg)^V/(x_25Mg/x_24Mg)^L = K_d_double_prime/K_d_prime; K_d_double_prime = alpha*K_d_prime; (25) x_25Mg^L/x_24Mg^L
+      = (x_25Mg^0L/x_24Mg^0L)*F_Mg^[K_d_prime*(alpha-1)].'
+    qualifications: 'P. 785, left column: the Rayleigh equation is derived under the condition of constancy of K_D_prime (printed
+      K''_D, capital-D subscript; the subsequent lines and equation (21) print K''_d, carried here as K_d_prime), which the
+      paper calls a serious assumption, and also under constant temperature, i.e. isothermal evaporation; p. 786 describes
+      instantaneous removal of equilibrium vapor as an extremely nonequilibrium fractionation process. Pp. 786-787 explicitly
+      say equations (24) and (25) are not perfect because K_d_prime and K_d_double_prime are assumed constant throughout evaporation
+      but generally change with evolving melt composition and duration.'
+    equilibrium_fractionation: The paper also relates isotope partitioning between coexisting vapor and melt to exp(-DeltaG_zero/(R*T));
+      it notes the canonical equilibrium factor depends on temperature and system composition and is not a constant.
+  context_id: yakovleva-2019-mg-si-isotope-fractionation::context::yakovleva_2019_rayleigh_equations_and_caveats
+  work_id: 10.31857/s0016-7525648777-793
+  source_id: yakovleva-2019-mg-si-isotope-fractionation
+  species: Mg

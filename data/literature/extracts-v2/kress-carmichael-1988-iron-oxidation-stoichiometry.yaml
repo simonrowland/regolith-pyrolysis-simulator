@@ -177,6 +177,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1522.15:h=6964e1baa394
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -254,8 +256,8 @@ observations:
       tag: value
       value: '54.9540873857624552093684436'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -285,7 +287,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -646,6 +655,8 @@ observations:
           record: B82
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1569.15:h=c766a5076d50
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -723,8 +734,8 @@ observations:
       tag: value
       value: '85.11380382023764678171263186'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -754,7 +765,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -1115,6 +1133,8 @@ observations:
           record: B79
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1572.15:h=5aeb62d18357
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -1192,8 +1212,8 @@ observations:
       tag: value
       value: '0.004168693834703354017710921289'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -1223,7 +1243,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -1584,6 +1611,8 @@ observations:
           record: B113
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1615.15:h=15a88b1db2cf
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -1661,8 +1690,8 @@ observations:
       tag: value
       value: '128.8249551693133962842653113'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -1692,7 +1721,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -2053,6 +2089,8 @@ observations:
           record: B76
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1633.15:h=42b48c75b74c
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -2130,8 +2168,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -2161,7 +2199,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -2522,6 +2567,8 @@ observations:
           record: '212'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1633.15:h=584fbd3697f9
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -2599,8 +2646,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -2630,7 +2677,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -2991,6 +3045,8 @@ observations:
           record: '210'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1633.15:h=9b4bb8f3de2e
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -3068,8 +3124,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -3099,7 +3155,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -3460,6 +3523,8 @@ observations:
           record: '209'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1633.15:h=b1dba25177b0
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -3537,8 +3602,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -3568,7 +3633,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -3929,6 +4001,8 @@ observations:
           record: '218'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1633.15:h=c0667bb94077
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -4006,8 +4080,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -4037,7 +4111,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -4398,6 +4479,8 @@ observations:
           record: '211'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1634.15:h=34393dd4a424
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -4475,8 +4558,8 @@ observations:
       tag: value
       value: '0.00001071519305237606417408302225'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -4506,7 +4589,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -4867,6 +4957,8 @@ observations:
           record: '151'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1634.15:h=612202d93cb7
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -4944,8 +5036,8 @@ observations:
       tag: value
       value: '181.9700858609983440103680806'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -4975,7 +5067,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -5336,6 +5435,8 @@ observations:
           record: '159'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1634.15:h=656857893562
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -5413,8 +5514,8 @@ observations:
       tag: value
       value: '181.9700858609983440103680806'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -5444,7 +5545,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -5805,6 +5913,8 @@ observations:
           record: '161'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1634.15:h=7d8f0e315e9c
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -5882,8 +5992,8 @@ observations:
       tag: value
       value: '181.9700858609983440103680806'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -5913,7 +6023,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -6274,6 +6391,8 @@ observations:
           record: '167'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1634.15:h=ba5e91d964b3
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -6351,8 +6470,8 @@ observations:
       tag: value
       value: '181.9700858609983440103680806'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -6382,7 +6501,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -6743,6 +6869,8 @@ observations:
           record: '160'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1634.15:h=cea3bc4d20ff
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -6820,8 +6948,8 @@ observations:
       tag: value
       value: '0.00001071519305237606417408302225'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -6851,7 +6979,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -7212,6 +7347,8 @@ observations:
           record: '155'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1635.15:h=4bea932049f6
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -7289,8 +7426,8 @@ observations:
       tag: value
       value: '0.001174897554939529541722067765'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -7320,7 +7457,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -7681,6 +7825,8 @@ observations:
           record: '141'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1635.15:h=5d24994da844
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -7758,8 +7904,8 @@ observations:
       tag: value
       value: '0.001174897554939529541722067765'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -7789,7 +7935,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -8150,6 +8303,8 @@ observations:
           record: '139'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1635.15:h=86f2393c0b1f
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -8227,8 +8382,8 @@ observations:
       tag: value
       value: '0.001174897554939529541722067765'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -8258,7 +8413,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -8619,6 +8781,8 @@ observations:
           record: '147'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1635.15:h=e05b9ee257cc
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -8696,8 +8860,8 @@ observations:
       tag: value
       value: '0.001174897554939529541722067765'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -8727,7 +8891,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -9088,6 +9259,8 @@ observations:
           record: '142'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1636.15:h=69f2b1379b06
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -9165,8 +9338,8 @@ observations:
       tag: value
       value: '0.01548816618912481344671617841'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -9196,7 +9369,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -9557,6 +9737,8 @@ observations:
           record: B111
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1636.15:h=cd0c81c34012
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -9634,8 +9816,8 @@ observations:
       tag: value
       value: '0.01548816618912481344671617841'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -9665,7 +9847,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -10026,6 +10215,8 @@ observations:
           record: B112
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1637.15:h=1e098ad5679a
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -10103,8 +10294,8 @@ observations:
       tag: value
       value: '0.138038426460288483784271249'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -10134,7 +10325,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -10495,6 +10693,8 @@ observations:
           record: '177'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1637.15:h=8fe197179540
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -10572,8 +10772,8 @@ observations:
       tag: value
       value: '0.138038426460288483784271249'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -10603,7 +10803,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -10964,6 +11171,8 @@ observations:
           record: '171'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1637.15:h=a2b20b6d7ca5
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -11041,8 +11250,8 @@ observations:
       tag: value
       value: '0.138038426460288483784271249'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -11072,7 +11281,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -11433,6 +11649,8 @@ observations:
           record: '169'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1637.15:h=cb1850f5bddb
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -11510,8 +11728,8 @@ observations:
       tag: value
       value: '0.138038426460288483784271249'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -11541,7 +11759,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -11902,6 +12127,8 @@ observations:
           record: '172'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1637.15:h=fdf7efa6f7a7
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -11979,8 +12206,8 @@ observations:
       tag: value
       value: '0.138038426460288483784271249'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -12010,7 +12237,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -12371,6 +12605,8 @@ observations:
           record: '174'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1639.15:h=562c6ac1db33
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -12448,8 +12684,8 @@ observations:
       tag: value
       value: '0.0001230268770812381534241540436'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -12479,7 +12715,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -12840,6 +13083,8 @@ observations:
           record: '202'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1639.15:h=795cfa7ff2c7
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -12917,8 +13162,8 @@ observations:
       tag: value
       value: '0.0001230268770812381534241540436'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -12948,7 +13193,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -13309,6 +13561,8 @@ observations:
           record: '199'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1639.15:h=acf03527a786
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -13386,8 +13640,8 @@ observations:
       tag: value
       value: '0.0001230268770812381534241540436'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -13417,7 +13671,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -13778,6 +14039,8 @@ observations:
           record: '208'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1639.15:h=ef4caf05170d
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -13855,8 +14118,8 @@ observations:
       tag: value
       value: '0.0001230268770812381534241540436'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -13886,7 +14149,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -14247,6 +14517,8 @@ observations:
           record: '205'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1661.15:h=9efe85ccd552
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -14324,8 +14596,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -14355,7 +14627,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -14716,6 +14995,8 @@ observations:
           record: B34
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1710.15:h=9136815d5533
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -14793,8 +15074,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -14824,7 +15105,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -15185,6 +15473,8 @@ observations:
           record: B27
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1728.15:h=421567ef315a
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -15262,8 +15552,8 @@ observations:
       tag: value
       value: '380.1893963205611961497062297'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -15293,7 +15583,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -15654,6 +15951,8 @@ observations:
           record: '131'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1728.15:h=4a50e261ec4e
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -15731,8 +16030,8 @@ observations:
       tag: value
       value: '380.1893963205611961497062297'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -15762,7 +16061,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -16123,6 +16429,8 @@ observations:
           record: '129'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1728.15:h=5e69e98db66a
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -16200,8 +16508,8 @@ observations:
       tag: value
       value: '380.1893963205611961497062297'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -16231,7 +16539,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -16592,6 +16907,8 @@ observations:
           record: '137'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1728.15:h=6e3feee16ade
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -16669,8 +16986,8 @@ observations:
       tag: value
       value: '380.1893963205611961497062297'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -16700,7 +17017,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -17061,6 +17385,8 @@ observations:
           record: '130'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1728.15:h=8c044e9a2569
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -17138,8 +17464,8 @@ observations:
       tag: value
       value: '380.1893963205611961497062297'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -17169,7 +17495,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -17530,6 +17863,8 @@ observations:
           record: '132'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1731.15:h=4c7a39efd59a
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -17607,8 +17942,8 @@ observations:
       tag: value
       value: '0.000005888436553555889672670989411'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -17638,7 +17973,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -17999,6 +18341,8 @@ observations:
           record: '125'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1731.15:h=4f6d2d42633d
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -18076,8 +18420,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -18107,7 +18451,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -18468,6 +18819,8 @@ observations:
           record: '236'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1731.15:h=864dab69c3df
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -18545,8 +18898,8 @@ observations:
       tag: value
       value: '0.000005888436553555889672670989411'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -18576,7 +18929,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -18937,6 +19297,8 @@ observations:
           record: '121'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1731.15:h=a0f3b8e13319
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -19014,8 +19376,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -19045,7 +19407,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -19406,6 +19775,8 @@ observations:
           record: '231'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1731.15:h=b0cffa728f17
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -19483,8 +19854,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -19514,7 +19885,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -19875,6 +20253,8 @@ observations:
           record: '230'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1731.15:h=e13baac86787
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -19952,8 +20332,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -19983,7 +20363,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -20344,6 +20731,8 @@ observations:
           record: '238'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1731.15:h=e5ef9614945a
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -20421,8 +20810,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -20452,7 +20841,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -20813,6 +21209,8 @@ observations:
           record: '229'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=0e1afc6f5a11
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -20890,8 +21288,8 @@ observations:
       tag: value
       value: '0.0006165950018614821663203483439'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -20921,7 +21319,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -21282,6 +21687,8 @@ observations:
           record: '83'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=121b6fdb7141
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -21359,8 +21766,8 @@ observations:
       tag: value
       value: '0.07079457843841379108022149422'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -21390,7 +21797,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -21751,6 +22165,8 @@ observations:
           record: '103'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=149f89470704
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -21828,8 +22244,8 @@ observations:
       tag: value
       value: '0.07079457843841379108022149422'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -21859,7 +22275,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -22220,6 +22643,8 @@ observations:
           record: '101'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=2beff7a4281a
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -22297,8 +22722,8 @@ observations:
       tag: value
       value: '0.07079457843841379108022149422'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -22328,7 +22753,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -22689,6 +23121,8 @@ observations:
           record: '100'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=448989612b68
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -22766,8 +23200,8 @@ observations:
       tag: value
       value: '0.00006165950018614821663203483439'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -22797,7 +23231,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -23158,6 +23599,8 @@ observations:
           record: '91'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=4c58d5345d68
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -23235,8 +23678,8 @@ observations:
       tag: value
       value: '0.0006165950018614821663203483439'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -23266,7 +23709,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -23627,6 +24077,8 @@ observations:
           record: '86'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=4d2b456dda50
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -23704,8 +24156,8 @@ observations:
       tag: value
       value: '0.00006165950018614821663203483439'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -23735,7 +24187,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -24096,6 +24555,8 @@ observations:
           record: '89'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=67464899054f
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -24173,8 +24634,8 @@ observations:
       tag: value
       value: '0.0006165950018614821663203483439'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -24204,7 +24665,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -24565,6 +25033,8 @@ observations:
           record: '79'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=676f89bba14a
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -24642,8 +25112,8 @@ observations:
       tag: value
       value: '0.07079457843841379108022149422'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -24673,7 +25143,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -25034,6 +25511,8 @@ observations:
           record: '107'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1732.15:h=e28bef34b8c2
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -25111,8 +25590,8 @@ observations:
       tag: value
       value: '0.07079457843841379108022149422'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -25142,7 +25621,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -25503,6 +25989,8 @@ observations:
           record: '102'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1734.15:h=40f76c02f540
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -25580,8 +26068,8 @@ observations:
       tag: value
       value: '0.006760829753919817710589919496'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -25611,7 +26099,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -25972,6 +26467,8 @@ observations:
           record: '71'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1734.15:h=97155cd34ecf
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -26049,8 +26546,8 @@ observations:
       tag: value
       value: '0.006760829753919817710589919496'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -26080,7 +26577,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1270
@@ -26441,6 +26945,8 @@ observations:
           record: '74'
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1758.15:h=3bf985608338
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -26518,8 +27024,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -26549,7 +27055,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -26910,6 +27423,8 @@ observations:
           record: B44
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1808.15:h=f724fa118a5a
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -26987,8 +27502,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -27018,7 +27533,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -27379,6 +27901,8 @@ observations:
           record: B54
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1817.15:h=554a07479356
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -27456,8 +27980,8 @@ observations:
       tag: value
       value: '0.3801893963205611961497062297'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -27487,7 +28011,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -27848,6 +28379,8 @@ observations:
           record: B118
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1857.15:h=f79b7582cb91
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -27925,8 +28458,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -27956,7 +28489,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -28317,6 +28857,8 @@ observations:
           record: B64
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1905.15:h=443861244103
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -28394,8 +28936,8 @@ observations:
       tag: value
       value: '1.819700858609983440103680806'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -28425,7 +28967,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -28786,6 +29335,8 @@ observations:
           record: B120
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1908.15:h=1db1cc1f1f69
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -28863,8 +29414,8 @@ observations:
       tag: value
       value: '20892.96130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -28894,7 +29445,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -29255,6 +29813,8 @@ observations:
           record: B73
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series::T=1909.15:h=3ef13e0a1f5d
   experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
   identity:
@@ -29332,8 +29892,8 @@ observations:
       tag: value
       value: '0.0512861383991364855546333465'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -29363,7 +29923,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: total_pressure_ambient_open_furnace
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: total_pressure_Pa=101325 Pa derived from explicit ambient_pressure_evidence class=gas_mixing; condensed-phase
+      VdP/RT is about 1e-5; no band assigned
+    origin: kress-carmichael-1988-iron-oxidation-stoichiometry::kress_1988_table1_measured_redox_series
+    authority: derived_from_apparatus
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   locator:
     published_page: 1271
@@ -29724,3 +30291,5 @@ observations:
           record: B105
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass

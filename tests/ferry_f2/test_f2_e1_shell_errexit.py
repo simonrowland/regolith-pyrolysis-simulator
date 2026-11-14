@@ -184,6 +184,18 @@ def test_collect_recipe_db_exits_nonzero_when_zero_studies() -> None:
     assert proc.returncode != 0
 
 
+def test_collect_recipe_db_requires_node_arguments() -> None:
+    script = ROOT / "scripts" / "collect_recipe_db.sh"
+    proc = subprocess.run(
+        ["bash", str(script)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode != 0
+    assert "Usage:" in proc.stderr
+
+
 def test_enginepatch_refresh_refuses_missing_checkout() -> None:
     script = ROOT / "patches" / "scripts" / "enginepatch.sh"
     env = {**os.environ, "SULFLIQ_CHECKOUT": "/tmp/f2-no-such-sulfliq-checkout"}

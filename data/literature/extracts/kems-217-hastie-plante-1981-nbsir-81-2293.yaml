@@ -1,0 +1,1697 @@
+schema_version: literature_extract.v1
+source_id: kems-217-hastie-plante-1981-nbsir-81-2293
+source:
+  citation: Hastie, J. W. & Plante, E. R. (1981), Mass Spectrometric Studies of MHD Slag Thermochemistry, NBSIR 81-2293, National
+    Bureau of Standards, interim report, June 1981.
+  year: 1981
+  doi: 10.6028/NBS.IR.81-2293
+  corpus_asset: kems-217-hastie-plante-1981-nbsir-81-2293.pdf
+  sha256: 69760e98f1619ae289dc97abb3e0280d5f7c510ded21a4f1b29f41e6d74c96a9
+extraction:
+  method: Manual extraction; all 38 PDF pages rendered at 220 dpi and visually reviewed. Table 1 transcribed cell by cell
+    from rotated page images. Figures 1-8 retained as figure_only without digitization.
+  date: '2026-10-05'
+  worker: codex
+  provenance_path: text/kems-217-hastie-plante-1981-nbsir-81-2293/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- species: K
+  observation_id: hastie_plante_1981_table1_row_01_k_pressure_fit
+  observable: table_row
+  field: A
+  value: 4.721
+  locator:
+    pdf_page_index: 18
+    published_page: 15
+    table: '1'
+    row: '1'
+- species: K
+  observation_id: hastie_plante_1981_table1_row_16_k_pressure_fit
+  observable: table_row
+  field: B
+  value: 20642
+  locator:
+    pdf_page_index: 19
+    published_page: 16
+    table: '1'
+    row: '16'
+- species: K
+  observation_id: hastie_plante_1981_table1_row_12_k_pressure_fit
+  observable: table_row
+  field: C
+  value: 0.07887
+  locator:
+    pdf_page_index: 19
+    published_page: 16
+    table: '1'
+    row: '12'
+benches:
+- id: hastie_plante_kms
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen Effusion Mass Spectrometric (KMS) method
+    locator:
+      pdf_page_index: 5
+      published_page: 2
+      section: Introduction
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      pdf_page_index: 5
+      published_page: 2
+      note: No cell or liner material stated in this report; KMS method description referenced elsewhere.
+  cell_materials:
+  - state:
+      tag: unknown
+      reason: not_published
+    locator:
+      pdf_page_index: 5
+      published_page: 2
+      note: No cell material stated.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Temperature sensor not stated.
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Temperature calibration not stated.
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Not stated.
+    ionization_cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Not stated.
+    ionization_cross_section_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Not stated.
+    multiplier_or_isotope_corrections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Not stated.
+  other_facts:
+  - name: intensity_to_partial_pressure_calibration
+    unit: as printed
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        section: KMS Study in Salt Solidus Region
+        note: Calibration procedure and numerical factors not published; near-unit NaCl check pertains to TMS only.
+  - name: chamber_background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 9
+        published_page: 6
+        note: No chamber background pressure stated; 10^-4 atm is the method upper pressure limit, not background.
+- id: hastie_plante_tms
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Transpiration Mass Spectrometric (TMS) method
+    locator:
+      pdf_page_index: 5
+      published_page: 2
+      section: Introduction
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      pdf_page_index: 5
+      published_page: 2
+      note: No cell or liner material stated in this report.
+  cell_materials:
+  - state:
+      tag: unknown
+      reason: not_published
+    locator:
+      pdf_page_index: 5
+      published_page: 2
+      note: No cell material stated.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Temperature sensor not stated.
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Temperature calibration not stated.
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Not stated.
+    ionization_cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Not stated.
+    ionization_cross_section_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Not stated.
+    multiplier_or_isotope_corrections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: Not stated.
+  other_facts:
+  - name: intensity_to_partial_pressure_calibration
+    unit: as printed
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        section: TMS Study in Salt Liquidus Region
+        note: Calibration procedure and numerical factors not published; near-unit NaCl check pertains to TMS only.
+  - name: chamber_background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        note: No background/residual pressure stated.
+experiments:
+- experiment_id: synthetic-channel-slag-kms
+  bench_id: hastie_plante_kms
+  method: knudsen_effusion
+  locator:
+    pdf_page_index: 9
+    published_page: 6
+    section: Synthetic MHD Channel Slags
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00034'
+        locator:
+          pdf_page_index: 9
+          published_page: 6
+          section: Synthetic MHD Channel Slags
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          pdf_page_index: 9
+          published_page: 6
+          note: No channel length stated.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 9
+        published_page: 6
+        note: Residual chamber pressure not stated.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 9
+        published_page: 6
+        note: Sweep gas composition/settings not published; stated vacuum conditions retained in exchange_pressure_conditions
+          context.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Vacuum vaporization stated; molecular/transitional/viscous flow class not published.
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          pdf_page_index: 9
+          published_page: 6
+          note: Base pressure not stated.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthetic Western and Eastern channel slags; full separate initial weight-percent compositions in
+          Table 1 rows 14 and 15, retained in their located context rows.
+      locator:
+        pdf_page_index: 19
+        published_page: 16
+        note: Two printed composition sets; not a composition absence.
+        table: '1'
+        row: 14-15
+    preparation:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 9
+        published_page: 6
+        note: Detailed synthesis procedure and purity not published; composition selection and phase characterization
+          retained in channel_sample_selection context.
+- experiment_id: salt-slag-exchange-tms
+  bench_id: hastie_plante_tms
+  method: transpiration
+  locator:
+    pdf_page_index: 14
+    published_page: 11
+    section: TMS Study in Salt Liquidus Region
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: NaCl + K1 slag (19.4 wt.% K2O)
+      locator:
+        pdf_page_index: 14
+        published_page: 11
+        section: TMS Study in Salt Liquidus Region
+    preparation:
+      state:
+        tag: value
+        value: Thin layer of powdered NaCl on K1 slag surface.
+      locator:
+        pdf_page_index: 14
+        published_page: 11
+        note: Preparation printed; source material purity not published. Facts also carried in reader-surviving
+          context.
+- experiment_id: salt-slag-exchange-kms
+  bench_id: hastie_plante_kms
+  method: knudsen_effusion
+  locator:
+    pdf_page_index: 15
+    published_page: 12
+    section: KMS Study in Salt Solidus Region
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00034'
+        locator:
+          pdf_page_index: 15
+          published_page: 12
+          section: KMS Study in Salt Solidus Region
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          pdf_page_index: 15
+          published_page: 12
+          note: No channel length stated.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        note: Residual chamber pressure not stated.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        note: Sweep gas composition/settings not published; stated vacuum conditions retained in exchange_pressure_conditions
+          context.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Vacuum vaporization stated; molecular/transitional/viscous flow class not published.
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          pdf_page_index: 15
+          published_page: 12
+          note: Base pressure not stated.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: K2 slag plus separate top layer of powdered NaCl; excess NaCl
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        section: KMS Study in Salt Solidus Region
+    preparation:
+      state:
+        tag: value
+        value: K2 slag with separate top layer of powdered NaCl; excess NaCl.
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        note: Preparation printed; source material purity not published. Facts also carried in reader-surviving
+          context.
+species:
+  K:
+    observations: []
+    context:
+    - observation_id: hastie_plante_1981_table1_row_01_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '1'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 4.721
+        B: 15624
+        temperature_range_K_as_printed: 1300-1800
+        system_as_printed: K2O-SiO2
+        phases_as_printed: Solution 44 to ~5 [K2O]
+        composition_and_comments_as_printed: Pressures higher than earlier data of Plante et al. (1975) because of orifice
+          effect.
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        C: 9.32
+        attribution: Plante et al. (1975)
+        T_min_K: 1300
+        T_max_K: 1800
+        composition_range_wt_pct_as_printed:
+          K2O:
+            min: 5.0
+            max: 44.0
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_02_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '2'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 5.489
+        B: 15036
+        temperature_range_K_as_printed: 1300-1800
+        system_as_printed: K2O-Al2O3
+        phases_as_printed: KAlO2 → K2O·5Al2O3
+        composition_and_comments_as_printed: P_K independent of bulk composition. Plante et al. (1975).
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Plante et al. (1975)
+        T_min_K: 1300
+        T_max_K: 1800
+        phase_footnote_f: Exact crystalline phase compositions uncertain; Table 1 footnote f, PDF 21 / printed 17.
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_03_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '3'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 7.487
+        B: 21453
+        temperature_range_K_as_printed: 1500-1800
+        system_as_printed: K2O-Al2O3
+        phases_as_printed: K2O·9Al2O3 → Al2O3
+        composition_and_comments_as_printed: P_K independent of bulk composition. Plante et al. (1975).
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Plante et al. (1975)
+        T_min_K: 1500
+        T_max_K: 1800
+        phase_footnote_f: Exact crystalline phase compositions uncertain; Table 1 footnote f, PDF 21 / printed 17.
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_04_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '4'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 4.524
+        B: 12873
+        temperature_range_K_as_printed: 1100-1450
+        system_as_printed: K2O-ZrO2
+        phases_as_printed: K4Zr5O12-ZrO2
+        composition_and_comments_as_printed: Plante (1977). Pressure could be low by a factor of two because of vapor unsaturation
+          (large orifice); K2CO3 contamination present.
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Plante (1977)
+        T_min_K: 1100
+        T_max_K: 1450
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_05_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '5'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 4.524
+        B: 12873
+        temperature_range_K_as_printed: 1150-1450
+        system_as_printed: K2O-Fe2O3
+        phases_as_printed: KFeO2-K2O·6Fe2O3
+        composition_and_comments_as_printed: Phase boundary composition slightly dependent on T. Data adjusted for constant
+          K/O2. Plante (1979b).
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        T_min_K: 1150
+        T_max_K: 1450
+        phase_footnote_f: Exact crystalline phase compositions uncertain; Table 1 footnote f, PDF 21 / printed 17.
+        attribution: Plante (1979b)
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_06_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '6'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 7.028
+        B: 16750
+        temperature_range_K_as_printed: 1200-1600
+        system_as_printed: K2O-Fe2O3
+        phases_as_printed: K2O·6Fe2O3-Fe3O4
+        composition_and_comments_as_printed: Phase boundary composition slightly dependent on T. Data adjusted for constant
+          K/O2. Plante (1979b).
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Plante (1979b)
+        T_min_K: 1200
+        T_max_K: 1600
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_07_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '7'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 8.722
+        B: 20923
+        temperature_range_K_as_printed: 1400-1650
+        system_as_printed: K2O-Al2O3-SiO2 (KAlSiO4)
+        phases_as_printed: KAlSiO4, K2O·9Al2O3, KAlSi2O6
+        composition_and_comments_as_printed: Probably not equilibrated because of slow condensed phase kinetics. Plante
+          (1979c, 1980a).
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Plante (1979c, 1980a)
+        T_min_K: 1400
+        T_max_K: 1650
+        system_footnote_h: Compositions constrained to mole ratio Al2O3/SiO2 = 0.5; Table 1 footnote h, PDF 21 / printed
+          17.
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_08_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '8'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_unattributed
+        A: 7.068
+        B: 20763
+        temperature_range_K_as_printed: 1600-1900
+        system_as_printed: K2O-Al2O3-SiO2
+        phases_as_printed: Possibly KAlSi2O6, Al2O3, K2O·9Al2O3 ~22 [K2O]
+        composition_and_comments_as_printed: Evidence of melt formation.
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        T_min_K: 1600
+        T_max_K: 1900
+        composition_wt_pct_as_printed:
+          K2O: 22.0
+        system_footnote_h: Compositions constrained to mole ratio Al2O3/SiO2 = 0.5; Table 1 footnote h, PDF 21 / printed
+          17.
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_09_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '9'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_unattributed
+        A: 6.35
+        B: 20693
+        temperature_range_K_as_printed: 1600-2000
+        system_as_printed: K2O-Al2O3-SiO2
+        phases_as_printed: Phases uncertain ~17 [K2O]
+        composition_and_comments_as_printed: ''
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        T_min_K: 1600
+        T_max_K: 2000
+        composition_wt_pct_as_printed:
+          K2O: 17.0
+        system_footnote_h: Compositions constrained to mole ratio Al2O3/SiO2 = 0.5; Table 1 footnote h, PDF 21 / printed
+          17.
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_10_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '10'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_unattributed
+        A: 4.667
+        B: 19800
+        temperature_range_K_as_printed: 1750-2150
+        system_as_printed: K2O-Al2O3-SiO2
+        phases_as_printed: Phases uncertain ~11.5 [K2O]
+        composition_and_comments_as_printed: ''
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        T_min_K: 1750
+        T_max_K: 2150
+        composition_wt_pct_as_printed:
+          K2O: 11.5
+        system_footnote_h: Compositions constrained to mole ratio Al2O3/SiO2 = 0.5; Table 1 footnote h, PDF 21 / printed
+          17.
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_11_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 18
+        published_page: 15
+        table: '1'
+        row: '11'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_unattributed
+        A: 4.464
+        B: 20424
+        temperature_range_K_as_printed: 1800-2150
+        system_as_printed: K2O-Al2O3-SiO2
+        phases_as_printed: Liquid + 3Al2O3·2SiO2 (10.8 [K2O]) (mullite)
+        composition_and_comments_as_printed: Decreasing T-chronology used to minimize composition change.
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        T_min_K: 1800
+        T_max_K: 2150
+        composition_wt_pct_as_printed:
+          K2O: 10.8
+        system_footnote_h: Compositions constrained to mole ratio Al2O3/SiO2 = 0.5; Table 1 footnote h, PDF 21 / printed
+          17.
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_12_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 19
+        published_page: 16
+        table: '1'
+        row: '12'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 5.228
+        B: 16794
+        temperature_range_K_as_printed: 1400-1900
+        system_as_printed: Simplified Western slags; K2O-CaO-Al2O3-SiO2
+        phases_as_printed: Solution + KAlSiO4 at higher K2O content
+        composition_and_comments_as_printed: Composition range [K2O] 3-14, [CaO] 17-36, [Al2O3] 14-36, [SiO2] balance. Standard
+          deviation ~30 percent, maximum deviation ~100 percent. Additional data for 20 [K2O] compositions have been obtained.
+          Plante (1980a,b,c,d; 1981).
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        C: 0.07887
+        D: 0.001741
+        E: 0.01825
+        attribution: Plante (1980a,b,c,d; 1981)
+        T_min_K: 1400
+        T_max_K: 1900
+        composition_range_wt_pct_as_printed:
+          K2O:
+            min: 3.0
+            max: 14.0
+          CaO:
+            min: 17.0
+            max: 36.0
+          Al2O3:
+            min: 14.0
+            max: 36.0
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_13_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 19
+        published_page: 16
+        table: '1'
+        row: '13'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 5.564
+        B: 16650
+        temperature_range_K_as_printed: 1600-1800
+        system_as_printed: Real MHD channel slag K1
+        phases_as_printed: KAlSiO4 major + minor unidentified crystalline phase + slag
+        composition_and_comments_as_printed: '[K2O] 19.5; [Al2O3] 12.1; [Fe2O3] 14.3; [CaO] 3.8; [MgO] 1.0; [SiO2] 46.8; [Na2O]
+          0.5 wt.%. Illinois no. 6 coal, UTSI test sample. Initially high pressure of K due to K2SO4 and K2CO3 (0.2 percent
+          S). Equation corresponds to [K2O] ~14. Hastie et al. (1980).'
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Hastie et al. (1980)
+        T_min_K: 1600
+        T_max_K: 1800
+        composition_wt_pct_as_printed:
+          K2O: 19.5
+          Al2O3: 12.1
+          Fe2O3: 14.3
+          CaO: 3.8
+          MgO: 1.0
+          SiO2: 46.8
+          Na2O: 0.5
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_14_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 19
+        published_page: 16
+        table: '1'
+        row: '14'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 6.818
+        B: 18472
+        temperature_range_K_as_printed: 1500-1700
+        system_as_printed: Synthetic Western channel slag
+        phases_as_printed: KAlSiO4 + glassy phase
+        composition_and_comments_as_printed: '[K2O] 22.7; [Al2O3] 24.6; [Fe2O3] 5.3; [CaO] 9.3; [MgO] 3.3; [SiO2] 34.8 wt.%.
+          [K2O] 18.9-17.6. Plante and Cook (1978).'
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Plante and Cook (1978)
+        T_min_K: 1500
+        T_max_K: 1700
+        composition_wt_pct_as_printed:
+          K2O: 22.7
+          Al2O3: 24.6
+          Fe2O3: 5.3
+          CaO: 9.3
+          MgO: 3.3
+          SiO2: 34.8
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_15_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 19
+        published_page: 16
+        table: '1'
+        row: '15'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 6.831
+        B: 19056
+        temperature_range_K_as_printed: 1600-1750
+        system_as_printed: Synthetic Eastern channel slag
+        phases_as_printed: KAlSiO4 + glassy phase
+        composition_and_comments_as_printed: '[K2O] 23.6; [Al2O3] 25.5; [Fe2O3] 12.5; [CaO] 1.8; [MgO] 0.6; [SiO2] 36.0 wt.%.
+          [K2O] 23.3-22.1, linear portion AB, BC curves in Fig. 3. Plante and Cook (1978).'
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Plante and Cook (1978)
+        T_min_K: 1600
+        T_max_K: 1750
+        composition_wt_pct_as_printed:
+          K2O: 23.6
+          Al2O3: 25.5
+          Fe2O3: 12.5
+          CaO: 1.8
+          MgO: 0.6
+          SiO2: 36.0
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_16_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 19
+        published_page: 16
+        table: '1'
+        row: '16'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 6.286
+        B: 20642
+        temperature_range_K_as_printed: 1550-2085
+        system_as_printed: Illite
+        phases_as_printed: Liquid
+        composition_and_comments_as_printed: '[K2O] 7.4; [Al2O3] 26.0; [Fe2O3] 4.4; [MgO] 2.1; [SiO2] 60.2 wt.%. Hastie et
+          al. (1979).'
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Hastie et al. (1979)
+        T_min_K: 1550
+        T_max_K: 2085
+        composition_wt_pct_as_printed:
+          K2O: 7.4
+          Al2O3: 26.0
+          Fe2O3: 4.4
+          MgO: 2.1
+          SiO2: 60.2
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_table1_row_17_k_pressure_fit
+      type: table_row
+      locator:
+        pdf_page_index: 20
+        published_page: 17
+        table: '1'
+        row: '17'
+        note: Printed fit coefficients; no individual pressure-temperature points tabulated.
+      units: printed fit coefficients; pressure atm; temperature K
+      values:
+        quantity: elemental_K_pressure_empirical_fit_coefficients
+        method_class: quoted_attributed
+        A: 6.231
+        B: 17863
+        temperature_range_K_as_printed: 1470-1820
+        system_as_printed: Low melting synthetic slag K2
+        phases_as_printed: Liquid
+        composition_and_comments_as_printed: '[K2O] 8.7; [Al2O3] 11.1; [Fe2O3] 12.0; [CaO] 13.9; [MgO] 7.9; [SiO2] 47.3 wt.%.
+          [K2O] 6. Initial pO2 >= P_K, but later fell to level of K2O. Hastie et al. (1980).'
+        relation_as_printed: log P(atm) = A - B/T + C + D - E
+        pressure_unit: atm
+        attribution: Hastie et al. (1980)
+        T_min_K: 1470
+        T_max_K: 1820
+        composition_wt_pct_as_printed:
+          K2O: 8.7
+          Al2O3: 11.1
+          Fe2O3: 12.0
+          CaO: 13.9
+          MgO: 7.9
+          SiO2: 47.3
+        K2O_after_vaporization_wt_pct: 6.0
+      uncertainty:
+        note: No coefficient uncertainty printed.
+    - observation_id: hastie_plante_1981_seed_retention
+      type: quantitative_background
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        section: Introduction
+      units: wt.% and relative amount as printed
+      values:
+        printed_quote: “about 17 to 20 percent of the potassium seed is bound in the slag at 1400 K”; “This concentration
+          level is about a factor of three lower than that predicted from equilibrium calculations”; “Only about half
+          of the seed slag is readily recoverable.”
+        recoverable_form_as_printed: Readily recoverable seed is K2SO4 adsorbed on the slag surface.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_methods_limits
+      type: method_context
+      locator:
+        pdf_page_index: 6
+        published_page: 3
+        section: Introduction
+      units: as printed
+      values:
+        printed_quote: “the upper pressure limits of 10^-4 and one atm”; “upper limit gas residence times of about 0.04 and
+          20 sec, respectively”; “the TMS method will more closely approach the equilibrium condition for systems exhibiting
+          non-equilibrium behavior.”
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_prior_transpiration
+      type: comparative_statement
+      locator:
+        pdf_page_index: 6
+        published_page: 3
+        section: Synthetic Slag Systems
+      units: as printed
+      values:
+        printed_quote: “order-of-magnitude differences, with the Charles’s activities being low.”
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_k2o_standard_state
+      type: activity_standard_state
+      locator:
+        pdf_page_index: 7
+        published_page: 4
+        section: Synthetic Slag Systems
+      units: log Kp; cal/deg mol
+      values:
+        printed_quote: K2O(l) activity is derived using dissociation pressure data for pure liquid K2O; log Kp[K2O(l)]
+          = -23751/T + 11.7723; estimated liquid K2O Cp = 25 cal/deg mol
+        log_Kp_as_printed: -23751/T + 11.7723
+        estimated_liquid_Cp_cal_mol_K: 25
+        reduction_inputs_attribution: JANAF (1971) solid K2O data combined with enthalpy and entropy of fusion reported
+          by Natola and Touzain (1970).
+        evidence_by_field:
+          log_Kp_as_printed: calculated from attributed thermochemical inputs
+          estimated_liquid_Cp_cal_mol_K: author_estimate
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_k2o_activity_definition
+      type: activity_basis
+      locator:
+        pdf_page_index: 6
+        published_page: 3
+        section: Synthetic Slag Systems
+      units: as printed
+      values:
+        printed_quote: K2O(l) = 2K + 1/2 O2; a_K2O = (pK)^2.5/(2Kp); K and O2 partial pressures define the activity
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_clausius_clapeyron_qualifiers
+      type: qualifying_conditions
+      locator:
+        pdf_page_index: 7
+        published_page: 4
+        section: Synthetic Slag Systems
+      units: as printed
+      values:
+        printed_quote: 'Clauses a-d: residual alkali carbonate impurities; non-equilibrium effects in the condensed
+          phase; condensed/vapor non-equilibrium leading to unsaturated vapor; changing phase boundaries due to incongruent
+          vaporization.'
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_kalsilite_dependence
+      type: qualifying_conditions
+      locator:
+        pdf_page_index: 8
+        published_page: 5
+        section: K2O-Al2O3-SiO2 System
+      units: as printed
+      values:
+        printed_quote: “we observe the K-pressure (and hence K2O activity) to be dependent on bulk composition”; “slow condensed
+          phase kinetics”; the beta-alumina phase “extends from K2O/Al2O3 ratios of 1/5 to 1/9”; “the vapor pressure equation
+          in table 1, for the three phase region, is based on the highest alkali-pressures which were effectively independent
+          of composition.”
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_kalsilite_hysteresis
+      type: comparative_statement
+      locator:
+        pdf_page_index: 8
+        published_page: 5
+        section: K2O-Al2O3-SiO2 System
+      units: as printed
+      values:
+        printed_quote: The preceding temperature-increase run reached 1860 K. On decreasing temperature, lower pressures
+          were found, particularly at 1760 K and below; probably insufficient time for the frozen melt to recrystallize,
+          with slow alkali transfer across the frozen eutectic.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_channel_composition_drift
+      type: qualifying_conditions
+      locator:
+        pdf_page_index: 9
+        published_page: 6
+        section: Synthetic MHD Channel Slags
+      units: as printed
+      values:
+        printed_quote: “Steady state pressures were not obtained until about ten percent of the K2O content had been
+          depleted by vaporization”; “Excess oxygen was vaporized during this initial experimental phase”; “Following
+          this initial reduction period, the oxygen partial pressure was, within experimental error, what would be expected
+          if the O2 pressure were controlled by K2O dissociation.”
+        iron_oxide_reduction_as_printed: Initial excess O2 accompanies FeOx reduction from x = 1.5 to 1.33.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_western_eastern
+      type: comparative_statement
+      locator:
+        pdf_page_index: 10
+        published_page: 7
+        section: Synthetic MHD Channel Slags
+      units: as printed
+      values:
+        printed_quote: “Eastern slags require about twice as much K2O-content to achieve similar alkali pressures as
+          for Western slags”; “higher concentration of basic CaO and MgO in Western slags”; “a less complex silicate
+          structure”; “a less bound form of K2O.”
+        eastern_narrative_K2O_wt_pct_as_printed: 24 to 21; distinct from the Table 1 and figure-caption intervals.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_eastern_break
+      type: qualifying_conditions
+      locator:
+        pdf_page_index: 10
+        published_page: 7
+        section: Synthetic MHD Channel Slags
+      units: as printed
+      values:
+        printed_quote: “The vapor pressure curves show a significant break at location X, the position of which depends
+          on the amount of sample vaporized”; “significant positive deviation” of observed K and O2 pressures from the
+          extrapolated higher-temperature portions; “At temperatures above 1620 K, these two curve sets are seen to
+          merge into a single linear portion”; at higher temperatures O2 pressures “were greater than would be predicted
+          by K2O dissociation alone,” while at lower temperatures “less”; above 1620 K FeOx reduction releases O2 and
+          below this temperature FeOx is oxidized.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_simplified_slag_match
+      type: comparative_statement
+      locator:
+        pdf_page_index: 11
+        published_page: 8
+        section: Synthetic Low Melting Slag
+      units: as printed
+      values:
+        printed_quote: “good agreement (within 50 percent in K-pressure)”; “Comparable agreement was obtained for other
+          systems where CaO was significant.”
+        K2_liquidus_range_K_as_printed: 1480 and higher
+        replacement_basis: For six-component K2 at 6 wt.% K2O after vaporization, replace Fe2O3 (or Fe3O4) by Al2O3
+          and MgO by CaO on a molar basis.
+        simplified_composition_wt_pct_as_printed:
+          SiO2: 48.8
+          Al2O3: 19.6
+          CaO: 25.4
+          K2O: 6.2
+        evidence_by_field:
+          K2_liquidus_range_K_as_printed: author-reported experimental context
+          simplified_composition_wt_pct_as_printed: calculated replacement composition
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_real_slag_volatile_species
+      type: qualifying_conditions
+      locator:
+        pdf_page_index: 11
+        published_page: 8
+        section: Real MHD Channel Slag
+      units: as printed
+      values:
+        printed_quote: “about two percent of the potassium was present in relatively volatile form, mainly as K2SO4
+          and K2CO3”; “After depletion of these components by vaporization, the only significant slag vapor species
+          were K and O2”; these “were present in the approximate stoichiometric ratio expected for K2O decomposition.”
+        liquidus_K_as_printed: about 1700
+        origin_as_printed: Real K1 slag produced by combustion of Illinois No. 6 coal with additional potassium added
+          to the combustor; X-ray diffraction indicated mainly KAlSiO4.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_k2o_gamma_figure
+      type: figure_only
+      locator:
+        pdf_page_index: 24
+        published_page: 21
+        section: Figure captions
+        figure: '5'
+        note: Caption 5; figure image at PDF page 31 / index 30.
+      units: as printed
+      values:
+        printed_quote: Figure 5 K2O activity coefficient versus temperature and composition; printed labels range from
+          0.154 to 0.08 and refer to mole fraction of K2O remaining; runs 1 to 3 were consecutive on same sample; open-square
+          point at 1575 K, run 1, is TMS with additional O2
+        method_class: figure_only
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_tms_kms_equilibrium
+      type: comparative_statement
+      locator:
+        pdf_page_index: 12
+        published_page: 9
+        section: Real MHD Channel Slag
+      units: as printed
+      values:
+        printed_quote: “Good agreement was obtained between the TMS and KMS-based data at relatively high temperatures (~1600
+          K)”; “the high temperature data represent thermodynamic equilibrium conditions”; “TMS ~ 10 sec and KMS ~ 0.04 sec.”
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_gamma_run_qualifiers
+      type: qualifying_conditions
+      locator:
+        pdf_page_index: 12
+        published_page: 9
+        section: Real MHD Channel Slag
+      units: as printed
+      values:
+        printed_quote: 'Activity is apparent because the slag may not always be in complete thermodynamic equilibrium;
+          most data below liquidus. Normal negative-slope segments: run 1 up to about 1430 K, run 2 between 1430 and
+          1630 K. Run 1 anomalous during initial heating when K2SO4 and K2CO3 supplied additional K; rapid gamma(K2O)
+          reduction beyond 1430 K results from virtually complete depletion of these relatively volatile forms of potassium.
+          For runs 2 and 3, initial reduction may reflect diffusion-limited K transport in solid slag or changes in
+          O2 release, for instance Fe3O4 dissociation. Subsequent increase may reflect a less viscous but still solid
+          form with increased diffusion, or depletion of secondary O2 sources. Rapid bulk composition changes lead to
+          gamma peaking. Runs 2 and 3 above 1450 K are believed to represent equilibrium vaporization.'
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_dp_model_conditions
+      type: model_context
+      locator:
+        pdf_page_index: 13
+        published_page: 10
+        section: MHD Slag Thermochemistry
+      units: as printed
+      values:
+        printed_quote: “interface temperatures for K2O slag saturation in the range of 2100 to 2500 K at 10 atm and
+          1900 to 2200 K at 1 atm” for 5 to 15 wt.% K2O; “significantly lower for the one atm conditions”; “as the temperature
+          decreases, the slag DP curves decrease much faster than for the plasma.”
+        method_class: model_derived
+        dissociation_pressure_product_as_printed: DP = pK^2 * pO2^(1/2)
+        activity_relation_as_printed: a(K2O) = DP(solution) / DP(pure liquid K2O)
+        model_assumptions_as_printed: Multicomponent equilibrium program; stoichiometric combustion of CH0.7 with air
+          at 4/1 N2/O2 mole ratio; vapor alkali species KOH, K, KO and K+.
+        pressure_roles: 10 atm for combustor; 1 atm for channel-diffuser-downstream seed recovery units.
+        inferred_slag_K2O_wt_pct_as_printed: about 10 under the interface conditions cited from Self (1979)
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_salt_activity_reference
+      type: activity_standard_state
+      locator:
+        pdf_page_index: 25
+        published_page: 22
+        section: Figure captions
+        figure: '7'
+        note: Caption reference attribution; image at PDF 33 / index 32.
+      units: as printed
+      values:
+        printed_quote: Fig. 7 NaCl and KCl thermodynamic activities use reference-state partial pressures from JANAF
+          (1971); condensed phase form for the pure-salt reference state is not stated in this report
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_tms_exchange
+      type: comparative_statement
+      locator:
+        pdf_page_index: 14
+        published_page: 11
+        section: TMS Study in Salt Liquidus Region
+      units: as printed
+      values:
+        printed_quote: Just above NaCl melting, NaCl activity decreases while KCl activity increases. After about 50
+          min heating, NaCl and the KCl product were virtually depleted. Insufficient initial salt to convert all available
+          K2O; 90 percent of initial NaCl converted to Na2O(slag) with stoichiometric KCl release; about six percent
+          of available K2O converted to KCl vapor. Nearly complete removal would have been possible with sufficient
+          NaCl (continuation on PDF 16 / printed 12).
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_kms_exchange
+      type: comparative_statement
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        section: KMS Study in Salt Solidus Region
+      units: as printed
+      values:
+        printed_quote: “the exchange reaction is more favorable at lower temperatures”; “this thermodynamic gain may
+          be offset by slower kinetics in the solid phase”; “A relatively small cell orifice diameter of 0.34 mm was
+          used to provide vapor species residence times of about 40 ms.”
+        powder_preparation_as_printed: K2 slag plus a separate top layer of powdered NaCl; excess NaCl to allow possible
+          complete K2O removal.
+        ideal_full_conversion_KCl_mole_fraction: 0.2
+        full_conversion_assumptions: All slag K2O converted to KCl with no KCl or NaCl vaporization loss.
+        solid_solution_temperature_range_K:
+        - 720
+        - 1010
+        phase_diagram_attribution: Scheil and Stadelmaier (1952)
+        exchange_Kp_as_printed:
+        - T_K: 1000
+          Kp: 2 x 10^5
+        - T_K: 700
+          Kp: 6.5 x 10^7
+        evidence_by_field:
+          exchange_Kp_as_printed: thermodynamic prediction
+          ideal_full_conversion_KCl_mole_fraction: model_derived
+          solid_solution_temperature_range_K: quoted_attributed phase diagram
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_kms_salt_species
+      type: qualifying_conditions
+      locator:
+        pdf_page_index: 16
+        published_page: 13
+        section: KMS Study in Salt Solidus Region
+      units: as printed
+      values:
+        printed_quote: “NaCl activities in the range ~1.0 to 0.8 over the whole measurement temperature regime”; dimer-exchange
+          data were “in excellent agreement with the literature values”; “thermodynamic equilibrium appears to be established
+          in the overall system.”
+        method_class: measured_reduced
+        measurement_temperature_range_K:
+        - 810
+        - 1010
+        observed_ions_as_printed:
+        - NaCl
+        - Na2Cl2
+        - KCl
+        - K2Cl2
+        - KNaCl2
+        mass_balance_result: Complete conversion of K2O(slag) to Na2O(slag) by halide exchange.
+        reduction_inputs: Na2Cl2/NaCl partial pressures compared with JANAF (1971) values for pure NaCl.
+        dimer_exchange_as_printed: Na2Cl2 + KCl = NaKCl2 + NaCl; corresponding K-case also mentioned, without a separately
+          printed equation.
+        equilibrium_check: Equilibrium constant and second- and third-law reaction enthalpy data agree with literature
+          (Hastie, 1971).
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_kcl_activity
+      type: prose_result
+      locator:
+        pdf_page_index: 16
+        published_page: 13
+        section: KMS Study in Salt Solidus Region
+        figure: '8'
+      units: as printed
+      values:
+        printed_quote: Independent KCl activity reductions from KCl and K2Cl2 partial pressures; early-phase measured
+          activities as high as 0.62.
+        method_class: measured_reduced
+        maximum_activity_as_printed: 0.62
+        reduction_inputs: KCl and K2Cl2 partial pressures; temperature; pure-salt pressure reference. No numerical underlying
+          pressure series printed; keep curves undigitized.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_distribution_coefficient
+      type: comparative_statement
+      locator:
+        pdf_page_index: 16
+        published_page: 13
+        section: KMS Study in Salt Solidus Region
+      units: as printed
+      values:
+        printed_quote: “Values of K_D ~ 0.1 were found”; similar separation factors “have been observed for other metals
+          in borate, rather than silicate, solvent extraction systems”; effective under “vacuum vaporization and near-atmospheric
+          transpiration conditions.”
+        definition_as_printed: K_D = X(K2O, slag) / X(KCl, salt), where X is mole fraction.
+        comparison_attribution: Williams et al. (1977) for other metals in borate solvent extraction systems.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_static_air_exchange
+      type: comparative_statement
+      locator:
+        pdf_page_index: 17
+        published_page: 14
+        section: KMS Study in Salt Solidus Region
+      units: as printed
+      values:
+        printed_quote: The exchange process in air at 920 K “appeared to be slower than for the vacuum experiments”;
+          NaCl vapor transport would be “significantly lower under static atmospheric conditions”; an analogous CaCl2
+          process is “even more favorable” thermodynamically but may be “transport limited.”
+        experiment_as_printed: NaCl and K2 slag mixture heated in air to 920 K in a muffle furnace; X-ray diffraction
+          products showed both KCl and NaCl solid.
+        ion_exchange_qualification: CaCl2 exchange between divalent Ca2+ and monovalent K+ may be transport limited;
+          experimental confirmation needed.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_fig1_only
+      type: figure_only
+      locator:
+        pdf_page_index: 24
+        published_page: 21
+        section: Figure captions
+        figure: '1'
+      units: as printed
+      values:
+        printed_quote: Non-equilibrium vaporization effect in K2O-Al2O3-SiO2; run chronology ABC.
+        method_class: figure_only
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_fig2_only
+      type: figure_only
+      locator:
+        pdf_page_index: 24
+        published_page: 21
+        section: Figure captions
+        figure: '2'
+      units: as printed
+      values:
+        printed_quote: 'Selected K pressure curves: W2 composition 19 to 17.6 wt.% K2O, W3 12.9 to 10.8, E 23.3 to 22.1; Eastern
+          points omitted for clarity and described as similar precision.'
+        method_class: figure_only
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_fig3_only
+      type: figure_only
+      locator:
+        pdf_page_index: 24
+        published_page: 21
+        section: Figure captions
+        figure: '3'
+      units: as printed
+      values:
+        printed_quote: 'K and O2 curves for Eastern slag: 23.3 to 22.8 wt.% K2O in AB and 22.8 to 22.1 in BC; symbols show
+          increasing/decreasing temperature chronology.'
+        method_class: figure_only
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_fig4_only
+      type: figure_only
+      locator:
+        pdf_page_index: 24
+        published_page: 21
+        section: Figure captions
+        figure: '4'
+      units: as printed
+      values:
+        printed_quote: Six-component slag compared with four-component simplified Western slag using normalized K2O
+          dissociation pressure product; curves not digitized.
+        method_class: figure_only
+        normalized_DP_as_printed: (a_K2O)^0.4 * [pK^2 * pO2^(1/2), pure K2O(l)]^0.4
+        note: Printed caption definition; corresponding image PDF 30 / index 29; no digitization.
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_fig6_only
+      type: figure_only
+      locator:
+        pdf_page_index: 25
+        published_page: 22
+        section: Figure captions
+        figure: '6'
+      units: as printed
+      values:
+        printed_quote: MHD plasma/slag K2O pressure-product curves with 1 wt.% K2CO3; simplified Western slag at 5, 10, 15
+          wt.% K2O.
+        method_class: figure_only
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_fig7_only
+      type: figure_only
+      locator:
+        pdf_page_index: 25
+        published_page: 22
+        section: Figure captions
+        figure: '7'
+      units: as printed
+      values:
+        printed_quote: TMS NaCl and KCl activity curves; reference-state partial pressures from JANAF (1971).
+        method_class: figure_only
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_fig8_only
+      type: figure_only
+      locator:
+        pdf_page_index: 25
+        published_page: 22
+        section: Figure captions
+        figure: '8'
+      units: as printed
+      values:
+        printed_quote: KMS KCl activity curves derived from KCl or K2Cl2 pressures; broken curve Asano et al. (1980),
+          20 mol.% KCl + 80 mol.% NaCl.
+        method_class: figure_only
+        symbol_mapping: 'Triangles based on KCl pressures: open run 1, closed run 2. Circles based on (KCl)2 pressures:
+          open run 1, closed run 2. Broken curve: Asano et al. (1980).'
+      uncertainty:
+        note: No numerical uncertainty stated for this narrative item.
+    - observation_id: hastie_plante_1981_table1_footnotes
+      type: table_conventions
+      locator:
+        pdf_page_index: 20
+        published_page: 17
+        table: '1'
+        note: Table 1 footnotes a-h.
+      units: as printed
+      values:
+        initial_composition: weight percent; actual analyses not normalized to 100 percent
+        iron_oxide: Fe2O3 systems usually converted to Fe3O4 with loss of O2 under vacuum or neutral-atmosphere vaporization
+        phases: phases indicated are solid
+        temperature_range: range over which experimental data were taken
+        method: Table 1 results obtained by KMS
+        species: P refers to pressure of elemental K, the only K species present
+        formula: log P(atm) = A - B/T + C + D - E; A entropy term; B enthalpy; C, D, E concentration factors for K2O,
+          CaO, Al2O3 respectively
+        special_factor: C in K2O-SiO2 is multiplied by K2O mole fraction squared
+        composition_convention: similar fits exist for mole-percent compositions; square brackets indicate wt.%; exp-2
+          means 10^-2
+        uncertainty: Simplified Western slag fit standard deviation about 30 percent, maximum deviation about 100 percent;
+          exact crystalline phases uncertain where marked; ZrO2 pressure can be low by factor of two due vapor unsaturation
+          from large orifice; K2CO3 contamination present; Al2O3/SiO2 mole ratio fixed at 0.5
+    - observation_id: hastie_plante_1981_table1_method_conflict
+      type: source_internal_inconsistency
+      locator:
+        pdf_page_index: 7
+        published_page: 4
+        section: Synthetic Slag Systems
+        note: Compare with Table 1 footnote d on PDF page 21 / published page 17.
+      units: method attribution as printed
+      reason: 'source_internally_inconsistent: section 2 says the potassium vapor-pressure data were obtained using TMS; Table
+        1 footnote d says the tabulated results were obtained by KMS. The report does not reconcile the method assignments
+        for all Table 1 rows.'
+      values:
+        section_quote: The potassium vapor pressure data were obtained under neutral conditions using the TMS technique.
+        table_footnote_quote: Results obtained by KMS.
+        method_assignment: Do not assign a single method to every Table 1 row; retain the specific KMS description for the
+          synthetic channel-slag and K2 exchange sets and the specific TMS description for the salt liquidus-region exchange.
+    - observation_id: hastie_plante_1981_apparatus_detection
+      type: method_context
+      locator:
+        pdf_page_index: 5
+        published_page: 2
+        section: Introduction
+      units: as printed
+      values:
+        printed_quote: Both methods use modulated molecular beams and phase-sensitive detection.
+    - observation_id: hastie_plante_1981_pressure_unit_footnote
+      type: unit_convention
+      locator:
+        pdf_page_index: 6
+        published_page: 3
+        section: Footnote
+      units: as printed
+      values:
+        relation_as_printed: 1 atm = 1.01325 x 10^2 kPa
+    - observation_id: hastie_plante_1981_clausius_clapeyron_qualifiers_ef
+      type: qualifying_conditions
+      locator:
+        pdf_page_index: 8
+        published_page: 5
+        section: Synthetic Slag Systems
+      units: as printed
+      values:
+        printed_quote: 'Clauses e-f: rapid loss of alkali pressure with time at constant T, possibly from surface depletion;
+          Fe-controlled redox reactions change O2 and hence K partial pressures with temperature and time.'
+    - observation_id: hastie_plante_1981_kalsilite_eutectic_literature
+      type: quantitative_background
+      locator:
+        pdf_page_index: 8
+        published_page: 5
+        section: K2O-Al2O3-SiO2 System
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        attribution: Levin et al. (1964)
+        temperature_K: 1829
+        K2O_wt_pct: 22
+        printed_quote: Eutectic melting at 1829 K and 22 wt.% K2O.
+    - observation_id: hastie_plante_1981_channel_sample_selection
+      type: method_context
+      locator:
+        pdf_page_index: 9
+        published_page: 6
+        section: Synthetic MHD Channel Slags
+      units: as printed
+      values:
+        selection_as_printed: Compositions selected from analyses of several hundred coal ashes and several MHD channel
+          slags in the literature; Western four-component simplified and Western/Eastern six-component slags considered.
+        phase_characterization: Samples non-glassy, KAlSiO4 dominant in both Western and Eastern; minor KAlSi2O6 and
+          at least one unidentified Eastern phase. Retain separately the Table 1 rows 14-15 glassy-phase descriptions.
+        earlier_orifice_diameter_mm:
+        - 0.5
+        - 1.0
+        current_orifice_diameter_mm: 0.34
+        reason: Smaller orifice selected to reduce vapor unsaturation previously seen with larger orifices.
+    - observation_id: hastie_plante_1981_remaining_composition_reduction
+      type: method_context
+      locator:
+        pdf_page_index: 11
+        published_page: 8
+        section: Real MHD Channel Slag
+      units: as printed
+      values:
+        printed_quote: Integration of K and O2 vapor-pressure data over the experimental history gives the remaining
+          slag composition during a vaporization run; used for apparent K2O activity versus temperature and composition.
+    - observation_id: hastie_plante_1981_self_interface_estimate
+      type: quantitative_background
+      locator:
+        pdf_page_index: 13
+        published_page: 10
+        section: Application of Vaporization Data to Seed-Slag Interaction
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        attribution: Self (1979)
+        estimated_interface_temperature_range_K:
+        - 2100
+        - 2300
+        qualifier: Probably in this region; difficult to measure experimentally.
+    - observation_id: hastie_plante_1981_tms_sample_preparation
+      type: method_context
+      locator:
+        pdf_page_index: 14
+        published_page: 11
+        section: TMS Study in Salt Liquidus Region
+      units: as printed
+      values:
+        experiment_id: salt-slag-exchange-tms
+        general_possible_MHD_slag_K2O_wt_pct: about 20
+        printed_composition: NaCl + K1 slag (19.4 wt.% K2O)
+        preparation: Thin layer of powdered NaCl on K1 slag surface; salt purity unreported.
+        exchange_as_printed: NaCl(l) + K2O(slag) = KCl(l) + Na2O(slag)
+        equation_qualification: Printed stoichiometric shorthand retained without silently balancing coefficients.
+    - observation_id: hastie_plante_1981_tms_exchange_continuation
+      type: prose_result
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        section: TMS Study in Salt Liquidus Region
+      units: as printed
+      values:
+        method_class: measured_reduced
+        remaining_NaCl_lost_pct: 10
+        isothermal_constant_activity_interval_min:
+        - 20
+        - 40
+        enhancement_as_printed: pKCl / pK(no NaCl) ~ 10^4
+        interpretation: High KCl activity suggests essentially ideal KCl-NaCl solution.
+    - observation_id: hastie_plante_1981_tms_calibration_check
+      type: calibration_context
+      locator:
+        pdf_page_index: 15
+        published_page: 12
+        section: TMS Study in Salt Liquidus Region
+      units: as printed
+      values:
+        experiment_id: salt-slag-exchange-tms
+        initial_NaCl_activity: near unity
+        printed_check: Confirms calibration factors converting mass spectral ion intensities to partial pressures and
+          establishment of thermodynamic equilibrium.
+        calibration_factor_values: not published
+        scope: TMS check; do not attribute it to the KMS bench.
+    - observation_id: hastie_plante_1981_kcl_ideal_prediction
+      type: model_context
+      locator:
+        pdf_page_index: 16
+        published_page: 13
+        section: KMS Study in Salt Solidus Region
+      units: as printed
+      values:
+        method_class: model_derived
+        ideal_solid_solution_maximum_activity: 0.2
+        assumptions: Thermodynamically ideal solid solution with complete slag K2O conversion to KCl.
+    - observation_id: hastie_plante_1981_asano_kcl_comparison
+      type: quantitative_background
+      locator:
+        pdf_page_index: 25
+        published_page: 22
+        section: Figure captions
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        attribution: Asano et al. (1980)
+        composition_mol_pct:
+          KCl: 20
+          NaCl: 80
+        relation: Broken curve in Figure 8; own prose reductions reported consistent with these literature data on PDF
+          17 / printed 13.
+    - observation_id: hastie_plante_1981_exchange_pressure_conditions
+      type: method_context
+      locator:
+        pdf_page_index: 16
+        published_page: 13
+        section: KMS Study in Salt Solidus Region
+      units: as printed
+      values:
+        synthetic-channel-slag-kms: Vacuum vaporization; Table 1 footnote a also describes vacuum or neutral-atmosphere
+          vaporization (PDF 21 / printed 17).
+        salt-slag-exchange-kms: Vacuum vaporization; continuation on PDF 18 / printed 14 contrasts vacuum experiments
+          with static air.
+        salt-slag-exchange-tms: Near-atmospheric transpiration; no exact run pressure published.
+        numeric_base_or_residual_pressure: not published
+        flow_class: Molecular/transitional/viscous class not published; vacuum is retained as the stated pressure condition
+          without guessing a flow class.
+  K2O:
+    context:
+    - observation_id: hastie_plante_1981_k2o_activity_relation
+      type: activity_standard_state
+      locator:
+        pdf_page_index: 6
+        published_page: 3
+        section: Synthetic Slag Systems
+      units: activity and partial pressure as printed
+      values:
+        quantity: K2O_activity
+        printed_quote: K2O(l) = 2K + 1/2 O2; a_K2O = (pK)^2.5/(2Kp)
+        method_class: measured_reduced
+        standard_state: pure liquid K2O
+        activity_ions: K and O2
+    observations: []
+  NaCl:
+    context:
+    - observation_id: hastie_plante_1981_nacl_activity_standard
+      type: activity_standard_state
+      locator:
+        pdf_page_index: 25
+        published_page: 22
+        figure: '7'
+        section: Figure captions
+        note: JANAF reference in caption 7; image PDF 33 / index 32. KMS reduction prose on PDF 17 / index 16.
+      units: activity reference as printed
+      values:
+        quantity: NaCl_activity
+        method_class: figure_only
+        reference_state: JANAF (1971) pure NaCl vapor pressure
+        condensed_phase_of_standard: not stated in report
+        note: Figure curve not digitized.
+        activity_ions: NaCl and Na2Cl2 vapor pressures
+    observations: []
+  KCl:
+    context:
+    - observation_id: hastie_plante_1981_kcl_activity_standard
+      type: activity_standard_state
+      locator:
+        pdf_page_index: 25
+        published_page: 22
+        figure: '7'
+        section: Figure captions
+        note: JANAF reference in caption 7; image PDF 33 / index 32. KMS reduction prose on PDF 17 / index 16.
+      units: activity reference as printed
+      values:
+        quantity: KCl_activity
+        method_class: figure_only
+        reference_state: pure KCl vapor pressure reference; JANAF (1971)
+        condensed_phase_of_standard: not stated in report
+        note: Figures 7 and 8 not digitized.
+        activity_ions: KCl and K2Cl2 vapor pressures
+    observations: []

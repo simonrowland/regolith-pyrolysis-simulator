@@ -19,7 +19,7 @@ from dataclasses import asdict, dataclass
 from typing import Any, Protocol
 
 from simulator.furnace_materials import load_furnace_materials
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.refractory_vaporization import (
     CongruentVaporizationError,
     solve_congruent_vaporization,
@@ -32,7 +32,7 @@ TARGET_LIFE_CANONICAL_UNIT = "runs"
 # Free-molecular pO2 boundary: 1 bar = 1e5 Pa matches the JANAF standard
 # pressure used by the refractory congruent-vaporization solver
 # (STANDARD_PRESSURE_PA = 100000).
-_BAR_TO_PA = 100_000.0
+_BAR_TO_PA = PA_PER_BAR
 DEFAULT_DIAGNOSTIC_TARGET_LIFE_RUNS = 100.0
 DEFAULT_DIAGNOSTIC_HOT_HOURS_PER_RUN = 10.0
 DEFAULT_DIAGNOSTIC_MATERIAL_ID = "dense_alumina_continuous"

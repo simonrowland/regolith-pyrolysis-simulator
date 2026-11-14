@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:willenborg-2006-alkali-removal-thermodynamics
       role: pdf
@@ -75,8 +75,21 @@ context:
   units: relative activity as printed
   values:
     quantity: relative activity comparison
-    method_class: quoted_attributed
+    method_class: measured_reduced
     admission_status: typed_refusal
+    derivation:
+      relation: The authors compared Na2O activities reduced from measured sodium partial pressures using Eq. (3).
+      raw_inputs:
+        state:
+          tag: value
+          value: not_printed
+        locator:
+          page: 5
+          published_page: 2597
+          pdf_page_index: 4
+          section: Results and Discussion
+          equation: '3'
+          note: Numeric partial-pressure inputs for these compositions are not stored.
     reason: 'schema gap: the paper prints only an activity ratio, about two times, without absolute activity values; no activity-ratio
       quantity is defined.'
     comparison_as_published: The sodium oxide activity in AlSi8Mg8Na5 is about 2 times higher than in AlSi8Mg4Na5.
@@ -136,8 +149,21 @@ context:
   units: dimensionless activity as printed
   values:
     quantity: activity
-    method_class: quoted_attributed
+    method_class: measured_reduced
     admission_status: typed_refusal
+    derivation:
+      relation: The authors reduced measured alkali partial pressures to the reported oxide activities using Eq. (3).
+      raw_inputs:
+        state:
+          tag: value
+          value: not_printed
+        locator:
+          page: 3
+          published_page: 2595
+          pdf_page_index: 2
+          section: Results and Discussion
+          equation: '3'
+          note: The numerical partial-pressure inputs for the plotted activity series are not stored.
     reason: 'identity incomplete: prose groups SiO2 and TiO2 treatments without an individual treatment composition for each
       value.'
     temperature_as_published: 1400 °C
@@ -160,8 +186,20 @@ context:
   units: Pa as printed
   values:
     quantity: partial_pressure
-    method_class: quoted_attributed
+    method_class: measured_reduced
     admission_status: typed_refusal
+    derivation:
+      relation: The reported alkali partial-pressure summaries are the authors' reduction of their KEMS measurements.
+      raw_inputs:
+        state:
+          tag: value
+          value: not_printed
+        locator:
+          page: 4
+          published_page: 2596
+          pdf_page_index: 3
+          section: Results and Discussion
+          note: Numeric ion-current inputs for the reported pressure summaries are not stored.
     reason: 'species not reported: the source says alkali partial pressures but does not identify a gas species.'
     partial_pressures_as_published:
     - about 0.6 Pa over untreated slag

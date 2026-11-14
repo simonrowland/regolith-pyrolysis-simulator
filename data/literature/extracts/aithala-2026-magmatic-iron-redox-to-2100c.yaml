@@ -2865,6 +2865,45 @@ species:
             S-2 reference composition; the adjusted ratio is converted to Fe3+/FeT.'
           equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
           inputs: *id020
+      - observation_id: aithala_2026_vf_apparatus_and_protocol
+        type: apparatus
+        locator:
+          page: 7
+          published_page: SI-1
+          section: Methods
+        units: as printed
+        values:
+          quantity: experimental apparatus and protocol
+          method_class: method_only
+          notes: >-
+            Vertical Furnace series: six experiments used a Deltech VT-28 HN-C gas-mixing furnace in air
+            at 1250, 1300, 1365, 1400, 1450, and 1500 °C for 72, 24, 6, 6, 2, and 1 h respectively.
+            Experimental charges consisted of approximately 30-35 mg of Humphrey powder bonded to Pt
+            wire using hydrated polyvinyl alcohol (PVA). Pt wire diameter and Fe presaturation: not
+            stated. Fe loss from the silicate to Pt was minimal under these oxidizing conditions. Textures
+            were characterized and chemical homogeneity validated by wavelength-dispersive spectroscopy
+            using a JEOL JXA-8530F+ electron-probe microanalyzer. Total Fe and alkali bulk values, and Pt
+            pickup analysis: not stated in Methods.
+      - observation_id: aithala_2026_allf_apparatus_and_protocol
+        type: apparatus
+        locator:
+          page: 8
+          published_page: SI-2
+          section: Methods
+        units: as printed
+        values:
+          quantity: experimental apparatus and protocol
+          method_class: method_only
+          notes: >-
+            Aerodynamic Laser Levitation Furnace series: approximately 10-15 mg of Humphrey was packed
+            in 1 mm diameter hemisphere wells in a copper hearth plate and fused with two 8-15 s laser
+            pulses at 8-12%. The spheroids were then levitated in ultra-high-purity O2 gas of 99.994%
+            purity, with total impurities below 10 ppm, flowing at 300-340 cc/min. The 1800-2100 °C
+            temperature series used 30 s dwell times; at 2000 °C, time-series dwell times were 10, 30,
+            and 120 s. Sample mass at levitation: not stated. No wire loop or cell is described; loop wire
+            diameter and Fe presaturation: not stated. Glass chemical homogeneity was validated by WDS
+            using a JEOL JXA-8530F+ electron-probe microanalyzer. Total Fe and alkali bulk values, and
+            pickup of copper or other apparatus material: not stated in Methods.
   silicate_melt:
     observations:
     - observation_id: aithala_2026_vf271_wdsepma_composition

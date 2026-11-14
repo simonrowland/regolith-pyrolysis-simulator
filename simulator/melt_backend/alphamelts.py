@@ -100,7 +100,11 @@ from simulator.environment import (
     DEFAULT_VACUUM_FLOOR_BAR,
     vacuum_floor_bar_for_environment,
 )
-from simulator.feedstock_composition import iron_oxide_values, total_fe
+from simulator.feedstock_composition import (
+    _TOTAL_IRON_AS_FEO_KEYS,
+    iron_oxide_values,
+    total_fe,
+)
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.alphamelts_reference_pressure import (
     ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR,
@@ -160,9 +164,11 @@ MELTS_OXIDE_ALIASES = {
 }
 MELTS_OXIDE_ALIASES.update({
     'feo_total': 'FeO_total',
-    'feot': 'FeO_total',
     'feototal': 'FeO_total',
     'feo_tot': 'FeO_total',
+})
+MELTS_OXIDE_ALIASES.update({
+    key.lower(): 'FeO_total' for key in _TOTAL_IRON_AS_FEO_KEYS
 })
 FE_REDOX_BUFFERS = {'QFM', 'NNO', 'IW', 'HM'}
 FE_REDOX_BUFFER_ALIASES = {'FMQ': 'QFM'}
@@ -2934,6 +2940,33 @@ class _MELTSBackendSupport(MeltBackend):
         normalized_basis = {oxide: 0.0 for oxide in MELTS_OXIDE_BASIS}
         feo_total = 0.0
         feo, fe2o3 = iron_oxide_values(comp_wt)
+        # Premise: iron_oxide_values reads FeOt, FeOT, FeO_T, and FeO* as
+        # FeO-equivalent total iron when FeO and Fe2O3 are absent. The alias
+        # table also sends the spelling "feot" (FeOt and FeOT) to FeO_total,
+        # and the loop below would add that same mass again.
+        # Algebra: iron_oxide_values keeps the first of those keys. If this
+        # loop classifies that same key as FeO_total, drop feo here. The
+        # FeO_total policy below (explicit Fe3+/Fe_total ratio, redox buffer
+        # with no split, or a typed refusal) then adds the mass once.
+        # A real FeO/Fe2O3 split is not this case: those keys make
+        # iron_oxide_values ignore the total-iron spellings, and the loop
+        # skips FeO and Fe2O3, so each spelling is still counted once.
+        # Unit check: feo and the FeO_total addition are both wt% of this
+        # input map. Dropping the duplicated term leaves one wt% of iron.
+        # Sanity: {SiO2: 80, FeOt: 10} under QFM is 10 wt% FeO before the
+        # renormalisation to 100 (FeO = 100 * 10/90), not FeO 20.
+        consumed_total_iron = None
+        if "FeO" not in comp_wt and "Fe2O3" not in comp_wt:
+            for key in _TOTAL_IRON_AS_FEO_KEYS:
+                if key in comp_wt:
+                    consumed_total_iron = key
+                    break
+        if (
+            consumed_total_iron is not None
+            and self._canonical_oxide_name(consumed_total_iron) == "FeO_total"
+        ):
+            feo = 0.0
+            fe2o3 = 0.0
 
         for raw_name, raw_wt in comp_wt.items():
             oxide = self._canonical_oxide_name(raw_name)
@@ -3939,9 +3972,28 @@ class _MELTSBackendSupport(MeltBackend):
                 eq.vapor_pressures_source,
                 vapor_diagnostics,
             ) = self._builtin_vapor_projection_for_subprocess(eq)
+            # Evaporation reads vapor_pressure_zero_reason on the equilibrium
+            # diagnostic, not under subprocess_vapor_projection. Hoist only a
+            # notice the projection already typed (reason, authority, band).
+            vapor_fields: dict[str, object] = {
+                'subprocess_vapor_projection': vapor_diagnostics,
+            }
+            authority_notice = vapor_diagnostics.get(
+                'vapor_pressure_authority_notice'
+            )
+            zero_reason = vapor_diagnostics.get('vapor_pressure_zero_reason')
+            if (
+                isinstance(authority_notice, Mapping)
+                and isinstance(zero_reason, str)
+                and zero_reason
+            ):
+                vapor_fields['vapor_pressure_zero_reason'] = zero_reason
+                vapor_fields['vapor_pressure_authority_notice'] = dict(
+                    authority_notice
+                )
             eq.diagnostics = self._merge_diagnostics(
                 eq.diagnostics,
-                {'subprocess_vapor_projection': vapor_diagnostics},
+                vapor_fields,
             )
             return eq
 
@@ -4116,6 +4168,8 @@ class _MELTSBackendSupport(MeltBackend):
             def number(name: str) -> float:
                 return float(values[headers.index(name)])
 
+            non_finite_columns: list[str] = []
+
             def optional_number(name: str) -> Optional[float]:
                 if name not in headers:
                     return None
@@ -4128,11 +4182,13 @@ class _MELTSBackendSupport(MeltBackend):
                     raise ValueError(
                         f'System_main_tbl.txt invalid {name}={raw_value!r}'
                     ) from exc
-                if not math.isfinite(value):
-                    raise ValueError(
-                        f'System_main_tbl.txt non-finite {name}={raw_value!r}'
-                    )
-                return value
+                # nan/inf is not a property value. Omit it. Required columns
+                # (system mass, absolute fO2) still fail closed when the
+                # omitted value leaves them absent. A non-numeric token still
+                # raises: that row is not this typed omission.
+                return self._omit_nonfinite_engine_number(
+                    value, name, non_finite_columns
+                )
 
             fO2_index = next(
                 (
@@ -4190,8 +4246,25 @@ class _MELTSBackendSupport(MeltBackend):
                 and solid_density_g_cm3 > 0.0
                 else None
             )
+            if non_finite_columns:
+                payload['non_finite_system_columns'] = tuple(
+                    non_finite_columns
+                )
             return payload
         return {}
+
+    @staticmethod
+    def _omit_nonfinite_engine_number(
+        value: float,
+        label: str,
+        omitted: list[str],
+    ) -> Optional[float]:
+        """Omit nan/inf. Record ``label`` once. Never substitute 0."""
+        if math.isfinite(value):
+            return value
+        if label not in omitted:
+            omitted.append(label)
+        return None
 
     def _parse_phase_main_output(self, output: str) -> dict[str, object]:
         lines = [line.strip() for line in output.splitlines() if line.strip()]
@@ -4219,6 +4292,13 @@ class _MELTSBackendSupport(MeltBackend):
 
         accumulated: dict[str, dict[str, object]] = {}
         phase_instances: list[dict[str, object]] = []
+        omitted_phase_columns: list[str] = []
+        thermo_fields = (
+            ('enthalpy', 'enthalpy_J'),
+            ('entropy', 'entropy_J_K'),
+            ('volume', 'volume_m3'),
+            ('heat_capacity_Cp', 'heat_capacity_J_K'),
+        )
         for line in lines[header_index + 1:]:
             tokens = line.split()
             if len(tokens) < 7 + len(oxides):
@@ -4228,9 +4308,8 @@ class _MELTSBackendSupport(MeltBackend):
             instance_id = tokens[0]
             phase = re.sub(r'\d+$', '', instance_id)
             try:
-                mass_g, enthalpy, entropy, volume, heat_capacity = (
-                    float(value) for value in tokens[1:6]
-                )
+                mass_g = float(tokens[1])
+                raw_thermo = [float(value) for value in tokens[2:6]]
                 composition_values = [
                     float(value) for value in tokens[-len(oxides):]
                 ]
@@ -4238,6 +4317,19 @@ class _MELTSBackendSupport(MeltBackend):
                 raise ValueError(
                     f'Phase_main_tbl.txt has non-numeric table value: {line!r}'
                 ) from exc
+            # Mass is the phase amount, same as system mass: a non-finite
+            # token is not an optional thermo cell.
+            if not math.isfinite(mass_g):
+                raise ValueError(
+                    f'Phase_main_tbl.txt non-finite mass: {line!r}'
+                )
+            thermo_values: dict[str, Optional[float]] = {}
+            for (key, published), raw_value in zip(thermo_fields, raw_thermo):
+                thermo_values[key] = self._omit_nonfinite_engine_number(
+                    raw_value,
+                    f'{phase}.{published}',
+                    omitted_phase_columns,
+                )
             property_tokens = tokens[6:-len(oxides)]
             if not property_tokens:
                 raise ValueError(
@@ -4246,19 +4338,27 @@ class _MELTSBackendSupport(MeltBackend):
             # AlphaMELTS prints liquid viscosity or a solid formula in this
             # slot, despite older table descriptions calling it density.
             # The table's mass (g) / volume (cm3) is the phase density.
+            volume = thermo_values['volume']
             density_kg_m3 = (
                 mass_g / volume * 1000.0
-                if mass_g > 0.0 and volume > 0.0 else None
+                if (
+                    mass_g > 0.0
+                    and volume is not None
+                    and volume > 0.0
+                )
+                else None
             )
             phase_instances.append({
                 'instance_id': instance_id,
                 'phase': phase,
                 'solver_basis_mass_kg': mass_g / 1000.0,
                 'formula_or_endmember_token': ' '.join(property_tokens),
-                'enthalpy_J': enthalpy,
-                'entropy_J_K': entropy,
-                'volume_m3': volume * 1.0e-6,
-                'heat_capacity_J_K': heat_capacity,
+                'enthalpy_J': thermo_values['enthalpy'],
+                'entropy_J_K': thermo_values['entropy'],
+                'volume_m3': (
+                    None if volume is None else volume * 1.0e-6
+                ),
+                'heat_capacity_J_K': thermo_values['heat_capacity_Cp'],
                 'density_kg_m3': density_kg_m3,
                 'reference_mass_kg': mass_g / 1000.0,
                 'reference_basis': 'alphamelts_solver_phase_amount',
@@ -4269,23 +4369,23 @@ class _MELTSBackendSupport(MeltBackend):
                 phase,
                 {
                     'mass_g': 0.0,
-                    'enthalpy': 0.0,
-                    'entropy': 0.0,
-                    'volume': 0.0,
-                    'heat_capacity_Cp': 0.0,
+                    'enthalpy': None,
+                    'entropy': None,
+                    'volume': None,
+                    'heat_capacity_Cp': None,
                     'density_mass_sum': 0.0,
                     'density_mass_g': 0.0,
                     'composition_mass_sums': {oxide: 0.0 for oxide in oxides},
                 },
             )
             entry['mass_g'] = float(entry['mass_g']) + mass_g
-            for key, value in (
-                ('enthalpy', enthalpy),
-                ('entropy', entropy),
-                ('volume', volume),
-                ('heat_capacity_Cp', heat_capacity),
-            ):
-                entry[key] = float(entry[key]) + value
+            for key, value in thermo_values.items():
+                if value is None:
+                    continue
+                current = entry[key]
+                entry[key] = (
+                    value if current is None else float(current) + value
+                )
             if density_kg_m3 is not None and mass_g > 0.0:
                 entry['density_mass_sum'] = (
                     float(entry['density_mass_sum']) + density_kg_m3 * mass_g
@@ -4304,10 +4404,10 @@ class _MELTSBackendSupport(MeltBackend):
                 continue
             density_mass_g = float(entry['density_mass_g'])
             phase_thermo[phase] = {
-                'enthalpy': float(entry['enthalpy']),
-                'entropy': float(entry['entropy']),
-                'volume': float(entry['volume']),
-                'heat_capacity_Cp': float(entry['heat_capacity_Cp']),
+                'enthalpy': entry['enthalpy'],
+                'entropy': entry['entropy'],
+                'volume': entry['volume'],
+                'heat_capacity_Cp': entry['heat_capacity_Cp'],
                 'reference_mass_kg': mass_g / 1000.0,
                 'density_kg_m3': (
                     float(entry['density_mass_sum']) / density_mass_g
@@ -4324,6 +4424,7 @@ class _MELTSBackendSupport(MeltBackend):
             'phase_thermo': phase_thermo,
             'phase_compositions': phase_compositions,
             'phase_instances': phase_instances,
+            'non_finite_phase_columns': tuple(omitted_phase_columns),
         }
 
     @staticmethod
@@ -4818,6 +4919,42 @@ class _MELTSBackendSupport(MeltBackend):
             )
             if key in system_values
         }
+        non_finite_columns = tuple(
+            str(name)
+            for name in (system_values.get('non_finite_system_columns') or ())
+        )
+        phase_non_finite_columns = tuple(
+            str(name)
+            for name in (phase_values.get('non_finite_phase_columns') or ())
+        )
+        # One notice for both tables. System column names stay first so the
+        # system-row contract is unchanged when the phase table is finite.
+        notice_columns = list(non_finite_columns)
+        for name in phase_non_finite_columns:
+            if name not in notice_columns:
+                notice_columns.append(name)
+        non_finite_notice: dict[str, object] | None = None
+        if notice_columns:
+            # The engine returned an assemblage, and some thermo cells are
+            # nan. Keep the finite cells. Do not abort the run and do not
+            # publish nan, or a silent 0, as an enthalpy or entropy.
+            non_finite_notice = {
+                'kind': 'alphamelts_system_property_notice',
+                'reason': 'non_finite_system_property',
+                'authority': 'alphamelts',
+                'band': {'columns': notice_columns},
+                'temperature_C': executed_temperature_C,
+            }
+            if non_finite_columns:
+                result_warnings.append(
+                    'AlphaMELTS system table omitted non-finite columns: '
+                    + ', '.join(non_finite_columns)
+                )
+            if phase_non_finite_columns:
+                result_warnings.append(
+                    'AlphaMELTS phase table omitted non-finite columns: '
+                    + ', '.join(phase_non_finite_columns)
+                )
         result_diagnostics = self._merge_diagnostics(
             success_diagnostics,
             {
@@ -4829,6 +4966,11 @@ class _MELTSBackendSupport(MeltBackend):
                 **property_diagnostics,
                 'phase_instance_masses_solver_basis_kg': (
                     phase_instance_masses_kg
+                ),
+                **(
+                    {'alphamelts_system_property_notice': non_finite_notice}
+                    if non_finite_notice is not None
+                    else {}
                 ),
             },
         )
@@ -5918,7 +6060,10 @@ class _MELTSBackendSupport(MeltBackend):
                 'missing solved liquid composition for positive liquid fraction',
             )
 
-        from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+        from engines.builtin.vapor_pressure import (
+            BUILTIN_VAPOR_BELOW_400K_ZERO_REASON,
+            BuiltinVaporPressureProvider,
+        )
         from simulator.chemistry.offgas_fo2 import (
             _oxygen_atom_partial_pressure_bar,
         )
@@ -5986,6 +6131,19 @@ class _MELTSBackendSupport(MeltBackend):
         pressures = dict(diagnostic.get('vapor_pressures_Pa') or {})
         sources = dict(diagnostic.get('vapor_pressures_source') or {})
         if not pressures:
+            # The builtin provider's own below-400 K short-circuit is a
+            # sourced empty map (reason + authority + band). Any other
+            # status=ok empty map is still an unsourced contract failure.
+            notice = diagnostic.get('vapor_pressure_authority_notice')
+            if (
+                diagnostic.get('vapor_pressure_zero_reason')
+                == BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+                and isinstance(notice, Mapping)
+                and notice.get('reason') == BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+                and notice.get('authority')
+                and isinstance(notice.get('band'), Mapping)
+            ):
+                return {}, {}, diagnostic
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
                 'provider returned status=ok with no vapor_pressures_Pa entries',

@@ -8,7 +8,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:shornikov-2024-alkali-phosphate
       role: pdf
@@ -144,7 +144,7 @@ context:
     figure: '2'
   values:
     quantity: partial pressure upper bound
-    method_class: quoted_attributed
+    method_class: model_derived
     temperature_K: 1175
     composition: potassium metaphosphate
     species: K
@@ -153,6 +153,32 @@ context:
       significantly differs from the results obtained by Steblevsky et al. (1977). The value determined by them is too high
       (Fig. 2, symbol 4).
     reference_phase: A gas partial pressure. The Steblevsky number is not printed; symbol 4 was not read.
+  derivation:
+    relation: The authors calculate this upper bound with the semi-empirical model described in Shornikov (2019), using the
+      cited thermochemical reference data.
+    method:
+      state:
+        tag: value
+        value: semi-empirical model
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        section: Theoretical calculations of thermodynamic properties of the K2O–P4O10 melts
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        section: Theoretical calculations of thermodynamic properties of the K2O–P4O10 melts
+        note: Gibbs-energy inputs are described but not printed per calculated point.
+    references:
+    - Glushko et al. (1978–1982)
+    - Alikhanyan et al. (1975)
+    - Rudny et al. (1986)
   context_id: shornikov-2024-alkali-phosphate::context::shornikov_2024_k2o_k_pressure_bound
   work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
   source_id: shornikov-2024-alkali-phosphate
@@ -168,7 +194,7 @@ context:
     figure: '2'
   values:
     quantity: partial pressure upper bound
-    method_class: quoted_attributed
+    method_class: model_derived
     temperature_K: 1300
     composition: KPO3 melt (2K2O · P4O10), as printed
     species: PO2 and O2
@@ -176,6 +202,32 @@ context:
     sentence_as_published: The PO2 and O2 partial pressures over the KPO3 melt at 1300 K calculated in the present study do
       not exceed 10−6 atm (Fig. 2).
     reference_phase: A gas partial pressure. Not an oxide activity standard.
+  derivation:
+    relation: The authors calculate this upper bound with the semi-empirical model described in Shornikov (2019), using the
+      cited thermochemical reference data.
+    method:
+      state:
+        tag: value
+        value: semi-empirical model
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        section: Theoretical calculations of thermodynamic properties of the K2O–P4O10 melts
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        section: Theoretical calculations of thermodynamic properties of the K2O–P4O10 melts
+        note: Gibbs-energy inputs are described but not printed per calculated point.
+    references:
+    - Glushko et al. (1978–1982)
+    - Alikhanyan et al. (1975)
+    - Rudny et al. (1986)
   context_id: shornikov-2024-alkali-phosphate::context::shornikov_2024_k2o_po2_o2_bound
   work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
   source_id: shornikov-2024-alkali-phosphate

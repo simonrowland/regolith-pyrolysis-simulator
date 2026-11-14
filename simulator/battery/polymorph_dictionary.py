@@ -188,6 +188,7 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "marcasite": Polymorph.MARCASITE,
     "pyrite": Polymorph.PYRITE,
     "hematite": Polymorph.HEMATITE,
+    "eskolaite": Polymorph.ESKOLAITE,
     "magnetite": Polymorph.MAGNETITE,
     "anatase": Polymorph.ANATASE,
     "rutile": Polymorph.RUTILE,

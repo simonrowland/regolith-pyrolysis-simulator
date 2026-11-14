@@ -59,6 +59,8 @@ observations:
         pdf_page_index: 5
         table: I
         note: Table I. Values for Temperature Correction. Ag Tm=1234.9 K
+  provenance:
+    printed_phase: pure_Ag_melting_point_temperature_correction
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_agmn_15p6at_solidus_liquidus_prose
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -104,6 +106,8 @@ observations:
     pdf_page_index: 10
     paragraph: The solidus and liquidus temperatures of 15.6at%-Mn alloy are respectively estimated to 1241K and 1244K
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-rich_Ag-Mn_alloy
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_agmn_table2_invariant_temperatures
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -151,6 +155,8 @@ observations:
     table: II
     note: Table II. Temperature of Detected Reactions (K)
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_alloy_invariant_and_solidus_liquidus
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_agmn_table3_relative_heat_q
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -197,6 +203,8 @@ observations:
     table: III
     note: Table III. Amount of Heat Absorbed During Invariant Reactions According to Eq.(5)
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_alloy_invariant_arrests
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fe_a4_tb_table1
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -254,6 +262,8 @@ observations:
         pdf_page_index: 5
         table: I
         note: Table I. Fe TA4=1667 K temperature correction
+  provenance:
+    printed_phase: pure_Fe_A4_temperature_correction
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig2_ionization_efficiency_figure_only
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -303,6 +313,8 @@ observations:
     figure: '2'
     note: Ionization efficiency curve of Ag and Mn. I_Ag and I_Mn in arbitrary unit
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag_and_Mn_vapor_in_ion_source
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig3_ion_intensity_heating_figure_only
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -355,6 +367,8 @@ observations:
     figure: '3'
     note: Ion intensity curve on isothermal and dynamic measurements of reactions A, B and C on heating. Sample AgMn(6)
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: AgMn(6)_92.8_at_pct_Mn
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig4_ion_intensity_cooling_figure_only
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -407,6 +421,8 @@ observations:
     figure: '4'
     note: Ion intensity curve on cooling. Sample AgMn(6). Supercooling visible on I_Mn but not on Tb
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: AgMn(6)_92.8_at_pct_Mn
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig5_monovariant_figure_only
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -459,6 +475,8 @@ observations:
     figure: '5'
     note: Ion intensity curve on monovariant reaction. Sample AgMn(8). I_Mn at liquidus and I_Mn at solidus labelled
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: AgMn(8)_solid_liquid_two_phase
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig6_lnIT_vs_1T_figure_only
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -508,6 +526,8 @@ observations:
     figure: '6'
     note: Relation between ln(I_Mn T) vs 1/T. Sample AgMn(6). X_Mn=0.928
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: AgMn(6)_XMn_0.928
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig7_q_vs_xmn_figure_only
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -558,6 +578,8 @@ observations:
     note: 'Three printed series on the shared axes: Reaction A, Reaction B, Reaction C; q x 10^-2 versus atomic fraction of
       Mn'
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_alloy
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_kems_geometry_and_calibration
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -607,6 +629,8 @@ observations:
     section: 2.1 Apparatus
     note: Combined ion source and Knudsen cell furnace; English experimental section
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_liquid_and_solid_alloys_in_alumina_Knudsen_cell
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table4_sensitivity_model
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -668,6 +692,8 @@ observations:
         pdf_page_index: 11
         table: IV
         note: Table IV. Comparison of Sensitivity of Temperature Measurement (at 1800K)
+  provenance:
+    printed_phase: pure_metal_vapor_and_thermocouple
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=0ed3ad1a0012
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -714,6 +740,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=1ad11e0c90fd
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -760,6 +788,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=24be52c1713b
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -806,6 +836,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=5d73be2acafc
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -852,6 +884,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=a9482aa8dfb1
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -898,6 +932,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=dc24e52faa26
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -944,6 +980,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=dcdb4d62d427
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -990,6 +1028,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=e02f8af14504
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -1036,6 +1076,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=ee04ff1da56f
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -1082,6 +1124,8 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=f6992bafdd0d
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -1128,3 +1172,5 @@ observations:
     table: V
     note: Table V. Comparison with Previous Studies on Invariant Reactions
   read_from: pdf:kems-198-ichise-ueshima-1989
+  provenance:
+    printed_phase: Ag-Mn_binary_invariants_literature_comparison

@@ -5,9 +5,9 @@ source:
   year: 1997
 extraction:
   method: >-
-    Manual transcription of Tables 1–4 from the 200 dpi rendered page images, read independently by rows and columns. Table 1 values are printed partial pressures; Table 2 values are printed temperature-fit coefficients; Table 3 includes only activities attributed to this work; Table 4 contains this work's least-squares-derived partial component enthalpies and entropies. Tables 5–7 are thermodynamic calculations and model comparisons outside the requested vapor and melt-activity scope.
-  date: '2026-10-14'
-  worker: codex
+    Transcription began with the MinerU content-list table blocks and markdown, followed by pdftotext-layout.txt. Rendered pages were used to verify Table 1 row and column assignments and to resolve Table 3 reading disagreements; Table 4's math-form table cells were checked against its page render. Tables 1–4 retain all printed rows in the vapor and melt-activity scope; Tables 5–7 are excluded thermodynamic compilations and model comparisons.
+  date: '2026-11-08'
+  worker: w1108ox-sh97
 review_status: draft
 benches:
   - id: shornikov-1997-mo-kems
@@ -24,6 +24,9 @@ benches:
           published_page: 174
           pdf_page_index: 0
           paragraph: In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from molybdenum cells.
+    detector:
+      state: {tag: value, value: MI-1201 mass spectrometer modified for high-temperature studies}
+      locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental}
     geometry:
       orifice_to_sample_area_ratio:
         state: {tag: value, value: {kind: bound, bound_operator: '>=', bound_value: '0.0025'}}
@@ -33,11 +36,97 @@ benches:
           section: Experimental
           paragraph: "In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from molybdenum cells with the area ratio between the effusion orifice and the vaporization surface not less than 1 : 400."
           note: The printed lower bound is 1:400; typed as a lower bound on orifice area divided by vaporization surface area.
+    temperature_measurement:
+      sensor:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: The paper reports temperature values but does not identify the sensor.}
+    temperature_calibration:
+      method:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: 'Experimental conditions are referred to reference [27]; no calibration procedure is stated here.'}
+    ionization:
+      electron_energy_eV:
+        state: {tag: value, value: {kind: point, point: '70.0'}}
+        locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results}
+      electron_energy_uncertainty_eV:
+        state: {tag: value, value: {kind: point, point: '0.2'}}
+        locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results, note: Printed 70.0 ± 0.2 eV; confidence level not stated.}
+      ionization_cross_sections:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: 'The paper says oxygen ionization cross sections were calculated by additivity from atomic cross sections but gives no numerical values; experimental conditions are referred to [27].'}
 experiments:
   - experiment_id: shornikov-1997-diopside-kems
     bench_id: shornikov-1997-mo-kems
     method: knudsen_effusion
     locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: 'In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from molybdenum cells.'}
+    sample:
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_formula_stoichiometry
+            amount_basis: mol_inventory
+            components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]
+            proxy_flag: initial_charge_only
+            proxy_source: Shornikov et al. (1997), Table 1 and Experimental section
+            analysis_selection_rule: Nominal diopside charge; no row-resolved post-vaporization composition is printed.
+        locator:
+          page: 2
+          published_page: 175
+          pdf_page_index: 1
+          table: '1'
+          note: Table 1 caption identifies the material as molten CaO · MgO · 2SiO2.
+      composition_role:
+        value: initial_charge_only
+        locator:
+          page: 1
+          published_page: 174
+          pdf_page_index: 0
+          section: Experimental
+          note: The paper describes the diopside sample and reports only an impurity upper bound.
+        quote: The diopside sample contained Al2O3 and Fe2O3 impurities, the summed concentration of which did not exceed 0.4 mol %.
+  - experiment_id: shornikov-1997-diopside-table3-ref22
+    method: {tag: unknown, reason: The cited study's experimental details are not restated in Table 3.}
+    locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: 'Method II, Ref. [22]'}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: The row temperature is attached to each quoted observation point.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's total pressure.}}
+      fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's oxygen condition.}}
+  - experiment_id: shornikov-1997-diopside-table3-ref25
+    method: {tag: unknown, reason: The cited study's experimental details are not restated in Table 3.}
+    locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: 'Methods II, Refs. [25]'}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: The row temperature is attached to each quoted observation point.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's total pressure.}}
+      fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's oxygen condition.}}
+  - experiment_id: shornikov-1997-diopside-table3-ref30
+    method: {tag: unknown, reason: The cited study's model details are not restated in Table 3.}
+    locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: 'Method III, Ref. [30]'}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: The row temperature is attached to each quoted observation point.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's total pressure.}}
+      fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's oxygen condition.}}
+  - experiment_id: shornikov-1997-diopside-table3-ref23
+    method: {tag: unknown, reason: The cited study's experimental details are not restated in Table 3.}
+    locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: 'Method II, Ref. [23]'}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: The row temperature is attached to each quoted observation point.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's total pressure.}}
+      fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's oxygen condition.}}
+  - experiment_id: shornikov-1997-diopside-table3-ref29
+    method: {tag: unknown, reason: The cited study's model details are not restated in Table 3.}
+    locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: 'Method IV, Ref. [29]'}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: The row temperature is attached to each quoted observation point.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's total pressure.}}
+      fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's oxygen condition.}}
+  - experiment_id: shornikov-1997-diopside-table3-ref26
+    method: {tag: unknown, reason: The cited study's measurement details are not restated in Table 3.}
+    locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: 'Method V, Ref. [26]'}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: The row temperature is attached to each quoted observation point.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's total pressure.}}
+      fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited study's oxygen condition.}}
 fidelity_samples:
 - path: species.Ca.observations[shornikov_1997_ca_pressure_table1].values.points[0].temperature_K
   value: 1566
@@ -1028,6 +1117,7 @@ fidelity_samples:
         state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
         locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
     partial_molar_enthalpy_as_printed: {value: 0.0, units: kJ/mol, as_printed: '0.0 ± 1.4'}
+    value_as_published: '0.0 ± 1.4'
     sigma: 1.4
   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
 - path: species.CaO.observations[shornikov_1997_cao_partial_entropy_table4].values.points
@@ -1038,6 +1128,7 @@ fidelity_samples:
         state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
         locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
     entropy: {value: 17.0, units: J/mol/K, as_printed: '17.0 ± 1.5'}
+    value_as_published: '17.0 ± 1.5'
     sigma: 1.5
   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
 - path: species.MgO.observations[shornikov_1997_mgo_partial_enthalpy_table4].values.points
@@ -1048,6 +1139,7 @@ fidelity_samples:
         state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
         locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
     partial_molar_enthalpy_as_printed: {value: -40.2, units: kJ/mol, as_printed: '−40.2 ± 2.6'}
+    value_as_published: '−40.2 ± 2.6'
     sigma: 2.6
   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
 - path: species.MgO.observations[shornikov_1997_mgo_partial_entropy_table4].values.points
@@ -1058,6 +1150,7 @@ fidelity_samples:
         state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
         locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
     entropy: {value: 19.1, units: J/mol/K, as_printed: '19.1 ± 1.5'}
+    value_as_published: '19.1 ± 1.5'
     sigma: 1.5
   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
 - path: species.SiO2.observations[shornikov_1997_sio2_partial_enthalpy_table4].values.points
@@ -1068,6 +1161,7 @@ fidelity_samples:
         state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
         locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
     partial_molar_enthalpy_as_printed: {value: 9.6, units: kJ/mol, as_printed: '9.6 ± 2.4'}
+    value_as_published: '9.6 ± 2.4'
     sigma: 2.4
   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
 - path: species.SiO2.observations[shornikov_1997_sio2_partial_entropy_table4].values.points
@@ -1078,6 +1172,7 @@ fidelity_samples:
         state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
         locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
     entropy: {value: 23.2, units: J/mol/K, as_printed: '23.2 ± 2.4'}
+    value_as_published: '23.2 ± 2.4'
     sigma: 2.4
   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
 - path: species.O.observations[shornikov_1997_o_atomic_alternate_pressure_table1].values.points[0].pressure_as_printed
@@ -1130,27 +1225,102 @@ fidelity_samples:
   locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}
 schema_gaps:
   - observation_id: shornikov_1997_sio2_partial_entropy_table4
-    reason: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+    reason: "No exact quantity token represents the printed partial component entropy: simulator/battery/enums.py::Quantity.S is absolute entropy, simulator/battery/migrate.py::QUANTITY_ALIASES and ::TYPE_QUANTITY have no exact partial-component entropy token, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no exact typed observation."
   - observation_id: shornikov_1997_cao_partial_entropy_table4
-    reason: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+    reason: "No exact quantity token represents the printed partial component entropy: simulator/battery/enums.py::Quantity.S is absolute entropy, simulator/battery/migrate.py::QUANTITY_ALIASES and ::TYPE_QUANTITY have no exact partial-component entropy token, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no exact typed observation."
   - observation_id: shornikov_1997_mgo_partial_entropy_table4
-    reason: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+    reason: "No exact quantity token represents the printed partial component entropy: simulator/battery/enums.py::Quantity.S is absolute entropy, simulator/battery/migrate.py::QUANTITY_ALIASES and ::TYPE_QUANTITY have no exact partial-component entropy token, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no exact typed observation."
 species:
   Ca:
+    context:
+      - observation_id: shornikov_1997_ca_table1_readiness_1566
+        type: context_only
+        experiment: shornikov-1997-diopside-kems
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', row: pCa, column: '1566 ± 7 K'}
+        units: K
+        values:
+          T_K: 1566
+          initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+          measurement_state_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: No post-vaporization composition is reported for this row.}}
+          run_order_index: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Table 1 reports temperatures but no run sequence.}}
+          depletion_evidence: {state: {tag: unknown, reason: not_published}, note: unreported, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.'}}
+          vaporization_congruence: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results, note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call it congruent or incongruent.}}
+          vaporization_statement: {state: {tag: value, value: 'The vaporization of CaO · MgO · 2SiO2 mainly occurs as the transitions to the gas phase of pure CaO, MgO, and SiO2 oxides.'}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results}}
+      - observation_id: shornikov_1997_ca_table1_readiness_1640
+        type: context_only
+        experiment: shornikov-1997-diopside-kems
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', row: pCa, column: '1640 ± 3 K'}
+        units: K
+        values:
+          T_K: 1640
+          initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+          measurement_state_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: No post-vaporization composition is reported for this row.}}
+          run_order_index: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Table 1 reports temperatures but no run sequence.}}
+          depletion_evidence: {state: {tag: unknown, reason: not_published}, note: unreported, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.'}}
+          vaporization_congruence: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results, note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call it congruent or incongruent.}}
+      - observation_id: shornikov_1997_ca_table1_readiness_1688
+        type: context_only
+        experiment: shornikov-1997-diopside-kems
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', row: pCa, column: '1688 ± 5 K'}
+        units: K
+        values:
+          T_K: 1688
+          initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+          measurement_state_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: No post-vaporization composition is reported for this row.}}
+          run_order_index: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Table 1 reports temperatures but no run sequence.}}
+          depletion_evidence: {state: {tag: unknown, reason: not_published}, note: unreported, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.'}}
+          vaporization_congruence: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results, note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call it congruent or incongruent.}}
+      - observation_id: shornikov_1997_ca_table1_readiness_1743
+        type: context_only
+        experiment: shornikov-1997-diopside-kems
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', row: pCa, column: '1743 ± 8 K'}
+        units: K
+        values:
+          T_K: 1743
+          initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+          measurement_state_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: No post-vaporization composition is reported for this row.}}
+          run_order_index: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Table 1 reports temperatures but no run sequence.}}
+          depletion_evidence: {state: {tag: unknown, reason: not_published}, note: unreported, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.'}}
+          vaporization_congruence: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results, note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call it congruent or incongruent.}}
+      - observation_id: shornikov_1997_ca_table1_readiness_1778
+        type: context_only
+        experiment: shornikov-1997-diopside-kems
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', row: pCa, column: '1778 ± 5 K'}
+        units: K
+        values:
+          T_K: 1778
+          initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+          measurement_state_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: No post-vaporization composition is reported for this row.}}
+          run_order_index: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Table 1 reports temperatures but no run sequence.}}
+          depletion_evidence: {state: {tag: unknown, reason: not_published}, note: unreported, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.'}}
+          vaporization_congruence: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results, note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call it congruent or incongruent.}}
+      - observation_id: shornikov_1997_ca_table1_readiness_1862
+        type: context_only
+        experiment: shornikov-1997-diopside-kems
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', row: pCa, column: '1862 ± 4 K'}
+        units: K
+        values:
+          T_K: 1862
+          initial_charge_linkage: Table 1 caption identifies the pCa row as pressure over molten CaO · MgO · 2SiO2.
+          measurement_state_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: No post-vaporization composition is reported for this row.}}
+          run_order_index: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Table 1 reports temperatures but no run sequence.}}
+          depletion_evidence: {state: {tag: unknown, reason: not_published}, note: unreported, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'Table 1 gives temperature and vapor pressures but no mass-loss conversion or fractional loss.'}}
+          vaporization_congruence: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Results, note: The paper describes vaporization mainly as transitions to pure CaO MgO and SiO2 gas species but does not call it congruent or incongruent.}}
     observations:
       - observation_id: shornikov_1997_ca_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
           relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '1', note: 'Table 1 reports resulting partial pressures but does not tabulate the ion-current ratios and reduction inputs used for each value.'}
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1163,24 +1333,28 @@ species:
             SiO2: '2'
           temperature_K: 1566
           points:
-            - {temperature_K: 1566, T_C: 1292.85, temperature_as_printed: '1566 ± 7 K', temperature_uncertainty_K_as_printed: 7, pressure_as_printed: '1.6 ± 0.2', pressure_scale_as_printed: 'pCa × 10^10', pressure_atm: 1.6e-10, sigma: 2.0e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'Molten CaO · MgO · 2SiO2; the article reports Al2O3 + Fe2O3 impurities not exceeding 0.4 mol %.'}}}}
-            - {temperature_K: 1640, T_C: 1366.85, temperature_as_printed: '1640 ± 3 K', temperature_uncertainty_K_as_printed: 3, pressure_as_printed: '6.7 ± 0.5', pressure_scale_as_printed: 'pCa × 10^10', pressure_atm: 6.7e-10, sigma: 5.0e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '15 ± 1', pressure_scale_as_printed: 'pCa × 10^10', pressure_atm: 1.5e-9, sigma: 1.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '40 ± 2', pressure_scale_as_printed: 'pCa × 10^10', pressure_atm: 4.0e-9, sigma: 2.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '72 ± 3', pressure_scale_as_printed: 'pCa × 10^10', pressure_atm: 7.2e-9, sigma: 3.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '263 ± 10', pressure_scale_as_printed: 'pCa × 10^10', pressure_atm: 2.63e-8, sigma: 1.0e-9, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1566, T_C: 1292.85, temperature_as_printed: 1566 ± 7 K, temperature_uncertainty_K_as_printed: 7, pressure_as_printed: 1.6 ± 0.2, value_as_published: "1.6 ± 0.2", pressure_scale_as_printed: pCa × 10^10, pressure_atm: 1.6e-10, sigma: 2.0e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']], proxy_flag: initial_charge_only, proxy_source: 'Shornikov et al. (1997), Table 1 caption and Experimental section', analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Molten CaO · MgO · 2SiO2; the article reports Al2O3 + Fe2O3 impurities not exceeding 0.4 mol %.}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: No chamber or system pressure is reported.}}, fO2_Pa: {state: {tag: value, value: '2.0265e-10'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Same Table 1 temperature column as pO2.}, inference: {relation: source_oxygen_condition; same-cell Table 1 pO2, inputs: ['shornikov-1997-diopside-vaporization::shornikov_1997_o2_pressure_table1::T=1566.00:h=3342f695e6c8'], output_unit: Pa}}}}
+            - {temperature_K: 1640, T_C: 1366.85, temperature_as_printed: 1640 ± 3 K, temperature_uncertainty_K_as_printed: 3, pressure_as_printed: 6.7 ± 0.5, value_as_published: "6.7 ± 0.5", pressure_scale_as_printed: pCa × 10^10, pressure_atm: 6.7e-10, sigma: 5.0e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']], proxy_flag: initial_charge_only, proxy_source: 'Shornikov et al. (1997), Table 1 caption and Experimental section', analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: No chamber or system pressure is reported.}}, fO2_Pa: {state: {tag: value, value: '2.8371e-9'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Same Table 1 temperature column as pO2.}, inference: {relation: source_oxygen_condition; same-cell Table 1 pO2, inputs: ['shornikov-1997-diopside-vaporization::shornikov_1997_o2_pressure_table1::T=1640.00:h=67991e112e7e'], output_unit: Pa}}}}
+            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: 1688 ± 5 K, temperature_uncertainty_K_as_printed: 5, pressure_as_printed: 15 ± 1, value_as_published: "15 ± 1", pressure_scale_as_printed: pCa × 10^10, pressure_atm: 1.5e-09, sigma: 1.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']], proxy_flag: initial_charge_only, proxy_source: 'Shornikov et al. (1997), Table 1 caption and Experimental section', analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: No chamber or system pressure is reported.}}, fO2_Pa: {state: {tag: value, value: '1.519875e-8'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Same Table 1 temperature column as pO2.}, inference: {relation: source_oxygen_condition; same-cell Table 1 pO2, inputs: ['shornikov-1997-diopside-vaporization::shornikov_1997_o2_pressure_table1::T=1688.00:h=a9a4e0d1ffd2'], output_unit: Pa}}}}
+            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: 1743 ± 8 K, temperature_uncertainty_K_as_printed: 8, pressure_as_printed: 40 ± 2, value_as_published: "40 ± 2", pressure_scale_as_printed: pCa × 10^10, pressure_atm: 4.0e-09, sigma: 2.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']], proxy_flag: initial_charge_only, proxy_source: 'Shornikov et al. (1997), Table 1 caption and Experimental section', analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: No chamber or system pressure is reported.}}, fO2_Pa: {state: {tag: value, value: '8.30865e-8'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Same Table 1 temperature column as pO2.}, inference: {relation: source_oxygen_condition; same-cell Table 1 pO2, inputs: ['shornikov-1997-diopside-vaporization::shornikov_1997_o2_pressure_table1::T=1743.00:h=5a3926cb6dd8'], output_unit: Pa}}}}
+            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: 1778 ± 5 K, temperature_uncertainty_K_as_printed: 5, pressure_as_printed: 72 ± 3, value_as_published: "72 ± 3", pressure_scale_as_printed: pCa × 10^10, pressure_atm: 7.2e-09, sigma: 3.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']], proxy_flag: initial_charge_only, proxy_source: 'Shornikov et al. (1997), Table 1 caption and Experimental section', analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: No chamber or system pressure is reported.}}, fO2_Pa: {state: {tag: value, value: '1.7123925e-7'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Same Table 1 temperature column as pO2.}, inference: {relation: source_oxygen_condition; same-cell Table 1 pO2, inputs: ['shornikov-1997-diopside-vaporization::shornikov_1997_o2_pressure_table1::T=1778.00:h=8a8078e0eb42'], output_unit: Pa}}}}
+            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: 1862 ± 4 K, temperature_uncertainty_K_as_printed: 4, pressure_as_printed: 263 ± 10, value_as_published: "263 ± 10", pressure_scale_as_printed: pCa × 10^10, pressure_atm: 2.63e-08, sigma: 1.0e-09, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']], proxy_flag: initial_charge_only, proxy_source: 'Shornikov et al. (1997), Table 1 caption and Experimental section', analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: No chamber or system pressure is reported.}}, fO2_Pa: {state: {tag: value, value: '1.8846450e-6'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: Same Table 1 temperature column as pO2.}, inference: {relation: source_oxygen_condition; same-cell Table 1 pO2, inputs: ['shornikov-1997-diopside-vaporization::shornikov_1997_o2_pressure_table1::T=1862.00:h=0698de9b82b3'], output_unit: Pa}}}}
       - observation_id: shornikov_1997_ca_pressure_table2
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '2'}
+        derived_from: [shornikov_1997_ca_pressure_table1]
+        derivation:
+          relation: Author-reduced temperature dependence of the Table 1 Ca pressures.
+          inputs: [shornikov_1997_ca_pressure_table1]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: log pressure in atm; printed A and B coefficients
-        uncertainty: {note: 'Printed ± widths on A and B; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'Printed ± widths on A and B; no confidence level is stated.'}
         values:
           quantity: partial_pressure
-          method_class: measured_tabulated
+          method_class: measured_reduced
           gas_species: Ca(g)
           formula: Ca
           composition_mol:
@@ -1195,16 +1369,17 @@ species:
       - observation_id: shornikov_1997_mg_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
           relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '1', note: 'Table 1 reports resulting partial pressures but does not tabulate the ion-current ratios and reduction inputs used for each value.'}
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1216,24 +1391,28 @@ species:
             MgO: '1'
             SiO2: '2'
           points:
-            - {temperature_K: 1566, T_C: 1292.85, temperature_as_printed: '1566 ± 7 K', temperature_uncertainty_K_as_printed: 7, pressure_as_printed: '2.2 ± 0.2', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 2.2e-9, sigma: 2.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1640, T_C: 1366.85, temperature_as_printed: '1640 ± 3 K', temperature_uncertainty_K_as_printed: 3, pressure_as_printed: '8.1 ± 0.7', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 8.1e-9, sigma: 7.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '19 ± 1', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 1.9e-8, sigma: 1.0e-9, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '49 ± 2', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 4.9e-8, sigma: 2.0e-9, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '85 ± 3', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 8.5e-8, sigma: 3.0e-9, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '298 ± 10', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 2.98e-7, sigma: 1.0e-8, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1566, T_C: 1292.85, temperature_as_printed: '1566 ± 7 K', temperature_uncertainty_K_as_printed: 7, pressure_as_printed: '2.2 ± 0.2', value_as_published: '2.2 ± 0.2', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 2.2e-9, sigma: 2.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1640, T_C: 1366.85, temperature_as_printed: '1640 ± 3 K', temperature_uncertainty_K_as_printed: 3, pressure_as_printed: '8.1 ± 0.7', value_as_published: '8.1 ± 0.7', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 8.1e-9, sigma: 7.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '19 ± 1', value_as_published: '19 ± 1', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 1.9e-8, sigma: 1.0e-9, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '49 ± 2', value_as_published: '49 ± 2', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 4.9e-8, sigma: 2.0e-9, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '85 ± 3', value_as_published: '85 ± 3', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 8.5e-8, sigma: 3.0e-9, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '298 ± 10', value_as_published: '298 ± 10', pressure_scale_as_printed: 'pMg × 10^9', pressure_atm: 2.98e-7, sigma: 1.0e-8, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
       - observation_id: shornikov_1997_mg_pressure_table2
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '2'}
+        derived_from: [shornikov_1997_mg_pressure_table1]
+        derivation:
+          relation: Author-reduced temperature dependence of the Table 1 Mg pressures.
+          inputs: [shornikov_1997_mg_pressure_table1]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: log pressure in atm; printed A and B coefficients
-        uncertainty: {note: 'Printed ± widths on A and B; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'Printed ± widths on A and B; no confidence level is stated.'}
         values:
           quantity: partial_pressure
-          method_class: measured_tabulated
+          method_class: measured_reduced
           gas_species: Mg(g)
           formula: Mg
           composition_mol:
@@ -1248,16 +1427,17 @@ species:
       - observation_id: shornikov_1997_sio_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
           relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '1', note: 'Table 1 reports resulting partial pressures but does not tabulate the ion-current ratios and reduction inputs used for each value.'}
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1269,24 +1449,28 @@ species:
             MgO: '1'
             SiO2: '2'
           points:
-            - {temperature_K: 1566, T_C: 1292.85, temperature_as_printed: '1566 ± 7 K', temperature_uncertainty_K_as_printed: 7, pressure_as_printed: '1.2 ± 0.2', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 1.2e-7, sigma: 2.0e-8, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1640, T_C: 1366.85, temperature_as_printed: '1640 ± 3 K', temperature_uncertainty_K_as_printed: 3, pressure_as_printed: '5.2 ± 0.5', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 5.2e-7, sigma: 5.0e-8, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '11 ± 1', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 1.1e-6, sigma: 1.0e-7, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '30 ± 2', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 3.0e-6, sigma: 2.0e-7, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '52 ± 3', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 5.2e-6, sigma: 3.0e-7, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '198 ± 10', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 1.98e-5, sigma: 1.0e-6, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1566, T_C: 1292.85, temperature_as_printed: '1566 ± 7 K', temperature_uncertainty_K_as_printed: 7, pressure_as_printed: '1.2 ± 0.2', value_as_published: '1.2 ± 0.2', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 1.2e-7, sigma: 2.0e-8, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1640, T_C: 1366.85, temperature_as_printed: '1640 ± 3 K', temperature_uncertainty_K_as_printed: 3, pressure_as_printed: '5.2 ± 0.5', value_as_published: '5.2 ± 0.5', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 5.2e-7, sigma: 5.0e-8, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '11 ± 1', value_as_published: '11 ± 1', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 1.1e-6, sigma: 1.0e-7, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '30 ± 2', value_as_published: '30 ± 2', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 3.0e-6, sigma: 2.0e-7, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '52 ± 3', value_as_published: '52 ± 3', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 5.2e-6, sigma: 3.0e-7, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '198 ± 10', value_as_published: '198 ± 10', pressure_scale_as_printed: 'pSiO × 10^7', pressure_atm: 1.98e-5, sigma: 1.0e-6, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
       - observation_id: shornikov_1997_sio_pressure_table2
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '2'}
+        derived_from: [shornikov_1997_sio_pressure_table1]
+        derivation:
+          relation: Author-reduced temperature dependence of the Table 1 SiO pressures.
+          inputs: [shornikov_1997_sio_pressure_table1]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: log pressure in atm; printed A and B coefficients
-        uncertainty: {note: 'Printed ± widths on A and B; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'Printed ± widths on A and B; no confidence level is stated.'}
         values:
           quantity: partial_pressure
-          method_class: measured_tabulated
+          method_class: measured_reduced
           gas_species: SiO(g)
           formula: SiO
           composition_mol:
@@ -1301,16 +1485,17 @@ species:
       - observation_id: shornikov_1997_sio2_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
           relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '1', note: 'Table 1 reports resulting partial pressures but does not tabulate the ion-current ratios and reduction inputs used for each value.'}
         T_range_K: [1688, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1322,22 +1507,26 @@ species:
             MgO: '1'
             SiO2: '2'
           points:
-            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '1.2 ± 0.3', pressure_scale_as_printed: 'pSiO2 × 10^10', pressure_atm: 1.2e-10, sigma: 3.0e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '5.4 ± 0.5', pressure_scale_as_printed: 'pSiO2 × 10^10', pressure_atm: 5.4e-10, sigma: 5.0e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '11 ± 1', pressure_scale_as_printed: 'pSiO2 × 10^10', pressure_atm: 1.1e-9, sigma: 1.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '59 ± 5', pressure_scale_as_printed: 'pSiO2 × 10^10', pressure_atm: 5.9e-9, sigma: 5.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '1.2 ± 0.3', value_as_published: '1.2 ± 0.3', pressure_scale_as_printed: 'pSiO2 × 10^10', pressure_atm: 1.2e-10, sigma: 3.0e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '5.4 ± 0.5', value_as_published: '5.4 ± 0.5', pressure_scale_as_printed: 'pSiO2 × 10^10', pressure_atm: 5.4e-10, sigma: 5.0e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '11 ± 1', value_as_published: '11 ± 1', pressure_scale_as_printed: 'pSiO2 × 10^10', pressure_atm: 1.1e-9, sigma: 1.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '59 ± 5', value_as_published: '59 ± 5', pressure_scale_as_printed: 'pSiO2 × 10^10', pressure_atm: 5.9e-9, sigma: 5.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
       - observation_id: shornikov_1997_sio2_pressure_table2
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '2'}
+        derived_from: [shornikov_1997_sio2_pressure_table1]
+        derivation:
+          relation: Author-reduced temperature dependence of the Table 1 SiO2 pressures.
+          inputs: [shornikov_1997_sio2_pressure_table1]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: log pressure in atm; printed A and B coefficients
-        uncertainty: {note: 'Printed ± widths on A and B; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'Printed ± widths on A and B; no confidence level is stated.'}
         values:
           quantity: partial_pressure
-          method_class: measured_tabulated
+          method_class: measured_reduced
           gas_species: SiO2(g)
           formula: SiO2
           composition_mol:
@@ -1350,10 +1539,11 @@ species:
       - observation_id: shornikov_1997_sio2_activity_table3
         type: activity_coefficient
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
-          relation: Silica activity reduced from mass-spectrometric ion-current ratios as described by the authors.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          relation: The authors calculate SiO2 activity from mass-spectrometric ion-current ratios relative to pure silicon oxide using the stated calibration expressions.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '3', note: Individual sample and pure-oxide ion currents are not tabulated.}
         T_range_K: [1566, 1862]
         phase: l
         standard_state: SiO2 activity relative to the pure oxide reference; condensed state is not stated.
@@ -1383,6 +1573,9 @@ species:
         phase: l
         standard_state: Partial component enthalpy of SiO2 in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
         experiment: shornikov-1997-diopside-kems
+        uncertainty:
+          confidence_level: not_stated
+          note: Table 4 prints symmetric ± widths; confidence level is not stated.
         point_conditions:
           composition:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
@@ -1394,7 +1587,7 @@ species:
           inputs: [shornikov_1997_sio2_activity_table3]
         values:
           quantity: partial_molar_enthalpy
-          method_class: derived
+          method_class: measured_reduced
           formula: SiO2
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}
           temperature_range_K: [1665, 1870]
@@ -1405,6 +1598,7 @@ species:
                   state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
                   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
               partial_molar_enthalpy_as_printed: {value: 9.6, units: kJ/mol, as_printed: '9.6 ± 2.4'}
+              value_as_published: '9.6 ± 2.4'
               sigma: 2.4
       - observation_id: shornikov_1997_sio2_partial_entropy_table4
         type: gibbs_table
@@ -1413,6 +1607,11 @@ species:
         phase: l
         standard_state: Partial component entropy of SiO2 in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
         experiment: shornikov-1997-diopside-kems
+        uncertainty:
+          value: '2.4'
+          units: J/mol/K
+          confidence_level: not_stated
+          note: Printed ±2.4; confidence level is not stated.
         point_conditions:
           composition:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
@@ -1423,12 +1622,14 @@ species:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
           inputs: [shornikov_1997_sio2_activity_table3]
         values:
+          quantity: partial_component_entropy
           quantity_as_printed: "ΔS_i(SiO2)"
           reference_state_as_printed: "partial component entropy"
           schema_gap: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+          schema_gap_symbols: [simulator/battery/enums.py::Quantity.S, simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, tools/validate_literature_extracts.py::OBSERVATION_TYPES]
           value_as_printed: "23.2 ± 2.4"
 
-          method_class: derived
+          method_class: measured_reduced
           formula: SiO2
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}
           temperature_range_K: [1665, 1870]
@@ -1439,16 +1640,115 @@ species:
                   state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
                   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
               entropy: {value: 23.2, units: J/mol/K, as_printed: '23.2 ± 2.4'}
+              value_as_published: '23.2 ± 2.4'
               sigma: 2.4
+      - observation_id: shornikov_1997_sio2_activity_quoted_ref22
+        type: activity_coefficient
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1823 K, SiO2, Ref. [22]'}
+        phase: l
+        units: dimensionless
+        experiment: shornikov-1997-diopside-table3-ref22
+        standard_state: {state: {tag: unknown, reason: Table 3 does not restate the cited study's activity reference convention.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+        uncertainty: {note: Table 3 prints no uncertainty for this cited value.}
+        point_conditions:
+          composition: {state: {tag: unknown, reason: Table 3 identifies the material as diopside but does not give the cited run's composition.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+          fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's oxygen condition.}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's total pressure.}}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          formula: SiO2
+          attribution: Kay and Taylor [22], as reported in Shornikov et al. (1997), Table 3.
+          points:
+            - {T_K: 1823, activity: '0.35', value_as_published: '0.35', point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1823 K, SiO2, Ref. [22]'}}}}
+      - observation_id: shornikov_1997_sio2_activity_quoted_ref25
+        type: activity_coefficient
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: 'Methods II, Refs. [25]'}
+        phase: l
+        units: dimensionless
+        experiment: shornikov-1997-diopside-table3-ref25
+        standard_state: {state: {tag: unknown, reason: Table 3 does not restate the cited study's activity reference convention.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+        uncertainty: {note: Table 3 prints no uncertainty for these cited values.}
+        point_conditions:
+          composition: {state: {tag: unknown, reason: Table 3 identifies the material as diopside but does not give the cited runs' compositions.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+          fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited runs' oxygen conditions.}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited runs' total pressures.}}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          formula: SiO2
+          attribution: Henderson and Taylor [25], as reported in Shornikov et al. (1997), Table 3.
+          points:
+            - {T_K: 1773, activity: '0.48', value_as_published: '0.48', point_conditions: {temperature_K: {state: {tag: value, value: '1773'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1773 K, SiO2, Ref. [25]'}}}}
+            - {T_K: 1823, activity: '0.40', value_as_published: '0.40', point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1823 K, SiO2, Ref. [25]'}}}}
+      - observation_id: shornikov_1997_sio2_activity_quoted_ref30
+        type: activity_coefficient
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: 'Method III, Ref. [30]'}
+        phase: l
+        units: dimensionless
+        experiment: shornikov-1997-diopside-table3-ref30
+        standard_state: {state: {tag: unknown, reason: Table 3 does not restate the cited study's activity reference convention.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+        uncertainty: {note: Table 3 prints no uncertainty for these cited values.}
+        point_conditions:
+          composition: {state: {tag: unknown, reason: Table 3 identifies the material as diopside but does not give the cited runs' compositions.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+          fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited runs' oxygen conditions.}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited runs' total pressures.}}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          formula: SiO2
+          attribution: Hoch [30], as reported in Shornikov et al. (1997), Table 3.
+          points:
+            - {T_K: 1773, activity: '0.25', value_as_published: '0.25', point_conditions: {temperature_K: {state: {tag: value, value: '1773'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1773 K, SiO2, Ref. [30]'}}}}
+            - {T_K: 1823, activity: '0.22', value_as_published: '0.22', point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1823 K, SiO2, Ref. [30]'}}}}
+      - observation_id: shornikov_1997_sio2_activity_quoted_ref23
+        type: activity_coefficient
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, SiO2, Ref. [23]'}
+        phase: l
+        units: dimensionless
+        experiment: shornikov-1997-diopside-table3-ref23
+        standard_state: {state: {tag: unknown, reason: Table 3 does not restate the cited study's activity reference convention.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+        uncertainty: {note: Table 3 prints no uncertainty for this cited value.}
+        point_conditions:
+          composition: {state: {tag: unknown, reason: Table 3 identifies the material as diopside but does not give the cited run's composition.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+          fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's oxygen condition.}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's total pressure.}}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          formula: SiO2
+          attribution: Rein and Chipman [23], as reported in Shornikov et al. (1997), Table 3.
+          points:
+            - {T_K: 1873, activity: '0.50', value_as_published: '0.50', point_conditions: {temperature_K: {state: {tag: value, value: '1873'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, SiO2, Ref. [23]'}}}}
+      - observation_id: shornikov_1997_sio2_activity_quoted_ref29
+        type: activity_coefficient
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, SiO2, Ref. [29]'}
+        phase: l
+        units: dimensionless
+        experiment: shornikov-1997-diopside-table3-ref29
+        standard_state: {state: {tag: unknown, reason: Table 3 does not restate the cited study's activity reference convention.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+        uncertainty: {note: Table 3 prints no uncertainty for this cited value.}
+        point_conditions:
+          composition: {state: {tag: unknown, reason: Table 3 identifies the material as diopside but does not give the cited run's composition.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+          fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's oxygen condition.}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's total pressure.}}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          formula: SiO2
+          attribution: Blander and Pelton [29], as reported in Shornikov et al. (1997), Table 3.
+          points:
+            - {T_K: 1873, activity: '0.30', value_as_published: '0.30', point_conditions: {temperature_K: {state: {tag: value, value: '1873'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, SiO2, Ref. [29]'}}}}
   CaO:
     observations:
       - observation_id: shornikov_1997_cao_activity_table3
         type: activity_coefficient
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
-          relation: Calcia activity reduced from mass-spectrometric ion-current ratios as described by the authors.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          relation: The authors calculate CaO activity from mass-spectrometric ion-current ratios relative to pure CaO using the stated calibration expression.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '3', note: Individual sample and pure-CaO ion currents are not tabulated.}
         T_range_K: [1566, 1862]
         phase: l
         standard_state: CaO activity relative to the pure oxide reference; condensed state is not stated.
@@ -1478,6 +1778,9 @@ species:
         phase: l
         standard_state: Partial component enthalpy of CaO in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
         experiment: shornikov-1997-diopside-kems
+        uncertainty:
+          confidence_level: not_stated
+          note: Table 4 prints symmetric ± widths; confidence level is not stated.
         point_conditions:
           composition:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
@@ -1489,7 +1792,7 @@ species:
           inputs: [shornikov_1997_cao_activity_table3]
         values:
           quantity: partial_molar_enthalpy
-          method_class: derived
+          method_class: measured_reduced
           formula: CaO
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}
           temperature_range_K: [1665, 1870]
@@ -1500,6 +1803,7 @@ species:
                   state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
                   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
               partial_molar_enthalpy_as_printed: {value: 0.0, units: kJ/mol, as_printed: '0.0 ± 1.4'}
+              value_as_published: '0.0 ± 1.4'
               sigma: 1.4
       - observation_id: shornikov_1997_cao_partial_entropy_table4
         type: gibbs_table
@@ -1508,6 +1812,11 @@ species:
         phase: l
         standard_state: Partial component entropy of CaO in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
         experiment: shornikov-1997-diopside-kems
+        uncertainty:
+          value: '1.5'
+          units: J/mol/K
+          confidence_level: not_stated
+          note: Printed ±1.5; confidence level is not stated.
         point_conditions:
           composition:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
@@ -1518,12 +1827,14 @@ species:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
           inputs: [shornikov_1997_cao_activity_table3]
         values:
+          quantity: partial_component_entropy
           quantity_as_printed: "ΔS_i(CaO)"
           reference_state_as_printed: "partial component entropy"
           schema_gap: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+          schema_gap_symbols: [simulator/battery/enums.py::Quantity.S, simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, tools/validate_literature_extracts.py::OBSERVATION_TYPES]
           value_as_printed: "17.0 ± 1.5"
 
-          method_class: derived
+          method_class: measured_reduced
           formula: CaO
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}
           temperature_range_K: [1665, 1870]
@@ -1534,16 +1845,55 @@ species:
                   state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
                   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
               entropy: {value: 17.0, units: J/mol/K, as_printed: '17.0 ± 1.5'}
+              value_as_published: '17.0 ± 1.5'
               sigma: 1.5
+      - observation_id: shornikov_1997_cao_activity_quoted_ref23
+        type: activity_coefficient
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, CaO, Ref. [23]'}
+        phase: l
+        units: dimensionless
+        experiment: shornikov-1997-diopside-table3-ref23
+        standard_state: {state: {tag: unknown, reason: Table 3 does not restate the cited study's activity reference convention.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+        uncertainty: {note: Table 3 prints no uncertainty for this cited value.}
+        point_conditions:
+          composition: {state: {tag: unknown, reason: Table 3 identifies the material as diopside but does not give the cited run's composition.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+          fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's oxygen condition.}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's total pressure.}}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          formula: CaO
+          attribution: Rein and Chipman [23], as reported in Shornikov et al. (1997), Table 3.
+          points:
+            - {T_K: 1873, activity: '0.005', value_as_published: '0.005', point_conditions: {temperature_K: {state: {tag: value, value: '1873'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, CaO, Ref. [23]'}}}}
+      - observation_id: shornikov_1997_cao_activity_quoted_ref26
+        type: activity_coefficient
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, CaO, Ref. [26]'}
+        phase: l
+        units: dimensionless
+        experiment: shornikov-1997-diopside-table3-ref26
+        standard_state: {state: {tag: unknown, reason: Table 3 does not restate the cited study's activity reference convention.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+        uncertainty: {note: Table 3 prints no uncertainty for this cited value.}
+        point_conditions:
+          composition: {state: {tag: unknown, reason: Table 3 identifies the material as diopside but does not give the cited run's composition.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+          fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's oxygen condition.}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's total pressure.}}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          formula: CaO
+          attribution: Sawamura [26], as reported in Shornikov et al. (1997), Table 3.
+          points:
+            - {T_K: 1873, activity: '0.02', value_as_published: '0.02', point_conditions: {temperature_K: {state: {tag: value, value: '1873'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, CaO, Ref. [26]'}}}}
   MgO:
     observations:
       - observation_id: shornikov_1997_mgo_activity_table3
         type: activity_coefficient
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_mg_pressure_table1, shornikov_1997_o_atomic_pressure_table1]
         derivation:
-          relation: Magnesia activity reduced using the cited heterophase-equilibrium data as described by the authors.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          relation: The authors calculate MgO activity from same-temperature pMg and pO values and the gas-phase equilibrium constant in equation (4).
+          inputs: [shornikov_1997_mg_pressure_table1, shornikov_1997_o_atomic_pressure_table1]
         T_range_K: [1566, 1862]
         phase: l
         standard_state:
@@ -1586,6 +1936,9 @@ species:
         phase: l
         standard_state: Partial component enthalpy of MgO in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
         experiment: shornikov-1997-diopside-kems
+        uncertainty:
+          confidence_level: not_stated
+          note: Table 4 prints symmetric ± widths; confidence level is not stated.
         point_conditions:
           composition:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
@@ -1597,7 +1950,7 @@ species:
           inputs: [shornikov_1997_mgo_activity_table3]
         values:
           quantity: partial_molar_enthalpy
-          method_class: derived
+          method_class: measured_reduced
           formula: MgO
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}
           temperature_range_K: [1665, 1870]
@@ -1608,6 +1961,7 @@ species:
                   state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
                   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
               partial_molar_enthalpy_as_printed: {value: -40.2, units: kJ/mol, as_printed: '−40.2 ± 2.6'}
+              value_as_published: '−40.2 ± 2.6'
               sigma: 2.6
       - observation_id: shornikov_1997_mgo_partial_entropy_table4
         type: gibbs_table
@@ -1616,6 +1970,11 @@ species:
         phase: l
         standard_state: Partial component entropy of MgO in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
         experiment: shornikov-1997-diopside-kems
+        uncertainty:
+          value: '1.5'
+          units: J/mol/K
+          confidence_level: not_stated
+          note: Printed ±1.5; confidence level is not stated.
         point_conditions:
           composition:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
@@ -1626,12 +1985,14 @@ species:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
           inputs: [shornikov_1997_mgo_activity_table3]
         values:
+          quantity: partial_component_entropy
           quantity_as_printed: "ΔS_i(MgO)"
           reference_state_as_printed: "partial component entropy"
           schema_gap: "No quantity token represents the printed partial component entropy; S denotes absolute entropy."
+          schema_gap_symbols: [simulator/battery/enums.py::Quantity.S, simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, tools/validate_literature_extracts.py::OBSERVATION_TYPES]
           value_as_printed: "19.1 ± 1.5"
 
-          method_class: derived
+          method_class: measured_reduced
           formula: MgO
           composition_mol: {basis: printed_formula_stoichiometry, CaO: '0.25', MgO: '0.25', SiO2: '0.5'}
           temperature_range_K: [1665, 1870]
@@ -1642,22 +2003,43 @@ species:
                   state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
                   locator: {page: 3, published_page: 176, pdf_page_index: 2, table: '4'}
               entropy: {value: 19.1, units: J/mol/K, as_printed: '19.1 ± 1.5'}
+              value_as_published: '19.1 ± 1.5'
               sigma: 1.5
+      - observation_id: shornikov_1997_mgo_activity_quoted_ref23
+        type: activity_coefficient
+        locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, MgO, Ref. [23]'}
+        phase: l
+        units: dimensionless
+        experiment: shornikov-1997-diopside-table3-ref23
+        standard_state: {state: {tag: unknown, reason: Table 3 does not restate the cited study's activity reference convention.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+        uncertainty: {note: Table 3 prints no uncertainty for this cited value.}
+        point_conditions:
+          composition: {state: {tag: unknown, reason: Table 3 identifies the material as diopside but does not give the cited run's composition.}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3'}}
+          fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's oxygen condition.}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', note: Table 3 does not report the cited run's total pressure.}}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          formula: MgO
+          attribution: Rein and Chipman [23], as reported in Shornikov et al. (1997), Table 3.
+          points:
+            - {T_K: 1873, activity: '0.001', value_as_published: '0.001', point_conditions: {temperature_K: {state: {tag: value, value: '1873'}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '3', row: '1873 K, MgO, Ref. [23]'}}}}
   MoO2:
     observations:
       - observation_id: shornikov_1997_moo2_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'MoO2 pressure is from the molybdenum effusion cell/crucible, not the diopside melt.'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
           relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '1', note: 'Table 1 reports resulting partial pressures but does not tabulate the ion-current ratios and reduction inputs used for each value.'}
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1677,16 +2059,17 @@ species:
       - observation_id: shornikov_1997_moo3_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'MoO3 pressure is from the molybdenum effusion cell/crucible, not the diopside melt.'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
           relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '1', note: 'Table 1 reports resulting partial pressures but does not tabulate the ion-current ratios and reduction inputs used for each value.'}
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1706,16 +2089,17 @@ species:
       - observation_id: shornikov_1997_o_atomic_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
-          relation: Atomic oxygen pressure calculated from MoO2 and MoO3 ion-current ratios and gas-phase equilibrium data.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          relation: Atomic oxygen pressure calculated from the MoO2 and MoO3 ion-current ratio and equilibrium reaction (1).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '1', note: 'The resulting atomic oxygen pressures are tabulated but the ion-current ratio and equilibrium constant from reference [28] are not reported numerically.'}
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1728,25 +2112,26 @@ species:
             SiO2: '2'
           method: author_calculated using gas-phase equilibrium constants and ion-current ratios
           points:
-            - {temperature_K: 1566, T_C: 1292.85, temperature_as_printed: '1566 ± 7 K', temperature_uncertainty_K_as_printed: 7, pressure_as_printed: '0.4 ± 0.1', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 4.0e-13, sigma: 1.0e-13, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1640, T_C: 1366.85, temperature_as_printed: '1640 ± 3 K', temperature_uncertainty_K_as_printed: 3, pressure_as_printed: '3.8 ± 0.4', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 3.8e-12, sigma: 4.0e-13, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '15 ± 2', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 1.5e-11, sigma: 2.0e-12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '63 ± 8', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 6.3e-11, sigma: 8.0e-12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '140 ± 15', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 1.4e-10, sigma: 1.5e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '920 ± 100', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 9.2e-10, sigma: 1.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1566, T_C: 1292.85, temperature_as_printed: '1566 ± 7 K', temperature_uncertainty_K_as_printed: 7, pressure_as_printed: '0.4 ± 0.1', value_as_published: '0.4 ± 0.1', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 4.0e-13, sigma: 1.0e-13, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1640, T_C: 1366.85, temperature_as_printed: '1640 ± 3 K', temperature_uncertainty_K_as_printed: 3, pressure_as_printed: '3.8 ± 0.4', value_as_published: '3.8 ± 0.4', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 3.8e-12, sigma: 4.0e-13, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '15 ± 2', value_as_published: '15 ± 2', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 1.5e-11, sigma: 2.0e-12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '63 ± 8', value_as_published: '63 ± 8', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 6.3e-11, sigma: 8.0e-12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '140 ± 15', value_as_published: '140 ± 15', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 1.4e-10, sigma: 1.5e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '920 ± 100', value_as_published: '920 ± 100', pressure_scale_as_printed: 'pO × 10^12', pressure_atm: 9.2e-10, sigma: 1.0e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
       - observation_id: shornikov_1997_o_atomic_alternate_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1', note: 'Asterisked atomic-oxygen pressures are the authors’ alternate reductions using equation (3), distinct from the unasterisked oxygen row.'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
         derivation:
-          relation: Alternate atomic oxygen pressure calculated from SiO2 and SiO ion-current ratios and gas-phase equilibrium data.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          relation: Alternate atomic oxygen pressure calculated from the SiO2 and SiO ion-current ratio and equilibrium reaction (3).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 175, pdf_page_index: 1, section: Results, table: '1', note: 'The ion-current ratio and equilibrium constant from reference [28] are not reported numerically in this article.'}
         T_range_K: [1688, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1756,23 +2141,23 @@ species:
           method: 'Author-calculated alternate atomic-oxygen pressure from equation (3), SiO2(g) = SiO(g) + O(g).'
           pressure_scale_as_printed: 'pO* × 10^12'
           points:
-            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '11 ± 3', pressure_scale_as_printed: 'pO* × 10^12', pressure_atm: 1.1e-11, sigma: 3.0e-12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '50 ± 9', pressure_scale_as_printed: 'pO* × 10^12', pressure_atm: 5.0e-11, sigma: 9.0e-12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '120 ± 18', pressure_scale_as_printed: 'pO* × 10^12', pressure_atm: 1.2e-10, sigma: 1.8e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
-            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '700 ± 150', pressure_scale_as_printed: 'pO* × 10^12', pressure_atm: 7.0e-10, sigma: 1.5e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1688, T_C: 1414.85, temperature_as_printed: '1688 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '11 ± 3', value_as_published: '11 ± 3', pressure_scale_as_printed: 'pO* × 10^12', pressure_atm: 1.1e-11, sigma: 3.0e-12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1743, T_C: 1469.85, temperature_as_printed: '1743 ± 8 K', temperature_uncertainty_K_as_printed: 8, pressure_as_printed: '50 ± 9', value_as_published: '50 ± 9', pressure_scale_as_printed: 'pO* × 10^12', pressure_atm: 5.0e-11, sigma: 9.0e-12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1778, T_C: 1504.85, temperature_as_printed: '1778 ± 5 K', temperature_uncertainty_K_as_printed: 5, pressure_as_printed: '120 ± 18', value_as_published: '120 ± 18', pressure_scale_as_printed: 'pO* × 10^12', pressure_atm: 1.2e-10, sigma: 1.8e-11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
+            - {temperature_K: 1862, T_C: 1588.85, temperature_as_printed: '1862 ± 4 K', temperature_uncertainty_K_as_printed: 4, pressure_as_printed: '700 ± 150', value_as_published: '700 ± 150', pressure_scale_as_printed: 'pO* × 10^12', pressure_atm: 7.0e-10, sigma: 1.5e-10, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}}}}
       - observation_id: shornikov_1997_o_atomic_pressure_table2
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '2'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_o_atomic_pressure_table1]
         derivation:
-          relation: Temperature fit to atomic oxygen pressures calculated from MoO2 and MoO3 ion-current ratios and gas-phase equilibrium data.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          relation: Author-reduced temperature dependence of the Table 1 unasterisked atomic oxygen pressures.
+          inputs: [shornikov_1997_o_atomic_pressure_table1]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: log pressure in atm; printed A and B coefficients
-        uncertainty: {note: 'Printed ± widths on A and B; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'Printed ± widths on A and B; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1789,16 +2174,16 @@ species:
       - observation_id: shornikov_1997_o_atomic_alternate_pressure_table2
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '2', note: 'Asterisked oxygen fit calculated from reaction (3).'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_o_atomic_alternate_pressure_table1]
         derivation:
-          relation: Temperature fit to alternate atomic oxygen pressures calculated from SiO2 and SiO ion-current ratios and gas-phase equilibrium data.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          relation: Author-reduced temperature dependence of the Table 1 asterisked atomic oxygen pressures.
+          inputs: [shornikov_1997_o_atomic_alternate_pressure_table1]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: log pressure in atm; printed A and B coefficients
-        uncertainty: {note: 'Printed ± widths on A and B; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'Printed ± widths on A and B; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1817,16 +2202,16 @@ species:
       - observation_id: shornikov_1997_o2_pressure_table1
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '1'}
-        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_o_atomic_pressure_table1]
         derivation:
-          relation: Molecular oxygen pressure calculated from atomic oxygen pressure and gas-phase equilibrium data.
-          inputs: [unknown:shornikov-1997-diopside-vaporization]
+          relation: Molecular oxygen pressure calculated from atomic oxygen pressure using equilibrium reaction (2) and the reference [28] equilibrium constant, whose numerical value is not reported here.
+          inputs: [shornikov_1997_o_atomic_pressure_table1]
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: atm
-        uncertainty: {note: 'The paper prints ± widths; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'The paper prints ± widths; no confidence level is stated.'}
         values:
           quantity: partial_pressure
           method_class: measured_reduced
@@ -1848,15 +2233,19 @@ species:
       - observation_id: shornikov_1997_o2_pressure_table2
         type: partial_pressure
         locator: {page: 2, published_page: 175, pdf_page_index: 1, table: '2'}
+        derived_from: [shornikov_1997_o2_pressure_table1]
+        derivation:
+          relation: Author-reduced temperature dependence of the Table 1 molecular oxygen pressures.
+          inputs: [shornikov_1997_o2_pressure_table1]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: log pressure in atm; printed A and B coefficients
-        uncertainty: {note: 'Printed ± widths on A and B; no confidence level is stated.'}
+        uncertainty: {confidence_level: not_stated, note: 'Printed ± widths on A and B; no confidence level is stated.'}
         values:
           quantity: partial_pressure
-          method_class: measured_tabulated
+          method_class: measured_reduced
           gas_species: O2(g)
           formula: O2
           composition_mol:

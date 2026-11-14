@@ -61,6 +61,8 @@ observations:
         pdf_page_index: 5
         figure: '4'
         note: also Figs 6 and 7
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_figs_ion_intensity_figure_only
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -110,6 +112,8 @@ observations:
     figure: '1'
     note: also Figs 2 and 5
   read_from: pdf:kems-112-ichise-1989
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_infinite_dilution_gamma
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -219,6 +223,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity coefficient
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_kems_geometry_and_calibration
   experiment_id: 10.2355/isijinternational.29.843::kems-112-ichise-1989
   identity:
@@ -273,6 +279,8 @@ observations:
         published_page: 844
         pdf_page_index: 2
         section: '2.1'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_quoted_gamma0_literature
   experiment_id: 10.2355/isijinternational.29.843::kems-112-ichise-1989
   identity:
@@ -327,6 +335,8 @@ observations:
         published_page: 850
         pdf_page_index: 8
         section: 4. Discussion
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p094
   identity:
@@ -395,8 +405,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -485,6 +500,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 12; X_Ta=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p319
   identity:
@@ -554,8 +571,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -644,6 +666,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 17; X_Ta=0.319; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p153
   identity:
@@ -712,8 +736,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -802,6 +831,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 21; X_Ta=0.153; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p244
   identity:
@@ -871,8 +902,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -961,6 +997,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 22; X_Ta=0.244; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p239
   identity:
@@ -1030,8 +1068,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1120,6 +1163,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 25; X_Ta=0.239; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p255
   identity:
@@ -1189,8 +1234,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1279,6 +1329,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 27; X_Ta=0.255; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p156
   identity:
@@ -1347,8 +1399,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1437,6 +1494,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 31; X_Ta=0.156; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p152
   identity:
@@ -1505,8 +1564,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1595,6 +1659,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 32; X_Ta=0.152; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p297
   identity:
@@ -1664,8 +1730,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1754,6 +1825,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 33; X_Ta=0.297; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p054
   identity:
@@ -1822,8 +1895,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1912,6 +1990,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 34; X_Ta=0.054; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p436
   identity:
@@ -1981,8 +2061,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2071,6 +2156,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 47; X_Ta=0.436; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p606
   identity:
@@ -2140,8 +2227,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2230,6 +2322,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 48; X_Ta=0.606; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p406
   identity:
@@ -2299,8 +2393,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2389,6 +2488,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 49; X_Ta=0.406; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p404
   identity:
@@ -2458,8 +2559,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2548,6 +2654,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 50; X_Ta=0.404; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p444
   identity:
@@ -2617,8 +2725,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2707,6 +2820,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 51; X_Ta=0.444; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p727
   identity:
@@ -2776,8 +2891,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2866,6 +2986,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 53; X_Ta=0.727; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p810
   identity:
@@ -2935,8 +3057,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3025,6 +3152,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 54; X_Ta=0.810; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p775
   identity:
@@ -3094,8 +3223,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3184,6 +3318,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 55; X_Ta=0.775; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p828
   identity:
@@ -3253,8 +3389,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3343,6 +3484,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 56; X_Ta=0.828; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p048
   identity:
@@ -3411,8 +3554,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3501,6 +3649,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Table 1 heat 9; X_Ta=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=0e0c6fb0a16b
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3554,6 +3704,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=401090b6a5db
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3607,6 +3759,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=4586ef81902b
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3660,6 +3814,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=6110f3b6a1d2
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3713,6 +3869,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=69e63b1acf5e
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3766,6 +3924,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=73bd2c3686ac
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3819,6 +3979,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=9ec40e77acd4
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3872,6 +4034,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=a45295efee4b
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3925,6 +4089,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=c963a2290aed
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3978,6 +4144,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=d358f4ba63bb
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4031,6 +4199,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=f4c1aad168f1
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4084,6 +4254,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography::rows:h=fa2ab2c8ea60
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4137,6 +4309,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '2'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4191,6 +4365,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4245,6 +4421,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4299,6 +4477,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4353,6 +4533,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4407,6 +4589,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4461,6 +4645,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4515,6 +4701,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4569,6 +4757,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4623,6 +4813,8 @@ observations:
         published_page: 847
         pdf_page_index: 5
         table: '3'
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1e8ba29b1b34
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4746,6 +4938,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1ee33138691e
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4869,6 +5063,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=4a4e18cae179
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4992,6 +5188,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=53ea7b6ff00e
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -5115,6 +5313,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=6036a9693dd5
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -5238,6 +5438,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=754814d05e4b
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -5361,6 +5563,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=8758d9ed7e57
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -5484,6 +5688,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=b1ae03f9128f
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -5607,6 +5813,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=cb81bedabbcc
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -5730,6 +5938,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p192
   identity:
@@ -5798,8 +6008,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5888,6 +6103,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 11; X_Nb=0.192; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p242
   identity:
@@ -5956,8 +6173,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6046,6 +6268,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 12; X_Nb=0.242; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p234
   identity:
@@ -6114,8 +6338,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6204,6 +6433,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 14; X_Nb=0.234; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p320
   identity:
@@ -6273,8 +6504,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6363,6 +6599,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 15; X_Nb=0.320; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p502
   identity:
@@ -6431,8 +6669,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6521,6 +6764,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 16; X_Nb=0.502; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p394
   identity:
@@ -6590,8 +6835,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6680,6 +6930,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 19; X_Nb=0.394; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p388
   identity:
@@ -6749,8 +7001,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6839,6 +7096,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 20; X_Nb=0.388; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p596
   identity:
@@ -6908,8 +7167,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6998,6 +7262,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 23; X_Nb=0.596; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p671
   identity:
@@ -7067,8 +7333,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7157,6 +7428,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 24; X_Nb=0.671; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p760
   identity:
@@ -7226,8 +7499,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7316,6 +7594,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 25; X_Nb=0.760; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p548
   identity:
@@ -7385,8 +7665,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7475,6 +7760,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 26; X_Nb=0.548; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p856
   identity:
@@ -7544,8 +7831,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7634,6 +7926,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 27; X_Nb=0.856; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_solid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p384
   identity:
@@ -7703,8 +7997,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7793,6 +8092,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 29; X_Nb=0.384; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p370
   identity:
@@ -7862,8 +8163,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7952,6 +8258,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 30; X_Nb=0.370; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p094
   identity:
@@ -8020,8 +8328,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8110,6 +8423,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 31; X_Nb=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p298
   identity:
@@ -8179,8 +8494,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8269,6 +8589,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 32; X_Nb=0.298; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p091
   identity:
@@ -8337,8 +8659,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8427,6 +8754,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 4; X_Nb=0.091; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p144
   identity:
@@ -8495,8 +8824,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8585,6 +8919,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 58; X_Nb=0.144; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p139
   identity:
@@ -8653,8 +8989,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8743,6 +9084,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 59; X_Nb=0.139; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p048
   identity:
@@ -8811,8 +9154,13 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value:
+        point: '0.0001'
+        low: '0.000031622776601683793319988935444327185337195551393252'
+        high: '0.00031622776601683793319988935444327185337195551393252'
+        band_basis: half_decade_order_of_magnitude
+        kind: approximate_pressure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8901,6 +9249,8 @@ observations:
         pdf_page_index: 6
         table: '5'
         note: Table 5 heat 8; X_Nb=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=03387327ec49
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9006,6 +9356,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=29827268987e
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9111,6 +9463,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=32a283b44ca3
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9216,6 +9570,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=389c4144c554
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9321,6 +9677,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=53d2e2290dc0
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9426,6 +9784,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=57afa890296a
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9531,6 +9891,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=66419c04fab0
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9636,6 +9998,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=8546bcbe96b2
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9741,6 +10105,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=9041569d4ba2
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9846,6 +10212,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=a6a48e08c04c
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -9951,6 +10319,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=b10fa59f0a57
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -10056,6 +10426,8 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=fbab9e204f7b
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -10161,3 +10533,5 @@ observations:
     parameters: []
     output_unit: activity, dimensionless activity coefficient, J mol^-1
     references: []
+  provenance:
+    printed_phase: Fe-Ta_or_Fe-Nb_alloy

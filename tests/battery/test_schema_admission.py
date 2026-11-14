@@ -476,20 +476,46 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     sample = M._sample_from_plain(yaml.safe_load(yaml.safe_dump(M.to_plain(sample))))
     experiment = replace(F.tabulation_experiment(), sample=sample)
     selected = normalized_composition(experiment, None).selected
+    charge = charge_moles_by_species(experiment, None)
+    chlorine_printed = any(
+        isinstance(item, (list, tuple)) and str(item[0]) == "Cl" for item in components
+    )
     feot_printed = any(
         isinstance(item, (list, tuple)) and str(item[0]) == "FeOT" for item in components
     )
-    if feot_printed:
+    assert sample.printed_composition.state.is_value
+    if chlorine_printed:
+        # The printed Cl component makes the whole mass-percent map unusable
+        # for charge admission; SiO2 must not become a partial charge route.
+        assert selected is None
+        assert not charge.by_species
+        assert charge.absence is not None
+        assert charge.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        assert charge.absence.missing == (
+            "experiment.sample.printed_composition.Cl",
+        )
+        assert charge.dropped == ("Cl",)
+        initial = sample.initial_composition
+        assert initial is not None and initial.state.is_unknown
+        assert "Cl=40 wt%" in initial.state.reason
+        assert sample.printed_composition.state.value == {
+            "basis": "printed_oxides",
+            "amount_basis": "mass_percent",
+            "components": [["SiO2", "60"], ["Cl", "40"]],
+        }
+    elif feot_printed:
         assert selected is not None
         assert set(selected.value) == {"SiO2", "FeO"}
         assert selected.notice is not None
         assert "total_iron_as_FeO" in selected.notice
         assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in selected.notice
         assert "FeOT" in str(sample.printed_composition.state.value)
+        assert bool(charge.by_species) == valid
     else:
         assert (selected is not None) == valid
-    assert bool(charge_moles_by_species(experiment, None).by_species) == valid
-    assert sample.printed_composition.state.is_value
+        assert bool(charge.by_species) == valid
+    if chlorine_printed:
+        return
     if not valid:
         assert sample.initial_composition.state.is_unknown
     elif sample.initial_composition.state.is_value:

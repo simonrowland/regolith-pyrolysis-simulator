@@ -138,6 +138,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 import yaml
+from simulator.corpus_paths import regolith_corpus_root
 
 
 _CHUNK_START = re.compile(r"p(\d+)-p\d+")
@@ -191,7 +192,10 @@ _CSV_FIELDS = (
     "colspan",
     "flags",
 )
-_DEFAULT_CORPUS_ROOT = Path.home() / "Repos" / "regolith-corpus" / "raw"
+
+
+def default_corpus_root() -> Path:
+    return regolith_corpus_root() / "raw"
 
 
 @dataclass
@@ -893,9 +897,14 @@ def convert_source(
     source: str | Path,
     out_dir: str | Path,
     *,
-    corpus_root: str | Path = _DEFAULT_CORPUS_ROOT,
+    corpus_root: str | Path | None = None,
 ) -> Path:
-    sid, content_files = _source_files(source, Path(corpus_root).expanduser())
+    corpus = (
+        Path(corpus_root).expanduser()
+        if corpus_root is not None
+        else default_corpus_root()
+    )
+    sid, content_files = _source_files(source, corpus)
     table_dir = Path(out_dir).expanduser() / "tables" / sid
     table_dir.mkdir(parents=True, exist_ok=True)
     tables: list[dict[str, Any]] = []
@@ -2548,7 +2557,7 @@ def main(argv: list[str] | None = None) -> int:
     convert.add_argument("--out", required=True, help="draft output root")
     convert.add_argument(
         "--corpus-root",
-        default=str(_DEFAULT_CORPUS_ROOT),
+        default=None,
         help="raw corpus root used when source is a source id",
     )
     convert.set_defaults(run=_convert_command)

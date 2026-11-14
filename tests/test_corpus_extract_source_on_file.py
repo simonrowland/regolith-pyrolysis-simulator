@@ -30,6 +30,9 @@ EXTRACT_DIR = REPO_ROOT / "data" / "literature" / "extracts"
 REQUIRE_CORPUS_ENV = "REGOLITH_REQUIRE_CORPUS"
 SKIP_REASON = "corpus_checkout_not_required_by_this_gate"
 
+# Generated from every non-policy YAML file in data/literature/extracts by
+# scripts/update_extract_census_manifest.py; each row names the filename and
+# its source_id so additions and removals identify the affected extract.
 CENSUS_MANIFEST = REPO_ROOT / "tests" / "manifests" / "literature_extract_source_ids.jsonl"
 
 # Root source_id in the preamble, YAML or JSON-style. Checked against a full

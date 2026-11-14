@@ -51,6 +51,7 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
+        attribution: Fegley and Schaefer (2012), as cited by Visscher and Fegley in Section 3.2.
         method_class: quoted_attributed
         generator: Visscher and Fegley (2013), quoting Fegley and Schaefer 2012 MAGMA calculation
         expression: log10(P_vap_bar) = 8.203 - 25898.9/T_K
@@ -59,7 +60,17 @@ species:
   SiO:
     observations:
     - observation_id: visscher_2013_sio_partial_pressure_equilibrium
-      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation using IMCC activities
+      derivation:
+        relation: "The MAGMA equilibrium calculation determines SiO partial pressure using the printed Eq. (5) relation and model activities."
+        raw_inputs: &visscher_magma_raw_inputs
+          state: {tag: value, value: not_printed}
+          locator: {page: 2, pdf_page_index: 1, published_page: 2, section: '2.1. Chemical Model'}
+        method:
+          state: {tag: value, value: "MAGMA equilibrium relation for SiO partial pressure using melt activity and oxygen fugacity."}
+          locator: {page: 4, pdf_page_index: 3, published_page: 4, section: '3.2', equation: '5'}
+        references: &visscher_magma_references
+          - "Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207."
+          - "Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216."
       type: psat_series
       locator: {published_page: 4, equation: '5', section: '3.2'}
       phase: multicomponent_silicate_melt
@@ -67,7 +78,7 @@ species:
       units: partial pressure in bar; fO2 in bar; T dependence through K4
       values:
         quantity: p_partial
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation using IMCC activities
         expression: P_SiO = K4 * a_SiO2 * fO2^(-0.5)
         terms: {equilibrium_constant: K4, melt_activity: a_SiO2, oxygen_fugacity: fO2}
@@ -75,16 +86,61 @@ species:
   Na:
     observations:
     - observation_id: visscher_2013_low_temperature_volatile_dominance
-      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      derived_from: [visscher_2013_table1_bulk_silicate_compositions]
+      derivation:
+        relation: >-
+          The MAGMA calculations compare saturated vapor compositions across the printed melt compositions;
+          the paper states that volatile abundance controls the temperature transition.
+        inputs: [visscher_2013_table1_bulk_silicate_compositions]
+        method:
+          state:
+            tag: value
+            value: >-
+              We used the MAGMA code (Fegley & Cameron 1987; Schaefer & Fegley 2004) to calculate the
+              temperature-dependent chemical equilibrium composition of silicate melt and coexisting vapor.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2
+            section: '2.1. Chemical Model'
+        references: *visscher_magma_references
       type: rate_series
       locator: {published_page: 3, section: '3.1'}
       phase: saturated_silicate_vapor
       regime: MAGMA_IMCC_equilibrium
-      units: temperature K; qualitative model trend
+      standard_state: saturated vapor in chemical equilibrium with molten silicate
+      standard_state_locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2
+        section: '2.1. Chemical Model'
+        note: The authors describe the calculated equilibrium composition of silicate melt and coexisting vapor.
+      basis: >-
+        Qualitative mole-fraction dominance in the saturated vapor as a function of temperature; the
+        transition depends on volatile-element abundances in the melt.
+      basis_locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        section: '3.1'
+        note: The discussion links the SiO/Na/Zn transition temperature to volatile abundances in each melt.
+      units: qualitative mole-fraction dominance; transition temperatures in K
       values:
         quantity: evolved_gas_yield
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
+        value_as_printed: >-
+          At high temperatures (> 3000 K), the disk atmosphere is dominated by SiO, O2, and O, whereas more
+          volatile species such as Na and Zn tend to dominate the silicate vapor at lower temperatures.
+        transition_statement_as_printed: >-
+          For bulk compositions with relatively higher abundances of volatiles (BSE, Mars, Ureilite) this
+          transition occurs between 3000-3500 K. For melt compositions with lower volatile abundances
+          (Moon, EPB, Angrite), this transition occurs at temperatures near 2500 K.
+        transition_locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 4
+          section: '3.1'
         lower_temperature_dominant_species: [Na, Zn, O2]
         lower_temperature_regime: below 3000 K generally; transition is composition-dependent
         transition_temperature_K_as_printed: {volatile_rich_compositions: '3000-3500', volatile_poor_compositions: 'near 2500'}
@@ -92,23 +148,78 @@ species:
   Zn:
     observations:
     - observation_id: visscher_2013_low_temperature_volatile_dominance_zinc
-      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      derived_from: [visscher_2013_table1_bulk_silicate_compositions]
+      derivation:
+        relation: >-
+          The MAGMA zinc-bearing vapor calculation depends on the relative abundances of volatile elements
+          in the printed melt compositions.
+        inputs: [visscher_2013_table1_bulk_silicate_compositions]
+        method:
+          state:
+            tag: value
+            value: >-
+              We used the MAGMA code (Fegley & Cameron 1987; Schaefer & Fegley 2004) to calculate the
+              temperature-dependent chemical equilibrium composition of silicate melt and coexisting vapor.
+              Zinc thermochemistry was recently added to the code calculations in order to explore the
+              chemical behavior and potential volatile loss of Zn-bearing gases from the protolunar disk
+              atmosphere (e.g., Paniello et al. 2012).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2
+            section: '2.1. Chemical Model'
+        references:
+        - "Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207."
+        - "Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216."
+        - "Paniello, R. C., Day, J. M. D., & Moynier, F. 2012, Nature, 490, 376."
       type: rate_series
       locator: {published_page: 3, section: '3.1'}
       phase: saturated_silicate_vapor
       regime: MAGMA_IMCC_equilibrium
-      units: temperature K; qualitative model trend
+      standard_state: saturated vapor in chemical equilibrium with molten silicate
+      standard_state_locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2
+        section: '2.1. Chemical Model'
+        note: The authors describe the calculated equilibrium composition of silicate melt and coexisting vapor.
+      basis: >-
+        Qualitative mole-fraction dominance of zinc-bearing vapor as a function of temperature and melt
+        volatile-element abundance.
+      basis_locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 4
+        section: '3.1'
+        note: The paper states that the Zn-dominated transition depends on volatile abundances in the melt.
+      units: qualitative mole-fraction dominance; transition temperatures in K
       values:
         quantity: evolved_gas_yield
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
+        value_as_printed: >-
+          The Zn-dominated regime depends upon the relative abundances of the volatiles in the melt. For bulk
+          compositions with relatively higher abundances of volatiles (BSE, Mars, Ureilite) this transition
+          occurs between 3000-3500 K. For melt compositions with lower volatile abundances (Moon, EPB,
+          Angrite), this transition occurs at temperatures near 2500 K.
+        value_locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 4
+          section: '3.1'
         dominant_with_lower_temperature_volatile_species: [Na, Zn, O2]
         composition_sensitivity: relative abundance of volatile elements in melt
       uncertainty: no model uncertainty reported
   O2:
     observations:
     - observation_id: visscher_2013_saturated_vapor_oxygen_fugacity
-      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      derivation:
+        relation: "MAGMA model outputs give oxygen fugacity through the printed Eq. (8) relation; the authors use gamma_O2 approximately 1."
+        raw_inputs: *visscher_magma_raw_inputs
+        method:
+          state: {tag: value, value: "MAGMA oxygen fugacity calculated from oxygen mole fraction and total pressure using Eq. (8)."}
+          locator: {page: 5, pdf_page_index: 4, published_page: 5, section: '3.3', equation: '8'}
+        references: *visscher_magma_references
       type: psat_series
       locator: {published_page: 5, figure: '3b', section: '3.3'}
       phase: saturated_silicate_vapor
@@ -116,7 +227,7 @@ species:
       units: fO2 in bar; temperature K
       values:
         quantity: p_partial
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         expression: fO2 = gamma_O2 * P_O2 = gamma_O2 * X_O2 * P_T
         model_approximation: gamma_O2 approximately 1, therefore fO2 approximately P_O2 approximately X_O2 * P_T
@@ -143,7 +254,13 @@ species:
   SiO2_melt:
     observations:
     - observation_id: visscher_2013_total_vapor_pressure_sum
-      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      derivation:
+        relation: "The saturated vapor pressure over the multicomponent melt is the sum of partial pressures of all equilibrium gas species, as printed in Eq. (3)."
+        raw_inputs: *visscher_magma_raw_inputs
+        method:
+          state: {tag: value, value: "MAGMA equilibrium vapor pressure from the sum of gas-species partial pressures using Eq. (3)."}
+          locator: {page: 4, pdf_page_index: 3, published_page: 4, section: '3.2', equation: '3'}
+        references: *visscher_magma_references
       type: psat_series
       locator: {published_page: 4, equation: '3', section: '3.2'}
       phase: multicomponent_silicate_melt
@@ -151,12 +268,18 @@ species:
       units: pressure in bar
       values:
         quantity: p_sat
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         expression: P_T = sum(P_i)
         species_scope: all gas species in equilibrium with the multicomponent melt
     - observation_id: visscher_2013_bse_total_vapor_pressure_fit
-      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      derivation:
+        relation: "Fit to the authors' MAGMA-calculated total saturation vapor pressure over the BSE-composition melt."
+        raw_inputs: *visscher_magma_raw_inputs
+        method:
+          state: {tag: value, value: "MAGMA total saturation vapor-pressure fit for BSE-composition melt using Eq. (6)."}
+          locator: {page: 4, pdf_page_index: 3, published_page: 4, section: '3.2', equation: '6'}
+        references: *visscher_magma_references
       type: psat_series
       locator: {published_page: 4, equation: '6', section: '3.2'}
       phase: BSE_composition_melt
@@ -164,13 +287,19 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         expression: log10(P_vap_bar) approximately equals -51.17 - 1048.8/T_K + 14.60*log10(T_K)
         composition: BSE
       uncertainty: no model uncertainty reported
     - observation_id: visscher_2013_bsm_total_vapor_pressure_fit
-      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      derivation:
+        relation: "Fit to the authors' MAGMA-calculated total saturation vapor pressure over the BSM-composition melt."
+        raw_inputs: *visscher_magma_raw_inputs
+        method:
+          state: {tag: value, value: "MAGMA total saturation vapor-pressure fit for BSM-composition melt using Eq. (7)."}
+          locator: {page: 4, pdf_page_index: 3, published_page: 4, section: '3.2', equation: '7'}
+        references: *visscher_magma_references
       type: psat_series
       locator: {published_page: 4, equation: '7', section: '3.2'}
       phase: BSM_composition_melt
@@ -178,7 +307,7 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         expression: log10(P_vap_bar) approximately equals -41.45 - 4052.3/T_K + 14.90*log10(T_K)
         composition: BSM
@@ -201,7 +330,13 @@ species:
   H2O:
     observations:
     - observation_id: visscher_2013_water_ratio_constraint
-      quote: Visscher and Fegley (2013), MAGMA-derived fO2 equilibrium relation
+      derivation:
+        relation: "The printed equilibrium relation predicts H2O/H2 from oxygen fugacity determined by the silicate melt-vapor chemistry; H2O is not included in MAGMA."
+        raw_inputs: *visscher_magma_raw_inputs
+        method:
+          state: {tag: value, value: "Equilibrium relation for H2O/H2 as a function of MAGMA-derived oxygen fugacity using Eq. (10)."}
+          locator: {page: 5, pdf_page_index: 4, published_page: 5, section: '3.3', equation: '10'}
+        references: *visscher_magma_references
       type: psat_series
       locator: {published_page: 5, equation: '10', section: '3.3'}
       phase: saturated_silicate_vapor
@@ -209,7 +344,7 @@ species:
       units: dimensionless ratio; fO2 in bar
       values:
         quantity: p_partial
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), equilibrium relation constrained by MAGMA-derived fO2; H2O not included in MAGMA model
         expression: H2O/H2 = K9 * fO2^0.5
         model_status: inferred constraint, not a directly calculated MAGMA species abundance
@@ -217,7 +352,13 @@ species:
   CO2:
     observations:
     - observation_id: visscher_2013_carbon_dioxide_ratio_constraint
-      quote: Visscher and Fegley (2013), MAGMA-derived fO2 equilibrium relation
+      derivation:
+        relation: "The printed equilibrium relation predicts CO2/CO from oxygen fugacity determined by the silicate melt-vapor chemistry; CO2 and CO are not included in MAGMA."
+        raw_inputs: *visscher_magma_raw_inputs
+        method:
+          state: {tag: value, value: "Equilibrium relation for CO2/CO as a function of MAGMA-derived oxygen fugacity using Eq. (12)."}
+          locator: {page: 5, pdf_page_index: 4, published_page: 5, section: '3.3', equation: '12'}
+        references: *visscher_magma_references
       type: psat_series
       locator: {published_page: 5, equation: '12', section: '3.3'}
       phase: saturated_silicate_vapor
@@ -225,7 +366,7 @@ species:
       units: dimensionless ratio; fO2 in bar
       values:
         quantity: p_partial
-        method_class: quoted_attributed
+        method_class: model_derived
         generator: Visscher and Fegley (2013), equilibrium relation constrained by MAGMA-derived fO2; CO2 and CO not included in MAGMA model
         expression: CO2/CO = K11 * fO2^0.5
         model_status: inferred constraint, not a directly calculated MAGMA species abundance

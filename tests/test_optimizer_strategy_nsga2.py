@@ -28,10 +28,12 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.strategy import bayesian
-from simulator.optimize.strategy.genetic import (
-    OPTUNA_NSGA2_REQUIRED_MESSAGE,
+from simulator.optimize.strategy.bayesian import (
     _CANDIDATE_ID_ATTR,
     _CONSTRAINT_VALUES_ATTR,
+)
+from simulator.optimize.strategy.genetic import (
+    OPTUNA_NSGA2_REQUIRED_MESSAGE,
     _constraints_for_trial,
     OptunaNSGA2UnavailableError,
 )

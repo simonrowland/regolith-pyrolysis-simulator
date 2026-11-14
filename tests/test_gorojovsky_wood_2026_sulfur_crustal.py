@@ -28,6 +28,19 @@ RENDER_PINS = (
     ("t3-r057-k2o", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, Decimal("3.3")),
 )
 
+# Table 2's quenched-glass values, read from the rendered page independently.
+T2_R003_PRODUCT_GLASS_COMPOSITION = [
+    ["SiO2", "62.2"],
+    ["TiO2", "1.2"],
+    ["Al2O3", "22.5"],
+    ["FeO", "0.08"],
+    ["MnO", "0.12"],
+    ["MgO", "0.92"],
+    ["CaO", "5.2"],
+    ["Na2O", "7.3"],
+    ["K2O", "1.6"],
+]
+
 
 def _source_doc() -> dict:
     doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
@@ -113,20 +126,65 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
         assert printed_oxygen.state.value == Decimal(raw["values"]["point_conditions"]["fO2_log"]["state"]["value"])
         assert printed_oxygen.locator is not None
         sample = experiment_by_id[raw["experiment"]].get("sample", {})
-        if "printed_composition" in sample:
-            composition = observation.identity.composition
-            if composition.is_value:
-                assert composition.value is not None
+        printed_composition = sample.get("printed_composition")
+        if (
+            observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        ):
+            if (
+                isinstance(printed_composition, dict)
+                and printed_composition["state"]["tag"] == "value"
+            ):
+                if observation.identity.composition.is_value:
+                    assert observation.identity.composition.value is not None
+                else:
+                    # Green's mass-percent refusal gate runs before the
+                    # stack-4 conversion when a printed subset does not close.
+                    assert observation.identity.composition.is_unknown, raw_id
+                    reason = observation.identity.composition.reason or ""
+                    if "kept sum=94.37 wt% is below 95 wt%" in reason:
+                        refused_partial_analyses += 1
+                    else:
+                        # Table 1's dash leaves its starting bulk composition
+                        # incomplete before the row-level closure calculation.
+                        assert "printed dash" in reason, raw_id
             else:
-                # b-704 keeps the printed map but refuses its 94.37 wt% oxide
-                # subset, below the 95 wt% minimum closure window.
-                assert composition.is_unknown, raw_id
-                assert "kept sum=94.37 wt% is below 95 wt%" in composition.reason
-                refused_partial_analyses += 1
-        else:
-            assert observation.identity.composition.is_unknown, raw_id
+                assert observation.identity.composition.is_unknown, raw_id
 
-    assert refused_partial_analyses == 57
+    full_product_glass = experiment_by_id["t2-r003"]["sample"]["printed_composition"]
+    assert full_product_glass["state"]["value"]["amount_basis"] == "mass_percent"
+    assert full_product_glass["state"]["value"]["components"] == (
+        T2_R003_PRODUCT_GLASS_COMPOSITION
+    )
+    assert full_product_glass["locator"]["table"] == "2"
+    assert full_product_glass["locator"]["page"] == 40
+    t2_r003_rows = [
+        row
+        for row in phase_rows
+        if row.experiment_id == _row(result, "t2-r003-sio2").experiment_id
+    ]
+    assert t2_r003_rows
+    assert all(row.identity.composition.is_unknown for row in t2_r003_rows)
+    assert all(
+        "printed dash" in (row.identity.composition.reason or "")
+        for row in t2_r003_rows
+    )
+
+    partial_product_glass = experiment_by_id["t2-r001"]["sample"]["printed_composition"]
+    assert partial_product_glass["state"] == {
+        "tag": "unknown",
+        "reason": "Table 2 prints a dash for MnO; complete product-glass composition unavailable.",
+    }
+    t2_r001_rows = [
+        row
+        for row in phase_rows
+        if row.experiment_id == _row(result, "t2-r001-sio2").experiment_id
+    ]
+    assert t2_r001_rows
+    assert all(row.identity.composition.is_unknown for row in t2_r001_rows)
+
+    assert refused_partial_analyses == 54
 
     for suffix, quantity, expected in RENDER_PINS:
         observation = _row(result, suffix)

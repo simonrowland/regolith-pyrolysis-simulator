@@ -59,22 +59,29 @@ def main() -> int:
                 (scenario, *_run_scenario(scenario, capture=True)) for scenario in SCENARIOS
             ]
     failures = [
-        (scenario["name"], payload.get("status"), payload.get("reason", ""))
+        (
+            scenario["name"],
+            payload.get("status"),
+            payload.get("reason", ""),
+            payload.get("error_message", ""),
+        )
         for scenario, payload, capture in generated
         if payload.get("status") != "ok"
     ]
     if failures:
         details = "; ".join(
-            f"{name}: status={status!r} reason={reason!r}"
-            for name, status, reason in failures
+            f"{name}: status={status!r} reason={reason!r} "
+            f"error_message={error_message!r}"
+            for name, status, reason, error_message in failures
         )
         raise RuntimeError(f"runner golden regeneration refused: {details}")
 
     for scenario, payload, capture in generated:
         output = FIXTURES_DIR / scenario["fixture"]
-        print(json.dumps({"scenario": scenario["name"], **_flux_ledger_pins(capture)}))
+        pins = _flux_ledger_pins(payload, capture)
+        print(json.dumps({"scenario": scenario["name"], **pins}))
         if args.check:
-            assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
+            assert pins == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
             assert output.read_text(encoding="utf-8") == json.dumps(payload, indent=2, allow_nan=False) + "\n"
         else:
             _atomic_write_json(output, payload)

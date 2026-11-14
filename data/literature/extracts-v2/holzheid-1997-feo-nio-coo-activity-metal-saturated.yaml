@@ -45,6 +45,8 @@ observations:
     page: 21
     section: abstract
   read_from: pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  provenance:
+    printed_phase: silicate_melt
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -88,6 +90,8 @@ observations:
     section: 3. Calculation of activity coefficients
     note: equations=7-9
   read_from: pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  provenance:
+    printed_phase: liquid_oxide_standard_state
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table1_starting_compositions
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -130,6 +134,8 @@ observations:
     table: '1'
     section: Silicate starting compositions (electron microprobe analysis)
   read_from: pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  provenance:
+    printed_phase: silicate_melt_starting_composition
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1672:row=bk-59-a:h=755b0ecfe146
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -316,7 +322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1672:row=bk-59-b:h=6758e70e83a9
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -503,7 +522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1672:row=bk-60-a:h=7176301aa91b
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -690,7 +722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1672:row=bk-60-b:h=74195d83dd8f
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -877,7 +922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1673:row=bk-49-a:h=bbc1208fc246
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -1064,7 +1122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1673:row=bk-49-b:h=4210908169ec
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -1251,7 +1322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1673:row=bk-57-a:h=2b9d45b37c14
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -1438,7 +1522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1673:row=bk-57-b:h=40b8ae7ad6b9
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -1625,7 +1722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1674:row=bk-54-a:h=ef52180f0b8e
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -1812,7 +1922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1674:row=bk-54-b:h=ae94adc3b130
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -1999,7 +2122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1674:row=bk-56-a:h=204987b9366f
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -2186,7 +2322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1674:row=bk-56-b:h=1380abd345a0
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -2373,7 +2522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1675:row=bk-53-a:h=93d9d36d2d26
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -2560,7 +2722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1675:row=bk-53-b:h=35bdcf79eb78
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -2747,7 +2922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1675:row=bk-55-a:h=74d56bb04cb9
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -2934,7 +3122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1675:row=bk-55-b:h=1660320f8372
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -3121,7 +3322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1675:row=bk-58-a:h=808a351be326
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -3308,7 +3522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1675:row=bk-58-b:h=49a3243ca5d7
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -3495,7 +3722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1677:row=ad-10:h=c1a47e76a782
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -3682,7 +3922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1677:row=ad-5:h=5fa12e9b5fd4
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -3869,7 +4122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1677:row=ad-6:h=737be04c2d23
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -4056,7 +4322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1679:row=ad-1:h=563c4cbdc5c7
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -4243,7 +4522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1679:row=ad-9:h=96c104a47652
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -4430,7 +4722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1680:row=ad-2:h=a41e3559d334
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -4617,7 +4922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1680:row=ad-3:h=43e0bd63ea05
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -4804,7 +5122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1682:row=ad-8:h=702383c24008
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -4991,7 +5322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1578:row=ad-50:h=56a64dddf33e
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -5178,7 +5522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1623:row=ad-43:h=1f0c136d7549
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -5365,7 +5722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1672:row=bk-51-a:h=278ef07dcdf2
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -5552,7 +5922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1672:row=bk-51-b:h=137abd9a55b7
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -5739,7 +6122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1672:row=bk-59-a:h=5581d9a34776
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -5926,7 +6322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1672:row=bk-59-b:h=63f045481984
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -6113,7 +6522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1673:row=ad-49:h=f275a504b5a6
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -6300,7 +6722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1673:row=bk-57-a:h=a153362ead86
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -6487,7 +6922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1673:row=bk-57-b:h=03c292742772
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -6674,7 +7122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1674:row=bk-54-a:h=37c7e6a2b9b1
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -6861,7 +7322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1674:row=bk-54-b:h=567d6397e0a1
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -7048,7 +7522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1674:row=bk-56-a:h=d26b9dd1624c
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -7235,7 +7722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1674:row=bk-56-b:h=2d29f2f1e82d
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -7422,7 +7922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1675:row=bk-53-a:h=dcd9c6f2a2e9
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -7609,7 +8122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1675:row=bk-53-b:h=fe6e236f1ba8
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -7796,7 +8322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1675:row=bk-55-a:h=bb3b141b59fa
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -7983,7 +8522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1675:row=bk-55-b:h=9fbe7a8e021f
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -8170,7 +8722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1675:row=bk-58-a:h=79e8a5b4908e
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -8357,7 +8922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1675:row=bk-58-b:h=8ea8c9c8aede
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -8544,7 +9122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1711:row=ad-46:h=7ff1f39e2581
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -8731,7 +9322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1755:row=ad-47:h=2515c3fba927
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -8918,7 +9522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1780:row=ad-48:h=3e647e648c52
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -9105,7 +9722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1795:row=ad-44:h=6f28f53d33c4
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -9292,7 +9922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1826:row=ad-52:h=1fa32e36a4cf
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -9479,7 +10122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page24_feo::T=1872:row=ad-45:h=46c5f03a8bce
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -9666,7 +10322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page25_feo::T=1578:row=bk-50-a:h=ced4dd0326fc
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -9853,7 +10522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page25_feo::T=1578:row=bk-50-b:h=c64038151ae6
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -10040,7 +10722,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page25_feo::T=1673:row=bk-49-a:h=4f5689966e19
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -10227,7 +10922,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page25_feo::T=1673:row=bk-49-b:h=9dd6df7d7e9c
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -10414,7 +11122,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page25_feo::T=1711:row=bk-46-a:h=fbcdd3f923e4
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -10601,7 +11322,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page25_feo::T=1711:row=bk-46-b:h=c27fe6ca388a
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -10788,7 +11522,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3_pages27_bk_feo::T=1667:row=v-67:h=2d232252738d
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -10922,7 +11669,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3_pages27_bk_feo::T=1667:row=v-68:h=1c6b5dda6ce7
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -11056,7 +11816,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3_pages27_bk_feo::T=1667:row=v-68:h=3ec195e63720
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -11190,7 +11963,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3_pages27_bk_feo::T=1667:row=v-68:h=7b8d9b55ca6b
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -11324,7 +12110,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3_pages27_bk_feo::T=1673:row=bk-57:h=42995c3d3460
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -11458,7 +12257,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3_pages27_bk_feo::T=1673:row=bk-57:h=52cfba345db2
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -11592,7 +12404,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3_pages27_bk_feo::T=1675:row=v-64:h=62071c0429e9
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -11726,7 +12551,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3_pages27_bk_feo::T=1675:row=v-64:h=7e6810327325
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -11860,7 +12698,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_1::T=1673:row=v-69:h=6447173f45bb
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-1
   identity:
@@ -11994,12 +12845,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_2::T=1677:row=ad-12:h=447f954a34a7
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-12-2
   identity:
@@ -12133,12 +12997,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_3::T=1670:row=v-70:h=7e30f423fc05
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-3
   identity:
@@ -12272,12 +13149,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_4::T=1675:row=v-64:h=86e726ae4b1d
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-4
   identity:
@@ -12411,12 +13301,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_5::T=1671:row=v-66:h=f494d432ed9a
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-5
   identity:
@@ -12550,12 +13453,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_6::T=1670:row=v-70:h=3fba5be3c6ad
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-6
   identity:
@@ -12689,12 +13605,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_7::T=1671:row=v-66:h=c68ae97a3aad
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-7
   identity:
@@ -12828,12 +13757,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_8::T=1671:row=v-65:h=b326dbdce21b
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-65-8
   identity:
@@ -12967,12 +13909,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_10::T=1671:row=v-65:h=0904f5c39603
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-65-22
   identity:
@@ -13106,12 +14061,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_1::T=1673:row=v-69:h=1b4ce9a4fe09
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-13
   identity:
@@ -13245,12 +14213,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_2::T=1673:row=v-69:h=0e012450a218
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-14
   identity:
@@ -13384,12 +14365,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_3::T=1677:row=ad-12:h=3abab7dac9f6
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-12-15
   identity:
@@ -13523,12 +14517,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_4::T=1670:row=v-70:h=ecdb5a393e32
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-16
   identity:
@@ -13662,12 +14669,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_5::T=1670:row=v-70:h=7c7392517433
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-17
   identity:
@@ -13801,12 +14821,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_6::T=1675:row=v-64:h=b9a8374e7827
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-18
   identity:
@@ -13940,12 +14973,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_7::T=1671:row=v-66:h=e8ebeb9bf4c8
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-19
   identity:
@@ -14079,12 +15125,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_8::T=1670:row=v-70:h=1da0cfacf448
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-20
   identity:
@@ -14218,12 +15277,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_9::T=1671:row=v-66:h=cc3bc1bd13f9
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-21
   identity:
@@ -14357,12 +15429,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1::T=1673:row=v-69:h=90ff302b98a8
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-27
   identity:
@@ -14502,7 +15587,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_2::T=1673:row=v-69:h=99c7d4b08446
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-28
   identity:
@@ -14642,7 +15740,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_3::T=1677:row=ad-10:h=7b084a2338c8
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-10-29
   identity:
@@ -14782,7 +15893,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_4::T=1677:row=v-64:h=a263f3009df5
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-30
   identity:
@@ -14922,7 +16046,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_5::T=1667:row=v-68:h=36104488a8e0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-31
   identity:
@@ -15062,7 +16199,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_6::T=1671:row=v-66:h=aa080a7b1abe
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-32
   identity:
@@ -15202,7 +16352,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_7::T=1671:row=v-66:h=2f2d33263ccf
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-33
   identity:
@@ -15342,7 +16505,20 @@ observations:
     - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
     output_unit: dimensionless
-    references: []
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_1::T=1673:row=bk57:h=766ad9754121
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-bk57-9
   identity:
@@ -15476,12 +16652,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_2::T=1667:row=v-68:h=f90d168764d0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-10
   identity:
@@ -15615,12 +16804,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_3::T=1675:row=v-64:h=452d6cc1ed62
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-11
   identity:
@@ -15754,12 +16956,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_4::T=1667:row=v-68:h=f95843db5c2b
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-12
   identity:
@@ -15893,12 +17108,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_1::T=1673:row=bk57:h=84dd207e4d31
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-bk57-23
   identity:
@@ -16032,12 +17260,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_2::T=1667:row=v-68:h=6c9b06b42393
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-24
   identity:
@@ -16171,12 +17412,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_3::T=1675:row=v-64:h=dc93b12cad82
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-25
   identity:
@@ -16310,12 +17564,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_4::T=1667:row=v-67:h=e0aa79b12016
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-67-26
   identity:
@@ -16449,12 +17716,25 @@ observations:
   derived_from:
   - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
   derivation:
-    relation: as_published
+    relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
     inputs:
-    - pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
     parameters: []
-    output_unit: wt.% and dimensionless activity coefficient as printed
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Activity coefficients are calculated with Eq. (4) from the equilibrium constant, oxide mole fraction and oxygen
+          fugacity; the authors state that the Co and Fe treatments are analogous to Ni.
+      locator:
+        page: 29
+        section: 3. Calculation of activity coefficients
+        equation: '4'
+    references:
+    - 'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical
+      Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2.'
+  provenance:
+    printed_phase: l
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table4_activity_coefficient_summary
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:
@@ -16498,3 +17778,5 @@ observations:
     table: '4'
     section: Summary of activity coefficients gamma of metal oxides
   read_from: pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  provenance:
+    printed_phase: silicate_melt

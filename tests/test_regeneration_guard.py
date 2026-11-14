@@ -370,6 +370,22 @@ def test_migrate_pilot_extracts_help_does_not_rewrite_extracts():
     assert after == before
 
 
+def test_migrate_pilot_cli_requires_research_root(tmp_path, capsys, monkeypatch):
+    migrate = _load_migrate_pilot_extracts()
+    with pytest.raises(SystemExit) as excinfo:
+        migrate._parse_args([])
+    assert excinfo.value.code == 2
+    assert "--research-root" in capsys.readouterr().err
+
+    research_root = tmp_path / "research-checkout"
+    monkeypatch.setattr(migrate, "ROOT", tmp_path / "seat")
+    monkeypatch.setattr(migrate, "_RESEARCH_ROOT", research_root)
+    source = research_root / "docs-private" / "research" / "draft.md"
+    source.parent.mkdir(parents=True)
+    source.write_text("draft", encoding="utf-8")
+    assert migrate._find_research("docs-private", "research", "draft.md") == source
+
+
 # The two halves of the guard, when called by hand rather than through the
 # context manager. Naming them here rather than inline keeps the failure
 # message able to say which one it found.

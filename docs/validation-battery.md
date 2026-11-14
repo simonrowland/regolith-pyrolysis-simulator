@@ -68,10 +68,21 @@ Apply and check the engine patches first, so the scores describe the engines the
 | `--rail RAIL` | Score one rail |
 | `--work ID` | Score one work or source id |
 | `--limit N` | Stop after N observations |
+| `--species FORMULA[,FORMULA...]` | Score observations whose stored species formula matches one of the listed formulas |
 | `--measured-headline` | Score measured-evidence candidates only and write the per-engine headline |
 | `--report-only` | Rebuild `score-report.md` from an existing `residuals.jsonl` |
 | `--update-band-ratchet` | Accept the current source-derived band minima into the ratchet file |
 | `--write-pins` | Regenerate `pins.yaml` from the pin sources, never from residuals |
+
+Species matching is exact equality on the stored identity formula; phase is separate, so `Mn`
+includes gas-phase Mn (`Mn(g)`) and excludes `MnO`. Queries are trimmed, matched to stored
+formulas exactly when possible, and otherwise matched case-insensitively only when that spelling
+is unique. Filtered runs combine the species, rail, work, limit and engine restrictions; they keep
+the full scoring context and write labelled subset artifacts under `data/battery/subsets/`
+instead of replacing the published headline files. In particular, `--work` and `--rail` no longer
+refresh the published headline artifacts; run an unfiltered score to refresh those files.
+Hashimoto and Sossi source checks still see all 24 and 43 extracted runs, while residue integration
+runs only for experiments represented by selected references.
 
 For quick diagnostics, `scripts/battery_residuals_report.py funnel` counts a residuals file by
 status, rail, engine and refusal reason, and `rowdiff BASE TIP` lists the rows that moved.

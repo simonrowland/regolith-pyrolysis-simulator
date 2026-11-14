@@ -46,7 +46,13 @@ def _seeded_output(source: str, seed: str) -> str:
             id="vapor-pressure-parent-neighbor-order-defensive",
         ),
         pytest.param(
-            """import json\nfrom tests.test_runner_smoke import SCENARIOS, _run_scenario\ns = next(s for s in SCENARIOS if s['name'] == 'lunar_mare_low_ti_C0_24h')\np = _run_scenario(s)\nprint(json.dumps(p, sort_keys=True, separators=(',', ':'), allow_nan=False))""",
+            """import json
+from tests.test_runner_smoke import SCENARIOS, _run_scenario
+s = next(s for s in SCENARIOS if s['name'] == 'lunar_mare_low_ti_C0_24h')
+p = _run_scenario(s)
+assert p.get('status') == 'ok', f"runner refused before hash: status={p.get('status')!r}, reason={p.get('reason')!r}, error_message={p.get('error_message')!r}"
+assert p.get('per_hour_summary')
+print(json.dumps(p, sort_keys=True, separators=(',', ':'), allow_nan=False))""",
             id="capture-relaxation-defensive",
         ),
     ],

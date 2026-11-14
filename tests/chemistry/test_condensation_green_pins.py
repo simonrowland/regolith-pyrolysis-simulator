@@ -52,6 +52,16 @@ def route_totals(monkeypatch):
 
 
 def assert_pin(name, actual, tmp_path, runner_output=None):
+    if runner_output is not None:
+        assert runner_output.get("status") == "ok", (
+            "runner output must complete successfully before pinning its "
+            f"digest; status={runner_output.get('status')!r}, "
+            f"reason={runner_output.get('reason')!r}, "
+            f"error_message={runner_output.get('error_message')!r}"
+        )
+        assert runner_output.get("per_hour_summary"), (
+            "runner output has no completed hours to include in its digest"
+        )
     # Preserve measurements even when a deliberate physics change moves a pin.
     (tmp_path / f"{name}.json").write_text(json.dumps(actual, sort_keys=True))
     print(f"T1217_MEASUREMENT {name} {json.dumps(actual, sort_keys=True)}")

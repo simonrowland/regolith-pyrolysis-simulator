@@ -55,6 +55,12 @@ _AITHALA_REDOX_EXPERIMENTS = {
 }
 
 
+def _subset_artifact(root: Path, name: str) -> Path:
+    paths = tuple((root / "data/battery/subsets").glob(f"*/{name}"))
+    assert len(paths) == 1
+    return paths[0]
+
+
 def _sossi_aithala_redox_context():
     root = Path(__file__).resolve().parents[2]
     source_paths = (
@@ -117,10 +123,25 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
         return original_evaluate_redox(*args, **kwargs)
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_call)
-    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=context.experiments[observation.experiment_id],
+    )
 
     assert prediction.value is not None, prediction.refusal_detail
     assert prediction.refusal_reason is None
+    quench = [
+        notice.reason
+        for notice in prediction.notices
+        if notice.reason.startswith("single_melt_evidence_quench_glass")
+    ]
+    assert quench == [
+        "single_melt_evidence_quench_glass: "
+        "observation.phase: quenched peridotite glass; "
+        "experiment.thermal_schedule.cooling_or_quench: "
+        "Laser switched off; reported cooling rate approximately 800 °C/s"
+    ]
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
     assert prediction.authority is Authority.BRIDGE
     assert len(calls) == 1
@@ -180,9 +201,19 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
             notice
             for notice in prediction.notices
             if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and notice.origin == "openimcc.evaluate_redox"
+        )
+        quench_notices = tuple(
+            notice
+            for notice in prediction.notices
+            if notice.reason.startswith("single_melt_evidence_quench_glass")
         )
         assert flags
         assert tuple(notice.reason for notice in flag_notices) == flags
+        if observation_id.startswith("sossi-2020-"):
+            assert len(quench_notices) == 1
+        else:
+            assert quench_notices == ()
         assert all(
             notice.origin == "openimcc.evaluate_redox"
             and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
@@ -223,7 +254,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         ),
     ):
         assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
-        assert backlog["engine_model_caveat"] == 130
+        assert backlog["engine_model_caveat"] == 142
         assert backlog["admission_defaulted"] == 18
         assert backlog["total_iron_reported_as_feo"] == 18
     assert all(
@@ -479,9 +510,14 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # and carries the source unit text.
     # b-979 / d-053: source_relation on all 18 residuals moves from
     # independent to unknown. Kress attribution stays UNKNOWN unless both
-    # walks are complete. No numeric field moved.
+    # walks are complete.
+    # d-342 retarget. At b1cb2dec4 the payload hashed to
+    # 1ab48f4d30da838c5ae5a6445b3a773bee1c04738637e2693f7b2e17263d46b2
+    # and the twelve Sossi rows were refused input_phase_assemblage_unstated.
+    # Those twelve now score. The six Aithala rows are byte-identical.
+    # The previous pin was already stale at that base.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "11313cf08df6b900eb17e50da8ab69b4387ac75d91956105d34e50cfcdee33d5"
+        "5035aea8b78ad081fda458e8565b4f1bb49fd2e9381af7fedc68d111ae93dd23"
     )
 
 
@@ -922,10 +958,10 @@ def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     summary = json.loads(
-        (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
+        _subset_artifact(tmp_path, "score-summary.json").read_text(encoding="utf-8")
     )
     _assert_unknown_redox_headline(summary["records"])
-    report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    report = _subset_artifact(tmp_path, "score-report.md").read_text(encoding="utf-8")
     retired = (
         "calibration_source_overlap_fit_fidelity",
         "independent_source_accuracy",
@@ -1083,7 +1119,7 @@ def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     summary = json.loads(
-        (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
+        _subset_artifact(tmp_path, "score-summary.json").read_text(encoding="utf-8")
     )
     _assert_unknown_redox_headline(summary["records"])
     assert not any(
@@ -1094,7 +1130,7 @@ def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
         or row.get("source_relation") == "training"
         for row in summary["records"]
     )
-    report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    report = _subset_artifact(tmp_path, "score-report.md").read_text(encoding="utf-8")
     assert "calibration_source_overlap_fit_fidelity" not in report
     assert "independent_source_accuracy" not in report
     report_rows = {
@@ -1340,6 +1376,12 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
                     "no fixed-T/fO2/composition ferric output without "
                     "phase-equilibrium execution"
                 )
+        elif engine == "catalog_evaluator":
+            # Gate 9's catalog evaluator answers vapour pressures only.
+            # Fe3+/Fe2+ stays a quantity refusal, not a ferric-split refusal.
+            assert residual.numeric is None
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.UNSUPPORTED
         else:
             assert residual.numeric is None
             assert residual.refusal is not None
@@ -1349,7 +1391,11 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
             )
 
 
-def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
+def test_kress_table1_redox_rows_score_at_ambient_furnace_pressure():
+    # SCHEMA.md: an ambient_pressure_evidence quote supplies 101325 Pa when
+    # total pressure is otherwise missing. Kress Table 1's gas_mixing quote is
+    # that evidence. The row text says the uncertainty was not printed, so the
+    # score has no band and is not an unpublished-pressure refusal.
     root = Path(__file__).resolve().parents[2]
     extract = (
         root
@@ -1361,6 +1407,27 @@ def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
     hard_issue_details = [issue.detail for issue in result.validation.hard_issues]
     assert hard_issue_details.count("derived observation requires derived_from") == 0
     assert result.validation.hard_issues == ()
+    redox_rows = [
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.FE3_FE2_RATIO
+    ]
+    assert len(redox_rows) == 63
+    for row in redox_rows:
+        assert row.identity.total_pressure_Pa.is_value
+        assert row.identity.total_pressure_Pa.value == Decimal("101325")
+        ambient = [
+            notice
+            for notice in row.notices
+            if notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+        ]
+        assert ambient
+        assert all(
+            notice.authority is Authority.DERIVED_FROM_APPARATUS
+            and notice.band is None
+            for notice in ambient
+        )
     context = ScoreContext(
         result.works,
         result.experiments,
@@ -1377,12 +1444,12 @@ def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
         if "kress-carmichael-1988-iron-oxidation-stoichiometry" in residual.key
     ]
     assert len(residuals) == 63
-    assert all(residual.numeric is None for residual in residuals)
     assert all(
-        residual.refusal is not None
-        and residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
-        and residual.refusal.detail
-        == {"fields": ["total_pressure_Pa"], "detail": ""}
+        residual.refusal is None
+        and residual.numeric is not None
+        and residual.numeric.value.is_finite()
+        and residual.numeric.decision_band is None
+        and residual.status is ResidualStatus.NO_BAND
         for residual in residuals
     )
 
@@ -1674,7 +1741,7 @@ def test_engines_without_a_ferric_split_do_not_equilibrate(monkeypatch):
         "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
         _boom,
     )
-    for engine in (Engine.MAGEMIN, Engine.VAPOROCK):
+    for engine in (Engine.MAGEMIN, Engine.VAPOROCK, Engine.NASA_CEA_9):
         prediction = predict_with_engine(engine, row4)
         assert prediction.value is None
         assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX

@@ -66,6 +66,9 @@ Ambiguity resolutions:
   treat that hole as unknown.
 - Decimal comparison is numeric (``Decimal.__eq__``), so ``1e5`` equals
   ``100000``. 1643 K does not equal 1643.15 K; no rounding band.
+  ``total_pressure_Pa`` is the exception: an ``ApproxPressure`` compares by
+  closed containment (exact versus band) or closed overlap (band versus
+  band). Endpoint contact counts. The nominals are not the predicate.
 - ``canonicalize_with_recorded_conversion`` applies only the unit helpers
   below (calorie, bar/atm, C→K, per-mol-O2 rescaling). It does not invent
   a ΔfG(p°) rewrite without a recorded Derivation on an Observation.
@@ -109,21 +112,24 @@ from simulator.battery.enums import (
     ValenceValueForm,
 )
 from simulator.battery.records import (
+    ApproxPressure,
+    ApproxPressureRefusal,
     Composition,
     Reaction,
     ReactionTerm,
     Species,
     StandardState,
     State,
+    Value,
     as_decimal,
     as_fraction,
     phase_token,
 )
 from simulator.physical_constants import (
+    ATM_PA_DECIMAL,
+    BAR_PA_DECIMAL,
     CELSIUS_TO_KELVIN_OFFSET,
-    GAS_CONSTANT,
-    PA_PER_BAR,
-    STANDARD_ATMOSPHERE_PA,
+    GAS_CONSTANT_DECIMAL,
 )
 from simulator.reference_data.janaf import formula_composition
 
@@ -151,12 +157,12 @@ THERMOCHEMICAL_CALORIE_J = Decimal("4.184")
 # A 1 atm vs 1 bar slip in ΔfG is Δn_g RT ln(1.01325) ≈ 0.033 kJ/mol at
 # 298 K per mol of gas — inside the 1 kJ/mol independent band, noted, not
 # silently corrected by identity_equal.
-PA_PER_BAR_DEC = Decimal(str(int(PA_PER_BAR))) if PA_PER_BAR == 1e5 else Decimal(str(PA_PER_BAR))
-PA_PER_ATM_DEC = Decimal(str(int(STANDARD_ATMOSPHERE_PA)))
+PA_PER_BAR_DEC = BAR_PA_DECIMAL
+PA_PER_ATM_DEC = ATM_PA_DECIMAL
 CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 
 # R as used for ΔfG ↔ log10 Kf in *cross-source* identity. CODATA / SI 2019
-# R = N_A k_B = 8.314462618… J/(mol·K) from physical_constants.GAS_CONSTANT.
+# R = N_A k_B from physical_constants.GAS_CONSTANT_DECIMAL.
 # Source-era transcription constants (JANAF 8.31441, B1544 8.3143,
 # B1259 1.98717 cal/(mol·K)) stay on their generators; see this
 # module's Gas-constant policy docstring.
@@ -167,7 +173,7 @@ CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 # Unit check: kJ/mol divided by [kJ/(mol·K)]·K is dimensionless (dex).
 # B1544's ±1.320 kJ/mol at 298.15 K gives 1.320/(R·T·ln 10) = 0.231 dex.
 LN10 = Decimal(str(math.log(10.0)))
-R_J_PER_MOL_K = Decimal(str(GAS_CONSTANT))
+R_J_PER_MOL_K = GAS_CONSTANT_DECIMAL
 R_KJ_PER_MOL_K = R_J_PER_MOL_K / Decimal("1000")
 
 # Fixed-valence domain for condensed oxide-activity comparison. Roy &
@@ -204,6 +210,39 @@ FIXED_VALENCE_ELEMENTS = frozenset(
 # remains required. In the limiting case ΔP → 0, Δlog10(a) → 0. Re-derive if
 # the scored activity store gains a lower T.
 _MELT_ACTIVITY_PRESSURE_LIMIT_PA = Decimal("999726.4829")
+# |ΔV| bound in the derivation above. The dex reported for an approximate
+# pressure uses this same bound. It is not a second volume.
+_MELT_ACTIVITY_DV_BOUND_M3_PER_MOL = Decimal("3e-5")
+
+
+def melt_activity_log10_pressure_bound(
+    delta_pressure_pa: Decimal, temperature_K: Decimal
+) -> Decimal:
+    """|Δlog10(a)| = |ΔV|·ΔP / (R T ln 10).
+
+    |ΔV| is the bound that derived the activity pressure limit. ΔP is the
+    band width. A non-finite input or a non-positive temperature refuses.
+    It does not become a zero shift.
+    """
+
+    if (
+        not isinstance(delta_pressure_pa, Decimal)
+        or not isinstance(temperature_K, Decimal)
+        or not delta_pressure_pa.is_finite()
+        or not temperature_K.is_finite()
+        or delta_pressure_pa < 0
+        or temperature_K <= 0
+    ):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_IDENTITY,
+            "total_pressure_Pa",
+            "activity dex bound needs a non-negative finite ΔP and a positive finite T",
+        )
+    return (
+        _MELT_ACTIVITY_DV_BOUND_M3_PER_MOL
+        * delta_pressure_pa
+        / (R_J_PER_MOL_K * temperature_K * LN10)
+    )
 
 # Per-mol-O2 rescaling.
 # Premise: Ellingham / mol-O2 tables report ΔG for the reaction written on
@@ -275,6 +314,11 @@ def ideal_gas_entropy_pressure_shift_J_per_mol_K(
     """
 
     return -R_J_PER_MOL_K * _ideal_gas_ln_pressure_ratio(p_from_Pa, p_to_Pa)
+
+
+_STANDARD_PRESSURE_AMBIGUITY_RELATION = (
+    "standard-pressure ambiguity: |RT ln(p_atm/p_bar)|"
+)
 
 
 def standard_pressure_delta_g_kJ_per_mol(
@@ -681,7 +725,7 @@ class Identity:
     reservoir: State[Species] | None = None
     composition: State[Composition] | None = None
     fO2_Pa: State[Decimal] | None = None
-    total_pressure_Pa: State[Decimal] | None = None
+    total_pressure_Pa: State[Decimal | ApproxPressure] | None = None
     sweep_gas: State[SweepIdentity] | None = None
     exposure: State[Exposure] | None = None
     sample_mass_kg: State[Decimal] | None = None
@@ -737,11 +781,29 @@ class Identity:
         if self.fO2_Pa is not None and self.fO2_Pa.is_value:
             object.__setattr__(self, "fO2_Pa", State.of(as_decimal(self.fO2_Pa.value)))
         if self.total_pressure_Pa is not None and self.total_pressure_Pa.is_value:
-            object.__setattr__(
-                self,
-                "total_pressure_Pa",
-                State.of(as_decimal(self.total_pressure_Pa.value)),
-            )
+            raw_pressure = self.total_pressure_Pa.value
+            if isinstance(raw_pressure, ApproxPressure):
+                pass
+            elif isinstance(raw_pressure, Value):
+                # State.of(point) is the strip this axis used to do. An
+                # approximate Value has to arrive as an ApproxPressure.
+                detail = (
+                    "approximate printed pressure is a band; "
+                    "State.of(point) would drop it"
+                    if raw_pressure.approximate
+                    else "a Value is not an identity pressure"
+                )
+                raise IdentityRefusal(
+                    RefusalReason.INVALID_IDENTITY,
+                    "total_pressure_Pa",
+                    detail,
+                )
+            else:
+                object.__setattr__(
+                    self,
+                    "total_pressure_Pa",
+                    State.of(as_decimal(raw_pressure)),
+                )
         if self.sample_mass_kg is not None and self.sample_mass_kg.is_value:
             object.__setattr__(
                 self,
@@ -1125,6 +1187,26 @@ def profile_for(identity: Identity) -> QuantityProfile:
             # flux per area may omit area from equality only after recorded
             # normalization; sample mass still required for extensive rates.
             pass
+    elif q is Quantity.WALL_DEPOSIT_AREAL_RATE:
+        req(
+            "temperature_K",
+            "per",
+            "composition",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "wall",
+        )
+        na(
+            "subtype",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "fO2_Pa",
+            "exposure",
+            "sample_mass_kg",
+        )
     elif q is Quantity.TRANSITION_TEMPERATURE:
         req("subtype", "total_pressure_Pa")
         # no duplicate T coordinate
@@ -1356,15 +1438,34 @@ def _composition_is_fixed_valence(identity: Identity) -> bool:
     return bool(present)
 
 
+def _activity_pressure_edge(value: object) -> Decimal:
+    """Decimal the activity limit reads. A band uses its high edge.
+
+    The high edge is the most continuum-like pressure in the band. A band
+    whose high edge is still at or below the limit is the same omission as
+    a decimal at or below the limit. A band that crosses the limit stays
+    compared, and the compare is the band test.
+    """
+
+    if isinstance(value, ApproxPressure):
+        return value.high
+    if isinstance(value, Decimal):
+        return value
+    raise TypeError(
+        f"activity pressure must be a Decimal or ApproxPressure, not {type(value)!r}"
+    )
+
+
 def _activity_pressure_above_limit(identity: Identity) -> bool:
     pressure = identity.total_pressure_Pa
-    return (
-        pressure is not None
-        and pressure.is_value
-        and pressure.value is not None
-        and pressure.value.is_finite()
-        and pressure.value > _MELT_ACTIVITY_PRESSURE_LIMIT_PA
-    )
+    if (
+        pressure is None
+        or not pressure.is_value
+        or pressure.value is None
+    ):
+        return False
+    edge = _activity_pressure_edge(pressure.value)
+    return edge.is_finite() and edge > _MELT_ACTIVITY_PRESSURE_LIMIT_PA
 
 
 def _melt_activity_uncompared_axes(
@@ -1383,7 +1484,7 @@ def _melt_activity_uncompared_axes(
         pressure is not None
         and pressure.is_value
         and pressure.value is not None
-        and not pressure.value.is_finite()
+        and not _activity_pressure_edge(pressure.value).is_finite()
         for pressure in (identity.total_pressure_Pa for identity in identities)
     )
     if not pressure_is_nonfinite and not any(
@@ -1788,6 +1889,39 @@ def _multiset_compare(
     return _mismatch(name)
 
 
+def _decimal_inside_pressure_band(value: object) -> Decimal | None:
+    """Finite decimal for containment. Not a band, and not a non-number."""
+
+    if isinstance(value, (bool, ApproxPressure)):
+        return None
+    try:
+        number = as_decimal(value)
+    except (TypeError, ValueError, ArithmeticError, ApproxPressureRefusal):
+        return None
+    if not number.is_finite():
+        return None
+    return number
+
+
+def _approx_pressure_compare(
+    name: str, left: object, right: object
+) -> IdentityEqualOutcome:
+    """Closed containment or closed overlap. Never ``Decimal ==`` on the nominal."""
+
+    if isinstance(left, ApproxPressure) and isinstance(right, ApproxPressure):
+        if left.low <= right.high and right.low <= left.high:
+            return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+        return _mismatch(name)
+    band = left if isinstance(left, ApproxPressure) else right
+    other = right if isinstance(left, ApproxPressure) else left
+    if not isinstance(band, ApproxPressure):
+        return _mismatch(name)
+    number = _decimal_inside_pressure_band(other)
+    if number is not None and band.low <= number <= band.high:
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+    return _mismatch(name)
+
+
 def _values_compare(
     name: str,
     left: Any,
@@ -1795,6 +1929,8 @@ def _values_compare(
     *,
     allow_unknown_species_polymorph: bool = False,
 ) -> IdentityEqualOutcome:
+    if isinstance(left, ApproxPressure) or isinstance(right, ApproxPressure):
+        return _approx_pressure_compare(name, left, right)
     if isinstance(left, Decimal) or isinstance(right, Decimal):
         if as_decimal(left) == as_decimal(right):
             return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
@@ -1811,6 +1947,8 @@ def _values_compare(
         if left.component_basis != right.component_basis:
             return _mismatch(name)
         if left.reference_pressure_bar != right.reference_pressure_bar:
+            return _mismatch(name)
+        if left.iron_saturation_composition != right.iron_saturation_composition:
             return _mismatch(name)
         nested = _species_equal(
             left.endmember,

@@ -52,7 +52,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state a numeric total_pressure_Pa
+      reason: The cited prose reports no pressure for this invariant point.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -189,6 +189,8 @@ observations:
             in Fig. 8 on PDF page 7; it remains one observation.
     output_unit: K
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: romero-serrano-1999-binary-ternary-silicates::romero_1999_osborn_muan_invariant_a::T=1743.15:h=bd0b434d88a7
   experiment_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89::romero-serrano-1999-binary-ternary-silicates
   identity:
@@ -239,7 +241,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state a numeric total_pressure_Pa
+      reason: The cited prose reports no pressure for this invariant point.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -370,6 +372,8 @@ observations:
           note: Experimental invariant point a attributed to [22].
     output_unit: K
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: romero-serrano-1999-binary-ternary-silicates::romero_1999_osborn_muan_invariant_b::T=1578.15:h=de57b01ec0a3
   experiment_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89::romero-serrano-1999-binary-ternary-silicates
   identity:
@@ -420,7 +424,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state a numeric total_pressure_Pa
+      reason: The cited prose reports no pressure for this invariant point.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -551,6 +555,8 @@ observations:
           note: Experimental invariant point b attributed to [22].
     output_unit: K
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: romero-serrano-1999-binary-ternary-silicates::romero_1999_riboud_muan_invariant_a::T=1458.15:h=2c203b268ba2
   experiment_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89::romero-serrano-1999-binary-ternary-silicates
   identity:
@@ -601,7 +607,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state a numeric total_pressure_Pa
+      reason: The cited prose reports no pressure for this invariant point.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -732,3 +738,5 @@ observations:
           note: The quoted experimental invariant point is compared with the calculated point a and attributed to [20].
     output_unit: K
     references: []
+  provenance:
+    printed_phase: l

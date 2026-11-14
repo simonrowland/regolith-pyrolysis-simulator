@@ -2,12 +2,15 @@
 # Collect recipe-DB studies from all studio nodes into ONE laptop runs dir.
 # The per-(feedstock,campaign) study dirs are disjoint across nodes, so they
 # merge into a single browsable runs root (point OPTIMIZER_RUNS_DIR at it).
-# Usage: collect_recipe_db.sh [dest_dir] [node1 node2 ...]
+# Usage: collect_recipe_db.sh [dest_dir] node1 [node2 ...]
 set -euo pipefail
 DEST="${1:-$HOME/recipe-db-collected}"
 shift || true
 NODES=("$@")
-[ ${#NODES[@]} -eq 0 ] && NODES=(mac-studio-256-1 mac-studio-256-2 mac-studio-256-3)
+if [ ${#NODES[@]} -eq 0 ]; then
+  echo "Usage: $0 [dest_dir] node1 [node2 ...]" >&2
+  exit 2
+fi
 mkdir -p "$DEST/runs"
 status=0
 for n in "${NODES[@]}"; do

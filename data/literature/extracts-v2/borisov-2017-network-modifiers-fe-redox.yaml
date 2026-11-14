@@ -51,7 +51,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the analytical standard.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -136,6 +136,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: PU-3 reference mean attributed to Schuessler et al. (2008).
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_pu3_wet_chemistry_session_1
   experiment_id: 10.1007/s00410-017-1337-1::borisov-2017-network-modifiers-fe-redox
   identity:
@@ -185,7 +187,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the analytical standard assay.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -269,6 +271,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: PU-3 in-house reference ratio for the Ca-series analytical session.
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_pu3_wet_chemistry_session_2
   experiment_id: 10.1007/s00410-017-1337-1::borisov-2017-network-modifiers-fe-redox
   identity:
@@ -318,7 +322,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the analytical standard assay.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -402,6 +406,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: PU-3 in-house reference ratio for the Na-series analytical session.
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_pu3_wet_chemistry_session_3
   experiment_id: 10.1007/s00410-017-1337-1::borisov-2017-network-modifiers-fe-redox
   identity:
@@ -451,7 +457,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the analytical standard assay.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -535,6 +541,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: PU-3 in-house reference ratio for the K-series analytical session.
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_01_haf_6
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_6
   identity:
@@ -736,13 +744,8 @@ observations:
               note: row=1; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_02_hafc16_6
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_6
   identity:
@@ -946,13 +949,8 @@ observations:
               note: row=2; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_03_haf_3
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
   identity:
@@ -1154,13 +1152,8 @@ observations:
               note: row=3; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_04_hafc5_3
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
   identity:
@@ -1364,13 +1357,8 @@ observations:
               note: row=4; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_05_hafc11_3
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
   identity:
@@ -1574,13 +1562,8 @@ observations:
               note: row=5; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_06_hafc16_3
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
   identity:
@@ -1784,13 +1767,8 @@ observations:
               note: row=6; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_07_hafs_3
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
   identity:
@@ -1994,13 +1972,8 @@ observations:
               note: row=7; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_08_hafc5s_3
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
   identity:
@@ -2204,13 +2177,8 @@ observations:
               note: row=8; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_09_hafc11s_3
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
   identity:
@@ -2414,13 +2382,8 @@ observations:
               note: row=9; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_10_hafc16s_3
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
   identity:
@@ -2624,13 +2587,8 @@ observations:
               note: row=10; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_11_haf_4
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
   identity:
@@ -2832,13 +2790,8 @@ observations:
               note: row=11; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_12_hafc5_4
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
   identity:
@@ -3042,13 +2995,8 @@ observations:
               note: row=12; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_13_hafc11_4
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
   identity:
@@ -3252,13 +3200,8 @@ observations:
               note: row=13; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_14_hafc16_4
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
   identity:
@@ -3462,13 +3405,8 @@ observations:
               note: row=14; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_15_hafs_4
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
   identity:
@@ -3672,13 +3610,8 @@ observations:
               note: row=15; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_16_hafc5s_4
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
   identity:
@@ -3882,13 +3815,8 @@ observations:
               note: row=16; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_17_hafc11s_4
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
   identity:
@@ -4092,13 +4020,8 @@ observations:
               note: row=17; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_18_hafc16s_4
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
   identity:
@@ -4302,13 +4225,8 @@ observations:
               note: row=18; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_19_daf_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -4510,13 +4428,8 @@ observations:
               note: row=19; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_20_dafn8_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -4720,13 +4633,8 @@ observations:
               note: row=20; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_21_dafn15_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -4930,13 +4838,8 @@ observations:
               note: row=21; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_22_dafs_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -5140,13 +5043,8 @@ observations:
               note: row=22; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_23_dafsn7_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -5350,13 +5248,8 @@ observations:
               note: row=23; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_24_dafsn15_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -5560,13 +5453,8 @@ observations:
               note: row=24; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_25_dafa_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -5770,13 +5658,8 @@ observations:
               note: row=25; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_26_dafan8_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -5980,13 +5863,8 @@ observations:
               note: row=26; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_27_dafan16_93
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -6190,13 +6068,8 @@ observations:
               note: row=27; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_28_daf_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -6400,13 +6273,8 @@ observations:
               note: row=28; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_29_dafn8_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -6610,13 +6478,8 @@ observations:
               note: row=29; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_30_dafn15_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -6820,13 +6683,8 @@ observations:
               note: row=30; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_31_dafs_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -7030,13 +6888,8 @@ observations:
               note: row=31; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_32_dafsn7_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -7240,13 +7093,8 @@ observations:
               note: row=32; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_33_dafsn15_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -7450,13 +7298,8 @@ observations:
               note: row=33; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_34_dafa_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -7660,13 +7503,8 @@ observations:
               note: row=34; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_35_dafan8_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -7870,13 +7708,8 @@ observations:
               note: row=35; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_36_dafan16_94
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
   identity:
@@ -8080,13 +7913,8 @@ observations:
               note: row=36; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_37_dafs_14
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_14
   identity:
@@ -8288,13 +8116,8 @@ observations:
               note: row=37; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_38_dafsk12_14
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_14
   identity:
@@ -8498,13 +8321,8 @@ observations:
               note: row=38; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_39_dafsk25_14
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_14
   identity:
@@ -8708,13 +8526,8 @@ observations:
               note: row=39; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_40_hafs_14
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_14
   identity:
@@ -8918,13 +8731,8 @@ observations:
               note: row=40; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_41_hafsk13_14
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_14
   identity:
@@ -9128,13 +8936,8 @@ observations:
               note: row=41; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_42_hafsk26_14
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_14
   identity:
@@ -9338,13 +9141,8 @@ observations:
               note: row=42; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_43_dafs_13
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_13
   identity:
@@ -9546,13 +9344,8 @@ observations:
               note: row=43; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_44_dafsk12_13
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_13
   identity:
@@ -9756,13 +9549,8 @@ observations:
               note: row=44; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_45_dafsk25_13
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_13
   identity:
@@ -9966,13 +9754,8 @@ observations:
               note: row=45; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_46_hafs_13
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_13
   identity:
@@ -10176,13 +9959,8 @@ observations:
               note: row=46; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_47_hafsk13_13
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_13
   identity:
@@ -10386,13 +10164,8 @@ observations:
               note: row=47; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_48_hafsk26_13
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_13
   identity:
@@ -10596,13 +10369,8 @@ observations:
               note: row=48; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_49_dafs_15
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_15
   identity:
@@ -10804,13 +10572,8 @@ observations:
               note: row=49; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_50_dafsk12_15
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_15
   identity:
@@ -11014,13 +10777,8 @@ observations:
               note: row=50; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_51_dafsk25_15
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_15
   identity:
@@ -11224,13 +10982,8 @@ observations:
               note: row=51; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_52_hafs_15
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_15
   identity:
@@ -11434,13 +11187,8 @@ observations:
               note: row=52; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_53_hafsk13_15
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_15
   identity:
@@ -11644,13 +11392,8 @@ observations:
               note: row=53; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_54_hafsk26_15
   experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_15
   identity:
@@ -11854,10 +11597,5 @@ observations:
               note: row=54; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-2017-network-modifiers-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l

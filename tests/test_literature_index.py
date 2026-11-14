@@ -6,7 +6,6 @@ import hashlib
 import importlib.util
 import subprocess
 import sys
-from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -410,14 +409,40 @@ def test_nasa_cea_private_locator_backlog():
 COMMITTED_STATUS = REPO_ROOT / "data" / "literature" / "SOURCE_STATUS.yaml"
 
 
-def test_committed_source_status_counts_match_rows():
-    status = builder.load_yaml(COMMITTED_STATUS)
-    rows = status["sources"]
-    row_counts = Counter(row["stage"] for row in rows)
-    by_stage = dict(row_counts)
+def test_repo_source_status_counts_match_rows() -> None:
+    status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
+    # build_index.py omits a stage whose row count is zero.
+    by_stage = {
+        stage: sum(row["stage"] == stage for row in status["sources"])
+        for stage in builder.STATUS_STAGES
+    }
+    by_stage = {name: count for name, count in by_stage.items() if count}
+    assert status["counts"] == {
+        "sources": len(status["sources"]),
+        "by_stage": by_stage,
+    }
 
-    assert status["counts"]["sources"] == len(rows)
-    assert status["counts"]["by_stage"] == by_stage
+
+def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
+    index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
+    counts = index["counts"]
+    # Pin the generated index for the approved combined-offer merge stack.
+    assert counts["sources"] == 850
+    assert counts["extracts"] == 848
+    assert counts["extracts_without_pdf"] == 848
+    assert counts["alias_groups_needing_resolution"] == 94
+
+    status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
+    # SOURCE_STATUS is restricted to green plus extracts in this merge stack.
+    assert status["counts"]["sources"] == 2338
+    assert status["counts"]["by_stage"] == {
+        "located": 206,
+        "inbox": 1250,
+        "in_progress": 192,
+        "ingested_partial": 183,
+        "ingested_complete": 149,
+        "unknown": 358,
+    }
 
 
 def _status_tree(tmp_path: Path, monkeypatch, *, git_corpus: bool = False) -> tuple[Path, Path]:
@@ -575,6 +600,36 @@ def test_source_status_compilation_not_inbox_with_control(tmp_path, monkeypatch)
     assert compilation not in inbox_ids
 
 
+def test_source_status_covered_by_alias_exclusion_and_missing_target_refusal(tmp_path, monkeypatch):
+    root, corpus = _status_tree(tmp_path, monkeypatch)
+    source_id = "fixture-appendix"
+    target_id = "fixture-main-paper"
+    raw = corpus / "raw" / source_id
+    raw.mkdir(parents=True)
+    (raw / f"{source_id}.pdf").write_bytes(b"%PDF-1.4 fixture\n")
+    _write_yaml(root / "data/literature/extracts" / f"{target_id}.yaml", _extract_v1(target_id))
+    declaration = {
+        source_id: {
+            "covered_by": target_id,
+            "note": "The appendix adds no distinct numeric rows (189/189 rows match Tables AI-AXX).",
+        }
+    }
+    _write_yaml(root / "data/literature/source_aliases.yaml", declaration)
+
+    rows, status = _status_rows(root)
+    assert rows[source_id]["stage"] == "unknown"
+    assert rows[source_id]["inbox_exclusion_reason"] == (
+        "covered_by: source is covered by fixture-main-paper; "
+        "The appendix adds no distinct numeric rows (189/189 rows match Tables AI-AXX)."
+    )
+    assert source_id not in [row["source_id"] for row in status["sources"] if row["stage"] == "inbox"]
+
+    declaration[source_id]["covered_by"] = "missing-target"
+    _write_yaml(root / "data/literature/source_aliases.yaml", declaration)
+    with pytest.raises(ValueError, match="not a known source with an extract"):
+        builder.build_source_status(root)
+
+
 def test_source_status_partial_vs_complete_boundary(tmp_path, monkeypatch):
     """One non-usable row among otherwise usable rows is partial, not complete."""
     root, corpus = _status_tree(tmp_path, monkeypatch)
@@ -619,7 +674,7 @@ def test_source_status_wired_zero_today_and_positive_control(tmp_path, monkeypat
     _write_yaml(root / "data/literature/extracts" / f"{sid}.yaml", _extract_v1(sid))
     _write_yaml(root / "data/literature/extracts-v2" / f"{sid}.yaml", _v21(sid, [_usable_obs()]))
     rows, status = _status_rows(root)
-    assert status["counts"]["by_stage"]["wired"] == 0
+    assert "wired" not in status["counts"]["by_stage"]
     assert rows[sid]["stage"] != "wired"
 
     _write_yaml(root / "data/literature/battery_residuals.yaml", {

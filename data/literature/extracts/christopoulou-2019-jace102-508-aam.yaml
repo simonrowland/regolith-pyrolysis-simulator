@@ -1,0 +1,673 @@
+schema_version: literature_extract.v1
+source_id: christopoulou-2019-jace102-508-aam
+source:
+  citation: >-
+    Christopoulou, G., Modarresifar, F., Allsopp, B., Jones, H. & Bingham, P. A.
+    (2019), "Nonisothermal crystallization kinetics and stability of leucite and
+    kalsilite from K2O-Al2O3-SiO2 glasses", Journal of the American Ceramic
+    Society 102(1), 508-523 (online 2018), accepted manuscript.
+  doi: 10.1111/jace.15944
+  year: 2019
+  corpus_asset: raw/christopoulou-2019-jace102-508-aam/christopoulou-2019-jace102-508-aam.pdf
+  corpus_sha256: a7568abaa6086d4fe4efa17e2993d9019b9c772ae8a6674a12d1bc639e368a6b
+extraction:
+  method: >-
+    Manual review of all 26 pages rendered at 220 dpi. The supplied accepted
+    manuscript contains no table bodies or figure panels, although the prose
+    cites Tables 1, 3, 4, and 5 and Figures 4-13. Prose values were checked
+    against page images; unavailable table cells and non-tabulated curves were
+    not reconstructed or digitized. PDF page indexes are used in locators;
+    printed manuscript page numbers are one lower. The source is internally
+    inconsistent: the abstract says 5 minutes to 1000 hours while section 2.1
+    says 1 minute to 1000 hours; p14 says treatment duration was identical for
+    all samples while p10 says KAS-2 was not treated beyond 24 hours; the cover
+    names "JONES, Hywel" while the title page names "Alan H. Jones".
+  date: '2026-10-06'
+  worker: codex-resume-56997-1791247676
+  provenance_path: text/christopoulou-2019-jace102-508-aam/pdftotext-layout.txt
+review_status: draft
+experiments:
+  - experiment_id: christopoulou_2019_nonisothermal_dsc_series
+    bench_id: christopoulou_2019_netzsch_sta_449_f5_jupiter
+    method: dta_dsc
+    locator:
+      page: 9
+      section: Sample characterization
+    sample:
+      mass_kg:
+        state:
+          tag: value
+          value: 5.00e-5
+        locator:
+          page: 9
+          section: Sample characterization
+          note: 50.0 mg as printed; converted to kg.
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: room temperature
+        locator:
+          page: 9
+          section: Sample characterization
+          note: Room temperature lower bound as printed; the interval ends at 1400 C (1673.15 K).
+      temperature_end_K:
+        state:
+          tag: value
+          value: 1673.15
+        locator:
+          page: 9
+          section: Sample characterization
+          note: 1400 C as printed, converted to K for the experiment interval.
+    thermal_schedule:
+      method:
+        state:
+          tag: value
+          value: Non-isothermal DSC from room temperature to 1400 C at heating rates 5 to 40 C/min
+        locator:
+          page: 9
+          section: Sample characterization
+      total_duration_s:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 9
+          section: Sample characterization
+benches:
+  - id: christopoulou_2019_netzsch_sta_449_f5_jupiter
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: NETZSCH STA 449 F5 Jupiter differential scanning calorimeter
+      locator:
+        page: 8
+        section: Sample characterization
+    heating_method:
+      state:
+        tag: value
+        value: Non-isothermal differential scanning calorimetry
+      locator:
+        page: 8
+        section: Sample characterization
+    temperature_measurement:
+      sensor:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 8
+          section: Sample characterization
+    temperature_calibration:
+      calibration:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 8
+          section: Sample characterization
+  - id: christopoulou_2019_xrf_panalytical_axios_advanced
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: PANalytical Axios Advanced X-ray fluorescence analyzer
+      locator:
+        page: 8
+        section: Sample characterization
+  - id: christopoulou_2019_xrd_empyrean
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: Empyrean XRD diffractometer
+      locator:
+        page: 8
+        section: Sample characterization
+  - id: christopoulou_2019_thermo_dxr2_raman
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: Thermo Scientific DXR2 microscope spectrometer
+      locator:
+        page: 9
+        section: Sample characterization
+    heating_method:
+      state:
+        tag: value
+        value: Raman spectroscopy
+      locator:
+        page: 9
+        section: Sample characterization
+species:
+  K:
+    observations: []
+    context:
+      - observation_id: christopoulou_2019_k_loss_prose_values
+        type: characterization
+        locator:
+          page: 13
+          section: Chemical characterization
+          table: '4'
+          note: Table 4 is cited, but only these potassium-loss results are stated in the text; the table itself is absent from the supplied PDF.
+        units: wt% loss, as printed
+        values:
+          quantity: potassium_loss_by_sample
+          method_class: measured_direct
+          evidence_class: authors_own_measurement
+          treatment_temperature_C: 1250
+          KAS-1_loss: not_detected
+          KAS-2_loss: not_detected
+          KAS-3_loss_wt_pct: 1.5
+          KAS-4_and_KAS-5_loss_wt_pct_range: [2.7, 3.6]
+          measurement_method: XRF
+          composition_context: KAS-1 and KAS-2 are SiO2-rich leucite-field glasses; KAS-3 is next closest to leucite; KAS-4 and KAS-5 are closer to stoichiometric kalsilite.
+          exposure_duration: KAS-3, KAS-4 and KAS-5 losses reported after 1000 h at 1250 C; KAS-1 and KAS-2 exposure duration is inconsistent in the source (p14 says durations were identical, p10 says KAS-2 was not run beyond 24 h).
+          KAS-3_to_KAS-5_exposure_temperature_C: 1250
+          KAS-3_to_KAS-5_exposure_duration_h: 1000
+          exposure_duration_locators: PDF pages 2 and 19
+          source_internally_inconsistent: p14 says heat-treatment duration was identical for all samples; p10 says long-term experiments for KAS-2 were not performed after 24 h.
+          KAS-4_potassium_loss_exceeds_KAS-5: true
+          KAS-4_vs_KAS-5_ordering_locator: PDF page 17
+          uncertainty: not_stated
+      - observation_id: christopoulou_2019_sample_preparation_and_compositions
+        type: composition
+        locator:
+          page: 6
+          section: Preparation of leucite and kalsilite samples
+          figure: '4'
+          table: '1'
+          note: Five compositions are identified along the leucite-kalsilite tie-line; plotted composition coordinates and raw-material table are absent from this PDF.
+        units: as printed
+        values:
+          quantity: starting_glass_compositions_and_preparation
+          method_class: measured_direct
+          compositions: Five potassium aluminosilicate glasses with increasing K2O along the leucite-kalsilite tie-line; numeric oxide compositions unavailable in supplied copy.
+          starting_materials: Inorganic raw materials listed in cited Table 1; identities and purity absent from supplied copy.
+          batching: weighed according to stoichiometry
+          melting: submerged arc furnace, 1 h at 2000 C
+          casting: poured onto a large steel plate
+          annealing: 550 C to relieve internal stresses
+          atmosphere: air for subsequent electric-furnace heat treatments
+      - observation_id: christopoulou_2019_missing_apparatus_and_unreported_run_facts
+        type: method
+        locator:
+          page: 8
+          section: Sample characterization
+        units: as printed
+        values:
+          quantity: unreported_or_not_applicable_apparatus_facts
+          method_class: measured_direct
+          cell_material_and_liner: not applicable; no cell is described for furnace heat treatment or DSC
+          orifice_diameter_and_channel_length: not applicable; no effusion apparatus was used
+          background_or_residual_pressure: not reported; heat treatments are stated to be in air
+          mass_spectrometric_pressure_calibration: not applicable; no vapour pressure or ion current measurements were made
+          ionisation_cross_sections_energy_or_multiplier_corrections: not applicable; no mass spectrometer used
+          activity_defining_ions_and_standard_states: not applicable; no activities reported
+          furnace_temperature_measurement_and_calibration: not reported
+          heat_treatment_temperature_uncertainty: not stated
+      - observation_id: christopoulou_2019_heat_treatment_schedule
+        type: experiment_series
+        locator:
+          page: '6-7'
+          section: Preparation of leucite and kalsilite samples
+          table: '3'
+          note: Table 3 schedule is absent; these conditions are stated in prose.
+        units: as printed
+        values:
+          quantity: isothermal_heat_treatment
+          method_class: measured_direct
+          furnace: electric furnace
+          atmosphere: air
+          temperatures_C: [850, 950, 1250]
+          long_term_temperature_C: 1250
+          long_term_heating_ramp_C_per_min: 5
+          long_term_duration_range: 1 to 1000 h
+          short_term_duration_range: 1 to 30 min
+          sample_insertion_long_term: room temperature before furnace ramp
+          short_term_insertion: placed into furnace at 1250 C
+          removal: removed at selected maximum temperature
+          removal_accuracy_s: [2, 5]
+          removal_accuracy_s_applies_to_hold_minutes:
+            - accuracy_s: 2
+              holds_min: [1, 5]
+            - accuracy_s: 5
+              holds_min: [15, 30]
+              holds_h: [1]
+          removal_accuracy_min: 5
+          removal_accuracy_min_applies_to_hold_h: 24
+          removal_accuracy_h: 1
+          removal_accuracy_h_applies_to_hold_h: [500, 1000]
+      - observation_id: christopoulou_2019_xrf_and_fused_bead_method
+        type: method
+        locator:
+          page: 8
+          section: Sample characterization
+        units: as printed
+        values:
+          quantity: xrf_sample_preparation
+          method_class: measured_direct
+          instrument: PANalytical Axios Advanced
+          specimen: fused bead
+          sample_mass_g: 1.000
+          sample_mass_as_printed: "1.000 ± 0.002 g"
+          sample_mass_uncertainty_g: 0.002
+          dilithium_tetraborate_mass_g: 10.000
+          dilithium_tetraborate_mass_as_printed: "10.000 ± 0.002 g"
+          dilithium_tetraborate_mass_uncertainty_g: 0.002
+          bead_forming: automatic bead making instrument; transparent glass disc
+          calibration: XRF calibration settings are said to be identical across samples; calibration procedure/material not specified in available text (PDF page 14).
+      - observation_id: christopoulou_2019_xrd_conditions
+        type: method
+        locator:
+          page: 8
+          section: Sample characterization
+        units: as printed
+        values:
+          quantity: xrd_measurement_conditions
+          method_class: measured_direct
+          instrument: Empyrean XRD, PANalytical
+          measurement_temperature: room temperature
+          radiation_source: Cu tube
+          tube_voltage_kV: 40
+          tube_current_mA: 40
+          two_theta_range_degrees: [5, 100]
+          two_theta_range_qualifier: normally
+          two_theta_increment_degrees: 0.013
+          counting_time_s_per_step: 70
+          counting_time_approximate: true
+          holder: reflection spinner sample holder
+          spinner_frequency_Hz: 0.25
+          powder_preparation: crushed to fine powders using mortar and pestle
+      - observation_id: christopoulou_2019_dsc_conditions_and_reference
+        type: method
+        locator:
+          page: 9
+          section: Sample characterization
+        units: as printed
+        values:
+          quantity: dsc_conditions
+          method_class: measured_direct
+          instrument: NETZSCH STA 449 F5 Jupiter
+          temperature_range: room temperature to 1400 C
+          heating_rate_range_C_per_min: [5, 40]
+          temperature_end_C: 1400
+          sample_mass_mg: 50.0
+          reference_material: alpha-Al2O3 of 99.9% purity
+          reference_mass: same mass as sample
+          reference_calcination: 1450 C for 15 h
+          cell_material: not reported
+          liner: not reported
+          sample_atmosphere: not reported
+          temperature_calibration: not reported
+          temperature_uncertainty: not reported
+      - observation_id: christopoulou_2019_activation_energy_results
+        type: thermodynamic_example
+        locator:
+          page: 15
+          section: Thermal analysis
+          figure: '13'
+          note: Kissinger activation-energy outputs are stated in prose; Figure 13 numerical coordinates are not digitized.
+        units: kJ/mol
+        values:
+          quantity: crystallization_activation_energy_by_sample
+          method_class: measured_reduced
+          relation: Kissinger equation applied to exothermic DSC peak temperatures; fitted in Origin using Fit Multi-Peaks.
+          derivation:
+            relation: Equation (1), Kissinger method
+            inputs: Exothermic DSC peak temperatures T0 at each heating rate; peak values are not tabulated and Figure 12 curves are figure-only.
+          KAS-1_Ea_kJ_per_mol: 579
+          KAS-1_uncertainty_kJ_per_mol: 8
+          KAS-2_Ea_kJ_per_mol: 473
+          KAS-2_uncertainty_kJ_per_mol: 1
+          KAS-3_Ea_kJ_per_mol: 364
+          KAS-3_uncertainty_kJ_per_mol: 1
+          KAS-4_Ea_kJ_per_mol: 360
+          KAS-4_uncertainty_kJ_per_mol: 1
+          KAS-5_Ea_kJ_per_mol: 548
+          KAS-5_uncertainty_kJ_per_mol: 1
+          KAS-1_phase: stoichiometric leucite
+          KAS-5_phase: stoichiometric kalsilite
+      - observation_id: christopoulou_2019_numeric_background_context
+        type: thermodynamic_example
+        locator:
+          page: 3
+          section: Introduction
+          note: Numeric statements about prior literature; values are attributed as printed and are not observations from this study.
+        units: degrees Celsius and hours, as printed
+        values:
+          quantity: numeric_background_context
+          method_class: quoted_attributed
+          attribution: Prior studies cited in the introduction and discussion, as identified in the individual entries.
+          compounds_congruent_melting_points_above_C: 1600
+          natural_leucite_heat_treatment_cubic_form_C: 635
+          tetragonal_leucite_below_C: 665
+          leucite_reported_transition_temperatures_C: [655, 675]
+          kalsilite_melting_temperature_above_C: 1700
+          prior_leucite_kalsilite_study_first_kalsilite_C: 800
+          prior_leucite_kalsilite_study_subsequent_leucite_C: 900
+          capobianco_orthorhombic_kalsilite_anneal_C: 1200
+          capobianco_orthorhombic_kalsilite_anneal_h: 48
+          k_beta_alumina_principal_xrd_peak_2theta_degrees_approx: 7
+          prior_xrd_lower_scan_limit_2theta_degrees: 10
+          mullite_comparator_reaction_temperature_C: 1000
+          lithium_silicate_comparator_first_phase_temperature_C: 650
+          lithium_silicate_comparator_second_reaction_temperature_C: 830
+          gregorkiewitz_six_membered_ring_types: [UUDUDD, UUUDDD]
+          gregorkiewitz_six_membered_ring_ratio: 2:1
+          raman_silicate_aluminosilicate_bands_cm_minus_1: [[525, 625], [400, 525], [900, 1200]]
+          locator_notes: "PDF page 3: >1600, 635, <665; PDF page 4: 655 and 675; PDF page 5: >1700 and six-membered rings; PDF page 11: 1200 C for 48 h; PDF page 12: 525-625, 400-525 and 900-1200 cm-1; PDF page 17: 1000 C, PDF page 17: 650 C and 830 C. Other-study values are attributed background, not measurements in this source."
+      - observation_id: christopoulou_2019_unattributed_leucite_melting_point
+        type: thermodynamic_example
+        locator:
+          page: 3
+          section: Introduction
+          note: No citation is printed with this melting temperature.
+        units: C, as printed
+        values:
+          quantity: leucite_congruent_melting_temperature
+          method_class: quoted_unattributed
+          temperature_C: 1686
+      - observation_id: christopoulou_2019_raman_measurements
+        type: characterization
+        locator:
+          page: 12
+          section: Raman spectroscopy
+          note: Authors' own prose-reported bands and modes; spectra are figure-only and are not digitized.
+        units: cm-1, as printed
+        values:
+          quantity: author_measured_raman_bands_and_modes
+          method_class: measured_direct
+          evidence_class: authors_own_measurement
+          as_annealed_glass_band_ranges: [[300, 650], [700, 1200]]
+          fired_KAS3_to_KAS5_modes: [[240, 260], [275, 325], [350, 370], [380, 400], [450, 470], [900, 950]]
+          fired_KAS3_to_KAS5_modes_locator: PDF page 13
+          fired_KAS3_to_KAS5_high_frequency_modes: [1000, 1200]
+          fired_sample_treatment: All samples fired at 1250 C for 24 h before analysis.
+          figure_data_status: Figure-only spectra; no curve coordinates reconstructed.
+      - observation_id: christopoulou_2019_raman_instrument_settings
+        type: method
+        locator:
+          page: 9
+          section: Sample characterization
+        units: as printed
+        values:
+          quantity: raman_instrument_settings
+          method_class: measured_direct
+          instrument: Thermo Scientific DXR2 microscope spectrometer
+          laser_wavelength_nm: 532
+          laser_output_power_mW: 300
+          grating_lines_per_mm: 1200
+          collection_objective_magnification: 50
+          scattered_photons_collected_by: CCD camera
+      - observation_id: christopoulou_2019_reported_numeric_methods_and_phase_results
+        type: method
+        locator:
+          page: 7
+          section: Activation energy determination by the Kissinger method
+        units: as printed
+        values:
+          quantity: reported_numeric_method_and_phase_context
+          method_class: quoted_unattributed
+          kissinger_equation_1: "ln(a/T0^2) = -Ea/(R*T0) + C; a is heating rate, T0 is exothermic peak temperature in K; slope of ln(a/T0^2) versus 1/T0 gives Ea."
+          avrami_equation_2: "n = (2.5/ΔT) * T0^2/(Ea/R); ΔT is the full width at half maximum of the exothermic peak."
+          avrami_growth_dimensions: [1, 2, 3]
+          avrami_growth_dimension_meaning: one-, two- or three-dimensional crystal entities
+          avrami_nucleation_values: [0, 1]
+          avrami_nucleation_0: instantaneous
+          avrami_nucleation_1: sporadic
+          diffusion_controlled_threshold_n_greater_than: 2.5
+          polymorphic_transformation_threshold_n_greater_than: 4
+          first_crystallization_event_for_all_samples_approximately_C: 1250
+          tetragonal_leucite_ICDD: "01-076-8737"
+          orthorhombic_kalsilite_ICDD: "00-033-0988"
+          hexagonal_kalsilite_ICDD: "00-012-0134"
+          hexagonal_potassium_aluminium_oxide_ICDD: "04-010-8954"
+          KAS1_temperature_series_hold_h: 1
+          KAS4_phases_after_1250_C_for_24_h: tetragonal leucite and orthorhombic kalsilite
+          all_raman_samples_fired_at_C: 1250
+          all_raman_samples_firing_duration_h: 24
+          attributed_hexagonal_kalsilite_Raman_bands_cm_minus_1: [[300, 400], [900, 1050]]
+          attributed_hexagonal_kalsilite_Raman_bands_reference: '[28]'
+          KAS1_kalsilite_first_formation_C: 850
+          KAS1_kalsilite_first_formation_duration_h: 1
+          equation_3_as_printed: "KAlSiO4 → 1/4 K2O + 1/4 Al2O3 + 1/2 (KAlSi2O6)"
+          equation_4_as_printed: "3/2 K2O + 11/2 Al2O3 → KAl11O17 + K2O↑"
+          equation_5_as_printed: "KAlSiO4 + SiO2 → KAlSi2O6"
+          KAS5_XRD_heat_treatment_C: 1250
+          KAS5_XRD_heat_treatment_h: 1000
+          nucleation_and_phase_evolution: "For KAS-3 to KAS-5 at 1250 C and KAS-1 at 850 C, kalsilite nucleates first; leucite and sometimes K-β-alumina develop between 24 and 500 h, accompanied by potassium evaporation."
+          abstract_heat_treatment_duration_lower_bound: 5 min
+          abstract_heat_treatment_duration_upper_bound: 1000 h
+          source_internal_duration_difference: Abstract states 5 min; section 2.1 states 1 min.
+          field_locators: "Equation 1 and Equation 2: PDF page 7; Avrami growth/nucleation criteria: PDF page 8; Raman settings and DSC event near 1250 C: PDF page 9; leucite/kalsilite ICDD cards and 1 h KAS-1 series: PDF page 10; hexagonal kalsilite/K-beta-alumina ICDD cards and KAS-4 at 24 h: PDF page 11; Raman firing duration and [28] bands: PDF page 13; KAS-1 at 850 C for 1 h: PDF page 15; Equations 3-5: PDF pages 16-17; KAS-5 at 1250 C for 1000 h: PDF page 17; 24-500 h phase evolution: PDF page 18; abstract's 5 min bound: PDF page 2."
+          numeric_statements:
+            - locator: PDF page 17
+              quote: "This is consistent with the XRD results presented in this study for KAS-5 samples heat treated at 1250°C for 1000 hours."
+            - locator: PDF page 18
+              quote: "XRF and XRD analyses for samples KAS-3 to KAS-5 at 1250°C and sample KAS-1 at 850°C demonstrated that kalsilite will nucleate first; and then between 24 and 500 hours of heat treatment the development of leucite, and in some cases potassium aluminium oxide (K-β-alumina) is accompanied by the evaporation of potassium."
+      - observation_id: christopoulou_2019_attributed_statements
+        type: characterization
+        locator:
+          page: 6
+          section: Introduction
+        units: as printed
+        values:
+          quantity: attributed_statements
+          method_class: quoted_attributed
+          statements:
+            - locator: "PDF page 6, section 1.3"
+              attribution: Zhang et al. [36]
+              quote: "Zhang et al.36 reported that the formation of kalsilite is a transitional stage that leads to crystallization of leucite."
+            - locator: "PDF page 6, section 1.3"
+              attribution: Studies [27,43]
+              quote: "Moreover, in some studies it is indicated that the prolonged heat treatment of natural or synthesized kalsilite at elevated temperatures will gradually lead to a complete conversion to leucite and this phenomenon is believed to relate to the high volatility of potassium.27,43"
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              attribution: Capobianco et al. [43]
+              quote: "Capobianco et al.43 obtained orthorhombic kalsilite by annealing natural hexagonal kalsilite at 1200°C in open Pt crucibles for 48 hours, which is not inconsistent with our results."
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              attribution: Studies [29,30,36]
+              quote: "The unstable nature of kalsilite is also described in other studies29,30,36 which show that it probably acts as a precursor of leucite."
+            - locator: "PDF page 15, section Thermal analysis"
+              attribution: Studies [59,60]
+              quote: "It is believed59,60 that if the melt and the crystal are identical in composition, the crystal growth rate is controlled by interface reactions, but if the composition of the melt differs to that of the crystal, both interdiffusion and the interface reactions can control crystal growth which may explain the lower activation energies for the KAS-2 sample and particularly for the KAS-3 and KAS-4 samples."
+            - locator: "PDF page 16, section 3.3"
+              attribution: Studies [36,37,61]
+              quote: "The three-dimensional nucleation and crystal growth mechanism for kalsilite and leucite samples has also been reported in other studies.36,37,61"
+            - locator: "PDF page 16, section 4 Discussion"
+              attribution: Literature [27,43]
+              quote: "XRD analysis has demonstrated that kalsilite is unstable at elevated temperatures (1250°C) and will transform into leucite as a function of time, as also reported in the literature.27,43"
+            - locator: "PDF page 18, section 4 Discussion"
+              attribution: Zhang et al. [36]
+              quote: "Indeed, Zhang et al.36 determined by the Kissinger method44 that the activation energy for crystallization of kalsilite is lower than that of leucite, which is consistent with the results of this work."
+            - locator: "PDF pages 18-19, section 4 Discussion"
+              attribution: Abbot [67]
+              quote: "According to Abbot67 orthorhombic kalsilite is more likely to be a metastable phase."
+            - locator: "PDF page 19, section 4 Discussion"
+              attribution: Studies [29,31,68]
+              quote: "Nucleation and growth kinetics can be altered by the addition of nucleating agents29,31,68 such as leucite nanocrystals, which lead to the elimination of kalsilite as an intermediate crystallization product, and the formation of leucite at lower temperatures."
+      - observation_id: christopoulou_2019_reported_qualifications_and_directions
+        type: characterization
+        locator:
+          page: 2
+          section: Abstract
+          note: Verbatim direction and qualification statements are carried in this context payload and the companion extraction report.
+        units: as printed
+        values:
+          quantity: directional_and_qualifying_claims
+          method_class: quoted_unattributed
+          reason: These are prose statements, not figure-derived values; absent table cells and figure-only curves are not reconstructed.
+          statements:
+            - locator: "PDF page 2, abstract"
+              quote: "Kalsilite is an unstable phase that behaves as an intermediate precursor to leucite."
+            - locator: "PDF page 2, abstract"
+              quote: "Crystalline materials in which kalsilite is the major phase lose potassium upon prolonged heat treatment (1000 hours at 1250°C), in contrast to those with leucite, in which little or no compositional alteration is detected."
+            - locator: "PDF page 2, abstract"
+              quote: "The formation of leucite from stoichiometric kalsilite is accompanied by the formation of potassium doped alumina."
+            - locator: "PDF page 2, abstract"
+              quote: "The activation energies for leucite and kalsilite crystallization, determined via application of the Kissinger equation to thermal analysis data, were 579 kJ/mol and 548 kJ/mol respectively."
+            - locator: "PDF page 2, abstract"
+              quote: "Finally, production of pure leucite can be achieved with more favourable crystallization kinetics when starting with off-stoichiometric compositions."
+            - locator: "PDF page 5, section 1.3"
+              quote: "In some studies, in which leucite was synthesized, kalsilite was detected as a non-stable reaction product that vanishes with prolonged heat treatment."
+            - locator: "PDF page 9, section 3.1"
+              quote: "For short heat treatment times (up to 24 hours), all compositions formed the primary phases expected from the K2O-Al2O3-SiO2 phase diagram, i.e. samples KAS-1 and KAS-2 formed leucite, KAS-3 and KAS-4 a mixture of leucite and kalsilite, and KAS-5 formed kalsilite."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "Crystallization of leucite occurs very rapidly, in less than 5 minutes for sample KAS-1 and less than 15 minutes for sample KAS-2."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "samples KAS-1 and KAS-2 are X-ray amorphous prior to heat treatment. After heat treatment at 1250°C for up to 1000 hours and 24 hours, respectively, they both formed only tetragonal leucite (ICDD 01-076-8737) without any phase transformation or development of second phases."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "Sample KAS-2 formed only leucite so long-term (after 24 hours) experiments were not performed."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "At 850°C kalsilite peaks are stronger compared to those of leucite, with high levels of amorphous phase remaining."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "At higher temperature (950°C) the proportion of leucite increases and kalsilite is still present, and there is little, if any, amorphous phase."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "At even more elevated temperatures (1250°C), kalsilite is not detectable and leucite is the sole crystalline phase, with no evidence of amorphous phase."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "The quantity of kalsilite decreases with increasing heat treatment times and as tetragonal leucite forms but at 1000 hours it does not appear to have reduced any further suggesting that an equilibrium has been achieved."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "The crystallization process for sample KAS-3 takes longer (< 30 minutes) than for samples KAS-1 and KAS-2."
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              quote: "The complete transition from hexagonal to orthorhombic kalsilite is accompanied by the formation of leucite after between 1 hour and 24 hours of heat treatment at 1250°C."
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              quote: "this transition being detected by XRD after about 24 hours (KAS-4) and 500 hours (KAS-5) of heat treatment (Figure 9 and Figure 10)"
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              quote: "It is unclear whether hexagonal kalsilite first transforms to orthorhombic kalsilite which then gradually transforms to leucite, or whether orthorhombic kalsilite and leucite form simultaneously."
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              quote: "Moreover, crystallization occurs rapidly, in less than 15 minutes."
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              quote: "Once again, kalsilite gradually transforms to leucite with increasing heat treatment time at 1250°C."
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              quote: "In the early stages of crystallization (< 24 hours) for sample KAS-5 hexagonal kalsilite forms, which then transforms into orthorhombic kalsilite with simultaneous formation of tetragonal leucite and hexagonal potassium aluminium oxide."
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              quote: "Even for sample KAS-5, which has the kalsilite stoichiometry, a small amount of leucite forms after prolonged heat treatment."
+            - locator: "PDF page 12, section Raman spectroscopy"
+              quote: "The gradual shift to lower Raman shifts of the overall peak position and profile, on moving from sample KAS-1 to KAS-5, is fully consistent with the increasing network modifier oxide (K2O) through this series, confirming increasing depolymerisation of the aluminosilicate network from sample KAS-1 to KAS-5."
+            - locator: "PDF page 12, section Raman spectroscopy"
+              quote: "The large width of these bands confirms the high presence of amorphous phase in the examined materials, and also a distribution of Q-species consistent with a depolymerised tetrahedral amorphous network."
+            - locator: "PDF page 12, section Raman spectroscopy"
+              quote: "A peak around 1020 cm-1 which is present in the spectra for samples KAS-4 and KAS-5, and which is more prominent in the spectrum for sample KAS-3 is attributed to impurities in the materials and, more specifically, residual or reaction product carbonate."
+            - locator: "PDF page 13, section Raman spectroscopy"
+              quote: "Oxide glasses with high K2O contents have the tendency to react with the atmosphere and form K2CO3."
+            - locator: "PDF page 13, section Raman spectroscopy"
+              quote: "The authors were unable to find any existing literature data regarding the Raman spectrum of orthorhombic kalsilite."
+            - locator: "PDF page 13, section Raman spectroscopy"
+              quote: "The Raman spectrum of sample KAS-5 is not the same as that of hexagonal kalsilite."
+            - locator: "PDF page 13, section Raman spectroscopy"
+              quote: "The observed modes in the ranges of ca. 240-260 cm-1, 275-325 cm-1, 350-370 cm-1, 380-400 cm-1, 450-470 cm-1 and 900-950 cm-1 for samples KAS-3, KAS-4 and KAS-5 cannot be fully identified, however, some or all of them may be attributable to orthorhombic kalsilite."
+            - locator: "PDF page 13, section Raman spectroscopy"
+              quote: "The presence of high frequency modes at 1000-1200 cm-1 could be related to residual aluminosilicate glass and could also be evidence of small amounts of residual silica in these samples."
+            - locator: "PDF page 13, section Chemical characterization"
+              quote: "in samples KAS-1 and KAS-2, which have compositions in the leucite phase field (SiO2-rich), no potassium loss was observed after heat treatment at 1250°C."
+            - locator: "PDF page 13, section Chemical characterization"
+              quote: "potassium loss was significantly lower (1.5 wt%) compared to the samples (KAS-4 and KAS-5) with compositions closer to the stoichiometry of kalsilite (2.7-3.6 wt%) for the same heat treatment conditions."
+            - locator: "PDF page 14, section Chemical characterization"
+              quote: "in the case of potassium loss it is unclear in which chemical form the potassium is volatilised or evolved."
+            - locator: "PDF page 14, section Thermal analysis"
+              quote: "moving from the leucite phase field glass samples KAS-1 to KAS-3, the first crystallization exotherm moves to higher temperatures. This is contrary to the kalsilite phase field glasses, KAS-4 and KAS-5, for which it moves to lower temperatures."
+            - locator: "PDF page 14, section Thermal analysis"
+              quote: "The exotherm of sample KAS-1 at a heating rate 5°C/min was extremely weak so it was not included in the results presented here."
+            - locator: "PDF page 14, section Thermal analysis"
+              quote: "For these three samples, a strong anomaly is observed just before the first crystallization event, which may relate to an endothermic event, probably a rearrangement of the structure of the amorphous phase."
+            - locator: "PDF page 14, section Thermal analysis"
+              quote: "The main exothermic peak for samples KAS-1, KAS-2 and KAS-3 relates to the development of leucite."
+            - locator: "PDF page 14, section Thermal analysis"
+              quote: "all of the exothermic peaks increase in intensity, become broader and shift to higher temperatures with increasing heating rate."
+            - locator: "PDF pages 14-15, section Thermal analysis"
+              quote: "The peaks become wider because at higher heating rates the spatial gradient of temperature in the sample will increase. At a higher Φ, the reaction in the sample requires less time."
+            - locator: "PDF page 15, section Thermal analysis"
+              quote: "DSC results (Figure 12f) show only one crystallization event for these materials as the formation of a second phase is both temperature- and time-dependent."
+            - locator: "PDF page 15, section Thermal analysis"
+              quote: "The calculated activation energy of crystallization varies considerably for the different samples."
+            - locator: "PDF page 15, section Thermal analysis"
+              quote: "According to XRD data, when samples KAS-3, KAS-4 and KAS-5 were heat treated at 1250°C the formation of the primary crystallization phase occurs rapidly and then a second phase appears at longer heat treatment times."
+            - locator: "PDF page 15, section Thermal analysis"
+              quote: "For the glass samples with intermediate compositions, the activation energies are much lower, as shown in Figure 13, with the lowest activation energies (samples KAS-3 and KAS-4, 364 and 360 kJ/mol) determined for the samples which are compositionally furthest away from the stoichiometric compounds."
+            - locator: "PDF page 16, section 3.3"
+              quote: "The combined average shape factor (Avrami constant) was similar, as depicted in Table 5, for all sample data, which indicates that the crystal formation process for all samples is three-dimensional growth and nucleation which follows the diffusion-controlled mechanism with increasing nucleation rate."
+            - locator: "PDF page 16, section 4 Discussion"
+              quote: "Then, after prolonged heat treatment – with the exact time varying depending on composition – kalsilite transforms to leucite with an accompanying loss of potassium as measured by XRF."
+            - locator: "PDF page 17, section 4 Discussion"
+              quote: "Again, it is not confirmed in which chemical form the potassium volatilises, but we have depicted it here as K2O."
+            - locator: "PDF page 17, section 4 Discussion"
+              quote: "The formation of this K-β-alumina is related to the starting composition and the excess of alumina in the system and is not observed when leucite is formed from its stoichiometric mixtures."
+            - locator: "PDF page 17, section 4 Discussion"
+              quote: "The formation of K-β-alumina, as described in Eq. 4, requires significantly more alumina than potassium oxide; thus if this excess of alumina is not present, the ejected potassium may evaporate without K-β-alumina forming, as occurs in the case of sample KAS-4 sample, where even though the potassium loss is higher than for sample KAS-5, K-β-alumina is not formed."
+            - locator: "PDF page 18, section 4 Discussion"
+              quote: "XRD results do not indicate the presence of residual silica in the KAS-3 to KAS-5 samples which is important for the second mechanism, however, Raman spectroscopy has indicated the presence of some retained silicate glass for samples KAS-3, KAS-4 and KAS-5."
+            - locator: "PDF page 18, section 4 Discussion"
+              quote: "The second transformation mechanism is also possible in the case of sample KAS-1 (leucite composition) where at lower temperatures kalsilite is initially formed."
+            - locator: "PDF page 18, section 4 Discussion"
+              quote: "The starting glass compositions are potassium-deficient compared to kalsilite, which may explain why there is no loss of potassium in this case."
+            - locator: "PDF page 18, section 4 Discussion"
+              quote: "XRD results suggest that these reactions will continue until all kalsilite transforms to leucite at elevated temperatures."
+            - locator: "PDF page 19, section 4 Discussion"
+              quote: "the formation of leucite is possible with any starting composition along the leucite-kalsilite tie-line; especially here for sample KAS-2 with leucite as the sole crystalline phase, the activation energy is significantly lower (by 100 kJ/mol) compared with sample KAS-1."
+            - locator: "PDF page 19, Conclusions"
+              quote: "Samples in which kalsilite is the main phase lose potassium after prolonged heat treatment (1000 hours) as opposed to samples in which leucite is the major phase formed at 1250°C, in which no compositional alteration was detected with time or temperature."
+            - locator: "PDF page 19, Conclusions"
+              quote: "Leucite begins to develop from kalsilite either with increasing temperature for samples close to leucite stoichiometry or with increasing time at 1250°C for the samples close to kalsilite stoichiometry."
+            - locator: "PDF page 19, Conclusions"
+              quote: "Taking into consideration the results of this study, in combination with literature, it seems more likely that the second mechanism is taking place during this phase transformation."
+            - locator: "PDF page 9, section 3.1"
+              quote: "the selected heat treatment temperature of 1250°C is below the liquidus temperature for all compositions studied, hence all compositions were expected to crystallise."
+            - locator: "PDF page 9, section 3.1"
+              quote: "Prolonged heat treatment altered the phases present in some of the samples as discussed below."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "This suggests that leucite is a stable crystalline phase in terms of time at 1250°C."
+            - locator: "PDF page 10, section X-ray powder diffraction"
+              quote: "orthorhombic potassium aluminium silicate, kalsilite51, (ICDD 00-033-0988) and tetragonal leucite peaks form simultaneously, as suggested by the phase diagram wherein the composition of KAS-3 lies on a phase field boundary."
+            - locator: "PDF page 11, section X-ray powder diffraction"
+              quote: "For sample KAS-4, Figure 9 illustrates that at the beginning of crystallization most of the diffraction peaks are matched by hexagonal kalsilite."
+            - locator: "PDF page 12, section Raman spectroscopy"
+              quote: "It is important to stress that our study confirms that during the transformation of kalsilite to leucite, K-β-alumina is also formed. To our knowledge this has not been previously reported, and its formation may modify the properties of the products produced via the kalsite-to-leucite conversion."
+            - locator: "PDF page 12, section Raman spectroscopy"
+              quote: "In the aforementioned studies where this phase transformation was examined, reported XRD data started from 10° 2θ, which may explain why K-β-alumina has not previously been associated with the kalsilite-leucite phase transition."
+            - locator: "PDF page 13, section Raman spectroscopy"
+              quote: "Figure 11b shows Raman spectra demonstrating the effects of heat treatment on glass samples which exhibit stronger, sharper Raman bands consistent with the existence of crystalline phases."
+            - locator: "PDF page 13, section Raman spectroscopy"
+              quote: "Samples KAS-1 and KAS-2 produce Raman spectra corresponding to tetragonal leucite57. As confirmed by XRD, samples KAS-3 and KAS-4 form orthorhombic kalsilite whilst sample KAS-5 forms hexagonal kalsilite."
+            - locator: "PDF page 14, section Chemical characterization"
+              quote: "These results suggest that chemical stability is strongly connected with the starting composition and hence the amount of kalsilite formed at 1250°C, since apart from the starting chemical composition all of the remaining experimental conditions (electric furnace, temperature and heat treatment duration) and the analysis settings (XRF calibration and fused bead sample making) were identical for all the samples under investigation."
+            - locator: "PDF page 14, section Chemical characterization"
+              quote: "even though the XRF results are presented as oxides"
+            - locator: "PDF page 14, section Thermal analysis"
+              quote: "As depicted in Figure 12, DSC curves show one strong exothermic peak related to the main crystallization event."
+            - locator: "PDF page 15, section Thermal analysis"
+              quote: "then increasing again to 548±1 kJ/mol for sample KAS-5 (stoichiometric kalsilite), indicating that the formation of kalsilite is kinetically favoured."
+            - locator: "PDF pages 16-17, section 4 Discussion"
+              quote: "This mechanism shows that after prolonged heat treatment, kalsilite will completely transform to leucite, particularly in the case of stoichiometric kalsilite. In this case some of the ejected potassium will react with alumina to form K-β-alumina, and the remainder will evaporate, according to Eq. 4."
+            - locator: "PDF page 17, section 4 Discussion"
+              quote: "The formation of potassium aluminium oxide, or K-β-alumina, has been confirmed by XRD for KAS-5 samples when heat treated at 1250°C and seems to be more applicable only for the samples that are stoichiometrically close to kalsilite."
+            - locator: "PDF page 18, section 4 Discussion"
+              quote: "Kalsilite will transform to leucite by reacting with SiO2 from the amorphous phase. This reaction will create in the system an excess amount of potassium and aluminium. In addition, some of the potassium will react with the remaining aluminium forming potassium aluminium oxide (K-β-alumina) and the rest will evaporate as described in Eq.4."
+            - locator: "PDF page 18, section 4 Discussion"
+              quote: "XRF (Table 4) reveals that sample KAS-1 will not have any elemental alteration as a function of heat treatment time."
+            - locator: "PDF page 19, Conclusions"
+              quote: "Heat treatment of glasses in the ternary K2O-Al2O3-SiO2 system has revealed that kalsilite is an unstable phase at 1250°C and that it behaves as an intermediate precursor of leucite."
+            - locator: "PDF page 19, Conclusions"
+              quote: "For both mechanisms, in the case of the stoichiometric kalsilite sample (KAS-5) the excess potassium evaporates, and some reacts with the additional aluminium oxide existing in the system (KAS-5) to form KAl11O17 (K-β-alumina)."
+      - observation_id: christopoulou_2019_figures_without_numeric_values
+        type: characterization
+        locator:
+          page: 9
+          figure: '5-13'
+          note: Figure panels are not present in the supplied accepted manuscript; references and prose descriptions remain.
+        units: as printed
+        values:
+          quantity: figure_only_results
+          method_class: figure_only
+          figures: Figures 1-13 are cited in the text; their figure panels/curves are not present in the supplied PDF.
+          figure_1_to_3: Leucite and kalsilite structure illustrations cited on PDF pages 3-5; panels absent.
+          figure_4: Composition diagram cited for the five starting glass compositions on PDF page 6; plot absent.
+          figure_5_to_10: XRD patterns cited for crystallization and phase evolution on PDF pages 10-11; plot panels absent.
+          figure_11: Raman spectra cited on PDF pages 12-13; spectra absent.
+          figure_12: DSC traces cited on PDF page 14; traces absent.
+          figure_13: Activation-energy plot cited on PDF page 15; plotted data absent.

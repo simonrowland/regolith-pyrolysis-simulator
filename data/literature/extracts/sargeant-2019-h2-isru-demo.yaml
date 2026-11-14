@@ -1,0 +1,3129 @@
+schema_version: literature_extract.v1
+source_id: sargeant-2019-h2-isru-demo
+source:
+  citation: 'Sargeant, H. M., Abernethy, F. A. J., Barber, S. J., Wright, I. P., Anand, M., Sheridan, S., and Morse, A. (2019),
+    “Hydrogen reduction of ilmenite: Towards an in situ resource utilization demonstration on the surface of the Moon,” Planetary
+    and Space Science, PSS 104751 (Journal Pre-proof; received 30 April 2019, revised 11 September 2019, accepted 18 September
+    2019).'
+  doi: 10.1016/j.pss.2019.104751
+  url: https://doi.org/10.1016/j.pss.2019.104751
+  year: 2019
+  version: Journal Pre-proof (accepted manuscript with Elsevier cover page); not the version of record
+  corpus_asset: raw/sargeant-2019-h2-isru-demo/sargeant-2019-h2-isru-demo.pdf
+  corpus_sha256: e3ce5a652fa7d73fc70b96fff89392cfde015e4ec66a23515684eacc0faf1768
+extraction:
+  method: Native PDF text layer (pdftotext -layout) used to locate content; Tables 1-3 transcribed and every cell checked
+    against 170 dpi page renders; key prose numbers checked against page images. Figures not digitized. Locators use PDF page
+    and manuscript line numbers because the pre-proof has no journal pagination.
+  date: '2026-10-05'
+  worker: s37b3-backlog37
+  corpus_tables: tables/sargeant-2019-h2-isru-demo/
+review_status: draft
+fidelity_samples:
+- species: FeTiO3
+  observation_id: sargeant_2019_table2_1100C
+  field: total_water_produced_uL
+  value:
+    value: 2.24
+    uncertainty: 0.09
+  locator:
+    page: 18
+    table: '2'
+    note: 1100 ± 5 row, Total calculated water produced (µl) 2.24±0.09
+- species: FeTiO3
+  observation_id: sargeant_2019_table3_118mbar
+  field: water_production_rate_uL_per_h
+  value:
+    0-1 h:
+      value: 0.54
+      uncertainty: 0.08
+    1-2 h:
+      value: 0.28
+      uncertainty: 0.07
+    2-3 h:
+      value: 0.21
+      uncertainty: 0.07
+    3-4 h:
+      value: 0.15
+      uncertainty: 0.07
+  locator:
+    page: 25
+    table: '3'
+    note: 0.28:1.00 / 118±1 mbar row hourly rates
+- species: FeTiO3
+  observation_id: sargeant_2019_h2_series_yield_and_discrepancy
+  field: yield_1000C_418mbar_wt_pct_O2
+  value:
+    value: 3.51
+    uncertainty: 0.17
+  locator:
+    page: 26
+    line_range: 387-388
+    note: 3.51±0.17 wt.% oxygen at 1000°C and 418 mbar
+- species: FeTiO3
+  observation_id: sargeant_2019_table1_operational_conditions
+  field: stages
+  value:
+    bake_out:
+      operational_volume_m3: 4.73E-05±1.93E-07
+      cold_finger_C: -80
+      furnace_C: 500
+      heated_box_C: 120
+      external_manifold_C: 100
+    H2_addition:
+      operational_volume_m3: 1.19E-05±9.93E-08
+      cold_finger_C: -80
+      furnace_C: 500
+      heated_box_C: 120
+      external_manifold_C: 100
+    reduction_reaction:
+      operational_volume_m3: 2.19E-05±1.49E-07
+      cold_finger_C: -80
+      furnace_C: Reaction temperature
+      heated_box_C: 120
+      external_manifold_C: 100
+    water_release:
+      operational_volume_m3: 2.19E-05±1.49E-07
+      cold_finger_C: 120
+      furnace_C: 120
+      heated_box_C: 120
+      external_manifold_C: 100
+  locator:
+    page: 11
+    table: '1'
+    note: All Table 1 cells
+benches:
+- id: isru-bdm-static-h2-reduction
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: 'ISRU breadboard model (ISRU-BDM) of ProSPA: static (non-flowing) hydrogen reduction with a cold finger to trap
+        product water, pressure monitoring, and a quadrupole mass spectrometer'
+    locator:
+      page: 6
+      pdf_page_index: 5
+      line_range: 96-103
+      section: 1 Introduction / 2 Materials and Methods
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Ceramic sample tube, 200 mm long, 4 mm ID, inside a compact furnace with a ceramic chamber; tube sealed onto
+        the system at valve 7 with an O-ring tube fitting
+    locator:
+      page: 8
+      pdf_page_index: 7
+      line_range: 116-122
+      section: 2.1 System Design
+      note: O-ring fitting at valve 7 is on PDF p. 10, lines 142-143.
+  heating_method:
+    state:
+      tag: value
+      value: Compact furnace using a ceramic chamber with embedded resistance wires, samples heated up to 1100°C; all high-temperature
+        components inside a vermiculite heated box held at ~120°C by two 2 kW oven heating elements; outer manifold heated
+        to 100°C with resistance heating wire
+    locator:
+      page: 8
+      pdf_page_index: 7
+      line_range: 111-129
+      section: 2.1 System Design
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: K-type thermocouple located within the furnace
+      locator:
+        page: 8
+        pdf_page_index: 7
+        line_range: 117-121
+        section: 2.1 System Design
+        note: The thermocouple experienced multiple failures above 1000°C, which can shut the furnace down early and lower
+          yields; it was closely monitored in this study.
+  temperature_calibration:
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        pdf_page_index: 16
+        line_range: 259-261
+        section: 3.1.2 Reaction Pressures
+        note: Only a ±5°C manifold-temperature uncertainty (variation in the heated box) is printed; no furnace thermocouple
+          calibration is printed.
+  gauges:
+    pressure_sensor:
+      state:
+        tag: value
+        value: High temperature Kulite diaphragm pressure sensor monitoring system gas pressure (read every minute during
+          the reaction)
+      locator:
+        page: 8
+        pdf_page_index: 7
+        line_range: 115-116
+        section: 2.1 System Design
+        note: Reading interval (every minute) on PDF p. 10, line 161.
+  detector:
+    state:
+      tag: value
+      value: Hiden HPR-20 quadrupole mass spectrometer on the outer manifold via a crimped stainless steel capillary inlet;
+        scans m/z 1-50
+    locator:
+      page: 8
+      pdf_page_index: 7
+      line_range: 123-127
+      section: 2.1 System Design
+      note: m/z 1-50 scan on PDF p. 12, line 176.
+  other_facts:
+  - name: heated_box_frame_dimensions
+    unit: cm
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 100x65x75
+      locator:
+        page: 7
+        pdf_page_index: 6
+        line_range: '111'
+        section: 2.1 System Design
+  - name: sample_tube_length
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '200'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        line_range: '122'
+        section: 2.1 System Design
+  - name: sample_tube_inner_diameter
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        line_range: '122'
+        section: 2.1 System Design
+  - name: fittings_inner_diameter
+    unit: inch
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 1/4 (Swagelok VCR)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        line_range: '112'
+        section: 2.1 System Design
+  - name: actuator_valve_max_temperature
+    unit: °C
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '315'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        line_range: 113-114
+        section: 2.1 System Design
+        note: Printed 'High temperature (up to 315°C) Swagelok actuator valves with stainless steel spherical tips'.
+  - name: pressure_value_uncertainty
+    unit: mbar
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6.2'
+      locator:
+        page: 17
+        pdf_page_index: 16
+        line_range: 259-265
+        section: 3.1.2 Reaction Pressures
+        note: ±6.2 mbar; standard deviation of pressures from repeat 1000°C experiments.
+  - name: manifold_temperature_uncertainty
+    unit: °C
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator:
+        page: 17
+        pdf_page_index: 16
+        line_range: 259-262
+        section: 3.1.2 Reaction Pressures
+        note: ±5°C; variation of manifold temperature in the heated box.
+  - name: prospecting_payload_mass
+    unit: kg
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: true
+      locator:
+        page: 5
+        pdf_page_index: 4
+        line_range: 74-75
+        section: 1 Introduction
+        note: Printed as ~10 kg for small prospecting instruments.
+  - name: prospa_mass_budget
+    unit: kg
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        line_range: 78-82
+        section: 1 Introduction
+        note: ProSPA mass budget limited to 10 kg.
+  - name: luna_27_mission_year
+    unit: year
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2025'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        line_range: 78-80
+        section: 1 Introduction
+experiments:
+- experiment_id: isru-bdm-temperature-850C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id001
+    page: 17
+    pdf_page_index: 16
+    line_range: 266-271
+    table: '2'
+    source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+    row: 850 ± 5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1123.15'
+      locator:
+        page: 17
+        pdf_page_index: 16
+        line_range: 266-271
+        table: '2'
+        source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+        row: 850 ± 5
+        note: Reaction temperature 850°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '42000'
+          interval_high: '47000'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        line_range: 223-227
+        section: 3.1 Temperature Studies
+        note: 'Initial H2 fill: planned 420 mbar (0.3 mmol H2), but the fill can overshoot by as much as 50 mbar (an extra
+          0.036 mmol), so 420-470 mbar; Table 2 caption says ~420 mbar. Closed static system, so pressure falls during the
+          run. 1 mbar = 100 Pa.'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1123.15'
+        locator:
+          page: 17
+          pdf_page_index: 16
+          line_range: 266-271
+          table: '2'
+          source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+          row: 850 ± 5
+          note: 850°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-temperature-900C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id002
+    page: 17
+    pdf_page_index: 16
+    line_range: 266-271
+    table: '2'
+    source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+    row: 900 ± 5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1173.15'
+      locator:
+        page: 17
+        pdf_page_index: 16
+        line_range: 266-271
+        table: '2'
+        source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+        row: 900 ± 5
+        note: Reaction temperature 900°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '42000'
+          interval_high: '47000'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        line_range: 223-227
+        section: 3.1 Temperature Studies
+        note: 'Initial H2 fill: planned 420 mbar (0.3 mmol H2), but the fill can overshoot by as much as 50 mbar (an extra
+          0.036 mmol), so 420-470 mbar; Table 2 caption says ~420 mbar. Closed static system, so pressure falls during the
+          run. 1 mbar = 100 Pa.'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+        locator:
+          page: 17
+          pdf_page_index: 16
+          line_range: 266-271
+          table: '2'
+          source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+          row: 900 ± 5
+          note: 900°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-temperature-950C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id003
+    page: 17
+    pdf_page_index: 16
+    line_range: 266-271
+    table: '2'
+    source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+    row: 950 ± 5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1223.15'
+      locator:
+        page: 17
+        pdf_page_index: 16
+        line_range: 266-271
+        table: '2'
+        source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+        row: 950 ± 5
+        note: Reaction temperature 950°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '42000'
+          interval_high: '47000'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        line_range: 223-227
+        section: 3.1 Temperature Studies
+        note: 'Initial H2 fill: planned 420 mbar (0.3 mmol H2), but the fill can overshoot by as much as 50 mbar (an extra
+          0.036 mmol), so 420-470 mbar; Table 2 caption says ~420 mbar. Closed static system, so pressure falls during the
+          run. 1 mbar = 100 Pa.'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1223.15'
+        locator:
+          page: 17
+          pdf_page_index: 16
+          line_range: 266-271
+          table: '2'
+          source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+          row: 950 ± 5
+          note: 950°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-temperature-1000C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id004
+    page: 17
+    pdf_page_index: 16
+    line_range: 266-271
+    table: '2'
+    source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+    row: 1000 ± 5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+      locator:
+        page: 17
+        pdf_page_index: 16
+        line_range: 266-271
+        table: '2'
+        source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+        row: 1000 ± 5
+        note: Reaction temperature 1000°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '42000'
+          interval_high: '47000'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        line_range: 223-227
+        section: 3.1 Temperature Studies
+        note: 'Initial H2 fill: planned 420 mbar (0.3 mmol H2), but the fill can overshoot by as much as 50 mbar (an extra
+          0.036 mmol), so 420-470 mbar; Table 2 caption says ~420 mbar. Closed static system, so pressure falls during the
+          run. 1 mbar = 100 Pa.'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1273.15'
+        locator:
+          page: 17
+          pdf_page_index: 16
+          line_range: 266-271
+          table: '2'
+          source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+          row: 1000 ± 5
+          note: 1000°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-temperature-1050C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id005
+    page: 17
+    pdf_page_index: 16
+    line_range: 266-271
+    table: '2'
+    source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+    row: 1050 ± 5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1323.15'
+      locator:
+        page: 17
+        pdf_page_index: 16
+        line_range: 266-271
+        table: '2'
+        source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+        row: 1050 ± 5
+        note: Reaction temperature 1050°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '42000'
+          interval_high: '47000'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        line_range: 223-227
+        section: 3.1 Temperature Studies
+        note: 'Initial H2 fill: planned 420 mbar (0.3 mmol H2), but the fill can overshoot by as much as 50 mbar (an extra
+          0.036 mmol), so 420-470 mbar; Table 2 caption says ~420 mbar. Closed static system, so pressure falls during the
+          run. 1 mbar = 100 Pa.'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1323.15'
+        locator:
+          page: 17
+          pdf_page_index: 16
+          line_range: 266-271
+          table: '2'
+          source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+          row: 1050 ± 5
+          note: 1050°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-temperature-1100C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id006
+    page: 18
+    pdf_page_index: 17
+    line_range: 266-271
+    table: '2'
+    source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+    row: 1100 ± 5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1373.15'
+      locator:
+        page: 18
+        pdf_page_index: 17
+        line_range: 266-271
+        table: '2'
+        source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+        row: 1100 ± 5
+        note: Reaction temperature 1100°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '42000'
+          interval_high: '47000'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        line_range: 223-227
+        section: 3.1 Temperature Studies
+        note: 'Initial H2 fill: planned 420 mbar (0.3 mmol H2), but the fill can overshoot by as much as 50 mbar (an extra
+          0.036 mmol), so 420-470 mbar; Table 2 caption says ~420 mbar. Closed static system, so pressure falls during the
+          run. 1 mbar = 100 Pa.'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1373.15'
+        locator:
+          page: 18
+          pdf_page_index: 17
+          line_range: 266-271
+          table: '2'
+          source_path: tables/sargeant-2019-h2-isru-demo/t2.csv
+          row: 1100 ± 5
+          note: 1100°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-h2-118mbar-1000C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id007
+    page: 25
+    pdf_page_index: 24
+    line_range: 373-377
+    table: '3'
+    source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+    row: 0.28:1.00
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 0.28:1.00
+        note: Reaction temperature 1000°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '11800'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 0.28:1.00
+        note: Initial H2 pressure 118±1 mbar (Table 3), calculated for a manifold temperature of 120°C (lines 336-337); unit
+          conversion only (1 mbar = 100 Pa). Closed static system, so pressure falls during the run.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1273.15'
+        locator:
+          page: 25
+          pdf_page_index: 24
+          line_range: 373-377
+          table: '3'
+          source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+          row: 0.28:1.00
+          note: 1000°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-h2-210mbar-1000C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id008
+    page: 25
+    pdf_page_index: 24
+    line_range: 373-377
+    table: '3'
+    source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+    row: 0.50:1.00
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 0.50:1.00
+        note: Reaction temperature 1000°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '21000'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 0.50:1.00
+        note: Initial H2 pressure 210±1 mbar (Table 3), calculated for a manifold temperature of 120°C (lines 336-337); unit
+          conversion only (1 mbar = 100 Pa). Closed static system, so pressure falls during the run.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1273.15'
+        locator:
+          page: 25
+          pdf_page_index: 24
+          line_range: 373-377
+          table: '3'
+          source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+          row: 0.50:1.00
+          note: 1000°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-h2-345mbar-1000C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id009
+    page: 25
+    pdf_page_index: 24
+    line_range: 373-377
+    table: '3'
+    source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+    row: 0.83:1.00
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 0.83:1.00
+        note: Reaction temperature 1000°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '34500'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 0.83:1.00
+        note: Initial H2 pressure 345±1 mbar (Table 3), calculated for a manifold temperature of 120°C (lines 336-337); unit
+          conversion only (1 mbar = 100 Pa). Closed static system, so pressure falls during the run.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1273.15'
+        locator:
+          page: 25
+          pdf_page_index: 24
+          line_range: 373-377
+          table: '3'
+          source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+          row: 0.83:1.00
+          note: 1000°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-h2-418mbar-1000C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id010
+    page: 25
+    pdf_page_index: 24
+    line_range: 373-377
+    table: '3'
+    source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+    row: 0.99:1.00
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 0.99:1.00
+        note: Reaction temperature 1000°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '41800'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 0.99:1.00
+        note: Initial H2 pressure 418±1 mbar (Table 3), calculated for a manifold temperature of 120°C (lines 336-337); unit
+          conversion only (1 mbar = 100 Pa). Closed static system, so pressure falls during the run.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1273.15'
+        locator:
+          page: 25
+          pdf_page_index: 24
+          line_range: 373-377
+          table: '3'
+          source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+          row: 0.99:1.00
+          note: 1000°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+- experiment_id: isru-bdm-h2-584mbar-1000C
+  bench_id: isru-bdm-static-h2-reduction
+  method:
+    tag: unknown
+    reason: 'Static/non-flowing hydrogen reduction is stated, but no matching token exists in the closed method vocabulary.'
+  locator: &id011
+    page: 25
+    pdf_page_index: 24
+    line_range: 373-377
+    table: '3'
+    source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+    row: 1.38:1.0
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000045'
+          approximate: true
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 142-144
+        section: 2.2 Experimental Procedure
+        note: Printed ~45 mg (0.3 mmol, line 338); unit conversion only. Sample-mass uncertainty ±0.5 mg is printed on PDF
+          p. 19, line 293.
+    form:
+      state:
+        tag: value
+        value: Terrestrial ilmenite (FeTiO3), ~95% pure, average particle diameter ~170 µm (Sargeant et al., 2019a)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 141-142
+        section: 2.2 Experimental Procedure
+        note: Terrestrial origin stated on PDF p. 31, line 473; supplied by Dr Aiden Cowley (acknowledgements).
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-477
+        section: 4 Discussion
+        note: 'Only general statements quoted from Deer et al. (1992): terrestrial ilmenite ~6% Fe3+ and ~2% Mg. No assay
+          of this sample is printed.'
+    pretreatment:
+      state:
+        tag: value
+        value: 1 hour bake-out with the furnace at 500°C, open to the vacuum pump, to remove volatiles
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-151
+        section: 2.2 Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 1.38:1.0
+        note: Reaction temperature 1000°C (±5°C as printed for this series); unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '58400'
+      locator:
+        page: 25
+        pdf_page_index: 24
+        line_range: 373-377
+        table: '3'
+        source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+        row: 1.38:1.0
+        note: Initial H2 pressure 584±1 mbar (Table 3), calculated for a manifold temperature of 120°C (lines 336-337); unit
+          conversion only (1 mbar = 100 Pa). Closed static system, so pressure falls during the run.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: not_applicable
+            reason: not_applicable
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 155-161
+        section: 2.2 Experimental Procedure
+        note: 'Static (non-flowing) closed system: hydrogen fills the defined volume to the required pressure, then the system
+          is closed. No flow. The H2 partial-pressure history is not printed as a value; the initial fill is under total_pressure_Pa.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 149-151
+          section: 2.2 Experimental Procedure
+          note: Bake-out is open to the vacuum pump; no base pressure is printed.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Bake-out 1 h at 500°C open to vacuum (cold finger isolated at -80°C); furnace isolated and set to reaction
+          temperature; H2 added; furnace and cold finger opened to the system; 4 h reaction; system evacuated; furnace cooled
+          2 h to 120°C; cold finger heated to 120°C to release water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 149-165
+        section: 2.2 Experimental Procedure
+        note: Stage durations are printed (1 h bake-out, 4 h reaction, 2 h cooling) but the H2-addition and release durations
+          are not, so no total is assigned.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1273.15'
+        locator:
+          page: 25
+          pdf_page_index: 24
+          line_range: 373-377
+          table: '3'
+          source_path: tables/sargeant-2019-h2-isru-demo/t3.csv
+          row: 1.38:1.0
+          note: 1000°C reaction temperature; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14400'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          line_range: 161-163
+          section: 2.2 Experimental Procedure
+          note: Samples left to react for 4 hours; unit conversion only.
+species:
+  FeTiO3:
+    observations: []
+    context:
+    - observation_id: sargeant_2019_table1_operational_conditions
+      type: laboratory_conditions
+      locator:
+        page: 11
+        pdf_page_index: 10
+        line_range: 162-166
+        table: '1'
+        source_path: tables/sargeant-2019-h2-isru-demo/t1.csv
+      units: m3; °C as printed
+      values:
+        quantity: isru_bdm_stage_conditions
+        method_class: controlled_laboratory_condition
+        stages:
+          bake_out:
+            operational_volume_m3: 4.73E-05±1.93E-07
+            cold_finger_C: -80
+            furnace_C: 500
+            heated_box_C: 120
+            external_manifold_C: 100
+          H2_addition:
+            operational_volume_m3: 1.19E-05±9.93E-08
+            cold_finger_C: -80
+            furnace_C: 500
+            heated_box_C: 120
+            external_manifold_C: 100
+          reduction_reaction:
+            operational_volume_m3: 2.19E-05±1.49E-07
+            cold_finger_C: -80
+            furnace_C: Reaction temperature
+            heated_box_C: 120
+            external_manifold_C: 100
+          water_release:
+            operational_volume_m3: 2.19E-05±1.49E-07
+            cold_finger_C: 120
+            furnace_C: 120
+            heated_box_C: 120
+            external_manifold_C: 100
+        note: Volumes kept as printed strings (value±uncertainty). V and T from Table 1 enter Eqn. 2 (n = pV/RT).
+    - observation_id: sargeant_2019_table2_850C
+      type: experiment_run_result
+      experiment: isru-bdm-temperature-850C
+      locator: *id001
+      units: °C; µl hr-1; mbar; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: temperature study, ~420 mbar initial H2, ~45 mg ilmenite, 4 h
+        reaction_temperature_C:
+          value: 850
+          uncertainty: 5
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.31
+            uncertainty: 0.07
+          1-2 h:
+            value: 0.29
+            uncertainty: 0.07
+          2-3 h:
+            value: 0.3
+            uncertainty: 0.07
+          3-4 h:
+            value: 0.3
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 90
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 60
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.08
+          uncertainty: 0.08
+        totals_basis: Water release phase (cold-finger sublimation) pressure rise, kT-corrected and blank-subtracted
+    - observation_id: sargeant_2019_table2_900C
+      type: experiment_run_result
+      experiment: isru-bdm-temperature-900C
+      locator: *id002
+      units: °C; µl hr-1; mbar; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: temperature study, ~420 mbar initial H2, ~45 mg ilmenite, 4 h
+        reaction_temperature_C:
+          value: 900
+          uncertainty: 5
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.37
+            uncertainty: 0.07
+          1-2 h:
+            value: 0.32
+            uncertainty: 0.07
+          2-3 h:
+            value: 0.32
+            uncertainty: 0.07
+          3-4 h:
+            value: 0.33
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 101
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 68
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.22
+          uncertainty: 0.08
+        totals_basis: Water release phase (cold-finger sublimation) pressure rise, kT-corrected and blank-subtracted
+    - observation_id: sargeant_2019_table2_950C
+      type: experiment_run_result
+      experiment: isru-bdm-temperature-950C
+      locator: *id003
+      units: °C; µl hr-1; mbar; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: temperature study, ~420 mbar initial H2, ~45 mg ilmenite, 4 h
+        reaction_temperature_C:
+          value: 950
+          uncertainty: 5
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.4
+            uncertainty: 0.07
+          1-2 h:
+            value: 0.4
+            uncertainty: 0.07
+          2-3 h:
+            value: 0.4
+            uncertainty: 0.07
+          3-4 h:
+            value: 0.41
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 122
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 82
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.47
+          uncertainty: 0.08
+        totals_basis: Water release phase (cold-finger sublimation) pressure rise, kT-corrected and blank-subtracted
+    - observation_id: sargeant_2019_table2_1000C
+      type: experiment_run_result
+      experiment: isru-bdm-temperature-1000C
+      locator: *id004
+      units: °C; µl hr-1; mbar; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: temperature study, ~420 mbar initial H2, ~45 mg ilmenite, 4 h
+        reaction_temperature_C:
+          value: 1000
+          uncertainty: 5
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.46
+            uncertainty: 0.07
+          1-2 h:
+            value: 0.47
+            uncertainty: 0.07
+          2-3 h:
+            value: 0.47
+            uncertainty: 0.07
+          3-4 h:
+            value: 0.48
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 143
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 96
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.72
+          uncertainty: 0.09
+        totals_basis: Water release phase (cold-finger sublimation) pressure rise, kT-corrected and blank-subtracted
+    - observation_id: sargeant_2019_table2_1050C
+      type: experiment_run_result
+      experiment: isru-bdm-temperature-1050C
+      locator: *id005
+      units: °C; µl hr-1; mbar; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: temperature study, ~420 mbar initial H2, ~45 mg ilmenite, 4 h
+        reaction_temperature_C:
+          value: 1050
+          uncertainty: 5
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.45
+            uncertainty: 0.07
+          1-2 h:
+            value: 0.59
+            uncertainty: 0.08
+          2-3 h:
+            value: 0.62
+            uncertainty: 0.08
+          3-4 h:
+            value: 0.61
+            uncertainty: 0.08
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 175
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 117
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 2.11
+          uncertainty: 0.09
+        totals_basis: Water release phase (cold-finger sublimation) pressure rise, kT-corrected and blank-subtracted
+    - observation_id: sargeant_2019_table2_1100C
+      type: experiment_run_result
+      experiment: isru-bdm-temperature-1100C
+      locator: *id006
+      units: °C; µl hr-1; mbar; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: temperature study, ~420 mbar initial H2, ~45 mg ilmenite, 4 h
+        reaction_temperature_C:
+          value: 1100
+          uncertainty: 5
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.53
+            uncertainty: 0.08
+          1-2 h:
+            value: 0.65
+            uncertainty: 0.08
+          2-3 h:
+            value: 0.62
+            uncertainty: 0.08
+          3-4 h:
+            value: 0.63
+            uncertainty: 0.08
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 186
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 124
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 2.24
+          uncertainty: 0.09
+        totals_basis: Water release phase (cold-finger sublimation) pressure rise, kT-corrected and blank-subtracted
+    - observation_id: sargeant_2019_table3_118mbar
+      type: experiment_run_result
+      experiment: isru-bdm-h2-118mbar-1000C
+      locator: *id007
+      units: mbar; µl hr-1; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: hydrogen concentration study at 1000°C, ~45 mg ilmenite, 4 h
+        H2_to_ilmenite_concentration_as_printed: 0.28:1.00
+        initial_H2_pressure_mbar:
+          value: 118
+          uncertainty: 1
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.54
+            uncertainty: 0.08
+          1-2 h:
+            value: 0.28
+            uncertainty: 0.07
+          2-3 h:
+            value: 0.21
+            uncertainty: 0.07
+          3-4 h:
+            value: 0.15
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 87
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 59
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.05
+          uncertainty: 0.08
+        totals_basis: Water release phase pressure rise
+    - observation_id: sargeant_2019_table3_210mbar
+      type: experiment_run_result
+      experiment: isru-bdm-h2-210mbar-1000C
+      locator: *id008
+      units: mbar; µl hr-1; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: hydrogen concentration study at 1000°C, ~45 mg ilmenite, 4 h
+        H2_to_ilmenite_concentration_as_printed: 0.50:1.00
+        initial_H2_pressure_mbar:
+          value: 210
+          uncertainty: 1
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.52
+            uncertainty: 0.08
+          1-2 h:
+            value: 0.4
+            uncertainty: 0.07
+          2-3 h:
+            value: 0.36
+            uncertainty: 0.07
+          3-4 h:
+            value: 0.35
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 123
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 82
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.48
+          uncertainty: 0.08
+        totals_basis: Water release phase pressure rise
+    - observation_id: sargeant_2019_table3_345mbar
+      type: experiment_run_result
+      experiment: isru-bdm-h2-345mbar-1000C
+      locator: *id009
+      units: mbar; µl hr-1; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: hydrogen concentration study at 1000°C, ~45 mg ilmenite, 4 h
+        H2_to_ilmenite_concentration_as_printed: 0.83:1.00
+        initial_H2_pressure_mbar:
+          value: 345
+          uncertainty: 1
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.49
+            uncertainty: 0.07
+          1-2 h:
+            value: 0.46
+            uncertainty: 0.07
+          2-3 h:
+            value: 0.42
+            uncertainty: 0.07
+          3-4 h:
+            value: 0.42
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 131
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 88
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.58
+          uncertainty: 0.08
+        totals_basis: Water release phase pressure rise
+    - observation_id: sargeant_2019_table3_418mbar
+      type: experiment_run_result
+      experiment: isru-bdm-h2-418mbar-1000C
+      locator: *id010
+      units: mbar; µl hr-1; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: hydrogen concentration study at 1000°C, ~45 mg ilmenite, 4 h
+        H2_to_ilmenite_concentration_as_printed: 0.99:1.00
+        initial_H2_pressure_mbar:
+          value: 418
+          uncertainty: 1
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.47
+            uncertainty: 0.07
+          1-2 h:
+            value: 0.5
+            uncertainty: 0.08
+          2-3 h:
+            value: 0.49
+            uncertainty: 0.08
+          3-4 h:
+            value: 0.49
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 148
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 99
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.78
+          uncertainty: 0.09
+        totals_basis: Water release phase pressure rise
+    - observation_id: sargeant_2019_table3_584mbar
+      type: experiment_run_result
+      experiment: isru-bdm-h2-584mbar-1000C
+      locator: *id011
+      units: mbar; µl hr-1; µmol; µl as printed
+      values:
+        quantity: static_H2_reduction_water_production
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        series: hydrogen concentration study at 1000°C, ~45 mg ilmenite, 4 h
+        H2_to_ilmenite_concentration_as_printed: 1.38:1.0
+        initial_H2_pressure_mbar:
+          value: 584
+          uncertainty: 1
+        water_production_rate_uL_per_h:
+          0-1 h:
+            value: 0.37
+            uncertainty: 0.07
+          1-2 h:
+            value: 0.5
+            uncertainty: 0.08
+          2-3 h:
+            value: 0.49
+            uncertainty: 0.08
+          3-4 h:
+            value: 0.49
+            uncertainty: 0.07
+        water_production_rate_basis: Hourly rates from reaction-phase H2 pressure drop (n_h used as a proxy for n_w)
+        total_corrected_pressure_change_mbar:
+          value: 140
+          uncertainty: 7
+        total_water_produced_umol:
+          value: 94
+          uncertainty: 5
+        total_water_produced_uL:
+          value: 1.69
+          uncertainty: 0.09
+        totals_basis: Water release phase pressure rise
+        text_discrepancy_note: Prose line 370 calls this 584 mbar run '1.39:1'; line 336 gives the range as '0.28 up to 1.38'.
+          Table value kept.
+    - observation_id: sargeant_2019_cold_finger_trap_rationale
+      type: method
+      locator:
+        page: 10
+        pdf_page_index: 9
+        line_range: 152-155
+        section: 2.2 Experimental Procedure
+      units: °C; mbar; %
+      values:
+        quantity: cold_finger_trap_temperature_basis
+        method_class: author_calculation
+        cold_finger_temperature_C: -80
+        water_condensed_fraction_pct_gt: 99.99
+        saturation_vapor_limit_mbar_lt: 0.0044
+        saturation_limit_fraction_of_potential_water_pct: 0.01
+        note: Author calculation printed as '>99.99% ... should condense'; saturation vapour limit < 0.0044 mbar = 0.01% of
+          the potential water.
+    - observation_id: sargeant_2019_yield_definitions_and_maxima
+      type: method
+      locator:
+        page: 14
+        pdf_page_index: 13
+        line_range: 197-217
+        section: 2.3 Calculating Yields
+      units: wt.% O2
+      values:
+        quantity: yield_definitions
+        method_class: author_definition
+        yield_definition: wt.% O2 = mass of oxygen produced / mass of ilmenite (Eqn. 4); reduction extent ξ = m_o / m_o,max
+          (Eqn. 5)
+        max_theoretical_yield_ilmenite_wt_pct_O2: 10.5
+        max_yield_incl_complete_rutile_reduction_wt_pct_O2: 31.6
+        yield_basis: Final yields from n_w of the water-release pressure rise; hourly values use n_h from the reaction-phase
+          H2 drop as a proxy
+        corrections: Pressure changes multiplied by the kT factor (supplementary S1) and blank-subtracted; S1 is not in this
+          PDF
+    - observation_id: sargeant_2019_temperature_blank_and_release_loss
+      type: experiment_series
+      locator:
+        page: 15
+        pdf_page_index: 14
+        line_range: 231-245
+        section: 3.1 Temperature Studies
+      units: °C; mbar; %
+      values:
+        quantity: blank_and_release_efficiency
+        method_class: measured_direct
+        blank: Empty sample tube reacted at 1000°C
+        blank_pressure_drop_temperature_corrected_mbar: 6.1
+        blank_cause: Flow through the capillary to the mass spectrometer
+        release_vs_reaction_pressure_change: Water-release pressure changes are as much as 10% less than those in the reaction
+          phase
+        release_shortfall_pct_up_to: 10
+        supplementary_tables_not_in_pdf:
+        - S2
+        - S3
+        note: Blank on PDF p. 15-16 (lines 231-241); the 10% statement is on PDF p. 16, lines 244-245.
+    - observation_id: sargeant_2019_h2_series_blank_and_range
+      type: experiment_series
+      locator:
+        page: 23
+        pdf_page_index: 22
+        line_range: 334-341
+        section: 3.2 Hydrogen Concentration Studies
+      units: mbar; mmol; mg
+      values:
+        quantity: hydrogen_series_design
+        method_class: method_only
+        temperature_C: 1000
+        concentration_range_as_printed: 0.28 up to 1.38 (nh:nilm)
+        starting_pressure_range_mbar:
+        - 118
+        - 584
+        pressure_basis: Calculated for a manifold temperature of 120°C
+        ilmenite_mass_mg: 45
+        ilmenite_amount_mmol: 0.3
+        blank: Ilmenite sample reacted at 1000°C with no hydrogen; no blank value printed
+        supplementary_tables_not_in_pdf:
+        - S5
+        - S6
+    - observation_id: sargeant_2019_temperature_series_yields
+      type: experiment_series
+      locator:
+        page: 20
+        pdf_page_index: 19
+        line_range: 298-300
+        section: 3.1.2 Yields
+      units: wt.% O2; %
+      values:
+        quantity: final_yield_and_reduction_extent
+        method_class: measured_derived
+        admission_status: author_derived
+        yield_1100C_wt_pct_O2:
+          value: 4.42
+          uncertainty: 0.18
+        max_reduction_extent_4h_pct:
+          value: 42.0
+          uncertainty: 1.7
+        peak_water_production_rate_1100C_uL_per_h:
+          value: 0.65
+          uncertainty: 0.08
+        uncertainty_basis: Propagated from the quantity of water produced and sample mass (±0.5 mg)
+        other_yields: Hourly yields and extents for other temperatures are plotted in Figure 5 only (figure-only)
+        note: Peak rate 0.65±0.08 µl hr-1 at 1100°C stated on PDF p. 16-17, lines 256-257.
+    - observation_id: sargeant_2019_figure6_grain_reduction_extents
+      type: characterization
+      locator:
+        page: 22
+        pdf_page_index: 21
+        line_range: 319-321
+        figure: '6'
+      units: '%'
+      values:
+        quantity: grain_reduction_extent
+        method_class: measured_derived
+        reduction_extent_pct:
+          1000C:
+            value: 32.3
+            uncertainty: 1.6
+          1050C:
+            value: 39.7
+            uncertainty: 1.7
+          1100C:
+            value: 42.0
+            uncertainty: 1.7
+        basis: 'Caption: reduction extent calculated for each grain shown in the BSE images, 4 h in hydrogen'
+    - observation_id: sargeant_2019_h2_series_yield_and_discrepancy
+      type: experiment_series
+      locator:
+        page: 26
+        pdf_page_index: 25
+        line_range: 385-389
+        section: 3.2.2 Yields
+      units: wt.% O2; %; mbar
+      values:
+        quantity: final_yield_and_reduction_extent
+        method_class: measured_derived
+        admission_status: author_derived
+        best_H2_ratio_as_printed: 0.99:1.0
+        best_initial_H2_pressure_mbar: 418
+        yield_1000C_418mbar_wt_pct_O2:
+          value: 3.51
+          uncertainty: 0.17
+        max_reduction_extent_4h_pct:
+          value: 33.4
+          uncertainty: 1.7
+        text_discrepancy_note: The abstract (line 21) and Conclusions (line 501) give 3.40±0.17 wt.% O2 and 32.3±1.6% extent
+          at 1000°C (the temperature-series run, ~420 mbar). Section 3.2.2 gives 3.51±0.17 wt.% and 33.4±1.7% for the 418
+          mbar H2-series run. Both are kept; not reconciled.
+    - observation_id: sargeant_2019_abstract_and_conclusion_claims
+      type: experiment_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        line_range: 18-24
+        section: Abstract
+      units: mbar; °C; wt.% O2; µl; µl hr-1
+      values:
+        quantity: aggregate_author_claims
+        method_class: author_summary
+        optimum_initial_H2_FeTiO3_ratio: 1
+        optimum_H2_pressure_mbar: 418
+        max_yield_1000C_wt_pct_O2:
+          value: 3.4
+          uncertainty: 0.17
+        max_possible_yield_wt_pct_O2: 10.5
+        yield_1100C_wt_pct_O2:
+          value: 4.42
+          uncertainty: 0.18
+        conclusion_1000C: 32.3±1.6% extent in 4 h, 3.40±0.17 wt.% O2 from ~45 mg ilmenite, 1.72±0.09 µl water (lines 500-502)
+        conclusion_1100C: 42.0±1.7% extent, 4.42±0.18 wt.% O2, 2.24±0.09 µl water (lines 503-505)
+        conclusion_h2: 118 mbar (0.28:1.00) gives 0.54±0.08 µl hr-1 in hour 1; 418 mbar (0.99:1.00) gives 0.49±0.07 µl hr-1
+          in hour 4 (lines 506-511)
+        conclusion_temperature_typo_as_printed: Line 498 prints 'reaction temperatures of ≥1500°C result in an alternative
+          reaction process with the formation of ferropseudobrookite'; the Results and Discussion place this at 1050-1100°C
+          (lines 311-314, 439). Kept as printed; not corrected.
+        note: Conclusions on PDF p. 32.
+    - observation_id: sargeant_2019_mass_spectrum_released_volatiles
+      type: gas_composition_context
+      locator:
+        page: 18
+        pdf_page_index: 17
+        line_range: 272-287
+        figure: '4'
+      units: m/z
+      values:
+        quantity: released_volatile_identity
+        method_class: measured_qualitative
+        mz_monitored:
+        - 1
+        - 2
+        - 16
+        - 17
+        - 18
+        - 28
+        - 32
+        - 44
+        predominant: water (m/z 16, 17, 18)
+        minor: residual hydrogen (m/z 1 and 2); some carbon dioxide and carbon monoxide (printed as m/z 44 and 32 respectively)
+        relative_abundance: Figure 4b bar chart only (RSF-corrected, Hiden); not digitized
+        note: The text assigns CO to m/z 32 as printed; not corrected. Figure 4 lists m/z 28 in its key.
+    - observation_id: sargeant_2019_sem_xrd_phase_observations
+      type: characterization
+      locator:
+        page: 21
+        pdf_page_index: 20
+        line_range: 302-332
+        section: 3.1.3 Sample Analysis
+      units: °C; mg; %
+      values:
+        quantity: reaction_product_phases
+        method_class: measured_qualitative
+        sem: ~15 mg of reacted grains per experiment in epoxy, BSE imaging at the Open University
+        xrd: ~5 mg (~11%) of the 1000, 1050 and 1100°C samples; Enraf-Nonius Powder Diffraction System 120, CoKa1 source,
+          Natural History Museum UK
+        1000C: Ilmenite, iron and rutile (partially reduced); voids from oxygen loss
+        1050C: Mostly ilmenite, rutile and iron, with evidence that ferropseudobrookite is starting to form; vein-like rutile;
+          printed as the melting point of ilmenite
+        1100C: Ferropseudobrookite (FeTi2O5) with iron, rutile and ilmenite; titanium-enriched solid solution, often with
+          an unreacted ilmenite core; rutile rare or absent
+        no_secondary_rutile_reduction: No indication of rutile reducing to e.g. Ti3O5 (PDF p. 29, lines 444-447)
+    - observation_id: sargeant_2019_terrestrial_vs_lunar_ilmenite
+      type: literature_context
+      locator:
+        page: 31
+        pdf_page_index: 30
+        line_range: 473-480
+        section: 4 Discussion
+      units: '%'
+      values:
+        quantity: feedstock_proxy_statement
+        method_class: quoted_attributed
+        attribution: Deer et al. (1992)
+        terrestrial_ilmenite_Fe3_pct_about: 6
+        lunar_ilmenite_Fe3: none
+        terrestrial_ilmenite_Mg_pct_about: 2
+        lunar_ilmenite_Mg_pct_about: 6
+        lunar_regolith_ilmenite_volume_pct_up_to: 20
+        lunar_highlands_ilmenite_volume_pct_below: 1
+        author_assumption: Terrestrial ilmenite assumed a suitable proxy for lunar ilmenite
+    - observation_id: sargeant_2019_figure1_figure_only
+      type: figure_only
+      locator:
+        page: 7
+        pdf_page_index: 6
+        line_range: 108-109
+        figure: '1'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: ISRU breadboard schematic
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_figure2_figure_only
+      type: figure_only
+      locator:
+        page: 9
+        pdf_page_index: 8
+        line_range: 132-135
+        figure: '2'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Photographs of the ISRU breadboard; entire system ~2 m wide and 1 m tall
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_figure3_figure_only
+      type: figure_only
+      locator:
+        page: 16
+        pdf_page_index: 15
+        line_range: 247-250
+        figure: '3'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Pressure change during reduction and volatile release, 850-1100°C, not blank-corrected
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_figure4_figure_only
+      type: figure_only
+      locator:
+        page: 18
+        pdf_page_index: 17
+        line_range: 277-281
+        figure: '4'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Mass spectrum with time during cold-finger heating and relative abundance by m/z
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_figure5_figure_only
+      type: figure_only
+      locator:
+        page: 20
+        pdf_page_index: 19
+        line_range: 294-296
+        figure: '5'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Yield and reduction extent per hour, temperature series
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_figure6_figure_only
+      type: figure_only
+      locator:
+        page: 22
+        pdf_page_index: 21
+        line_range: 318-321
+        figure: '6'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: BSE images of grains reduced at 1000, 1050 and 1100°C
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_figure7_figure_only
+      type: figure_only
+      locator:
+        page: 24
+        pdf_page_index: 23
+        line_range: 357-361
+        figure: '7'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Pressure change for varying initial H2:FeTiO3, not blank-corrected
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_figure8_figure_only
+      type: figure_only
+      locator:
+        page: 26
+        pdf_page_index: 25
+        line_range: 381-383
+        figure: '8'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Yield and reduction extent per hour, H2 series
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_figure9_figure_only
+      type: figure_only
+      locator:
+        page: 30
+        pdf_page_index: 29
+        line_range: 464-472
+        figure: '9'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Schematic model of hydrogen-pressure effects on reaction rate
+        note: Figure inspected; not digitized. Caption numbers, where printed, are carried in other rows.
+    - observation_id: sargeant_2019_crew_life_support_requirements
+      type: literature_context
+      locator: {page: 3, pdf_page_index: 2, line_range: 32-34, section: 1 Introduction}
+      units: kg/day
+      values:
+        quantity: crew_life_support_requirements
+        method_class: author_summary
+        water_per_crew_member_kg_per_day_approx: 4.19
+        oxygen_per_crew_member_kg_per_day: 0.93
+    - observation_id: sargeant_2019_mass_spectrometer_baseline_requirement
+      type: method_only
+      locator: {page: 11, pdf_page_index: 10, line_range: 168-171, section: 2.2 Experimental Procedure}
+      units: h
+      values:
+        quantity: mass_spectrometer_baseline_requirement
+        method_class: method_only
+        baseline_normalization_time_h_at_least: 1
+        note: At least 1 hour is required for baseline readings to normalize without changing operational volume.
+    - observation_id: sargeant_2019_hydrogen_crossover_time
+      type: literature_context
+      locator: {page: 23, pdf_page_index: 22, line_range: 348-349, section: 3.1.2 Reaction Pressures}
+      units: min
+      values:
+        quantity: hydrogen_pressure_crossover_time
+        method_class: author_summary
+        crossover_time_min: 80
+        note: Past 80 minutes, higher hydrogen pressures are required to sustain faster reaction rates.
+    - observation_id: sargeant_2019_isru_bdm_pipe_diameter_comparison
+      type: literature_context
+      locator: {page: 27, pdf_page_index: 26, line_range: 400-403, section: 4 Discussion}
+      units: as printed
+      values:
+        quantity: isru_bdm_pipe_diameter_relative_to_prospa
+        method_class: author_summary
+        diameter_factor_approx: 2
+        comparison: ISRU-BDM pipes are approximately twice the diameter of those that will be used in ProSPA.
+    - observation_id: sargeant_2019_isru_bdm_cold_finger_coolant
+      type: literature_context
+      locator: {page: 27, pdf_page_index: 26, line_range: 406-408, section: 4 Discussion}
+      units: as printed
+      values:
+        quantity: cold_finger_cooling_mechanism_comparison
+        method_class: author_summary
+        isru_bdm_coolant: liquid nitrogen
+        isru_bdm_cooling: active system
+        prospa_cooling: radiative losses to space
+    - observation_id: sargeant_2019_equation_1
+      type: literature_context
+      locator: {page: 4, pdf_page_index: 3, line_range: '53-56'}
+      units: as printed
+      values:
+        quantity: printed_equation
+        method_class: author_definition
+        equation_number: 1
+        equation_as_printed: FeTiO3(s) + H2(g) ⇌ Fe(s) + TiO2(s) + H2O(g)
+    - observation_id: sargeant_2019_equation_2
+      type: literature_context
+      locator: {page: 13, pdf_page_index: 12, line_range: 180-188, section: 2.3 Calculating Yields}
+      units: as printed
+      values:
+        quantity: printed_equation
+        method_class: author_definition
+        equation_number: 2
+        equation_as_printed: n_h|w = pV/(RT)
+    - observation_id: sargeant_2019_equation_3
+      type: literature_context
+      locator: {page: 13, pdf_page_index: 12, line_range: 189-196, section: 2.3 Calculating Yields}
+      units: as printed
+      values:
+        quantity: printed_equation
+        method_class: author_definition
+        equation_number: 3
+        equation_as_printed: R_w = V_w/t = m_w/(ρ_w t) = n_w M_w/(ρ_w t)
+        standard_temperature_K: 273.15
+        standard_pressure_kPa: 101.325
+    - observation_id: sargeant_2019_equation_4
+      type: literature_context
+      locator: {page: 14, pdf_page_index: 13, line_range: 197-201, section: 2.3 Calculating Yields}
+      units: as printed
+      values:
+        quantity: printed_equation
+        method_class: author_definition
+        equation_number: 4
+        equation_as_printed: wt.% O2 = m_o/m_ilm = m_w M_o/(m_ilm M_w) = n_w M_o/m_ilm
+    - observation_id: sargeant_2019_equation_5
+      type: literature_context
+      locator: {page: 15, pdf_page_index: 14, line_range: 214-219, section: 2.3 Calculating Yields}
+      units: as printed
+      values:
+        quantity: printed_equation
+        method_class: author_definition
+        equation_number: 5
+        equation_as_printed: ξ = m_o/m_o,max = m_o M_ilm/(M_o m_ilm)
+    - observation_id: sargeant_2019_equation_6
+      type: literature_context
+      locator: {page: 29, pdf_page_index: 28, line_range: 436-440, section: 4 Discussion}
+      units: as printed
+      values:
+        quantity: printed_equation
+        method_class: author_definition
+        equation_number: 6
+        equation_as_printed: 3FeTiO3(s) + 2H2(g) ⇌ 2Fe(s) + TiO2(s) + 2H2O(g) + FeTi2O5(s)
+scope_assessment:
+  observations_scored: 0
+  reason: 'Static H2 reduction of ilmenite: water production rates, water totals, yields and reduction extents. None fits
+    a closed scored type (no vapour pressure, activity, alpha, mass-loss series of a condensed phase, or thermodynamic table),
+    so all rows are context.'
+  not_extracted:
+  - Figure curves (Figs. 3, 5, 7, 8; figure-only)
+  - Supplementary Tables S2, S3, S5, S6 and supplementary S1 kT factor (not in this PDF)

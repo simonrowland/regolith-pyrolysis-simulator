@@ -264,6 +264,42 @@ def test_all_locators_use_one_based_physical_pages(document: dict) -> None:
     assert all(locator["page"] == locator["pdf_page_index"] + 1 for locator in locators)
 
 
+def _assert_apparatus_table_page(document: dict) -> None:
+    expected_pages = {
+        "borisov_2015_apparatus_run_49": 49,
+        "borisov_2015_apparatus_run_55": 55,
+        "borisov_2015_apparatus_run_58": 58,
+        "borisov_2015_apparatus_run_63": 63,
+    }
+    contexts = {
+        row["observation_id"]: row
+        for row in document["species"]["Fe"]["context"]
+        if row["observation_id"] in expected_pages
+    }
+    assert set(contexts) == set(expected_pages)
+    for observation_id, row in contexts.items():
+        page = expected_pages[observation_id]
+        note = row["values"]["notes"][1]
+        assert f"Table 1 row {page} on physical PDF page 5." in note
+        assert f"Table 1 row {page} on physical PDF page 4." not in note
+
+
+def test_apparatus_contexts_pin_table1_physical_page_five(document: dict) -> None:
+    _assert_apparatus_table_page(document)
+
+    mutated = deepcopy(document)
+    context = next(
+        row
+        for row in mutated["species"]["Fe"]["context"]
+        if row["observation_id"] == "borisov_2015_apparatus_run_49"
+    )
+    context["values"]["notes"][1] = context["values"]["notes"][1].replace(
+        "physical PDF page 5", "physical PDF page 4"
+    )
+    with pytest.raises(AssertionError):
+        _assert_apparatus_table_page(mutated)
+
+
 def test_cited_source_pages_are_present_and_guarded_when_corpus_is_absent() -> None:
     corpus = regolith_corpus_root()
     pdf = corpus / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"

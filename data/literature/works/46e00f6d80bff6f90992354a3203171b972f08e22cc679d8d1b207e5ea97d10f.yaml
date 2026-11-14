@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:stolyarova-1996-cao-alumina-silica-kems
       role: pdf
@@ -216,6 +216,7 @@ experiments:
           section: Results
           note: The paper says “The vapor pressure of silver was used as a standard.”
   bench_id: 46e00f6d80bff6f90992354a3203171b972f08e22cc679d8d1b207e5ea97d10f::bench::stolyarova-1996-mi1201
+  equipment_context_id: stolyarova-1996-cao-alumina-silica-kems::context::stolyarova_1996_experimental_apparatus_record
 benches:
 - id: 46e00f6d80bff6f90992354a3203171b972f08e22cc679d8d1b207e5ea97d10f::bench::stolyarova-1996-mi1201
   work_id: 46e00f6d80bff6f90992354a3203171b972f08e22cc679d8d1b207e5ea97d10f
@@ -264,3 +265,35 @@ benches:
       output_unit: as_published
       references: []
   other_facts: []
+context:
+- observation_id: stolyarova_1996_experimental_apparatus_record
+  type: apparatus
+  experiment: stolyarova-1996-mi1201-1933k
+  locator:
+    page: 3
+    published_page: 17
+    pdf_page_index: 2
+    section: Experimental
+    note: Instrument description continues on published page 18.
+  units: as printed
+  values:
+    apparatus: Magnetic mass spectrometer model MI 1201, modified for high-temperature mass spectrometric studies by standard
+      methods (64).
+    instrument: Magnetic mass spectrometer model MI 1201, produced at the Electron Microscope Plant, Sumy, Ukraine.
+    sample_preparation_as_printed: precursor method described previously (63)
+    series_temperature_range_as_printed: 1833–2033 K
+    sample_holder_or_cell_material_as_printed: not stated
+    loop_wire_diameter_as_printed: not stated
+    cell_inner_dimensions_and_orifice_size_as_printed: not stated
+    sample_mass_as_printed: not stated
+    run_duration_at_temperature_as_printed: not stated
+    loop_Fe_presaturation_and_method_as_printed: not stated
+    post_run_bulk_analysis_of_total_Fe_alkalis_or_cell_material_pickup: not stated
+    cell_oxygen_condition_as_printed: not stated
+    method_quote_as_published: Samples studied were prepared using the precursor method described previously (63). The present
+      study was carried out on a magnetic mass spectrometer model MI 1201 (produced at the Electron Microscope Plant, Sumy,
+      Ukraine), which was modified for high-temperature mass spectrometric studies by standard methods (64).
+  context_id: stolyarova-1996-cao-alumina-silica-kems::context::stolyarova_1996_experimental_apparatus_record
+  work_id: 46e00f6d80bff6f90992354a3203171b972f08e22cc679d8d1b207e5ea97d10f
+  source_id: stolyarova-1996-cao-alumina-silica-kems
+  species: Ca

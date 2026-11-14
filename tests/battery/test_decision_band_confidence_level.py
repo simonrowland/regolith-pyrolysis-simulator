@@ -40,6 +40,28 @@ def test_confidence_metadata_preserves_units_printed_in_scalar_value() -> None:
     assert resolved.band.unit == "dimensionless"
 
 
+def test_denial_that_uncertainty_is_not_printed_is_not_a_width() -> None:
+    # Kress & Carmichael 1988 Table 1. The sentence names 0.8 and 8.0% as
+    # the spread of major-element analyses and says the row uncertainty
+    # itself was not printed. The first number is not the cell width.
+    resolved = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim=(
+                "Row-specific uncertainties are not printed. The paper reports "
+                "standard deviations of major-element analyses between 0.8 and "
+                "8.0% relative."
+            ),
+        ),
+        Decimal("0.1"),
+    )
+
+    assert resolved.band is None
+    assert resolved.refusal is None
+    assert resolved.notice is None
+
+
 def test_confidence_metadata_does_not_hide_an_unmapped_printed_unit() -> None:
     resolved = _printed_uncertainty_band(
         Quantity.P_PARTIAL,

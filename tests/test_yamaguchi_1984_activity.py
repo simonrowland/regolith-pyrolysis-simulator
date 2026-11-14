@@ -25,11 +25,18 @@ def test_abstract_activity_migrates_with_printed_conditions() -> None:
     assert point["T_K"] == "1573"
     assert point["composition_mol"] == {"Na2O": "0.5", "P2O5": "0.5"}
     assert row["locator"]["published_page"] == 43
-    assert row["values"]["reduction_locator"] == {
+    assert row["values"]["method_class"] == "measured_reduced"
+    assert point["method_class"] == "measured_reduced"
+    assert point["evidence_class"] == "measured_reduced"
+    assert row["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert row["values"]["derivation"]["raw_inputs"]["locator"]["figure"] == "2"
+    assert "Nernst relation" in row["values"]["derivation"]["relation"]
+    assert row["values"]["derivation"]["method"]["locator"] == {
         "page": 2,
         "published_page": 44,
+        "pdf_page_index": 1,
+        "section": "EMF method",
         "equation": "1",
-        "note": "Nernst relation for the cell EMF.",
     }
 
     migrator = battery_factories.migrate_one_extract(
@@ -42,6 +49,7 @@ def test_abstract_activity_migrates_with_printed_conditions() -> None:
     assert len(migrator.result.observations) == 1
     observation = next(iter(migrator.result.observations.values()))
     assert observation.value.point == Decimal("1e-13")
+    assert observation.evidence.class_.value.value == "measured_reduced"
     assert observation.identity.temperature_K.value == Decimal("1573")
     assert observation.identity.composition.is_value
     assert observation.identity.composition.value.components == (

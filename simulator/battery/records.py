@@ -23,13 +23,15 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, fields, is_dataclass
-from decimal import Decimal
+from decimal import Decimal, localcontext
+from enum import StrEnum
 from fractions import Fraction
 from typing import Any, Generic, Mapping, TypeVar
 
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
+    AmbientPressureEvidenceClass,
     AssetRole,
     Authority,
     BoundDirection,
@@ -87,7 +89,7 @@ _LOCATOR_KEYS = (
 )
 
 
-def as_decimal(value: object) -> Decimal:
+def _decimal_from_scalar(value: object) -> Decimal:
     """Exact decimal from int/str/Decimal; floats via their printed form.
 
     Binary floats are not identity keys. ``Decimal(str(x))`` preserves the
@@ -107,6 +109,343 @@ def as_decimal(value: object) -> Decimal:
     if isinstance(value, float):
         return Decimal(str(value))
     raise TypeError(f"cannot convert {type(value)!r} to Decimal")
+
+
+def as_decimal(value: object) -> Decimal:
+    """Exact decimal. An approximate pressure stays a band, not a bare point."""
+
+    if isinstance(value, ApproxPressure):
+        raise ApproxPressureRefusal(
+            "approximate_pressure_not_a_decimal",
+            "an approximate pressure is a band; as_decimal would make equality legal again",
+        )
+    return _decimal_from_scalar(value)
+
+
+# Half-decade edges are computed at this precision so a caller's ambient
+# decimal context cannot move a stored band. The factor is √10 to 50
+# significant figures. A later change of that factor does not move rows
+# already stored: the edges are part of the value.
+_HALF_DECADE_PRECISION = 50
+_APPROXIMATE_PRESSURE_KIND = "approximate_pressure"
+
+
+class BandBasis(StrEnum):
+    """Why the band has the width it has.
+
+    ``printed`` is a structured interval the source stated.
+    ``half_decade_order_of_magnitude`` is the assumption for a "~" or
+    order-of-magnitude point that states no interval. Without the token
+    those two facts are the same number.
+    """
+
+    PRINTED = "printed"
+    HALF_DECADE_ORDER_OF_MAGNITUDE = "half_decade_order_of_magnitude"
+
+
+class ApproxPressureRefusal(ValueError):
+    """A printed pressure that cannot become an identity band."""
+
+    def __init__(self, reason: str, detail: str) -> None:
+        self.reason = reason
+        self.detail = detail
+        super().__init__(f"{reason}: {detail}")
+
+
+@dataclass(frozen=True)
+class ApproxPressure:
+    """Nominal pressure plus the closed band identity compares.
+
+    The type is the approximate flag. There is no ``approximate=False``
+    on this class: a false flag would make ``Decimal ==`` legal again.
+    """
+
+    point: Decimal
+    low: Decimal
+    high: Decimal
+    band_basis: BandBasis
+    kind: str = _APPROXIMATE_PRESSURE_KIND
+
+    def __post_init__(self) -> None:
+        point = _coerce_band_decimal("point", self.point)
+        low = _coerce_band_decimal("low", self.low)
+        high = _coerce_band_decimal("high", self.high)
+        try:
+            basis = (
+                self.band_basis
+                if isinstance(self.band_basis, BandBasis)
+                else BandBasis(self.band_basis)
+            )
+        except ValueError as exc:
+            raise ApproxPressureRefusal(
+                "unknown_band_basis",
+                "band_basis must be printed or half_decade_order_of_magnitude, "
+                f"not {self.band_basis!r}",
+            ) from exc
+        if self.kind != _APPROXIMATE_PRESSURE_KIND:
+            raise ApproxPressureRefusal(
+                "unknown_kind",
+                f"kind must be {_APPROXIMATE_PRESSURE_KIND!r}, not {self.kind!r}",
+            )
+        for name, edge in (("point", point), ("low", low), ("high", high)):
+            if not edge.is_finite():
+                raise ApproxPressureRefusal(
+                    "non_finite_edge",
+                    f"{name} must be a finite decimal",
+                )
+        if low <= 0:
+            raise ApproxPressureRefusal(
+                "non_positive_low",
+                f"low must be positive, not {low}",
+            )
+        if low > high:
+            raise ApproxPressureRefusal(
+                "inverted_band",
+                f"low {low} is above high {high}",
+            )
+        if not low <= point <= high:
+            raise ApproxPressureRefusal(
+                "point_outside_band",
+                f"point {point} is outside [{low}, {high}]",
+            )
+        object.__setattr__(self, "point", point)
+        object.__setattr__(self, "low", low)
+        object.__setattr__(self, "high", high)
+        object.__setattr__(self, "band_basis", basis)
+
+
+def _coerce_band_decimal(name: str, value: object) -> Decimal:
+    try:
+        return _decimal_from_scalar(value)
+    except (TypeError, ValueError, ArithmeticError) as exc:
+        raise ApproxPressureRefusal(
+            "not_a_decimal",
+            f"{name} is not a decimal ({value!r})",
+        ) from exc
+
+
+def _half_decade_edges(point: Decimal) -> tuple[Decimal, Decimal]:
+    with localcontext() as ctx:
+        ctx.prec = _HALF_DECADE_PRECISION
+        factor = Decimal(10).sqrt()
+        return point / factor, point * factor
+
+
+def approximate_pressure_from_printed_point(value: object) -> ApproxPressure:
+    """Half-decade band around an approximate printed point, after unit conversion.
+
+    Bounds and intervals stay bounds and intervals. An exact point stays a
+    decimal. A "~" point states no edges, so the band cannot be rebuilt
+    later from a changed √10 without a regen: the edges are stored.
+    """
+
+    if not isinstance(value, Value):
+        raise ApproxPressureRefusal(
+            "not_a_printed_value",
+            f"expected a Value point, not {type(value)!r}",
+        )
+    if value.kind is not ValueKind.POINT:
+        raise ApproxPressureRefusal(
+            "not_a_point",
+            f"a {value.kind.value} stays a {value.kind.value}; it is not a pressure band",
+        )
+    if not value.approximate:
+        raise ApproxPressureRefusal(
+            "not_approximate",
+            "an exact point stays a decimal identity pressure",
+        )
+    if value.point is None:
+        raise ApproxPressureRefusal(
+            "missing_point",
+            "an approximate point has no pressure",
+        )
+    low, high = _half_decade_edges(value.point)
+    return ApproxPressure(
+        point=value.point,
+        low=low,
+        high=high,
+        band_basis=BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE,
+    )
+
+
+# A stored band names every field. ``kind`` has a dataclass default so a
+# Python caller can omit it. The codec must not: filling that default
+# would turn an unmarked mapping into a band.
+_APPROXIMATE_PRESSURE_FIELDS = frozenset(
+    {"kind", "point", "low", "high", "band_basis"}
+)
+
+
+def approx_pressure_from_mapping(payload: object) -> ApproxPressure:
+    """Reload a stored band. A decimal string is not this function's input.
+
+    A missing ``kind`` refuses. The dataclass default would mark a pressure
+    the store never called approximate, and decimal equality would become
+    illegal for it. A point-condition mapping is a different type.
+    """
+
+    if not isinstance(payload, Mapping):
+        raise ApproxPressureRefusal(
+            "not_a_mapping",
+            f"an approximate pressure mapping is required, not {type(payload)!r}",
+        )
+    if "kind" in payload and payload["kind"] != _APPROXIMATE_PRESSURE_KIND:
+        raise ApproxPressureRefusal(
+            "not_approximate_pressure",
+            "kind must be "
+            f"{_APPROXIMATE_PRESSURE_KIND!r}, not {payload['kind']!r}",
+        )
+    extra = sorted(set(payload) - _APPROXIMATE_PRESSURE_FIELDS)
+    if extra:
+        raise ApproxPressureRefusal(
+            "unknown_field",
+            f"unknown approximate-pressure fields: {extra}",
+        )
+    missing = sorted(_APPROXIMATE_PRESSURE_FIELDS - set(payload))
+    if missing:
+        raise ApproxPressureRefusal(
+            "missing_field",
+            f"approximate pressure requires {missing}",
+        )
+    return ApproxPressure(
+        point=payload["point"],
+        low=payload["low"],
+        high=payload["high"],
+        band_basis=payload["band_basis"],
+        kind=payload["kind"],
+    )
+
+
+def nominal_pressure_pa(value: object) -> Decimal | None:
+    """The call pressure. This is the point, not the band and not an equality.
+
+    Accepts a ``State``, a ``Located``, an ``ApproxPressure``, a ``Value``
+    point, a decimal-like scalar, and the serialized mapping
+    ``{tag: value, value: ...}``, a serialized band, or ``{kind: point, point: ...}``.
+    Returns ``None`` when the pressure is absent or is not a point.
+    Callers keep their own sign and finiteness filters.
+    """
+
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, Located):
+        return nominal_pressure_pa(value.state)
+    if isinstance(value, State):
+        if not value.is_value:
+            return None
+        return nominal_pressure_pa(value.value)
+    if isinstance(value, ApproxPressure):
+        return value.point if value.point.is_finite() else None
+    if isinstance(value, Value):
+        if value.kind is not ValueKind.POINT or value.point is None:
+            return None
+        return value.point if value.point.is_finite() else None
+    if isinstance(value, Mapping):
+        tag = value.get("tag")
+        if tag is not None and tag != "value":
+            return None
+        if "value" in value:
+            return nominal_pressure_pa(value.get("value"))
+        if "state" in value and tag is None:
+            return nominal_pressure_pa(value.get("state"))
+        if value.get("kind") == _APPROXIMATE_PRESSURE_KIND:
+            return nominal_pressure_pa(approx_pressure_from_mapping(value))
+        if value.get("kind") not in (None, "point"):
+            return None
+        if "point" in value:
+            return nominal_pressure_pa(value.get("point"))
+        return None
+    try:
+        amount = _decimal_from_scalar(value)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not amount.is_finite():
+        return None
+    return amount
+
+
+def identity_pressure_from_converted_point(
+    point: object,
+    *,
+    approximate: bool,
+) -> State[Decimal | ApproxPressure]:
+    """Identity axis from a pressure already converted to pascals.
+
+    An exact point stays a decimal. An approximate point becomes the band.
+    ``State.of(point)`` is the strip this replaces: it cannot carry the flag.
+    """
+
+    if type(approximate) is not bool:
+        raise ApproxPressureRefusal(
+            "approximate_flag_not_bool",
+            f"approximate must be a bool, not {approximate!r}",
+        )
+    amount = point if isinstance(point, Decimal) else _decimal_from_scalar(point)
+    if not approximate:
+        return State.of(amount)
+    return State.of(
+        approximate_pressure_from_printed_point(
+            Value(ValueKind.POINT, point=amount, approximate=True)
+        )
+    )
+
+
+def identity_pressure_state(value: object) -> State[Decimal | ApproxPressure] | None:
+    """Identity pressure from a printed point, or ``None`` when it is not one.
+
+    A bound or an interval stays out of the axis. The caller writes its own
+    unknown reason. An approximate point becomes the band.
+    """
+
+    if isinstance(value, ApproxPressure):
+        return State.of(value)
+    if isinstance(value, Value):
+        if value.kind is not ValueKind.POINT or value.point is None:
+            return None
+        return identity_pressure_from_converted_point(
+            value.point, approximate=value.approximate
+        )
+    if isinstance(value, State):
+        if not value.is_value:
+            return None
+        return identity_pressure_state(value.value)
+    try:
+        amount = _decimal_from_scalar(value)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not amount.is_finite():
+        return None
+    return State.of(amount)
+
+
+def approximate_derived_total_reason() -> str:
+    """A sum or congruent total is derived. An approximate term is not exact."""
+
+    return "approximate_term_in_derived_total"
+
+
+def approximate_pressure_band_reason(band: ApproxPressure) -> str:
+    """The sentence for one band. The basis is the assumption or the print.
+
+    A half-decade names that assumption, the point, and the edges. A printed
+    band names that the edges are the printed precision. There is no free-text
+    assumption field: a basis without a sentence refuses.
+    """
+
+    if not isinstance(band, ApproxPressure):
+        raise ApproxPressureRefusal(
+            "not_approximate_pressure",
+            f"band sentence requires ApproxPressure, not {type(band)!r}",
+        )
+    edges = f"point {band.point} Pa; edges {band.low} Pa to {band.high} Pa"
+    if band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE:
+        return f"half-decade order-of-magnitude assumption; {edges}"
+    if band.band_basis is BandBasis.PRINTED:
+        return f"edges are the printed precision; {edges}"
+    raise ApproxPressureRefusal(
+        "unknown_band_basis",
+        f"band basis {band.band_basis!r} has no sentence",
+    )
 
 
 def as_fraction(value: object) -> Fraction:
@@ -170,6 +509,23 @@ class Locator:
                 continue
             return True
         return False
+
+    def has_method_location(self) -> bool:
+        """A physical page plus a section, paragraph, equation, or table anchor."""
+
+        page = self.page
+        has_physical_page = (
+            isinstance(page, int) and not isinstance(page, bool) and page > 0
+        ) or (isinstance(page, str) and bool(page.strip())) or (
+            isinstance(self.pdf_page_index, int)
+            and not isinstance(self.pdf_page_index, bool)
+            and self.pdf_page_index >= 0
+        )
+        has_method_anchor = any(
+            isinstance(value, str) and bool(value.strip())
+            for value in (self.section, self.paragraph, self.equation, self.table)
+        )
+        return has_physical_page and has_method_anchor
 
 
 @dataclass(frozen=True)
@@ -391,6 +747,24 @@ class Composition:
     proxy_flag: str | None = None
     proxy_source: str | None = None
     analysis_selection_rule: str | None = None
+    # How this vector was chosen as an engine input. Closed tokens, set by
+    # migrate.py from locators, notes, and table identity. Absent means a
+    # writer that has not been classified. The phase scorer does not compare
+    # component amounts to the scored point.
+    #   scored_phase_analysis
+    #     own-row analysis, a sibling of that phase, a printed-phase stamp of
+    #     a product or analysed phase, or a table of averages of analyses.
+    #   printed_starting_bulk
+    #     starting, batched, or nominal charge on a different table from the
+    #     scored row, or a note that says so.
+    #   named_material_mixture_of_printed_starts
+    #     t-1593 mixture whose parents are printed starting materials.
+    #   analysed_melt_minus_scored
+    #     d-323 analysed single-melt majors. The stored amounts stay the
+    #     printed analysis; the scorer removes the scored components.
+    #   same_run_initial_analysed_melt
+    #     KC91 Table 3 initial analysis bound onto the final row.
+    input_provenance: str | None = None
 
     def __post_init__(self) -> None:
         if not self.basis:
@@ -407,7 +781,12 @@ class Composition:
                     f"Composition component {key!r} must be a nonnegative finite amount"
                 )
         object.__setattr__(self, "components", canonical)
-        for name in ("proxy_flag", "proxy_source", "analysis_selection_rule"):
+        for name in (
+            "proxy_flag",
+            "proxy_source",
+            "analysis_selection_rule",
+            "input_provenance",
+        ):
             value = getattr(self, name)
             if value is not None:
                 value = str(value).strip()
@@ -419,6 +798,81 @@ class Composition:
         return dict(self.components)
 
 
+_CITED_SATURATION_METHOD = "cited_standard"
+_DERIVED_SATURATION_METHOD = "derived_from_source_analyses"
+_SATURATION_METHODS = frozenset(
+    {_CITED_SATURATION_METHOD, _DERIVED_SATURATION_METHOD}
+)
+
+
+@dataclass(frozen=True)
+class IronSaturationComposition:
+    """Recorded saturation composition an extract can carry into the one owner.
+
+    ``cited_standard`` is precedence (1): the thermo chain names the oxide
+    (quote, locator, composition as printed, for example Fe0.947O). No band.
+    ``derived_from_source_analyses`` is precedence (1.5): N_Fe2+ is a recorded
+    reduction of the source's own printed analyses, with method provenance and
+    the method-spread band in dex. The number is never a constant in the scorer.
+    """
+
+    method: str
+    composition_as_printed: str
+    quote: str
+    locator: Locator
+    n_fe2_plus: Decimal | None = None
+    provenance: str | None = None
+    band_dex: Decimal | None = None
+
+    def __post_init__(self) -> None:
+        method = str(self.method or "").strip()
+        if method not in _SATURATION_METHODS:
+            raise ValueError(
+                "IronSaturationComposition.method must be cited_standard "
+                "or derived_from_source_analyses"
+            )
+        object.__setattr__(self, "method", method)
+        for name in ("composition_as_printed", "quote"):
+            value = str(getattr(self, name) or "").strip()
+            if not value:
+                raise ValueError(f"IronSaturationComposition.{name} is required")
+            object.__setattr__(self, name, value)
+        if not isinstance(self.locator, Locator):
+            raise TypeError("IronSaturationComposition.locator is required")
+        if method == _CITED_SATURATION_METHOD:
+            if (
+                self.n_fe2_plus is not None
+                or self.provenance is not None
+                or self.band_dex is not None
+            ):
+                raise ValueError(
+                    "cited_standard carries the printed formula only"
+                )
+            return
+        if self.n_fe2_plus is None:
+            raise ValueError(
+                "derived_from_source_analyses requires n_fe2_plus"
+            )
+        n_fe2_plus = as_decimal(self.n_fe2_plus)
+        if n_fe2_plus <= 0 or n_fe2_plus > 1:
+            raise ValueError("n_fe2_plus must lie in (0, 1]")
+        object.__setattr__(self, "n_fe2_plus", n_fe2_plus)
+        provenance = str(self.provenance or "").strip()
+        if not provenance:
+            raise ValueError(
+                "derived_from_source_analyses requires provenance"
+            )
+        object.__setattr__(self, "provenance", provenance)
+        if self.band_dex is None:
+            raise ValueError(
+                "derived_from_source_analyses requires band_dex"
+            )
+        band_dex = as_decimal(self.band_dex)
+        if band_dex <= 0:
+            raise ValueError("band_dex must be positive")
+        object.__setattr__(self, "band_dex", band_dex)
+
+
 @dataclass(frozen=True)
 class StandardState:
     convention: ReferenceStateConvention
@@ -426,6 +880,8 @@ class StandardState:
     component_basis: str
     # Absent when the source does not print a number. Never a default of 1 bar.
     reference_pressure_bar: Decimal | None = None
+    # Absent unless the extract records a cited or derived saturation composition.
+    iron_saturation_composition: IronSaturationComposition | None = None
 
     def __post_init__(self) -> None:
         if not self.component_basis:
@@ -438,6 +894,12 @@ class StandardState:
         if self.reference_pressure_bar is not None:
             object.__setattr__(
                 self, "reference_pressure_bar", as_decimal(self.reference_pressure_bar)
+            )
+        recorded = self.iron_saturation_composition
+        if recorded is not None and not isinstance(recorded, IronSaturationComposition):
+            raise TypeError(
+                "StandardState.iron_saturation_composition must be "
+                "IronSaturationComposition or absent"
             )
 
 
@@ -494,25 +956,20 @@ class Derivation:
     @property
     def has_located_method(self) -> bool:
         locator = self.method.locator if self.method is not None else None
-        page = locator.page if locator is not None else None
-        has_physical_page = (
-            isinstance(page, int) and not isinstance(page, bool) and page > 0
-        ) or (isinstance(page, str) and bool(page.strip()))
         return (
             self.method is not None
             and self.method.state.is_value
             and isinstance(self.method.state.value, str)
             and bool(self.method.state.value.strip())
             and locator is not None
-            and has_physical_page
-            and isinstance(locator.equation, str)
-            and bool(locator.equation.strip())
+            and locator.has_method_location()
         )
 
     @property
     def has_named_references(self) -> bool:
         return bool(self.references) and all(
             isinstance(reference, str) and bool(reference.strip())
+            and reference != "none_printed"
             for reference in self.references
         )
 
@@ -1225,6 +1682,19 @@ class PressureEnvironment:
 
 
 @dataclass(frozen=True)
+class AmbientPressureEvidence:
+    evidence_class: AmbientPressureEvidenceClass
+    quote: str
+    locator: Locator
+
+    def __post_init__(self) -> None:
+        if not self.quote.strip():
+            raise ValueError("AmbientPressureEvidence.quote is required")
+        if self.locator is None:
+            raise ValueError("AmbientPressureEvidence.locator is required")
+
+
+@dataclass(frozen=True)
 class Experiment:
     experiment_id: str
     kind: ExperimentKind
@@ -1236,6 +1706,7 @@ class Experiment:
     simulated_experiment_id: str | None = None
     locator: Locator | None = None
     apparatus: Apparatus | None = None
+    ambient_pressure_evidence: AmbientPressureEvidence | None = None
     fO2_control: FO2Control | None = None
     bench_id: str | None = None
     # FK to the work record's context row holding this experiment's equipment
@@ -1394,6 +1865,8 @@ class DecisionBand:
         if self.band_basis not in {
             "row_printed",
             "source_method",
+            "printed_plus_derived_bound",
+            "derived_bound",
             "fusion_combined_row_printed",
             "fusion_combined_source_method",
             "derived_scatter",

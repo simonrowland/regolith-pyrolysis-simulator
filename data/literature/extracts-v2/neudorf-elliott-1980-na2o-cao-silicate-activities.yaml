@@ -71,7 +71,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -93,9 +93,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -210,7 +209,29 @@ observations:
               note: approximately −10.2 at 25 wt pct Na2O
         output_unit: K
         references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+  derivation:
+    relation: Abstract activity evaluated from the authors' fitted log aNa2O = A/T + B relation for the 25 w/o melt; fit inputs
+      derive from measured cell potentials.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Abstract activity evaluated from the authors' fitted log aNa2O = A/T + B relation for the 25 w/o melt; fit
+          inputs derive from measured cell potentials.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        section: Table I
+        equation: 4–6
+    references: []
   provenance:
+    printed_phase: l
     printed_value: '-10.2'
     printed_form: log10
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c
@@ -282,7 +303,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -304,9 +325,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -421,7 +441,29 @@ observations:
               note: approximately −8.3 at 40 wt pct Na2O
         output_unit: K
         references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+  derivation:
+    relation: Abstract activity evaluated from the authors' fitted log aNa2O = A/T + B relation for the 40 w/o melt; fit inputs
+      derive from measured cell potentials.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Abstract activity evaluated from the authors' fitted log aNa2O = A/T + B relation for the 40 w/o melt; fit
+          inputs derive from measured cell potentials.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        section: Table I
+        equation: 4–6
+    references: []
   provenance:
+    printed_phase: l
     printed_value: '-8.3'
     printed_form: log10
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_sio2_activity_na_binary_at_1070c
@@ -493,7 +535,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The source does not state the total pressure for this activity.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -644,6 +686,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -685,9 +729,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -755,6 +798,36 @@ observations:
         pdf_page_index: 4
         table: I
         note: Table I reports coefficients for log aNa2O = A/T + B.
+  derivation:
+    relation: Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were
+      fitted to Fig. 3 data and coefficients printed in Table I.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 610
+        pdf_page_index: 3
+        figure: '3'
+        note: Raw cell-potential values used for the fit are not tabulated.
+    method:
+      state:
+        tag: value
+        value: Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were
+          fitted to Fig. 3 data and coefficients printed in Table I.
+      locator:
+        page: 3
+        published_page: 609
+        pdf_page_index: 2
+        section: Na2O-SiO2 System
+        equation: 4–6
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -796,9 +869,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -866,6 +938,36 @@ observations:
         pdf_page_index: 4
         table: I
         note: Table I reports coefficients for log aNa2O = A/T + B.
+  derivation:
+    relation: Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were
+      fitted to Fig. 3 data and coefficients printed in Table I.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 610
+        pdf_page_index: 3
+        figure: '3'
+        note: Raw cell-potential values used for the fit are not tabulated.
+    method:
+      state:
+        tag: value
+        value: Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were
+          fitted to Fig. 3 data and coefficients printed in Table I.
+      locator:
+        page: 3
+        published_page: 609
+        pdf_page_index: 2
+        section: Na2O-SiO2 System
+        equation: 4–6
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -907,9 +1009,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -977,6 +1078,36 @@ observations:
         pdf_page_index: 4
         table: I
         note: Table I reports coefficients for log aNa2O = A/T + B.
+  derivation:
+    relation: Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were
+      fitted to Fig. 3 data and coefficients printed in Table I.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 610
+        pdf_page_index: 3
+        figure: '3'
+        note: Raw cell-potential values used for the fit are not tabulated.
+    method:
+      state:
+        tag: value
+        value: Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were
+          fitted to Fig. 3 data and coefficients printed in Table I.
+      locator:
+        page: 3
+        published_page: 609
+        pdf_page_index: 2
+        section: Na2O-SiO2 System
+        equation: 4–6
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1018,9 +1149,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -1088,6 +1218,36 @@ observations:
         pdf_page_index: 4
         table: I
         note: Table I reports coefficients for log aNa2O = A/T + B.
+  derivation:
+    relation: Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were
+      fitted to Fig. 3 data and coefficients printed in Table I.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 610
+        pdf_page_index: 3
+        figure: '3'
+        note: Raw cell-potential values used for the fit are not tabulated.
+    method:
+      state:
+        tag: value
+        value: Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were
+          fitted to Fig. 3 data and coefficients printed in Table I.
+      locator:
+        page: 3
+        published_page: 609
+        pdf_page_index: 2
+        section: Na2O-SiO2 System
+        equation: 4–6
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1124,9 +1284,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -1179,6 +1338,35 @@ observations:
         pdf_page_index: 0
         section: Thermodynamic Considerations
         note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+  derivation:
+    relation: Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation
+      and coefficients are printed in Table II.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation
+          and coefficients are printed in Table II.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        section: Table II
+        equation: log aNa2O = C × R* + D
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1215,9 +1403,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -1270,6 +1457,35 @@ observations:
         pdf_page_index: 0
         section: Thermodynamic Considerations
         note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+  derivation:
+    relation: Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation
+      and coefficients are printed in Table II.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation
+          and coefficients are printed in Table II.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        section: Table II
+        equation: log aNa2O = C × R* + D
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1306,9 +1522,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -1361,6 +1576,35 @@ observations:
         pdf_page_index: 0
         section: Thermodynamic Considerations
         note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+  derivation:
+    relation: Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation
+      and coefficients are printed in Table II.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation
+          and coefficients are printed in Table II.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        section: Table II
+        equation: log aNa2O = C × R* + D
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row1
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1399,9 +1643,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -1459,6 +1702,34 @@ observations:
         pdf_page_index: 0
         section: Thermodynamic Considerations
         note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+  derivation:
+    relation: Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation
+      temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation
+          temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II.
+      locator:
+        page: 4
+        published_page: 610
+        pdf_page_index: 3
+        section: Na2O-SiO2 System
+        equation: '8'
+    references:
+    - 'Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583.'
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row2
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1497,9 +1768,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -1557,6 +1827,34 @@ observations:
         pdf_page_index: 0
         section: Thermodynamic Considerations
         note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+  derivation:
+    relation: Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation
+      temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation
+          temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II.
+      locator:
+        page: 4
+        published_page: 610
+        pdf_page_index: 3
+        section: Na2O-SiO2 System
+        equation: '8'
+    references:
+    - 'Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583.'
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row3
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1595,9 +1893,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -1655,6 +1952,34 @@ observations:
         pdf_page_index: 0
         section: Thermodynamic Considerations
         note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+  derivation:
+    relation: Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation
+      temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation
+          temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II.
+      locator:
+        page: 4
+        published_page: 610
+        pdf_page_index: 3
+        section: Na2O-SiO2 System
+        equation: '8'
+    references:
+    - 'Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583.'
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row4
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1693,9 +2018,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -1753,6 +2077,34 @@ observations:
         pdf_page_index: 0
         section: Thermodynamic Considerations
         note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+  derivation:
+    relation: Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation
+      temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation
+          temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II.
+      locator:
+        page: 4
+        published_page: 610
+        pdf_page_index: 3
+        section: Na2O-SiO2 System
+        equation: '8'
+    references:
+    - 'Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583.'
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table3_row1_mixing_properties
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -1895,6 +2247,8 @@ observations:
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row1
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table3_row2_mixing_properties
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -2037,6 +2391,8 @@ observations:
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row2
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table3_row3_mixing_properties
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -2179,6 +2535,8 @@ observations:
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row3
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table3_row4_mixing_properties
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -2321,6 +2679,8 @@ observations:
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
   - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row4
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row1_interpolated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -2357,8 +2717,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2377,7 +2751,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2393,8 +2767,8 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
@@ -2501,6 +2875,8 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row2_calculated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -2537,8 +2913,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2557,7 +2947,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2573,16 +2963,17 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: author reduction requires an author derivation and admitted measured lineage
-    original_method_class: author_derived
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
@@ -2681,6 +3072,30 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+  derivation:
+    relation: The authors calculate this Table IV log activity using the Richardson ideal-mixing relation identified by Eq.
+      [8]¹¹.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+    parameters: []
+    output_unit: dimensionless log activity as printed
+    method:
+      state:
+        tag: value
+        value: By Eq. [8]¹¹ as printed in the Table IV header.
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        equation: '8'
+    references:
+    - F. D. Richardson [11], Trans. Faraday Soc., 1956, vol. 52, p. 1312.
+    - H. R. Rein and J. Chipman [25], Trans. AIME, 1955, vol. 203, pp. 1250-1254.
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row2_interpolated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -2717,8 +3132,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2737,7 +3166,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2753,8 +3182,8 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
@@ -2861,6 +3290,8 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row3_calculated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -2897,8 +3328,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2917,7 +3362,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2933,16 +3378,17 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: author reduction requires an author derivation and admitted measured lineage
-    original_method_class: author_derived
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
@@ -3041,6 +3487,30 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+  derivation:
+    relation: The authors calculate this Table IV log activity using the Richardson ideal-mixing relation identified by Eq.
+      [8]¹¹.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+    parameters: []
+    output_unit: dimensionless log activity as printed
+    method:
+      state:
+        tag: value
+        value: By Eq. [8]¹¹ as printed in the Table IV header.
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        equation: '8'
+    references:
+    - F. D. Richardson [11], Trans. Faraday Soc., 1956, vol. 52, p. 1312.
+    - H. R. Rein and J. Chipman [25], Trans. AIME, 1955, vol. 203, pp. 1250-1254.
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row3_interpolated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -3077,8 +3547,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3097,7 +3581,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3113,8 +3597,8 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
@@ -3221,6 +3705,8 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row4_calculated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -3257,8 +3743,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3277,7 +3777,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3293,16 +3793,17 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: author reduction requires an author derivation and admitted measured lineage
-    original_method_class: author_derived
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
@@ -3401,6 +3902,30 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+  derivation:
+    relation: The authors calculate this Table IV log activity using the Richardson ideal-mixing relation identified by Eq.
+      [8]¹¹.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+    parameters: []
+    output_unit: dimensionless log activity as printed
+    method:
+      state:
+        tag: value
+        value: By Eq. [8]¹¹ as printed in the Table IV header.
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        equation: '8'
+    references:
+    - F. D. Richardson [11], Trans. Faraday Soc., 1956, vol. 52, p. 1312.
+    - H. R. Rein and J. Chipman [25], Trans. AIME, 1955, vol. 203, pp. 1250-1254.
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row4_interpolated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -3437,8 +3962,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3457,7 +3996,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3473,8 +4012,8 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
@@ -3581,6 +4120,8 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row5_calculated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -3617,8 +4158,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3637,7 +4192,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3653,16 +4208,17 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: author reduction requires an author derivation and admitted measured lineage
-    original_method_class: author_derived
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
@@ -3761,6 +4317,30 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+  derivation:
+    relation: The authors calculate this Table IV log activity using the Richardson ideal-mixing relation identified by Eq.
+      [8]¹¹.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+    parameters: []
+    output_unit: dimensionless log activity as printed
+    method:
+      state:
+        tag: value
+        value: By Eq. [8]¹¹ as printed in the Table IV header.
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        equation: '8'
+    references:
+    - F. D. Richardson [11], Trans. Faraday Soc., 1956, vol. 52, p. 1312.
+    - H. R. Rein and J. Chipman [25], Trans. AIME, 1955, vol. 203, pp. 1250-1254.
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row5_interpolated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -3797,8 +4377,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3817,7 +4411,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3833,8 +4427,8 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
@@ -3941,6 +4535,8 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row6_calculated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -3977,8 +4573,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3997,7 +4607,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4013,16 +4623,17 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: author reduction requires an author derivation and admitted measured lineage
-    original_method_class: author_derived
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
@@ -4121,6 +4732,30 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+  derivation:
+    relation: The authors calculate this Table IV log activity using the Richardson ideal-mixing relation identified by Eq.
+      [8]¹¹.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+    parameters: []
+    output_unit: dimensionless log activity as printed
+    method:
+      state:
+        tag: value
+        value: By Eq. [8]¹¹ as printed in the Table IV header.
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        equation: '8'
+    references:
+    - F. D. Richardson [11], Trans. Faraday Soc., 1956, vol. 52, p. 1312.
+    - H. R. Rein and J. Chipman [25], Trans. AIME, 1955, vol. 203, pp. 1250-1254.
+  provenance:
+    printed_phase: l
 - observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row6_interpolated_log_a_star_na2o
   experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
   identity:
@@ -4157,8 +4792,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+        reference_pressure_bar: '1.01325'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4177,7 +4826,7 @@ observations:
       value: '21278.25'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4193,8 +4842,8 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
-      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
-      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, quantity,
+      method_class, admission_status, refusal_reason, oxygen_partial_pressure'
     approximate: false
   uncertainty:
     kind: none
@@ -4301,3 +4950,5 @@ observations:
               note: Table IV caption gives 1070 °C.
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l

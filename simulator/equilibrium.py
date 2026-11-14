@@ -41,7 +41,7 @@ from simulator.environment import (
     vacuum_floor_bar_for_environment,
 )
 from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, Atmosphere
 
@@ -55,7 +55,7 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
     Atmosphere.CONTROLLED_O2_FLOW,
     Atmosphere.O2_BACKPRESSURE,
 })
-_ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+_ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
 
 
 def _internal_analytical_control_refusal(

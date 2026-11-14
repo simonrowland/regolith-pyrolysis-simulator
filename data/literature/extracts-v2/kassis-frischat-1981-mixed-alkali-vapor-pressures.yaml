@@ -1,0 +1,512 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kassis-frischat-1981-mixed-alkali-vapor-pressures.yaml
+observations:
+- observation_id: kassis-frischat-1981-mixed-alkali-vapor-pressures::kassis_frischat_1981_table3_rb_pressure_ratio_1150c
+  experiment_id: 10.34657/17394::experiment::mixed_alkali_pressure_ratio_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Rb partial-pressure ratio between two melt compositions'
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    composition:
+      tag: unknown
+      reason: Table 3 is a ratio between two melt compositions; no single composition identifies this row. Both printed compositions
+        are retained in values.compared_melts_as_published.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Rb partial-pressure ratio between two melt compositions';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=unavailable is not a closed v2.1 token
+  notices: []
+  source_id: kassis-frischat-1981-mixed-alkali-vapor-pressures
+  locator:
+    page: 7
+    published_page: 95
+    table: '3'
+    note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1150 °C; table_row_number=2; table_column_number=2
+  read_from: pdf:kassis-frischat-1981-mixed-alkali-vapor-pressures
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1150'
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 is a ratio between two melt compositions; no single composition identifies this row. Both printed
+          compositions are retained in values.compared_melts_as_published.
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas mixture is reported for this measurement.
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+        note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1150 °C; table_row_number=2; table_column_number=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1150 °C; table_row_number=2; table_column_number=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1150 °C; table_row_number=2; table_column_number=2
+        output_unit: K
+        references: []
+  derivation:
+    relation: The reported pγRb(0.3) / pγRb(0.5) ratio is calculated from the authors' measured evaporation data using Eqs.
+      (19)–(20) and (23)–(26), PDF page 7 (printed page 95).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 8
+        published_page: 96
+        figure: 8a, 8b, 9a, 9b
+        note: Figures 8a–b and 9a–b show the calculated Na and Rb partial pressures as curves; the row-wise numeric inputs
+          are not printed as table values.
+    references: []
+  provenance:
+    printed_phase: gas
+- observation_id: kassis-frischat-1981-mixed-alkali-vapor-pressures::kassis_frischat_1981_table3_rb_pressure_ratio_1200c
+  experiment_id: 10.34657/17394::experiment::mixed_alkali_pressure_ratio_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Rb partial-pressure ratio between two melt compositions'
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: unknown
+      reason: Table 3 is a ratio between two melt compositions; no single composition identifies this row. Both printed compositions
+        are retained in values.compared_melts_as_published.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Rb partial-pressure ratio between two melt compositions';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=unavailable is not a closed v2.1 token
+  notices: []
+  source_id: kassis-frischat-1981-mixed-alkali-vapor-pressures
+  locator:
+    page: 7
+    published_page: 95
+    table: '3'
+    note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1200 °C; table_row_number=2; table_column_number=3
+  read_from: pdf:kassis-frischat-1981-mixed-alkali-vapor-pressures
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 is a ratio between two melt compositions; no single composition identifies this row. Both printed
+          compositions are retained in values.compared_melts_as_published.
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas mixture is reported for this measurement.
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+        note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1200 °C; table_row_number=2; table_column_number=3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1200 °C; table_row_number=2; table_column_number=3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1200 °C; table_row_number=2; table_column_number=3
+        output_unit: K
+        references: []
+  derivation:
+    relation: The reported pγRb(0.3) / pγRb(0.5) ratio is calculated from the authors' measured evaporation data using Eqs.
+      (19)–(20) and (23)–(26), PDF page 7 (printed page 95).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 8
+        published_page: 96
+        figure: 8a, 8b, 9a, 9b
+        note: Figures 8a–b and 9a–b show the calculated Na and Rb partial pressures as curves; the row-wise numeric inputs
+          are not printed as table values.
+    references: []
+  provenance:
+    printed_phase: gas
+- observation_id: kassis-frischat-1981-mixed-alkali-vapor-pressures::kassis_frischat_1981_table3_rb_pressure_ratio_1250c
+  experiment_id: 10.34657/17394::experiment::mixed_alkali_pressure_ratio_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Rb partial-pressure ratio between two melt compositions'
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    composition:
+      tag: unknown
+      reason: Table 3 is a ratio between two melt compositions; no single composition identifies this row. Both printed compositions
+        are retained in values.compared_melts_as_published.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Rb partial-pressure ratio between two melt compositions';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=unavailable is not a closed v2.1 token
+  notices: []
+  source_id: kassis-frischat-1981-mixed-alkali-vapor-pressures
+  locator:
+    page: 7
+    published_page: 95
+    table: '3'
+    note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1250 °C; table_row_number=2; table_column_number=4
+  read_from: pdf:kassis-frischat-1981-mixed-alkali-vapor-pressures
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 is a ratio between two melt compositions; no single composition identifies this row. Both printed
+          compositions are retained in values.compared_melts_as_published.
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas mixture is reported for this measurement.
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+        note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1250 °C; table_row_number=2; table_column_number=4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1250 °C; table_row_number=2; table_column_number=4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1250 °C; table_row_number=2; table_column_number=4
+        output_unit: K
+        references: []
+  derivation:
+    relation: The reported pγRb(0.3) / pγRb(0.5) ratio is calculated from the authors' measured evaporation data using Eqs.
+      (19)–(20) and (23)–(26), PDF page 7 (printed page 95).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 8
+        published_page: 96
+        figure: 8a, 8b, 9a, 9b
+        note: Figures 8a–b and 9a–b show the calculated Na and Rb partial pressures as curves; the row-wise numeric inputs
+          are not printed as table values.
+    references: []
+  provenance:
+    printed_phase: gas
+- observation_id: kassis-frischat-1981-mixed-alkali-vapor-pressures::kassis_frischat_1981_table3_rb_pressure_ratio_1300c
+  experiment_id: 10.34657/17394::experiment::mixed_alkali_pressure_ratio_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Rb partial-pressure ratio between two melt compositions'
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: Table 3 is a ratio between two melt compositions; no single composition identifies this row. Both printed compositions
+        are retained in values.compared_melts_as_published.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Rb partial-pressure ratio between two melt compositions';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=unavailable is not a closed v2.1 token
+  notices: []
+  source_id: kassis-frischat-1981-mixed-alkali-vapor-pressures
+  locator:
+    page: 7
+    published_page: 95
+    table: '3'
+    note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1300 °C; table_row_number=2; table_column_number=5
+  read_from: pdf:kassis-frischat-1981-mixed-alkali-vapor-pressures
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 is a ratio between two melt compositions; no single composition identifies this row. Both printed
+          compositions are retained in values.compared_melts_as_published.
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity or gas mixture is reported for this measurement.
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 7
+        published_page: 95
+        table: '3'
+        note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1300 °C; table_row_number=2; table_column_number=5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1300 °C; table_row_number=2; table_column_number=5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              note: row_label=pγRb(0.3) / pγRb(0.5); column_header=1300 °C; table_row_number=2; table_column_number=5
+        output_unit: K
+        references: []
+  derivation:
+    relation: The reported pγRb(0.3) / pγRb(0.5) ratio is calculated from the authors' measured evaporation data using Eqs.
+      (19)–(20) and (23)–(26), PDF page 7 (printed page 95).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 8
+        published_page: 96
+        figure: 8a, 8b, 9a, 9b
+        note: Figures 8a–b and 9a–b show the calculated Na and Rb partial pressures as curves; the row-wise numeric inputs
+          are not printed as table values.
+    references: []
+  provenance:
+    printed_phase: gas

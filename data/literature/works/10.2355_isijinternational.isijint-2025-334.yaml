@@ -1,0 +1,835 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  citation: Shi, C., Liu, Y., Urata, K., Yasui, S., Abe, T. & Kobayashi, Y. (2025). Thermodynamic Investigation of MnAl2O4
+    Spinel Precipitation Behavior in Manganese-Containing Slag Systems. ISIJ International 65(13), 2269–2274.
+  source_ids:
+  - shi-2025-mno-activity-eaf-spinel
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:shi-2025-mno-activity-eaf-spinel
+      role: pdf
+      path: raw/shi-2025-mno-activity-eaf-spinel/shi-2025-mno-activity-eaf-spinel.pdf
+      sha256:
+        tag: value
+        value: e3000261d0ae05c81124cef67a0f44c804905aca9d23eeb3455c256986121fdf
+    - asset_id: pdftotext:shi-2025-mno-activity-eaf-spinel
+      role: pdftotext
+      path: text/shi-2025-mno-activity-eaf-spinel
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shi-2025-mno-activity-eaf-spinel
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.isijint-2025-334
+experiments:
+- experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  locator:
+    page: 2
+    published_page: 2270
+    pdf_page_index: 1
+    section: 2.3. Experimental Procedure
+    note: row=1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  locator:
+    page: 2
+    published_page: 2270
+    pdf_page_index: 1
+    section: 2.3. Experimental Procedure
+    note: row=2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  locator:
+    page: 2
+    published_page: 2270
+    pdf_page_index: 1
+    section: 2.3. Experimental Procedure
+    note: row=3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_4
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  locator:
+    page: 2
+    published_page: 2270
+    pdf_page_index: 1
+    section: 2.3. Experimental Procedure
+    note: row=4
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2025-334::shi-2025-mno-activity-eaf-spinel
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  locator:
+    page: 4
+    published_page: 2272
+    pdf_page_index: 3
+    section: 3.2. Effect of Al2O3 Content on the Precipitation of Spinel
+    equation: 7–9
+    note: The text states a maximum MnAl2O4 precipitation ratio of 80.32% at 33.64 mol% Al2O3.
+context:
+- observation_id: shi2025_table1_initial_slag_row_1_context
+  type: measured_table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2270
+    table: '1'
+    row: '1'
+  units: mol% as printed
+  values:
+    quantity: printed_initial_slag_composition
+    typed_quantity_as_printed: initial slag recipe, not an equilibrium phase composition
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    - composition_series
+    schema_gap_or_disposition: Table 1 is an initial charge recipe. The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES
+      and simulator/battery/migrate.py::QUANTITY_ALIASES have no exact initial-charge-composition observation; equilibrium_phase_composition
+      would misstate the state. The values are retained as located initial-charge conditions on the applicable rows.
+    row_as_printed: '1'
+    components_as_printed:
+      CaO: '18.97'
+      SiO2: '23.06'
+      Al2O3: '13.64'
+      MgO: '7.420'
+      FeO: '28.24'
+      MnO: '8.670'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table1_initial_slag_row_1_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table1_initial_slag_row_2_context
+  type: measured_table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2270
+    table: '1'
+    row: '2'
+  units: mol% as printed
+  values:
+    quantity: printed_initial_slag_composition
+    typed_quantity_as_printed: initial slag recipe, not an equilibrium phase composition
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    - composition_series
+    schema_gap_or_disposition: Table 1 is an initial charge recipe. The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES
+      and simulator/battery/migrate.py::QUANTITY_ALIASES have no exact initial-charge-composition observation; equilibrium_phase_composition
+      would misstate the state. The values are retained as located initial-charge conditions on the applicable rows.
+    row_as_printed: '2'
+    components_as_printed:
+      CaO: '14.46'
+      SiO2: '17.58'
+      Al2O3: '23.64'
+      MgO: '7.420'
+      FeO: '28.24'
+      MnO: '8.670'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table1_initial_slag_row_2_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table1_initial_slag_row_3_context
+  type: measured_table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2270
+    table: '1'
+    row: '3'
+  units: mol% as printed
+  values:
+    quantity: printed_initial_slag_composition
+    typed_quantity_as_printed: initial slag recipe, not an equilibrium phase composition
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    - composition_series
+    schema_gap_or_disposition: Table 1 is an initial charge recipe. The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES
+      and simulator/battery/migrate.py::QUANTITY_ALIASES have no exact initial-charge-composition observation; equilibrium_phase_composition
+      would misstate the state. The values are retained as located initial-charge conditions on the applicable rows.
+    row_as_printed: '3'
+    components_as_printed:
+      CaO: '12.21'
+      SiO2: '14.84'
+      Al2O3: '28.64'
+      MgO: '7.420'
+      FeO: '28.24'
+      MnO: '8.670'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table1_initial_slag_row_3_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table1_initial_slag_row_4_context
+  type: measured_table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2270
+    table: '1'
+    row: '4'
+  units: mol% as printed
+  values:
+    quantity: printed_initial_slag_composition
+    typed_quantity_as_printed: initial slag recipe, not an equilibrium phase composition
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    - composition_series
+    schema_gap_or_disposition: Table 1 is an initial charge recipe. The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES
+      and simulator/battery/migrate.py::QUANTITY_ALIASES have no exact initial-charge-composition observation; equilibrium_phase_composition
+      would misstate the state. The values are retained as located initial-charge conditions on the applicable rows.
+    row_as_printed: '4'
+    components_as_printed:
+      CaO: '9.940'
+      SiO2: '12.09'
+      Al2O3: '33.64'
+      MgO: '7.420'
+      FeO: '28.24'
+      MnO: '8.670'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table1_initial_slag_row_4_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table2_slow_cooling_gas_ratio_schedule_context
+  type: measured_table_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2271
+    table: '2'
+  units: PCO/PCO2 ratio as printed
+  values:
+    quantity: printed_gas_ratio_schedule
+    typed_quantity_as_printed: CO/CO2 partial-pressure-ratio schedule for oxygen-potential control
+    caption_as_printed: Partial pressure ratios of CO2 to CO required to maintain 10^-13 atm oxygen partial pressure
+    column_header_as_printed: PCO/PCO2
+    schema_gap_or_disposition: Retained as the printed gas-control schedule, not as an observation of a thermodynamic output.
+      The caption prose says CO2 to CO, while the printed column header and values state PCO/PCO2; both are preserved without
+      reversing the listed ratios.
+    oxygen_partial_pressure_as_printed: 10^-13 atm
+    temperature_interval_unit: K
+    rows_as_printed:
+    - - 1673–1633
+      - '121.0'
+    - - 1633–1593
+      - '77.74'
+    - - 1593–1553
+      - '49.51'
+    - - 1553–1513
+      - '31.34'
+    - - 1513–1473
+      - '19.62'
+    - - 1473–1433
+      - '11.90'
+    - - 1433–1393
+      - '6.940'
+    - - 1393–1353
+      - '3.863'
+    - - 1353–1313
+      - '2.062'
+    - - 1313–1273
+      - '0.4219'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table2_slow_cooling_gas_ratio_schedule_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table3_fact_sage_model_inputs_context
+  type: measured_table_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2271
+    section: 3.1. Thermodynamic Equilibrium Calculation
+  units: mol% and dimensionless as printed
+  values:
+    quantity: printed_model_input_conditions
+    method_class: model_derived
+    software_as_printed: FactSage 8.3 (FToxid 8.3 and FactPS 8.3 databases)
+    temperature_K_as_printed: '1673'
+    oxygen_partial_pressure_as_printed: 10^-13 atm
+    fixed_components_mol_percent:
+      MgO: '7.420'
+      FeO: '28.24'
+      MnO: '8.670'
+    basicity_as_printed: 0.82 (CaO/SiO2 molar ratio)
+    alumina_content_rows_as_printed:
+    - - '1'
+      - '13.64'
+    - - '2'
+      - '23.64'
+    - - '3'
+      - '28.64'
+    - - '4'
+      - '33.64'
+    - - '5'
+      - '36.56'
+    activity_values_are_outputs_of: FactSage 8.3 calculation; Table 3, PDF page 3
+    note: For output rows 1–4, the corresponding full printed initial composition is also linked from Table 1. For row 5,
+      the source prints Al2O3 content, the fixed oxide fractions, and the CaO/SiO2 ratio, but not individual CaO and SiO2
+      values; none are inferred.
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table3_fact_sage_model_inputs_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table4_row_1_spinel_schema_gap_context
+  type: measured_table_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 2272
+    table: '4'
+    row: '1'
+    note: Table 4 phase row printed as Spinel.
+  units: mol% as printed
+  phase_as_printed: Spinel
+  quench_statement:
+    text: The equilibrated samples were retrieved and water-quenched immediately.
+    preservation: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 2270
+      section: 2.3. Experimental Procedure
+  values:
+    quantity: measured_solid_spinel_elemental_composition_as_printed
+    admission_status: typed_refusal
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 4 is measured solid spinel elemental EDS composition, but simulator/battery/enums.py::PhaseRole
+      has no solid role and simulator/battery/migrate.py::_phase_role_token rejects all other labels. Do not map the spinel
+      to glass or slag. PHASE_MAP and Phase.cr only identify a crystal phase, not the required solid phase role.
+    columns_as_printed:
+    - O
+    - Ca
+    - Si
+    - Al
+    - Mg
+    - Fe
+    - Mn
+    row_as_printed:
+    - '1'
+    - Spinel
+    - '49.25'
+    - '-'
+    - '-'
+    - '34.23'
+    - '10.28'
+    - '2.131'
+    - '4.110'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table4_row_1_spinel_schema_gap_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table4_row_2_spinel_schema_gap_context
+  type: measured_table_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 2272
+    table: '4'
+    row: '2'
+    note: Table 4 phase row printed as Spinel.
+  units: mol% as printed
+  phase_as_printed: Spinel
+  quench_statement:
+    text: The equilibrated samples were retrieved and water-quenched immediately.
+    preservation: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 2270
+      section: 2.3. Experimental Procedure
+  values:
+    quantity: measured_solid_spinel_elemental_composition_as_printed
+    admission_status: typed_refusal
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 4 is measured solid spinel elemental EDS composition, but simulator/battery/enums.py::PhaseRole
+      has no solid role and simulator/battery/migrate.py::_phase_role_token rejects all other labels. Do not map the spinel
+      to glass or slag. PHASE_MAP and Phase.cr only identify a crystal phase, not the required solid phase role.
+    columns_as_printed:
+    - O
+    - Ca
+    - Si
+    - Al
+    - Mg
+    - Fe
+    - Mn
+    row_as_printed:
+    - '2'
+    - Spinel
+    - '48.42'
+    - '-'
+    - '-'
+    - '34.30'
+    - '6.473'
+    - '5.420'
+    - '5.390'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table4_row_2_spinel_schema_gap_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table4_row_3_spinel_schema_gap_context
+  type: measured_table_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 2272
+    table: '4'
+    row: '3'
+    note: Table 4 phase row printed as Spinel.
+  units: mol% as printed
+  phase_as_printed: Spinel
+  quench_statement:
+    text: The equilibrated samples were retrieved and water-quenched immediately.
+    preservation: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 2270
+      section: 2.3. Experimental Procedure
+  values:
+    quantity: measured_solid_spinel_elemental_composition_as_printed
+    admission_status: typed_refusal
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 4 is measured solid spinel elemental EDS composition, but simulator/battery/enums.py::PhaseRole
+      has no solid role and simulator/battery/migrate.py::_phase_role_token rejects all other labels. Do not map the spinel
+      to glass or slag. PHASE_MAP and Phase.cr only identify a crystal phase, not the required solid phase role.
+    columns_as_printed:
+    - O
+    - Ca
+    - Si
+    - Al
+    - Mg
+    - Fe
+    - Mn
+    row_as_printed:
+    - '3'
+    - Spinel
+    - '50.55'
+    - '-'
+    - '-'
+    - '33.45'
+    - '5.360'
+    - '5.935'
+    - '4.700'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table4_row_3_spinel_schema_gap_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table4_row_4_spinel_schema_gap_context
+  type: measured_table_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 2272
+    table: '4'
+    row: '4'
+    note: Table 4 phase row printed as Spinel.
+  units: mol% as printed
+  phase_as_printed: Spinel
+  quench_statement:
+    text: The equilibrated samples were retrieved and water-quenched immediately.
+    preservation: not_stated
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 2270
+      section: 2.3. Experimental Procedure
+  values:
+    quantity: measured_solid_spinel_elemental_composition_as_printed
+    admission_status: typed_refusal
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 4 is measured solid spinel elemental EDS composition, but simulator/battery/enums.py::PhaseRole
+      has no solid role and simulator/battery/migrate.py::_phase_role_token rejects all other labels. Do not map the spinel
+      to glass or slag. PHASE_MAP and Phase.cr only identify a crystal phase, not the required solid phase role.
+    columns_as_printed:
+    - O
+    - Ca
+    - Si
+    - Al
+    - Mg
+    - Fe
+    - Mn
+    row_as_printed:
+    - '4'
+    - Spinel
+    - '48.89'
+    - '-'
+    - '-'
+    - '34.60'
+    - '4.670'
+    - '6.410'
+    - '5.430'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table4_row_4_spinel_schema_gap_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO
+- observation_id: shi2025_table5_spinel_cooling_comparison_schema_gap_context
+  type: measured_table_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 2273
+    table: '5'
+  units: mol% as printed
+  phase_as_printed: Spinel
+  quench_statement:
+    text: The paper states that spinel compositions from water-quenching and slow cooling were nearly identical.
+    preservation: asserted_preserved
+    locator:
+      page: 5
+      pdf_page_index: 4
+      published_page: 2273
+      section: 3.3. Effect of Cooling Rate on MnAl2O4 Precipitation
+  values:
+    quantity: measured_solid_spinel_elemental_composition_as_printed
+    admission_status: typed_refusal
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 5 compares measured solid spinel compositions after quenching and slow cooling. simulator/battery/enums.py::PhaseRole
+      has no solid role and simulator/battery/migrate.py::_phase_role_token has no exact solid/spinel role; values are retained
+      verbatim, not treated as glass or liquid slag compositions.
+    columns_as_printed:
+    - Cooling method
+    - O
+    - Al
+    - Mg
+    - Fe
+    - Mn
+    rows_as_printed:
+    - - quenching
+      - '48.89'
+      - '34.60'
+      - '4.670'
+      - '6.410'
+      - '5.430'
+    - - slow cooling
+      - '48.24'
+      - '35.18'
+      - '4.506'
+      - '6.572'
+      - '5.502'
+  context_id: shi-2025-mno-activity-eaf-spinel::context::shi2025_table5_spinel_cooling_comparison_schema_gap_context
+  work_id: 10.2355/isijinternational.isijint-2025-334
+  source_id: shi-2025-mno-activity-eaf-spinel
+  species: MnO

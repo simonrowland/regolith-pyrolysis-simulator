@@ -1,0 +1,493 @@
+source_id: watne-1977-potassium-vapor-pressure-furnace
+source:
+  citation: Watne, Bruce Michael (December 1977). Development of a constant temperature, platinum, atomic absorption
+    furnace and its use in potassium vapor pressure measurements for MHD. PhD dissertation in Chemistry, Montana
+    State University.
+extraction:
+  method: MinerU table-draft mapping with full-cell render audit
+  date: '2026-11-02'
+  worker: w1103cw1-wt77
+tables:
+- page: 112
+  table_index: 13
+  type: partial_pressure
+  quantity: potassium_absorbance_as_printed
+  evidence_class: measured_direct
+  unit: absorbance
+  phase: gas
+  rows: all
+  temperature:
+    column: 1
+    unit: C
+  values:
+  - column: 4
+    species: K
+  render_verified:
+  - row: 3
+    column: 1
+    text: 1070±10
+  - row: 3
+    column: 2
+    text: 1343±10
+  - row: 3
+    column: 3
+    text: 7.45±.05
+  - row: 3
+    column: 4
+    text: '0'
+  - row: 4
+    column: 1
+    text: 1110±10
+  - row: 4
+    column: 2
+    text: 1383±10
+  - row: 4
+    column: 3
+    text: 7.23±.05
+  - row: 4
+    column: 4
+    text: .008±.0007
+  - row: 5
+    column: 1
+    text: 1155±10
+  - row: 5
+    column: 2
+    text: 1428±10
+  - row: 5
+    column: 3
+    text: 7.00±.05
+  - row: 5
+    column: 4
+    text: .023±.0007
+  - row: 6
+    column: 1
+    text: 1170±10
+  - row: 6
+    column: 2
+    text: 1443±10
+  - row: 6
+    column: 3
+    text: 6.93±.05
+  - row: 6
+    column: 4
+    text: .040±.0007
+  - row: 8
+    column: 1
+    text: 1100±10
+  - row: 8
+    column: 2
+    text: 1373±10
+  - row: 8
+    column: 3
+    text: 7.28±.05
+  - row: 8
+    column: 4
+    text: .011±.0007
+  - row: 9
+    column: 1
+    text: 1210±10
+  - row: 9
+    column: 2
+    text: 1483±10
+  - row: 9
+    column: 3
+    text: 6.74±.05
+  - row: 9
+    column: 4
+    text: .020±.0007
+  - row: 10
+    column: 1
+    text: 1310±10
+  - row: 10
+    column: 2
+    text: 1583±10
+  - row: 10
+    column: 3
+    text: 6.32±.05
+  - row: 10
+    column: 4
+    text: .066±.0007
+  conditions:
+  - key: composition
+    state:
+      tag: value
+      value:
+        basis: printed_formula_stoichiometry
+        amount_basis: mol_inventory
+        components:
+        - - K2O
+          - '1'
+        - - Al2O3
+          - '9'
+    locator:
+      page: 112
+      table: '12'
+      note: 'Table 12 sample: Same sample of K2O·9Al2O3-alumina.'
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: No experiment total pressure is printed for this table row.
+    locator:
+      page: 112
+      table: '12'
+      note: No experiment total pressure is printed for this table row.
+  - key: fO2_log
+    state:
+      tag: unknown
+      reason: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+    locator:
+      page: 112
+      table: '12'
+      note: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+- page: 135
+  table_index: 15
+  type: partial_pressure
+  quantity: potassium_absorbance_as_printed
+  evidence_class: measured_direct
+  unit: absorbance
+  phase: gas
+  rows: all
+  temperature:
+    column: 1
+    unit: C
+  values:
+  - column: 3
+    species: K
+  render_verified:
+  - row: 2
+    column: 1
+    text: '1004'
+  - row: 2
+    column: 2
+    text: '101'
+  - row: 2
+    column: 3
+    text: 1.32*
+  - row: 2
+    column: 4
+    text: '7.38'
+  - row: 4
+    column: 1
+    text: '965'
+  - row: 4
+    column: 2
+    text: '88'
+  - row: 4
+    column: 3
+    text: '1.15'
+  - row: 4
+    column: 4
+    text: '8.08'
+  - row: 15
+    column: 1
+    text: '839'
+  - row: 15
+    column: 2
+    text: '0'
+  - row: 15
+    column: 3
+    text: .00*
+  - row: 15
+    column: 4
+    text: '8.99'
+  - row: 19
+    column: 1
+    text: '928'
+  - row: 19
+    column: 2
+    text: '24'
+  - row: 19
+    column: 3
+    text: '.31'
+  - row: 19
+    column: 4
+    text: '8.33'
+  - row: 20
+    column: 1
+    text: '867'
+  - row: 20
+    column: 2
+    text: '1'
+  - row: 20
+    column: 3
+    text: '.01'
+  - row: 20
+    column: 4
+    text: '8.77'
+  conditions:
+  - key: composition
+    state:
+      tag: value
+      value:
+        basis: printed_formula_stoichiometry
+        amount_basis: mol_inventory
+        components:
+        - - K2O
+          - '1'
+        - - Al2O3
+          - '9'
+    locator:
+      page: 135
+      table: '14'
+      note: 'Table 14 sample: Old K2O·9Al2O3-alumina.'
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: No experiment total pressure is printed for this table row.
+    locator:
+      page: 135
+      table: '14'
+      note: No experiment total pressure is printed for this table row.
+  - key: fO2_log
+    state:
+      tag: unknown
+      reason: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+    locator:
+      page: 135
+      table: '14'
+      note: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+  - key: gas_mix
+    state:
+      tag: value
+      value: Ar-4%H2
+    locator:
+      page: 135
+      table: '14'
+      note: Figure 18 or 19 caption identifies this table's data series as Ar-4%H2.
+- page: 136
+  table_index: 16
+  type: partial_pressure
+  quantity: potassium_absorbance_as_printed
+  evidence_class: measured_direct
+  unit: absorbance
+  phase: gas
+  rows: all
+  temperature:
+    column: 1
+    unit: C
+  values:
+  - column: 3
+    species: K
+  render_verified:
+  - row: 2
+    column: 1
+    text: '750'
+  - row: 2
+    column: 2
+    text: '8'
+  - row: 2
+    column: 3
+    text: '.10'
+  - row: 2
+    column: 4
+    text: '9.78'
+  - row: 21
+    column: 1
+    text: '957'
+  - row: 21
+    column: 2
+    text: '>101'
+  - row: 21
+    column: 3
+    text: '>1.32*'
+  - row: 21
+    column: 4
+    text: '8.13'
+  conditions:
+  - key: composition
+    state:
+      tag: value
+      value:
+        basis: printed_formula_stoichiometry
+        amount_basis: mol_inventory
+        components:
+        - - K2O
+          - '1'
+        - - Al2O3
+          - '9'
+    locator:
+      page: 136
+      table: '15'
+      note: 'Table 15 sample: Renewed K2O·9Al2O3-alumina.'
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: No experiment total pressure is printed for this table row.
+    locator:
+      page: 136
+      table: '15'
+      note: No experiment total pressure is printed for this table row.
+  - key: fO2_log
+    state:
+      tag: unknown
+      reason: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+    locator:
+      page: 136
+      table: '15'
+      note: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+  - key: gas_mix
+    state:
+      tag: value
+      value: Ar-4%H2
+    locator:
+      page: 136
+      table: '15'
+      note: Figure 18 or 19 caption identifies this table's data series as Ar-4%H2.
+- page: 141
+  table_index: 17
+  type: partial_pressure
+  quantity: potassium_absorbance_as_printed
+  evidence_class: measured_direct
+  unit: absorbance
+  phase: gas
+  rows: all
+  temperature:
+    column: 1
+    unit: C
+  values:
+  - column: 3
+    species: K
+  render_verified:
+  - row: 2
+    column: 1
+    text: '820'
+  - row: 2
+    column: 2
+    text: '4'
+  - row: 2
+    column: 3
+    text: '.05'
+  - row: 2
+    column: 4
+    text: '9.15'
+  - row: 14
+    column: 1
+    text: '828'
+  - row: 14
+    column: 2
+    text: '7'
+  - row: 14
+    column: 3
+    text: '.09'
+  - row: 14
+    column: 4
+    text: '9.08'
+  - row: 24
+    column: 1
+    text: '870'
+  - row: 24
+    column: 2
+    text: '18'
+  - row: 24
+    column: 3
+    text: '.24'
+  - row: 24
+    column: 4
+    text: '8.75'
+  conditions:
+  - key: composition
+    state:
+      tag: value
+      value:
+        basis: printed_element_mole_ratio
+        amount_basis: mol_inventory
+        components:
+        - - Al
+          - '3'
+        - - K
+          - '2'
+    locator:
+      page: 141
+      table: '16'
+      note: 'Table 16 sample: 1.5A Al:K=3:2 April 6, 1976; Cup H lower-temperature series.'
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: No experiment total pressure is printed for this table row.
+    locator:
+      page: 141
+      table: '16'
+      note: No experiment total pressure is printed for this table row.
+  - key: fO2_log
+    state:
+      tag: unknown
+      reason: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+    locator:
+      page: 141
+      table: '16'
+      note: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+  - key: gas_mix
+    state:
+      tag: value
+      value: Ar-4%H2
+    locator:
+      page: 141
+      table: '16'
+      note: Figure 18 or 19 caption identifies this table's data series as Ar-4%H2.
+- page: 142
+  table_index: 18
+  type: partial_pressure
+  quantity: potassium_absorbance_as_printed
+  evidence_class: measured_direct
+  unit: absorbance
+  phase: gas
+  rows: all
+  temperature:
+    column: 1
+    unit: C
+  values:
+  - column: 3
+    species: K
+  render_verified:
+  - row: 2
+    column: 1
+    text: '955'
+  - row: 2
+    column: 2
+    text: '1'
+  - row: 2
+    column: 3
+    text: '.0128'
+  - row: 2
+    column: 4
+    text: '8.14'
+  conditions:
+  - key: composition
+    state:
+      tag: value
+      value:
+        basis: printed_element_mole_ratio
+        amount_basis: mol_inventory
+        components:
+        - - Al
+          - '3'
+        - - K
+          - '2'
+    locator:
+      page: 142
+      table: '17'
+      note: 'Table 17 sample: 1.5A Al:K=3:2 April 6, 1976; Cup H higher-temperature series.'
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: No experiment total pressure is printed for this table row.
+    locator:
+      page: 142
+      table: '17'
+      note: No experiment total pressure is printed for this table row.
+  - key: fO2_log
+    state:
+      tag: unknown
+      reason: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+    locator:
+      page: 142
+      table: '17'
+      note: No absolute log fO2 or buffer-relative fO2 is printed for this table row.
+  - key: gas_mix
+    state:
+      tag: value
+      value: Ar-4%H2
+    locator:
+      page: 142
+      table: '17'
+      note: Figure 18 or 19 caption identifies this table's data series as Ar-4%H2.

@@ -51,7 +51,7 @@ observations:
       value: '3000'
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: Total furnace pressure is not reported.
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -200,6 +200,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_2_co_partial_pressure
   experiment_id: 10.34657/13064::beerkens-2001-industrial-glass-evaporation
   identity:
@@ -249,7 +251,7 @@ observations:
       value: '0'
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: Total furnace pressure is not reported.
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -398,6 +400,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_3_co_partial_pressure
   experiment_id: 10.34657/13064::beerkens-2001-industrial-glass-evaporation
   identity:
@@ -447,7 +451,7 @@ observations:
       value: '0'
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: Total furnace pressure is not reported.
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -596,6 +600,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_4_co_partial_pressure
   experiment_id: 10.34657/13064::beerkens-2001-industrial-glass-evaporation
   identity:
@@ -645,7 +651,7 @@ observations:
       value: '0'
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: Total furnace pressure is not reported.
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -794,3 +800,5 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas

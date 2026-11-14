@@ -13,6 +13,7 @@ import subprocess
 import sys
 import unicodedata
 from collections import Counter
+from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -86,6 +87,7 @@ from simulator.battery.migrate import (
     load_migrated_context,
     QUANTITY_SOURCE_FIELDS,
     map_phase,
+    _kelley_king_formula_phase_suffix,
     map_quantity,
     select_declared_source,
     parse_quantity_suffix,
@@ -122,7 +124,7 @@ from simulator.battery.migrate import (
     write_outputs,
 
 )
-from simulator.battery.stable_ids import series_row_extra
+from simulator.battery.stable_ids import series_point_id, series_row_extra
 from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 
@@ -542,6 +544,117 @@ def _migrate_real_extract(
     )
     (extracts / name).write_text(extract_text, encoding="utf-8")
     return migrate(root, write=write)
+
+
+def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
+    from simulator.battery.residue import _printed_fm_definition
+    from simulator.battery.score import rail_for_quantity
+
+    result = _migrate_real_extract(
+        tmp_path, "norris-2016-trace-volatility-thesis.yaml"
+    )
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "norris-2016-trace-volatility-thesis"
+        and observation.locator.table == "5.7"
+    ]
+    # Independently transcribed from the rendered Table 5.7, physical p.232 /
+    # folio 202: pairs are FM, printed sigma, in log fO2 order -7,-9,-11,-13.
+    printed = {
+        "Ag": "0.646 0.117 0.198 0.017 0.127 0.007 0.022 0.019",
+        "Bi": "0.227 0.080 0.170 0.078 0.074 0.007 0.008 0.007",
+        "Cd": "0.228 0.057 0.071 0.014 0.019 0.003 0.019 0.009",
+        "Cr": "1.021 0.179 1.192 0.179 0.998 0.150 1.171 0.265",
+        "Cu": "0.618 0.072 0.331 0.030 0.367 0.030 0.176 0.138",
+        "Ga": "1.454 0.432 1.217 0.361 1.314 0.388 0.669 0.380",
+        "Ge": "0.315 0.090 0.168 0.050 0.045 0.013 0.014 0.005",
+        "In": "0.816 0.095 0.622 0.074 0.621 0.068 0.192 0.142",
+        "Mo": "1.260 0.144 1.168 0.125 1.130 0.120 0.624 0.349",
+        "Pb": "1.030 0.087 0.646 0.069 0.365 0.022 0.116 0.099",
+        "Sb": "0.457 0.084 0.210 0.071 0.012 0.001 0.002 0.001",
+        "Sn": "0.471 0.031 0.194 0.017 0.201 0.009 0.038 0.035",
+        "Tl": "0.525 0.052 0.397 0.040 0.125 0.007 0.069 0.057",
+        "V": "1.219 0.141 1.226 0.139 1.179 0.134 1.112 0.125",
+        "W": "2.508 0.416 2.347 0.383 2.223 0.365 1.975 0.405",
+        "Zn": "1.038 0.069 0.617 0.053 0.488 0.021 0.130 0.087",
+    }
+    # Table 5.2, physical p.220 / folio 190. Use the existing conversion
+    # owner to bind the complete nine-oxide initial charge, without a second
+    # wt%-to-mole implementation in this regression.
+    charge = wt_pct_to_mole_fraction({
+        name: Decimal(amount) for name, amount in {
+            "SiO2": "50.66", "TiO2": "0.96", "Al2O3": "15.11",
+            "FeO": "9.69", "MnO": "0.20", "MgO": "8.90",
+            "CaO": "12.28", "Na2O": "1.96", "K2O": "0.07",
+        }.items()
+    })
+    log_fO2s = ("-7", "-9", "-11", "-13")
+    expected = {
+        (element, log_fO2): (Decimal(cells[2 * index]), cells[2 * index + 1])
+        for element, printed_row in printed.items()
+        for cells in [printed_row.split()]
+        for index, log_fO2 in enumerate(log_fO2s)
+    }
+    assert len(rows) == len(expected) == 64
+    assert not result.validation.hard_issues
+    assert rail_for_quantity(Quantity.ELEMENT_RETENTION_RATIO) is Rail.RESIDUE_COMPOSITION
+    seen = set()
+    for observation in rows:
+        element = observation.identity.species.formula
+        row_id = observation.observation_id.split("::")[1]
+        log_fO2 = "-" + row_id.rsplit("_neg", 1)[1]
+        assert row_id == f"norris_2016_table5_7_{element.lower()}_logfo2_neg{log_fO2[1:]}"
+        key = (element, log_fO2)
+        assert key not in seen
+        seen.add(key)
+        fm, sigma = expected[key]
+        assert (observation.locator.page, observation.locator.published_page) == (232, 202)
+        assert quantity_token(observation.identity) is Quantity.ELEMENT_RETENTION_RATIO
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == fm
+        assert observation.uncertainty.kind is UncertaintyKind.PRINTED
+        assert observation.uncertainty.verbatim == {
+            "kind": "standard_deviation", "value": sigma,
+            "units": "dimensionless", "verbatim": sigma,
+            "confidence_level": "not_stated",
+            "basis": "Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.",
+        }
+        assert observation.identity.subtype == State.of("concentration_retention")
+        assert observation.identity.temperature_K == State.of(Decimal("1573.15"))
+        assert observation.identity.composition.value.components == charge.components
+        assert observation.identity.composition.value.amount_basis == charge.amount_basis
+        assert observation.experiment_id.endswith(f"::volatile-loss-logfo2-neg{log_fO2[1:]}")
+        conditions = observation.point_conditions
+        assert conditions is not None
+        assert conditions["temperature_K"].state.value == Decimal("1573.15")
+        assert conditions["fO2_log"].state.value.point == Decimal(log_fO2)
+        assert (conditions["fO2_log"].locator.page, conditions["fO2_log"].locator.table) == (232, "5.7")
+        assert conditions["composition"].state.value.components == charge.components
+        assert conditions["composition"].locator.table == "5.2"
+        assert conditions["composition"].locator.page == 220
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.sample.initial_composition.state.value.components == charge.components
+        assert experiment.thermal_schedule.total_duration_s.state.value.point == Decimal("3600")
+        located = conditions["fm_definition"]
+        definition, record = _printed_fm_definition(located)
+        assert definition == "concentration_retention"
+        assert record["concentration_basis"] == "mole_fraction_single_cation_oxide"
+        assert record["quote"] == (
+            "final concentration of the trace element divided by the initial concentration"
+        )
+        assert record["page"] == 201
+        assert (located.locator.page, located.locator.published_page) == (231, 201)
+        assert record["concentration_basis_quote"] == (
+            "concentration values are expressed as mole fraction single cation oxide"
+        )
+        assert record["concentration_basis_locator"] == {
+            "page": 232, "pdf_page_index": 231, "published_page": 202, "equation": "5.1",
+        }
+    assert seen == set(expected)
 
 
 def test_identity_equal_transition_temperature_conflict_and_green_unknown(
@@ -1202,11 +1315,10 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
             )
             - 1
         ) < Decimal("1e-24")
-    # The unavailable-value exemption removes two missing-derivation issues;
-    # the separate derived_from lineage issues remain required.
-    assert Counter(issue.reason.value for issue in result.validation.hard_issues) == Counter(
-        {"conditional_field": 2}
-    )
+    assert result.validation is not None
+    # d-351 accepts this source's supplied lineage as recorded; unlike the old
+    # unconditional conditional-field expectation, this extraction is clean.
+    assert result.validation.hard_issues == ()
 
     expected = {
         "::T=1677:row=ad-10:": {
@@ -2316,7 +2428,6 @@ def test_shornikov_2015_extract_migrates_model_derived_provenance(
         "shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04",
         "shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04",
         "shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04",
-        "shornikov_2015_feo_cr_prose",
     }
 
     for observation in model_rows.values():
@@ -3488,6 +3599,176 @@ def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) 
     assert pressure.state.value.kind is ValueKind.INTERVAL
     assert pressure.state.value.interval_low == as_decimal("10")
     assert pressure.state.value.interval_high == as_decimal("20")
+
+
+def test_non_phase_row_point_pressure_is_identity_and_overrides_parent_default(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = "gibbs_table"
+    row["phase"] = "liquid"
+    row["units"] = "kJ/mol"
+    row["values"].pop("series")
+    row["values"].update(
+        quantity="partial_molar_enthalpy",
+        points=[
+            {
+                "T_K": 1200,
+                "partial_molar_enthalpy_as_printed": {
+                    "value": "-4",
+                    "units": "kJ/mol",
+                    "as_printed": "-4 kJ/mol",
+                },
+                "point_conditions": {
+                    "total_pressure_Pa": {
+                        "state": {
+                            "tag": "value",
+                            "value": {"kind": "point", "point": "80000"},
+                        },
+                        "locator": {"table": "I", "page": 3},
+                    }
+                },
+            }
+        ],
+        composition_wt_pct={"Na2O": 50, "SiO2": 50},
+    )
+    row["point_conditions"] = {
+        "total_pressure_Pa": {
+            "state": {"tag": "value", "value": "100000"},
+            "locator": {"table": "I", "page": 2},
+        }
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.total_pressure_Pa == State.of(as_decimal("80000"))
+    assert observation.point_conditions["total_pressure_Pa"].locator.page == 3
+
+
+def test_non_phase_row_parent_only_pressure_remains_default(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = "gibbs_table"
+    row["phase"] = "liquid"
+    row["units"] = "kJ/mol"
+    row["values"].pop("series")
+    row["values"].update(
+        quantity="partial_molar_enthalpy",
+        points=[
+            {
+                "T_K": 1200,
+                "partial_molar_enthalpy_as_printed": {
+                    "value": "-4",
+                    "units": "kJ/mol",
+                    "as_printed": "-4 kJ/mol",
+                },
+            }
+        ],
+        composition_wt_pct={"Na2O": 50, "SiO2": 50},
+    )
+    row["values"]["point_conditions"] = {
+        "total_pressure_Pa": {
+            "state": {"tag": "value", "value": "90000"},
+            "locator": {"table": "I", "page": 2},
+        }
+    }
+    row["point_conditions"] = {
+        "total_pressure_Pa": {
+            "state": {"tag": "value", "value": "100000"},
+            "locator": {"table": "I", "page": 1},
+        }
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.total_pressure_Pa.is_unknown
+    assert observation.point_conditions["total_pressure_Pa"].locator.page == 1
+
+
+def test_non_phase_scalar_point_pressure_is_identity(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(
+        quantity="partial_molar_enthalpy",
+        T_K=1200,
+        composition_wt_pct={"Na2O": 50, "SiO2": 50},
+        partial_molar_enthalpy_as_printed={
+            "value": "-4",
+            "units": "kJ/mol",
+            "as_printed": "-4 kJ/mol",
+        },
+    )
+    row["values"]["point_conditions"] = {
+        "total_pressure_Pa": {
+            "state": {"tag": "value", "value": "80000"},
+            "locator": {"table": "I", "page": 3},
+        }
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.total_pressure_Pa == State.of(as_decimal("80000"))
+
+
+def test_simeonov_gamma_printed_uncompared_pressure_is_identity(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "simeonov-sano-1985-na-bearing-mno-activities.yaml"
+    )
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith(
+            "::simeonov_sano_1985_gamma_mn_carbon_saturated_iron"
+        )
+    )
+
+    assert observation.identity.total_pressure_Pa == State.of(Decimal("101325"))
+
+
+def test_non_phase_uncompared_explicit_unknown_pressure_stays_unknown(
+    tmp_path: Path,
+) -> None:
+    extract_path = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "extracts"
+        / "simeonov-sano-1985-na-bearing-mno-activities.yaml"
+    )
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    gamma = next(
+        observation
+        for observation in extract["species"]["Mn"]["observations"]
+        if observation["observation_id"]
+        == "simeonov_sano_1985_gamma_mn_carbon_saturated_iron"
+    )
+    gamma["point_conditions"]["total_pressure_Pa"]["state"] = {
+        "tag": "unknown",
+        "reason": "pressure not stated for this run",
+    }
+    result = _migrate_real_extract(
+        tmp_path,
+        "simeonov-sano-1985-na-bearing-mno-activities.yaml",
+        extract_doc=extract,
+    )
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith(
+            "::simeonov_sano_1985_gamma_mn_carbon_saturated_iron"
+        )
+    )
+
+    assert observation.identity.total_pressure_Pa == State.unknown(
+        "pressure not stated for this run"
+    )
 
 
 def test_missing_admission_status_defaults_with_notice_even_when_class_unknown(
@@ -4877,6 +5158,12 @@ def test_effusion_pressure_reservoir_requires_stated_phase_and_pressure() -> Non
         ("condensed_solid", composition, Quantity.P_SAT, Phase.CR),
         (None, composition, Quantity.P_SAT, None),
         ("condensed_solid", composition, Quantity.EVAPORATION_RATE, None),
+        (
+            "condensed_solid",
+            composition,
+            Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+            Phase.CR,
+        ),
         ("condensed_solid", mixed_composition, Quantity.P_SAT, None),
         ("condensed_solid", mismatched_composition, Quantity.P_SAT, None),
         (
@@ -5627,17 +5914,22 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
     assert not obs.derived_from
 
 
-def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -> None:
+def _model_derived_density_without_derivation() -> dict:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     row = extract["species"]["Na"]["observations"][0]
     row["type"] = "density"
     row["units"] = "kg/m3"
-    values = row["values"]
-    values.clear()
-    values["quantity"] = "density"
-    values["method_class"] = "model_derived"
-    values["density_kg_m3"] = 1.0
-    values["admission_status"] = "typed_refusal"
+    row["values"] = {
+        "quantity": "density",
+        "method_class": "model_derived",
+        "density_kg_m3": 1.0,
+        "admission_status": "typed_refusal",
+    }
+    return extract
+
+
+def test_model_derived_without_derivation_is_a_counted_notice(tmp_path: Path) -> None:
+    extract = _model_derived_density_without_derivation()
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
@@ -5649,17 +5941,119 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
-    paths = [i.path for i in report.hard_issues]
-    assert any(p.endswith(".derived_from") for p in paths), report.hard_issues
-    assert any(p.endswith(".derivation") for p in paths), report.hard_issues
-    assert all(
-        i.reason.value == "conditional_field"
-        for i in report.hard_issues
-        if i.path.endswith(".derived_from") or i.path.endswith(".derivation")
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        for issue in report.hard_issues
     )
+    assert [(notice.code, notice.source_id, notice.count) for notice in report.notices] == [
+        ("model_derived_provenance_unrecorded", "fixture-source", 1)
+    ]
+    assert sum(notice.count for notice in report.notices) == 1
+    assert result.validation is not None
+    assert result.validation.notices == report.notices
     assert any(
-        "derived_from" in (e.axes or ()) or "derivation" in (e.axes or ())
+        "derivation" in (e.axes or ())
         for e in result.queue
+    )
+
+
+def test_model_derived_derivation_missing_method_and_references_is_counted(
+    tmp_path: Path,
+) -> None:
+    extract = _model_derived_density_without_derivation()
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("admission_status", None)
+    row["values"]["derivation"] = {
+        "relation": "density model output",
+        "inputs": ["pdf:fixture-source"],
+        "output_unit": "kg_per_m3",
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    assert observation.derivation is not None
+    assert result.validation is not None
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        and issue.path.startswith(f"observation[{observation.observation_id}].")
+        for issue in result.validation.hard_issues
+    )
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in result.validation.notices
+    ] == [("model_derived_provenance_unrecorded", "fixture-source", 1)]
+    assert sum(notice.count for notice in result.validation.notices) == 1
+
+
+def test_grounded_model_derived_methods_survive_extract_migration() -> None:
+    source_ids = (
+        "arxiv-2509-sio-flame-nucleation",
+        "kems-184-behrens-1979",
+        "sublimation-kinetics-2023-minerals",
+        "ts1985",
+    )
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    for source_id in source_ids:
+        migrator._migrate_extract(
+            REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+        )
+    migrator.finalize()
+
+    source_observation_ids = {
+        "arxiv-2509-sio-flame-nucleation": {"haugen_2025_sio2_particle_density"},
+        "kems-184-behrens-1979": {
+            "behrens_1979_table2_si_this_work",
+            "behrens_1979_table2_si_reference_10",
+            "behrens_1979_table2_si2c_this_work",
+            "behrens_1979_table2_si2c_reference_10",
+            "behrens_1979_table2_sic2_this_work",
+            "behrens_1979_table2_sic2_reference_10",
+        },
+        "sublimation-kinetics-2023-minerals": {
+            "shaw_2023_table2_fe_psat_factsage_feo",
+            "shaw_2023_table2_k_psat_factsage_al2o3_k2o",
+            "shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o",
+        },
+        "ts1985": {"ts1985_sio2_gibbs_duhem_1200C_X0500"},
+    }
+    grounded = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id in source_observation_ids
+        and any(
+            observation.observation_id.split("::", 1)[-1] == source_id
+            or observation.observation_id.split("::", 1)[-1].startswith(
+                f"{source_id}::"
+            )
+            for source_id in source_observation_ids[observation.source_id]
+        )
+    ]
+    assert len(grounded) == 41
+    citations = {
+        source_id: yaml.safe_load(
+            (
+                REPO_ROOT
+                / "data"
+                / "literature"
+                / "extracts"
+                / f"{source_id}.yaml"
+            ).read_text(encoding="utf-8")
+        )["source"]["citation"]
+        for source_id in source_ids
+    }
+    for observation in grounded:
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert observation.derivation.references == (citations[observation.source_id],)
+    assert migrator.result.validation is not None
+    grounded_ids = {observation.observation_id for observation in grounded}
+    assert not any(
+        issue.path.endswith((".derivation.method", ".derivation.references"))
+        and any(
+            f"observation[{observation_id}]" in issue.path
+            for observation_id in grounded_ids
+        )
+        for issue in migrator.result.validation.hard_issues
     )
 
 
@@ -5706,7 +6100,8 @@ def test_unavailable_model_derived_value_keeps_supplied_derivation_references(
         ("figure_only", False, False, False),
         ("figure_only", False, True, False),
         ("figure_only", True, False, True),
-        ("admitted", False, False, True),
+        # Admission metadata alone does not create a numeric value with lineage.
+        ("admitted", False, False, False),
     ],
 )
 def test_b879_caption_only_figure_model_lineage_requirement(
@@ -5749,12 +6144,16 @@ def test_b879_caption_only_figure_model_lineage_requirement(
 
 
 def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) -> None:
+    from simulator.battery.validate import observation_issue_location
     from tools.dump_hard_issues import dump_hard_issues
 
-    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
-    values = extract["species"]["Na"]["observations"][0]["values"]
-    values["method_class"] = "model_derived"
-    values.pop("series", None)
+    extract = _model_derived_density_without_derivation()
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"]["derivation"] = {
+        "relation": "density model output",
+        "inputs": ["printed model inputs"],
+        "output_unit": "kg_per_m3",
+    }
     root = _write_min_tree(tmp_path / "tree", extract)
     result = migrate(root, write=False)
     out = tmp_path / "issues.tsv"
@@ -5769,12 +6168,41 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
         rows = list(csv.DictReader(stream, delimiter="\t"))
 
     assert written == len(rows) == len(result.validation.hard_issues)
-    assert any(
-        row["source_id"] == "fixture-source"
-        and row["field"] == "derived_from"
-        and row["issue_code"] == "conditional_field"
+    assert [
+        (notice.code, notice.source_id, notice.count)
+        for notice in result.validation.notices
+    ] == [("model_derived_provenance_unrecorded", "fixture-source", 1)]
+    expected_rows = {
+        (
+            "fixture-source",
+            observation_id,
+            field,
+            issue.reason.value,
+            issue.detail,
+        )
+        for issue in result.validation.hard_issues
+        if (location := observation_issue_location(issue.path)) is not None
+        for observation_id, field in (location,)
+    }
+    actual_rows = {
+        (
+            row["source_id"],
+            row["observation_id"],
+            row["field"],
+            row["issue_code"],
+            row["message"],
+        )
         for row in rows
-    )
+    }
+    assert actual_rows == expected_rows
+    assert {
+        row["field"] for row in rows if row["source_id"] == "fixture-source"
+    } == {
+        "derived_from",
+        "derivation",
+        "derivation.inputs",
+        "derivation.raw_inputs",
+    }
 
     filtered = tmp_path / "filtered.tsv"
     assert dump_hard_issues(root, filtered, "fixture-source") == len(rows)
@@ -7586,6 +8014,7 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
     assert mapped.is_unknown and why is not None
 
     for spelling in (
+        "c",
         "quenched_silicate_glass",
         "quenched silicate glass; recalculated",
     ):
@@ -8298,7 +8727,7 @@ _TORR = _ATM / as_decimal("760")
 
 
 def _census_declared_quantity(obs_type: str | None, values: dict, units: str) -> str | None:
-    raw = values.get("quantity") if isinstance(values, dict) else None
+    raw = values.get("quantity") if isinstance(values, Mapping) else None
     if isinstance(raw, str) and raw in _CENSUS_QUANTITY_ALIASES:
         return _CENSUS_QUANTITY_ALIASES[raw]
     if isinstance(raw, str) and raw in _CENSUS_CLOSED_QUANTITIES:
@@ -8601,8 +9030,82 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     return None
 
 
+@pytest.fixture(scope="module")
+def _series_census_source_documents() -> dict[str, object]:
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
+    source_paths = sorted(
+        path
+        for path in extracts.glob("*.yaml")
+        if (extracts_v2 / path.name).is_file()
+    )
+    store_paths = [extracts_v2 / path.name for path in source_paths]
+    source_documents = {
+        path.name: yaml.load(
+            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        )
+        for path in source_paths
+    }
+    store_documents = {
+        path.name: yaml.load(
+            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        )
+        for path in store_paths
+    }
+    return {
+        "source_documents": source_documents,
+        "store_documents": store_documents,
+        "source_build_count": len(source_paths),
+        "store_build_count": len(store_paths),
+    }
+
+
+def _match_census_row_extra(
+    stable_points: list[Mapping[str, object]], row_extra: str
+) -> Mapping[str, object] | None:
+    full_suffix = f":{row_extra}"
+    exact_matches = [
+        observation
+        for observation in stable_points
+        if str(observation.get("observation_id") or "").endswith(full_suffix)
+    ]
+    if exact_matches:
+        return exact_matches[0] if len(exact_matches) == 1 else None
+
+    row_label = row_extra.split(":h=", 1)[0]
+    if not row_label.startswith("row="):
+        return None
+    label_suffix = f":{row_label}"
+    label_matches = [
+        observation
+        for observation in stable_points
+        if str(observation.get("observation_id") or "")
+        .rsplit(":h=", 1)[0]
+        .endswith(label_suffix)
+    ]
+    return label_matches[0] if len(label_matches) == 1 else None
+
+
+def test_census_row_extra_prefers_live_hash_with_shared_label() -> None:
+    live = {"observation_id": "source::series::point:0:row=shared:h=live"}
+    other = {"observation_id": "source::series::point:1:row=shared:h=other"}
+
+    assert _match_census_row_extra([live, other], "row=shared:h=live") is live
+    assert (
+        _match_census_row_extra(
+            [{"observation_id": "source::series::point:2:row=unique:h=old"}],
+            "row=unique:h=new",
+        )
+        == {"observation_id": "source::series::point:2:row=unique:h=old"}
+    )
+
+
 def _series_census(
-    extracts: Path, extracts_v2: Path
+    extracts: Path,
+    extracts_v2: Path,
+    *,
+    source_documents: Mapping[str, object] | None = None,
+    store_documents: Mapping[str, object] | None = None,
 ) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
     from decimal import Decimal, InvalidOperation
     from simulator.battery.migrate import _residue_component_field_sets
@@ -8613,21 +9116,31 @@ def _series_census(
     n_numeric = 0
     n_unavailable = 0
     for src_path in sorted(extracts.glob("*.yaml")):
-        source = yaml.load(
-            src_path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
-        )
-        if not isinstance(source, dict):
-            continue
         store_path = extracts_v2 / src_path.name
         if not store_path.is_file():
             continue
-        stored = yaml.load(
-            store_path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        source = (
+            source_documents[src_path.name]
+            if source_documents is not None
+            else yaml.load(
+                src_path.read_text(encoding="utf-8"),
+                Loader=_FAST_SAFE_YAML_LOADER,
+            )
+        )
+        if not isinstance(source, Mapping):
+            continue
+        stored = (
+            store_documents[src_path.name]
+            if store_documents is not None
+            else yaml.load(
+                store_path.read_text(encoding="utf-8"),
+                Loader=_FAST_SAFE_YAML_LOADER,
+            )
         )
         stored_observations = [
             o
             for o in (stored.get("observations") or [])
-            if isinstance(o, dict)
+            if isinstance(o, Mapping)
         ]
         by_id = {
             o["observation_id"]: o
@@ -8636,19 +9149,19 @@ def _series_census(
         source_id = str(source.get("source_id") or src_path.stem)
         used_stable_ids: set[str] = set()
         for source_species, body in (source.get("species") or {}).items():
-            if not isinstance(body, dict):
+            if not isinstance(body, Mapping):
                 continue
             for row in body.get("observations") or []:
                 values = row.get("values") or {}
-                series = values.get("series") if isinstance(values, dict) else None
-                if not isinstance(series, list) or not series:
+                series = values.get("series") if isinstance(values, Mapping) else None
+                if not isinstance(series, (list, tuple)) or not series:
                     continue
                 obs_type = row.get("type") if isinstance(row.get("type"), str) else None
                 units = str(row.get("units") or "")
                 q_token = _census_declared_quantity(obs_type, values, units)
                 raw_id = str(row.get("observation_id") or "")
                 for index, item in enumerate(series):
-                    if not isinstance(item, dict):
+                    if not isinstance(item, Mapping):
                         continue
                     oid = f"{source_id}::{raw_id}::point:{index}"
                     if q_token == "residue_component_composition":
@@ -8737,17 +9250,40 @@ def _series_census(
                         if expected is None:
                             row_extra = series_row_extra(item, include_locator=False)
                             if row_extra is not None:
-                                row_suffix = f":{row_extra}"
-                                stored_obs = next(
-                                    (
-                                        observation
-                                        for observation in stable_points
-                                        if str(observation.get("observation_id") or "").endswith(
-                                            row_suffix
+                                row_label = row_extra.split(":h=", 1)[0]
+                                if row_label.startswith("row="):
+                                    stored_obs = _match_census_row_extra(
+                                        stable_points, row_extra
+                                    )
+                                else:
+                                    temperature_value = item.get(
+                                        "T_K", item.get("temperature_K")
+                                    )
+                                    temperature_unit = "K"
+                                    if temperature_value is None and "T_C" in item:
+                                        temperature_value = item["T_C"]
+                                        temperature_unit = "C"
+                                    temperature, _ = convert_temperature_to_k(
+                                        temperature_value, temperature_unit
+                                    )
+                                    point_id = (
+                                        series_point_id(
+                                            f"{source_id}::{raw_id}",
+                                            temperature=temperature,
+                                            extra=row_extra,
                                         )
-                                    ),
-                                    None,
-                                )
+                                        if temperature is not None
+                                        else None
+                                    )
+                                    row_matches = (
+                                        [by_id[point_id]]
+                                        if point_id is not None
+                                        and point_id in by_id
+                                        and point_id not in used_stable_ids
+                                        else []
+                                    )
+                                    if len(row_matches) == 1:
+                                        stored_obs = row_matches[0]
                         else:
                             stored_obs = next(
                                 (
@@ -8796,13 +9332,27 @@ def _series_census(
     return census, mismatches, n_numeric, n_unavailable, per_source
 
 
-def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) -> None:
+@pytest.mark.xdist_group("migration-series-census")
+def test_j01_store_census_series_numeric_matches_declared_field(
+    tmp_path: Path,
+    _series_census_source_documents: dict[str, object],
+) -> None:
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
         pytest.skip("migrated store not generated yet")
+    source_documents = deepcopy(_series_census_source_documents)
+    assert source_documents["source_build_count"] == sum(
+        (extracts_v2 / path.name).is_file() for path in extracts.glob("*.yaml")
+    )
+    assert source_documents["store_build_count"] == sum(
+        (extracts / path.name).is_file() for path in extracts_v2.glob("*.yaml")
+    )
     census, mismatches, n_numeric, n_unavailable, per_source = _series_census(
-        extracts, extracts_v2
+        extracts,
+        extracts_v2,
+        source_documents=source_documents["source_documents"],
+        store_documents=source_documents["store_documents"],
     )
     sato = _migrate_real_extract(
         tmp_path,
@@ -8819,6 +9369,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     ) = _series_census(
         sato_literature / "extracts",
         sato_literature / "extracts-v2",
+        source_documents=source_documents["source_documents"],
     )
     assert len(sato.observations) == 115
     assert sato_census == {"activity": 54, "fugacity": 55}
@@ -8883,8 +9434,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     assert census.get("evaporation_rate", 0) == 0
     # Re-pinned after the loader-survival regeneration: Richter +50 measured
     # mass_loss_pct / 100 singleton series; mismatches remains 0.
-    # The same Ozawa 2012 extract adds 86 printed mass-loss fraction cells: 69->155.
-    assert census.get("mass_loss_fraction") == 155
+    # Ozawa 2012 Table 1 rows are flat observations after e0f1d52a7;
+    # _series_census counts only values.series, leaving the three series sources at 69.
+    assert census.get("mass_loss_fraction") == 69
     assert census.get("mass_loss_rate", 0) == 0
     # Re-pinned once for the reviewed Ueshima replacement: its Fe-Mo Table 4
     # adds 58 printed T_C points, routed as transition_temperature. The
@@ -8951,13 +9503,17 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # relative entropy increments remain typed refusals; it prints no Cp or
     # absolute S cells. H-H298 259->377 and n_numeric 8700->8818.
     # A fresh migration adds Fredrickson & Chasanov's 74 H_minus_H298 and 12 cp
-    # points: H_minus_H298 377->451 and cp 1752->1764. The Beyer schema-gap
-    # rows stop exposing 93 unsupported glass-S and oxide-formation cells as
-    # numeric, so n_numeric is 8818 + 86 - 93 = 8811. Offers 3+4 add 3,780
-    # numeric points (3,759 residue components plus 21 isotope deltas), moving
-    # n_numeric to 12,591. They also add 60 null Su & Zhang Table S2 cells
-    # (30 each for Cr2O3 and MnO) and Richter's printed <0.01 Na2O cell to the
-    # unavailable tally: 949->1,010. These cells are not numeric observations.
+    # points: H_minus_H298 377->451 and cp 1752->1764. Before the current
+    # offers, series census was 8904 - 86 flat Ozawa rows - 93 Beyer schema-gap
+    # rows = 8725. Offers 3+4 add 3,780 numeric points (3,759 residue
+    # components plus 21 isotope deltas), moving n_numeric to 12,505. They also
+    # add 60 null Su & Zhang Table S2 cells and Richter's printed <0.01 Na2O
+    # cell to the unavailable tally: 949->1,010. These cells are not numeric.
+    # The old 8818 total also
+    # counted 93 Beyer cells from the Table 6 glass-S and Tables 8/10/12
+    # simple-oxide-formation schema-gap rows. SC-475 keeps those rows typed
+    # unavailable; their printed cells remain unchanged and are pinned by
+    # test_sc475_incr_frame_extracts. Ozawa's 86 flat Table 1 rows are not
     assert census.get("cp") == 1764
     assert census.get("H_minus_H298") == 451
     assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
@@ -9009,7 +9565,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 12591, (n_numeric, census, n_unavailable)
+    assert n_numeric == 12505, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -9295,6 +9851,120 @@ def test_bencze_2016_reference_temperature_is_bound(tmp_path: Path) -> None:
     )
 
 
+def test_bencze_2016_table_s1_1273k_partial_pressure_is_the_printed_glyph(
+    tmp_path: Path,
+) -> None:
+    """Table S-I prints p(Na) as ``1.70·10-2`` Pa at the parent's 1273 K.
+
+    The sibling activity ``7.57·10-9`` is not this quantity. A caret power
+    and a printed ± on the mantissa stay unavailable. A and B are not gridded.
+    """
+
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/bencze-yazhenskikh-2016.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    na_rows = source["species"]["Na"]["observations"]
+    table_s1 = next(
+        row for row in na_rows if row["observation_id"] == "bencze_2016_table_s1_na_all_subsamples"
+    )
+    printed = table_s1["values"]["rows"][0]
+    assert printed["p_Na_at_1273_K_Pa"] == "1.70·10-2"
+    assert printed["a_Na2O_at_1273_K"] == "7.57·10-9"
+    assert printed["A"] == 45.439
+    assert printed["B"] == -63030
+
+    selected = select_declared_source(Quantity.P_PARTIAL, "Pa", printed)
+    assert selected.field_name == "p_Na_at_1273_K_Pa"
+    assert selected.value.kind is ValueKind.POINT
+    assert selected.amount == Decimal("1.70e-2")
+    assert selected.unit_trail == "identity:Pa"
+    # The printed cell, not exp(A + B/1273). That fit is about 0.01701 Pa.
+    fit_pa = Decimal(str(math.exp(45.439 + (-63030) / 1273)))
+    assert abs(selected.amount - fit_pa) > Decimal("1e-6")
+
+    activity_only = {
+        key: value for key, value in printed.items() if key != "p_Na_at_1273_K_Pa"
+    }
+    refused_activity = select_declared_source(Quantity.P_PARTIAL, "Pa", activity_only)
+    assert refused_activity.value.kind is ValueKind.UNAVAILABLE
+    assert "no mapped p_partial" in (refused_activity.reason or "")
+    assert refused_activity.amount != Decimal("7.57e-9")
+    activity_quantity = select_declared_source(Quantity.ACTIVITY, None, printed)
+    assert activity_quantity.value.kind is ValueKind.UNAVAILABLE
+    assert activity_quantity.amount != Decimal("7.57e-9")
+
+    caret = dict(printed)
+    caret["p_Na_at_1273_K_Pa"] = "1.70·10^-2"
+    caret_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", caret)
+    assert caret_selection.value.kind is ValueKind.UNAVAILABLE
+
+    table_s2 = next(
+        row for row in na_rows if row["observation_id"] == "bencze_2016_table_s2_na_selected_means"
+    )
+    mean_row = table_s2["values"]["rows"][0]
+    assert mean_row["p_Na_at_1273_K_Pa"] == "(5.45±0.61)·10-2"
+    mean_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", mean_row)
+    assert mean_selection.value.kind is ValueKind.UNAVAILABLE
+    assert "not numeric" in (mean_selection.reason or "")
+    assert "(5.45±0.61)·10-2" in (mean_selection.reason or "")
+    assert mean_selection.amount != Decimal("5.45e-2")
+
+    potassium = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml"
+        ).read_text(encoding="utf-8")
+    )["rows"][0]
+    assert potassium["p_K_at_1273_K_Pa"] == "5.52·10-4"
+    assert potassium["a_K2O_at_1273_K"] == "1.13·10-14"
+    potassium_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", potassium)
+    assert potassium_selection.field_name == "p_K_at_1273_K_Pa"
+    assert potassium_selection.amount == Decimal("5.52e-4")
+    assert potassium_selection.amount != Decimal("1.13e-14")
+
+    result = _migrate_real_extract(tmp_path, "bencze-yazhenskikh-2016.yaml")
+    assert len(result.observations) == 70
+    example = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples"
+        "::rows:row=1:h=db6e6e110926"
+    ]
+    assert example.value.kind is ValueKind.POINT
+    assert example.value.point == Decimal("1.70e-2")
+    assert example.identity.quantity.value is Quantity.P_PARTIAL
+    assert example.identity.temperature_K.value == Decimal("1273")
+    assert example.identity.species.formula == "Na"
+    assert example.value.point != Decimal("7.57e-9")
+
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.POINT
+    ]
+    unavailable = [
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.UNAVAILABLE
+    ]
+    assert len(points) == 61
+    assert {observation.value.point for observation in points} >= {Decimal("1.70e-2")}
+    assert Decimal("7.57e-9") not in {observation.value.point for observation in points}
+    assert len(unavailable) == 9
+    mean = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s2_na_selected_means"
+        "::rows:row=s1-1:h=1d0d1e2bbace"
+    ]
+    assert mean.value.kind is ValueKind.UNAVAILABLE
+    assert "(5.45±0.61)·10-2" in (mean.value.unavailable_reason or "")
+    potassium_shell = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s1_k_all_subsamples"
+    ]
+    assert potassium_shell.value.kind is ValueKind.UNAVAILABLE
+    assert "table_transcription" in (potassium_shell.value.unavailable_reason or "")
+    assert "no mapped p_partial" in (potassium_shell.value.unavailable_reason or "")
+
+
 @pytest.mark.parametrize(
     "extra, expected",
     [
@@ -9515,10 +10185,15 @@ def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -
         assert prediction.requested_composition == composition
 
 
-def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> None:
+@pytest.mark.xdist_group("migration-series-census")
+def test_k04_census_goes_red_when_stored_alpha_is_corrupted(
+    tmp_path: Path,
+    _series_census_source_documents: dict[str, object],
+) -> None:
     import shutil
     from decimal import Decimal
 
+    source_documents = deepcopy(_series_census_source_documents)
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
@@ -9545,8 +10220,15 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         n_mutated += 1
     assert n_mutated == 6, n_mutated
     shirai.write_text(yaml.safe_dump(stored, sort_keys=False), encoding="utf-8")
+    changed_store_documents = dict(
+        source_documents["store_documents"]
+    )
+    changed_store_documents[shirai.name] = stored
     _census, mismatches, _n_numeric, _n_unavailable, _per_source = _series_census(
-        extracts, dest
+        extracts,
+        dest,
+        source_documents=source_documents["source_documents"],
+        store_documents=changed_store_documents,
     )
     assert mismatches, "census must go red when stored alpha points are corrupted"
 
@@ -9609,6 +10291,51 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     row["units"] = units
     row["values"] = values
     return extract
+
+
+def test_prose_percent_fraction_conversion_keeps_basis_and_semicolon_units(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="S6+/ΣS as printed in percent",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_fraction": "74.5",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.745")
+
+    semicolon = select_declared_source(
+        Quantity.MASS_LOSS_FRACTION,
+        "experimental time in hours; evaporated fraction in percent",
+        {"mass_loss_fraction": "74.5"},
+    )
+    assert semicolon.value.point == Decimal("0.745")
+    assert semicolon.unit_trail == "percent_to_fraction"
+
+    wt_percent = select_declared_source(
+        Quantity.MASS_LOSS_FRACTION,
+        "wt%",
+        {"mass_loss_fraction": "74.5"},
+    )
+    assert wt_percent.value.point == Decimal("0.745")
+    assert wt_percent.unit_trail == "percent_to_fraction"
+
+    reduced_valence = select_declared_source(
+        Quantity.VALENCE_RATIO,
+        "% of total Mn",
+        {"value": "0.045", "value_as_published": "4.5"},
+    )
+    assert reduced_valence.value.point == Decimal("0.045")
+    assert reduced_valence.unit_trail != "percent_to_fraction"
 
 
 def test_partial_molar_enthalpy_value_field_migrates_as_numeric_point(
@@ -10354,6 +11081,7 @@ def test_scalar_activity_printed_forms_round_trip(
     assert observation.provenance == {
         "printed_value": printed_value,
         "printed_form": printed_form,
+        "printed_phase": "gas",
     }
 
 
@@ -10535,10 +11263,37 @@ def test_k01_tsaplin_store_activity_not_coefficient() -> None:
     assert as_decimal(obs["value"]["point"]) == as_decimal("7.19e-10")
 
 
+_BOUNDARY_WRAPPERS = frozenset(
+    {
+        "select_declared_source",
+        "empty_value_from_payload",
+        "_series_point_value",
+        "_selection_from_named_field",
+        "_condition_ranges_from_payload",
+        "_numeric_field",
+        "_unavailable_selection",
+        "_point_selection",
+        "_interval_selection",
+        "_series_selection_from_items",
+    }
+)
+_BOUNDARY_INGEST_CALLERS = frozenset(
+    {
+        "_migrate_extract_observation",
+        "_emit_exploded_point",
+        "_migrate_kems",
+        "_migrate_mre",
+        "_migrate_langmuir",
+        "_migrate_refractory",
+        "_migrate_vacuum_pyrolysis",
+        "_migrate_ledger",
+        "_migrate_compilation_file",
+    }
+)
+
+
 def test_k01_value_constructions_live_inside_the_boundary() -> None:
     import ast
-
-    from simulator.battery.migrate import BOUNDARY_INGEST_CALLERS
 
     src = (REPO_ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
     tree = ast.parse(src)
@@ -10618,9 +11373,10 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
                     f"Value constructed in {owner}:{node.lineno} outside the boundary"
                 )
             if name == "select_declared_source":
-                from simulator.battery.migrate import _BOUNDARY_WRAPPERS
-
-                assert owner in BOUNDARY_INGEST_CALLERS or owner in _BOUNDARY_WRAPPERS, (
+                assert (
+                    owner in _BOUNDARY_INGEST_CALLERS
+                    or owner in _BOUNDARY_WRAPPERS
+                ), (
                     f"select_declared_source called from unlisted {owner}:{node.lineno}"
                 )
             self.generic_visit(node)
@@ -10628,14 +11384,7 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
     Visitor().visit(tree)
 
 
-def test_k01_boundary_records_ingest_callers(tmp_path: Path) -> None:
-    from simulator.battery.migrate import (
-        BOUNDARY_INGEST_CALLERS,
-        reset_boundary_served,
-        boundary_served_callers,
-    )
-
-    reset_boundary_served()
+def test_k01_boundary_migrates_declared_observation(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="pure_Psat",
         units="atm",
@@ -10798,13 +11547,19 @@ def test_k01_boundary_records_ingest_callers(tmp_path: Path) -> None:
             "rows": [{"atomic_weight": {"value": 227}}],
         },
     )
-    migrate(root, write=False)
-    served = {name for _file, _line, name in boundary_served_callers()}
-    assert served
-    unexpected = served - BOUNDARY_INGEST_CALLERS
-    assert not unexpected, unexpected
-    missing = BOUNDARY_INGEST_CALLERS - served
-    assert not missing, missing
+    result = migrate(root, write=False)
+    migrated = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith("fixture-source::")
+    ]
+    assert migrated
+    assert any(
+        observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.P_SAT
+        and observation.value.kind is ValueKind.POINT
+        for observation in migrated
+    )
 
 
 def test_k02_t_range_is_domain_not_value(tmp_path: Path) -> None:
@@ -13322,9 +14077,10 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
     assert table3.derivation is not None
     assert "exchange reaction (3) and Eq. (4)" in table3.derivation.relation
     assert table3.derivation.inputs == table3.derived_from
-    assert table4.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-    assert table4.derived_from is None
-    assert table4.derivation is None
+    assert table4.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert table4.derivation is not None
+    assert "exchange relation (Eqs. 1-6" in table4.derivation.relation
+    assert table4.derivation.inputs == table4.derived_from
 
     source = REPO_ROOT / "data" / "literature" / "extracts" / name
     extract = yaml.safe_load(source.read_text(encoding="utf-8"))
@@ -13336,8 +14092,7 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
     }
     rows[table3_id].pop("derivation")
     mutated_table4 = rows[table4_id]
-    mutated_table4["values"]["method_class"] = "measured_reduced"
-    mutated_table4["values"]["evidence_class"] = "measured_reduced"
+    mutated_table4.pop("derivation")
     mutated_table4["derived_from"] = ["missing-parent"]
     mutated = migrate(_write_min_tree(tmp_path / "mutated", extract), write=False)
     issues = {
@@ -14182,6 +14937,55 @@ def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
     assert k_by_key["entropy_recommended"].value.point == as_decimal("111.21072")
 
 
+@pytest.mark.parametrize(
+    ("formula", "printed_phase", "expected_formula", "expected_phase"),
+    (
+        ("AlCl3(c)", "(c)", "AlCl3", Phase.CR),
+        ("Ni(g)", "(g)", "Ni", Phase.G),
+        ("Na(l)", "(l)", "Na", Phase.L),
+        ("H2O(aq)", "(aq)", "H2O(aq)", None),
+        ("AlCl3(c)", "(l)", "AlCl3(c)", None),
+    ),
+)
+def test_kelley_king_phase_suffix_is_separated_using_closed_map(
+    formula: str,
+    printed_phase: str,
+    expected_formula: str,
+    expected_phase: Phase | None,
+) -> None:
+    normalized, phase = _kelley_king_formula_phase_suffix(formula, printed_phase)
+    assert normalized == expected_formula
+    if expected_phase is None:
+        assert phase is None
+    else:
+        assert phase is not None and phase.is_value and phase.value is expected_phase
+
+
+def test_kelley_king_phase_suffix_reaches_migrated_species(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root, "kelley-king-1961-usbm-b592", "table-006-0007.json"
+    )
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if "table-006-0007" in observation.observation_id
+    ]
+    assert rows
+    assert {quantity_token(row.identity) for row in rows} == {
+        None,
+        Quantity.CP,
+        Quantity.S,
+    }
+    assert all(row.identity.species.formula == "AlCl3" for row in rows)
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.CR
+        for row in rows
+    )
+
+
 def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     page = json.loads(
         (
@@ -14219,6 +15023,52 @@ def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     assert selection.value.unavailable_reason == (
         "missing printed unit for cp; refusing ungrounded numeric value"
     )
+
+
+def test_pankratz_1987_crystal_columns_reach_separate_series(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root, "pankratz-1987-usbm-b689", "page-0005.json"
+    )
+    _copy_compilation_record(root, "nasa-glenn", "NG-1475.json")
+    _copy_compilation_record(root, "burcat", "BU-2430.json")
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "pankratz-1987-usbm-b689:page-0005"
+        )
+    ]
+    by_quantity = {
+        quantity_token(observation.identity): observation
+        for observation in rows
+        if quantity_token(observation.identity)
+        in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    }
+    assert set(by_quantity) == {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    for observation in by_quantity.values():
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.CR
+        assert observation.value.kind is ValueKind.SERIES
+        assert len(observation.value.series or ()) == 14
+
+    for source_id, record_id in (
+        ("nasa-glenn", "NG-1475"),
+        ("burcat", "BU-2430"),
+    ):
+        record_prefix = f"{source_id}:{record_id}"
+        observations = [
+            observation
+            for observation in result.observations.values()
+            if observation.observation_id == record_prefix
+            or observation.observation_id.startswith(f"{record_prefix}:")
+        ]
+        assert observations
+        assert all(
+            observation.identity.species.phase.is_unknown
+            for observation in observations
+        )
 
 
 def test_g5_compilation_conversion_trail_mutation_proof(
@@ -16300,10 +17150,22 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
     tokens = {quantity_token(o.identity) for o in robinot}
     assert Quantity.YIELD_FRACTION in tokens
     assert Quantity.O2_YIELD in tokens
+    model_yield = [
+        o
+        for o in robinot
+        if o.observation_id.startswith(
+            "kems-044-robinot-2026::robinot_2026_o2_hsc_expected_1p37_model"
+        )
+    ]
+    assert len(model_yield) == 1
+    assert model_yield[0].identity.temperature_K.is_value
+    assert model_yield[0].identity.temperature_K.value == Decimal("2073.15")
+    experimental_yields = [o for o in robinot if o is not model_yield[0]]
+    assert experimental_yields
     assert all(
         o.identity.temperature_K.is_unknown
         and "no midpoint invented" in (o.identity.temperature_K.reason or "")
-        for o in robinot
+        for o in experimental_yields
     )
     sauerborn = [
         o
@@ -16409,7 +17271,8 @@ def test_store_pyrolysis_yield_census_is_honest() -> None:
                 continue
             if rail_for_quantity(q, species_formula=formula) is Rail.PYROLYSIS_YIELD:
                 rows.append(obs)
-    assert len(rows) == 30
+    # b261: the main join adds kems-044-robinot-2026 o2_comparable_run_1p17.
+    assert len(rows) == 31
     tokens = {quantity_token(o.identity) for o in rows}
     assert Quantity.MASS_LOSS_FRACTION in tokens
     assert Quantity.YIELD_FRACTION in tokens
@@ -18377,6 +19240,290 @@ def test_residue_identity_uses_only_printed_fo2_from_row_or_experiment(
     assert "fO2_Pa" in outcome.fields
 
 
+def test_bare_log_convention_pins_existing_iw_window() -> None:
+    from simulator.battery.migrate import _bare_log_convention
+
+    accepted, notice = _bare_log_convention(Decimal("-12"), Decimal("1600"))
+    assert accepted.is_value
+    # 10^-12 bar × 100000 Pa/bar, pinned before the admission rule changes.
+    assert accepted.value == Decimal("1e-7")
+    assert notice == (
+        "fO2 reference state not printed; 1 bar convention assumed "
+        "(1 atm alternative: +0.0057 dex)"
+    )
+
+    rejected, rejection_notice = _bare_log_convention(
+        Decimal("-0.68"), Decimal("1600")
+    )
+    assert rejected.is_unknown
+    assert rejected.reason == (
+        "fO2 reference scale not printed (absolute vs buffer-relative)"
+    )
+    assert rejection_notice is None
+
+
+def test_bare_log_accepts_printed_air_atmosphere() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.68"), Decimal("1600"), printed_atmospheres=("air",)
+    )
+    assert decision.state.is_value
+    assert decision.state.value == Decimal("20892.96130854039483122233736")
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert "expected log10(fO2/bar)=-0.6788" in decision.notice_reason
+    assert "matched 1 bar total-pressure anchor" in decision.notice_reason
+    assert "bar-vs-atm unit ambiguity (0.0057 dex)" in decision.notice_reason
+
+
+def test_bare_log_air_at_one_bar_uses_the_bar_frame() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.68"),
+        Decimal("1600"),
+        printed_atmospheres=("air",),
+        total_pressure_pa=Decimal("100000"),
+    )
+
+    assert decision.state.is_value
+    assert decision.state.value == log10_fo2_to_pa(
+        Decimal("-0.68"), Decimal("100000")
+    )
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert "expected log10(fO2/bar)=-0.6788" in decision.notice_reason
+    assert "matched bar frame" in decision.notice_reason
+
+
+def test_bare_log_accepts_printed_pure_oxygen_at_one_atmosphere() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("0.00"),
+        Decimal("1600"),
+        printed_atmospheres=("O2 100.0 × 200 SCCM",),
+    )
+    assert decision.state.is_value
+    assert decision.state.value == Decimal("100000")
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert "expected log10(fO2/bar)=+0.0000" in decision.notice_reason
+    assert "matched 1 bar total-pressure anchor" in decision.notice_reason
+
+
+def test_bare_log_accepts_explicit_one_atmosphere_pure_oxygen_anchor() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+
+    printed_log = Decimal("0.0057")
+    decision = _bare_log_frame_decision(
+        printed_log,
+        Decimal("1600"),
+        printed_atmospheres=("pure O2 at 1 atm",),
+    )
+
+    assert decision.state.is_value
+    assert decision.state.value == log10_fo2_to_pa(
+        printed_log, Decimal("100000")
+    )
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert "expected log10(fO2/bar)=+0.0057" in decision.notice_reason
+    assert "matched atm frame at P_total=1.01325 bar" in decision.notice_reason
+
+
+@pytest.mark.parametrize(
+    ("gas_as_printed", "log_fO2"),
+    [
+        ("CO2 82.200 × 100.00 SCCM + CO 1.000 × 1.00 SCCM", "-0.68"),
+        ("H2O 275.400 × 100.00 SCCM + H2 1.000 × 1.00 SCCM", "-0.68"),
+    ],
+)
+def test_bare_log_accepts_direct_printed_gas_couple_with_combined_band(
+    gas_as_printed: str, log_fO2: str
+) -> None:
+    from simulator.battery.enums import Authority, NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal(log_fO2),
+        Decimal("1682.15"),
+        printed_atmospheres=(gas_as_printed,),
+    )
+
+    assert decision.state.is_value
+    assert decision.state.value == Decimal("20892.96130854039483122233736")
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert decision.notice_authority is Authority.CERTIFIED
+    assert "combined_band=" in decision.notice_band
+    assert "expected CEA log10(fO2/bar)=" in decision.notice_reason
+
+
+def test_bare_log_direct_couple_mismatch_is_refused_as_possible_misprint() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.30"),
+        Decimal("1682.15"),
+        printed_atmospheres=("CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM",),
+    )
+
+    assert decision.state.is_unknown
+    assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
+    assert "possible source misprint" in decision.notices[0].reason
+
+
+def test_bare_log_direct_couple_outside_cea_domain_carries_extrapolated_authority() -> None:
+    from simulator.battery.enums import Authority, NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.chemistry.offgas_fo2 import _direct_gas_couple_fo2
+
+    expected = _direct_gas_couple_fo2(
+        {"CO2": 1.0, "CO": 1.0},
+        {"CO2": 0.011, "CO": 0.011},
+        199.0,
+    ).log10_fO2
+    decision = _bare_log_frame_decision(
+        Decimal(str(expected)),
+        Decimal("199"),
+        printed_atmospheres=(
+            "CO2 1.000 × 1.00 SCCM + CO 1.000 × 1.00 SCCM",
+        ),
+    )
+
+    assert decision.state.is_value
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert decision.notice_authority is Authority.EXTRAPOLATED
+
+
+def test_bare_log_wgs_dependent_mix_remains_typed_refusal() -> None:
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.30"),
+        Decimal("1682.15"),
+        printed_atmospheres=(
+            "CO2 20.0 × 10 SCCM + H2 50.0 × 200 SCCM",
+        ),
+    )
+
+    assert decision.state.is_unknown
+    assert "gas_mix_fo2_band_unavailable" in decision.state.reason
+    assert "WGS-dependent" in decision.state.reason
+
+
+def test_direct_gas_couple_without_janaf_uses_mix_band_and_notices(monkeypatch) -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.generators import janaf
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    def missing_table(_formula, _temperature):
+        raise ValueError("no JANAF gas table")
+
+    monkeypatch.setattr(janaf, "_janaf_gas_formation_gibbs_J_per_mol", missing_table)
+    decision = _bare_log_frame_decision(
+        Decimal("-0.68"),
+        Decimal("1682.15"),
+        printed_atmospheres=(
+            "CO2 82.200 × 100.00 SCCM + CO 1.000 × 1.00 SCCM",
+        ),
+    )
+
+    assert decision.state.is_value
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and "gas_couple_thermo_spread_unsized" in notice.reason
+        for notice in decision.notices
+    )
+
+
+def test_bare_log_mismatch_is_refused_and_noticed() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.30"), Decimal("1600"), printed_atmospheres=("air",)
+    )
+    assert decision.state.is_unknown
+    assert len(decision.notices) == 1
+    assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
+    assert "possible source misprint" in decision.notices[0].reason
+
+
+def test_bare_log_without_printed_atmosphere_stays_frame_ambiguous() -> None:
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(Decimal("-0.30"), Decimal("1600"))
+    assert decision.state.is_unknown
+    assert decision.state.reason == (
+        "fO2 reference scale not printed (absolute vs buffer-relative)"
+    )
+    assert decision.notices == ()
+
+
+def test_bare_log_above_total_pressure_ceiling_is_refused() -> None:
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("0.01"),
+        Decimal("1600"),
+        printed_atmospheres=("pure O2",),
+        total_pressure_pa=Decimal("101325"),
+    )
+    assert decision.state.is_unknown
+    assert "total-pressure pO2 ceiling" in decision.state.reason
+
+
+def test_kc89_printed_air_admits_48_rows_and_keeps_four_reducing_rows(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import NoticeKind
+
+    source_id = "kress-carmichael-1989-lime-iron-silicate-redox"
+    result = _migrate_real_extract(tmp_path / source_id, f"{source_id}.yaml")
+    rows = [row for row in result.observations.values() if row.source_id == source_id]
+    bare = [
+        row
+        for row in rows
+        if row.point_conditions
+        and "fO2_log" in row.point_conditions
+        and row.point_conditions["fO2_log"].state.is_value
+    ]
+
+    def table1_run_id(row) -> str:
+        return row.observation_id.split("::", 1)[1].split("_")[2]
+
+    air = [
+        row
+        for row in bare
+        if row.point_conditions["fO2_log"].state.value == Decimal("-0.68")
+    ]
+    assert len({table1_run_id(row) for row in air}) == 48
+    assert all(row.identity.fO2_Pa.is_value for row in air)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            for notice in row.notices
+        )
+        for row in air
+    )
+
+    reducing = [row for row in bare if row not in air]
+    assert {table1_run_id(row) for row in reducing} == {"93A", "98B", "99A", "101A"}
+    assert all(row.identity.fO2_Pa.is_value for row in reducing)
+    assert all(
+        not any(
+            notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            for notice in row.notices
+        )
+        for row in reducing
+    )
+
+
 def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
     tmp_path: Path,
 ) -> None:
@@ -18592,6 +19739,27 @@ def test_hashimoto_row_left_live_diagnostics_are_final(
     ]
     assert contradicted == []
     assert len(left_live) == 0
+
+
+def test_residue_component_source_phase_outputs_are_pinned(tmp_path: Path) -> None:
+    from simulator.battery.enums import Quantity
+
+    expected = {
+        "kems-015-hashimoto-1983": Phase.L,
+        "kems-012-sossi-2019": Phase.GLASS,
+    }
+    for source_id, phase in expected.items():
+        result = _migrate_real_extract(tmp_path / source_id, f"{source_id}.yaml")
+        rows = [
+            row
+            for row in result.observations.values()
+            if row.source_id == source_id
+            and row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and row.value.point is not None
+        ]
+        assert rows
+        assert {row.identity.species.phase.value for row in rows} == {phase}
 
 
 def test_residue_store_write_files_cells_under_their_extract_sources(
@@ -18930,7 +20098,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         assert identity.temperature_K.value == conditions["temperature_K"].state.value
         assert identity.sample_mass_kg.value == Decimal("0.0001")
         assert identity.exposure.value.duration_s.value == conditions["time_min"].state.value * Decimal("60")
-        assert identity.total_pressure_Pa.value == experiment.pressure_environment.total_pressure_Pa.state.value.point
+        from simulator.battery.records import ApproxPressure, BandBasis
+
+        pressure_band = identity.total_pressure_Pa.value
+        assert isinstance(pressure_band, ApproxPressure)
+        assert pressure_band.point == experiment.pressure_environment.total_pressure_Pa.state.value.point
+        assert pressure_band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+        assert pressure_band.low < pressure_band.point < pressure_band.high
         assert identity.fO2_Pa.is_not_applicable
         assert identity.fO2_Pa.reason == "oxygen_unbuffered_vacuum"
         assert run_id == obs.experiment_id.split("::experiment::")[-1]
@@ -19828,7 +21002,7 @@ def test_stolyarova_1995_oxygen_routes_keep_typed_reactions_without_invented_par
     for rows in (eqn1_rows, eqn2_rows, o2_rows):
         assert all(
             obs.evidence.class_.is_value
-            and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+            and obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
             for obs in rows
         )
 
@@ -19943,7 +21117,7 @@ def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
     assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
 
 
-def test_stolyarova_1991_atomic_oxygen_is_quoted_attributed_with_relation(
+def test_stolyarova_1991_atomic_oxygen_is_quoted_from_equilibrium_1(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
@@ -19993,12 +21167,16 @@ def test_stolyarova_1991_atomic_oxygen_is_quoted_attributed_with_relation(
         )
     )
     for obs in rows:
+        # quoted_attributed drops the equilibrium source derivation. The
+        # printed atm value still converts to Pa.
         assert obs.derivation is not None
         assert obs.derivation.relation == "atm_to_Pa"
-        assert "WO3" not in obs.derivation.relation
+        assert obs.derivation.output_unit == "Pa"
         assert obs.derived_from is None
         assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert obs.evidence.attribution == "Stolyarova et al. (1991), Table Ib, Eq. [1]"
+        assert obs.evidence.attribution == (
+            "Authors' atomic-oxygen pressure reduction from KEMS measurements using the printed equilibrium relation (1); WO2 and WO3 inputs are not tabulated."
+        )
 
 
 def test_stolyarova_1991_composition_map_mutation_removes_identity(

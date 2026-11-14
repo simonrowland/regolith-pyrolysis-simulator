@@ -22,13 +22,20 @@ extraction:
   provenance_path: raw/kems-137-bischof-2023/kems-137-bischof-2023.pdf
 review_status: draft
 fidelity_samples:
+- path: species.Ga.observations[bischof_2023_ga_psat_s1_1low_polytherm].values.points[0].p_Pa
+  value: 4.04e-05
+  locator: {page: 2, pdf_page_index: 1, table: S1, row: 1, note: 'Rendered Supplement Table S1, Ga partial pressure'}
+- path: species.In.observations[bischof_2023_in_psat_s1_1low_polytherm].values.points[5].p_Pa
+  value: 0.000123
+  locator: {page: 2, pdf_page_index: 1, table: S1, row: 6, note: 'Rendered Supplement Table S1, In partial pressure'}
 - species: Ga
   observable: activity_coefficient
   observation_id: bischof_2023_gao15_gamma_preferred_1700k
   field: gamma
   value: 0.036
   locator:
-    pdf_page_index: 23
+    page: 23
+    pdf_page_index: 22
     paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
     note: authors preferred average; AM page 23 lines 593-596; uncertainty in last digit as printed
 - species: In
@@ -37,7 +44,8 @@ fidelity_samples:
   field: gamma
   value: 0.017
   locator:
-    pdf_page_index: 23
+    page: 23
+    pdf_page_index: 22
     paragraph: giving γ(InO1.5) = 0.017(12) at an average T of 1674 K
     note: AM page 23 lines 593-596; Table 8 on page 22 has mole fractions, not these γ averages
 - species: Ga
@@ -47,7 +55,8 @@ fidelity_samples:
   value: 0.0632
   locator:
     table: S1
-    pdf_page_index: 2
+    page: 2
+    pdf_page_index: 1
     note: supplement Table S1 first row γ(GaO1.5)=6.32E-02 at 1586.4 K
 - species: Ga
   observable: activity_coefficient
@@ -56,7 +65,8 @@ fidelity_samples:
   value: 0.0172
   locator:
     table: '8'
-    pdf_page_index: 22
+    page: 22
+    pdf_page_index: 21
     note: Table 8 x(GaO1.5)=0.0172(4) for 1_low polytherm (from 2_low)
 - species: Ga
   observable: transition_point
@@ -65,31 +75,36 @@ fidelity_samples:
   value: T50_condensation_K
   locator:
     table: '9'
-    pdf_page_index: 30
+    page: 30
+    pdf_page_index: 29
     note: Table 9 Ga Tc50 ADeu 1874 K at 10^-6 bar; FactSage 8.2 model, not a KEMS gamma
 - path: species.Ga.observations[bischof_2023_kems_geometry_and_calibration].values.orifice_diameter_mm
   value: 0.4
   locator:
-    pdf_page_index: 5
+    page: 5
+    pdf_page_index: 4
     section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
     paragraph: a lid with a 0.4 mm orifice at its centre
 - path: species.Ga.observations[bischof_2023_kems_geometry_and_calibration].values.ionizing_electron_energy_eV
   value: 60.0
   locator:
-    pdf_page_index: 5
+    page: 5
+    pdf_page_index: 4
     section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
     paragraph: Given an electron ionisation energy E(e-) of 60 eV
 - path: species.Ga.observations[bischof_2023_kems_geometry_and_calibration].values.emission_current_mA
   value: 0.468
   locator:
-    pdf_page_index: 5
+    page: 5
+    pdf_page_index: 4
     section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
     paragraph: a constant electron emission i(em) of 0.468 mA
 - path: species.Ga.observations[bischof_2023_gao15_gamma_s1_1low_polytherm].values.initial_weight_mg
   value: 79.1
   locator:
     table: '2'
-    pdf_page_index: 6
+    page: 6
+    pdf_page_index: 5
     paragraph: 'Table 2 1_low initial weight [mg] 79.1'
 - species: Ga
   observable: rate_series
@@ -245,11 +260,15 @@ experiments:
 - experiment_id: an-di-1-low
   bench_id: finnigan-mat-271-ir
   method: knudsen_effusion
-  locator: {page: 5, table: '2', note: 'Physical run 1_low; Table 2 and S1/S2 label this charge explicitly'}
+  locator: {page: 6, table: '2', note: 'Physical run 1_low; Table 2 and S1/S2 label this charge explicitly'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: point, point: '0.0000791'}}
-      locator: {page: 5, table: '2', note: 'Printed initial weight 79.1 mg; unit conversion only'}
+      locator: {page: 6, table: '2', note: 'Printed initial weight 79.1 mg; unit conversion only'}
+    form:
+      state: {tag: value, value: condensed_liquid}
+      locator: {page: 1, section: Abstract, quote: 'equilibrium partial pressures above the silicate liquid'}
+    form_as_published: silicate liquid
     printed_composition:
       state: {tag: value, value: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}}
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 1_low; total 99.90; trace additions excluded from oxide columns'}
@@ -274,22 +293,22 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-      locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}
+      locator: {page: 5, note: 'KC chamber about 10^-6 mbar; unit conversion only'}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
     channel: {tag: value, value: intrinsic}
-    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 6, table: 'S1'}}
+    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 2, table: 'S1', source_path: 'docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf'}}
   conditions:
-    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 5, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
+    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 6, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
 - experiment_id: an-di-2-low
   bench_id: finnigan-mat-271-ir
   method: knudsen_effusion
-  locator: {page: 5, table: '2', note: 'Physical run 2_low; Table 2 and S3 label this charge explicitly'}
+  locator: {page: 6, table: '2', note: 'Physical run 2_low; Table 2 and S3 label this charge explicitly'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: point, point: '0.00007292'}}
-      locator: {page: 5, table: '2', note: 'Printed initial weight 72.92 mg; unit conversion only'}
+      locator: {page: 6, table: '2', note: 'Printed initial weight 72.92 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}}
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low'}
@@ -312,22 +331,22 @@ experiments:
         - sample.printed_composition
         output_unit: mole_fraction
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 5, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
     channel: {tag: value, value: intrinsic}
-    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 6, table: 'S1'}}
+    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 2, table: 'S1', source_path: 'docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf'}}
   conditions:
-    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 5, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
+    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 6, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
 - experiment_id: an-di-3-high
   bench_id: finnigan-mat-271-ir
   method: knudsen_effusion
-  locator: {page: 5, table: '2', note: 'Physical run 3_high; Table 2 and S4 label this charge explicitly'}
+  locator: {page: 6, table: '2', note: 'Physical run 3_high; Table 2 and S4 label this charge explicitly'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: point, point: '0.00003869'}}
-      locator: {page: 5, table: '2', note: 'Printed initial weight 38.69 mg; unit conversion only'}
+      locator: {page: 6, table: '2', note: 'Printed initial weight 38.69 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: {SiO2: '49.72', Al2O3: '15.15', MgO: '10.27', CaO: '23.28'}}
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 3_high; total oxide columns 98.42; trace Ga/In oxides excluded'}
@@ -350,22 +369,22 @@ experiments:
         - sample.printed_composition
         output_unit: mole_fraction
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 5, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
     channel: {tag: value, value: intrinsic}
-    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 6, table: 'S1'}}
+    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 2, table: 'S1', source_path: 'docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf'}}
   conditions:
-    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 5, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
+    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 6, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
 - experiment_id: an-di-series
   bench_id: finnigan-mat-271-ir
   method: knudsen_effusion
-  locator: {page: 5, table: '2', note: 'Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge'}
+  locator: {page: 6, table: '2', note: 'Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003869', interval_high: '0.0000791'}}
-      locator: {page: 5, table: '2', note: Printed initial weights across runs}
+      locator: {page: 6, table: '2', note: Printed initial weights across runs}
     printed_composition:
       state: {tag: value, value: {SiO2: '50.34', Al2O3: '15.40', MgO: '10.80', CaO: '23.46'}}
       locator: {pdf_page_index: 3, page: 4, section: '2.1 Sample preparation', note: 'lines 110-111; nominal composition SiO2=50.34, Al2O3=15.40, MgO=10.80, CaO=23.46 wt%; An-Di eutectic 42 wt% anorthite / 58 wt% diopside with run-varying Ga/In/Tl traces'}
@@ -405,11 +424,11 @@ experiments:
         locator: *b137_apparatus
       orifice_channel_length_m:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 4, note: No channel length printed}
+        locator: {page: 5, note: No channel length printed}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-      locator: {page: 4, note: KC chamber about 10^-6 mbar; unit conversion only}
+      locator: {page: 5, note: KC chamber about 10^-6 mbar; unit conversion only}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: *b137_apparatus
@@ -418,14 +437,14 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, table: '2', note: Table 2 has run-specific isotherm and polytherm temperatures; no one series setpoint}
+      locator: {page: 6, table: '2', note: Table 2 has run-specific isotherm and polytherm temperatures; no one series setpoint}
   thermal_schedule:
     method:
       state: {tag: value, value: Isotherm and polytherm measurements; 5 min equilibration at each polytherm step}
-      locator: {page: 5, table: '2'}
+      locator: {page: 6, table: '2'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, table: '2', note: '15 h at 1742 K applies to 1_low only, not every series run'}
+      locator: {page: 6, table: '2', note: '15 h at 1742 K applies to 1_low only, not every series run'}
 species:
   Ga:
     observations:
@@ -433,7 +452,8 @@ species:
       experiment: an-di-series
       type: activity_coefficient
       locator:
-        pdf_page_index: 23
+        page: 23
+        pdf_page_index: 22
         paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
         note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines
           593-596, not Table 8 on page 22
@@ -464,13 +484,15 @@ species:
         cell_material:
           value: Ir
           locator:
-            pdf_page_index: 4
+            page: 4
+            pdf_page_index: 3
             section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
             paragraph: the iridium Knudsen cell (KC)
         orifice_diameter_mm:
           value: 0.4
           locator:
-            pdf_page_index: 5
+            page: 5
+            pdf_page_index: 4
             section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
             paragraph: a lid with a 0.4 mm orifice at its centre
         chamber_pressure:
@@ -479,7 +501,8 @@ species:
           kind: nominal
           note: printed as KC chamber (~10^-6 mbar); other compartments (~10^-9 mbar); not collapsed to a point
           locator:
-            pdf_page_index: 5
+            page: 5
+            pdf_page_index: 4
             section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
             paragraph: The KC chamber (~10-6 mbar)
         sample:
@@ -487,7 +510,8 @@ species:
             form: powdered glasses packed into the KC
             container: iridium Knudsen cell (crucible and lid)
           locator:
-            pdf_page_index: 5
+            page: 5
+            pdf_page_index: 4
             section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
             paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with low trace element concentrations, were then packed into the KC
         starting_glass_wt_pct:
@@ -497,7 +521,8 @@ species:
             MgO: 10.80
             CaO: 23.46
           locator:
-            pdf_page_index: 4
+            page: 4
+            pdf_page_index: 3
             section: 2.1. Sample preparation
             paragraph: 'nominal composition, in wt. %, of SiO2 = 50.34, Al2O3 = 15.40, MgO = 10.80, CaO = 23.46'
     - observation_id: bischof_2023_kems_geometry_and_calibration
@@ -505,7 +530,8 @@ species:
       type: gibbs_table
       locator:
         table: '2'
-        pdf_page_index: 6
+        page: 6
+        pdf_page_index: 5
         section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
         note: apparatus §2.2.1 AM pp. 4-5; Table 2 weights AM p. 6; calibration eqs. 2-3 AM p. 8
       T_range_K:
@@ -551,7 +577,8 @@ species:
           Total: 99.90
           locator:
             table: '6'
-            pdf_page_index: 15
+            page: 15
+            pdf_page_index: 14
             section: 4.1. EPMA
             paragraph: 'Table 6 1_low Start SiO2 50.47 ± 0.09, Al2O3 15.38 ± 0.08, MgO 10.42 ± 0.04, CaO 23.63 ± 0.09, Total 99.90 ± 0.16'
         epma_table6_end_wt_pct_1_low:
@@ -562,7 +589,8 @@ species:
           Total: 99.94
           locator:
             table: '6'
-            pdf_page_index: 15
+            page: 15
+            pdf_page_index: 14
             section: 4.1. EPMA
             paragraph: 'Table 6 1_low End SiO2 50.60 ± 0.18, Al2O3 15.31 ± 0.09, MgO 10.38 ± 0.10, CaO 23.65 ± 0.27, Total 99.94 ± 0.35'
         epma_table6_start_wt_pct_2_low:
@@ -573,7 +601,8 @@ species:
           Total: 99.90
           locator:
             table: '6'
-            pdf_page_index: 15
+            page: 15
+            pdf_page_index: 14
             section: 4.1. EPMA
             paragraph: 'Table 6 2_low Start identical to 1_low Start (same starting glass)'
         epma_table6_end_wt_pct_2_low:
@@ -584,7 +613,8 @@ species:
           Total: 99.91
           locator:
             table: '6'
-            pdf_page_index: 15
+            page: 15
+            pdf_page_index: 14
             section: 4.1. EPMA
             paragraph: 'Table 6 2_low End SiO2 50.46 ± 0.17, Al2O3 15.48 ± 0.07, MgO 10.72 ± 0.08, CaO 23.25 ± 0.05, Total 99.91 ± 0.21'
         epma_table6_start_wt_pct_3_high:
@@ -595,7 +625,8 @@ species:
           Total: 98.42
           locator:
             table: '6'
-            pdf_page_index: 15
+            page: 15
+            pdf_page_index: 14
             section: 4.1. EPMA
             paragraph: 'Table 6 3_high Start SiO2 49.72 ± 0.09, Al2O3 15.15 ± 0.08, MgO 10.27 ± 0.04, CaO 23.28 ± 0.09, Total 98.42 ± 0.16'
         epma_table6_end_wt_pct_3_high:
@@ -606,7 +637,8 @@ species:
           Total: 98.82
           locator:
             table: '6'
-            pdf_page_index: 15
+            page: 15
+            pdf_page_index: 14
             section: 4.1. EPMA
             paragraph: 'Table 6 3_high End SiO2 49.92 ± 0.39, Al2O3 15.22 ± 0.12, MgO 10.70 ± 0.07, CaO 22.98 ± 0.08, Total 98.82 ± 0.42'
         laicpms_table7_start_ppm:
@@ -618,7 +650,8 @@ species:
           In_3_high: 5296
           locator:
             table: '7'
-            pdf_page_index: 16
+            page: 16
+            pdf_page_index: 15
             section: 4.2. LA-ICP-MS
             paragraph: 'Table 7 Start Ga 720 ± 12 (1_low, 2_low), 7185 ± 618 (3_high); In 47 ± 9 (1_low, 2_low), 5296 ± 560 (3_high)'
         dopant_as_printed: spiked with 1000 or 10000 ppm of each Ga, In and Tl (added as their sesquioxides); Tl completely evaporated below ~700 °C
@@ -656,7 +689,8 @@ species:
           In2O+: 16.03
           locator:
             table: '3'
-            pdf_page_index: 9
+            page: 9
+            pdf_page_index: 8
             section: 3.1. Determination of partial pressures
             paragraph: 'Table 3: Summary of ionisation cross sections of measured species (Bischof et al., 2023).'
         ionization_cross_section_A2_table3_as_printed:
@@ -722,7 +756,8 @@ species:
       type: activity_coefficient
       locator:
         table: '8'
-        pdf_page_index: 22
+        page: 22
+        pdf_page_index: 21
       T_range_K:
       - 1400.0
       - 1742.0
@@ -746,7 +781,8 @@ species:
       type: activity_coefficient
       locator:
         table: S1
-        pdf_page_index: 2
+        page: 2
+        pdf_page_index: 1
         note: supplement 1_low polytherm
       T_range_K:
       - 1586.4
@@ -776,6 +812,7 @@ species:
           gamma: 0.0632
           gamma_SD: 0.0558
           delta_IW: 1.66
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 4.54e-15
           K_Ga_SD: 2.28e-15
           p_Ga_Pa: 4.04e-05
@@ -789,6 +826,7 @@ species:
           gamma: 0.0478
           gamma_SD: 0.0418
           delta_IW: 1.62
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 5.73e-15
           K_Ga_SD: 2.81e-15
           p_Ga_Pa: 4.37e-05
@@ -802,6 +840,7 @@ species:
           gamma: 0.0369
           gamma_SD: 0.0322
           delta_IW: 1.61
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 7.02e-15
           K_Ga_SD: 3.4e-15
           p_Ga_Pa: 4.49e-05
@@ -815,6 +854,7 @@ species:
           gamma: 0.0305
           gamma_SD: 0.0264
           delta_IW: 1.57
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 9.17e-15
           K_Ga_SD: 4.3e-15
           p_Ga_Pa: 5.16e-05
@@ -828,6 +868,7 @@ species:
           gamma: 0.0285
           gamma_SD: 0.0246
           delta_IW: 1.57
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.4e-14
           K_Ga_SD: 6.56e-15
           p_Ga_Pa: 6.45e-05
@@ -841,6 +882,7 @@ species:
           gamma: 0.0367
           gamma_SD: 0.0317
           delta_IW: 1.57
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.93e-14
           K_Ga_SD: 1.37e-14
           p_Ga_Pa: 0.00011
@@ -854,6 +896,7 @@ species:
           gamma: 0.0248
           gamma_SD: 0.0213
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.08e-14
           K_Ga_SD: 1.4e-14
           p_Ga_Pa: 9.98e-05
@@ -867,6 +910,7 @@ species:
           gamma: 0.0272
           gamma_SD: 0.0233
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 5.4e-14
           K_Ga_SD: 2.46e-14
           p_Ga_Pa: 0.000145
@@ -880,6 +924,7 @@ species:
           gamma: 0.0248
           gamma_SD: 0.0212
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 7.24e-14
           K_Ga_SD: 3.27e-14
           p_Ga_Pa: 0.000166
@@ -893,6 +938,7 @@ species:
           gamma: 0.0239
           gamma_SD: 0.0204
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.06e-13
           K_Ga_SD: 4.75e-14
           p_Ga_Pa: 0.000207
@@ -906,6 +952,7 @@ species:
           gamma: 0.0246
           gamma_SD: 0.021
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.66e-13
           K_Ga_SD: 7.39e-14
           p_Ga_Pa: 0.000273
@@ -916,7 +963,8 @@ species:
       type: activity_coefficient
       locator:
         table: S2
-        pdf_page_index: 3
+        page: 3
+        pdf_page_index: 2
         note: supplement 1_low isotherm ~1742 K
       T_range_K:
       - 1740.8
@@ -946,6 +994,7 @@ species:
           gamma: 0.0353
           gamma_SD: 0.0299
           delta_IW: 1.51
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.39e-12
           K_Ga_SD: 6.09e-13
           p_Ga_Pa: 0.000881
@@ -959,6 +1008,7 @@ species:
           gamma: 0.0384
           gamma_SD: 0.0326
           delta_IW: 1.52
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.51e-12
           K_Ga_SD: 6.66e-13
           p_Ga_Pa: 0.000946
@@ -972,6 +1022,7 @@ species:
           gamma: 0.0426
           gamma_SD: 0.0363
           delta_IW: 1.52
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.68e-12
           K_Ga_SD: 7.45e-13
           p_Ga_Pa: 0.00104
@@ -985,6 +1036,7 @@ species:
           gamma: 0.0497
           gamma_SD: 0.0425
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.96e-12
           K_Ga_SD: 8.81e-13
           p_Ga_Pa: 0.00119
@@ -998,6 +1050,7 @@ species:
           gamma: 0.0527
           gamma_SD: 0.045
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.08e-12
           K_Ga_SD: 9.36e-13
           p_Ga_Pa: 0.00126
@@ -1011,6 +1064,7 @@ species:
           gamma: 0.0484
           gamma_SD: 0.0413
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.98e-12
           K_Ga_SD: 8.91e-13
           p_Ga_Pa: 0.00121
@@ -1024,6 +1078,7 @@ species:
           gamma: 0.0522
           gamma_SD: 0.0446
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.14e-12
           K_Ga_SD: 9.66e-13
           p_Ga_Pa: 0.00129
@@ -1037,6 +1092,7 @@ species:
           gamma: 0.0488
           gamma_SD: 0.0416
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.85e-12
           K_Ga_SD: 8.25e-13
           p_Ga_Pa: 0.00113
@@ -1050,6 +1106,7 @@ species:
           gamma: 0.0499
           gamma_SD: 0.0425
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.89e-12
           K_Ga_SD: 8.44e-13
           p_Ga_Pa: 0.00116
@@ -1063,6 +1120,7 @@ species:
           gamma: 0.0518
           gamma_SD: 0.0442
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.96e-12
           K_Ga_SD: 8.81e-13
           p_Ga_Pa: 0.0012
@@ -1076,6 +1134,7 @@ species:
           gamma: 0.0523
           gamma_SD: 0.0446
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.98e-12
           K_Ga_SD: 8.88e-13
           p_Ga_Pa: 0.00121
@@ -1089,6 +1148,7 @@ species:
           gamma: 0.0455
           gamma_SD: 0.0388
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.79e-12
           K_Ga_SD: 7.99e-13
           p_Ga_Pa: 0.00111
@@ -1102,6 +1162,7 @@ species:
           gamma: 0.0466
           gamma_SD: 0.0396
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.76e-12
           K_Ga_SD: 7.83e-13
           p_Ga_Pa: 0.00109
@@ -1115,6 +1176,7 @@ species:
           gamma: 0.0427
           gamma_SD: 0.0362
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.62e-12
           K_Ga_SD: 7.13e-13
           p_Ga_Pa: 0.00101
@@ -1128,6 +1190,7 @@ species:
           gamma: 0.044
           gamma_SD: 0.0374
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.67e-12
           K_Ga_SD: 7.37e-13
           p_Ga_Pa: 0.00104
@@ -1141,6 +1204,7 @@ species:
           gamma: 0.0403
           gamma_SD: 0.0342
           delta_IW: 1.52
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.53e-12
           K_Ga_SD: 6.7e-13
           p_Ga_Pa: 0.000966
@@ -1151,7 +1215,8 @@ species:
       type: activity_coefficient
       locator:
         table: S3-cont
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
       T_range_K:
       - 1425.6
       - 1733.4
@@ -1182,6 +1247,7 @@ species:
           gamma: 270.0
           gamma_SD: 265.0
           delta_IW: 3.71
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 6.71e-15
           K_Ga_SD: 4.41e-15
         - T_K: 1437.2
@@ -1193,6 +1259,7 @@ species:
           gamma: 248.0
           gamma_SD: 243.0
           delta_IW: 3.67
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.16e-14
           K_Ga_SD: 7.66e-15
         - T_K: 1449.9
@@ -1204,6 +1271,7 @@ species:
           gamma: 244.0
           gamma_SD: 239.0
           delta_IW: 3.65
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.27e-14
           K_Ga_SD: 1.49e-14
         - T_K: 1461.6
@@ -1215,6 +1283,7 @@ species:
           gamma: 230.0
           gamma_SD: 225.0
           delta_IW: 3.61
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.95e-14
           K_Ga_SD: 2.6e-14
         - T_K: 1474.2
@@ -1226,6 +1295,7 @@ species:
           gamma: 195.0
           gamma_SD: 191.0
           delta_IW: 3.55
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 6.48e-14
           K_Ga_SD: 4.27e-14
         - T_K: 1486.9
@@ -1237,6 +1307,7 @@ species:
           gamma: 145.0
           gamma_SD: 142.0
           delta_IW: 3.45
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 9.21e-14
           K_Ga_SD: 6.04e-14
         - T_K: 1498.6
@@ -1248,6 +1319,7 @@ species:
           gamma: 112.0
           gamma_SD: 110.0
           delta_IW: 3.34
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.28e-13
           K_Ga_SD: 8.43e-14
         - T_K: 1511.3
@@ -1259,6 +1331,7 @@ species:
           gamma: 74.7
           gamma_SD: 73.0
           delta_IW: 3.22
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.6e-13
           K_Ga_SD: 1.05e-13
         - T_K: 1522.9
@@ -1270,6 +1343,7 @@ species:
           gamma: 45.8
           gamma_SD: 44.8
           delta_IW: 3.03
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.73e-13
           K_Ga_SD: 1.13e-13
         - T_K: 1535.6
@@ -1281,6 +1355,7 @@ species:
           gamma: 24.3
           gamma_SD: 23.7
           delta_IW: 2.87
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.69e-13
           K_Ga_SD: 1.1e-13
         - T_K: 1548.3
@@ -1292,6 +1367,7 @@ species:
           gamma: 13.0
           gamma_SD: 12.6
           delta_IW: 2.73
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.64e-13
           K_Ga_SD: 1.06e-13
         - T_K: 1557.8
@@ -1303,6 +1379,7 @@ species:
           gamma: 5.34
           gamma_SD: 5.18
           delta_IW: 2.61
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.05e-13
           K_Ga_SD: 6.74e-14
         - T_K: 1571.6
@@ -1314,6 +1391,7 @@ species:
           gamma: 0.581
           gamma_SD: 0.55
           delta_IW: 2.17
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.14e-14
           K_Ga_SD: 1.3e-14
         - T_K: 1588.5
@@ -1325,6 +1403,7 @@ species:
           gamma: 0.426
           gamma_SD: 0.4
           delta_IW: 2.1
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.36e-14
           K_Ga_SD: 2.01e-14
         - T_K: 1601.2
@@ -1336,6 +1415,7 @@ species:
           gamma: 0.22
           gamma_SD: 0.204
           delta_IW: 1.95
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.04e-14
           K_Ga_SD: 1.75e-14
         - T_K: 1613.9
@@ -1347,6 +1427,7 @@ species:
           gamma: 0.151
           gamma_SD: 0.138
           delta_IW: 1.86
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.6e-14
           K_Ga_SD: 2.01e-14
         - T_K: 1626.6
@@ -1358,6 +1439,7 @@ species:
           gamma: 0.0996
           gamma_SD: 0.0899
           delta_IW: 1.77
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 4.1e-14
           K_Ga_SD: 2.2e-14
         - T_K: 1638.2
@@ -1369,6 +1451,7 @@ species:
           gamma: 0.0779
           gamma_SD: 0.0695
           delta_IW: 1.71
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 5.23e-14
           K_Ga_SD: 2.71e-14
         - T_K: 1650.9
@@ -1380,6 +1463,7 @@ species:
           gamma: 0.0634
           gamma_SD: 0.056
           delta_IW: 1.66
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 7.21e-14
           K_Ga_SD: 3.61e-14
         - T_K: 1662.6
@@ -1391,6 +1475,7 @@ species:
           gamma: 0.0559
           gamma_SD: 0.0489
           delta_IW: 1.63
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.02e-13
           K_Ga_SD: 4.98e-14
         - T_K: 1674.2
@@ -1402,6 +1487,7 @@ species:
           gamma: 0.0502
           gamma_SD: 0.0436
           delta_IW: 1.59
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.47e-13
           K_Ga_SD: 6.99e-14
         - T_K: 1685.8
@@ -1413,6 +1499,7 @@ species:
           gamma: 0.0447
           gamma_SD: 0.0386
           delta_IW: 1.57
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.07e-13
           K_Ga_SD: 9.7e-14
         - T_K: 1699.6
@@ -1424,6 +1511,7 @@ species:
           gamma: 0.0382
           gamma_SD: 0.0328
           delta_IW: 1.55
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.03e-13
           K_Ga_SD: 1.39e-13
         - T_K: 1712.3
@@ -1435,6 +1523,7 @@ species:
           gamma: 0.0377
           gamma_SD: 0.0322
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 4.87e-13
           K_Ga_SD: 2.21e-13
         - T_K: 1719.7
@@ -1446,6 +1535,7 @@ species:
           gamma: 0.0377
           gamma_SD: 0.0322
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 6.46e-13
           K_Ga_SD: 2.92e-13
         - T_K: 1733.4
@@ -1457,6 +1547,7 @@ species:
           gamma: 0.0385
           gamma_SD: 0.0329
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.11e-12
           K_Ga_SD: 5.0e-13
       equipment: *id001
@@ -1465,7 +1556,8 @@ species:
       type: activity_coefficient
       locator:
         table: S4-gamma
-        pdf_page_index: 6
+        page: 6
+        pdf_page_index: 5
       T_range_K:
       - 1538.8
       - 1631.9
@@ -1494,6 +1586,7 @@ species:
           gamma: 0.356
           gamma_SD: 0.297
           delta_IW: 2.98
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.87e-15
           K_Ga_SD: 1.18e-15
         - T_K: 1547.2
@@ -1505,6 +1598,7 @@ species:
           gamma: 0.25
           gamma_SD: 0.208
           delta_IW: 2.89
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.0e-15
           K_Ga_SD: 1.23e-15
         - T_K: 1555.7
@@ -1516,6 +1610,7 @@ species:
           gamma: 0.209
           gamma_SD: 0.174
           delta_IW: 2.84
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.73e-15
           K_Ga_SD: 1.53e-15
         - T_K: 1564.2
@@ -1527,6 +1622,7 @@ species:
           gamma: 0.146
           gamma_SD: 0.122
           delta_IW: 2.74
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 3.84e-15
           K_Ga_SD: 1.57e-15
         - T_K: 1577.9
@@ -1538,6 +1634,7 @@ species:
           gamma: 0.147
           gamma_SD: 0.122
           delta_IW: 2.68
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 7.23e-15
           K_Ga_SD: 2.93e-15
         - T_K: 1587.4
@@ -1549,6 +1646,7 @@ species:
           gamma: 0.127
           gamma_SD: 0.105
           delta_IW: 2.6
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 9.53e-15
           K_Ga_SD: 3.84e-15
         - T_K: 1598.0
@@ -1560,6 +1658,7 @@ species:
           gamma: 0.0955
           gamma_SD: 0.0792
           delta_IW: 2.55
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.15e-14
           K_Ga_SD: 4.59e-15
         - T_K: 1609.7
@@ -1571,6 +1670,7 @@ species:
           gamma: 0.08
           gamma_SD: 0.0661
           delta_IW: 2.47
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 1.59e-14
           K_Ga_SD: 6.32e-15
         - T_K: 1618.1
@@ -1582,6 +1682,7 @@ species:
           gamma: 0.0711
           gamma_SD: 0.0587
           delta_IW: 2.43
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.04e-14
           K_Ga_SD: 8.04e-15
         - T_K: 1631.9
@@ -1593,6 +1694,7 @@ species:
           gamma: 0.0529
           gamma_SD: 0.0435
           delta_IW: 2.33
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_Ga: 2.72e-14
           K_Ga_SD: 1.05e-14
       equipment: *id001
@@ -1600,8 +1702,9 @@ species:
       experiment: an-di-1-low
       type: psat_series
       locator:
+        page: 2
         table: S1
-        pdf_page_index: 2
+        pdf_page_index: 1
       T_range_K:
       - 1586.4
       - 1695.4
@@ -1613,45 +1716,206 @@ species:
         quantity: partial_pressure
         gas_species: Ga(g)
         method_class: measured_kems
+        initial_charge_as_published:
+          role: initial_charge_only
+          locator: {page: 4, section: '2.1 Sample preparation', note: nominal An-Di base and sesquioxide spikes}
+          nominal_base_wt_pct:
+            SiO2: '50.34'
+            Al2O3: '15.40'
+            MgO: '10.80'
+            CaO: '23.46'
+          spike_additions_ppm:
+            Ga: '1000'
+            In: '1000'
+            Tl: '1000'
+          spike_basis: elemental ppm; added as sesquioxides, as printed
+          mixed_basis_refusal: The full initial charge combines oxide wt% and elemental ppm and has no exact mixed-basis bulk composition token.
+          measured_start_trace_ppm:
+            locator: {page: 16, table: '7', row: '1_low Start'}
+            Ga: '720 ± 12'
+            In: '47 ± 9'
         composition_wt_pct: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}
         composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
         composition_role: &bischof_table6_1_low_start
           value: initial_charge_only
-          locator: {published_page: 15, pdf_page_index: 15, table: '6', section: '4.1. EPMA'}
+          locator: {published_page: 15, page: 15, pdf_page_index: 14, table: '6', section: '4.1. EPMA'}
           quote: 'Table 6 1_low Start SiO2 50.47 ± 0.09, Al2O3 15.38 ± 0.08, MgO 10.42 ± 0.04, CaO 23.63 ± 0.09, Total 99.90 ± 0.16'
         points:
         - T_K: 1586.4
           p_Pa: 4.04e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1586.4'}}
+              locator: {page: 2, table: 'S1', row: 1}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 1}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.66
         - T_K: 1598.0
           p_Pa: 4.37e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1598.0'}}
+              locator: {page: 2, table: 'S1', row: 2}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 2}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.62
         - T_K: 1608.6
           p_Pa: 4.49e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1608.6'}}
+              locator: {page: 2, table: 'S1', row: 3}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 3}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.61
         - T_K: 1619.2
           p_Pa: 5.16e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1619.2'}}
+              locator: {page: 2, table: 'S1', row: 4}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 4}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1630.8
           p_Pa: 6.45e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1630.8'}}
+              locator: {page: 2, table: 'S1', row: 5}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 5}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1642.5
           p_Pa: 0.00011
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1642.5'}}
+              locator: {page: 2, table: 'S1', row: 6}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 6}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1653.0
           p_Pa: 9.98e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1653.0'}}
+              locator: {page: 2, table: 'S1', row: 7}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 7}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1664.7
           p_Pa: 0.000145
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1664.7'}}
+              locator: {page: 2, table: 'S1', row: 8}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 8}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1674.2
           p_Pa: 0.000166
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1674.2'}}
+              locator: {page: 2, table: 'S1', row: 9}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 9}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1684.8
           p_Pa: 0.000207
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1684.8'}}
+              locator: {page: 2, table: 'S1', row: 10}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 10}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.53
         - T_K: 1695.4
           p_Pa: 0.000273
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1695.4'}}
+              locator: {page: 2, table: 'S1', row: 11}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 11}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.53
       equipment: *id001
     - observation_id: bischof_2023_ga2o3_henrian_log10_gamma_model
@@ -1659,7 +1923,8 @@ species:
       type: gibbs_table
       locator:
         table: '9'
-        pdf_page_index: 30
+        page: 30
+        pdf_page_index: 29
         note: 'Henrian coefficients used in FactSage T50c. Caption: For Ga2O3(l), A = -4800, B = 0'
       T_range_K:
       - 1568.0
@@ -1683,7 +1948,8 @@ species:
       type: transition_point
       locator:
         table: '9'
-        pdf_page_index: 30
+        page: 30
+        pdf_page_index: 29
         note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
       T_range_K:
       - 1874.0
@@ -2365,7 +2631,7 @@ species:
     - observation_id: bischof_2023_epma_table6_start_1_low
       type: analytical_composition
       experiment: an-di-series
-      locator: {table: '6', pdf_page_index: 15, section: '4.1. EPMA', note: 'Table 6 1_low Start; pre-KEMS starting glass'}
+      locator: {table: '6', page: 15, pdf_page_index: 14, section: '4.1. EPMA', note: 'Table 6 1_low Start; pre-KEMS starting glass'}
       phase: anorthite_diopside_eutectic_silicate_melt
       regime: epma_pre_kems
       units: wt_percent
@@ -2384,7 +2650,7 @@ species:
     - observation_id: bischof_2023_epma_table6_end_1_low
       type: analytical_composition
       experiment: an-di-series
-      locator: {table: '6', pdf_page_index: 15, section: '4.1. EPMA', note: 'Table 6 1_low End; post-KEMS; not an initial/sample engine selector'}
+      locator: {table: '6', page: 15, pdf_page_index: 14, section: '4.1. EPMA', note: 'Table 6 1_low End; post-KEMS; not an initial/sample engine selector'}
       phase: anorthite_diopside_eutectic_silicate_melt
       regime: epma_post_kems
       units: wt_percent
@@ -2403,7 +2669,7 @@ species:
     - observation_id: bischof_2023_epma_table6_start_2_low
       type: analytical_composition
       experiment: an-di-series
-      locator: {table: '6', pdf_page_index: 15, section: '4.1. EPMA', note: 'Table 6 2_low Start; identical starting glass to 1_low Start'}
+      locator: {table: '6', page: 15, pdf_page_index: 14, section: '4.1. EPMA', note: 'Table 6 2_low Start; identical starting glass to 1_low Start'}
       phase: anorthite_diopside_eutectic_silicate_melt
       regime: epma_pre_kems
       units: wt_percent
@@ -2422,7 +2688,7 @@ species:
     - observation_id: bischof_2023_epma_table6_end_2_low
       type: analytical_composition
       experiment: an-di-series
-      locator: {table: '6', pdf_page_index: 15, section: '4.1. EPMA', note: 'Table 6 2_low End; post-KEMS; not an initial/sample engine selector'}
+      locator: {table: '6', page: 15, pdf_page_index: 14, section: '4.1. EPMA', note: 'Table 6 2_low End; post-KEMS; not an initial/sample engine selector'}
       phase: anorthite_diopside_eutectic_silicate_melt
       regime: epma_post_kems
       units: wt_percent
@@ -2441,7 +2707,7 @@ species:
     - observation_id: bischof_2023_epma_table6_start_3_high
       type: analytical_composition
       experiment: an-di-series
-      locator: {table: '6', pdf_page_index: 15, section: '4.1. EPMA', note: 'Table 6 3_high Start; pre-KEMS starting glass'}
+      locator: {table: '6', page: 15, pdf_page_index: 14, section: '4.1. EPMA', note: 'Table 6 3_high Start; pre-KEMS starting glass'}
       phase: anorthite_diopside_eutectic_silicate_melt
       regime: epma_pre_kems
       units: wt_percent
@@ -2460,7 +2726,7 @@ species:
     - observation_id: bischof_2023_epma_table6_end_3_high
       type: analytical_composition
       experiment: an-di-series
-      locator: {table: '6', pdf_page_index: 15, section: '4.1. EPMA', note: 'Table 6 3_high End; post-KEMS; not an initial/sample engine selector'}
+      locator: {table: '6', page: 15, pdf_page_index: 14, section: '4.1. EPMA', note: 'Table 6 3_high End; post-KEMS; not an initial/sample engine selector'}
       phase: anorthite_diopside_eutectic_silicate_melt
       regime: epma_post_kems
       units: wt_percent
@@ -2482,7 +2748,8 @@ species:
       experiment: an-di-series
       type: activity_coefficient
       locator:
-        pdf_page_index: 23
+        page: 23
+        pdf_page_index: 22
         paragraph: giving γ(InO1.5) = 0.017(12) at an average T of 1674 K
         note: AM page 23 lines 593-596; not Table 8 on page 22
       T_range_K:
@@ -2513,7 +2780,8 @@ species:
       type: activity_coefficient
       locator:
         table: S1
-        pdf_page_index: 2
+        page: 2
+        pdf_page_index: 1
       T_range_K:
       - 1586.4
       - 1695.4
@@ -2542,6 +2810,7 @@ species:
           gamma: 0.0527
           gamma_SD: 0.0437
           delta_IW: 1.66
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.87e-12
           K_In_SD: 1.08e-12
           p_In_Pa: 6.69e-05
@@ -2555,6 +2824,7 @@ species:
           gamma: 0.044
           gamma_SD: 0.0361
           delta_IW: 1.62
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.36e-12
           K_In_SD: 1.33e-12
           p_In_Pa: 7.25e-05
@@ -2568,6 +2838,7 @@ species:
           gamma: 0.0486
           gamma_SD: 0.0397
           delta_IW: 1.61
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.79e-12
           K_In_SD: 2.12e-12
           p_In_Pa: 9.76e-05
@@ -2581,6 +2852,7 @@ species:
           gamma: 0.0349
           gamma_SD: 0.0281
           delta_IW: 1.57
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.93e-12
           K_In_SD: 2.14e-12
           p_In_Pa: 8.9e-05
@@ -2594,6 +2866,7 @@ species:
           gamma: 0.0377
           gamma_SD: 0.0303
           delta_IW: 1.57
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 6.33e-12
           K_In_SD: 3.43e-12
           p_In_Pa: 0.000117
@@ -2607,6 +2880,7 @@ species:
           gamma: 0.0329
           gamma_SD: 0.0265
           delta_IW: 1.57
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 8.19e-12
           K_In_SD: 4.44e-12
           p_In_Pa: 0.000123
@@ -2620,6 +2894,7 @@ species:
           gamma: 0.0315
           gamma_SD: 0.0252
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.12e-11
           K_In_SD: 5.94e-12
           p_In_Pa: 0.000146
@@ -2633,6 +2908,7 @@ species:
           gamma: 0.0286
           gamma_SD: 0.0228
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.49e-11
           K_In_SD: 7.88e-12
           p_In_Pa: 0.00016
@@ -2646,6 +2922,7 @@ species:
           gamma: 0.0301
           gamma_SD: 0.0239
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.14e-11
           K_In_SD: 1.12e-11
           p_In_Pa: 0.000197
@@ -2659,6 +2936,7 @@ species:
           gamma: 0.0265
           gamma_SD: 0.021
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.64e-11
           K_In_SD: 1.38e-11
           p_In_Pa: 0.000207
@@ -2672,6 +2950,7 @@ species:
           gamma: 0.0254
           gamma_SD: 0.0201
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.54e-11
           K_In_SD: 1.84e-11
           p_In_Pa: 0.000234
@@ -2682,7 +2961,8 @@ species:
       type: activity_coefficient
       locator:
         table: S2
-        pdf_page_index: 3
+        page: 3
+        pdf_page_index: 2
       T_range_K:
       - 1740.8
       - 1743.0
@@ -2711,6 +2991,7 @@ species:
           gamma: 0.0211
           gamma_SD: 0.0166
           delta_IW: 1.51
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.23e-10
           K_In_SD: 6.34e-11
           p_In_Pa: 0.00032
@@ -2724,6 +3005,7 @@ species:
           gamma: 0.0231
           gamma_SD: 0.0183
           delta_IW: 1.52
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.34e-10
           K_In_SD: 7.0e-11
           p_In_Pa: 0.000347
@@ -2737,6 +3019,7 @@ species:
           gamma: 0.0197
           gamma_SD: 0.0157
           delta_IW: 1.52
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.15e-10
           K_In_SD: 6.01e-11
           p_In_Pa: 0.000294
@@ -2750,6 +3033,7 @@ species:
           gamma: 0.022
           gamma_SD: 0.0175
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.28e-10
           K_In_SD: 6.77e-11
           p_In_Pa: 0.000321
@@ -2763,6 +3047,7 @@ species:
           gamma: 0.0194
           gamma_SD: 0.0155
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.13e-10
           K_In_SD: 5.99e-11
           p_In_Pa: 0.000282
@@ -2776,6 +3061,7 @@ species:
           gamma: 0.0194
           gamma_SD: 0.0154
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.16e-10
           K_In_SD: 6.15e-11
           p_In_Pa: 0.000292
@@ -2789,6 +3075,7 @@ species:
           gamma: 0.0188
           gamma_SD: 0.015
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.13e-10
           K_In_SD: 6.0e-11
           p_In_Pa: 0.000281
@@ -2802,6 +3089,7 @@ species:
           gamma: 0.02
           gamma_SD: 0.0159
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.13e-10
           K_In_SD: 5.93e-11
           p_In_Pa: 0.000286
@@ -2815,6 +3103,7 @@ species:
           gamma: 0.0186
           gamma_SD: 0.0148
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.04e-10
           K_In_SD: 5.51e-11
           p_In_Pa: 0.000265
@@ -2828,6 +3117,7 @@ species:
           gamma: 0.0196
           gamma_SD: 0.0156
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.1e-10
           K_In_SD: 5.82e-11
           p_In_Pa: 0.000277
@@ -2841,6 +3131,7 @@ species:
           gamma: 0.0167
           gamma_SD: 0.0133
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 9.38e-11
           K_In_SD: 4.96e-11
           p_In_Pa: 0.000237
@@ -2854,6 +3145,7 @@ species:
           gamma: 0.0189
           gamma_SD: 0.015
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.1e-10
           K_In_SD: 5.78e-11
           p_In_Pa: 0.00028
@@ -2867,6 +3159,7 @@ species:
           gamma: 0.0169
           gamma_SD: 0.0134
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 9.52e-11
           K_In_SD: 4.99e-11
           p_In_Pa: 0.000244
@@ -2880,6 +3173,7 @@ species:
           gamma: 0.0173
           gamma_SD: 0.0137
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 9.74e-11
           K_In_SD: 5.08e-11
           p_In_Pa: 0.000252
@@ -2893,6 +3187,7 @@ species:
           gamma: 0.0167
           gamma_SD: 0.0132
           delta_IW: 1.53
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 9.4e-11
           K_In_SD: 4.9e-11
           p_In_Pa: 0.000242
@@ -2906,6 +3201,7 @@ species:
           gamma: 0.0154
           gamma_SD: 0.0122
           delta_IW: 1.52
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 8.7e-11
           K_In_SD: 4.51e-11
           p_In_Pa: 0.000227
@@ -2916,7 +3212,8 @@ species:
       type: activity_coefficient
       locator:
         table: S3-cont
-        pdf_page_index: 5
+        page: 5
+        pdf_page_index: 4
       T_range_K:
       - 1401.3
       - 1733.4
@@ -2945,6 +3242,7 @@ species:
           gamma: 29.6
           gamma_SD: 37.7
           delta_IW: 3.86
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 5.54e-13
           K_In_SD: 6.23e-13
         - T_K: 1413.9
@@ -2956,6 +3254,7 @@ species:
           gamma: 16.6
           gamma_SD: 21.2
           delta_IW: 3.67
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 5.54e-13
           K_In_SD: 6.29e-13
         - T_K: 1425.6
@@ -2967,6 +3266,7 @@ species:
           gamma: 18.8
           gamma_SD: 24.4
           delta_IW: 3.71
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.06e-12
           K_In_SD: 1.22e-12
         - T_K: 1437.2
@@ -2978,6 +3278,7 @@ species:
           gamma: 18.2
           gamma_SD: 23.7
           delta_IW: 3.67
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 1.72e-12
           K_In_SD: 1.99e-12
         - T_K: 1449.9
@@ -2989,6 +3290,7 @@ species:
           gamma: 17.9
           gamma_SD: 23.2
           delta_IW: 3.65
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.93e-12
           K_In_SD: 3.39e-12
         - T_K: 1461.6
@@ -3000,6 +3302,7 @@ species:
           gamma: 16.5
           gamma_SD: 21.4
           delta_IW: 3.61
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 4.45e-12
           K_In_SD: 5.13e-12
         - T_K: 1474.2
@@ -3011,6 +3314,7 @@ species:
           gamma: 14.4
           gamma_SD: 18.8
           delta_IW: 3.55
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 6.64e-12
           K_In_SD: 7.68e-12
         - T_K: 1486.9
@@ -3022,6 +3326,7 @@ species:
           gamma: 10.3
           gamma_SD: 13.4
           delta_IW: 3.45
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 8.04e-12
           K_In_SD: 9.27e-12
         - T_K: 1498.6
@@ -3033,6 +3338,7 @@ species:
           gamma: 6.63
           gamma_SD: 8.61
           delta_IW: 3.34
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 8.27e-12
           K_In_SD: 9.56e-12
         - T_K: 1511.3
@@ -3044,6 +3350,7 @@ species:
           gamma: 4.27
           gamma_SD: 5.54
           delta_IW: 3.22
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 8.86e-12
           K_In_SD: 1.02e-11
         - T_K: 1522.9
@@ -3055,6 +3362,7 @@ species:
           gamma: 1.82
           gamma_SD: 2.36
           delta_IW: 3.03
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 5.96e-12
           K_In_SD: 6.87e-12
         - T_K: 1535.6
@@ -3066,6 +3374,7 @@ species:
           gamma: 0.987
           gamma_SD: 1.28
           delta_IW: 2.87
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 5.3e-12
           K_In_SD: 6.09e-12
         - T_K: 1548.3
@@ -3077,6 +3386,7 @@ species:
           gamma: 0.648
           gamma_SD: 0.837
           delta_IW: 2.73
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 5.64e-12
           K_In_SD: 6.46e-12
         - T_K: 1557.8
@@ -3088,6 +3398,7 @@ species:
           gamma: 0.586
           gamma_SD: 0.753
           delta_IW: 2.61
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 7.29e-12
           K_In_SD: 8.31e-12
         - T_K: 1571.6
@@ -3099,6 +3410,7 @@ species:
           gamma: 0.102
           gamma_SD: 0.128
           delta_IW: 2.17
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.12e-12
           K_In_SD: 2.34e-12
         - T_K: 1588.5
@@ -3110,6 +3422,7 @@ species:
           gamma: 0.0814
           gamma_SD: 0.102
           delta_IW: 2.1
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.12e-12
           K_In_SD: 3.41e-12
         - T_K: 1601.2
@@ -3121,6 +3434,7 @@ species:
           gamma: 0.045
           gamma_SD: 0.0552
           delta_IW: 1.95
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.7e-12
           K_In_SD: 2.9e-12
         - T_K: 1613.9
@@ -3132,6 +3446,7 @@ species:
           gamma: 0.0307
           gamma_SD: 0.0373
           delta_IW: 1.86
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.89e-12
           K_In_SD: 3.05e-12
         - T_K: 1626.6
@@ -3143,6 +3458,7 @@ species:
           gamma: 0.0202
           gamma_SD: 0.0241
           delta_IW: 1.77
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.94e-12
           K_In_SD: 3.04e-12
         - T_K: 1638.2
@@ -3154,6 +3470,7 @@ species:
           gamma: 0.0135
           gamma_SD: 0.0158
           delta_IW: 1.71
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.91e-12
           K_In_SD: 2.95e-12
         - T_K: 1650.9
@@ -3165,6 +3482,7 @@ species:
           gamma: 0.00941
           gamma_SD: 0.0109
           delta_IW: 1.66
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.11e-12
           K_In_SD: 3.11e-12
         - T_K: 1662.6
@@ -3176,6 +3494,7 @@ species:
           gamma: 0.00626
           gamma_SD: 0.00721
           delta_IW: 1.63
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.04e-12
           K_In_SD: 2.99e-12
         - T_K: 1674.2
@@ -3187,6 +3506,7 @@ species:
           gamma: 0.00462
           gamma_SD: 0.00528
           delta_IW: 1.59
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.28e-12
           K_In_SD: 3.19e-12
         - T_K: 1685.8
@@ -3198,6 +3518,7 @@ species:
           gamma: 0.00354
           gamma_SD: 0.00401
           delta_IW: 1.57
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.65e-12
           K_In_SD: 3.52e-12
         - T_K: 1699.6
@@ -3209,6 +3530,7 @@ species:
           gamma: 0.00285
           gamma_SD: 0.00321
           delta_IW: 1.55
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 4.53e-12
           K_In_SD: 4.33e-12
         - T_K: 1712.3
@@ -3220,6 +3542,7 @@ species:
           gamma: 0.00216
           gamma_SD: 0.00243
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 5.11e-12
           K_In_SD: 4.86e-12
         - T_K: 1719.7
@@ -3231,6 +3554,7 @@ species:
           gamma: 0.00196
           gamma_SD: 0.0022
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 5.83e-12
           K_In_SD: 5.54e-12
         - T_K: 1733.4
@@ -3242,6 +3566,7 @@ species:
           gamma: 0.00145
           gamma_SD: 0.00162
           delta_IW: 1.54
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 6.53e-12
           K_In_SD: 6.19e-12
       equipment: *id001
@@ -3250,7 +3575,8 @@ species:
       type: activity_coefficient
       locator:
         table: S4-gamma
-        pdf_page_index: 6
+        page: 6
+        pdf_page_index: 5
       T_range_K:
       - 1538.8
       - 1631.9
@@ -3279,6 +3605,7 @@ species:
           gamma: 0.0335
           gamma_SD: 0.0275
           delta_IW: 2.98
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.03e-13
           K_In_SD: 1.14e-13
         - T_K: 1547.2
@@ -3290,6 +3617,7 @@ species:
           gamma: 0.025
           gamma_SD: 0.0204
           delta_IW: 2.89
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.09e-13
           K_In_SD: 1.17e-13
         - T_K: 1555.7
@@ -3301,6 +3629,7 @@ species:
           gamma: 0.0211
           gamma_SD: 0.0173
           delta_IW: 2.84
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.43e-13
           K_In_SD: 1.36e-13
         - T_K: 1564.2
@@ -3312,6 +3641,7 @@ species:
           gamma: 0.0154
           gamma_SD: 0.0125
           delta_IW: 2.74
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 2.42e-13
           K_In_SD: 1.35e-13
         - T_K: 1577.9
@@ -3323,6 +3653,7 @@ species:
           gamma: 0.0127
           gamma_SD: 0.0103
           delta_IW: 2.68
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.31e-13
           K_In_SD: 1.84e-13
         - T_K: 1587.4
@@ -3334,6 +3665,7 @@ species:
           gamma: 0.00978
           gamma_SD: 0.00794
           delta_IW: 2.6
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 3.6e-13
           K_In_SD: 1.99e-13
         - T_K: 1598.0
@@ -3345,6 +3677,7 @@ species:
           gamma: 0.00845
           gamma_SD: 0.00685
           delta_IW: 2.55
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 4.54e-13
           K_In_SD: 2.5e-13
         - T_K: 1609.7
@@ -3356,6 +3689,7 @@ species:
           gamma: 0.00646
           gamma_SD: 0.00522
           delta_IW: 2.47
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 5.23e-13
           K_In_SD: 2.86e-13
         - T_K: 1618.1
@@ -3367,6 +3701,7 @@ species:
           gamma: 0.00581
           gamma_SD: 0.00469
           delta_IW: 2.43
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 6.32e-13
           K_In_SD: 3.44e-13
         - T_K: 1631.9
@@ -3378,6 +3713,7 @@ species:
           gamma: 0.00398
           gamma_SD: 0.00319
           delta_IW: 2.33
+          oxygen_buffer_as_published: "O’Neill and Pownceby, 1993"
           K_In: 6.93e-13
           K_In_SD: 3.72e-13
       equipment: *id001
@@ -3385,8 +3721,9 @@ species:
       experiment: an-di-1-low
       type: psat_series
       locator:
+        page: 2
         table: S1
-        pdf_page_index: 2
+        pdf_page_index: 1
       T_range_K:
       - 1586.4
       - 1695.4
@@ -3398,42 +3735,203 @@ species:
         quantity: partial_pressure
         gas_species: In(g)
         method_class: measured_kems
+        initial_charge_as_published:
+          role: initial_charge_only
+          locator: {page: 4, section: '2.1 Sample preparation', note: nominal An-Di base and sesquioxide spikes}
+          nominal_base_wt_pct:
+            SiO2: '50.34'
+            Al2O3: '15.40'
+            MgO: '10.80'
+            CaO: '23.46'
+          spike_additions_ppm:
+            Ga: '1000'
+            In: '1000'
+            Tl: '1000'
+          spike_basis: elemental ppm; added as sesquioxides, as printed
+          mixed_basis_refusal: The full initial charge combines oxide wt% and elemental ppm and has no exact mixed-basis bulk composition token.
+          measured_start_trace_ppm:
+            locator: {page: 16, table: '7', row: '1_low Start'}
+            Ga: '720 ± 12'
+            In: '47 ± 9'
         composition_wt_pct: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}
         composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
         composition_role: *bischof_table6_1_low_start
         points:
         - T_K: 1586.4
           p_Pa: 6.69e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1586.4'}}
+              locator: {page: 2, table: 'S1', row: 1}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 1}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.66
         - T_K: 1598.0
           p_Pa: 7.25e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1598.0'}}
+              locator: {page: 2, table: 'S1', row: 2}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 2}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.62
         - T_K: 1608.6
           p_Pa: 9.76e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1608.6'}}
+              locator: {page: 2, table: 'S1', row: 3}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 3}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.61
         - T_K: 1619.2
           p_Pa: 8.9e-05
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1619.2'}}
+              locator: {page: 2, table: 'S1', row: 4}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 4}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1630.8
           p_Pa: 0.000117
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1630.8'}}
+              locator: {page: 2, table: 'S1', row: 5}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 5}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1642.5
           p_Pa: 0.000123
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1642.5'}}
+              locator: {page: 2, table: 'S1', row: 6}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 6}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.57
         - T_K: 1653.0
           p_Pa: 0.000146
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1653.0'}}
+              locator: {page: 2, table: 'S1', row: 7}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 7}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1664.7
           p_Pa: 0.00016
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1664.7'}}
+              locator: {page: 2, table: 'S1', row: 8}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 8}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1674.2
           p_Pa: 0.000197
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1674.2'}}
+              locator: {page: 2, table: 'S1', row: 9}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 9}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.54
         - T_K: 1684.8
           p_Pa: 0.000207
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1684.8'}}
+              locator: {page: 2, table: 'S1', row: 10}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 10}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.53
         - T_K: 1695.4
           p_Pa: 0.000234
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: {kind: point, point: '1695.4'}}
+              locator: {page: 2, table: 'S1', row: 11}
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+            fO2_control:
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
+              locator: {page: 2, table: 'S1', row: 11}
+            composition:
+              state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
+              locator: {page: 4, section: '2.1 Sample preparation'}
           delta_IW: 1.53
       equipment: *id001
     - observation_id: bischof_2023_in2o3_henrian_log10_gamma_model
@@ -3441,7 +3939,8 @@ species:
       type: gibbs_table
       locator:
         table: '9'
-        pdf_page_index: 30
+        page: 30
+        pdf_page_index: 29
         note: 'Henrian coefficients used in FactSage T50c. Caption: for In2O3(s), A = -7230 and B = 0'
       T_range_K:
       - 1568.0
@@ -3465,7 +3964,8 @@ species:
       type: transition_point
       locator:
         table: '9'
-        pdf_page_index: 30
+        page: 30
+        pdf_page_index: 29
         note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
       T_range_K:
       - 1781.0
@@ -3562,8 +4062,16 @@ corrections:
     Our preferred value is an average of those marked in red in Fig. 5a plus the isotherm value, yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K. The value of γ(InO1.5) is within error for all runs (Fig. 5b), too, giving γ(InO1.5) = 0.017(12) at an average T of 1674 K.
     [...]
     Given that the oxygen fugacities under which equilibrium was achieved in the melts studied herein (ΔIW+1.5 to ΔIW+2.5) [...]
-  page: '23, 24'
-  line_range: '593-596; 610-611'
+  page: 23
+  line_range: '593-596'
+  quote: *preferred_quote
+- observation_id: bischof_2023_gao15_gamma_preferred_1700k
+  field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: *preferred_quote
+  page: 24
+  line_range: '610-611'
   quote: *preferred_quote
 - observation_id: bischof_2023_table8_x_gao15
   field: printed_quote
@@ -3582,8 +4090,16 @@ corrections:
     1_low, initially [...] | 1742 | [...] | 1585-1695 | [...]
     2_low, initially [...] | - | [...] | 1400-1730 | [...]
     3_high, initially [...] | - | [...] | 1540-1640 | [...]
-  page: '22, 6'
-  table: '8 (page 22); 2 (page 6)'
+  page: 22
+  table: '8'
+  quote: *table8_quote
+- observation_id: bischof_2023_table8_x_gao15
+  field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: *table8_quote
+  page: 6
+  table: '2'
   quote: *table8_quote
 - observation_id: bischof_2023_gao15_gamma_s1_1low_polytherm
   field: printed_quote
@@ -3694,6 +4210,59 @@ corrections:
   page: 2
   table: S1
   quote: *s1_quote
+- observation_id: bischof_2023_ga_psat_s1_1low_polytherm
+  field: oxygen_buffer_as_published
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: O’Neill and Pownceby, 1993
+  page: 20
+  line_range: '519-522'
+  quote: Both 1_low and 2_low runs exhibit a gradual reduction relative to IW (O’Neill and
+    Pownceby, 1993) as temperature increases from 1587 K; ΔIW+1.66 and ΔIW+2.10, respectively,
+    before converging at the highest temperatures (~1700 K) to a constant value of ΔIW+1.54 in
+    both runs.
+- observation_id: bischof_2023_gao15_gamma_s2_1low_isotherm
+  field: oxygen_buffer_as_published
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: O’Neill and Pownceby, 1993
+  page: 20
+  line_range: '519-522'
+  quote: Both 1_low and 2_low runs exhibit a gradual reduction relative to IW (O’Neill and
+    Pownceby, 1993) as temperature increases from 1587 K; ΔIW+1.66 and ΔIW+2.10, respectively,
+    before converging at the highest temperatures (~1700 K) to a constant value of ΔIW+1.54 in
+    both runs.
+- observation_id: bischof_2023_ino15_gamma_s2_1low_isotherm
+  field: oxygen_buffer_as_published
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: O’Neill and Pownceby, 1993
+  page: 20
+  line_range: '519-522'
+  quote: Both 1_low and 2_low runs exhibit a gradual reduction relative to IW (O’Neill and
+    Pownceby, 1993) as temperature increases from 1587 K; ΔIW+1.66 and ΔIW+2.10, respectively,
+    before converging at the highest temperatures (~1700 K) to a constant value of ΔIW+1.54 in
+    both runs.
+- observation_id: bischof_2023_gao15_gamma_s4_3high_polytherm
+  field: oxygen_buffer_as_published
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
+  old: absent
+  new: O’Neill and Pownceby, 1993
+  page: 16
+  quote: The oxygen fugacity around the iron-wüstite buffer is calculated using eq. S4
+    (O’Neill and Pownceby, 1993), fO2_{ΔIW X} = 10^{(ΔG_Fe-FeO,T/(RT ln(10))) ± X} (C4),
+    where X is the difference from the iron-wüstite buffer and ΔG_Fe-FeO,T the Gibbs free
+    energy of the buffer reaction (O’Neill and Pownceby, 1993).
+- observation_id: bischof_2023_ino15_gamma_s4_3high_polytherm
+  field: oxygen_buffer_as_published
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
+  old: absent
+  new: O’Neill and Pownceby, 1993
+  page: 16
+  quote: The oxygen fugacity around the iron-wüstite buffer is calculated using eq. S4
+    (O’Neill and Pownceby, 1993), fO2_{ΔIW X} = 10^{(ΔG_Fe-FeO,T/(RT ln(10))) ± X} (C4),
+    where X is the difference from the iron-wüstite buffer and ΔG_Fe-FeO,T the Gibbs free
+    energy of the buffer reaction (O’Neill and Pownceby, 1993).
 - observation_id: bischof_2023_ga2o3_henrian_log10_gamma_model
   field: printed_quote
   source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
@@ -3721,8 +4290,16 @@ corrections:
   source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: *preferred_quote
-  page: '23, 24'
-  line_range: '593-596; 610-611'
+  page: 23
+  line_range: '593-596'
+  quote: *preferred_quote
+- observation_id: bischof_2023_ino15_gamma_preferred_1674k
+  field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: *preferred_quote
+  page: 24
+  line_range: '610-611'
   quote: *preferred_quote
 - observation_id: bischof_2023_ino15_gamma_s1_1low_polytherm
   field: printed_quote

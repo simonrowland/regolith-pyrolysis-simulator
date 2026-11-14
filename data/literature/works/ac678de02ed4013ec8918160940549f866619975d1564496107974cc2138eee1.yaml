@@ -1,0 +1,453 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1
+  citation: Wetzel, S. (2012), Infrarotspektroskopische Untersuchung von Siliziumoxiden, Silikaten, deren Wechselwirkung mit
+    Metallinselfilmen sowie Dampfdruckmessungen an Siliziummonoxid, PhD thesis, Heidelberg.
+  source_ids:
+  - wetzel-2012-heidelberg-thesis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:wetzel-2012-heidelberg-thesis
+      role: pdf
+      path: raw/wetzel-2012-heidelberg-thesis/wetzel-2012-heidelberg-thesis.pdf
+      sha256:
+        tag: value
+        value: 482b48bfc47c634ef3cf048418ea388f6a88d8aaa2e52f56513650864a7b37ff
+    - asset_id: pdftotext:wetzel-2012-heidelberg-thesis
+      role: pdftotext
+      path: text/wetzel-2012-heidelberg-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:wetzel-2012-heidelberg-thesis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1::experiment::wetzel_sio_measurement_series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: nominal_pure_substance
+          components:
+          - - SiO
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 34
+        published_page: 24
+        section: 2.3.2
+        note: Nominal SiO endmember for composition bookkeeping; this does not assign a condensed phase or reservoir. The
+          printed purity is 99.99% and the remaining 0.01% is unspecified and not modelled.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1
+  locator:
+    page: 34
+    published_page: 24
+    figure: '2.11'
+    section: 2.3.2
+    note: Series-level identity for fits using both printed orifice experiments.
+  bench_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1::bench::wetzel_sio_knudsen_qcm
+- experiment_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1::experiment::wetzel_sio_orifice_0_50_mm
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: nominal_pure_substance
+          components:
+          - - SiO
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 34
+        published_page: 24
+        section: 2.3.2
+        note: Nominal SiO endmember for composition bookkeeping; this does not assign a condensed phase or reservoir. The
+          printed purity is 99.99% and the remaining 0.01% is unspecified and not modelled.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1
+  locator:
+    page: 34
+    published_page: 24
+    figure: '2.11'
+    section: 2.3.2
+  apparatus: {}
+  bench_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1::bench::wetzel_sio_knudsen_qcm
+- experiment_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1::experiment::wetzel_sio_orifice_0_79_mm
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: nominal_pure_substance
+          components:
+          - - SiO
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 34
+        published_page: 24
+        section: 2.3.2
+        note: Nominal SiO endmember for composition bookkeeping; this does not assign a condensed phase or reservoir. The
+          printed purity is 99.99% and the remaining 0.01% is unspecified and not modelled.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1
+  locator:
+    page: 34
+    published_page: 24
+    figure: '2.11'
+    section: 2.3.2
+  apparatus: {}
+  bench_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1::bench::wetzel_sio_knudsen_qcm
+- experiment_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1::wetzel-2012-heidelberg-thesis
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1
+  locator:
+    page: 36
+    published_page: 26
+    table: '2.2'
+    equation: '2.26'
+    note: row=ΔH1400K
+benches:
+- id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1::bench::wetzel_sio_knudsen_qcm
+  work_id: ac678de02ed4013ec8918160940549f866619975d1564496107974cc2138eee1
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Electron-bombardment heated Knudsen cell with quartz crystal balance
+    locator:
+      page: 21
+      published_page: 11
+      section: 2.2.1
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion; QCM deposition rate used to determine cell mass loss
+    locator:
+      page: 21
+      published_page: 11
+      section: 2.2.1
+  cell_materials:
+  - state:
+      tag: value
+      value: Ta
+    locator:
+      page: 24
+      published_page: 14
+      figure: '2.5'
+  detector:
+    state:
+      tag: value
+      value: Quartz crystal balance
+    locator:
+      page: 21
+      published_page: 11
+      section: 2.2.1
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Thermocouple in a tungsten-powder-filled dummy charge compared against an ice-water reference; thermocouple
+          voltage isolated and read by optocoupler and data-acquisition card.
+      locator:
+        page: 27
+        published_page: 17
+        section: 2.2.3
+    validation:
+      state:
+        tag: value
+        value: Checked by observing copper melting in the calibrated range
+      locator:
+        page: 27
+        published_page: 17
+        section: 2.2.3
+  other_facts:
+  - name: crucible_to_qcm_distance
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '9.7'
+          approximate: false
+      locator:
+        page: 21
+        published_page: 11
+        section: 2.2.1
+    unit: cm
+  - name: chamber_base_pressure_after_bakeout
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000001'
+          approximate: false
+      locator:
+        page: 21
+        published_page: 11
+        section: 2.2.1
+    unit: mbar
+  - name: qcm_resonant_frequency
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6'
+          approximate: false
+      locator:
+        page: 21
+        published_page: 11
+        section: 2.2.1
+    unit: MHz
+  - name: qcm_mass_areal_change_per_frequency_change
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000123'
+          approximate: false
+      locator:
+        page: 21
+        published_page: 11
+        section: 2.2.1
+    unit: g/cm2 per Hz
+  - name: filament_count
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4'
+          approximate: false
+      locator:
+        page: 23
+        published_page: 13
+        section: 2.2.1
+  - name: filament_length
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '17'
+          approximate: true
+      locator:
+        page: 23
+        published_page: 13
+        section: 2.2.1
+    unit: mm
+  - name: thermocouple_accuracy
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        page: 27
+        published_page: 17
+        section: 2.2.3
+    unit: '%'
+  - name: temperature_calibration_error
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.4'
+          approximate: false
+      locator:
+        page: 27
+        published_page: 17
+        section: 2.2.3
+    unit: '%'
+  - name: temperature_error_used_for_vapor_pressure
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2'
+          approximate: false
+      locator:
+        page: 30
+        published_page: 20
+        section: 2.2.5
+    unit: '%'
+  - name: aperture_area_assumed_relative_error
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        page: 30
+        published_page: 20
+        section: 2.2.5
+    unit: '%'
+  - name: sample_surface_area_assumed_relative_error
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        page: 30
+        published_page: 20
+        section: 2.2.5
+    unit: '%'
+  - name: clausing_factor_relative_error
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4'
+          approximate: false
+      locator:
+        page: 30
+        published_page: 20
+        section: 2.2.5
+    unit: '%'
+  - name: qcm_mass_rate_assumed_relative_error
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        page: 30
+        published_page: 20
+        section: 2.2.5
+    unit: '%'
+  - name: SiO_alpha_mean_statistical_deviation
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.02'
+          approximate: false
+      locator:
+        page: 30
+        published_page: 20
+        section: 2.2.5
+    unit: dimensionless
