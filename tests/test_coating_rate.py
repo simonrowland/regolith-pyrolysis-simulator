@@ -655,7 +655,20 @@ def test_positive_production_diagnostic_and_resumed_session_are_local() -> None:
     session = run._start_session()
 
     first = run._run_session(session)
+    first_notice = copy.deepcopy(
+        session.simulator.condensation_model.last_sticking_alpha_provenance_notice
+    )
     second = run._run_session(session)
+    cumulative_notice = (
+        session.simulator.condensation_model.last_sticking_alpha_provenance_notice
+    )
+    # Resuming must retain the first execution's refused pressure channels in
+    # the session even when they did not engage in the second execution.
+    pressure_key = "wall_saturation_pressure_refusals_by_species"
+    assert first_notice[pressure_key]
+    for species, segments in first_notice[pressure_key].items():
+        for segment, refusal in segments.items():
+            assert cumulative_notice[pressure_key][species][segment] == refusal
 
     for payload in (first, second):
         row = payload["per_hour_summary"][0]
@@ -692,6 +705,7 @@ def test_positive_production_diagnostic_and_resumed_session_are_local() -> None:
         assert committed["dt_h"] == 1.0
         assert committed["by_segment_species"]
         lifespan = payload["final"]["wall_fouling_lifespan"]
+        assert lifespan["authority_scope"] == "execution_local"
         assert lifespan["authoritative_for_resinter"] is False
         assert lifespan["verdict"] == "non-authoritative"
 
