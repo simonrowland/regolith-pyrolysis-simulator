@@ -12,7 +12,13 @@ extraction:
     manuscript (59 pages; March 28 2016 / July 25 2016), not the typeset GCA 201:49-64 article. Clean text layer. pdftotext
     -layout plus 300 dpi pdftoppm of PDF page 39 used to map Table 1 and Table 2 column headers (headers wrap across two printed
     lines). Experimental-section apparatus transcribed from PDF pages 8–9. No OCR. No Hashimoto 1990 furnace dimensions copied;
-    this paper cites that work for furnace details and does not restate them.
+    this paper cites that work for furnace details and does not restate them. Page-index inventory (index → physical PDF page;
+    quoted text is from each page) 8 → 9, “mixture loaded onto 2.5 mm diameter iridium wire loops”; 9 → 10, “15 keV
+    accelerating voltage and a 0.4 nA beam current”; 13 → 14, “CaO and Al2O3 do not evaporate from the melt”; 16 → 17,
+    “α25,24= 0.98383±0.00033, which within error”; 11 → 12, “relatively slow quenching (~1000˚C/min) of the molten Mg2SiO4-rich droplets”;
+    17 → 18, “silicon isotopic compositions plot along a line with slope”;
+    20 → 21, “γMg = 2.1 which was the value used in Fig. 3”; 38 → 39, “Table 1. Measured chemical bulk composition and
+    magnesium, silicon”.
   date: '2026-09-19'
   worker: extract-mendybaev-2017
 review_status: draft
@@ -1330,7 +1336,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -1344,7 +1350,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -1372,27 +1378,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -1402,7 +1408,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area
@@ -1599,7 +1605,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -1613,7 +1619,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -1641,27 +1647,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -1671,7 +1677,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area
@@ -1866,7 +1872,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -1880,7 +1886,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -1908,27 +1914,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -1938,7 +1944,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area
@@ -2131,7 +2137,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -2145,7 +2151,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -2173,27 +2179,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -2203,7 +2209,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area
@@ -2398,7 +2404,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -2412,7 +2418,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -2440,27 +2446,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -2470,7 +2476,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area
@@ -2663,7 +2669,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -2677,7 +2683,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -2705,27 +2711,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -2735,7 +2741,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area
@@ -2930,7 +2936,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -2944,7 +2950,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -2972,27 +2978,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -3002,7 +3008,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area
@@ -3195,7 +3201,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -3209,7 +3215,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -3237,27 +3243,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -3267,7 +3273,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area
@@ -3462,7 +3468,7 @@ species:
           are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
-          pdf_page_index: 9
+          pdf_page_index: 8
           paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
         thermal_schedule_as_printed:
           pump_down: about 10^{-7} bars at room temperature
@@ -3476,7 +3482,7 @@ species:
           pdf_page_index: 9
         quench_rate_locator:
           section: '4'
-          pdf_page_index: 12
+          pdf_page_index: 11
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
           evaporation_condition: <10^{-9} bars
@@ -3504,27 +3510,27 @@ species:
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
             figure: '6'
-            pdf_page_index: 17
+            pdf_page_index: 16
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
           alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α29,28 = 0.99010±0.00038
           alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
           alpha_18_16_forsterite_field: 0.9815
           alpha_18_16_forsterite_field_2sigma: 0.0016
           alpha_18_16_forsterite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 = 0.9815±0.0016
           alpha_18_16_melilite_field_as_printed: ~0.9911
           alpha_18_16_melilite_field_kind: approximate
           alpha_18_16_melilite_field_locator:
             figure: '8'
-            pdf_page_index: 18
+            pdf_page_index: 17
             paragraph: α18,16 ~ 0.9911
         gamma_SiO_over_gamma_Mg:
           value: 2.1
@@ -3534,7 +3540,7 @@ species:
             paper.
           locator:
             figure: '3'
-            pdf_page_index: 21
+            pdf_page_index: 20
             paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
         missing_for_motzfeldt:
         - orifice_area

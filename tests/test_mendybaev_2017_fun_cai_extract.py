@@ -1,6 +1,7 @@
 """Table 1 residue-composition pins for Mendybaev et al. (2017)."""
 
 import re
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
@@ -19,6 +20,24 @@ FUNC_STARTING_COMPOSITION = {
     "SiO2": Decimal("42.9"),
     "CaO": Decimal("7.6"),
 }
+SOURCE_PAGE_PINS = {
+    8: "mixture loaded onto 2.5 mm diameter iridium wire loops",
+    9: "15 keV accelerating voltage and a 0.4 nA beam current",
+    11: "relatively slow quenching (~1000˚C/min) of the molten Mg2SiO4-rich droplets",
+    13: "CaO and Al2O3 do not evaporate from the melt",
+    16: "α25,24= 0.98383±0.00033, which within error",
+    17: "silicon isotopic compositions plot along a line with slope",
+    20: "γMg = 2.1 which was the value used in Fig. 3",
+    38: "Table 1. Measured chemical bulk composition and magnesium, silicon",
+}
+SOURCE_LOCATOR_INDEX_PINS = {
+    "sample_load_locator": 8,
+    "quench_rate_locator": 11,
+    "alpha_25_24_locator": 16,
+    "alpha_29_28_locator": 17,
+    "alpha_18_16_forsterite_field_locator": 17,
+    "alpha_18_16_melilite_field_locator": 17,
+}
 
 
 def _migrate(path: Path = EXTRACT) -> Migrator:
@@ -35,6 +54,59 @@ def _residues(migrator: Migrator):
         if item.identity.quantity.is_value
         and item.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
     ]
+
+
+def _named_values(value: object, name: str) -> list[object]:
+    if isinstance(value, dict):
+        matches = [value[name]] if name in value else []
+        return matches + [
+            match
+            for child in value.values()
+            for match in _named_values(child, name)
+        ]
+    if isinstance(value, list):
+        return [match for child in value for match in _named_values(child, name)]
+    return []
+
+
+def _assert_source_page_index_pins(document: dict) -> None:
+    indexes: set[int] = set()
+
+    def collect_indexes(value: object) -> None:
+        if isinstance(value, dict):
+            if "pdf_page_index" in value:
+                indexes.add(value["pdf_page_index"])
+            for child in value.values():
+                collect_indexes(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect_indexes(child)
+
+    collect_indexes(document)
+    assert indexes == set(SOURCE_PAGE_PINS)
+    for locator_name, expected_index in SOURCE_LOCATOR_INDEX_PINS.items():
+        locators = _named_values(document, locator_name)
+        assert locators
+        assert all(locator["pdf_page_index"] == expected_index for locator in locators)
+    gamma = _named_values(document, "gamma_SiO_over_gamma_Mg")
+    assert gamma and all(item["locator"]["pdf_page_index"] == 20 for item in gamma)
+    detector = _named_values(document["benches"], "detector")
+    assert detector and all(item["locator"]["pdf_page_index"] == 9 for item in detector)
+
+
+def test_source_page_index_pins_and_plus_one_mutation() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_source_page_index_pins(document)
+
+    mutated = deepcopy(document)
+    sample_load = _named_values(mutated, "sample_load_locator")[0]
+    sample_load["pdf_page_index"] += 1
+    try:
+        _assert_source_page_index_pins(mutated)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("a +1 source-page mutation must fail the independent pin guard")
 
 
 def test_table_1_first_last_and_largest_two_sigma_cells_match_page() -> None:
