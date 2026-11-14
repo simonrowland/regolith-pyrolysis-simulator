@@ -6,11 +6,13 @@ import warnings
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-# Measured on green sha be76d28ad8b73d0563ee34fddf452ec77b3d6de5.
+# Set by the train on the b263 landing tree (t-1789 asked for the landing-tree sizes so that cars
+# accepted before the ratchet are grandfathered; b262 and b263 grew migrate.py past be76d28ad).
+# From here on, growth needs a cited owner ruling id.
 LINE_CEILINGS = {
-    Path("simulator/battery/score.py"): 25_855,
-    Path("simulator/battery/migrate.py"): 34_113,
-    Path("simulator/core.py"): 17_282,
+    Path("simulator/battery/score.py"): 24_898,
+    Path("simulator/battery/migrate.py"): 34_408,
+    Path("simulator/core.py"): 17_246,
 }
 
 
