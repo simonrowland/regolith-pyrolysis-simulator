@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     RefusalReason,
+    ResidualStatus,
 )
 from simulator.battery.score import (
     ScoreContext,
@@ -269,18 +270,26 @@ def test_table5_migration_reaches_temperature_and_scored_composition(
             context=context,
             comparison_ids={observation.observation_id},
         )
-        # Crystal with an unstated polymorph refuses before prediction, so
-        # the oxide notice is not attached.
-        assert residual.execution.state is ExecutionState.NOT_PROBED
+        # d-338 infers the stable crystal and the engine consumes the
+        # printed point composition, so the oxide notice is attached.
+        # The band stays open because the fusion uncertainty is unprinted.
+        assert residual.execution.state is ExecutionState.PRODUCED
+        assert residual.status is ResidualStatus.NO_BAND
+        assert residual.numeric is not None
         assert residual.refusal is not None
-        assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+        assert residual.refusal.reason is not RefusalReason.IDENTITY_INCOMPLETE
         assert residual.refusal.detail["reason"] == (
-            "fusion_source_reference_phase_unprinted"
+            "conversion_uncertainty_unprinted"
         )
-        assert all(
-            item.kind is not NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+        assert any(
+            item.reason.startswith("reference_polymorph_inferred_stable_phase:")
             for item in residual.notices
         )
+        assert any(
+            item.kind is NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+            for item in residual.notices
+        )
+        assert endmember.polymorph.is_unknown
         assert observation.identity.composition is point.state
         vaporock, _vaporock_candidate = compile_residual(
             observation,

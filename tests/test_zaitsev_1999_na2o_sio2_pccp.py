@@ -10,6 +10,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
+    ReferenceStateConvention,
     ResidualStatus,
     UncertaintyKind,
     ValueKind,
@@ -82,6 +83,15 @@ def test_zaitsev_1999_scored_rows_migrate_with_temperature_and_composition():
     ]
     assert len(na2o) == 29
     assert len(sio2) == 29
+    assert all(
+        observation.identity.reference_state.is_value
+        and observation.identity.reference_state.value.convention
+        is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        and observation.identity.reference_state.value.endmember.formula == "Na2O"
+        and observation.identity.reference_state.value.endmember.phase.value
+        is Phase.L
+        for observation in na2o
+    )
     assert all(len(observation.derived_from or ()) == 29 for observation in sio2)
 
 
@@ -127,6 +137,18 @@ def test_zaitsev_1999_render_pins_and_table1_row_count():
     assert (sio2[0]["activity"], sio2[0]["locator"]["row"]) == ("0.860", "1")
     assert (sio2[-1]["activity"], sio2[-1]["locator"]["row"]) == ("3.77e-6", "29")
     assert all(point["locator"]["published_page"] == 1901 for point in na2o + sio2)
+    measured_na2o = next(
+        item
+        for item in species["Na2O"]["observations"]
+        if item["observation_id"] == "zaitsev_1999_table1_na2o_activity"
+    )
+    model_activities = next(
+        item
+        for item in species["SiO2"]["context"]
+        if item["observation_id"] == "zaitsev_1999_table1_model_activities"
+    )
+    assert measured_na2o["values"]["method_class"] == "measured_direct"
+    assert model_activities["values"]["method_class"] == "model_derived"
 
 
 def test_zaitsev_1999_partial_enthalpy_and_element_formation_signs():

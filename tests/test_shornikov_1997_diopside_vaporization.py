@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -10,7 +11,9 @@ import yaml
 
 from simulator.battery.enums import (
     Phase,
+    EvidenceClass,
     Quantity,
+    RawInputStatus,
     RefusalReason,
     ReferenceStateConvention,
     ValueKind,
@@ -19,7 +22,10 @@ from simulator.battery.migrate import convert_pressure_to_pa
 from simulator.battery.records import AmountBasis
 from simulator.battery.validate import validate_corpus
 from tests.battery.factories import migrate_one_extract
-from tools.validate_literature_extracts import check_all_fidelity_samples_match
+from tools.validate_literature_extracts import (
+    check_all_fidelity_samples_match,
+    validate_extract_document,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -156,7 +162,54 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
         for observation in block["observations"]
     }
     records = list(result.observations.values())
-    assert len(records) == 81
+    assert len(records) == 91
+    quantity_unknown = {
+        row.uncertainty.verbatim["parent"].rsplit("::", 1)[-1]
+        for row in records
+        if row.identity.quantity.is_unknown
+    }
+    assert quantity_unknown == {
+        "shornikov_1997_cao_partial_entropy_table4",
+        "shornikov_1997_mgo_partial_entropy_table4",
+        "shornikov_1997_sio2_partial_entropy_table4",
+    }
+    assert not [
+        row.observation_id for row in records if row.identity.species.phase.is_unknown
+    ]
+    context_rows = source_document["species"]["Ca"]["context"]
+    assert len(context_rows) == 6
+    assert all(
+        row["values"]["measurement_state_composition"]["state"]["reason"]
+        == "not_published"
+        for row in context_rows
+    )
+    assert all(
+        row["values"]["run_order_index"]["state"]["reason"]
+        == "not_published"
+        for row in context_rows
+    )
+    assert all(
+        row["values"]["depletion_evidence"]["state"]["reason"]
+        == "not_published"
+        and row["values"]["depletion_evidence"]["locator"]["table"] == "1"
+        for row in context_rows
+    )
+    assert context_rows[0]["values"]["vaporization_statement"]["state"]["value"] == (
+        "The vaporization of CaO · MgO · 2SiO2 mainly occurs as the transitions to "
+        "the gas phase of pure CaO, MgO, and SiO2 oxides."
+    )
+    uncertainty_counts = Counter(
+        (
+            row.uncertainty.kind.value,
+            (row.uncertainty.verbatim or {}).get("confidence_level")
+            if isinstance(row.uncertainty.verbatim, dict)
+            else None,
+        )
+        for row in records
+    )
+    assert uncertainty_counts == Counter(
+        {("printed", "not_stated"): 63, ("printed", None): 28}
+    )
 
     pressure_points = [
         row for row in records
@@ -182,6 +235,100 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
             }
         assert row.value.kind is ValueKind.POINT
         assert row.uncertainty.verbatim["sigma"] > 0
+        assert row.uncertainty.verbatim["confidence_level"] == "not_stated"
+
+    from simulator.battery.score import (
+        ENGINE_CHANNELS,
+        ENGINE_COEFFICIENT_SOURCES,
+        ScoreContext,
+        SCORE_ENGINE_SET,
+        comparison_candidates,
+        _initial_charge_composition_notice,
+        _oxygen_input_request,
+        _source_oxygen_pressure_for_score,
+    )
+    from simulator.battery.source_oxygen import linked_source_pressure
+    from simulator.diagnostic_helpers.binary_pot_battery import PO2_COMMANDED
+    from simulator.battery.identity import profile_for
+
+    ca_points = [
+        row for row in pressure_points
+        if "shornikov_1997_ca_pressure_table1::T=" in row.observation_id
+    ]
+    o2_points = {
+        row.identity.temperature_K.value: row for row in pressure_points
+        if "shornikov_1997_o2_pressure_table1::T=" in row.observation_id
+    }
+    assert len(ca_points) == len(o2_points) == 6
+    score_context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        benches=result.benches,
+    )
+    applicable_ids = {
+        candidate.observation_id for candidate in comparison_candidates(score_context)
+    }
+    for row in ca_points:
+        assert row.observation_id in applicable_ids
+        temperature = row.identity.temperature_K.value
+        source = o2_points[temperature]
+        linked = row.point_conditions["fO2_Pa"]
+        assert linked.state.is_value
+        assert linked.state.value == source.value.point
+        assert linked.locator is not None
+        assert linked.locator.page == 2 and linked.locator.table == "1"
+        assert linked.inference is not None
+        assert linked.inference.relation.startswith("source_oxygen_condition;")
+        assert linked.inference.inputs == (source.observation_id,)
+        assert linked_source_pressure(row) == source.value.point
+        assert _source_oxygen_pressure_for_score(row) == source.value.point
+        assert source.observation_id.endswith(
+            {
+                Decimal("1566"): "h=3342f695e6c8",
+                Decimal("1640"): "h=67991e112e7e",
+                Decimal("1688"): "h=a9a4e0d1ffd2",
+                Decimal("1743"): "h=5a3926cb6dd8",
+                Decimal("1778"): "h=8a8078e0eb42",
+                Decimal("1862"): "h=0698de9b82b3",
+            }[temperature]
+        )
+        composition = row.point_conditions["composition"].state.value
+        assert composition.proxy_flag == "initial_charge_only"
+        assert _initial_charge_composition_notice(row) is not None
+        assert row.point_conditions["total_pressure_Pa"].state.is_unknown
+        assert row.point_conditions["total_pressure_Pa"].state.reason == "not_published"
+        assert row.identity.total_pressure_Pa.is_unknown
+        assert row.identity.composition.is_value
+        assert row.identity.fO2_Pa.is_value
+        assert row.identity.fO2_Pa.value == source.value.point
+        assert profile_for(row.identity).required == {
+            "composition",
+            "fO2_Pa",
+            "temperature_K",
+            "total_pressure_Pa",
+        }
+        experiment = result.experiments[row.experiment_id]
+        bench = result.benches[experiment.bench_id]
+        source_oxygen_bar = float(source.value.point) / 1.0e5
+        for engine in SCORE_ENGINE_SET:
+            request = _oxygen_input_request(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                identity=row.identity,
+                requested=row.identity.composition,
+                quantity=Quantity.P_PARTIAL,
+                composition_value=composition,
+                input_notices=[],
+                observation=row,
+                experiment=experiment,
+                bench=bench,
+                temperature_K=float(temperature),
+                source_oxygen_bar=source_oxygen_bar,
+            )
+            assert request.mode == PO2_COMMANDED
+            assert request.po2_bar == source_oxygen_bar
 
     fit_rows = [
         row for row in records
@@ -196,10 +343,49 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
         row for row in records
         if row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.ACTIVITY
+        and "_activity_table3::" in row.observation_id
     ]
     assert len(activity_rows) == 18
     assert all(row.point_conditions["composition"].state.is_value for row in activity_rows)
     assert all(row.point_conditions["temperature_K"].state.is_value for row in activity_rows)
+
+    quoted_activity_rows = [
+        row for row in records if "_activity_quoted_ref" in row.observation_id
+    ]
+    expected_quotes = [
+        ("shornikov_1997_cao_activity_quoted_ref23", "CaO", 1873, "0.005"),
+        ("shornikov_1997_cao_activity_quoted_ref26", "CaO", 1873, "0.02"),
+        ("shornikov_1997_mgo_activity_quoted_ref23", "MgO", 1873, "0.001"),
+        ("shornikov_1997_sio2_activity_quoted_ref22", "SiO2", 1823, "0.35"),
+        ("shornikov_1997_sio2_activity_quoted_ref25", "SiO2", 1773, "0.48"),
+        ("shornikov_1997_sio2_activity_quoted_ref25", "SiO2", 1823, "0.40"),
+        ("shornikov_1997_sio2_activity_quoted_ref30", "SiO2", 1773, "0.25"),
+        ("shornikov_1997_sio2_activity_quoted_ref30", "SiO2", 1823, "0.22"),
+        ("shornikov_1997_sio2_activity_quoted_ref23", "SiO2", 1873, "0.50"),
+        ("shornikov_1997_sio2_activity_quoted_ref29", "SiO2", 1873, "0.30"),
+    ]
+    assert len(quoted_activity_rows) == 10
+    quoted_by_parent_and_temperature = {
+        (
+            row.observation_id.split("::T=", 1)[0].rsplit("::", 1)[-1],
+            int(row.identity.temperature_K.value),
+        ): row
+        for row in quoted_activity_rows
+    }
+    for parent_id, formula, temperature, value in expected_quotes:
+        row = quoted_by_parent_and_temperature[(parent_id, temperature)]
+        assert row.identity.species.formula == formula
+        assert row.identity.species.phase.is_value
+        assert row.identity.species.phase.value is Phase.L
+        assert row.identity.quantity.value is Quantity.ACTIVITY
+        assert row.identity.temperature_K.value == Decimal(temperature)
+        assert row.value.point == Decimal(value)
+        assert row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert row.experiment_id in result.experiments
+        assert row.point_conditions["composition"].state.is_unknown
+        assert row.point_conditions["fO2_Pa"].state.is_unknown
+        assert row.point_conditions["total_pressure_Pa"].state.is_unknown
+        assert row.identity.reference_state.is_unknown
 
     table4_rows = [row for row in records if "partial_" in row.observation_id and "table4" in row.observation_id]
     assert len(table4_rows) == 6
@@ -216,9 +402,9 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
         if quantity is None:
             assert not row.identity.quantity.is_value
             assert row.value.kind is ValueKind.UNAVAILABLE
-            source_points = source_rows[row.observation_id.rsplit("::", 1)[-1]][
-                "values"
-            ]["points"]
+            parent_id = row.uncertainty.verbatim["parent"].rsplit("::", 1)[-1]
+            assert source_rows[parent_id]["values"]["quantity"] == "partial_component_entropy"
+            source_points = source_rows[parent_id]["values"]["points"]
             assert Decimal(str(source_points[0]["sigma"])) == sigma
         else:
             assert row.identity.quantity.value is quantity
@@ -254,6 +440,21 @@ def test_fidelity_pins_cover_table_values_and_fail_after_mutation():
     assert check_all_fidelity_samples_match(mutated_table4, label=str(EXTRACT))
 
 
+def test_context_records_pass_extract_schema_with_fidelity_matching():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+    assert all(
+        row["units"] == "K"
+        for row in document["species"]["Ca"]["context"]
+    )
+    assert validate_extract_document(
+        document,
+        path=EXTRACT,
+        expected_source_id=EXTRACT.stem,
+        check_fidelity_match=True,
+    ) == []
+
+
 def test_table1_preserves_temperature_widths_separately_from_pressure_widths():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     expected_widths = {1566: 7, 1640: 3, 1688: 5, 1743: 8, 1778: 5, 1862: 4}
@@ -273,6 +474,46 @@ def test_table1_preserves_temperature_widths_separately_from_pressure_widths():
         assert point["temperature_as_printed"] == f"{temperature} ± {width} K"
 
 
+def test_render_checked_values_and_printed_table_row_counts():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    sample_paths = {
+        "species.Ca.observations[shornikov_1997_ca_pressure_table1].values.points[0].pressure_as_printed": (
+            "1.6 ± 0.2",
+            2,
+            "1",
+        ),
+        "species.O2.observations[shornikov_1997_o2_pressure_table1].values.points[5].pressure_as_printed": (
+            "1860 ± 90",
+            2,
+            "1",
+        ),
+    }
+    fidelity = {sample["path"]: sample for sample in document["fidelity_samples"]}
+    for path, (expected, page, table) in sample_paths.items():
+        assert path in fidelity
+        assert str(fidelity[path]["value"]) == expected
+        assert fidelity[path]["locator"]["page"] == page
+        assert fidelity[path]["locator"]["table"] == table
+
+    mgo_enthalpy = next(
+        observation
+        for observation in document["species"]["MgO"]["observations"]
+        if observation["observation_id"]
+        == "shornikov_1997_mgo_partial_enthalpy_table4"
+    )
+    assert mgo_enthalpy["locator"]["page"] == 3
+    assert mgo_enthalpy["locator"]["table"] == "4"
+    assert mgo_enthalpy["values"]["points"][0]["value_as_published"] == "−40.2 ± 2.6"
+
+    mapping = yaml.safe_load(
+        (ROOT / "data/literature/extracts/audits/shornikov-1997-diopside-vaporization.mapping.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row_counts = {table["table"]: table["printed_rows"] for table in mapping["tables"]}
+    assert row_counts == {"1": 9, "2": 7, "3": 14, "4": 3}
+
+
 def test_mgo_activity_uses_the_source_stated_pure_solid_reference():
     rows = [
         row
@@ -280,6 +521,7 @@ def test_mgo_activity_uses_the_source_stated_pure_solid_reference():
         if row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.ACTIVITY
         and row.identity.species.formula == "MgO"
+        and "shornikov_1997_mgo_activity_table3::" in row.observation_id
     ]
 
     assert len(rows) == 6
@@ -349,9 +591,17 @@ def test_table4_lineage_resolves_to_same_source_table3_activity_rows():
         for work in result.works.values()
         for asset in work.source_files.files
     }
-    assert len(source_rows) == 81
+    assert len(source_rows) == 91
     for row in source_rows:
         if row.derivation is None:
+            continue
+        if row.evidence.class_.is_value and row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED:
+            assert not row.derived_from
+            continue
+        if not row.derived_from:
+            assert row.derivation.raw_inputs is not None
+            assert row.derivation.raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+            assert row.derivation.raw_inputs.locator is not None
             continue
         assert row.derived_from
         assert row.derived_from == row.derivation.inputs

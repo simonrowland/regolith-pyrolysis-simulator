@@ -51,7 +51,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the analytical standard.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -136,6 +136,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: Published PU-3 average cited by the authors.
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_pu3_wet_chemistry_session_1
   experiment_id: 10.1007/s00410-015-1119-6::borisov-behrens-holtz-2015-melt-composition-fe-redox
   identity:
@@ -185,7 +187,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the PU-3 standard assay.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -269,6 +271,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: PU-3 session 1 ratio.
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_pu3_wet_chemistry_session_2
   experiment_id: 10.1007/s00410-015-1119-6::borisov-behrens-holtz-2015-melt-composition-fe-redox
   identity:
@@ -318,7 +322,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the PU-3 standard assay.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -402,6 +406,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: PU-3 session 2 ratio.
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_pu3_wet_chemistry_session_3
   experiment_id: 10.1007/s00410-015-1119-6::borisov-behrens-holtz-2015-melt-composition-fe-redox
   identity:
@@ -451,7 +457,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the PU-3 standard assay.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -535,6 +541,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: PU-3 session 3 ratio.
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_pu3_wet_chemistry_session_4
   experiment_id: 10.1007/s00410-015-1119-6::borisov-behrens-holtz-2015-melt-composition-fe-redox
   identity:
@@ -584,7 +592,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No experimental pressure applies to the PU-3 standard assay.
     sweep_gas:
       tag: not_applicable
       reason: profile valence_ratio does not use sweep_gas
@@ -668,6 +676,8 @@ observations:
         pdf_page_index: 2
         section: Experimental procedure
         note: PU-3 session 4 ratio.
+  provenance:
+    printed_phase: glass
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_01_daf_52
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_01
   identity:
@@ -863,13 +873,8 @@ observations:
               note: row=1; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_02_dafa22_52
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_01
   identity:
@@ -1068,13 +1073,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=2; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_03_dafa30_52
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_01
   identity:
@@ -1273,13 +1273,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=3; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_04_dafs_52
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_01
   identity:
@@ -1478,13 +1473,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=4; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_05_dafsa15_52
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_01
   identity:
@@ -1683,13 +1673,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=5; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_06_dafsa23_52
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_01
   identity:
@@ -1888,13 +1873,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=6; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_07_daf_51
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_07
   identity:
@@ -2090,13 +2070,8 @@ observations:
               note: row=7; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_08_dafa22_51
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_07
   identity:
@@ -2295,13 +2270,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=8; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_09_dafa30_51
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_07
   identity:
@@ -2500,13 +2470,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=9; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_10_dafs_51
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_07
   identity:
@@ -2705,13 +2670,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=10; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_11_dafsa15_51
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_07
   identity:
@@ -2910,13 +2870,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=11; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_12_dafsa23_51
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_07
   identity:
@@ -3115,13 +3070,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=12; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_13_daf_53
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_13
   identity:
@@ -3317,13 +3267,8 @@ observations:
               note: row=13; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_14_dafa22_53
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_13
   identity:
@@ -3522,13 +3467,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=14; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_15_dafa30_53
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_13
   identity:
@@ -3727,13 +3667,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=15; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_16_dafs_53
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_13
   identity:
@@ -3932,13 +3867,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=16; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_17_dafsa15_53
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_13
   identity:
@@ -4137,13 +4067,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=17; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_18_dafsa23_53
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_13
   identity:
@@ -4342,13 +4267,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=18; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_19_daf_58
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_19
   identity:
@@ -4544,13 +4464,8 @@ observations:
               note: row=19; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_20_daf5_58
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_19
   identity:
@@ -4749,13 +4664,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=20; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_21_daf20_58
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_19
   identity:
@@ -4954,13 +4864,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=21; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_22_daf_56
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_22
   identity:
@@ -5156,13 +5061,8 @@ observations:
               note: row=22; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_23_daf5_56
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_22
   identity:
@@ -5361,13 +5261,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=23; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_24_daf20_56
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_22
   identity:
@@ -5566,13 +5461,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=24; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_25_dafol20_63
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_25
   identity:
@@ -5768,13 +5658,8 @@ observations:
               note: row=25; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_26_dafol40_63
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_25
   identity:
@@ -5973,13 +5858,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=26; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_27_daf_57
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_27
   identity:
@@ -6175,13 +6055,8 @@ observations:
               note: row=27; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_28_daf5_57
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_27
   identity:
@@ -6380,13 +6255,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=28; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_29_daf20_57
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_27
   identity:
@@ -6585,13 +6455,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=29; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_30_dafol20_57
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_27
   identity:
@@ -6790,13 +6655,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=30; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_31_dafol40_57
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_27
   identity:
@@ -6995,13 +6855,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=31; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_32_daf_59
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_32
   identity:
@@ -7197,13 +7052,8 @@ observations:
               note: row=32; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_33_daf5_59
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_32
   identity:
@@ -7402,13 +7252,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=33; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_34_daf20_59
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_32
   identity:
@@ -7607,13 +7452,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=34; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_35_dafol20_59
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_32
   identity:
@@ -7812,13 +7652,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=35; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_36_dafol40_59
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_32
   identity:
@@ -8017,13 +7852,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=36; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_37_daf_71
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_37
   identity:
@@ -8219,13 +8049,8 @@ observations:
               note: row=37; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_38_dafm15_71
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_37
   identity:
@@ -8424,13 +8249,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=38; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_39_dafm20_71
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_37
   identity:
@@ -8629,13 +8449,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=39; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_40_dafs_71
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_37
   identity:
@@ -8834,13 +8649,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=40; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_41_dafsm13_71
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_37
   identity:
@@ -9039,13 +8849,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=41; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_42_dafsm21_71
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_37
   identity:
@@ -9244,13 +9049,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=42; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_43_daf_72
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_43
   identity:
@@ -9446,13 +9246,8 @@ observations:
               note: row=43; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_44_dafm15_72
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_43
   identity:
@@ -9651,13 +9446,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=44; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_45_dafm20_72
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_43
   identity:
@@ -9856,13 +9646,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=45; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_46_dafs_72
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_43
   identity:
@@ -10061,13 +9846,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=46; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_47_dafsm13_72
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_43
   identity:
@@ -10266,13 +10046,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=47; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_48_dafsm21_72
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_43
   identity:
@@ -10471,13 +10246,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=48; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_49_daf_70
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_49
   identity:
@@ -10843,13 +10613,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: row=49; column=Fe3+/Fe2+
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_50_da_daft10_70
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_49
   identity:
@@ -11232,13 +10997,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=50; column=Fe3+/Fe2+
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_51_da_dafp10_70
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_49
   identity:
@@ -11621,13 +11381,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=51; column=Fe3+/Fe2+
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_52_da_dafa22_70
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_49
   identity:
@@ -12010,13 +11765,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=52; column=Fe3+/Fe2+
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_53_da_dafsa23_70
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_49
   identity:
@@ -12399,13 +12149,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=53; column=Fe3+/Fe2+
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_54_daft10_dafp10_70
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_49
   identity:
@@ -12788,13 +12533,8 @@ observations:
         pdf_page_index: 4
         table: '1'
         note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=54; column=Fe3+/Fe2+
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_55_daf_85
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_55
   identity:
@@ -12990,13 +12730,8 @@ observations:
               note: row=55; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_56_daf5_85
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_55
   identity:
@@ -13195,13 +12930,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=56; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_57_daf20_85
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_55
   identity:
@@ -13400,13 +13130,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=57; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_58_daf_83
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_58
   identity:
@@ -13602,13 +13327,8 @@ observations:
               note: row=58; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_59_daf5_83
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_58
   identity:
@@ -13807,13 +13527,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=59; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_60_daf20_83
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_58
   identity:
@@ -14012,13 +13727,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=60; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_61_dafol20_83
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_58
   identity:
@@ -14217,13 +13927,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=61; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_62_dafol40_83
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_58
   identity:
@@ -14422,13 +14127,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=62; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_63_daf_84
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_63
   identity:
@@ -14624,13 +14324,8 @@ observations:
               note: row=63; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_64_daf5_84
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_63
   identity:
@@ -14829,13 +14524,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=64; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_65_daf20_84
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_63
   identity:
@@ -15034,13 +14724,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=65; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_66_dafol20_84
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_63
   identity:
@@ -15239,13 +14924,8 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=66; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l
 - observation_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::borisov_2015_table1_fe3_fe2_row_67_dafol40_84
   experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_63
   identity:
@@ -15446,10 +15126,5 @@ observations:
               note: Ditto cells marked a inherit the same-run condition from the preceding sample row.; row=67; column=Fe3+/Fe2+
         output_unit: K
         references: []
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
-    parameters: []
-    output_unit: Pa
-    references: []
+  provenance:
+    printed_phase: l

@@ -40,10 +40,12 @@ from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+from simulator.oxygen_buffers import metal_oxide_coexistence_log10_fO2_bar
 from simulator.scalar_boundary import finite_float
 from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
@@ -2113,7 +2115,7 @@ _CELL_OXIDE_BUFFER_TABLES: dict[str, tuple[tuple[str, str], ...]] = {
     "W": (("WO2", "O-047"), ("WO3", "O-065")),
     "Mo": (("MoO2", "Mo-009"),),
 }
-_CELL_GAS_CONSTANT_J_MOL_K = 8.31446261815324
+_CELL_GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
 _CELL_ATOMIC_MASS_G_MOL = {"O": 15.999, "W": 183.84, "Mo": 95.95}
 
 
@@ -2202,9 +2204,8 @@ def _cell_oxide_thermodynamics(
             oxygen_atoms = sum(
                 int(count or "1") for element, count in atoms if element == "O"
             )
-            log10_p = (
-                2.0 * gibbs_j
-                / (oxygen_atoms * _CELL_GAS_CONSTANT_J_MOL_K * T * math.log(10.0))
+            log10_p = metal_oxide_coexistence_log10_fO2_bar(
+                gibbs_j, float(oxygen_atoms), T
             )
             buffers.append((log10_p, formula, table_id, digest))
         # The first solid stable as oxygen potential rises is the M/MOx pair
@@ -2327,6 +2328,10 @@ def _solve_cell_oxygen_balance(
             str(exc),
         ) from exc
 
+    from simulator.chemistry.langmuir_knudsen import (
+        knudsen_effusion_relative_weight,
+    )
+
     buffer_pinned = (
         buffer_log10_bar is not None
         and math.log10(float(pO2_bar)) > buffer_log10_bar
@@ -2336,11 +2341,17 @@ def _solve_cell_oxygen_balance(
         pO2_bar = 10.0**buffer_log10_bar
         pressures = combined_pressure_model(buffer_log10_bar)
         oxygen_flux = math.fsum(
-            row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass)
+            knudsen_effusion_relative_weight(
+                pressures[name], row.molar_mass, coefficient=row.oxygen_atoms
+            )
             for name, row in all_metadata.items()
         )
         parent_flux = math.fsum(
-            row.parent_oxygen_demand * pressures[name] / math.sqrt(row.molar_mass)
+            knudsen_effusion_relative_weight(
+                pressures[name],
+                row.molar_mass,
+                coefficient=row.parent_oxygen_demand,
+            )
             for name, row in all_metadata.items()
         )
         # Pinned-branch residual = oxygen retained as condensed wall oxide.
@@ -2362,7 +2373,14 @@ def _solve_cell_oxygen_balance(
             "bracket": list(balance["bracket"]),
             "dominant_O_carriers": sorted(
                 (
-                    (name, row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass))
+                    (
+                        name,
+                        knudsen_effusion_relative_weight(
+                            pressures[name],
+                            row.molar_mass,
+                            coefficient=row.oxygen_atoms,
+                        ),
+                    )
                     for name, row in all_metadata.items()
                     if row.oxygen_atoms > 0
                 ),
@@ -2371,7 +2389,14 @@ def _solve_cell_oxygen_balance(
             )[:5],
             "dominant_metal_carriers": sorted(
                 (
-                    (name, row.parent_oxygen_demand * pressures[name] / math.sqrt(row.molar_mass))
+                    (
+                        name,
+                        knudsen_effusion_relative_weight(
+                            pressures[name],
+                            row.molar_mass,
+                            coefficient=row.parent_oxygen_demand,
+                        ),
+                    )
                     for name, row in all_metadata.items()
                     if row.parent_oxygen_demand > 0
                 ),
@@ -2381,13 +2406,17 @@ def _solve_cell_oxygen_balance(
         }
 
     total_oxygen_flux = math.fsum(
-        row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass)
+        knudsen_effusion_relative_weight(
+            pressures[name], row.molar_mass, coefficient=row.oxygen_atoms
+        )
         for name, row in all_metadata.items()
     )
     cell_oxygen_flux = math.fsum(
-        cell_metadata[name].oxygen_atoms
-        * pressures[name]
-        / math.sqrt(cell_metadata[name].molar_mass)
+        knudsen_effusion_relative_weight(
+            pressures[name],
+            cell_metadata[name].molar_mass,
+            coefficient=cell_metadata[name].oxygen_atoms,
+        )
         for name in cell_metadata
     )
     fraction = cell_oxygen_flux / total_oxygen_flux if total_oxygen_flux else 0.0
@@ -3655,6 +3684,7 @@ def _internal_analytical_vapor_pressure_adapter(
         vapor_pressures_Pa={},
         vapor_pressures_source={},
         liquid_fraction=None,
+        warnings=[],
     )
     simulation_hour = int(core.melt.hour) + 1
     if include_diagnostic_shadows:
@@ -3877,14 +3907,11 @@ class _InternalAnalyticalBatteryBackend:
         po2_request: Po2Request | None = None,
         **_unused: object,
     ) -> Any:
-        # One core serves every cell. Certificates, held gammas, the
-        # previous-temperature clock, the fallback-step log and the last
-        # vapour diagnostic are the previous cell's trajectory. Clear them
-        # here, before this cell's own refresh. Below 400 K the refresh
-        # returns without replacing that diagnostic, and the adapter reads
-        # it. Callers that walk one cell's trajectory (the adapter, residue
-        # integration) do not re-enter here between steps, so that history
-        # stays.
+        # One core serves every cell. Reset high-temperature activity
+        # continuation state so each battery cell starts independently; the
+        # core refresh owns the per-call vapor-pressure diagnostic on every
+        # temperature path. Residue integration calls the adapter directly
+        # and keeps its within-row trajectory state.
         core = self._core
         core._last_high_t_melt_activity = {}
         core._last_high_t_melt_activity_temperature_K = None

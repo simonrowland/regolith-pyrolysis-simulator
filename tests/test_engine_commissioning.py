@@ -1198,7 +1198,7 @@ def test_studio_diff_classifies_allowed_and_other_verdicts() -> None:
 
     report = diff.diff_captures(
         {
-            'hostname': 'Mac-Studio-256-1.local',
+            'hostname': 'example-host.local',
             'revision_id': 'base',
             'run_timestamp': 't0',
             'cells': [
@@ -1208,7 +1208,7 @@ def test_studio_diff_classifies_allowed_and_other_verdicts() -> None:
             ],
         },
         {
-            'hostname': 'Mac-Studio-256-1.local',
+            'hostname': 'example-host.local',
             'revision_id': 'tip',
             'run_timestamp': 't1',
             'cells': [

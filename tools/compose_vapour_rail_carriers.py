@@ -26,7 +26,12 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from engines.antoine import _read_antoine_coefficients  # noqa: E402
+from engines.antoine import (  # noqa: E402
+    _read_antoine_coefficients,
+    antoine_ab_from_enthalpy_entropy,
+    clausius_clapeyron_pressure,
+)
+from simulator.physical_constants import ATM_PA, GAS_CONSTANT, PA_PER_BAR  # noqa: E402
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog  # noqa: E402
 from simulator.vapour_rail.channels import (  # noqa: E402
     ChannelCompositionRefusal,
@@ -41,7 +46,7 @@ STRICT = "COMPOSABLE-NOW-STRICT"
 CLIPPED = "COMPOSABLE-NOW-CLIPPED"
 OPERATING_LOW_K = 1300.0
 OPERATING_HIGH_K = 2300.0
-R_J_MOL_K = 8.31446261815324
+R_J_MOL_K = GAS_CONSTANT
 
 _FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?|\.\d+)?")
 
@@ -667,7 +672,7 @@ def _catalog_self_row(
             points.append(
                 {
                     "temperature_K": temperature,
-                    "pressure_Pa": math.exp(ln_p_bar) * 1.0e5,
+                    "pressure_Pa": math.exp(ln_p_bar) * PA_PER_BAR,
                 }
             )
         model = {
@@ -727,8 +732,12 @@ def _catalog_self_row(
             points = [
                 {
                     "temperature_K": temperature,
-                    "pressure_Pa": prefactor_pa
-                    * math.exp(-enthalpy_j_mol / (R_J_MOL_K * temperature)),
+                    "pressure_Pa": clausius_clapeyron_pressure(
+                        prefactor_pa,
+                        enthalpy_j_mol,
+                        temperature,
+                        gas_constant=R_J_MOL_K,
+                    ),
                 }
                 for temperature in temperatures
             ]
@@ -806,13 +815,18 @@ def _catalog_self_row(
         if match is None:
             raise ValueError(f"{spec.carrier}: cannot parse {source_form!r}")
         enthalpy, entropy = (float(match.group(1)), float(match.group(2)))
-        gas_constant = 1.98720425864083 if "cal_mol" in source_form else 8.31446261815324
+        gas_constant = 1.98720425864083 if "cal_mol" in source_form else GAS_CONSTANT
         standard_pressure = str(correlation.get("standard_pressure") or "1 bar").lower()
-        pressure_standard_pa = 101325.0 if "atm" in standard_pressure else 100000.0
+        pressure_standard_pa = ATM_PA if "atm" in standard_pressure else PA_PER_BAR
+        antoine_a, antoine_b = antoine_ab_from_enthalpy_entropy(
+            enthalpy,
+            entropy,
+            gas_constant=gas_constant,
+            standard_pressure=pressure_standard_pa,
+        )
         reference_coefficients = {
-            "A": math.log10(pressure_standard_pa)
-            + entropy / (gas_constant * math.log(10.0)),
-            "B": enthalpy / (gas_constant * math.log(10.0)),
+            "A": antoine_a,
+            "B": antoine_b,
             "C": 0.0,
         }
         tagged_target = formula + "(g)"

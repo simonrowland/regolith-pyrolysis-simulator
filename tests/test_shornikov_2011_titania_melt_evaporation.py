@@ -116,6 +116,49 @@ def _assert_rendered_cells(document) -> None:
         assert row["values"]["value"] == value
         assert row["phase"] == phase.value
         assert row["locator"]["page"] == 1
+        assert row["values"]["method_class"] == "model_derived"
+        assert row["values"]["formation_basis_as_published"] == "from elements"
+        assert "ΔfG°" in row["values"]["standard_state"]
+        assert row["values"]["standard_pressure"] == "not_printed"
+
+
+def test_authors_own_model_results_are_not_classified_as_citations():
+    document = _load()
+    observations = {
+        row["observation_id"]: row
+        for _formula, row in _observations(document)
+    }
+    table_rows = [row for row in observations.values() if row["type"] == "gibbs_table"]
+    assert len(table_rows) == 32
+    for table_row in table_rows:
+        values = table_row["values"]
+        assert values["method_class"] == "model_derived"
+        assert "value" in values
+        assert table_row["units"] == "kJ/mole"
+        assert values["formation_basis_as_published"] == "from elements"
+        assert "ΔfG°" in values["standard_state"]
+        assert values["standard_pressure"] == "not_printed"
+        method = table_row["derivation"]["method"]["state"]["value"].lower()
+        assert "ideal associated solutions" in method
+        assert table_row["derivation"]["references"] == [
+            "Xirouchakis et al. (1997)",
+            "DeСapitani and Kirschen (1998)",
+            "Shornikov et al. (2000)",
+            "Shornikov and Archakov (2003)",
+            "Glushko et al. (1978–1982)",
+        ]
+        method_locator = table_row["derivation"]["method"]["locator"]
+        assert method_locator["page"] == 1
+        assert method_locator["section"] == "Thermodynamic model"
+        assert "semi-phenomenological energy parameters" in method_locator["paragraph"]
+        assert "equation" not in method_locator
+
+    figure_row = observations["shornikov_2011_fig1a_line5_CaO_not_sampled"]
+    assert figure_row["values"]["method_class"] == "figure_only"
+    assert figure_row["values"]["method_class_as_printed"] == "model_derived"
+    assert figure_row["values"]["admission_status"] == "figure_only"
+    assert figure_row["values"]["unavailable_reason"] == "model_curve_not_sampled"
+    assert figure_row["values"].get("points", []) == []
 
 
 def test_table_and_figure_reads_are_pinned():
@@ -127,6 +170,11 @@ def test_table_and_figure_reads_are_pinned():
     ]
     assert len(gibbs) == 32
     assert {row["phase"] for row in gibbs} == {"cr", "l", "g"}
+    assert all(row["values"]["standard_pressure"] == "not_printed" for row in gibbs)
+    assert sum(
+        "standard_pressure" in row["values"]
+        for _formula, row in _observations(document)
+    ) == 32
     _assert_rendered_cells(document)
 
     oxygen = next(
@@ -272,7 +320,6 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     ]
     assert len(migrated) == 114
     assert not result.registry_issues
-    assert not result.validation.hard_issues
 
     gibbs = [row for row in migrated if row.identity.quantity.value.value == "delta_fG"]
     activities = [
@@ -306,6 +353,10 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     for row in migrated:
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value
+        assert row.point_conditions
+        for condition in row.point_conditions.values():
+            assert condition.state is not None
+            assert condition.locator is not None
 
     sample = next(row for row in activities if "fig1a_CaO_activity" in row.observation_id)
     assert sample.identity.temperature_K.value == Decimal("2050")
@@ -329,3 +380,4 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     # 5.0e-5 atm = 5.06625 Pa. The store keeps pascals.
     assert pressure.value.point == Decimal("5.066250")
     assert pressure.identity.temperature_K.value == Decimal("2300")
+    assert not result.validation.hard_issues

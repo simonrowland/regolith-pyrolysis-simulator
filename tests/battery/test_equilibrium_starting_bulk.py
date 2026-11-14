@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 from simulator.battery.enums import AmountBasis, NoticeKind, Quantity
+from simulator.battery.identity import profile_for
 from simulator.battery.migrate import migrate, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 
@@ -354,7 +355,7 @@ def test_gorojovsky_rows_do_not_gain_the_anhydrous_notice() -> None:
     assert "locator" not in dict(gorojovsky.identity.composition.value.components)
 
 
-def test_evans_equilibrium_composition_profile_keeps_composition_not_applicable() -> None:
+def test_evans_closed_phase_profile_requires_composition() -> None:
     from simulator.battery.migrate import Migrator
 
     extract = REPO / "data/literature/extracts/evans-2009-sulfur-mn-ni-w-xanes.yaml"
@@ -364,13 +365,19 @@ def test_evans_equilibrium_composition_profile_keeps_composition_not_applicable(
     evans = next(
         observation
         for observation in migrator.result.observations.values()
-        if observation.observation_id.endswith(
-            "::evans_2009_2c_al_composition::T=1673.15:row=b231205p1:h=1e9620f6f131"
+        if observation.observation_id.startswith(
+            "evans-2009-sulfur-mn-ni-w-xanes::evans_2009_2c_al_composition::T=1673.15:row=b231205p1:"
         )
     )
 
+    assert evans.identity.quantity.is_value
+    assert evans.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert "composition" in profile_for(evans.identity).required
     assert evans.identity.composition is not None
-    assert evans.identity.composition.is_not_applicable
+    assert evans.identity.composition.is_unknown
+    assert evans.identity.composition.reason == "no composition mapped from source"
+    assert evans.point_conditions["composition"].state.is_unknown
+    assert evans.point_conditions["composition"].state.reason == "not_published"
 
 
 def test_inoue_elemental_assay_keeps_composition_context_out_of_identity() -> None:

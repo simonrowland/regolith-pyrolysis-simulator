@@ -51,7 +51,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: 'The source states only an experimental setup bound: <10^-3 Pa.'
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -156,6 +156,8 @@ observations:
         published_page: 615
         section: Experimental
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: mueller-2004-alkali-oxide-activity-coal-ash::mueller_2004_k_pressure_untreated_1400c::T=1673.15:h=f40f98576d55
   experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-kems
   identity:
@@ -205,7 +207,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: 'The source states only an experimental setup bound: <10^-3 Pa.'
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -328,6 +330,8 @@ observations:
         published_page: 615
         section: Experimental
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: mueller-2004-alkali-oxide-activity-coal-ash::mueller_2004_na_pressure_tio2_1400c::T=1673.15:h=99de3f18dc44
   experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-plus-5-mass-percent-tio2
   identity:
@@ -377,7 +381,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: 'The source states only an experimental setup bound: <10^-3 Pa.'
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -482,6 +486,8 @@ observations:
         published_page: 615
         section: Experimental
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: mueller-2004-alkali-oxide-activity-coal-ash::mueller_2004_na_pressure_untreated_1400c::T=1673.15:h=9b4ba2c09bc6
   experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-kems
   identity:
@@ -531,7 +537,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: 'The source states only an experimental setup bound: <10^-3 Pa.'
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -654,3 +660,5 @@ observations:
         published_page: 615
         section: Experimental
     references: []
+  provenance:
+    printed_phase: gas

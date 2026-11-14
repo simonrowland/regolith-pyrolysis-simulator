@@ -95,6 +95,8 @@ observations:
           equation: '10'
     output_unit: fraction
     references: []
+  provenance:
+    printed_phase: L
 - observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=1d140014b00c
   experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
   identity:
@@ -141,8 +143,8 @@ observations:
       reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=94.64 wt%
         is below 95 wt%'
     fO2_Pa:
-      tag: unknown
-      reason: buffer-relative fO2 (FMQ+0.9) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      tag: value
+      value: '0.00005113074440117070062158129769'
     total_pressure_Pa:
       tag: value
       value: '200000000'
@@ -188,7 +190,24 @@ observations:
         published_page: 5933
         pdf_page_index: 7
         table: '4'
-  notices: []
+  notices:
+  - kind: engine_model_caveat
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=FMQ+0.9; calibration=oneill_1987_ammin_72_reaction2_emf;
+      T=1323.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.125419 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=2000 bar; pressure correction=Frost 1991 molar-volume ΔV term'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=1d140014b00c
+    band: ±0.125419 dex
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=+0.9 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1323.15
+      P_bar=2000 authority=certified band_dex=0.1217 log10_fO2_bar=-9.291317884430369 provenance=primary_emf pressure_coefficient_spread=yes
+      buffer_as_printed=FMQ+0.9'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=1d140014b00c
+    band: '0.1217'
+    authority: certified
   source_id: jugo-2010-sulfur-xanes
   locator:
     published_page: 5933
@@ -318,6 +337,8 @@ observations:
         figure: '8'
         note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
     references: []
+  provenance:
+    printed_phase: L
 - observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
   experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
   identity:
@@ -364,8 +385,8 @@ observations:
       reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=94.68 wt%
         is below 95 wt%'
     fO2_Pa:
-      tag: unknown
-      reason: buffer-relative fO2 (FMQ-1.4) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      tag: value
+      value: '0.0000002562607633972588427955447946'
     total_pressure_Pa:
       tag: value
       value: '200000000'
@@ -412,6 +433,23 @@ observations:
         pdf_page_index: 7
         table: '4'
   notices:
+  - kind: engine_model_caveat
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=FMQ-1.4; calibration=oneill_1987_ammin_72_reaction2_emf;
+      T=1323.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.125419 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=2000 bar; pressure correction=Frost 1991 molar-volume ΔV term'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
+    band: ±0.125419 dex
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=-1.4 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1323.15
+      P_bar=2000 authority=certified band_dex=0.1217 log10_fO2_bar=-11.591317884430369 provenance=primary_emf pressure_coefficient_spread=yes
+      buffer_as_printed=FMQ-1.4'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
+    band: '0.1217'
+    authority: certified
   - kind: source_value_outside_physical_range
     affected_quantities:
     - valence_ratio
@@ -547,6 +585,8 @@ observations:
         figure: '8'
         note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
     references: []
+  provenance:
+    printed_phase: L
 - observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=497365d87119
   experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
   identity:
@@ -593,8 +633,8 @@ observations:
       reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=93.21 wt%
         is below 95 wt%'
     fO2_Pa:
-      tag: unknown
-      reason: buffer-relative fO2 (FMQ+1.3) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      tag: value
+      value: '0.0001284346230942851138179222745'
     total_pressure_Pa:
       tag: value
       value: '200000000'
@@ -640,7 +680,24 @@ observations:
         published_page: 5933
         pdf_page_index: 7
         table: '4'
-  notices: []
+  notices:
+  - kind: engine_model_caveat
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=FMQ+1.3; calibration=oneill_1987_ammin_72_reaction2_emf;
+      T=1323.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.125419 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=2000 bar; pressure correction=Frost 1991 molar-volume ΔV term'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=497365d87119
+    band: ±0.125419 dex
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=+1.3 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1323.15
+      P_bar=2000 authority=certified band_dex=0.1217 log10_fO2_bar=-8.891317884430369 provenance=primary_emf pressure_coefficient_spread=yes
+      buffer_as_printed=FMQ+1.3'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=497365d87119
+    band: '0.1217'
+    authority: certified
   source_id: jugo-2010-sulfur-xanes
   locator:
     published_page: 5933
@@ -770,6 +827,8 @@ observations:
         figure: '8'
         note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
     references: []
+  provenance:
+    printed_phase: L
 - observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
   experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
   identity:
@@ -816,8 +875,8 @@ observations:
       reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=94.71 wt%
         is below 95 wt%'
     fO2_Pa:
-      tag: unknown
-      reason: buffer-relative fO2 (FMQ+1.8) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      tag: value
+      value: '0.0004061459394032036251391183096'
     total_pressure_Pa:
       tag: value
       value: '200000000'
@@ -863,7 +922,24 @@ observations:
         published_page: 5933
         pdf_page_index: 7
         table: '4'
-  notices: []
+  notices:
+  - kind: engine_model_caveat
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=FMQ+1.8; calibration=oneill_1987_ammin_72_reaction2_emf;
+      T=1323.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.125419 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=2000 bar; pressure correction=Frost 1991 molar-volume ΔV term'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
+    band: ±0.125419 dex
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=+1.8 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1323.15
+      P_bar=2000 authority=certified band_dex=0.1217 log10_fO2_bar=-8.391317884430369 provenance=primary_emf pressure_coefficient_spread=yes
+      buffer_as_printed=FMQ+1.8'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
+    band: '0.1217'
+    authority: certified
   source_id: jugo-2010-sulfur-xanes
   locator:
     published_page: 5933
@@ -993,6 +1069,8 @@ observations:
         figure: '8'
         note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
     references: []
+  provenance:
+    printed_phase: L
 - observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=83ac5b5b305b
   experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
   identity:
@@ -1039,8 +1117,8 @@ observations:
       reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=94.27 wt%
         is below 95 wt%'
     fO2_Pa:
-      tag: unknown
-      reason: buffer-relative fO2 (FMQ+1.6) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      tag: value
+      value: '0.0002562607633972588427955447946'
     total_pressure_Pa:
       tag: value
       value: '200000000'
@@ -1086,7 +1164,24 @@ observations:
         published_page: 5933
         pdf_page_index: 7
         table: '4'
-  notices: []
+  notices:
+  - kind: engine_model_caveat
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=FMQ+1.6; calibration=oneill_1987_ammin_72_reaction2_emf;
+      T=1323.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.125419 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=2000 bar; pressure correction=Frost 1991 molar-volume ΔV term'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=83ac5b5b305b
+    band: ±0.125419 dex
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=+1.6 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1323.15
+      P_bar=2000 authority=certified band_dex=0.1217 log10_fO2_bar=-8.591317884430369 provenance=primary_emf pressure_coefficient_spread=yes
+      buffer_as_printed=FMQ+1.6'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=83ac5b5b305b
+    band: '0.1217'
+    authority: certified
   source_id: jugo-2010-sulfur-xanes
   locator:
     published_page: 5933
@@ -1216,6 +1311,8 @@ observations:
         figure: '8'
         note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
     references: []
+  provenance:
+    printed_phase: L
 - observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
   experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
   identity:
@@ -1286,8 +1383,8 @@ observations:
           - '0.01252911466797510320331465308'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: buffer-relative fO2 (FMQ+2.7) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      tag: value
+      value: '0.003226131870865817405480795993'
     total_pressure_Pa:
       tag: value
       value: '200000000'
@@ -1334,6 +1431,23 @@ observations:
         pdf_page_index: 7
         table: '4'
   notices:
+  - kind: engine_model_caveat
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=FMQ+2.7; calibration=oneill_1987_ammin_72_reaction2_emf;
+      T=1323.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.125419 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=2000 bar; pressure correction=Frost 1991 molar-volume ΔV term'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
+    band: ±0.125419 dex
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=+2.7 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1323.15
+      P_bar=2000 authority=certified band_dex=0.1217 log10_fO2_bar=-7.491317884430369 provenance=primary_emf pressure_coefficient_spread=yes
+      buffer_as_printed=FMQ+2.7'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
+    band: '0.1217'
+    authority: certified
   - kind: source_value_outside_physical_range
     affected_quantities:
     - valence_ratio
@@ -1469,6 +1583,8 @@ observations:
         figure: '8'
         note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
     references: []
+  provenance:
+    printed_phase: L
 - observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=c65599bd2d30
   experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
   identity:
@@ -1515,8 +1631,8 @@ observations:
       reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=92.49 wt%
         is below 95 wt%'
     fO2_Pa:
-      tag: unknown
-      reason: buffer-relative fO2 (FMQ-0.1) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      tag: value
+      value: '0.000005113074440117070062158129769'
     total_pressure_Pa:
       tag: value
       value: '200000000'
@@ -1562,7 +1678,24 @@ observations:
         published_page: 5933
         pdf_page_index: 7
         table: '4'
-  notices: []
+  notices:
+  - kind: engine_model_caveat
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=FMQ-0.1; calibration=oneill_1987_ammin_72_reaction2_emf;
+      T=1323.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.125419 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=2000 bar; pressure correction=Frost 1991 molar-volume ΔV term'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=c65599bd2d30
+    band: ±0.125419 dex
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - valence_ratio
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=-0.1 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1323.15
+      P_bar=2000 authority=certified band_dex=0.1217 log10_fO2_bar=-10.291317884430369 provenance=primary_emf pressure_coefficient_spread=yes
+      buffer_as_printed=FMQ-0.1'
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=c65599bd2d30
+    band: '0.1217'
+    authority: certified
   source_id: jugo-2010-sulfur-xanes
   locator:
     published_page: 5933
@@ -1692,3 +1825,5 @@ observations:
         figure: '8'
         note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
     references: []
+  provenance:
+    printed_phase: L

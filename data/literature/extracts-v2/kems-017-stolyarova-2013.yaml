@@ -52,6 +52,8 @@ observations:
     figure: '1'
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: MgO-B2O3-SiO2_melt
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig2_bao_gltas_contours_model
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -81,13 +83,13 @@ observations:
       note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Stolyarova (2013), Figure 2; GLTAS [50] thermodynamic model contours
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
-    reason: model_output_not_measurement
+    reason: 'Figure-only model contours: printed contour labels are retained, but no composition coordinates were sampled
+      from the curves.'
     decided_by:
       worker: mine-multicarrier-gk
       date: '2026-08-04'
@@ -102,6 +104,8 @@ observations:
     figure: '2'
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: BaO-B2O3-SiO2_GLTAS_model
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig2_bao_kems_contours_figure_only
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -152,6 +156,8 @@ observations:
     figure: '2'
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: BaO-B2O3-SiO2_melt
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig3_b2o3_gltas_contours_model
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -181,13 +187,13 @@ observations:
       note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Stolyarova (2013), Figure 3; GLTAS [50] thermodynamic model contours
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
-    reason: model_output_not_measurement
+    reason: 'Figure-only model contours: printed contour labels are retained, but no composition coordinates were sampled
+      from the curves.'
     decided_by:
       worker: mine-multicarrier-gk
       date: '2026-08-04'
@@ -204,6 +210,8 @@ observations:
     note: Solid GLTAS model contours at 1650 K; printed log10 activity levels -8, -6, -4, -1
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: BaO-B2O3-SiO2_GLTAS_model
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig3_b2o3_kems_contours_figure_only
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -256,6 +264,8 @@ observations:
     note: Dotted KEMS contours at 1650 K; printed log10 activity levels -5, -4, -3, -2
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: BaO-B2O3-SiO2_melt
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig4_sio2_gltas_contours_model
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -285,13 +295,13 @@ observations:
       note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Stolyarova (2013), Figure 4; GLTAS [50] thermodynamic model contours
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
-    reason: model_output_not_measurement
+    reason: 'Figure-only model contours: printed contour labels are retained, but no composition coordinates were sampled
+      from the curves.'
     decided_by:
       worker: mine-multicarrier-gk
       date: '2026-08-04'
@@ -306,6 +316,8 @@ observations:
     figure: '4'
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: BaO-B2O3-SiO2_GLTAS_model
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig4_sio2_kems_contours_figure_only
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -356,6 +368,8 @@ observations:
     figure: '4'
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: BaO-B2O3-SiO2_melt
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig5_gibbs_gltas_contours_model
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -385,13 +399,13 @@ observations:
       note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Stolyarova (2013), Figure 5; GLTAS [50] thermodynamic model contours
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
-    reason: model_output_not_measurement
+    reason: 'Figure-only model contours: printed contour labels are retained, but no composition coordinates were sampled
+      from the curves.'
     decided_by:
       worker: mine-multicarrier-gk
       date: '2026-08-04'
@@ -406,6 +420,8 @@ observations:
     figure: '5'
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: BaO-B2O3-SiO2_GLTAS_model
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig5_gibbs_kems_contours_figure_only
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -456,6 +472,8 @@ observations:
     figure: '5'
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: BaO-B2O3-SiO2_melt
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig6_gibbs_gltas_model_figure_only
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -485,13 +503,12 @@ observations:
       note: Model output; no model uncertainty is printed.
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Stolyarova (2013), Figure 6; GLTAS [50] thermodynamic model curves
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
-    reason: model_output_not_measurement
+    reason: 'Figure-only model curves: no composition-value points are sampled from the curves.'
     decided_by:
       worker: mine-multicarrier-gk
       date: '2026-08-04'
@@ -506,6 +523,8 @@ observations:
     figure: '6'
     source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
   read_from: pdf:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: CaO_SrO_BaO_borosilicate_GLTAS_models
 - observation_id: kems-017-stolyarova-2013::stolyarova_2013_ternary_silicate_vapour_species_map_table1
   experiment_id: 10.2174/1874396x01307010057::kems-017-stolyarova-2013
   identity:
@@ -549,3 +568,5 @@ observations:
     line_range: 104-126
     source_path: text/kems-017-stolyarova-2013/mineru/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
   read_from: pdftotext:kems-017-stolyarova-2013
+  provenance:
+    printed_phase: ternary_silicate_melts_various_systems

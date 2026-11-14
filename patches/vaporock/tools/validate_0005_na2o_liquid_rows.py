@@ -10,6 +10,8 @@ import subprocess
 from decimal import Decimal
 from pathlib import Path
 
+from simulator.physical_constants import GAS_CONSTANT_DECIMAL
+
 SPECIES = "Na2O(l)"
 TARGET = "data/condensate-thermo-data.csv"
 FIELDS = (
@@ -22,7 +24,7 @@ COPIED_FIELDS = (
     "T_min", "T_max", "dH298_R", "dG_A", "dG_B", "dG_C", "dG_D",
     "dG_E", "Ref",
 )
-R_J_MOL_K = Decimal("8.31446261815324")
+R_J_MOL_K = GAS_CONSTANT_DECIMAL
 LOW_MAX_RESIDUAL_J_MOL = Decimal("0.484144162619486")
 HIGH_MAX_RESIDUAL_J_MOL = Decimal("5.21823957213201")
 

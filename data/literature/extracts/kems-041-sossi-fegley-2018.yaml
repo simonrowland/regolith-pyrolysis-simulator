@@ -239,15 +239,14 @@ species:
           page: 94
           equation: '2'
           note: Beckett 2002 defines lime as the CaO standard state at temperature and 1 atm.
-      derived_from: [tables:kems-041-sossi-fegley-2018]
       regime: compiled_melt_activity
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
         rows:
           - oxide: CaO
-            method_class: model_derived
-            evidence_model: Berman silicate-melt model as reported by Beckett (2002)
+            method_class: quoted_attributed
+            attribution: Beckett 2002, as cited in Table 2.
             oxide_formula_as_published: CaO
             temperature_as_published: '1873'
             T_range_K:
@@ -926,15 +925,14 @@ species:
           page: 94
           equation: '2'
           note: Beckett 2002 defines periclase as the MgO standard state at temperature and 1 atm.
-      derived_from: [tables:kems-041-sossi-fegley-2018]
       regime: compiled_melt_activity
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
         rows:
           - oxide: MgO
-            method_class: model_derived
-            evidence_model: Berman silicate-melt model as reported by Beckett (2002)
+            method_class: quoted_attributed
+            attribution: Beckett 2002, as cited in Table 2.
             oxide_formula_as_published: MgO
             temperature_as_published: '1873'
             T_range_K:
@@ -1173,6 +1171,7 @@ species:
             - '1673'
             gamma_as_published: '* logγMoO₃ = 1.49(logγMoO₂) − 3.59'
             melt_composition_as_published: CMAS
+            attribution: "O’Neill & Eggins 2002"
             references_as_published: O’Neill & Eggins 2002
             activity_relation_as_published: '* logγMoO₃ = 1.49(logγMoO₂) − 3.59'
             relation_parameters:
@@ -1903,6 +1902,7 @@ species:
             - '1673'
             gamma_as_published: '* logγWO₂ = logγMoO₂ − 2.20'
             melt_composition_as_published: CMAS
+            attribution: "O’Neill et al. 2008"
             references_as_published: O’Neill et al. 2008
             activity_relation_as_published: '* logγWO₂ = logγMoO₂ − 2.20'
             relation_parameters:
@@ -1965,6 +1965,7 @@ species:
             - '1673'
             gamma_as_published: '* logγWO₃ = logγMoO₃ − 1.42'
             melt_composition_as_published: CMAS
+            attribution: "O’Neill et al. 2008"
             references_as_published: O’Neill et al. 2008
             activity_relation_as_published: '* logγWO₃ = logγMoO₃ − 1.42'
             relation_parameters:

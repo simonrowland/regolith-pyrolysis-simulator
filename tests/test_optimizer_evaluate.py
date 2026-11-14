@@ -23,6 +23,7 @@ from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.battery.enums import Engine, ProprietaryEngineRefusal
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -99,6 +100,7 @@ def test_optimizer_trace_preserves_high_t_melt_activity_notice() -> None:
     payload = evaluate_module._cache_trace_payload(execution, None)
 
     assert payload["high_t_melt_activity_fallback_notice"] == notice
+    assert "engine_version" not in payload
 
 
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
@@ -369,6 +371,80 @@ def test_raw_profile_mapping_unknown_key_raises_before_run() -> None:
             profile=bad_profile,
             executor=executor,
         )
+
+    assert executor.calls == 0
+
+
+def _proprietary_optimizer_profile() -> dict:
+    profile = copy.deepcopy(PROFILE)
+    profile["run"]["backend_name"] = Engine.PROPRIETARY_REMOTE.value
+    profile["fidelities"]["fast"]["backend_name"] = (
+        Engine.PROPRIETARY_REMOTE.value
+    )
+    return profile
+
+
+def test_proprietary_engine_is_refused_by_direct_evaluate_before_executor() -> None:
+    executor = FakeExecutor(
+        execution=_execution(backend_status="ok", backend_authoritative=True)
+    )
+
+    with pytest.raises(ProprietaryEngineRefusal):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=_proprietary_optimizer_profile(),
+            executor=executor,
+        )
+
+    assert executor.calls == 0
+
+
+def test_verify_imported_study_reaches_proprietary_evaluate_guard(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    from simulator.optimize import import_bundle as import_bundle_module
+
+    candidate = {
+        "cache_key": "cache-a",
+        "candidate_id": "candidate-a",
+        "patch_json": "{}",
+    }
+    monkeypatch.setattr(
+        import_bundle_module,
+        "verify_import_hashes",
+        lambda root: {"verdict": "confirmed"},
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_enforce_import_safety_caps",
+        lambda root: {"leaderboard": [], "rows_by_cache_key": {}},
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_selected_verification_candidates",
+        lambda root, *, top_n, leaderboard: [candidate],
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_load_profile",
+        lambda path: _proprietary_optimizer_profile(),
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_imported_claim",
+        lambda candidate, imported_row: {"identity": {"cost_parameters": None}},
+    )
+    monkeypatch.setattr(import_bundle_module, "_load_json_object", lambda path: {})
+    executor = FakeExecutor(
+        execution=_execution(backend_status="ok", backend_authoritative=True)
+    )
+    monkeypatch.setattr(evaluate_module, "RunExecutor", lambda: executor)
+
+    with pytest.raises(ProprietaryEngineRefusal):
+        import_bundle_module.verify_imported_study(tmp_path)
 
     assert executor.calls == 0
 
@@ -1266,6 +1342,10 @@ def test_zero_overhead_flow_knudsen_snapshot_is_not_applicable_pass(
         trace=trace,
         backend_status="ok",
         backend_authoritative=True,
+        backend_diagnostics={
+            "backend_name": "alphamelts",
+            "engine_version": "petthermotools 1.2.3",
+        },
     )
     execution.session._config = SimpleNamespace(backend_name="alphamelts")
 
@@ -5762,6 +5842,85 @@ def test_cached_real_fidelity_inherits_run_level_cache_config(tmp_path) -> None:
     assert result.eval_spec.backend_name == "cached-real"
     assert executor.config.backend_name == "cached-real"
     assert executor.config.reduced_real_cache == cache_config
+
+
+def test_cache_trace_payload_binds_adapter_engine_stamp() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "alphamelts",
+                "engine_version": "petthermotools 1.2.3",
+            }
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "alphamelts"
+    assert payload["engine_version"] == "petthermotools 1.2.3"
+    assert payload["diagnostics"]["backend_name"] == "alphamelts"
+    assert payload["diagnostics"]["engine_version"] == "petthermotools 1.2.3"
+
+
+def test_cache_trace_payload_does_not_bind_a_foreign_engine_version() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "magemin",
+                "engine_version": "MAGEMin 1.7.0",
+            }
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "alphamelts"
+    assert "engine_version" not in payload
+    assert payload["diagnostics"]["backend_name"] == "magemin"
+    assert payload["diagnostics"]["engine_version"] == "MAGEMin 1.7.0"
+
+
+def test_cache_trace_payload_keeps_a_sentinel_adapter_version_unbound() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "alphamelts",
+                "engine_version": "unavailable",
+            },
+            backend=SimpleNamespace(
+                backend_name="alphamelts",
+                get_engine_version=lambda: "petthermotools 9.9.9",
+            ),
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert "engine_version" not in payload
+    assert "diagnostics" not in payload
+
+
+def test_cache_trace_payload_falls_back_to_live_backend_when_unstamped() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={"backend_status": "ok"},
+            backend=SimpleNamespace(
+                backend_name="unknown",
+                name="magemin",
+                get_engine_version=lambda: "MAGEMin 1.7.0",
+            ),
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="magemin")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "magemin"
+    assert payload["engine_version"] == "MAGEMin 1.7.0"
+    assert payload["diagnostics"]["backend_name"] == "magemin"
 
 
 def test_run_reference_derives_real_engine_canonical_class() -> None:

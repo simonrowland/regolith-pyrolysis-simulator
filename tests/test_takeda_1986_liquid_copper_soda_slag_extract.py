@@ -83,6 +83,8 @@ def test_rendered_prose_values_and_isolated_migration_are_pinned() -> None:
         or observation.identity.composition.is_not_applicable
     )
     source_observation = source_species["observations"][0]
+    assert source_observation["values"]["method_class"] == "quoted_unattributed"
+    assert "background information" in source_observation["values"]["reason"]
     assert source_observation["point_conditions"]["temperature_K"]["locator"] == {
         "page": 2,
         "published_page": 609,

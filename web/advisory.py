@@ -6,11 +6,14 @@ from collections.abc import Iterable, Mapping
 from typing import Any
 
 from simulator.accounting.ledger_api import oxide_wt_pct_from_kg
+from simulator.optimize.payloads import (
+    _ceramic_service_temp_payload,
+    _round_or_none,
+)
 
 from simulator.ceramic_classifier import (
     CeramicClassification,
     CeramicMatch,
-    CeramicServiceTemperature,
     GlassClassification,
     GlassMatch,
     classify_ceramic_rump,
@@ -652,33 +655,6 @@ def _glass_match_payload(match: GlassMatch) -> dict[str, Any]:
     }
 
 
-def _ceramic_service_temp_payload(
-    service_temp: CeramicServiceTemperature,
-) -> dict[str, Any]:
-    usable = service_temp.usable_service_C
-    kind = service_temp.kind
-    if usable is not None:
-        display = f"Usable service: {usable:g} C"
-        usable_service = True
-    elif service_temp.value_C is not None:
-        display = (
-            f"{kind}: {service_temp.value_C:g} C; "
-            "not a usable service rating"
-        )
-        usable_service = False
-    else:
-        display = f"{kind}; not a usable service rating"
-        usable_service = False
-    return {
-        "value_C": _round_or_none(service_temp.value_C),
-        "kind": kind,
-        "usable_service_C": _round_or_none(usable),
-        "usable_service": usable_service,
-        "display": display,
-        "note": service_temp.note,
-    }
-
-
 def _normalize_species(active_species: Iterable[str] | None) -> list[str]:
     if active_species is None:
         return []
@@ -715,9 +691,3 @@ def _string_or_none(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
-
-
-def _round_or_none(value: float | None) -> float | None:
-    if value is None:
-        return None
-    return round(float(value), 3)

@@ -50,8 +50,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '1'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -124,6 +124,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir::T=1723.0:h=4efc656b8804
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -172,8 +174,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '1'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -245,3 +247,5 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: gas

@@ -5691,3 +5691,47 @@ species:
         numeric_points: none
         context_only_reason: Figure-only Fe redox relationship; numeric coordinates are not tabulated and
           are deferred by this extraction wave.
+    - observation_id: mysen_virgo_1989_loop_apparatus_and_run_duration
+      type: apparatus
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        section: Experimental Methods
+      units: as printed
+      values:
+        quantity: loop_apparatus_and_run_conditions
+        method_class: method_only
+        apparatus: Quenched, Fe-bearing melts were formed by suspending sintered 50- to
+          80-mg pellets of starting materials on 0.1-mm-diameter Pt loops in vertical
+          quench furnaces (Pt- and MoSi2-heated).
+        notes:
+        - 'Sample mass: 50- to 80-mg pellets.'
+        - The weight ratio of sample to Pt was approximately 100/1.
+        - 'The paper states: 30- to 90-min experimental run durations were employed in
+          the present study. It does not allocate an individual duration to each temperature
+          in the printed methods.'
+        - 'Fe-presaturation of the Pt loops: not stated.'
+        - Reliable electron-microprobe analyses of quenched glasses could not be obtained
+          because of Na volatilization under the microprobe beam.
+        - No per-run post-run total-Fe or alkali bulk analyses are printed. The authors
+          cite 5-10% Fe loss measured by Mysen et al. (1985a) in equivalent Ca- and Mg-bearing
+          melts and state similar uncertainties probably apply; this is not a measurement
+          from the present samples.
+        - 'Pt pickup: not stated.'
+    - observation_id: mysen_virgo_1989_furnace_oxygen_fugacity_control
+      type: apparatus
+      locator:
+        page: 4
+        published_page: 61
+        pdf_page_index: 3
+        section: Experimental Methods
+      units: as printed
+      values:
+        quantity: furnace_oxygen_fugacity_control_apparatus
+        method_class: method_only
+        apparatus: The oxygen fugacity in the furnace was controlled with CO-CO2 gas mixing
+          with an yttria-doped ZrO2 oxygen-fugacity sensor to monitor the fO2.
+        notes:
+        - These are loop-furnace experiments; no Knudsen cell is reported.
+        - The source does not state total experimental pressure.

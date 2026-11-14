@@ -85,9 +85,12 @@ from typing import Any, Dict, Mapping, TypedDict
 
 from engines.engine_commissioning import engine_commissioning
 from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
+from simulator.physical_constants import GAS_CONSTANT_10SIG
 
-# CODATA / SI gas constant used by HT-PLAN r2 §H2 (exact for this instrument).
-R_J_MOL_K: float = 8.314462618
+# HT-PLAN r2 §H2 uses this 10-significant-figure spelling. It is not the
+# full CODATA leaf (relative gap −1.843e-11). The sanity figures above
+# were evaluated with this value.
+R_J_MOL_K: float = GAS_CONSTANT_10SIG
 _LN10: float = math.log(10.0)
 
 

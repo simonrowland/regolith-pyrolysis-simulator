@@ -1,0 +1,1325 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.pss.2010.03.006
+  citation: ten Kate, I.L., Cardiff, E.H., Dworkin, J.P., Feng, S.H., Holmes, V., Malespin, C., Stern, J.G., Swindle, T.D.,
+    and Glavin, D.P. (2010). VAPoR – Volatile Analysis by Pyrolysis of Regolith – an instrument for in situ detection of water,
+    noble gases, and organics on the Moon. Planetary and Space Science 58, 1007–1017.
+  source_ids:
+  - tenkate-2010-vapor-instrument
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:tenkate-2010-vapor-instrument
+      role: pdf
+      path: raw/tenkate-2010-vapor-instrument/tenkate-2010-vapor-instrument.pdf
+      sha256:
+        tag: value
+        value: cad604c54f8982d5eb6f91f122ca1b257252d6994b220333226220b86154df5f
+    - asset_id: pdftotext:tenkate-2010-vapor-instrument
+      role: pdftotext
+      path: text/tenkate-2010-vapor-instrument
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:tenkate-2010-vapor-instrument
+      role: table_csv
+      path: tables/tenkate-2010-vapor-instrument
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:tenkate-2010-vapor-instrument
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.pss.2010.03.006
+experiments:
+- experiment_id: 10.1016/j.pss.2010.03.006::experiment::vapor-apollo16-64801-53
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00006'
+          approximate: true
+      locator:
+        published_page: 1012
+        section: '4.1'
+        note: Approximately 60 mg; converted to kg.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              published_page: 1012
+              section: '4.1'
+              note: Approximately 60 mg; converted to kg.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 1012
+              section: '4.1'
+              note: Approximately 60 mg; converted to kg.
+        output_unit: kg
+        references: []
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1012
+        section: '4.1'
+        note: No numerical starting composition reported.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1012
+        section: '4.1'
+        note: Continuous ramp, not a single setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.pss.2010.03.006
+  locator:
+    published_page: 1012
+    section: '4.1'
+  bench_id: 10.1016/j.pss.2010.03.006::bench::vapor-breadboard
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: linear ramp
+      locator:
+        published_page: 1012
+        section: '4.1'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.08333333333333333333333333333'
+            approximate: false
+        locator:
+          published_page: 1012
+          section: '4.1'
+          note: 5 °C/min converted to K/s.
+      start_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '298.15'
+            approximate: false
+        locator:
+          published_page: 1012
+          section: '4.1'
+          note: 25 °C converted to K.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '25'
+              locator:
+                published_page: 1012
+                section: '4.1'
+                note: 25 °C converted to K.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1012
+                section: '4.1'
+                note: 25 °C converted to K.
+          output_unit: K
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1473.15'
+            approximate: false
+        locator:
+          published_page: 1012
+          section: '4.1'
+          note: 1200 °C converted to K.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1200'
+              locator:
+                published_page: 1012
+                section: '4.1'
+                note: 1200 °C converted to K.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1012
+                section: '4.1'
+                note: 1200 °C converted to K.
+          output_unit: K
+          references: []
+- experiment_id: 10.1016/j.pss.2010.03.006::experiment::vapor-empty-holder-blank
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1014
+        figure: '9'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.pss.2010.03.006
+  locator:
+    published_page: 1014
+    figure: '9'
+    note: Procedural blank with empty quartz sample holder before first sample.
+  bench_id: 10.1016/j.pss.2010.03.006::bench::vapor-breadboard
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1014
+        figure: '9'
+        note: Blank thermal program is not separately specified.
+- experiment_id: 10.1016/j.pss.2010.03.006::experiment::vapor-murchison-60mg-saturated
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00006'
+          approximate: false
+      locator:
+        published_page: 1012
+        section: '5'
+        note: 60 mg; converted to kg.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              published_page: 1012
+              section: '5'
+              note: 60 mg; converted to kg.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 1012
+              section: '5'
+              note: 60 mg; converted to kg.
+        output_unit: kg
+        references: []
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1012
+        section: '5'
+        note: Continuous ramp, not a single setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.pss.2010.03.006
+  locator:
+    published_page: 1012
+    section: '5'
+    note: 60 mg sample caused RGA saturation; evolved gas profile not shown.
+  bench_id: 10.1016/j.pss.2010.03.006::bench::vapor-breadboard
+- experiment_id: 10.1016/j.pss.2010.03.006::experiment::vapor-murchison-8mg
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000008'
+          approximate: false
+      locator:
+        published_page: 1012
+        section: '4.2'
+        note: 8 mg aliquot; converted to kg.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              published_page: 1012
+              section: '4.2'
+              note: 8 mg aliquot; converted to kg.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 1012
+              section: '4.2'
+              note: 8 mg aliquot; converted to kg.
+        output_unit: kg
+        references: []
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1012
+        section: '4.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1012
+        section: '4.2'
+        note: Continuous ramp, not a single setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.pss.2010.03.006
+  locator:
+    published_page: 1012
+    section: '4.2'
+  bench_id: 10.1016/j.pss.2010.03.006::bench::vapor-breadboard
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: linear ramp
+      locator:
+        published_page: 1012
+        section: '4.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.08333333333333333333333333333'
+            approximate: false
+        locator:
+          published_page: 1012
+          section: '4.2'
+          note: 5 °C/min converted to K/s.
+      start_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '298.15'
+            approximate: false
+        locator:
+          published_page: 1012
+          section: '4.2'
+          note: 25 °C converted to K.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '25'
+              locator:
+                published_page: 1012
+                section: '4.2'
+                note: 25 °C converted to K.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1012
+                section: '4.2'
+                note: 25 °C converted to K.
+          output_unit: K
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1473.15'
+            approximate: false
+        locator:
+          published_page: 1012
+          section: '4.2'
+          note: 1200 °C converted to K.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1200'
+              locator:
+                published_page: 1012
+                section: '4.2'
+                note: 1200 °C converted to K.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1012
+                section: '4.2'
+                note: 1200 °C converted to K.
+          output_unit: K
+          references: []
+benches:
+- id: 10.1016/j.pss.2010.03.006::bench::vapor-breadboard
+  work_id: 10.1016/j.pss.2010.03.006
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Vacuum pyrolysis mass spectrometer with modified Knudsen cell
+    locator:
+      published_page: 1011
+      section: '3'
+  method:
+    state:
+      tag: value
+      value: vacuum_chamber_pyrolysis
+    locator:
+      published_page: 1011
+      section: '3'
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: A quartz sample holder is placed in a graphite crucible mounted inside an alumina heater threaded with tungsten
+        heater wire; the heater is held in place by a stainless-steel tube in a stainless-steel water-cooled jacket.
+    locator:
+      published_page: 1011
+      section: '3'
+      note: Cell construction as described; the text does not identify an orifice material.
+  cell_materials:
+  - state:
+      tag: value
+      value: C_graphite
+    locator:
+      published_page: 1011
+      section: '3'
+      note: Graphite crucible holding the sample
+  - state:
+      tag: value
+      value: SiO2
+    locator:
+      published_page: 1011
+      section: '3'
+      note: Quartz sample holder and quartz wool
+  - state:
+      tag: value
+      value: Al2O3
+    locator:
+      published_page: 1011
+      section: '3'
+      note: Alumina heater component; not sample-contacting.
+  - state:
+      tag: value
+      value: W
+    locator:
+      published_page: 1011
+      section: '3'
+      note: Tungsten heater wire; not sample-contacting.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1011
+        section: '3'
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1011
+        section: '3'
+  pumping_type:
+    state:
+      tag: value
+      value: turbo-diaphragm pumping station
+    locator:
+      published_page: 1011
+      section: '3'
+  gauges:
+    pressure_gauge:
+      state:
+        tag: value
+        value: Pfeiffer Vacuum PKR 251
+      locator:
+        published_page: 1011
+        section: '3'
+  detector:
+    state:
+      tag: value
+      value: Stanford Research Systems RGA 300
+    locator:
+      published_page: 1011
+      section: '3'
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Pt-10%Rh thermocouple measuring heater temperature
+      locator:
+        published_page: 1011
+        section: '3'
+    controller:
+      state:
+        tag: value
+        value: Watlow SD 6C-HF-AA-AARG temperature controller
+      locator:
+        published_page: 1011
+        section: '3'
+    relay:
+      state:
+        tag: value
+        value: Omega SSR240DC25 solid-state relay
+      locator:
+        published_page: 1011
+        section: '3'
+    power_source:
+      state:
+        tag: value
+        value: Variac type 033-2558
+      locator:
+        published_page: 1011
+        section: '3'
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1011
+        section: '3'
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1011
+        section: '3'
+  other_facts:
+  - name: intensity_to_pressure_calibration
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1016
+        section: Discussion
+        note: Authors state that no attempt was made to calibrate or quantify evolved gas amounts.
+    unit: as printed
+  - name: ionization_cross_sections_and_energy
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1011
+        section: '3'
+    unit: as printed
+  - name: faraday_cup_detector_sensitivity
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002'
+          approximate: false
+      locator:
+        published_page: 1011
+        section: '3'
+        note: Sensitivity of the faraday cup detector.
+    unit: A/torr
+  - name: chamber_background_before_heating
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00000001'
+          approximate: true
+      locator:
+        published_page: 1012
+        section: '3'
+    unit: mbar
+  - name: chamber_pressure_with_RGA_filament_on
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000001'
+          approximate: true
+      locator:
+        published_page: 1012
+        section: '3'
+        note: Pressure after filament was left on for one-hour warm-up.
+    unit: mbar
+context:
+- observation_id: tenkate_apollo16_sample_and_run
+  type: characterization
+  locator:
+    published_page: 1012
+    section: '4.1'
+  units: as printed
+  values:
+    sample: Apollo 16 lunar regolith 64801,53, subsample of 64801; Station 4 in Descartes region of lunar highlands; sieve
+      fraction <1 mm.
+    sample_mass_mg: 60
+    preparation: Very fine-grained sample; did not require crushing. Approximately 60 mg was inserted into a quartz tube packed
+      with quartz wool, placed in the graphite crucible and mounted in the vacuum chamber.
+    source_qualification: Sample 64801 was specifically shielded from South Ray Crater; apparent cosmic-ray exposure age 310
+      million years from cosmogenic 21Ne measurements.
+    sample_composition: 'Relatively simple chemical characteristics with high aluminum and calcium; no numerical composition
+      reported. Four rock types identified: cataclastic anorthosites, partially molten breccias, igneous and high-grade metamorphic
+      rocks, and polymict breccias.'
+    after_run_composition:
+      state: unknown
+      reason: not_reported
+    heating_schedule: 25 °C start; linear ramp at 5 °C/min to 1200 °C.
+    purity:
+      state: unknown
+      reason: not_reported
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_apollo16_sample_and_run
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_data_qualifications_and_comparisons
+  type: experiment_series
+  locator:
+    published_page: 1013-1016
+    sections: 5-6
+  units: verbatim statements and located numeric context
+  values:
+    method_class: figure_only
+    statements:
+    - quote: Future versions of VAPoR with increased mass spectrometer sensitivity and resolution, a higher maximum pyrolysis
+        temperature, and reduced oven outgassing should make it possible to identify some of the species (e.g. Ne) that we
+        are currently unable to detect in the Apollo regolith sample using the VAPoR breadboard.
+      locator:
+        published_page: 1016
+        section: '6'
+    - quote: The TEGA ovens heated polar regolith samples up to 1000 °C and the evolved gases were analyzed using a mass spectrometer
+        (Boynton et al., 2001).
+      locator:
+        published_page: 1007
+        section: '1'
+        note: Table 1 on p.1008 gives TEGA ambient–950 °C; both source values are retained as printed.
+    - quote: The ability to heat regolith samples to these temperatures is critical for releasing oxygen and some noble gases
+        that are only released at temperatures in excess of 1200 °C under vacuum.
+      locator:
+        published_page: 1010
+    - quote: The purpose of this work was not to calibrate the instrument; therefore, no attempt has been made to quantify
+        the amount of evolved gases and the acquired data were only compared to existing data showing the gas release profiles
+        as a function of temperature.
+      locator:
+        published_page: 1016
+    - quote: The mass spectrometer used in this study does not have sufficient resolution to distinguish between CO+ and N2+,
+        or S+ and O2+ therefore these are plotted together.
+      locator:
+        published_page: 1012
+    - quote: Only the evolved gas patterns of the 8 mg Murchison sample are shown, because the 60 mg sample caused saturation
+        of the RGA due to high pressures observed from sample outgassing (predominately H2O+ released from hydrated minerals).
+      locator:
+        published_page: 1012
+    - quote: The partial pressures of the evolved gases varied considerably between the two samples, and in order to plot
+        the outgassing profiles of the two samples in the same figure, the samples are plotted on different pressure scales.
+      locator:
+        published_page: 1012
+    - quote: Both samples have a similar increase in m/z 12 (C+), 16 (CH4+ or O+, not distinguishable at these higher temperatures
+        from fragmentation patterns), 28+ (N2 or CO+), and 29 peaks (12 and 16 are not shown), at temperatures above 1000
+        °C. This increase is not observed at experiments that only ran up to 1000 °C, or in the blank run.
+      locator:
+        published_page: 1012
+    - quote: Previous evolved gas analyses of lunar samples showed similar results, which were attributed to bursting of gas-containing
+        vesicles (Gibson and Johnson, 1971) or other traps, or high temperature nitrides (Flory et al., 1972).
+      locator:
+        published_page: 1013
+    - quote: In the case of the Murchison sample, an estimate about the majority of CO+ or N2+ in the CO+/N2+ ratio could
+        be made based on analysis of the fragments of the CO+ and N2+ mass spectra (12 and 16 for CO+, and 14 for N2+). Similar
+        analysis of the Apollo 16 sample did not provide conclusive informative about the CO+/N2+ ratio.
+      locator:
+        published_page: 1013
+    - quote: The lack of other alkane and hydrocarbon fragments in the Apollo 16 sample suggests that this sample was not
+        significantly contaminated by organics during collection and curation over the past 37 years.
+      locator:
+        published_page: 1013
+    - quote: Oxygen is not expected to be released at temperatures below 1000–1200 °C, therefore the S+/O2+ profiles in both
+        the Apollo 16 and the Murchison sample are expected to be S+, especially when compared to the H2S+, SO2+, and CS2+
+        profiles.
+      locator:
+        published_page: 1013
+    - quote: H2+ has been detected in our analysis, but could not be confirmed as an outgassing product of the lunar or Murchison
+        meteorite samples due to a high H2+ background of the system.
+      locator:
+        published_page: 1014
+    - quote: neither CS2+ nor COS+ have been reported for Apollo samples and are only present in very minor amounts in our
+        sample
+      locator:
+        published_page: 1014
+    - quote: S+/O2+ is not reported for the earlier Murchison analysis and our analysis did not show the COS+ fragment.
+      locator:
+        published_page: 1014
+    - quote: The Murchison sample is compared to previous work by Simoneit et al. (1973) and shows consistent results as well.
+      locator:
+        published_page: 1014
+    - quote: In general the VAPoR breadboard produces results comparable to existing data.
+      locator:
+        published_page: 1014
+    - quote: a faster heating rate causes considerable widening of evolved gas peaks, even when the rate was doubled from
+        5 to 10 °C/min.
+      locator:
+        published_page: 1014
+    - quote: This could explain the broader evaporation rates of some of the fragments in the earlier Apollo 16 and Murchison
+        data.
+      locator:
+        published_page: 1014
+    - quote: Our samples were heated at a rate of 5 °C/min, the other Apollo 16 and Murchison sample at a rate of 14 °C/min
+        and the Apollo 14 and 15 samples at a rate of 6 °C/min.
+      locator:
+        published_page: 1014
+    - quote: Apollo 16 sample 61221,7 is referred to as rich in complex volatiles (Gibson and Johnson, 1971) and “unique”
+        (unclear whether North or South Ray Ejecta) in the same classification where 64 801 is classified as “dark soil” (Heymann
+        et al., 1975). Furthermore, both samples come from a different region, 61 221 from Station 1 on the rim of Plum Crater
+        and 64 801 from Station 4 in a shielded position from South Ray Crater (Heymann et al., 1975).
+      locator:
+        published_page: 1014
+    - quote: In this static mode the getter (Fig. 1) will pump the active gases and concentrate noble gas species released
+        from the regolith. This getter will be an important part of the instrument to concentrate noble gases, but even without
+        the getter as demonstrated in these experiments, we can still measure solar wind implanted He.
+      locator:
+        published_page: 1015
+    - quote: the 6 g interior fragment was crushed and sieved to <150 µm; from this 68 mg was allocated to this study.
+      locator:
+        published_page: 1012
+    - quote: Saal et al. (2008) detected water concentrations of 30 part-per-million (ppm) by reanalysis of Apollo samples,
+        which are higher than previously thought.
+      locator:
+        published_page: 1008
+    - quote: The very recent detection of H2O/OH by 3 independent missions, the M3 instrument on Chandrayaan (Pieters et al.,
+        2009), the EPOXI (extended Deep Impact) mission (Sunshine et al., 2009), and the VIMS instrument on Cassini (Clark,
+        2009) further support the case for water–ice and/or hydrated minerals on the Moon.
+      locator:
+        published_page: 1008
+    - quote: for the permanently shadowed regions, unless extraordinary measures are taken (e.g. collection and Earth return
+        at 50 K), a large fraction of the original volatile material would be lost prior to analyses on Earth.
+      locator:
+        published_page: 1009
+    - quote: Remote D/H measurements of HCN from comet Hale–Bopp show that the volatiles are heavily enriched in deuterium
+        compared to volatiles from other sources
+      locator:
+        published_page: 1008
+    - quote: Solar implanted C and H in the lunar equatorial soils have been found to be depleted in 13C and D, with isotope
+        ratios that are distinct from terrestrial organics, comets, and carbonaceous meteorites.
+      locator:
+        published_page: 1008
+    - quote: The solar wind also plays a role, among other potential sources, in the 15N/14N ratios on the lunar surface,
+        which may have varied significantly over the last 4 billion years
+      locator:
+        published_page: 1008
+    - quote: VAPoR is a smaller, more portable instrument designed for shorter mission durations.
+      locator:
+        published_page: 1009
+    - quote: The VAPoR ovens will be designed to achieve much higher temperatures (up to 1400 °C) compared to previous flight
+        pyrolysis units.
+      locator:
+        published_page: 1010
+    - quote: Although the current VAPoR breadboard is fairly massive (~40 kg) and requires significant power to operate (~200
+        W average), due to the need for a large turbomolecular pump, the VAPoR flight unit, based on the SAM design, will
+        be much smaller (~20 dm3), weighing ~10–15 kg.
+      locator:
+        published_page: 1010
+    - quote: The aimed power consumption for a typical evolved gas analysis up to 1400 °C based on extrapolation of required
+        power for operation of the SAM flight pyrolysis ovens is in the 40–60 W range.
+      locator:
+        published_page: 1010
+    - quote: The intrinsic sensitivity of this mass spectrometer is ~10^-4 (counts/second)/(particle/cc) for N2.
+      locator:
+        published_page: 1010
+    - quote: The 60 mg Murchison sample caused saturation of the RGA; only the 8 mg Murchison pattern is plotted.
+      locator:
+        published_page: 1012
+    - quote: the Apollo 16 sample shows a minor 39 and 43 peak around 1100 °C. Pump oil has been suggested; however no traces
+        of this contaminant have been detected in the blank sample.
+      locator:
+        published_page: 1013
+    - quote: Organics have been detected in a different Apollo 16 sample ... but at much lower temperatures (250–500 °C),
+        therefore this peak is most likely contamination of either the sample or the quartz holder used for this measurement.
+      locator:
+        published_page: 1013
+    - quote: This most likely explains the low temperature evolved SO2 and the presence of more volatiles than seen in sample
+        68401,53 (this study).
+      locator:
+        published_page: 1014
+    - quote: The text later prints ‘sample 68401,53’ when comparing volatile abundance; the sample elsewhere is identified
+        as 64801,53.
+      locator:
+        published_page: 1014
+    - quote: The data obtained with the VAPoR breadboard instrument demonstrates that vacuum pyrolysis up to 1200 °C coupled
+        with line of sight volatile detection by mass spectrometry is an attractive technique for volatile analysis of the
+        lunar regolith.
+      locator:
+        published_page: 1016
+    - quote: no good regolith analogs for the polar regions exist.
+      locator:
+        published_page: 1012
+    - quote: The Apollo 16 regolith sample (64801,53) was a very fine-grained sample and did not require crushing.
+      locator:
+        published_page: 1012
+    - quote: The Murchison meteorite fragment was crushed using a clean mortar and pestle prior to analysis and the powder
+        passed through a stainless steel 150 µm sieve.
+      locator:
+        published_page: 1012
+    numeric_context:
+      VAPoR_prototype_maximum_temperature_C: 1200
+      next_generation_oven_target_temperature_C: 1400
+      typical_sample_mass_mg:
+        lower: 10
+        upper: 100
+        approximate: true
+      breadboard_mass_kg:
+        value: 40
+        approximate: true
+      breadboard_average_power_W:
+        value: 200
+        approximate: true
+      planned_flight_unit_volume_dm3:
+        value: 20
+        approximate: true
+      planned_flight_unit_mass_kg:
+        lower: 10
+        upper: 15
+        approximate: true
+      extrapolated_flight_power_W:
+        lower: 40
+        upper: 60
+      SAM_quadrupole_mass_range_Da:
+      - 2
+      - 535
+      TOF_mass_resolution_m_over_delta_m:
+        value: 500
+        approximate: true
+      N2_intrinsic_sensitivity_counts_s_per_particle_cc:
+        value: '0.0001'
+        approximate: true
+      experiment_chamber_pressure_before_heating_mbar:
+        value: '0.00000001'
+        approximate: true
+      chamber_pressure_during_filament_warmup_mbar:
+        value: '0.0000001'
+        approximate: true
+      Apollo_16_exposure_age_Ma: 310
+      Murchison_fall_date: '1969-09-28'
+      experiment_heating_start_C: 25
+      experiment_heating_rate_C_per_min: 5
+      experiment_maximum_temperature_C: 1200
+      earlier_comparison_heating_rates_C_per_min:
+        other_Apollo_16_and_Murchison_samples: 14
+        Apollo_14_and_15_samples: 6
+      rate_comparison_C_per_min:
+      - 5
+      - 10
+      temperature_for_widening_high_temperature_peaks_C:
+        lower_bound: 1000
+        comparison: above
+      experiments_only_to_temperature_C: 1000
+      possible_lower_temperature_organic_contamination_C:
+        lower: 250
+        upper: 500
+      sample_64801_sieve_fraction_mm:
+        upper_bound: 1
+        comparison: less_than
+      quartz_holder_cleaning_minutes:
+      - 10
+      - 10
+      - 10
+      quartz_holder_bake_temperature_C: 500
+      quartz_holder_bake_time_hours: 2
+      RGA_warmup_hours: 1
+      observed_sample_number_saturation_mass_mg: 60
+      shown_Murchison_mass_mg: 8
+      Murchison_initial_fragment_mass_g: 6
+      Murchison_sieved_particle_size_um:
+        upper_bound: 150
+        comparison: less_than
+      Murchison_mass_allocated_mg: 68
+      Table4_O2_release_threshold:
+        lower_bound: 1270
+        comparison: greater_than
+        unit: not_printed
+    activities: No oxide activities are reported; no ion-defined activity or activity standard state applies.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_data_qualifications_and_comparisons
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_figure1_organic_isotope_plot
+  type: figure_only
+  locator:
+    published_page: 1009
+    figure: '1'
+  units: figure only; no digitization
+  values:
+    method_class: figure_only
+    content: 'Plot of δD versus δ13C ranges for organics from source categories. Caption is mismatched: it describes the gas-flow
+      diagram, which appears as Figure 2.'
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_figure1_organic_isotope_plot
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_figure2_gas_flow_diagram
+  type: figure_only
+  locator:
+    published_page: 1010
+    figure: '2'
+  units: figure only; no digitization
+  values:
+    method_class: figure_only
+    content: 'VAPoR gas-flow diagram showing atmospheric inlet, solid sample inlet tube, getters, mass spectrometer, pyrolysis
+      oven and valves. Caption is mismatched: it describes possible sources of lunar organic material, which appears as Figure
+      1.'
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_figure2_gas_flow_diagram
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_figure3_breadboard
+  type: figure_only
+  locator:
+    published_page: 1011
+    figure: '3'
+  units: figure only; no digitization
+  values:
+    method_class: figure_only
+    content: Photograph of laboratory breadboard with stainless-steel cross, RGA, pressure gauge, Knudsen cell and turbo-diaphragm
+      pumping station.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_figure3_breadboard
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_figure4_cell_and_holder
+  type: figure_only
+  locator:
+    published_page: 1012
+    figure: '4'
+  units: figure only; no digitization
+  values:
+    method_class: figure_only
+    content: Modified Knudsen cell and quartz sample holder before/after pyrolysis; caption states cell reaches 1200 °C and
+      next-generation oven is designed for 1400 °C.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_figure4_cell_and_holder
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_figure9_procedural_blank
+  type: figure_only
+  locator:
+    published_page: 1014
+    figure: '9'
+  units: figure only; no digitization
+  values:
+    method_class: figure_only
+    content: Procedural blank evolved-gas profiles with an empty quartz sample holder, before the first sample.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_figure9_procedural_blank
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_figures5_to_8_evolved_gas_profiles
+  type: figure_only
+  locator:
+    published_page: 1013-1014
+    figure: 5-8
+  units: figure only; no digitization
+  values:
+    method_class: figure_only
+    content: 'Evolved-gas profiles versus temperature for Apollo 16 and Murchison samples. Species/fragments represented:
+      H2O+, CO+/N2+, CO2+, CH4+ (m/z 13), 4He+, 40Ar+, hydrocarbon fragments m/z 29, 39, 23, 57, 78, 91, H2S+, SO2+, COS+,
+      CS2+, and S+/O2+. Figures show partial pressure (torr), but authors state these experiments did not quantify evolved-gas
+      amounts. The Fig. 6 caption states: “methane contribution in its other fragments (12, 14, 15, 16, and 17) is too small
+      to be distinguishable from other fragments at these m/zs.” Methane is represented at m/z 13. Do not digitize the curves.'
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_figures5_to_8_evolved_gas_profiles
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_murchison_sample_and_run
+  type: characterization
+  locator:
+    published_page: 1012
+    section: '4.2'
+  units: as printed
+  values:
+    sample: Murchison meteorite USNM 6650,2; CM2-type carbonaceous chondrite; 6 g interior fragment provided by curator at
+      Smithsonian Museum of Natural History.
+    sample_mass_allocated_mg: 68
+    aliquot_masses_mg:
+    - 8
+    - 60
+    preparation: Interior fragment crushed with clean mortar and pestle and sieved to <150 µm; powdered aliquots placed in
+      separate quartz tubes with quartz wool, then in graphite crucible.
+    analyzed_aliquot: 8 mg evolved-gas pattern is shown. The 60 mg sample caused RGA saturation from high outgassing pressure,
+      predominantly H2O+ released from hydrated minerals.
+    mineral_composition_wt_percent_from_cited_XRD_PSD:
+    - phase: tochilinite/cronstedtite
+      wt_percent: '58.5'
+    - phase: serpentine
+      wt_percent: '22.8'
+    - phase: olivine_Fo100
+      wt_percent: '7.4'
+    - phase: olivine_Fo80
+      wt_percent: '2.2'
+    - phase: olivine_Fo50
+      wt_percent: 2
+    other_reported_phases: Small amounts of Fe–Ni metal, orthopyroxene (enstatite), pyrrhotite, pentlandite, magnetite, and
+      calcite.
+    after_run_composition:
+      state: unknown
+      reason: not_reported
+    heating_schedule: 25 °C start; linear ramp at 5 °C/min to 1200 °C.
+    purity:
+      state: unknown
+      reason: not_reported
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_murchison_sample_and_run
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_numeric_background_context
+  type: characterization
+  locator:
+    published_page: 1007-1010
+    section: Introduction
+  units: as printed
+  values:
+    narrative_numeric_claims:
+      Apollo_sample_water_reanalysis_ppm: 30
+      heavy_bombardment_period_Ga:
+      - '4.1'
+      - '3.8'
+      LCROSS_impact_distance_from_South_Pole_km: 100
+      possible_sample_return_temperature_K: 50
+      lunar_surface_15N_14N_variation_timescale_Ga: 4
+      TEGA_oven_maximum_temperature_C: 1000
+    note: Background values from introduction/discussion, not new measurements by this paper.
+    source_internal_inconsistencies:
+    - TEGA is stated to heat polar regolith samples up to 1000 °C in the p.1007 introduction, while Table 1 gives ambient–950
+      °C on p.1008; both printed values are retained.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_numeric_background_context
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_sample_holder_cleaning
+  type: laboratory_conditions
+  locator:
+    published_page: 1012
+    section: '3'
+  units: as printed
+  values:
+    holder_cleaning: Quartz holders cleaned in an ultrasonic bath for 10 min in deionized water (Cole–Palmer IonXchanger),
+      followed by 10 min in 95% HPLC grade n-hexane (Fisher Scientific), and 10 min in 99.5% absolute 200 proof ethanol (Fisher
+      Scientific); wrapped in aluminum foil and baked 2 h in air at 500 °C. Borosilicate filling pipettes also baked 2 h at
+      500 °C in air.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_sample_holder_cleaning
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_table1_instrument_comparison
+  type: apparatus
+  locator:
+    published_page: 1008
+    table: '1'
+  units: as printed
+  values:
+    table_csv: tables/tenkate-2010-vapor-instrument/t1.csv
+    VAPoR_row:
+      temperature_range_C: ambient–1200
+      volume_mm3: 100
+      volume_approximate: true
+      number_of_ovens: 6
+      oven_material: platinum resistance wire encased in zirconia
+    SAM_row:
+      temperature_range_C: ambient–1000
+      volume_mm3: 500
+      volume_approximate: true
+      number_of_ovens: 2
+      sample_cups: 74
+      oven_material: quartz cup in alumina wrapped with platinum resistance wire
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_table1_instrument_comparison
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_table2_release_temperature_ranges
+  type: characterization
+  locator:
+    published_page: 1010
+    table: '2'
+  units: °C as printed
+  values:
+    table_csv: tables/tenkate-2010-vapor-instrument/t2.csv
+    examples:
+    - target: H2O; H2; CO2; CO; N2; SO2
+      lower_C: 0
+      upper_C: 1400
+    - target: He; Ne; Ar
+      lower_C: 300
+      upper_C: 1400
+    - target: O2
+      lower_C: 1100
+      upper_C: 1400
+    attribution: The table references previous studies in its footnotes; these are target release-temperature ranges, not
+      measurements made in the present experiments.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_table2_release_temperature_ranges
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_table3_mass_spectrometer_comparison
+  type: apparatus
+  locator:
+    published_page: 1011
+    table: '3'
+  units: as printed
+  values:
+    table_csv: tables/tenkate-2010-vapor-instrument/t3.csv
+    VAPoR_design_goal_row:
+      mass_range_low_Da: 1
+      mass_range_high_Da: 1000
+      sensitivity_per_N2_cps_per_molecule_cc: '0.0001'
+      average_power_W: 1
+      average_power_approximate: true
+      mass_kg_upper_bound: '0.4'
+      volume_cm3_upper_bound: 1000
+    testbed_RGA_row:
+      mass_range_low_Da: 1
+      mass_range_high_Da: 300
+      sensitivity_per_N2_cps_per_molecule_cc: '0.04'
+      sensitivity_approximate: true
+      average_power_W: 60
+      mass_kg: '2.7'
+      volume_cm3: 855
+    attribution: Table modified and updated from King et al. (2008); VAPoR column is design goals and test bed RGA is experimental
+      equipment.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_table3_mass_spectrometer_comparison
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_table4_qualitative_evolved_gas_comparison
+  type: characterization
+  locator:
+    published_page: 1015
+    table: '4'
+  units: qualitative range chart; as printed
+  values:
+    table_csv: tables/tenkate-2010-vapor-instrument/t4.csv
+    comparison_example:
+      sample: Apollo 16, 64801,53 (this work)
+      gases:
+      - H2O
+      - CO2
+      - CO/N2
+      - He
+      - SO2
+      - H2S
+      - S/O2
+      - COS
+      - CS2
+      - CH4
+      temperature_limits:
+        state: unknown
+        reason: not_numeric
+    note: Chart compares evolved-gas profiles by sample and gas label; temperature-axis values are not printed. No interval
+      endpoints were digitized.
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_table4_qualitative_evolved_gas_comparison
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O
+- observation_id: tenkate_vapor_methods_and_instrument
+  type: method
+  locator:
+    published_page: 1011
+    section: '3'
+  units: as printed
+  values:
+    method_tokens:
+    - vacuum_chamber_pyrolysis
+    - knudsen_effusion
+    - evolved_gas_ms
+    instrument: VAPoR breadboard; residual gas analyzer Stanford Research Systems RGA 300
+    apparatus: Stainless steel vacuum chamber with turbo-diaphragm pumping station Pfeiffer Vacuum TSU071E and TC600; pressure
+      gauge Pfeiffer Vacuum PKR 251; modified Knudsen cell (WA Technology, Cambridge, UK); graphite crucible; quartz sample
+      holder and quartz wool; line of sight from heated sample to RGA ion source.
+    cell_material: graphite crucible; quartz sample holder; quartz wool
+    orifice_diameter:
+      state: unknown
+      reason: not_reported
+    orifice_channel_length:
+      state: unknown
+      reason: not_reported
+    calibration: The paper states that its purpose was not to calibrate the instrument and no attempt was made to quantify
+      evolved gas amounts. Figure 1 caption says calibration gas will be used to calibrate the instrument at the lunar surface.
+      No calibration substance or calibration procedure for these experiments is specified.
+    ionization_cross_sections:
+      state: unknown
+      reason: not_reported
+    ionization_energy:
+      state: unknown
+      reason: not_reported
+    multiplier_or_isotope_corrections:
+      state: unknown
+      reason: not_reported
+    temperature_measurement:
+      controller: Watlow SD 6C-HF-AA-AARG temperature controller
+      relay: Omega SSR240DC25 solid-state relay
+      power_source: Variac, type 033-2558
+      sensor: Pt-10%Rh thermocouple measuring heater temperature
+      uncertainty:
+        state: unknown
+        reason: not_reported
+    temperature_calibration:
+      state: unknown
+      reason: not_reported
+    chamber_pressure_before_heating_mbar: '0.00000001'
+    chamber_pressure_with_rga_filament_on_mbar: '0.0000001'
+    chamber_pressure_note: Chamber pressure before heating; after the RGA filament was on during its one-hour warm-up. These
+      are chamber pressures, not evolved-gas sample partial pressures.
+    heating_start_temperature_C: 25
+    heating_rate_C_per_min: 5
+    maximum_experimental_temperature_C: 1200
+    future_oven_design_temperature_C: 1400
+    sample_temperature_uncertainty:
+      state: unknown
+      reason: not_reported
+    activity_ions: not_applicable_no_oxide_activity_reported
+    activity_standard_state: not_applicable_no_oxide_activity_reported
+  context_id: tenkate-2010-vapor-instrument::context::tenkate_vapor_methods_and_instrument
+  work_id: 10.1016/j.pss.2010.03.006
+  source_id: tenkate-2010-vapor-instrument
+  species: H2O

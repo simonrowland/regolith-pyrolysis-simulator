@@ -34,6 +34,7 @@ from simulator.condensation_routing import (
 )
 from simulator.config_flags import bool_feature_flag
 from simulator.melt_regime import MeltRegime, melt_regime
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -789,7 +790,7 @@ class ExtractionMixin:
         self._ensure_metal_phase_stratification_provider()
 
         k_mix_per_hr = k_mix_from_axial_stirring(self.melt.stir_state.axial)
-        temperature_K = float(self.melt.temperature_C) + 273.15
+        temperature_K = float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         melt_density, melt_density_tier = resolve_melt_density_kg_m3(
             getattr(equilibrium, 'liquid_density_kg_m3', None)
         )
@@ -1085,7 +1086,7 @@ class ExtractionMixin:
             # the requested rung before the live Nernst gate evaluates it.
             temperature_K = mre_ladder.MRE_REFERENCE_TEMPERATURE_K
         elif temperature_C >= 1000.0:
-            temperature_K = temperature_C + 273.15
+            temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
         return mre_ladder.build_mre_voltage_sequence(
             self.setpoints,
             temperature_K=temperature_K,
@@ -1180,7 +1181,7 @@ class ExtractionMixin:
         pO2_bar: float,
     ) -> dict[str, Any]:
         temperature_C = float(getattr(self.melt, 'temperature_C', 0.0))
-        temperature_K = temperature_C + 273.15
+        temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
         cleaned_melt_kg = AccountingQueries(self).species_kg_by_accounts(
             ('process.cleaned_melt',)
         )
@@ -1504,7 +1505,7 @@ class ExtractionMixin:
             if not seq:
                 feo_voltage = mre_ladder.canonical_mre_decomposition_voltage(
                     "FeO",
-                    temperature_K=float(self.melt.temperature_C) + 273.15,
+                    temperature_K=float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
                 )
                 voltage_V = min(
                     float(feo_voltage or 0.75) + self.melt.campaign_hour * 0.1,
@@ -3602,7 +3603,7 @@ class ExtractionMixin:
             cfg.get('c7_cold_skull_safe_stir_factor'), 6.0)
         applied_stir = min(clamped_stir, max(0.0, cold_skull_safe))
         hold_temp_C = self._c7_hold_temperature_C(cfg)
-        hold_temp_K = hold_temp_C + 273.15
+        hold_temp_K = hold_temp_C + CELSIUS_TO_KELVIN_OFFSET
         p_total_raw = cfg.get('p_total_mbar')
         if p_total_raw is None:
             p_total_raw = cfg.get('p_total_mbar_default')

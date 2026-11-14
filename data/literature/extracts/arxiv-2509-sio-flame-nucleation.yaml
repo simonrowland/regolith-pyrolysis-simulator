@@ -103,6 +103,21 @@ species:
       phase: silica_fume_particle
       units: g cm^-3
       values:
+        derivation:
+          relation: "g_per_cm3_to_kg_per_m3"
+          inputs:
+          - "pdf:arxiv-2509-sio-flame-nucleation"
+          output_unit: "kg_per_m3"
+          method:
+            state:
+              tag: value
+              value: "authors' particle-mass and volume model"
+            locator:
+              page: 20
+              equation: "52"
+              section: "B.2 Validation of expression for Brownian motion"
+          references:
+          - "Haugen, N. E. L., Brandenburg, A., Friede, B. & Birkeland, R. G. (2025), Silicon-monoxide flames: the nucleation and condensation of silica fume, arXiv:2509.03106v2."
         method_class: model_derived
         generator: authors' particle-mass and volume model
         quantity: density

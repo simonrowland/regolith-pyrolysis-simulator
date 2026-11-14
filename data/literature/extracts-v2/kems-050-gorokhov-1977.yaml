@@ -51,6 +51,8 @@ observations:
     source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
     record: '[77ГОР/ГУС]'
   read_from: pdftotext:kems-050-gorokhov-1977
+  provenance:
+    printed_phase: gas
 - observation_id: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_second_law
   experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::kems-050-gorokhov-1977
   identity:
@@ -88,13 +90,24 @@ observations:
         '
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Gorokhov, Gusarov et al. (1977), Report 43-77 [77ГОР/ГУС], as reprocessed in Table Cr.T3
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: 'Printed model_derived value retained as typed refusal: the primary report PDF is unavailable and the OA compilation''s
+      table method cell is not the required page-located prose method from that report.'
+    decided_by:
+      worker: wave-W2-ivtan-report43-77
+      date: '2026-09-06'
+      evidence:
+        table: Cr.T3
+        note: 'Second-law ΔrH°0 for AlO + Cr = Al + CrO from Table Cr.T3 (computed 3.12.2009). Compilation reprocessing of
+          Gorokhov 1977 KEMS; not a measured ion-current series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+        record: '[77ГОР/ГУС]'
   notices: []
   source_id: kems-050-gorokhov-1977
   locator:
@@ -106,6 +119,8 @@ observations:
     source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
     record: '[77ГОР/ГУС]'
   read_from: pdftotext:kems-050-gorokhov-1977
+  provenance:
+    printed_phase: gas
 - observation_id: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_third_law_d0
   experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::kems-050-gorokhov-1977
   identity:
@@ -171,3 +186,5 @@ observations:
     source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
     record: '[77ГОР/ГУС]'
   read_from: pdftotext:kems-050-gorokhov-1977
+  provenance:
+    printed_phase: gas

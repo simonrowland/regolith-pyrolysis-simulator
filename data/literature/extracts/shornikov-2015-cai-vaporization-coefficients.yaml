@@ -44,8 +44,6 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
       units: dimensionless
       mineru_flags: []
-      derived_from:
-      - Knyazeva and Vasil'ev, 1972
       derivation:
         relation: Calculated in the course of this research. The table footnote marks this cell with an asterisk. The reference cell names Knyazeva and Vasil'ev, 1972. This paper does not print the numeric inputs of that calculation.
         output_unit: dimensionless
@@ -97,8 +95,6 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
       units: dimensionless
       mineru_flags: []
-      derived_from:
-      - Claasen and Veenemans, 1933
       derivation:
         relation: Calculated in the course of this research. The table footnote marks this cell with an asterisk. The reference cell names Claasen and Veenemans, 1933. This paper does not print the numeric inputs of that calculation.
         output_unit: dimensionless
@@ -205,10 +201,29 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
       units: dimensionless
       mineru_flags: []
+      derivation:
+        relation: The authors present this as a recommended crystalline vaporization coefficient based on their analysis of theoretical and experimental data; no single calculation is printed for the recommendation.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract states that the recommendations follow an analysis but does not print its input data or calculations.
+        method:
+          state:
+            tag: value
+            value: "Based on the analysis of theoretical and experimental data, the following vaporization coefficients are suggested for crystalline oxides contained in Ca–Al–inclusions in chondrites:"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract introduces the six crystalline oxide coefficients as suggested recommendations.
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        method_class: compilation_assessed
         alpha_as_printed: '0.66 ± 0.15'
         alpha: '0.66'
       phase: cr
@@ -453,8 +468,6 @@ species:
       units: dimensionless
       mineru_flags:
       - non_numeric_in_numeric_column
-      derived_from:
-      - Lukin and Poluboyarinov, 1964
       derivation:
         relation: Calculated in the course of this research. The table footnote marks this cell with an asterisk. The reference cell names Lukin and Poluboyarinov, 1964. This paper does not print the numeric inputs of that calculation.
         output_unit: dimensionless
@@ -505,10 +518,29 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
       units: dimensionless
       mineru_flags: []
+      derivation:
+        relation: The authors present this as a recommended crystalline vaporization coefficient based on their analysis of theoretical and experimental data; no single calculation is printed for the recommendation.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract states that the recommendations follow an analysis but does not print its input data or calculations.
+        method:
+          state:
+            tag: value
+            value: "Based on the analysis of theoretical and experimental data, the following vaporization coefficients are suggested for crystalline oxides contained in Ca–Al–inclusions in chondrites:"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract introduces the six crystalline oxide coefficients as suggested recommendations.
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        method_class: compilation_assessed
         alpha_as_printed: '0.50 ± 0.20'
         alpha: '0.50'
       phase: cr
@@ -1074,10 +1106,33 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. The abstract, the discussion on published p. 1083, and the conclusions print the recommended crystalline value as 0.33 ± 0.02. That prose value is a separate observation. This cell is kept as printed.
       units: dimensionless
       mineru_flags: []
+      derivation:
+        relation: The authors present this as a recommended crystalline vaporization coefficient based on their analysis of theoretical and experimental data; no single calculation is printed for the recommendation.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract states that the recommendations follow an analysis but does not print its input data or calculations.
+        method:
+          state:
+            tag: value
+            value: "Table 5 reports the crystalline evaporation coefficient under αvap (cr)."
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 1086
+            table: '5'
+            row_label: $Al_2O_3$
+            column_header: αvap (cr)
+            note: Table 5 prints this crystalline evaporation coefficient; no separate calculation is assigned to the cell.
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 cell. Table 5 prints 0.32 ± 0.02. The abstract and the conclusions print 0.33 ± 0.02. Those are not the same number. The 0.33 ± 0.02 recommendation is a separate row.
+        method_class: compilation_assessed
+        consistency_note: >-
+          Prose observation shornikov_2015_al2o3_cr_recommendation_prose at published p. 1083 prints 0.33 ± 0.02; this Table 5 observation at published p. 1086 prints 0.32 ± 0.02. Both values remain as printed; neither is selected.
         alpha_as_printed: '0.32 ± 0.02'
         alpha: '0.32'
       phase: cr
@@ -1096,10 +1151,31 @@ species:
       uncertainty:
         note: Printed ±0.02 on the recommended αvap(Al2O3, cr).
         printed: '±0.02'
+      derivation:
+        relation: The authors present this as a recommended crystalline vaporization coefficient based on their analysis of theoretical and experimental data; no single calculation is printed for the recommendation.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract states that the recommendations follow an analysis but does not print its input data or calculations.
+        method:
+          state:
+            tag: value
+            value: "Based on the analysis of theoretical and experimental data, the following vaporization coefficients are suggested for crystalline oxides contained in Ca–Al–inclusions in chondrites:"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract introduces the six crystalline oxide coefficients as suggested recommendations.
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: Shornikov (2015) recommendation from the Table 3 compilation and the discussion of the melting jump. Per-row inputs are the table, already stored, but this sentence is the author's recommended value rather than one experimental cell.
+        method_class: compilation_assessed
+        consistency_note: >-
+          Table 5 observation shornikov_2015_cai_vaporization_coefficients_p007_t05_r05_c08 at published p. 1086 prints 0.32 ± 0.02; this prose observation at published p. 1083 prints 0.33 ± 0.02. Both values remain as printed; neither is selected.
         alpha: '0.33'
         alpha_as_printed: '0.33 ± 0.02'
       phase: cr
@@ -1373,10 +1449,29 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. The abstract, the SiO2 discussion, and the conclusions print (2.2 ± 0.3) × 10^{−2}, which is this same 0.022 ± 0.003. It is not stored twice.
       units: dimensionless
       mineru_flags: []
+      derivation:
+        relation: The authors present this as a recommended crystalline vaporization coefficient based on their analysis of theoretical and experimental data; no single calculation is printed for the recommendation.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract states that the recommendations follow an analysis but does not print its input data or calculations.
+        method:
+          state:
+            tag: value
+            value: "Based on the analysis of theoretical and experimental data, the following vaporization coefficients are suggested for crystalline oxides contained in Ca–Al–inclusions in chondrites:"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract introduces the six crystalline oxide coefficients as suggested recommendations.
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        method_class: compilation_assessed
         alpha_as_printed: '0.022 ± 0.003'
         alpha: '0.022'
       phase: cr
@@ -1467,10 +1562,29 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. Published p. 1084 says this recommended coefficient was calculated for the dominant gas-phase component TiO. That sentence follows the Semenov 0.20 ± 0.04 value and belongs to this 0.23 ± 0.02 recommendation.
       units: dimensionless
       mineru_flags: []
+      derivation:
+        relation: The authors present this as a recommended crystalline vaporization coefficient based on their analysis of theoretical and experimental data; no single calculation is printed for the recommendation.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract states that the recommendations follow an analysis but does not print its input data or calculations.
+        method:
+          state:
+            tag: value
+            value: "Based on the analysis of theoretical and experimental data, the following vaporization coefficients are suggested for crystalline oxides contained in Ca–Al–inclusions in chondrites:"
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract introduces the six crystalline oxide coefficients as suggested recommendations.
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree. The dominant gas-phase component named for this recommendation is TiO.
+        method_class: compilation_assessed
         alpha_as_printed: '0.23 ± 0.02'
         alpha: '0.23'
         gas_phase_component_as_printed: TiO
@@ -1534,10 +1648,33 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. The abstract, the discussion on published p. 1083, and the conclusions print 1.00 ± 0.20 for crystalline FeO. That prose value, with 1373–1623 K, is a separate observation. This cell is kept as printed.
       units: dimensionless
       mineru_flags: []
+      derivation:
+        relation: The authors present this as a recommended crystalline vaporization coefficient based on their analysis of theoretical and experimental data; no single calculation is printed for the recommendation.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1080
+            section: Abstract
+            note: The abstract states that the recommendations follow an analysis but does not print its input data or calculations.
+        method:
+          state:
+            tag: value
+            value: "Table 5 reports the crystalline evaporation coefficient under αvap (cr)."
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 1086
+            table: '5'
+            row_label: FeO
+            column_header: αvap (cr)
+            note: Table 5 prints this crystalline evaporation coefficient; no separate calculation is assigned to the cell.
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 cell. Table 5 prints 1.00 ± 0.30. The abstract and the conclusions print 1.00 ± 0.20. Those are not the same uncertainty. The 1.00 ± 0.20 evaluation is a separate row.
+        method_class: compilation_assessed
+        consistency_note: >-
+          Prose observation shornikov_2015_feo_cr_prose at published p. 1083 prints 1.00 ± 0.20; this Table 5 observation at published p. 1086 prints 1.00 ± 0.30. Both values remain as printed; neither is selected.
         alpha_as_printed: '1.00 ± 0.30'
         alpha: '1.00'
       phase: cr
@@ -1556,9 +1693,6 @@ species:
       uncertainty:
         note: Printed ±0.20 on αvap(FeO, cr).
         printed: '±0.20'
-      derived_from:
-      - Darken and Gurry, 1946
-      - Glushko et al., 1978–1982
       derivation:
         relation: Evaluated in this study on the basis of experimental data (Darken and Gurry, 1946) and calculations using thermochemical information from Glushko et al. (1978–1982). This paper does not print those input numbers.
         output_unit: dimensionless
@@ -1590,9 +1724,11 @@ species:
         - Glushko et al., 1978–1982
       values:
         quantity: alpha
-        method_class: model_derived
+        method_class: compilation_assessed
         admission_status: rejected
         attribution: Evaluated in this study from experimental data (Darken and Gurry, 1946) and thermochemical data in Glushko et al. (1978–1982).
+        consistency_note: >-
+          Table 5 observation shornikov_2015_cai_vaporization_coefficients_p007_t05_r08_c08 at published p. 1086 prints 1.00 ± 0.30; this prose observation at published p. 1083 prints 1.00 ± 0.20. Both values remain as printed; neither is selected.
         alpha: '1.00'
         alpha_as_printed: '1.00 ± 0.20'
         temperature_K_as_printed: '1373–1623'

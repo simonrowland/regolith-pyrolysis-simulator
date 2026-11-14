@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/cottrell-2009-iron-xanes.yaml
 observations:
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-05:h=e27f9174ca47
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-05:h=b461be4d5d31
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -50,8 +50,8 @@ observations:
       tag: value
       value: '0.006309573444801932494343601366'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -84,7 +84,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-05:h=e27f9174ca47
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-05:h=b461be4d5d31
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -158,7 +158,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -212,7 +212,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -231,7 +231,9 @@ observations:
           note: row=AII_− 05
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-15:h=8d7096bac754
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-15:h=1eb5c9067ed2
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -279,8 +281,8 @@ observations:
       tag: value
       value: '0.0006025595860743577469713029657'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -313,7 +315,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-15:h=8d7096bac754
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-15:h=1eb5c9067ed2
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -387,7 +389,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -441,7 +443,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -460,7 +462,9 @@ observations:
           note: row=AII_− 15
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-25:h=d73717436eb3
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-25:h=7459decf62aa
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -508,8 +512,8 @@ observations:
       tag: value
       value: '0.00004897788193684461959103085614'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -542,7 +546,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-25:h=d73717436eb3
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-25:h=7459decf62aa
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -616,7 +620,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -670,7 +674,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -689,7 +693,9 @@ observations:
           note: row=AII_− 25
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-35:h=1af26f1b251c
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-35:h=c7086aca7e61
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -737,8 +743,8 @@ observations:
       tag: value
       value: '0.000006456542290346555158782140681'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -771,7 +777,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-35:h=1af26f1b251c
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_-35:h=c7086aca7e61
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -848,7 +854,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -902,7 +908,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -921,7 +927,9 @@ observations:
           note: At 1623.15 K, the printed log fO2 of -10.19 is 0.0066 dex below IW (-10.1834).; row=AII_− 35
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_05:h=cccceb064c48
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_05:h=337cd687008d
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -969,8 +977,8 @@ observations:
       tag: value
       value: '0.0575439937337156930062037994'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -1003,7 +1011,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_05:h=cccceb064c48
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_05:h=337cd687008d
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -1077,7 +1085,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -1131,7 +1139,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -1150,7 +1158,9 @@ observations:
           note: row=AII_05
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_0:h=b4fa566252de
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_0:h=c9d35208e6c9
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -1198,8 +1208,8 @@ observations:
       tag: value
       value: '0.0194984459975804532357053486'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -1232,7 +1242,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_0:h=b4fa566252de
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_0:h=c9d35208e6c9
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -1306,7 +1316,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -1360,7 +1370,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -1379,7 +1389,9 @@ observations:
           note: row=AII_0
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_15:h=1aadbfb40bfb
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_15:h=942d2fac17fa
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -1427,8 +1439,8 @@ observations:
       tag: value
       value: '0.575439937337156930062037994'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -1461,7 +1473,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_15:h=1aadbfb40bfb
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_15:h=942d2fac17fa
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -1535,7 +1547,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -1589,7 +1601,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -1608,7 +1620,9 @@ observations:
           note: row=AII_15
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_25:h=97a354728bf6
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_25:h=ad4e596fa5fe
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -1656,8 +1670,8 @@ observations:
       tag: value
       value: '5.623413251903490803949510398'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -1690,7 +1704,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_25:h=97a354728bf6
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_25:h=ad4e596fa5fe
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -1764,7 +1778,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -1818,7 +1832,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -1837,7 +1851,9 @@ observations:
           note: row=AII_25
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_35:h=150bb337d254
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_35:h=32deec6461ea
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -1885,8 +1901,8 @@ observations:
       tag: value
       value: '60.25595860743577469713029657'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -1919,7 +1935,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_35:h=150bb337d254
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_35:h=32deec6461ea
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -1993,7 +2009,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -2047,7 +2063,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -2066,7 +2082,9 @@ observations:
           note: row=AII_35
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_45:h=3146659b2d45
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_45:h=1eb1f0d55894
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -2114,8 +2132,8 @@ observations:
       tag: value
       value: '630.9573444801932494343601366'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -2148,7 +2166,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_45:h=3146659b2d45
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=aii_45:h=1eb1f0d55894
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -2222,7 +2240,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -2276,7 +2294,7 @@ observations:
         value: CO2/O2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -2295,7 +2313,9 @@ observations:
           note: row=AII_45
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-10:h=96e42c678ef5
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-10:h=2aba1d0fe9da
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -2343,8 +2363,8 @@ observations:
       tag: value
       value: '0.001905460717963247182688014184'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -2377,7 +2397,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-10:h=96e42c678ef5
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-10:h=2aba1d0fe9da
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -2451,7 +2471,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -2505,7 +2525,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -2524,7 +2544,9 @@ observations:
           note: row=LW_− 10
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-20:h=596e950203b7
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-20:h=dd27f11fed0e
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -2572,8 +2594,8 @@ observations:
       tag: value
       value: '0.0001905460717963247182688014184'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -2606,7 +2628,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-20:h=596e950203b7
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-20:h=dd27f11fed0e
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -2680,7 +2702,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -2734,7 +2756,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -2753,7 +2775,9 @@ observations:
           note: row=LW_− 20
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-30:h=c3f2fed2edf2
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-30:h=b450c3101261
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -2801,8 +2825,8 @@ observations:
       tag: value
       value: '0.0000138038426460288483784271249'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -2835,7 +2859,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-30:h=c3f2fed2edf2
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_-30:h=b450c3101261
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -2909,7 +2933,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -2963,7 +2987,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -2982,7 +3006,9 @@ observations:
           note: row=LW_− 30
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_0:h=a335ce128230
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_0:h=19fd7777b755
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -3030,8 +3056,8 @@ observations:
       tag: value
       value: '0.02089296130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -3064,7 +3090,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_0:h=a335ce128230
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_0:h=19fd7777b755
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -3138,7 +3164,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -3192,7 +3218,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -3211,7 +3237,9 @@ observations:
           note: row=LW_0
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_10:h=12ec6d48c243
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_10:h=818b529f2e76
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -3259,8 +3287,8 @@ observations:
       tag: value
       value: '0.1905460717963247182688014184'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -3293,7 +3321,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_10:h=12ec6d48c243
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_10:h=818b529f2e76
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -3367,7 +3395,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -3421,7 +3449,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -3440,7 +3468,9 @@ observations:
           note: row=LW_10
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_20:h=bdce9c6705c7
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_20:h=2d355e0e5d75
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -3488,8 +3518,8 @@ observations:
       tag: value
       value: '1.862087136662867448671778998'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -3522,7 +3552,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_20:h=bdce9c6705c7
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_kress_predictions::T=1623.15:row=lw_20:h=2d355e0e5d75
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -3596,7 +3626,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -3650,7 +3680,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -3669,7 +3699,9 @@ observations:
           note: row=LW_20
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=33babca2189e
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -3717,8 +3749,8 @@ observations:
       tag: value
       value: '0.006309573444801932494343601366'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -3754,7 +3786,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=33babca2189e
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -3828,7 +3860,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -3882,7 +3914,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -3906,11 +3938,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=6ca174562d72
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -3958,8 +3992,8 @@ observations:
       tag: value
       value: '0.0006025595860743577469713029657'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -3995,7 +4029,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=6ca174562d72
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -4069,7 +4103,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -4123,7 +4157,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -4147,11 +4181,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-25:h=984977a441c7
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-25:h=7884e9eff0f5
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -4199,8 +4235,8 @@ observations:
       tag: value
       value: '0.00004897788193684461959103085614'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -4235,7 +4271,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-25:h=984977a441c7
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-25:h=7884e9eff0f5
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -4309,7 +4345,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -4363,7 +4399,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -4378,11 +4414,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-35:h=c7e50fa38368
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-35:h=dc8f96f1a132
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -4430,8 +4468,8 @@ observations:
       tag: value
       value: '0.000006456542290346555158782140681'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -4466,7 +4504,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-35:h=c7e50fa38368
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-35:h=dc8f96f1a132
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -4543,7 +4581,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -4597,7 +4635,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -4612,11 +4650,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=e10a222478c6
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -4664,8 +4704,8 @@ observations:
       tag: value
       value: '0.0575439937337156930062037994'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -4701,7 +4741,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=e10a222478c6
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -4775,7 +4815,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -4829,7 +4869,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -4853,11 +4893,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=55cddad480b7
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -4905,8 +4947,8 @@ observations:
       tag: value
       value: '0.0194984459975804532357053486'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -4942,7 +4984,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=55cddad480b7
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -5016,7 +5058,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -5070,7 +5112,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -5094,11 +5136,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=3014aad11186
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -5146,8 +5190,8 @@ observations:
       tag: value
       value: '0.575439937337156930062037994'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -5183,7 +5227,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=3014aad11186
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -5257,7 +5301,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -5311,7 +5355,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -5335,11 +5379,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=6112bbb1efe0
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -5387,8 +5433,8 @@ observations:
       tag: value
       value: '5.623413251903490803949510398'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -5424,7 +5470,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=6112bbb1efe0
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -5498,7 +5544,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -5552,7 +5598,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -5576,11 +5622,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=689af16e60b4
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -5628,8 +5676,8 @@ observations:
       tag: value
       value: '60.25595860743577469713029657'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -5665,7 +5713,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=689af16e60b4
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -5739,7 +5787,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -5793,7 +5841,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -5817,11 +5865,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=bdb3b360ef15
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -5869,8 +5919,8 @@ observations:
       tag: value
       value: '630.9573444801932494343601366'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -5906,7 +5956,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=bdb3b360ef15
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -5980,7 +6030,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -6034,7 +6084,7 @@ observations:
         value: CO2/O2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -6058,11 +6108,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=14e411c76e2c
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -6110,8 +6162,8 @@ observations:
       tag: value
       value: '0.001905460717963247182688014184'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -6147,7 +6199,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=14e411c76e2c
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -6221,7 +6273,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -6275,7 +6327,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -6299,11 +6351,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=45671d7935b5
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -6351,8 +6405,8 @@ observations:
       tag: value
       value: '0.0001905460717963247182688014184'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -6388,7 +6442,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=45671d7935b5
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -6462,7 +6516,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -6516,7 +6570,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -6540,11 +6594,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-30:h=630ae3b08aa1
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-30:h=448a389fa890
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -6592,8 +6648,8 @@ observations:
       tag: value
       value: '0.0000138038426460288483784271249'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -6628,7 +6684,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-30:h=630ae3b08aa1
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-30:h=448a389fa890
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -6702,7 +6758,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -6756,7 +6812,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -6771,11 +6827,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=7cd41a3320bc
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -6823,8 +6881,8 @@ observations:
       tag: value
       value: '0.02089296130854039483122233736'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -6860,7 +6918,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=7cd41a3320bc
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -6934,7 +6992,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -6988,7 +7046,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -7012,11 +7070,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=a546a2eb0f86
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -7064,8 +7124,8 @@ observations:
       tag: value
       value: '0.1905460717963247182688014184'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -7101,7 +7161,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=a546a2eb0f86
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -7175,7 +7235,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -7229,7 +7289,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -7253,11 +7313,13 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=0ba289e53f3a
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -7305,8 +7367,8 @@ observations:
       tag: value
       value: '1.862087136662867448671778998'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -7342,7 +7404,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
+    origin: cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=0ba289e53f3a
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -7416,7 +7478,7 @@ observations:
         value: '101325'
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: Basalts equilibrated at 1 atm.
     composition:
@@ -7470,7 +7532,7 @@ observations:
         value: CO/CO2; flow ratio not published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   derivation:
@@ -7494,10 +7556,12 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
@@ -7547,7 +7611,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -7674,6 +7738,8 @@ observations:
           note: row=DT_46
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
@@ -7723,7 +7789,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -7850,6 +7916,8 @@ observations:
           note: row=DT_39
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
@@ -7899,7 +7967,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -8024,6 +8092,8 @@ observations:
           note: row=H2O_63
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
@@ -8073,7 +8143,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -8180,6 +8250,8 @@ observations:
           note: row=DT_29
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
@@ -8229,7 +8301,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -8354,6 +8426,8 @@ observations:
           note: row=DT_31
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:5
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
@@ -8403,7 +8477,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -8528,7 +8602,9 @@ observations:
           note: row=DT_18
     output_unit: dimensionless
     references: []
-- observation_id: cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+  provenance:
+    printed_phase: quenched silicate glass
+- observation_id: cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=29ea154dd367
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
     quantity:
@@ -8577,7 +8653,7 @@ observations:
       value: '81.28305161640992465412787977'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -8613,7 +8689,7 @@ observations:
     affected_quantities:
     - fe3_fe2_ratio
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+    origin: cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=29ea154dd367
   source_id: cottrell-2009-iron-xanes
   locator:
     page: 6
@@ -8731,7 +8807,7 @@ observations:
         reason: not_published
       locator:
         page: 2
-        published_page: '169'
+        published_page: '168'
         section: 2.2 High temperature experiments
         note: VG568 chip held at 1550 °C for 72 h.
   derivation:
@@ -8755,10 +8831,12 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:1
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
@@ -8808,7 +8886,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -8944,10 +9022,12 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
+  provenance:
+    printed_phase: quenched silicate glass
 - observation_id: cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:2
   experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
   identity:
@@ -8997,7 +9077,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use sweep_gas
@@ -9133,7 +9213,9 @@ observations:
         value: not_printed
       locator:
         page: 3
-        published_page: '170'
+        published_page: '169'
         section: 3.1 Mössbauer spectroscopy
         note: Fitted spectrum areas are not tabulated as numeric cells.
     references: []
+  provenance:
+    printed_phase: quenched silicate glass

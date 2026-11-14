@@ -1,0 +1,2628 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/greig-1927-immiscibility-part2.yaml
+observations:
+- observation_id: greig-1927-immiscibility-part2::greig1927_feo_less_siliceous_feo
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1962.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.3579586413979231332924235473'
+        - - SiO2
+          - '0.6420413586020768667075764525'
+        amount_basis: mole_fraction
+        input_provenance: scored_phase_analysis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '40'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_feo_less_siliceous_feo
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 21
+    published_page: 153
+    pdf_page_index: 20
+    note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; less_siliceous liquid; FeO
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1689'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.3579586413979231332924235473'
+          - - SiO2
+            - '0.6420413586020768667075764525'
+          amount_basis: mole_fraction
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    temperature_K:
+      state:
+        tag: value
+        value: '1962.15'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; less_siliceous liquid; FeO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1689'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; less_siliceous liquid;
+                FeO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; less_siliceous liquid;
+                FeO
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: glass
+- observation_id: greig-1927-immiscibility-part2::greig1927_feo_less_siliceous_sio2
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1962.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.3579586413979231332924235473'
+        - - SiO2
+          - '0.6420413586020768667075764525'
+        amount_basis: mole_fraction
+        input_provenance: scored_phase_analysis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '60'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_feo_less_siliceous_sio2
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 21
+    published_page: 153
+    pdf_page_index: 20
+    note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; less_siliceous liquid; SiO2
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1689'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.3579586413979231332924235473'
+          - - SiO2
+            - '0.6420413586020768667075764525'
+          amount_basis: mole_fraction
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    temperature_K:
+      state:
+        tag: value
+        value: '1962.15'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; less_siliceous liquid; SiO2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1689'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; less_siliceous liquid;
+                SiO2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; less_siliceous liquid;
+                SiO2
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: glass
+- observation_id: greig-1927-immiscibility-part2::greig1927_feo_silica_rich_feo
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1962.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.02521276403785250682007302441'
+        - - SiO2
+          - '0.9747872359621474931799269757'
+        amount_basis: mole_fraction
+        input_provenance: scored_phase_analysis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_feo_silica_rich_feo
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 21
+    published_page: 153
+    pdf_page_index: 20
+    note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; silica_rich liquid; FeO
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1689'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.02521276403785250682007302441'
+          - - SiO2
+            - '0.9747872359621474931799269757'
+          amount_basis: mole_fraction
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '97'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    temperature_K:
+      state:
+        tag: value
+        value: '1962.15'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; silica_rich liquid; FeO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1689'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; silica_rich liquid;
+                FeO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; silica_rich liquid;
+                FeO
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: glass
+- observation_id: greig-1927-immiscibility-part2::greig1927_feo_silica_rich_sio2
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1962.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.02521276403785250682007302441'
+        - - SiO2
+          - '0.9747872359621474931799269757'
+        amount_basis: mole_fraction
+        input_provenance: scored_phase_analysis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '97'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_feo_silica_rich_sio2
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 21
+    published_page: 153
+    pdf_page_index: 20
+    note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; silica_rich liquid; SiO2
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1689'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.02521276403785250682007302441'
+          - - SiO2
+            - '0.9747872359621474931799269757'
+          amount_basis: mole_fraction
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '97'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    temperature_K:
+      state:
+        tag: value
+        value: '1962.15'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; silica_rich liquid; SiO2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1689'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; silica_rich liquid;
+                SiO2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=FeO; silica_rich liquid;
+                SiO2
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: glass
+- observation_id: greig-1927-immiscibility-part2::greig1927_sro_cristobalite_two_liquids_transition_1693
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: The transition is reported for two coexisting liquid limbs; no single bulk composition is printed.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1966.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '5'
+      units: °C
+      confidence_level: not_stated
+      value_as_published: ±5°
+      note: The paper prints this symmetric ± width but gives no confidence level.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_sro_cristobalite_two_liquids_transition_1693
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 21
+    published_page: 153
+    pdf_page_index: 20
+    note: Unnumbered inline summary; compositions are printed as weight per cent.; row=SrO-SiO2 equilibrium summary
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1693'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    composition:
+      state:
+        tag: unknown
+        reason: The transition is reported for two coexisting liquid limbs; no single bulk composition is printed.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.
+    temperature_K:
+      state:
+        tag: value
+        value: '1966.15'
+      locator:
+        page: 21
+        published_page: 153
+        pdf_page_index: 20
+        note: Unnumbered inline summary; compositions are printed as weight per cent.; row=SrO-SiO2 equilibrium summary
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1693'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=SrO-SiO2 equilibrium summary
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 21
+              published_page: 153
+              pdf_page_index: 20
+              note: Unnumbered inline summary; compositions are printed as weight per cent.; row=SrO-SiO2 equilibrium summary
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: l
+- observation_id: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_fe2o3
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.3556932161603277954634274828'
+        - - Fe2O3
+          - '0.0246518639472203270837085911'
+        - - SiO2
+          - '0.6196549198924518774528639261'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '5.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_fe2o3
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 3
+    published_page: 135
+    pdf_page_index: 2
+    table: VIII
+    note: 'row=A: Fe2O3'
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1710'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.3556932161603277954634274828'
+          - - Fe2O3
+            - '0.0246518639472203270837085911'
+          - - SiO2
+            - '0.6196549198924518774528639261'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '38.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '5.9'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.8'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+        note: 'row=A: Fe2O3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=A: Fe2O3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=A: Fe2O3'
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: l
+- observation_id: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_feo
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.3556932161603277954634274828'
+        - - Fe2O3
+          - '0.0246518639472203270837085911'
+        - - SiO2
+          - '0.6196549198924518774528639261'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '38.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_feo
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 3
+    published_page: 135
+    pdf_page_index: 2
+    table: VIII
+    note: 'row=A: FeO'
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1710'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.3556932161603277954634274828'
+          - - Fe2O3
+            - '0.0246518639472203270837085911'
+          - - SiO2
+            - '0.6196549198924518774528639261'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '38.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '5.9'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.8'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+        note: 'row=A: FeO'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=A: FeO'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=A: FeO'
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: l
+- observation_id: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_sio2
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.3556932161603277954634274828'
+        - - Fe2O3
+          - '0.0246518639472203270837085911'
+        - - SiO2
+          - '0.6196549198924518774528639261'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '55.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_sio2
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 3
+    published_page: 135
+    pdf_page_index: 2
+    table: VIII
+    note: 'row=A: SiO2'
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1710'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.3556932161603277954634274828'
+          - - Fe2O3
+            - '0.0246518639472203270837085911'
+          - - SiO2
+            - '0.6196549198924518774528639261'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '38.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '5.9'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.8'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+        note: 'row=A: SiO2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=A: SiO2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=A: SiO2'
+        output_unit: K
+        references: []
+  derived_from:
+  - greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_feo
+  - greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_fe2o3
+  derivation:
+    relation: SiO2 is reported by difference as 100 wt% minus measured FeO and Fe2O3.
+    inputs:
+    - greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_feo
+    - greig-1927-immiscibility-part2::greig1927_table8_feo_rich_a_fe2o3
+    parameters: []
+    output_unit: wt%
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_fe2o3
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.3790575743158529039494496496'
+        - - Fe2O3
+          - '0.01403960815159177879416840522'
+        - - SiO2
+          - '0.6069028175325553172563819454'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '3.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_fe2o3
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 3
+    published_page: 135
+    pdf_page_index: 2
+    table: VIII
+    note: 'row=B: Fe2O3'
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1710'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.3790575743158529039494496496'
+          - - Fe2O3
+            - '0.01403960815159177879416840522'
+          - - SiO2
+            - '0.6069028175325553172563819454'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.4'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+        note: 'row=B: Fe2O3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=B: Fe2O3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=B: Fe2O3'
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: l
+- observation_id: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_feo
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.3790575743158529039494496496'
+        - - Fe2O3
+          - '0.01403960815159177879416840522'
+        - - SiO2
+          - '0.6069028175325553172563819454'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '41.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_feo
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 3
+    published_page: 135
+    pdf_page_index: 2
+    table: VIII
+    note: 'row=B: FeO'
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1710'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.3790575743158529039494496496'
+          - - Fe2O3
+            - '0.01403960815159177879416840522'
+          - - SiO2
+            - '0.6069028175325553172563819454'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.4'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+        note: 'row=B: FeO'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=B: FeO'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=B: FeO'
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: l
+- observation_id: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_sio2
+  experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.3790575743158529039494496496'
+        - - Fe2O3
+          - '0.01403960815159177879416840522'
+        - - SiO2
+          - '0.6069028175325553172563819454'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Total pressure is not printed for this experiment.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '55.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_sio2
+  source_id: greig-1927-immiscibility-part2
+  locator:
+    page: 3
+    published_page: 135
+    pdf_page_index: 2
+    table: VIII
+    note: 'row=B: SiO2'
+  read_from: pdf:greig-1927-immiscibility-part2
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1710'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.3790575743158529039494496496'
+          - - Fe2O3
+            - '0.01403960815159177879416840522'
+          - - SiO2
+            - '0.6069028175325553172563819454'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.4'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.3'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Oxygen fugacity is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not printed for this experiment.
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 3
+        published_page: 135
+        pdf_page_index: 2
+        table: VIII
+        note: 'row=B: SiO2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=B: SiO2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 135
+              pdf_page_index: 2
+              table: VIII
+              note: 'row=B: SiO2'
+        output_unit: K
+        references: []
+  derived_from:
+  - greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_feo
+  - greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_fe2o3
+  derivation:
+    relation: SiO2 is reported by difference as 100 wt% minus measured FeO and Fe2O3.
+    inputs:
+    - greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_feo
+    - greig-1927-immiscibility-part2::greig1927_table8_feo_rich_b_fe2o3
+    parameters: []
+    output_unit: wt%
+    references: []
+  provenance:
+    printed_phase: l

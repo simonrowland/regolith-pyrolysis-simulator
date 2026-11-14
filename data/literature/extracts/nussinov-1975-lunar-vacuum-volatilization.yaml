@@ -1,0 +1,1345 @@
+schema_version: literature_extract.v1
+source_id: nussinov-1975-lunar-vacuum-volatilization
+source:
+  citation: Nussinov, M. D. & Chernyak, Yu. B. (1975), "On volatilization in vacuum of the elements from the planet surface soil melts", The Moon 13, 377–394, D. Reidel Publishing Company.
+  year: 1975
+  ads_bibcode: 1975Moon...13..377N
+  corpus_asset: nussinov-1975-lunar-vacuum-volatilization.pdf
+  corpus_sha256: f037f60a01a8b03d55e1cc1728acb29808e6c34bd8030d59f14845402bccc595
+extraction:
+  method: Manual transcription from page images; all 18 pages and every carried number were rechecked against fresh pdftoppm images at 220 dpi in solfix-T. The PDF is an ADS JBIG2 scan with no text layer. This theory/review paper carries zero scored observations; Table I is a model estimate. Figures 1–7 remain undigitized; printed caption values retain their cited provenance. All 45 numbered equations, their definitions and unnumbered relations, and quantitative prose are located unscored context. Apparent printed equation inconsistencies are annotated, not corrected. pdf_page_index is 0-based; printed page = pdf_page_index + 377.
+  date: '2026-10-05'
+  worker: regolith-empirical-seat37a
+review_status: draft
+fidelity_samples:
+- species: K
+  observation_id: nussinov_1975_table1_volatilization_time_constants
+  field: tau_f_as_printed
+  value:
+    1500 C: 0.65 Earth day
+    900 C: 5 Earth day
+    500 C: 25 Earth day
+    300 C: 300 yr
+  locator:
+    published_page: 390
+    pdf_page_index: 13
+    table: I
+- species: Na
+  observation_id: nussinov_1975_fig6_heats_of_process
+  field: psi_kcal_mol
+  value:
+    K: 31.2
+    Na: 21.6
+    Fe: 5.0
+    Si: 5.14
+  locator:
+    published_page: 382
+    pdf_page_index: 5
+    figure: '6'
+experiments:
+- experiment_id: p-var-basalt-series-ref12
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    published_page: 379
+    pdf_page_index: 2
+    section: 2. A Short Review of Experimental Data
+    note: The pressure-dependence ("p = Var") volatilization series on two basalts, attributed by the authors to work at the Space Research Institute, Academy of Sciences, U.S.S.R. [12] (Yakovlev, O. I., 1974, candidate dissertation, MGU, Moscow). Results appear only in Figs. 3 and 4. The paper names no apparatus, so no bench is recorded and no method token is chosen.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Melts of two types of basalt, aluminiferous basalt and tholeitic basalt (spelling as printed)
+      locator:
+        published_page: 380
+        pdf_page_index: 3
+        figure: 3, 4
+        note: Basalt types as printed in the Fig. 3 and Fig. 4 legends and captions; p. 379 says "using two types of basalt".
+    characterization:
+      state:
+        tag: value
+        value: Chemical composition of the residual glasses measured by two independent techniques, micro X-ray spectral and chemical; the results were closely concordant
+      locator:
+        published_page: 381
+        pdf_page_index: 4
+        section: 2. A Short Review of Experimental Data
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 379
+        pdf_page_index: 2
+        section: 2. A Short Review of Experimental Data
+        note: No starting composition of either basalt is printed.
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 379
+        pdf_page_index: 2
+        section: 2. A Short Review of Experimental Data
+        note: Sample mass is not stated.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 1573.15 or 1773.15
+      locator:
+        published_page: 380
+        pdf_page_index: 3
+        figure: 3, 4
+        note: Fig. 3 caption prints "T = 1300 and 1500 °C"; Fig. 4 caption prints "T ≈ 1300 and 1500 °C". Two discrete temperatures, converted from °C; not a range.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 379
+        pdf_page_index: 2
+        section: 2. A Short Review of Experimental Data
+        note: Crucible or cell material is not stated.
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 379
+          pdf_page_index: 2
+          section: 2. A Short Review of Experimental Data
+          note: No orifice or effusion geometry is printed. The paper does not say whether the melt was in an open crucible or an effusion cell.
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 379
+          pdf_page_index: 2
+          section: 2. A Short Review of Experimental Data
+          note: No pressure-gauge or temperature calibration is printed. Composition was measured post-run on the residual glasses (p. 381).
+    temperature_measurement:
+      sensor:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 379
+          pdf_page_index: 2
+          section: 2. A Short Review of Experimental Data
+          note: Temperature sensor is not stated.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 380
+        pdf_page_index: 3
+        figure: 3, 4
+        note: Residual (background) pressure is the varied quantity of this series ("in the mode p = Var"). Individual run pressures appear only on the Fig. 3 and Fig. 4 axes (torr) and were not digitized.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 379
+        pdf_page_index: 2
+        section: 2. A Short Review of Experimental Data
+        note: Evaporation "in vacuum"; the residual atmosphere is not characterized, and no carrier gas is named.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 379
+        pdf_page_index: 2
+        section: 2. A Short Review of Experimental Data
+        note: Run durations for this series are not printed; it is described only as the 'quasi-stationary' regime.
+species:
+  K:
+    observations: []
+    context:
+    - observation_id: nussinov_1975_table1_volatilization_time_constants
+      type: author_estimate
+      locator:
+        published_page: 390
+        pdf_page_index: 13
+        table: I
+      units: T in °C as printed; tau_f in Earth days (footnote a) except 300 °C, printed in years
+      values:
+        method_class: author_estimate
+        quantity: volatilization_time_constant_tau_f
+        definition_as_printed: tau_f = 1/j_1, volatilization from the lunar material with h ~ 1 cm
+        tau_f_as_printed:
+          1500 C: 0.65 Earth day
+          900 C: 5 Earth day
+          500 C: 25 Earth day
+          300 C: 300 yr
+        footnote_a_as_printed: Earth day.
+        elements_covered: Na and K (the volatile alkalis of the paper's argument); the table itself names no element
+        note: Model estimate from the authors' theory (Eq. 10 and following), not a measurement. The table prints no uncertainty or parameter values used.
+    - observation_id: nussinov_1975_fig4_k_pressure_dependence
+      type: figure_only
+      experiment: p-var-basalt-series-ref12
+      locator:
+        published_page: 380
+        pdf_page_index: 3
+        figure: '4'
+      units: caption verbatim; ordinate X_K2O/X_TiO2, abscissa P in torr; not digitized
+      values:
+        method_class: figure_only
+        quantity: residual_K2O_vs_background_pressure
+        cited_sources:
+        - '[12] Yakovlev, O. I.: 1974, candidate dissertation (geology and mineralogy), MGU, Moscow'
+        attribution: '[12] Yakovlev 1974'
+        series_as_printed: 1300 °C and 1500 °C, aluminiferous basalt and tholeitic basalt
+        caption: >-
+          Fig. 4. Volatility K from the melt of aluminiferous and tholeitic basalts in vacuum in the mode p = Var (T ≈ 1300 and 1500 °C) [12].
+    - observation_id: nussinov_1975_lunar_kinetic_regime_x0
+      type: author_estimate
+      locator:
+        published_page: 389
+        pdf_page_index: 12
+        section: 4. Peculiarities of Volatilization Process on the Moon
+      units: verbatim; X0 in percent and T in K as printed
+      values:
+        method_class: author_estimate
+        quantity: kinetic_regime_initial_concentration_bound
+        elements_covered: Na and K
+        X0_bound_as_printed: X0 ≤ 5%
+        temperature_bound_as_printed: T > 250–300 K
+        quote: >-
+          On the other hand, X0-value evaluated from the formula (25), with lunar material parameters determined in Figure 5 [8], shows that the kinetic regime of Na and K volatilization is observed with initial concentration X0 ≤ 5% at temperatures T > 250–300 K. Therefore, only rapid exponential growth of volatilization regime is observed on the lunar surface
+  Na:
+    observations: []
+    context:
+    - observation_id: nussinov_1975_fig1_lunar_material_kinetics
+      type: figure_only
+      locator:
+        published_page: 378
+        pdf_page_index: 1
+        figure: '1'
+      units: caption verbatim; ordinate X_infinity, abscissa tau in hours; not digitized
+      values:
+        method_class: figure_only
+        quantity: Na_K_volatility_kinetics_lunar_material
+        elements_covered: Na and K
+        temperature_C_as_printed: ≈1050
+        pressure_torr_as_printed: ~10^-6
+        cited_sources:
+        - '[8] Gibson, E. K. and Hubbard, N. J.: 1972, Geochim. Cosmochim. Acta, Suppl. 2, 3, 2003'
+        attribution: '[8] Gibson & Hubbard 1972'
+        caption: >-
+          Fig. 1. Volatility kinetics of Na and K from the melt of the lunar material in vacuum: (T ≈ 1050 °C; p ~ 10^-6 Torr) [8].
+    - observation_id: nussinov_1975_fig2_terrestrial_rock_kinetics
+      type: figure_only
+      locator:
+        published_page: 379
+        pdf_page_index: 2
+        figure: '2'
+      units: caption verbatim; ordinate X_infinity, abscissa t in hours; not digitized
+      values:
+        method_class: figure_only
+        quantity: Na_K_volatility_kinetics_terrestrial_rock
+        elements_covered: Na and K
+        panel_a_as_printed: T ≈ 1050 °C; p ~ 10^-6 Torr [13]
+        panel_b_as_printed: T ≃ 1150–1175 °C; p ~ 10^-4–10^-5 Torr [6, 7]
+        cited_sources:
+        - '[13] Storey, W. Ch.: 1973, Nature Phys. Sci. 241, 154'
+        - '[6] O''Hara, M. J., Biggar, G. M., and Richardson, S. W.: 1970, Science 167, 607'
+        - '[7] O''Hara, M. J., Biggar, G. M., Richardson, S. W., Ford, C. E., and Jamieson, B. G.: 1971, Geochim. Cosmochim. Acta, Suppl. 1, 1, 704'
+        attribution: '[13] Storey 1973 (panel a) | [6, 7] O''Hara et al. 1970, 1971 (panel b)'
+        caption: >-
+          Fig. 2. Volatility kinetics Na and K from the melt of the terrestrial rock in vacuum: (a) T ≈ 1050 °C; p ~ 10^-6 Torr [13], (b) T ≃ 1150–1175 °C; p ~ 10^-4–10^-5 Torr [6, 7].
+    - observation_id: nussinov_1975_kinetic_and_quasi_stationary_portions
+      type: qualifying_statement_context
+      locator:
+        published_page: 378
+        pdf_page_index: 1
+        section: 2. A Short Review of Experimental Data
+        note: Quote runs from p. 378 onto p. 379.
+      units: verbatim
+      values:
+        method_class: quoted_attributed
+        quantity: volatilization_kinetics_description
+        elements_covered: Na and K
+        cited_sources:
+        - '[6] O''Hara et al. 1970'
+        - '[7] O''Hara et al. 1971'
+        - '[8] Gibson & Hubbard 1972'
+        - '[13] Storey 1973'
+        attribution: '[6, 7, 8, 13]'
+        quote: >-
+          Figures 1 and 2 give the kinetics of the process of Na and K volatilization from melt of rock (and from lunar fines as well) [6, 7, 8, 13]. The so-called kinetic curve portion (a), where the component concentration exponentially decreases in time, is typical for all plots. The other portion with the practically constant concentration (b) is named 'quasi-stationary'. The characteristic time of volatilization for the latter portion is by orders much than for the former. Attention should be given to the two-step change of concentration K in the low-temperature experiment (1150–1175 °C) carried out by O'Hara [6, 7] (Figure 2b) the origin of which will be explained below.
+        note: '"by orders much than" is printed as is (word missing in the source).'
+    - observation_id: nussinov_1975_p_var_series_description
+      type: experiment_series
+      experiment: p-var-basalt-series-ref12
+      locator:
+        published_page: 379
+        pdf_page_index: 2
+        section: 2. A Short Review of Experimental Data
+        note: Quote runs from p. 379 onto p. 381 (p. 380 carries only Figs. 3 and 4).
+      units: verbatim; gamma dimensionless as printed
+      values:
+        method_class: quoted_attributed
+        quantity: pressure_dependence_of_residual_concentration
+        elements_covered: Si, Al, Fe, Mg, Ca, Na, K
+        gamma_Na_K_as_printed: ~10^-1
+        gamma_other_elements_as_printed: ~10^-2
+        cited_sources:
+        - '[12] Yakovlev, O. I.: 1974, candidate dissertation, MGU, Moscow'
+        attribution: '[12] Yakovlev 1974'
+        quote: >-
+          The analysis of pressure dependence for evaporation of the major elements (Si, Al, Fe, Mg, Ca, Na, K) in vacuum was fulfilled at Space Research Institute, Academy of Sciences, U.S.S.R. [12] in 'quasi-stationary' regime using two types of basalt. The typical results for the volatile Na and K are presented in Figures 3 and 4. The measurements of the chemical composition for residual glasses were carried out by the two independent techniques: micro X-ray spectral and chemical; the results obtained by these techniques were closely concordant. The concentration change is not observed up to some characteristic value of the pressure (p0); then with decreasing the pressure the concentration drops following the power law with constants γ ~ 10^-1 (for Na and K) and γ ~ 10^-2 for the other elements. Similar pressure dependences are typical for the adsorption processes [19, 20].
+    - observation_id: nussinov_1975_fig3_na_pressure_dependence
+      type: figure_only
+      experiment: p-var-basalt-series-ref12
+      locator:
+        published_page: 380
+        pdf_page_index: 3
+        figure: '3'
+      units: caption verbatim; ordinate X_Na2O/X_TiO2, abscissa P in torr; not digitized
+      values:
+        method_class: figure_only
+        quantity: residual_Na2O_vs_background_pressure
+        cited_sources:
+        - '[12] Yakovlev, O. I.: 1974, candidate dissertation, MGU, Moscow'
+        attribution: '[12] Yakovlev 1974'
+        series_as_printed: 1300 °C and 1500 °C, aluminiferous basalt and tholeitic basalt
+        caption: >-
+          Fig. 3. Volatility of Na from the melt of aluminiferous and tholeitic basalts in vacuum in the mode p = Var (T = 1300 and 1500 °C) [12].
+        note: The spelling "tholeitic" is kept as printed in the Fig. 3 and Fig. 4 captions and legends.
+    - observation_id: nussinov_1975_fig5_heats_of_process
+      type: figure_only
+      locator:
+        published_page: 381
+        pdf_page_index: 4
+        figure: '5'
+      units: kcal mole^-1 as printed (curve 3 prints "kcal mol^-1"); caption list transcribed, curves not digitized
+      values:
+        method_class: quoted_attributed
+        quantity: heat_of_process_psi_from_slope_T_above_T0
+        definition_as_printed: heat of the process psi defined by the slope in the region T > T0 (p. 381)
+        pressure_torr_as_printed: ~10^-6
+        mode_as_printed: T = Var
+        psi_kcal_mol_by_curve_as_printed:
+        - {curve: '1', Na: 7.2, K: 17.2, ref: '[11]'}
+        - {curve: '2', Na: 8.4, K: 7.6, ref: '[10]'}
+        - {curve: '3', Na: 5.3, K: 6.6, ref: '[36]'}
+        - {curve: 3', Na: 4.0, K: 6.4, ref: '[36]'}
+        - {curve: '4', Na: 5.2, K: 2.6, ref: '[8]'}
+        - {curve: '5', Na: 4.2, K: 2.4, ref: '[11]'}
+        - {curve: 5', Na: 3.2, K: 2.2, ref: '[11]'}
+        - {curve: '6', Na: 3.8, K: 1.44, ref: '[11]'}
+        - {curve: '7', Na: 0.74, K: 0.94, ref: '[11]'}
+        - {curve: '8', Na: 22.0, K: 8.4, ref: '[13]'}
+        cited_sources:
+        - '[8] Gibson, E. K. and Hubbard, N. J.: 1972, Geochim. Cosmochim. Acta, Suppl. 2, 3, 2003'
+        - '[10] Yakovlev, O. I., Kosolapov, A. I., Kuznetsov, A. V., and Nussinov, M. D.: 1972, DAN SSSR 206, No. 4'
+        - '[11] Yakovlev, O. I., Kosolapov, A. I., Kuznetsov, A. V., and Nussinov, M. D.: 1973, Vestnik MGU, Ser. Geol., No. 5, 6'
+        - '[13] Storey, W. Ch.: 1973, Nature Phys. Sci. 241, 154'
+        - '[36] Ozhegov, P. I., Glotov, V. A., et al.: 1973, Geokhimiya 8'
+        attribution: '[8] | [10] | [11] | [13] | [36]'
+        caption: >-
+          Fig. 5. Summary plot of the volatility dependence of Na and K in vacuum (p ~ 10^-6 Torr) from the melt of the terrestrial rock and minerals (including lunar material) in the mode T = Var.
+        note: Cyrillic references [10], [11], [36] are transliterated here; the printed reference list is in Russian. psi is the authors' slope parameter, not a vaporization enthalpy of a defined reaction; kept as printed.
+    - observation_id: nussinov_1975_fig6_heats_of_process
+      type: figure_only
+      locator:
+        published_page: 382
+        pdf_page_index: 5
+        figure: '6'
+      units: kcal mole^-1 as printed; caption values transcribed, curves not digitized
+      values:
+        method_class: quoted_attributed
+        quantity: heat_of_process_psi_from_slope_T_above_T0
+        pressure_torr_as_printed: ~10^-6
+        mode_as_printed: T = Var
+        psi_kcal_mol:
+          K: 31.2
+          Na: 21.6
+          Fe: 5.0
+          Si: 5.14
+        cited_sources:
+        - '[10] Yakovlev, O. I., Kosolapov, A. I., Kuznetsov, A. V., and Nussinov, M. D.: 1972, DAN SSSR 206, No. 4'
+        attribution: '[10] Yakovlev et al. 1972'
+        caption: >-
+          Fig. 6. Na, K, Si, and Fe volatility from the melt of the basalt in vacuum (p ~ 10^-6 Torr) in the mode T = Var [10].
+        note: Fig. 5 curve 2, also attributed to [10], prints psi_Na = 8.4 and psi_K = 7.6; both are kept as printed and not reconciled.
+    - observation_id: nussinov_1975_model_parameters_cited
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+        section: 3. Elements of the Theory for Evaporation of Multicomponent Solution in Vacuum in the Presence of Chemical Transformations
+        note: A_Na on p. 384; q_v on p. 387; Q and L on p. 388; Delta E on p. 390.
+      units: kcal mole^-1 as printed
+      values:
+        method_class: quoted_attributed
+        quantity: cited_model_parameter_magnitudes
+        A_Na_as_printed: ~10–20 kcal mole^-1 [21, 24]
+        q_v_heat_of_adsorption_as_printed: ~1 kcal mole^-1 [19, 20]
+        Q_activation_energy_of_oxidation_as_printed: ~1 kcal mole^-1 [27]
+        L_heat_of_evaporation_pure_Na_as_printed: L ≃ 25 kcal mole^-1 for Na [28]
+        Delta_E_diffusion_activation_as_printed: 1.0–10^2 kcal mole^-1 [27]
+        attribution: '[19, 20] | [21, 24] | [27] | [28]'
+        note: Order-of-magnitude parameter values quoted by the authors from textbooks to support the model; not measurements.
+    - observation_id: nussinov_1975_laboratory_simulation_pressures
+      type: laboratory_conditions
+      locator:
+        published_page: 390
+        pdf_page_index: 13
+        section: 5. Laboratory Simulation of Volatilization Processes
+        note: Recommendations are repeated in Conclusion (9), p. 393.
+      units: torr and l s^-1 as printed
+      values:
+        method_class: author_estimate
+        quantity: recommended_simulation_pressures
+        lunar_vacuum_as_printed: p ~ 10^-10–10^-12 Torr
+        recommended_kinetic_mode_pressure_as_printed: p ~ 10^-3–10^-7 Torr (if p_O2 << p)
+        recommended_pO2_estimation_pressure_as_printed: 10^-12–10^-13 Torr
+        pumping_speed_as_printed: S ~ 10^5–10^7 l s^-1
+        quote: >-
+          The principal mode of the laboratory simulation in the present paper was the p = Var mode. The pressure range recommended for study of the kinetic volatility mode, p ~ 10^-3–10^-7 Torr (if p_O2 << p). For the reliable experimental estimation p_O2 in lunar atmosphere to the moment of the surface substance consolidation the recommended pressure region 10^-12–10^-13 Torr, though it deals with much technical difficulties (needed pumping speeds S ~ 10^5–10^7 l s^-1).
+        inert_gas_option_quote: >-
+          Another possibility to avoid oxidizing process is to substitute the background gas with an inert gas instead of lowering p. Pressure in simulation studies is determined in this case by the requirement that Z << 1.
+        note: The main quote is Conclusion (9), p. 393; the inert-gas quote is p. 390.
+    - observation_id: nussinov_1975_residual_gas_oxidation_mechanism
+      type: qualifying_statement_context
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+        section: 3. Elements of the Theory for Evaporation of Multicomponent Solution in Vacuum in the Presence of Chemical Transformations
+      units: verbatim
+      values:
+        method_class: quoted_unattributed
+        quantity: background_gas_effect_mechanism
+        quote: >-
+          Obviously, the molecular mechanism of K12-dependence on p (and on T) can be described as follows: oxygen is adsorbed from the background gas on the surface of the melt and oxidizes some of the atoms emerged on the surface from the volatile component, thus transforming them into the non-volatile state.
+    - observation_id: nussinov_1975_equation_01
+      type: thermodynamic_example
+      locator:
+        published_page: 383
+        pdf_page_index: 6
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 1
+        equation_as_printed: "X = X_1 + X_2"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_02
+      type: thermodynamic_example
+      locator:
+        published_page: 383
+        pdf_page_index: 6
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 2
+        equation_as_printed: "dX_1/dt = −j↑ + j↓ + K_21 X_2 − K_12 X_1"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_03
+      type: thermodynamic_example
+      locator:
+        published_page: 383
+        pdf_page_index: 6
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 3
+        equation_as_printed: "dX_2/dt = −K_21 X_2 + K_12 X_1"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_04
+      type: thermodynamic_example
+      locator:
+        published_page: 383
+        pdf_page_index: 6
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 4
+        equation_as_printed: "j↓ = Z(p) j↑"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_05
+      type: thermodynamic_example
+      locator:
+        published_page: 383
+        pdf_page_index: 6
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 5
+        equation_as_printed: "Z ≪ 1"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_06
+      type: thermodynamic_example
+      locator:
+        published_page: 383
+        pdf_page_index: 6
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 6
+        equation_as_printed: "−j↑ + j↓ = −j↑(1−Z)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_07
+      type: thermodynamic_example
+      locator:
+        published_page: 383
+        pdf_page_index: 6
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 7
+        equation_as_printed: "j↑ = (α_v/h) p_1(T)/(2πmkT)^(1/2)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_08
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 8
+        equation_as_printed: "p_1(T) = p̄_1(T) X̄_1 exp[A(1−X̄_1)^2/(RT)]"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_09
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 9
+        equation_as_printed: "p_1(T) = exp(A/RT) (μ/ρ) p̄_1(T) X_1 exp[−(2Aμ/(RρT))X_1]"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_10
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 10
+        equation_as_printed: "(1−Z)(α_v/h)(2πmkT)^(−1/2) exp(A/RT)(μ/ρ)p̄_1(T) = j_1(T,p)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_11
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 11
+        equation_as_printed: "j↓ − j↑ = −j_1 X_1 exp(−βX_1); β = 2Aμ/(RTρ)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_12
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 12
+        equation_as_printed: "dX_1/dt = −(j_1+K_12)X_1 + K_21 X_2"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_13
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 13
+        equation_as_printed: "dX_2/dt = −K_21 X_2 + K_12 X_1"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_14
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 14
+        equation_as_printed: "X_i = Σ_(j=1)^2 a_ij exp(−λ_j t), i,j = 1,2; a_ij = const; λ_(1,2) = (K_12+K_21+j_1)/2 ± sqrt[(K_12+K_21+j_1)^2/2 − j_1 K_21]"
+        note: "The printed discriminant denominator is 2; retained without changing it to 4."
+    - observation_id: nussinov_1975_equation_15
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 15
+        equation_as_printed: "λ_2 ≪ λ_1"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_16
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 16
+        equation_as_printed: "K_21 ≪ j_1 + K_12"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_17
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 17
+        equation_as_printed: "X_0 ≫ X_∞"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_18
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 18
+        equation_as_printed: "X_0 ≈ X_10 ≫ X_20; X_10 + X_20 = X_0"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_19
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 19
+        equation_as_printed: "dX_1/dt = −j_1 X_1 exp(−βX_1) − K_12 X_1"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_20
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 20
+        equation_as_printed: "dX_2/dt = K_12 X_1"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_21
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 21
+        equation_as_printed: "∫_(X_10)^(X_1(t)) dX/[X(exp(−βX)+K_12/j_1)] = −j_1 t"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_22
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 22
+        equation_as_printed: "X_2(t) = X_20 + K_12 ∫_0^t X_1(t) dt"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_23
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 23
+        equation_as_printed: "E_i^*(βX_1) − E_i^*(βX_10) = −j_1 t"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_24
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 24
+        equation_as_printed: "E_i^*(Z) = ∫_Z^∞ [exp(−u)/u] du [26]"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_25
+      type: thermodynamic_example
+      locator:
+        published_page: 386
+        pdf_page_index: 9
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 25
+        equation_as_printed: "(2Aμ/(RTρ))X_10 ≡ U_0 ≳ 5"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_26
+      type: thermodynamic_example
+      locator:
+        published_page: 386
+        pdf_page_index: 9
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 26
+        equation_as_printed: "X_1(t) = X_10 exp[−(j_1+K_12)t]"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_27
+      type: thermodynamic_example
+      locator:
+        published_page: 386
+        pdf_page_index: 9
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 27
+        equation_as_printed: "X_∞ = X_2(∞) = X_20 + ∫_0^∞ K_12 X_10 exp[−(j_1+K_12)t]"
+        note: "The printed integral has no differential dt; retained as printed."
+    - observation_id: nussinov_1975_equation_28
+      type: thermodynamic_example
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 28
+        equation_as_printed: "X_∞ = X_20 + X_10 K_12/(j_1+K_12)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_29
+      type: thermodynamic_example
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 29
+        equation_as_printed: "X_∞ = K_12 X_10/(j_1+K_12)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_30
+      type: thermodynamic_example
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 30
+        equation_as_printed: "j_1 ∼ α_v(p)[1−Z(p)]"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_31
+      type: thermodynamic_example
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 31
+        equation_as_printed: "j_1(p_0) = K_12(p_0)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_32
+      type: thermodynamic_example
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 32
+        equation_as_printed: "n(p) = n_0 p^γ exp(q_v/(RT))"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_33
+      type: thermodynamic_example
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 33
+        equation_as_printed: "K_12 ∼ n(p)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_34
+      type: thermodynamic_example
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 34
+        equation_as_printed: "K_12 ∼ n(p) exp(−Q/(RT))"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_35
+      type: thermodynamic_example
+      locator:
+        published_page: 388
+        pdf_page_index: 11
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 35
+        equation_as_printed: "K_12 = a exp[−(Q−q_v)/(RT)], a ≈ const"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_36
+      type: thermodynamic_example
+      locator:
+        published_page: 388
+        pdf_page_index: 11
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 36
+        equation_as_printed: "j_1 = b exp[−(L−A)/(RT)], b = const"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_37
+      type: thermodynamic_example
+      locator:
+        published_page: 388
+        pdf_page_index: 11
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 37
+        equation_as_printed: "X_∞ ≃ X_10 a exp[−(Q−q_v)/(RT)]/{b exp[−(L−A)/(RT)]+a exp[−(Q−q_v)/(RT)]}"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_38
+      type: thermodynamic_example
+      locator:
+        published_page: 388
+        pdf_page_index: 11
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 38
+        equation_as_printed: "X_∞ ≃ X_10(a/b) exp[(L−A−Q+q_v)/(RT)]"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_39
+      type: thermodynamic_example
+      locator:
+        published_page: 388
+        pdf_page_index: 11
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 39
+        equation_as_printed: "j(T_0) = K_12(T_0)"
+        note: "The print uses j without subscript 1; retained."
+    - observation_id: nussinov_1975_equation_40
+      type: thermodynamic_example
+      locator:
+        published_page: 388
+        pdf_page_index: 11
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 40
+        equation_as_printed: "T_0 = (1/R)(L−A−Q+q_v)/ln(a/b)"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_41
+      type: thermodynamic_example
+      locator:
+        published_page: 389
+        pdf_page_index: 12
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 41
+        equation_as_printed: "X_∞ = X_0 exp(−j_1 t)"
+        note: "The printed left side is X_∞ although the right side varies with t; retained without replacing it by X(t)."
+    - observation_id: nussinov_1975_equation_42
+      type: thermodynamic_example
+      locator:
+        published_page: 389
+        pdf_page_index: 12
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 42
+        equation_as_printed: "τ_d ≈ h^2/D"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_43
+      type: thermodynamic_example
+      locator:
+        published_page: 389
+        pdf_page_index: 12
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 43
+        equation_as_printed: "h = (D j_0)^(1/3)"
+        note: "The cube root contains the product D j_0, not D/j_0. This is the printed model expression, not a corrected diffusion model."
+    - observation_id: nussinov_1975_equation_44
+      type: thermodynamic_example
+      locator:
+        published_page: 389
+        pdf_page_index: 12
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 44
+        equation_as_printed: "h ∼ exp[−(L+ΔE−A)/(3RT)]"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_equation_45
+      type: thermodynamic_example
+      locator:
+        published_page: 392
+        pdf_page_index: 15
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_theory_equation"
+        equation_number: 45
+        equation_as_printed: "d_max = π^2 σ/(v_0^2 ρ) [34]"
+        note: "Author theory relation; not measured, not implemented or independently corrected."
+    - observation_id: nussinov_1975_regime_definitions
+      type: thermodynamic_example
+      locator:
+        published_page: 382
+        pdf_page_index: 5
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "Two pressure regions p ≷ p_0 and two temperature regions T ≷ T_0 are defined by the relationship between rates of volatilization and transition into the non-volatile state. A two-component reduction treats one volatile component separately because element evaporation rates differ."
+    - observation_id: nussinov_1975_model_definitions
+      type: thermodynamic_example
+      locator:
+        published_page: 383
+        pdf_page_index: 6
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "X_1 and X_2 are concentrations per cm^3 of volatile and non-volatile states; X is their sum. K_12 and K_21 describe interconversion; j↑ and j↓ are outward and inward flux terms. Solvent evaporation is neglected for times τ_f not too large; small volume permits τ_tr ≪ τ_f, so transport is not limiting. Low-concentration components are treated independently as regular solutions, X̄_1 ≪ 1. h = V/S is specific depth (volume/free-surface area); α_v(p) is evaporation coefficient; m is mass of the released molecule/atom; k is Boltzmann constant."
+    - observation_id: nussinov_1975_solution_pressure_definitions
+      type: thermodynamic_example
+      locator:
+        published_page: 384
+        pdf_page_index: 7
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "ΔH = A X̄_1(1−X̄_1), A = const [21,24]. In (8), p̄_1(T) is vapor pressure of pure evaporated material at the same temperature; R is gas constant per mole. No additional solid/liquid standard-phase convention is printed. X̄_1 is volatile-state mole fraction, not total elemental X. X̄_1 = (μ/ρ)X_1; μ and ρ are solvent molar weight and density. For X̄_1 ≪ 1, (1−X̄_1)^2 ≃ 1−2X̄_1. At t → ∞, βX_1 ≪ 1 permits (12)–(13). K_21 ≪ j_1+K_12 means negligible reverse transformation."
+    - observation_id: nussinov_1975_initial_partition_and_reductions
+      type: thermodynamic_example
+      locator:
+        published_page: 385
+        pdf_page_index: 8
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "X_10 and X_20 are initial volatile/non-volatile concentrations, X_10+X_20=X_0. Observed X_0 ≫ X_∞ implies X_0 ≈ X_10 ≫ X_20; if X_0 ∼ X_∞, most material is initially non-volatile. Conditions (16) and (18) allow neglect of K_21X_2 in (19)–(20). Neglecting K_12/j_1 in (21) yields the qualitative X_1 solution (23)."
+    - observation_id: nussinov_1975_dimensionless_curve_and_linearization
+      type: thermodynamic_example
+      locator:
+        published_page: 386
+        pdf_page_index: 9
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "U = βX_1(t), τ = j_1t, U_0 = βX_10; time origin is shifted by E_i^*(βX_10) for Figure 7 (model curves, not digitized). U_0 ≳ 5 gives a two-step fall, while (2Aμ/(ρRT))X_10 < 1 gives immediate exponential kinetics. For U_0 < 1, exp(−βX) ≈ 1 and (19) becomes linear. X_1(∞)=0."
+    - observation_id: nussinov_1975_pressure_and_adsorption_limits
+      type: thermodynamic_example
+      locator:
+        published_page: 387
+        pdf_page_index: 10
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "Assume X_20 ≈ 0 in (29). At high vacuum α_v → 1, Z → 0 [17,18,22,23]. j_1 ≫ K_12 for p ≪ p_0; j_1 ≪ K_12 for p > p_0. K_12 ∼ p^γ, γ = const. n(p) is concentration of molecules/atoms adsorbed from residual atmosphere; q_v is adsorption heat. The oxygen mechanism is usually a binary reaction with activation energy Q."
+    - observation_id: nussinov_1975_temperature_and_pressure_limits
+      type: thermodynamic_example
+      locator:
+        published_page: 388
+        pdf_page_index: 11
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "L is pure-component evaporation heat. The exponential dependence for T > T_0 requires K_12 ≪ j_1; T < T_0 gives j_1 ≪ K_12. L−A > Q−q_v; at low T, X_1 → X_2 and X_∞ ≈ X_10 ≈ X_0, whereas at high T evaporation dominates, X_∞ ≃ (K_12/j_1)X_0 ≪ X_0. Above alkali-metal-oxide dissociation temperatures the print says K_12 will differ from 0; retained. At p ≫ p_0 the adsorbed-layer thickness is constant, K_12 and α_v are pressure-independent, but Z(p) ∼ 1 depends strongly on pressure."
+    - observation_id: nussinov_1975_lunar_transport_definitions
+      type: thermodynamic_example
+      locator:
+        published_page: 389
+        pdf_page_index: 12
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "K_12 = 0 in lunar ultra-high vacuum; X_∞ approaches 0 at substantially large volatilization time constants. Surface transport is assumed not limiting in a sufficiently thin layer h. For liquid convection-diffusion h was taken as total melt depth; solid sublimation/pure diffusion gives the thinnest layer. D is diffusion coefficient; j_1 = j_0/h, τ_f = 1/j_1, D = D_0 exp(−ΔE/(RT)), j_0 ∼ exp[−(L−A)/(RT)]. ΔE is diffusion activation energy. Footnote: volatilization in lunar-soil heating [8], Figure 1, indicates almost no oxygen in the lunar atmosphere when the material was melted."
+    - observation_id: nussinov_1975_simulation_conditions
+      type: thermodynamic_example
+      locator:
+        published_page: 390
+        pdf_page_index: 13
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "Kinetic simulation requires j_1 ≫ K_12, p ≪ p_0, α_v → 1 and Z → 0. For low-volatility elements γ ∼ 10^−2 in (32), a less stringent p ≲ p_0 is allowed. Inert background gas may avoid oxidation but still requires Z ≪ 1."
+    - observation_id: nussinov_1975_impact_and_simulation_relations
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "Thin subsurface layers require T > T_0; transfer mechanisms require a wide temperature range T ≷ T_0. For impact melt, τ_s ≪ τ_f. Behind a shock, ε ∼ u^2/2; melting requires ε ≫ ε_m, hence u > sqrt(2ε_m). D_p is diameter of melted crater part (pits); D_s is crater/crushing-zone diameter. ν is viscosity and ρ liquid density. Boundary-layer estimates neglect downstream solidification and are estimates because outer layers are ejected."
+    - observation_id: nussinov_1975_drop_and_time_regime_definitions
+      type: thermodynamic_example
+      locator:
+        published_page: 392
+        pdf_page_index: 15
+      units: "printed mathematical notation; symbolic theory, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "theory_definitions_assumptions"
+        text_as_printed_or_paraphrased: "v_0 is characteristic velocity of internal droplet motion, σ surface tension, ρ liquid density. Solidification time in vacuum τ_s ∼ d_max; smaller particles solidify sooner. Three concentration-time regimes are slow, quasi-stationary volatility, and fast exponential (kinetic). p_0 and T_0 represent approximate equality of volatilization and non-volatile-state transformation rates. The kinetic-temperature coefficient combines L, A, q_v and Q; individual melt-composition effects are governed by A."
+    - observation_id: nussinov_1975_text_number_N01
+      type: thermodynamic_example
+      locator:
+        published_page: 386
+        pdf_page_index: 9
+      units: "h"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "τ_f ∼ 1 h"
+        note: "Generic large quasi-stationary time constant before (26); not the duration of cited experiment [12]."
+    - observation_id: nussinov_1975_text_number_N02
+      type: thermodynamic_example
+      locator:
+        published_page: 390
+        pdf_page_index: 13
+      units: "orders of magnitude"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "Pressure allowance of 2–3 orders is sufficient"
+        note: "Simulation recommendation; not measured pressure."
+    - observation_id: nussinov_1975_text_number_N03
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "K"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "Extreme impact temperatures 10^4–10^6 K"
+        note: "Small target fraction evaporated at these extreme temperatures; all substance volatilized there."
+    - observation_id: nussinov_1975_text_number_N04
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "mm"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "Liquid drops to ∼1 mm"
+        note: "Impact-melt droplets or thin layers on crater walls."
+    - observation_id: nussinov_1975_text_number_N05
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "erg g^-1"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "ε_m ∼ 5 × 10^9 erg g^−1 [30]"
+        note: "Melting specific energy [30]."
+    - observation_id: nussinov_1975_text_number_N06
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "cm s^-1"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "u ∼ 10^5 cm s^−1"
+        note: "Order-of-magnitude velocity behind shock."
+    - observation_id: nussinov_1975_text_number_N07
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "dimensionless diameter ratio"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "D_p ∼ (1/5)D_s [31]"
+        note: "Melted pits diameter relative to crater diameter."
+    - observation_id: nussinov_1975_text_number_N08
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "dimensionless diameter ratio"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "Assume D_s/D_p ≈ 10"
+        note: "Calculation assumption differs from preceding quoted 1/5 relation; both retained."
+    - observation_id: nussinov_1975_text_number_N09
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "ps (as printed)"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "ν ∼ 10^3 ps [32]"
+        note: "Print uses ps for viscosity; no SI conversion or interpretation as a time unit."
+    - observation_id: nussinov_1975_text_number_N10
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "g cm^-3"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "ρ ≃ 2–3 g cm^−3 [32]"
+        note: "Liquid-density estimate."
+    - observation_id: nussinov_1975_text_number_N11
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "mm and dimensionless Reynolds number"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "For D_s > 1 mm, Re ≫ 1"
+        note: "Threshold for boundary-layer flow."
+    - observation_id: nussinov_1975_text_number_N12
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "cm as printed"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "δ_0 = D_p/sqrt(Re) = 10^−2 sqrt(D_s) cm (cf. [33])"
+        note: "Printed boundary-layer thickness relation; no unstated dimension convention added."
+    - observation_id: nussinov_1975_text_number_N13
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "m"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "D_s = 100 m"
+        note: "First extreme crater-size example."
+    - observation_id: nussinov_1975_text_number_N14
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "cm"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "D_s = 10 cm"
+        note: "Second extreme crater-size example."
+    - observation_id: nussinov_1975_text_number_N15
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "cm"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "δ_0 = 1.0 cm"
+        note: "First size example, D_s=100 m."
+    - observation_id: nussinov_1975_text_number_N16
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "mm"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "δ_0 = 0.3 mm"
+        note: "Second size example, D_s=10 cm."
+    - observation_id: nussinov_1975_text_number_N17
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "mm"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "A layer 0.3 mm thick will not flow down along rough soil"
+        note: "Separate printed repetition and physical consequence."
+    - observation_id: nussinov_1975_text_number_N18
+      type: thermodynamic_example
+      locator:
+        published_page: 391
+        pdf_page_index: 14
+      units: "cm and m"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "A δ_0 = 1 cm layer in a 100-meter crater could form a puddle only about 30 cm deep"
+        note: "Estimate neglects downstream solidification; outer boundary layer is ejected."
+    - observation_id: nussinov_1975_text_number_N19
+      type: thermodynamic_example
+      locator:
+        published_page: 392
+        pdf_page_index: 15
+      units: "cm s^-1"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "Assume v_0 ≃ 10^2 cm s^−1"
+        note: "Internal droplet velocity for (45)."
+    - observation_id: nussinov_1975_text_number_N20
+      type: thermodynamic_example
+      locator:
+        published_page: 392
+        pdf_page_index: 15
+      units: "dyne cm^-1"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "σ = 3 × 10^2 dyne cm^−1 [32]"
+        note: "Liquid surface tension."
+    - observation_id: nussinov_1975_text_number_N21
+      type: thermodynamic_example
+      locator:
+        published_page: 392
+        pdf_page_index: 15
+      units: "g cm^-3"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "ρ ≃ 3 g cm^−3"
+        note: "Density for (45)."
+    - observation_id: nussinov_1975_text_number_N22
+      type: thermodynamic_example
+      locator:
+        published_page: 392
+        pdf_page_index: 15
+      units: "cm and mm"
+      values:
+        method_class: "author_estimate"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "d_max = (10^3/10^4) × (3/3) ≃ 10^−1 cm ≃ 1 mm"
+        note: "The two 3 factors are crossed out in the printed substitution; retained here with cancellation noted."
+    - observation_id: nussinov_1975_text_number_N23
+      type: thermodynamic_example
+      locator:
+        published_page: 392
+        pdf_page_index: 15
+      units: "s and mm"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "τ_s ≃ 2 s for d ≃ 1 mm [35]"
+        note: "Direct solidification computation quoted from [35]; smaller particles have smaller times."
+    - observation_id: nussinov_1975_text_number_N24
+      type: thermodynamic_example
+      locator:
+        published_page: 392
+        pdf_page_index: 15
+      units: "s"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_model_or_quoted_text_number"
+        statement_as_printed: "τ_f ∼ 10^2–10^3 s [6–14]"
+        note: "Volatility time estimate compared with solidification time; not an individual reported run duration."

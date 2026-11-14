@@ -262,7 +262,7 @@ species:
           derivation:
             relation: difference_between_melt_and_crystal_relative_enthalpies_at_fusion_temperature
             inputs: [zigo_1987_t3_crystal_relative_enthalpy_fit, zigo_1987_t4_melt_relative_enthalpy_fit]
-            locator: {page: 179, pdf_page_index: 9, equation: '7'}
+            locator: {page: 9, published_page: 179, pdf_page_index: 8, equation: '7'}
         uncertainty: {reported_status: printed, value_kJ_mol-1: 6.0, note: 'Combined from the 2.9 and 5.2 kJ mol−1 relative-enthalpy errors by Gauss law of error propagation.'}
 
       - observation_id: zigo_1987_fusion_entropy_at_1863K
@@ -283,7 +283,7 @@ species:
           derivation:
             relation: fusion_enthalpy_divided_by_fusion_temperature
             inputs: [zigo_1987_fusion_enthalpy_at_1863K, zigo_1987_fusion_temperature_selected]
-            locator: {page: 179, pdf_page_index: 9, equation: '8'}
+            locator: {page: 9, published_page: 179, pdf_page_index: 8, equation: '8'}
         uncertainty: {reported_status: printed, value_J_mol-1_K-1: 3.2}
 
       - observation_id: zigo_1987_fusion_temperature_sensitivity
@@ -299,7 +299,7 @@ species:
           derivation:
             relation: heat_of_fusion_recalculated_at_literature_temperature_limits
             inputs: [zigo_1987_t3_crystal_relative_enthalpy_fit, zigo_1987_t4_melt_relative_enthalpy_fit, zigo_1987_fusion_temperature_selected]
-            locator: {page: 180, pdf_page_index: 10, paragraph: 'fusion temperature uncertainty'}
+            locator: {page: 10, published_page: 180, pdf_page_index: 9, paragraph: 'fusion temperature uncertainty'}
           points:
             - {T_fus_K: 1857, delta_H_fus_kJ_mol-1: 171.1, uncertainty_kJ_mol-1: 6.0}
             - {T_fus_K: 1866, delta_H_fus_kJ_mol-1: 172.6, uncertainty_kJ_mol-1: 6.0}

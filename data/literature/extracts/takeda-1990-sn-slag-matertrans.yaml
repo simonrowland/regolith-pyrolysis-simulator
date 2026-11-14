@@ -13,227 +13,436 @@ extraction:
   provenance_path: tables/takeda-1990-sn-slag-matertrans/provenance.md
 review_status: draft
 experiments:
-- experiment_id: takeda_1990_table1_gamma_summary
-  method: tabulation
-  method_as_printed: reported and compared activity-coefficient ranges
-  locator:
-    published_page: 794
-    pdf_page_index: 1
-    table: '1'
-  sample:
-    form:
-      state:
-        tag: value
-        value: literature comparison values and this study summary
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-    printed_composition:
-      state:
-        tag: unknown
-        reason: heterogeneous composition ranges as reported per source
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-- experiment_id: takeda_1990_reference_cell
-  method: emf_cell
-  method_as_printed: oxygen concentration cell; Sn-SnO reference equilibrium
-  locator:
-    published_page: 795
-    pdf_page_index: 2
-    table: '2'
-  sample:
-    form:
-      state:
-        tag: value
-        value: SnO plus Sn metal
-      locator:
-        published_page: 795
-        pdf_page_index: 2
-        table: '2'
-    container:
-      state:
-        tag: value
-        value: magnesia crucible
-      locator:
-        published_page: 795
-        pdf_page_index: 2
-        table: '2'
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: varies by test; 1366–1573 K in Table 2
-      locator:
-        published_page: 795
-        pdf_page_index: 2
-        table: '2'
-  pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 795, pdf_page_index: 2, section: Reference-cell measurement}
-    sweep_gas:
-      state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
-      locator: {published_page: 795, pdf_page_index: 2, section: Reference-cell measurement, note: 'Argon flow is printed; no numerical flow or background pressure is stated.'}
-    regime: {regime_class: {tag: unknown, reason: not_published}}
-- experiment_id: takeda_1990_iron_crucible_runs
-  method: emf_cell
-  method_as_printed: oxygen concentration cell; slag-metal equilibrium
-  locator:
-    published_page: 796
-    pdf_page_index: 3
-    table: '3'
-  sample:
-    form:
-      state:
-        tag: value
-        value: liquid Sn-Fe metal equilibrated with FeOx-CaO-SiO2 slag
-      locator:
-        published_page: 796
-        pdf_page_index: 3
-        table: '3'
-    container:
-      state:
-        tag: value
-        value: iron crucible
-      locator:
-        published_page: 793
-        pdf_page_index: 0
-        section: Experimental
-    printed_composition:
-      state:
-        tag: value
-        value: per-test slag and metal mass percentages in Table 3
-      locator:
-        published_page: 796
-        pdf_page_index: 3
-        table: '3'
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: 1573 K and 1673 K test rows; see Table 3
-      locator:
-        published_page: 796
-        pdf_page_index: 3
-        table: '3'
-  pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 793, pdf_page_index: 0, section: Experimental}
-    sweep_gas:
-      state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
-      locator: {published_page: 793, pdf_page_index: 0, section: Experimental, note: 'Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.'}
-    regime: {regime_class: {tag: unknown, reason: not_published}}
-- experiment_id: takeda_1990_magnesia_1573_runs
-  method: emf_cell
-  method_as_printed: oxygen concentration cell; slag-metal equilibrium
-  locator:
-    published_page: 796
-    pdf_page_index: 3
-    table: '4'
-  sample:
-    form:
-      state:
-        tag: value
-        value: Sn-Fe metal and FeOx-CaO-SiO2 slag
-      locator:
-        published_page: 796
-        pdf_page_index: 3
-        table: '4'
-    container:
-      state:
-        tag: value
-        value: magnesia crucible
-      locator:
-        published_page: 796
-        pdf_page_index: 3
-        table: '4'
-    printed_composition:
-      state:
-        tag: value
-        value: per-test slag mass percentages in Tables 4 and 6
-      locator:
-        published_page: 796
-        pdf_page_index: 3
-        table: '4'
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: 1573
-      locator:
-        published_page: 796
-        pdf_page_index: 3
-        table: '4'
-  pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 793, pdf_page_index: 0, section: Experimental}
-    sweep_gas:
-      state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
-      locator: {published_page: 793, pdf_page_index: 0, section: Experimental, note: 'Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.'}
-    regime: {regime_class: {tag: unknown, reason: not_published}}
-- experiment_id: takeda_1990_magnesia_1473_runs
-  method: emf_cell
-  method_as_printed: oxygen concentration cell; slag-metal equilibrium
-  locator:
-    published_page: 797
-    pdf_page_index: 4
-    table: '5'
-  sample:
-    form:
-      state:
-        tag: value
-        value: Sn-Fe metal and silica-free FeOx-CaO slag
-      locator:
-        published_page: 797
-        pdf_page_index: 4
-        table: '5'
-    container:
-      state:
-        tag: value
-        value: magnesia crucible
-      locator:
-        published_page: 797
-        pdf_page_index: 4
-        table: '5'
-    printed_composition:
-      state:
-        tag: value
-        value: per-test slag and metal values in Table 5
-      locator:
-        published_page: 797
-        pdf_page_index: 4
-        table: '5'
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: 1473
-      locator:
-        published_page: 797
-        pdf_page_index: 4
-        table: '5'
-  pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 793, pdf_page_index: 0, section: Experimental}
-    sweep_gas:
-      state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
-      locator: {published_page: 793, pdf_page_index: 0, section: Experimental, note: 'Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.'}
-    regime: {regime_class: {tag: unknown, reason: not_published}}
+  - experiment_id: takeda_1990_table1_gamma_summary
+    method: tabulation
+    method_as_printed: reported and compared activity-coefficient ranges
+    locator:
+      published_page: 794
+      pdf_page_index: 1
+      page: 2
+      table: '1'
+    sample:
+      form:
+        state:
+          tag: value
+          value: literature comparison values and this study summary
+        locator:
+          published_page: 794
+          pdf_page_index: 1
+          page: 2
+          table: '1'
+      printed_composition:
+        state:
+          tag: unknown
+          reason: heterogeneous composition ranges as reported per source
+        locator:
+          published_page: 794
+          pdf_page_index: 1
+          page: 2
+          table: '1'
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 794
+          table: '1'
+          note: Table 1 reports no chamber or system total pressure for its activity-coefficient rows.
+      sweep_gas:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 794
+          table: '1'
+          note: Table 1 provides no carrier-gas or flow data for the compiled activity-coefficient values.
+      regime:
+        regime_class:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 794
+          table: '1'
+          note: Table 1 provides no flow-regime information for the compiled activity-coefficient values.
+  - experiment_id: takeda_1990_reference_cell
+    method: emf_cell
+    method_as_printed: oxygen concentration cell; Sn-SnO reference equilibrium
+    locator:
+      published_page: 795
+      pdf_page_index: 2
+      page: 3
+      table: '2'
+    sample:
+      form:
+        state:
+          tag: value
+          value: SnO plus Sn metal
+        locator:
+          published_page: 795
+          pdf_page_index: 2
+          page: 3
+          table: '2'
+      container:
+        state:
+          tag: value
+          value: magnesia crucible
+        locator:
+          published_page: 795
+          pdf_page_index: 2
+          page: 3
+          table: '2'
+    conditions:
+      temperature_K:
+        state:
+          tag: unknown
+          reason: varies by test; 1366–1573 K in Table 2
+        locator:
+          published_page: 795
+          pdf_page_index: 2
+          page: 3
+          table: '2'
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 795
+          pdf_page_index: 2
+          section: Reference-cell measurement
+      sweep_gas:
+        state:
+          tag: value
+          value:
+            species: Ar
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+        locator:
+          published_page: 795
+          pdf_page_index: 2
+          section: Reference-cell measurement
+          note: Argon flow is printed; no numerical flow or background pressure is stated.
+      regime:
+        regime_class:
+          tag: unknown
+          reason: not_published
+  - experiment_id: takeda_1990_iron_crucible_runs
+    method: emf_cell
+    method_as_printed: oxygen concentration cell; slag-metal equilibrium
+    locator:
+      published_page: 796
+      pdf_page_index: 3
+      page: 4
+      table: '3'
+    sample:
+      form:
+        state:
+          tag: value
+          value: liquid Sn-Fe metal equilibrated with FeOx-CaO-SiO2 slag
+        locator:
+          published_page: 796
+          pdf_page_index: 3
+          page: 4
+          table: '3'
+      container:
+        state:
+          tag: value
+          value: iron crucible
+        locator:
+          published_page: 793
+          pdf_page_index: 0
+          page: 1
+          section: Experimental
+      printed_composition:
+        state:
+          tag: value
+          value: per-test slag and metal mass percentages in Table 3
+        locator:
+          published_page: 796
+          pdf_page_index: 3
+          page: 4
+          table: '3'
+    conditions:
+      temperature_K:
+        state:
+          tag: unknown
+          reason: 1573 K and 1673 K test rows; see Table 3
+        locator:
+          published_page: 796
+          pdf_page_index: 3
+          page: 4
+          table: '3'
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 793
+          pdf_page_index: 0
+          section: Experimental
+      sweep_gas:
+        state:
+          tag: value
+          value:
+            species: Ar
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+        locator:
+          published_page: 793
+          pdf_page_index: 0
+          section: Experimental
+          note: Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.
+      regime:
+        regime_class:
+          tag: unknown
+          reason: not_published
+  - experiment_id: takeda_1990_magnesia_1573_runs
+    method: emf_cell
+    method_as_printed: oxygen concentration cell; slag-metal equilibrium
+    locator:
+      published_page: 796
+      pdf_page_index: 3
+      page: 4
+      table: '4'
+    sample:
+      form:
+        state:
+          tag: value
+          value: Sn-Fe metal and FeOx-CaO-SiO2 slag
+        locator:
+          published_page: 796
+          pdf_page_index: 3
+          page: 4
+          table: '4'
+      container:
+        state:
+          tag: value
+          value: magnesia crucible
+        locator:
+          published_page: 796
+          pdf_page_index: 3
+          page: 4
+          table: '4'
+      printed_composition:
+        state:
+          tag: value
+          value: per-test slag mass percentages in Tables 4 and 6
+        locator:
+          published_page: 796
+          pdf_page_index: 3
+          page: 4
+          table: '4'
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1573
+        locator:
+          published_page: 796
+          pdf_page_index: 3
+          page: 4
+          table: '4'
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 793
+          pdf_page_index: 0
+          section: Experimental
+      sweep_gas:
+        state:
+          tag: value
+          value:
+            species: Ar
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+        locator:
+          published_page: 793
+          pdf_page_index: 0
+          section: Experimental
+          note: Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.
+      regime:
+        regime_class:
+          tag: unknown
+          reason: not_published
+  - experiment_id: takeda_1990_magnesia_1473_runs
+    method: emf_cell
+    method_as_printed: oxygen concentration cell; slag-metal equilibrium
+    locator:
+      published_page: 797
+      pdf_page_index: 4
+      page: 5
+      table: '5'
+    sample:
+      form:
+        state:
+          tag: value
+          value: Sn-Fe metal and silica-free FeOx-CaO slag
+        locator:
+          published_page: 797
+          pdf_page_index: 4
+          page: 5
+          table: '5'
+      container:
+        state:
+          tag: value
+          value: magnesia crucible
+        locator:
+          published_page: 797
+          pdf_page_index: 4
+          page: 5
+          table: '5'
+      printed_composition:
+        state:
+          tag: value
+          value: per-test slag and metal values in Table 5
+        locator:
+          published_page: 797
+          pdf_page_index: 4
+          page: 5
+          table: '5'
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1473
+        locator:
+          published_page: 797
+          pdf_page_index: 4
+          page: 5
+          table: '5'
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 793
+          pdf_page_index: 0
+          section: Experimental
+      sweep_gas:
+        state:
+          tag: value
+          value:
+            species: Ar
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+        locator:
+          published_page: 793
+          pdf_page_index: 0
+          section: Experimental
+          note: Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.
+      regime:
+        regime_class:
+          tag: unknown
+          reason: not_published
+  - experiment_id: takeda_1990_quoted_nunoue_kato_miscibility_gap
+    method:
+      tag: unknown
+      reason: The quoted 1987 study's measurement method is not restated in this source.
+    method_as_printed: Nunoue and Kato's coexisting Sn-Fe phases and Sn activity, quoted by Takeda et al.
+    locator:
+      page: 4
+      pdf_page_index: 3
+      published_page: 796
+      section: Results and Discussions
+      note: Paragraph attributing the miscibility-gap result to Nunoue and Kato (12).
+    sample:
+      form:
+        state:
+          tag: value
+          value: Two coexisting liquid Sn-Fe metal phases at the miscibility gap.
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 796
+          section: Results and Discussions
+      printed_composition:
+        state:
+          tag: value
+          value:
+            - Sn: '80 mass%'
+              Fe: '20 mass%'
+            - Sn: '53 mass%'
+              Fe: '47 mass%'
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 796
+          section: Results and Discussions
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: 1573
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 796
+          section: Results and Discussions
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 796
+          section: Results and Discussions
+          note: The quoted miscibility-gap result has no stated chamber or system pressure.
+      sweep_gas:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 796
+          section: Results and Discussions
+          note: Carrier gas and flow for the cited 1987 experiment are not restated.
+      regime:
+        regime_class:
+          tag: unknown
+          reason: not_published
 fidelity_samples:
 - species: SnO
   observation_id: takeda_1990_table1_gamma_11
-  observable: context
+  observable: activity_coefficient
   field: gamma_as_published
-  value: 1.0–7.0
+  value: 1.0 to 7.0
   locator:
+    page: 2
+    pdf_page_index: 1
     published_page: 794
     table: '1'
+    row: This experiment
     note: This experiment summary range
 - species: SnO
   observation_id: takeda_1990_t3_row_a_5
@@ -243,6 +452,10 @@ fidelity_samples:
   locator:
     published_page: 796
     table: '3'
+    page: 4
+    pdf_page_index: 3
+    row: A 5
+    column_header: Sn (mass%)
     note: Test A 5
 - species: SnO
   observation_id: takeda_1990_t6_row_a_s51
@@ -252,6 +465,10 @@ fidelity_samples:
   locator:
     published_page: 797
     table: '6'
+    page: 5
+    pdf_page_index: 4
+    row: A-S51
+    column_header: Sn (mass%)
     note: Test A-S51
 species:
   SnO:
@@ -271,6 +488,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Experimental
       units: as printed
       values:
@@ -295,6 +513,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Experimental
       units: as printed
       values:
@@ -313,6 +532,7 @@ species:
       locator:
         published_page: 794
         pdf_page_index: 1
+        page: 2
         section: Experimental
       units: seconds and ks as printed
       values:
@@ -326,6 +546,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         section: Thermal analysis, Results and Discussions
       units: as printed
       values:
@@ -346,6 +567,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Experimental
       units: typed absence
       values:
@@ -363,6 +585,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         equation: 2–5
       units: as printed
       values:
@@ -380,6 +603,7 @@ species:
       locator:
         published_page: 794
         pdf_page_index: 1
+        page: 2
         section: Experimental
       units: as printed
       values:
@@ -401,6 +625,7 @@ species:
       locator:
         published_page: 799
         pdf_page_index: 6
+        page: 7
         figure: 6–7
       units: figure-only; curves not digitized
       values:
@@ -413,6 +638,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         continuation_locator: {published_page: 799, pdf_page_index: 6, figure: '5'}
       units: figure-only; curves not digitized
@@ -426,6 +652,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         table: '2'
         note: Test S1
       units: EMF mV and MgO mass% as printed
@@ -444,6 +671,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         table: '2'
         note: Test S1 continued
       units: EMF mV and MgO mass% as printed
@@ -462,6 +690,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         table: '2'
         note: Test S2
       units: EMF mV and MgO mass% as printed
@@ -480,6 +709,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         table: '2'
         note: Test S3
       units: EMF mV and MgO mass% as printed
@@ -498,6 +728,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         table: '2'
         note: Test S4
       units: EMF mV and MgO mass% as printed
@@ -516,6 +747,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test A 5
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -540,6 +772,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test a 6
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -564,6 +797,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test B 7
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -588,6 +822,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test b 8
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -612,6 +847,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test E 9
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -636,6 +872,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test C 10
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -660,6 +897,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test c 11
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -684,6 +922,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test D 12
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -708,6 +947,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test d 13
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -732,6 +972,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test f 14
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -756,6 +997,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         note: Test f 15
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -780,6 +1022,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test A-a16
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -807,6 +1050,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 17
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -834,6 +1078,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 18
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -861,6 +1106,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 19
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -888,6 +1134,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 20
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -915,6 +1162,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test B-b21
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -942,6 +1190,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 22
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -969,6 +1218,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 23
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -996,6 +1246,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 24
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1023,6 +1274,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 25
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1050,6 +1302,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 26
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1077,6 +1330,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test E27
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1104,6 +1358,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 28
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1131,6 +1386,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 29
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1158,6 +1414,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test C-c30
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1185,6 +1442,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 31
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1212,6 +1470,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 32
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1239,6 +1498,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 33
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1266,6 +1526,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 34
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1293,6 +1554,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 35
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1320,6 +1582,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 36
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1347,6 +1610,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 37
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1374,6 +1638,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test D-d38
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1401,6 +1666,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 39
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1428,6 +1694,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 40
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1455,6 +1722,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 41
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1482,6 +1750,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 42
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1509,6 +1778,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 43
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1536,6 +1806,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         note: Test 44
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1563,6 +1834,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '5'
         note: Test D-S45
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1588,6 +1860,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '5'
         note: Test 46
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1613,6 +1886,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '5'
         note: Test 47
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1638,6 +1912,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '5'
         note: Test 48
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1663,6 +1938,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '5'
         note: Test 49
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1688,6 +1964,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '5'
         note: Test 50
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1713,6 +1990,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test A-S51
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1739,6 +2017,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 52
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1765,6 +2044,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 53
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1791,6 +2071,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 54
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1817,6 +2098,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 55
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1843,6 +2125,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 56
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1869,6 +2152,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 57
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1895,6 +2179,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 58
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1921,6 +2206,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 59
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1947,6 +2233,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test a-S60
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1973,6 +2260,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 61
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -1999,6 +2287,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 62
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2025,6 +2314,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 63
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2051,6 +2341,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 64
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2077,6 +2368,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 65
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2103,6 +2395,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 66
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2129,6 +2422,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test B-S67
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2155,6 +2449,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 68
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2181,6 +2476,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 69
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2207,6 +2503,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 70
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2233,6 +2530,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 71
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2259,6 +2557,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 72
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2285,6 +2584,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 73
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2311,6 +2611,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 74
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2337,6 +2638,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 75
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2363,6 +2665,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 76
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2389,6 +2692,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 77
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2415,6 +2719,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 78
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2441,6 +2746,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 79
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2467,6 +2773,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 80
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2493,6 +2800,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 81
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2522,6 +2830,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test b-S82
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2548,6 +2857,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 83
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2574,6 +2884,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 84
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2600,6 +2911,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 85
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2626,6 +2938,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 86
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2652,6 +2965,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 87
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2678,6 +2992,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 88
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2704,6 +3019,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test E-S89
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2730,6 +3046,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 90
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2756,6 +3073,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 91
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2782,6 +3100,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 92
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2808,6 +3127,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 93
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2834,6 +3154,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 94
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2860,6 +3181,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 95
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2886,6 +3208,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 96
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2912,6 +3235,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 97
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2938,6 +3262,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 98
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2964,6 +3289,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 99
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -2990,6 +3316,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 100
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3019,6 +3346,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test C-S101
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3045,6 +3373,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 102
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3071,6 +3400,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 103
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3097,6 +3427,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 104
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3123,6 +3454,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 105
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3149,6 +3481,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 106
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3175,6 +3508,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 107
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3201,6 +3535,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test c-S108
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3227,6 +3562,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 109
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3253,6 +3589,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 110
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3279,6 +3616,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 111
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3305,6 +3643,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 112
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3331,6 +3670,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 113
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3357,6 +3697,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 114
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3383,6 +3724,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test D-S115
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3409,6 +3751,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 116
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3435,6 +3778,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 117
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3461,6 +3805,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 118
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3487,6 +3832,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 119
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3513,6 +3859,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 120
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3539,6 +3886,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 121
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3565,6 +3913,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 122
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3591,6 +3940,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 123
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3617,6 +3967,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 124
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3646,6 +3997,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test d-S125
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3672,6 +4024,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 126
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3698,6 +4051,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 127
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3724,6 +4078,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 128
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3750,6 +4105,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 129
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3776,6 +4132,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 130
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3802,6 +4159,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '6'
         note: Test 131
       units: mass% for slag and metal composition; log pO2 dimensionless as printed
@@ -3831,6 +4189,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for A-S
       units: mole-ratio bounds as printed
@@ -3838,11 +4197,12 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: A-S
-        n_CaO_plus_MgO_over_total_as_printed: 0–0.21
+        legend_marker_as_rendered_at_600_dpi: open square on solid line
+        n_CaO_plus_MgO_over_total_as_printed: '0 - 0.21'
         n_CaO_plus_MgO_over_total_range:
         - 0.0
         - 0.21
-        n_FeOn_over_total_as_printed: 0.40–0.56
+        n_FeOn_over_total_as_printed: '0.40 - 0.56'
         n_FeOn_over_total_range:
         - 0.4
         - 0.56
@@ -3851,6 +4211,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for B-S
       units: mole-ratio bounds as printed
@@ -3858,11 +4219,12 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: B-S
-        n_CaO_plus_MgO_over_total_as_printed: 0.34–0.45
+        legend_marker_as_rendered_at_600_dpi: open diamond on solid line
+        n_CaO_plus_MgO_over_total_as_printed: '0.34 - 0.45'
         n_CaO_plus_MgO_over_total_range:
         - 0.34
         - 0.45
-        n_FeOn_over_total_as_printed: 0.12–0.19
+        n_FeOn_over_total_as_printed: '0.12 - 0.19'
         n_FeOn_over_total_range:
         - 0.12
         - 0.19
@@ -3871,6 +4233,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for E-S
       units: mole-ratio bounds as printed
@@ -3878,11 +4241,12 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: E-S
-        n_CaO_plus_MgO_over_total_as_printed: 0.44–0.54
+        legend_marker_as_rendered_at_600_dpi: open inverted triangle on solid line
+        n_CaO_plus_MgO_over_total_as_printed: '0.44 - 0.54'
         n_CaO_plus_MgO_over_total_range:
         - 0.44
         - 0.54
-        n_FeOn_over_total_as_printed: 0.27–0.35
+        n_FeOn_over_total_as_printed: '0.27 - 0.35'
         n_FeOn_over_total_range:
         - 0.27
         - 0.35
@@ -3891,6 +4255,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for C-S
       units: mole-ratio bounds as printed
@@ -3898,11 +4263,12 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: C-S
-        n_CaO_plus_MgO_over_total_as_printed: 0.49–0.57
+        legend_marker_as_rendered_at_600_dpi: open upright triangle on solid line
+        n_CaO_plus_MgO_over_total_as_printed: '0.49 - 0.57'
         n_CaO_plus_MgO_over_total_range:
         - 0.49
         - 0.57
-        n_FeOn_over_total_as_printed: 0.18–0.22
+        n_FeOn_over_total_as_printed: '0.18 - 0.22'
         n_FeOn_over_total_range:
         - 0.18
         - 0.22
@@ -3911,6 +4277,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for D-S
       units: mole-ratio bounds as printed
@@ -3918,10 +4285,11 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: D-S
+        legend_marker_as_rendered_at_600_dpi: divided open circle followed by open circle on solid line
         n_CaO_plus_MgO_over_total_as_printed: '1.0'
         n_CaO_plus_MgO_over_total_range:
         - 1.0
-        n_FeOn_over_total_as_printed: 0.67–0.72
+        n_FeOn_over_total_as_printed: '0.67 - 0.72'
         n_FeOn_over_total_range:
         - 0.67
         - 0.72
@@ -3930,6 +4298,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for a-S
       units: mole-ratio bounds as printed
@@ -3937,11 +4306,12 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: a-S
-        n_CaO_plus_MgO_over_total_as_printed: 0–0.33
+        legend_marker_as_rendered_at_600_dpi: filled square on dashed line
+        n_CaO_plus_MgO_over_total_as_printed: '0 - 0.33'
         n_CaO_plus_MgO_over_total_range:
         - 0.0
         - 0.33
-        n_FeOn_over_total_as_printed: 0.77–0.85
+        n_FeOn_over_total_as_printed: '0.77 - 0.85'
         n_FeOn_over_total_range:
         - 0.77
         - 0.85
@@ -3950,6 +4320,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for b-S
       units: mole-ratio bounds as printed
@@ -3957,11 +4328,12 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: b-S
-        n_CaO_plus_MgO_over_total_as_printed: 0.33–0.48
+        legend_marker_as_rendered_at_600_dpi: filled diamond on dashed line
+        n_CaO_plus_MgO_over_total_as_printed: '0.33 - 0.48'
         n_CaO_plus_MgO_over_total_range:
         - 0.33
         - 0.48
-        n_FeOn_over_total_as_printed: 0.58–0.71
+        n_FeOn_over_total_as_printed: '0.58 - 0.71'
         n_FeOn_over_total_range:
         - 0.58
         - 0.71
@@ -3970,6 +4342,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for c-S
       units: mole-ratio bounds as printed
@@ -3977,11 +4350,12 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: c-S
-        n_CaO_plus_MgO_over_total_as_printed: 0.49–0.62
+        legend_marker_as_rendered_at_600_dpi: filled upright triangle on dashed line
+        n_CaO_plus_MgO_over_total_as_printed: '0.49 - 0.62'
         n_CaO_plus_MgO_over_total_range:
         - 0.49
         - 0.62
-        n_FeOn_over_total_as_printed: 0.56–0.65
+        n_FeOn_over_total_as_printed: '0.56 - 0.65'
         n_FeOn_over_total_range:
         - 0.56
         - 0.65
@@ -3990,6 +4364,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         figure: '4'
         note: Legend composition ratios for d-S
       units: mole-ratio bounds as printed
@@ -3997,10 +4372,11 @@ species:
         quantity: figure_4_slag_composition_legend
         method_class: figure_only
         slag_set: d-S
+        legend_marker_as_rendered_at_600_dpi: filled circle on dashed line
         n_CaO_plus_MgO_over_total_as_printed: '0'
         n_CaO_plus_MgO_over_total_range:
         - 0.0
-        n_FeOn_over_total_as_printed: 0.82–0.86
+        n_FeOn_over_total_as_printed: '0.82 - 0.86'
         n_FeOn_over_total_range:
         - 0.82
         - 0.86
@@ -4009,6 +4385,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Introduction
       units: mass% as printed
       values:
@@ -4026,6 +4403,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         section: SnO melting and solidification
       units: K and g as printed
       values:
@@ -4059,6 +4437,7 @@ species:
       locator:
         published_page: 795
         pdf_page_index: 2
+        page: 3
         equations: 6–7
       units: as printed
       values:
@@ -4080,6 +4459,7 @@ species:
       locator:
         published_page: 797
         pdf_page_index: 4
+        page: 5
         table: '5'
         note: Footnote for D-S45
       units: as printed
@@ -4092,6 +4472,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '4'
         section: Left column, second-kind-of-experiment paragraph above Table 3
       units: as printed
@@ -4108,6 +4489,7 @@ species:
       locator:
         published_page: 796
         pdf_page_index: 3
+        page: 4
         table: '3'
         section: Results and Discussion
       units: mass% and K as printed
@@ -4132,6 +4514,7 @@ species:
       locator:
         published_page: 794
         pdf_page_index: 1
+        page: 2
         figure: '1'
         continuation_locator: {published_page: 795, pdf_page_index: 2, figure: '2'}
       units: figure-only; curves and diagram not digitized
@@ -4144,6 +4527,7 @@ species:
       locator:
         published_page: 800
         pdf_page_index: 7
+        page: 8
         figure: 8–10
       units: figure-only; curves not digitized
       values:
@@ -4156,6 +4540,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Abstract
       units: verbatim statement
       values:
@@ -4167,6 +4552,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Abstract
       units: verbatim statement
       values:
@@ -4177,6 +4563,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Abstract
       units: verbatim statement
       values:
@@ -4188,6 +4575,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Abstract
       units: verbatim statement
       values:
@@ -4199,6 +4587,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Abstract
       units: verbatim statement
       values:
@@ -4209,6 +4598,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Abstract
       units: verbatim statement
       values:
@@ -4221,6 +4611,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Introduction
       units: verbatim statement
       values:
@@ -4232,6 +4623,7 @@ species:
       locator:
         published_page: 793
         pdf_page_index: 0
+        page: 1
         section: Introduction
       units: verbatim statement
       values:
@@ -4243,6 +4635,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4254,6 +4647,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4265,6 +4659,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4276,6 +4671,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4287,6 +4683,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4298,6 +4695,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4309,6 +4707,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4321,6 +4720,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4333,6 +4733,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4344,6 +4745,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4354,6 +4756,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4364,6 +4767,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4375,6 +4779,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4386,6 +4791,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4397,6 +4803,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4408,6 +4815,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4419,6 +4827,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4429,6 +4838,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4440,6 +4850,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4451,6 +4862,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4462,6 +4874,7 @@ species:
       locator:
         published_page: 798
         pdf_page_index: 5
+        page: 6
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4473,6 +4886,7 @@ species:
       locator:
         published_page: 799
         pdf_page_index: 6
+        page: 7
         section: Magnesia discussion continued from p.798
         continuation_from_locator: {published_page: 798, pdf_page_index: 5, section: Final right-column paragraph}
       units: verbatim statement
@@ -4485,6 +4899,7 @@ species:
       locator:
         published_page: 799
         pdf_page_index: 6
+        page: 7
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4495,6 +4910,7 @@ species:
       locator:
         published_page: 799
         pdf_page_index: 6
+        page: 7
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4505,6 +4921,7 @@ species:
       locator:
         published_page: 799
         pdf_page_index: 6
+        page: 7
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4516,6 +4933,7 @@ species:
       locator:
         published_page: 799
         pdf_page_index: 6
+        page: 7
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4527,6 +4945,7 @@ species:
       locator:
         published_page: 799
         pdf_page_index: 6
+        page: 7
         section: Results and Discussion
       units: verbatim statement
       values:
@@ -4539,6 +4958,7 @@ species:
       locator:
         published_page: 800
         pdf_page_index: 7
+        page: 8
         section: Conclusions
       units: verbatim statement
       values:
@@ -4550,6 +4970,7 @@ species:
       locator:
         published_page: 800
         pdf_page_index: 7
+        page: 8
         section: Conclusions
       units: verbatim statement
       values:
@@ -4561,6 +4982,7 @@ species:
       locator:
         published_page: 800
         pdf_page_index: 7
+        page: 8
         section: Conclusions
       units: verbatim statement
       values:
@@ -4571,6 +4993,7 @@ species:
       locator:
         published_page: 800
         pdf_page_index: 7
+        page: 8
         section: Conclusions
       units: verbatim statement
       values:
@@ -4582,6 +5005,7 @@ species:
       locator:
         published_page: 800
         pdf_page_index: 7
+        page: 8
         section: Conclusions
       units: verbatim statement
       values:
@@ -4634,24 +5058,1376 @@ species:
         quantity: printed_FeO_activity_relation
         reaction_as_printed: Fe + 1/2 O2 = FeO
         relation_as_printed: K = a_FeO/(a_Fe pO2^(1/2))
+    observations:
+    - observation_id: takeda_1990_table1_gamma_01
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Chizhikov
+        page: 2
+        row: Chizhikov (1)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1423
+      - 1423
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.0 to 1.3
+        range:
+        - 1.0
+        - 1.3
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1423'
+        references_as_published: Chizhikov
+        attribution: Chizhikov (1)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 1
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - CaO
+        - FeOx
+        - Al2O3
+        composition_as_published:
+          SiO2: 0 to 60
+          CaO: —
+          FeOx: —
+          Al2O3: —
+          SnO: 100 to 40
+      table_row_number: 3
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1423'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Chizhikov (1)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Chizhikov (1)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Chizhikov (1)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Chizhikov (1)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_02
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Kozuka
+        page: 2
+        row: Kozuka (2)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1373
+      - 1373
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.0 to 1.4
+        range:
+        - 1.0
+        - 1.4
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1373'
+        references_as_published: Kozuka
+        attribution: Kozuka (2)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 2
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - CaO
+        - FeOx
+        - Al2O3
+        composition_as_published:
+          SiO2: 0 to 60
+          CaO: —
+          FeOx: —
+          Al2O3: —
+          SnO: 100 to 40
+      table_row_number: 4
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1373'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Kozuka (2)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Kozuka (2)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Kozuka (2)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Kozuka (2)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_03
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Carbo
+        page: 2
+        row: Carbo (3)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1433
+      - 1433
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.0 to 1.6
+        range:
+        - 1.0
+        - 1.6
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1433'
+        references_as_published: Carbo
+        attribution: Carbo (3)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 3
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - CaO
+        - FeOx
+        - Al2O3
+        composition_as_published:
+          SiO2: 0 to 60
+          CaO: —
+          FeOx: —
+          Al2O3: —
+          SnO: 100 to 40
+      table_row_number: 5
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1433'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Carbo (3)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Carbo (3)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Carbo (3)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Carbo (3)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_04
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Grau
+        page: 2
+        row: Grau (4)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1373
+      - 1373
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.0 to 1.6
+        range:
+        - 1.0
+        - 1.6
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1373'
+        references_as_published: Grau
+        attribution: Grau (4)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 4
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - CaO
+        - FeOx
+        - Al2O3
+        composition_as_published:
+          SiO2: 0 to 60
+          CaO: —
+          FeOx: —
+          Al2O3: —
+          SnO: 100 to 40
+      table_row_number: 6
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1373'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Grau (4)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Grau (4)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Grau (4)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Grau (4)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_05
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+        page: 2
+        row: Koike (5)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1423
+      - 1423
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.4 to 0.9
+        range:
+        - 0.9
+        - 1.4
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1423'
+        references_as_published: Koike
+        attribution: Koike (5)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 5
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - CaO
+        - FeOx
+        - Al2O3
+        composition_as_published:
+          SiO2: 0 to 60
+          CaO: —
+          FeOx: —
+          Al2O3: —
+          SnO: 100 to 40
+      table_row_number: 7
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1423'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_06
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Watanabe
+        page: 2
+        row: Watanabe (6)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1373
+      - 1373
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.6 to 1.7
+        range:
+        - 1.6
+        - 1.7
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 37.0
+          - 46.0
+          CaO_mole_percent_as_printed:
+          - 12.0
+          - 16.0
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 52.0
+          - 39.0
+        oxygen_condition: null
+        temperature_K_as_published: '1373'
+        references_as_published: Watanabe
+        attribution: Watanabe (6)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 6
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - FeOx
+        - Al2O3
+        composition_as_published:
+          SiO2: 37 to 46
+          CaO: 12 to 16
+          FeOx: —
+          Al2O3: —
+          SnO: 52 to 39
+      table_row_number: 8
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1373'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Watanabe (6)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Watanabe (6)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Watanabe (6)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Watanabe (6)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_07
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+        page: 2
+        row: Koike (5)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1423
+      - 1423
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.1 to 1.8
+        range:
+        - 1.1
+        - 1.8
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 42.0
+          - 58.0
+          CaO_mole_percent_as_printed:
+          - 0.0
+          - 13.0
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 58.0
+          - 32.0
+        oxygen_condition: null
+        temperature_K_as_published: '1423'
+        references_as_published: Koike
+        attribution: Koike (5)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 5
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - FeOx
+        - Al2O3
+        composition_as_published:
+          SiO2: 42 to 58
+          CaO: 0 to 13
+          FeOx: —
+          Al2O3: —
+          SnO: 58 to 32
+      table_row_number: 9
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1423'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_08
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Watanabe
+        page: 2
+        row: Watanabe (6)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1373
+      - 1373
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.2 to 1.4
+        range:
+        - 1.2
+        - 1.4
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 32.0
+          - 47.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed:
+          - 10.0
+          - 12.0
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 58.0
+          - 43.0
+        oxygen_condition: null
+        temperature_K_as_published: '1373'
+        references_as_published: Watanabe
+        attribution: Watanabe (6)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 6
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - CaO
+        - Al2O3
+        composition_as_published:
+          SiO2: 32 to 47
+          CaO: —
+          FeOx: 10 to 12
+          Al2O3: —
+          SnO: 58 to 43
+      table_row_number: 10
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1373'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Watanabe (6)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Watanabe (6)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Watanabe (6)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Watanabe (6)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_09
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+        page: 2
+        row: Koike (5)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1423
+      - 1423
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 0.9 to 1.6
+        range:
+        - 0.9
+        - 1.6
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 43.0
+          - 57.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed:
+          - 0.0
+          - 20.0
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 48.0
+          - 34.0
+        oxygen_condition: null
+        temperature_K_as_published: '1423'
+        references_as_published: Koike
+        attribution: Koike (5)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 5
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - CaO
+        - Al2O3
+        composition_as_published:
+          SiO2: 43 to 57
+          CaO: —
+          FeOx: 0 to 20
+          Al2O3: —
+          SnO: 48 to 34
+      table_row_number: 11
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1423'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Koike (5)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+    - observation_id: takeda_1990_table1_gamma_10
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Carbo
+        page: 2
+        row: Carbo (3)
+        column_header: γSnO(l)
+      T_range_K:
+      - 1433
+      - 1433
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        gamma_as_published: '1.8'
+        gamma: 1.8
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 69.0
+          CaO_mole_percent_as_printed:
+          - 16.0
+          FeOx_mole_percent_as_printed:
+          - 25.0
+          Al2O3_mole_percent_as_printed:
+          - 3.0
+          SnO_mole_percent_as_printed:
+          - 14.0
+        oxygen_condition: null
+        temperature_K_as_published: '1433'
+        references_as_published: Carbo
+        attribution: Carbo (3)
+        reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 3
+        value_form_as_published: linear scalar
+        unresolved_or_unreported_components: []
+        composition_as_published:
+          SiO2: '69'
+          CaO: '16'
+          FeOx: '25'
+          Al2O3: '3'
+          SnO: '14'
+      table_row_number: 12
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1433'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Carbo (3)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: The source gives a single composition but lists FeOx without a fixed stoichiometric formula; the
+              printed composition cells cannot be mapped without choosing an iron oxide species. The displayed component
+              numbers also do not close to 100 mol%.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Carbo (3)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Carbo (3)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Carbo (3)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
     - observation_id: takeda_1990_table1_gamma_11
       experiment: takeda_1990_table1_gamma_summary
-      type: context
+      type: activity_coefficient
       locator:
         published_page: 794
         pdf_page_index: 1
         table: '1'
         note: Reported comparison for This experiment
+        page: 2
+        row: This experiment
+        column_header: γSnO(l)
       T_range_K:
       - 1573
       - 1573
-      phase: FeOx-CaO-SiO2 liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
       values:
         quantity: activity_coefficient_range
-        method_class: author_estimate
-        gamma_as_published: 1.0–7.0
+        method_class: measured_reduced
+        gamma_as_published: 1.0 to 7.0
         range:
         - 1.0
         - 7.0
@@ -4674,375 +6450,98 @@ species:
         references_as_published: This experiment
         attribution: null
         reported_in_this_source: true
-        reduction_disclosure: Author-derived summary; equations and inputs are carried in takeda_1990_gamma_derivation_inputs. The endpoints are not linked to individual rows in the print.
-    observations:
-    - observation_id: takeda_1990_table1_gamma_01
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Chizhikov
-      T_range_K:
-      - 1423
-      - 1423
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 1.0–1.3
-        range:
-        - 1.0
-        - 1.3
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 0.0
-          - 60.0
-          CaO_mole_percent_as_printed: null
-          FeOx_mole_percent_as_printed: null
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 100.0
-          - 40.0
-        oxygen_condition: null
-        temperature_K_as_published: '1423'
-        references_as_published: Chizhikov
-        attribution: Chizhikov
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_02
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Kozuka
-      T_range_K:
-      - 1373
-      - 1373
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 1.0–1.4
-        range:
-        - 1.0
-        - 1.4
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 0.0
-          - 60.0
-          CaO_mole_percent_as_printed: null
-          FeOx_mole_percent_as_printed: null
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 100.0
-          - 40.0
-        oxygen_condition: null
-        temperature_K_as_published: '1373'
-        references_as_published: Kozuka
-        attribution: Kozuka
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_03
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Carbo
-      T_range_K:
-      - 1433
-      - 1433
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 1.0–1.6
-        range:
-        - 1.0
-        - 1.6
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 0.0
-          - 60.0
-          CaO_mole_percent_as_printed: null
-          FeOx_mole_percent_as_printed: null
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 100.0
-          - 40.0
-        oxygen_condition: null
-        temperature_K_as_published: '1433'
-        references_as_published: Carbo
-        attribution: Carbo
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_04
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Grau
-      T_range_K:
-      - 1373
-      - 1373
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 1.0–1.6
-        range:
-        - 1.0
-        - 1.6
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 0.0
-          - 60.0
-          CaO_mole_percent_as_printed: null
-          FeOx_mole_percent_as_printed: null
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 100.0
-          - 40.0
-        oxygen_condition: null
-        temperature_K_as_published: '1373'
-        references_as_published: Grau
-        attribution: Grau
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_05
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Koike
-      T_range_K:
-      - 1423
-      - 1423
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 1.4–0.9
-        range:
-        - 1.4
-        - 0.9
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 0.0
-          - 60.0
-          CaO_mole_percent_as_printed: null
-          FeOx_mole_percent_as_printed: null
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 100.0
-          - 40.0
-        oxygen_condition: null
-        temperature_K_as_published: '1423'
-        references_as_published: Koike
-        attribution: Koike
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_06
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Watanabe
-      T_range_K:
-      - 1373
-      - 1373
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 1.6–1.7
-        range:
-        - 1.6
-        - 1.7
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 37.0
-          - 46.0
-          CaO_mole_percent_as_printed:
-          - 12.0
-          - 16.0
-          FeOx_mole_percent_as_printed: null
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 52.0
-          - 39.0
-        oxygen_condition: null
-        temperature_K_as_published: '1373'
-        references_as_published: Watanabe
-        attribution: Watanabe
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_07
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Koike
-      T_range_K:
-      - 1423
-      - 1423
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 1.1–1.8
-        range:
-        - 1.1
-        - 1.8
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 42.0
-          - 58.0
-          CaO_mole_percent_as_printed:
-          - 0.0
-          - 13.0
-          FeOx_mole_percent_as_printed: null
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 58.0
-          - 32.0
-        oxygen_condition: null
-        temperature_K_as_published: '1423'
-        references_as_published: Koike
-        attribution: Koike
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_08
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Watanabe
-      T_range_K:
-      - 1373
-      - 1373
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 1.2–1.4
-        range:
-        - 1.2
-        - 1.4
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 32.0
-          - 47.0
-          CaO_mole_percent_as_printed: null
-          FeOx_mole_percent_as_printed:
-          - 10.0
-          - 12.0
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 58.0
-          - 43.0
-        oxygen_condition: null
-        temperature_K_as_published: '1373'
-        references_as_published: Watanabe
-        attribution: Watanabe
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_09
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Koike
-      T_range_K:
-      - 1423
-      - 1423
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
-      values:
-        quantity: activity_coefficient_range
-        method_class: quoted_attributed
-        gamma_as_published: 0.9–1.6
-        range:
-        - 0.9
-        - 1.6
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 43.0
-          - 57.0
-          CaO_mole_percent_as_printed: null
-          FeOx_mole_percent_as_printed:
-          - 0.0
-          - 20.0
-          Al2O3_mole_percent_as_printed: null
-          SnO_mole_percent_as_printed:
-          - 48.0
-          - 34.0
-        oxygen_condition: null
-        temperature_K_as_published: '1423'
-        references_as_published: Koike
-        attribution: Koike
-        reported_in_this_source: true
-    - observation_id: takeda_1990_table1_gamma_10
-      experiment: takeda_1990_table1_gamma_summary
-      type: activity_coefficient
-      locator:
-        published_page: 794
-        pdf_page_index: 1
-        table: '1'
-        note: Reported comparison for Carbo
-      T_range_K:
-      - 1433
-      - 1433
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient
-      values:
-        quantity: activity_coefficient
-        method_class: quoted_attributed
-        gamma_as_published: '1.8'
-        gamma: 1.8
-        composition_mole_percent_ranges:
-          SiO2_mole_percent_as_printed:
-          - 69.0
-          CaO_mole_percent_as_printed:
-          - 16.0
-          FeOx_mole_percent_as_printed:
-          - 25.0
-          Al2O3_mole_percent_as_printed:
-          - 3.0
-          SnO_mole_percent_as_printed:
-          - 14.0
-        oxygen_condition: null
-        temperature_K_as_published: '1433'
-        references_as_published: Carbo
-        attribution: Carbo
-        reported_in_this_source: true
+        reduction_disclosure: Author-derived summary; equations and inputs are carried in takeda_1990_gamma_derivation_inputs.
+          The endpoints are not linked to individual rows in the print.
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        method_class_reason: Authors report their own activity-coefficient range reduced from their equilibrium measurements.
+        derivation:
+          relation: The authors derive SnO activity coefficients from the printed slag-metal equilibrium relation and
+            report the 1.0–7.0 range in Table 1.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 7
+              pdf_page_index: 6
+              published_page: 799
+              figure: '6'
+              note: The individual activity-coefficient values and their endpoint composition pairings are plotted,
+                not tabulated.
+        reference_number_as_printed: null
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - Al2O3
+        composition_as_published:
+          SiO2: 0 to 53
+          CaO: 0 to 39
+          FeOx: 0 to 86
+          Al2O3: —
+          SnO: 100 to 0
+      table_row_number: 13
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1573'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: This experiment
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: This experiment
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: This experiment
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: This experiment
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
     - observation_id: takeda_1990_table1_gamma_12
       experiment: takeda_1990_table1_gamma_summary
       type: activity_coefficient
@@ -5051,16 +6550,33 @@ species:
         pdf_page_index: 1
         table: '1'
         note: Reported comparison for Nagamori
-      T_range_K:
-      - 1473
-      - 1573
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient range
+        page: 2
+        row: Nagamori (7)
+        column_header: γSnO(l)
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
       values:
         quantity: activity_coefficient_range
         method_class: quoted_attributed
-        gamma_as_published: 0.8–2.4
+        gamma_as_published: 0.8 to 2.4
         range:
         - 0.8
         - 2.4
@@ -5079,8 +6595,85 @@ species:
         oxygen_condition: null
         temperature_K_as_published: 1473, 1573
         references_as_published: Nagamori
-        attribution: Nagamori
+        attribution: Nagamori (7)
         reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 7
+        value_form_as_published: range
+        unresolved_or_unreported_components:
+        - CaO
+        - SnO
+        composition_as_published:
+          SiO2: 30 to 35
+          CaO: —
+          FeOx: 55 to 63
+          Al2O3: 5 to 11
+          SnO: —
+      table_row_number: 14
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 gives 1473 K and 1573 K but does not associate either temperature with a specific activity-coefficient
+              endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Nagamori (7)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Nagamori (7)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Nagamori (7)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Nagamori (7)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
     - observation_id: takeda_1990_table1_gamma_13
       experiment: takeda_1990_table1_gamma_summary
       type: activity_coefficient
@@ -5089,12 +6682,32 @@ species:
         pdf_page_index: 1
         table: '1'
         note: Reported comparison for Takeda
+        page: 2
+        row: Takeda (8)
+        column_header: γSnO(l)
       T_range_K:
       - 1523
       - 1523
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
@@ -5113,8 +6726,85 @@ species:
         oxygen_condition: null
         temperature_K_as_published: '1523'
         references_as_published: Takeda
-        attribution: Takeda
+        attribution: Takeda (8)
         reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 8
+        value_form_as_published: linear scalar
+        unresolved_or_unreported_components:
+        - CaO
+        - Al2O3
+        - SnO
+        composition_as_published:
+          SiO2: 42 to 45
+          CaO: —
+          FeOx: 58 to 55
+          Al2O3: —
+          SnO: —
+      table_row_number: 15
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1523'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Takeda (8)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 reports composition ranges aggregated over conditions, without pairing a specific composition
+              to each activity-coefficient endpoint.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Takeda (8)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Takeda (8)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Takeda (8)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
     - observation_id: takeda_1990_table1_gamma_14
       experiment: takeda_1990_table1_gamma_summary
       type: activity_coefficient
@@ -5123,12 +6813,32 @@ species:
         pdf_page_index: 1
         table: '1'
         note: Reported comparison for Takeda
+        page: 2
+        row: Takeda (8)
+        column_header: γSnO(l)
       T_range_K:
       - 1523
       - 1523
-      phase: liquid slag
-      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
-      units: dimensionless activity coefficient
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SnO
+              phase:
+                tag: value
+                value: l
+            component_basis: SnO
+        inferred: true
+        note: Table 1 labels the coefficient γSnO(l); Eq. (5) states unit activities for SnO(l) and Sn(l).
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
@@ -5145,5 +6855,187 @@ species:
         oxygen_condition: null
         temperature_K_as_published: '1523'
         references_as_published: Takeda
-        attribution: Takeda
+        attribution: Takeda (8)
         reported_in_this_source: true
+        standard_state_as_printed: γSnO(l); activities of unity for SnO(l) and Sn(l) in Eq. (5)
+        composition_role: measurement_state_bulk
+        composition_basis_as_printed: mol%
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+          note: Table 1 states no calibration window for the reported activity coefficient.
+        reported_oxygen_condition_as_printed: null
+        reference_number_as_printed: 8
+        value_form_as_published: linear scalar
+        unresolved_or_unreported_components:
+        - SiO2
+        - Al2O3
+        - SnO
+        composition_as_published:
+          SiO2: —
+          CaO: '32'
+          FeOx: '68'
+          Al2O3: —
+          SnO: —
+      table_row_number: 16
+      table_column_number: 1
+      uncertainty:
+        note: No measurement uncertainty is printed for this Table 1 activity coefficient or range.
+        confidence_level: not_stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1523'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Takeda (8)
+            column_header: Temp./K
+        composition:
+          state:
+            tag: unknown
+            reason: The source gives a single composition but lists FeOx without a fixed stoichiometric formula; the
+              printed composition cells cannot be mapped without choosing an iron oxide species.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Takeda (8)
+            column_header: Slag composition (mol%)
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Takeda (8)
+            note: Table 1 has no oxygen-potential column for this row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 794
+            table: '1'
+            row: Takeda (8)
+            note: The source reports no total pressure for this Table 1 activity-coefficient entry.
+  Sn:
+    observations:
+    - observation_id: takeda_1990_sn_activity_miscibility_gap
+      experiment: takeda_1990_quoted_nunoue_kato_miscibility_gap
+      type: activity_coefficient
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 796
+        section: Results and Discussions
+        note: 'Prose quotes Nunoue and Kato (12): 80 and 53 mass% Sn-Fe phases coexist at 1573 K and aSn=0.8.'
+      phase: l
+      T_K: '1573'
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Sn
+              phase:
+                tag: value
+                value: l
+            component_basis: Sn
+        inferred: true
+        note: Eq. (5) assumes unit activities for Sn(l); the source does not name the convention, so the pure-liquid endmember form is typed from that equation.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 795
+          equation: '5'
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity: '0.8'
+        value_as_published: aSn=0.8
+        component: Sn
+        method_class: quoted_attributed
+        attribution: Nunoue and Kato (12)
+        standard_state_as_printed: Activities of unity for Sn(l) in Eq. (5).
+        composition_role: coexisting_liquid_phases
+        composition_basis_as_printed: mass%
+        coexisting_metal_phases_as_printed:
+        - 80 mass% Sn-20 mass% Fe
+        - 53 mass% Sn-47 mass% Fe
+        coexisting_metal_phases_locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 796
+          section: Results and Discussions
+          note: Prose paragraph immediately before Table 4.
+        calibration_window:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 796
+            section: Results and Discussions
+          note: The cited miscibility-gap activity has no calibration window in the source.
+      uncertainty:
+        confidence_level: not_stated
+        note: No uncertainty is printed for the cited activity.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1573'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 796
+            section: Results and Discussions
+            note: The quoted miscibility-gap statement gives 1573 K.
+        composition:
+          state:
+            tag: unknown
+            reason: The activity applies at a miscibility gap with two distinct coexisting metal compositions; the source gives no single bulk composition for the activity datum.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 796
+            section: Results and Discussions
+            note: The quoted activity applies to two distinct coexisting metal phases, not a single bulk composition.
+        fO2_log:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 796
+            section: Results and Discussions
+            note: No oxygen potential is stated for the cited miscibility-gap activity; Table 4 row values refer to separate slag runs.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 796
+            section: Results and Discussions
+            note: No chamber or system total pressure is stated for the cited activity.

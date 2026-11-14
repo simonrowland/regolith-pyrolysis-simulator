@@ -1,0 +1,3250 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
+observations:
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq16_mg2sio4_model_function
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 9
+    published_page: 343
+    pdf_page_index: 8
+    equation: '16'
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The source prints a temperature-dependent relation, not a single point temperature or range.
+      locator:
+        page: 9
+        published_page: 343
+        pdf_page_index: 8
+        equation: '16'
+    composition:
+      state:
+        tag: unknown
+        reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+      locator:
+        page: 9
+        published_page: 343
+        pdf_page_index: 8
+        equation: '16'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 9
+        published_page: 343
+        pdf_page_index: 8
+        equation: '16'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq8_mgsio3_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+  derivation:
+    relation: Statistical-thermodynamic optimization of the MgO–SiO2 liquid and crystalline phases, using thermochemical and
+      phase-equilibrium data; this is the authors' optimized Mg2SiO4 formation function.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq8_mgsio3_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+    parameters: []
+    output_unit: as_published
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq17_mgsio3_model_function
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients'
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 9
+    published_page: 343
+    pdf_page_index: 8
+    equation: '17'
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The source prints a temperature-dependent relation, not a single point temperature or range.
+      locator:
+        page: 9
+        published_page: 343
+        pdf_page_index: 8
+        equation: '17'
+    composition:
+      state:
+        tag: unknown
+        reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+      locator:
+        page: 9
+        published_page: 343
+        pdf_page_index: 8
+        equation: '17'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 9
+        published_page: 343
+        pdf_page_index: 8
+        equation: '17'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq8_mgsio3_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+  derivation:
+    relation: Statistical-thermodynamic optimization of the MgO–SiO2 liquid and crystalline phases, using thermochemical and
+      phase-equilibrium data; this is the authors' optimized MgSiO3 formation function.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq8_mgsio3_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+    parameters: []
+    output_unit: as_published
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq6_mgo_partial_gibbs_fit
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_gibbs_energy_temperature_function_coefficients'
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: The equation applies to the MgSiO3 + Mg2SiO4 two-phase field without a single bulk composition.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_gibbs_energy_temperature_function_coefficients';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 3
+    published_page: 337
+    pdf_page_index: 2
+    equation: '6'
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Equation 6 is a temperature-dependent relation, not a point value.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '6'
+    composition:
+      state:
+        tag: unknown
+        reason: The equation applies to the MgSiO3 + Mg2SiO4 two-phase field without a single bulk composition.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '6'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not report an oxygen fugacity for these KEMS measurements.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '6'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+  derivation:
+    relation: Equation 4 subtracts the MgO + Mg2SiO4 (prime) ratio fit from the MgSiO3 + Mg2SiO4 (double-prime) ratio fit
+      to reduce the measured KEMS ion-current ratio to the partial Gibbs energy of MgO.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+    parameters: []
+    output_unit: J/mol
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq7_sio2_partial_gibbs_fit
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_gibbs_energy_temperature_function_coefficients'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: The equation applies to the MgSiO3 + Mg2SiO4 two-phase field without a single bulk composition.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_gibbs_energy_temperature_function_coefficients';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 3
+    published_page: 337
+    pdf_page_index: 2
+    equation: '7'
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Equation 7 is a temperature-dependent relation, not a point value.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '7'
+    composition:
+      state:
+        tag: unknown
+        reason: The equation applies to the MgSiO3 + Mg2SiO4 two-phase field without a single bulk composition.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '7'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not report an oxygen fugacity for these KEMS measurements.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '7'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgsio3_sio2_ratio_fit
+  derivation:
+    relation: Equation 5 subtracts the MgSiO3 + Mg2SiO4 (double-prime) ratio fit from the MgSiO3 + SiO2 (triple-prime) ratio
+      fit to reduce the measured KEMS ion-current ratio to the partial Gibbs energy of SiO2.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgsio3_sio2_ratio_fit
+    parameters: []
+    output_unit: J/mol
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq8_mgsio3_gibbs_fit
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients'
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 3
+    published_page: 337
+    pdf_page_index: 2
+    equation: '8'
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The source prints a temperature-dependent relation, not a single point temperature.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '8'
+    composition:
+      state:
+        tag: unknown
+        reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '8'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '8'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq6_mgo_partial_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq7_sio2_partial_gibbs_fit
+  derivation:
+    relation: The authors state that the measured partial thermodynamic characteristics of the MgSiO3 + Mg2SiO4 field were
+      used to calculate these integral formation Gibbs-energy functions.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq6_mgo_partial_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq7_sio2_partial_gibbs_fit
+    parameters: []
+    output_unit: J/mol
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 3
+    published_page: 337
+    pdf_page_index: 2
+    equation: '9'
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The source prints a temperature-dependent relation, not a single point temperature.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '9'
+    composition:
+      state:
+        tag: unknown
+        reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '9'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        equation: '9'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq6_mgo_partial_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq7_sio2_partial_gibbs_fit
+  derivation:
+    relation: The authors state that the measured partial thermodynamic characteristics of the MgSiO3 + Mg2SiO4 field were
+      used to calculate these integral formation Gibbs-energy functions.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq6_mgo_partial_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq7_sio2_partial_gibbs_fit
+    parameters: []
+    output_unit: J/mol
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ln_mg_to_sio_ion_intensity_ratio_fit_coefficients'
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1584, 1835]; no midpoint invented
+    composition:
+      tag: unknown
+      reason: The row names a two-phase field but gives no single mixture composition.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1584, 1835] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 3
+    published_page: 337
+    pdf_page_index: 2
+    table: '1'
+    note: row=MgO + Mg2SiO4
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 reports a temperature interval for this fit, not a single point temperature.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: The row names a two-phase field but gives no single mixture composition.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+  derivation:
+    relation: The Table 1 least-squares coefficients reduce the authors' measured KEMS ion-current ratios. Figure 2 prints
+      the points graphically; their numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+    parameters: []
+    output_unit: fit coefficients as printed
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ln_mg_to_sio_ion_intensity_ratio_fit_coefficients'
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1571, 1824]; no midpoint invented
+    composition:
+      tag: unknown
+      reason: The row names a two-phase field but gives no single mixture composition.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1571, 1824] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 3
+    published_page: 337
+    pdf_page_index: 2
+    table: '1'
+    note: row=MgSiO3 + Mg2SiO4
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 reports a temperature interval for this fit, not a single point temperature.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: The row names a two-phase field but gives no single mixture composition.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+  derivation:
+    relation: The Table 1 least-squares coefficients reduce the authors' measured KEMS ion-current ratios. Figure 2 prints
+      the points graphically; their numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+    parameters: []
+    output_unit: fit coefficients as printed
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table1_mgsio3_sio2_ratio_fit
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ln_mg_to_sio_ion_intensity_ratio_fit_coefficients'
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1578, 1808]; no midpoint invented
+    composition:
+      tag: unknown
+      reason: The row names a two-phase field but gives no single mixture composition.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1578, 1808] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: source admission_status=typed_unavailable is not a closed v2.1 token
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 3
+    published_page: 337
+    pdf_page_index: 2
+    table: '1'
+    note: row=MgSiO3 + SiO2
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 reports a temperature interval for this fit, not a single point temperature.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: The row names a two-phase field but gives no single mixture composition.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 3
+        published_page: 337
+        pdf_page_index: 2
+        table: '1'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+  derivation:
+    relation: The Table 1 least-squares coefficients reduce the authors' measured KEMS ion-current ratios. Figure 2 prints
+      the points graphically; their numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+    parameters: []
+    output_unit: fit coefficients as printed
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p486
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies crystalline MgO without naming its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.514'
+        - - SiO2
+          - '0.486'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.181'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=2; table_column_number=3; phase=liquid; row=x(SiO2) = 0.486*
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=2; table_column_number=3; phase=liquid; row=x(SiO2) = 0.486*
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=2; table_column_number=3; phase=liquid; row=x(SiO2) = 0.486*
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.514'
+          - - SiO2
+            - '0.486'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of
+      the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p498
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies crystalline MgO without naming its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.502'
+        - - SiO2
+          - '0.498'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.171'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=3; table_column_number=3; phase=liquid; row=x(SiO2) = 0.498
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=3; table_column_number=3; phase=liquid; row=x(SiO2) = 0.498
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=3; table_column_number=3; phase=liquid; row=x(SiO2) = 0.498
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.502'
+          - - SiO2
+            - '0.498'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of
+      the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p511
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies crystalline MgO without naming its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.489'
+        - - SiO2
+          - '0.511'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.158'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=4; table_column_number=3; phase=liquid; row=x(SiO2) = 0.511
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=4; table_column_number=3; phase=liquid; row=x(SiO2) = 0.511
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=4; table_column_number=3; phase=liquid; row=x(SiO2) = 0.511
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.489'
+          - - SiO2
+            - '0.511'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of
+      the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p528
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies crystalline MgO without naming its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.472'
+        - - SiO2
+          - '0.528'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.144'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=2; table_column_number=6; phase=liquid; row=x(SiO2) = 0.528
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=2; table_column_number=6; phase=liquid; row=x(SiO2) = 0.528
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=2; table_column_number=6; phase=liquid; row=x(SiO2) = 0.528
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.472'
+          - - SiO2
+            - '0.528'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of
+      the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p550
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies crystalline MgO without naming its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.45'
+        - - SiO2
+          - '0.55'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.129'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=3; table_column_number=6; phase=liquid; row=x(SiO2) = 0.550
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=3; table_column_number=6; phase=liquid; row=x(SiO2) = 0.550
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=3; table_column_number=6; phase=liquid; row=x(SiO2) = 0.550
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.45'
+          - - SiO2
+            - '0.55'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of
+      the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_mgo_x_sio2_0p563
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies crystalline MgO without naming its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.437'
+        - - SiO2
+          - '0.563'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.122'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=4; table_column_number=6; phase=liquid; row=x(SiO2) = 0.563
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=4; table_column_number=6; phase=liquid; row=x(SiO2) = 0.563
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=4; table_column_number=6; phase=liquid; row=x(SiO2) = 0.563
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.437'
+          - - SiO2
+            - '0.563'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of
+      the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq9_mg2sio4_gibbs_fit
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p486
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.514'
+        - - SiO2
+          - '0.486'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.693'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=2; table_column_number=2; phase=liquid; row=x(SiO2) = 0.486*
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=2; table_column_number=2; phase=liquid; row=x(SiO2) = 0.486*
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=2; table_column_number=2; phase=liquid; row=x(SiO2) = 0.486*
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.514'
+          - - SiO2
+            - '0.486'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq.
+      10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p498
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.502'
+        - - SiO2
+          - '0.498'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.737'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=3; table_column_number=2; phase=liquid; row=x(SiO2) = 0.498
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=3; table_column_number=2; phase=liquid; row=x(SiO2) = 0.498
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=3; table_column_number=2; phase=liquid; row=x(SiO2) = 0.498
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.502'
+          - - SiO2
+            - '0.498'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq.
+      10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p511
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.489'
+        - - SiO2
+          - '0.511'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.797'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=4; table_column_number=2; phase=liquid; row=x(SiO2) = 0.511
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=4; table_column_number=2; phase=liquid; row=x(SiO2) = 0.511
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=4; table_column_number=2; phase=liquid; row=x(SiO2) = 0.511
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.489'
+          - - SiO2
+            - '0.511'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq.
+      10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p528
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.472'
+        - - SiO2
+          - '0.528'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.865'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=2; table_column_number=5; phase=liquid; row=x(SiO2) = 0.528
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=2; table_column_number=5; phase=liquid; row=x(SiO2) = 0.528
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=2; table_column_number=5; phase=liquid; row=x(SiO2) = 0.528
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.472'
+          - - SiO2
+            - '0.528'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq.
+      10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p550
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.45'
+        - - SiO2
+          - '0.55'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.951'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=3; table_column_number=5; phase=liquid; row=x(SiO2) = 0.550
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=3; table_column_number=5; phase=liquid; row=x(SiO2) = 0.550
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=3; table_column_number=5; phase=liquid; row=x(SiO2) = 0.550
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.45'
+          - - SiO2
+            - '0.55'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq.
+      10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table2_sio2_x_sio2_0p563
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgO
+          - '0.437'
+        - - SiO2
+          - '0.563'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not state the total pressure during the KEMS measurements.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=4; table_column_number=5; phase=liquid; row=x(SiO2) = 0.563
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 4
+    published_page: 338
+    pdf_page_index: 3
+    table: '2'
+    note: table_row_number=4; table_column_number=5; phase=liquid; row=x(SiO2) = 0.563
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+        note: table_row_number=4; table_column_number=5; phase=liquid; row=x(SiO2) = 0.563
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - MgO
+            - '0.437'
+          - - SiO2
+            - '0.563'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 4
+        published_page: 338
+        pdf_page_index: 3
+        table: '2'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+  derivation:
+    relation: The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq.
+      10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_calculated_delta_fG
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+    composition:
+      tag: unknown
+      reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+        note: table_row_number=13; table_column_number=4; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Calculated
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 7
+    published_page: 341
+    pdf_page_index: 6
+    table: '4'
+    note: table_row_number=13; table_column_number=4; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Calculated
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+        note: table_row_number=13; table_column_number=4; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Calculated
+    composition:
+      state:
+        tag: unknown
+        reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq17_mgsio3_model_function
+  derivation:
+    relation: Calculated column of Table 4; the paper reports optimized thermodynamic properties.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq17_mgsio3_model_function
+    parameters: []
+    output_unit: as_published
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+    composition:
+      tag: unknown
+      reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[31]'
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+        note: table_row_number=13; table_column_number=3; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Experimental
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 7
+    published_page: 341
+    pdf_page_index: 6
+    table: '4'
+    note: table_row_number=13; table_column_number=3; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Experimental
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+        note: table_row_number=13; table_column_number=3; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_calculated_delta_fG
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+    composition:
+      tag: unknown
+      reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+        note: table_row_number=53; table_column_number=4; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Calculated
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 7
+    published_page: 341
+    pdf_page_index: 6
+    table: '4'
+    note: table_row_number=53; table_column_number=4; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Calculated
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+        note: table_row_number=53; table_column_number=4; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Calculated
+    composition:
+      state:
+        tag: unknown
+        reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+  derived_from:
+  - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq17_mgsio3_model_function
+  derivation:
+    relation: Calculated column of Table 4; the paper reports optimized thermodynamic properties.
+    inputs:
+    - zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq17_mgsio3_model_function
+    parameters: []
+    output_unit: as_published
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+    composition:
+      tag: unknown
+      reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[31]'
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-za06
+      date: '2026-11-03'
+      evidence:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+        note: table_row_number=53; table_column_number=3; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Experimental
+  notices: []
+  source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  locator:
+    page: 7
+    published_page: 341
+    pdf_page_index: 6
+    table: '4'
+    note: table_row_number=53; table_column_number=3; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Experimental
+  read_from: pdf:zaitsev-2006-magnesium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+        note: table_row_number=53; table_column_number=3; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not state an oxygen-fugacity condition for this row.
+      locator:
+        page: 7
+        published_page: 341
+        pdf_page_index: 6
+        table: '4'
+  provenance:
+    printed_phase: cr

@@ -177,3 +177,19 @@ def test_isolated_migration_preserves_typed_species_temperature_and_conditions()
     assert heat_fusion.identity.temperature_K.is_value
     assert heat_fusion.identity.temperature_K.value == Decimal("1373.15")
     assert "total_pressure_Pa" not in heat_fusion.point_conditions
+
+
+def test_sweep_hit_remains_context_with_its_printed_external_attributions() -> None:
+    document = _document()
+    context = _table_context(
+        document, "rb86_capobianco_1982_activation_and_bond_energies_context"
+    )
+    assert context["type"] == "text_statement_context"
+    assert context["locator"]["published_page"] == 721
+    assert context["locator"]["section"] == "Viscosity comparison"
+    values = context["values"]
+    assert values["method_class"] == "quoted_attributed"
+    assert values["activation_energy_Si_albite_attribution"] == "Cranmer and Uhlmann (1981)"
+    assert values["activation_energy_Ge_albite_attribution"] == "Riebling (1965)"
+    assert values["activation_energy_GeO2_attribution"] == "Fontana and Plummer (1966)"
+    assert values["Ge_O_and_Si_O_bond_energy_attribution"] == "Kingery et al. (1976)"

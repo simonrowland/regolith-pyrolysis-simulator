@@ -51,7 +51,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -75,10 +75,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6], but
-      the intermediate current and calibration inputs are not printed.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' own partial-pressure estimates, made using the procedure described in reference [6]; the intermediate
+      KEMS ion-current and calibration inputs are not printed.
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -128,9 +128,8 @@ observations:
         pdf_page_index: 12
         section: Results
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:de-maria-1969-rend-lincei
+    relation: The authors estimate the partial pressures following the procedure described in reference 6.
+    inputs: []
     parameters:
     - - original
       - state:
@@ -142,6 +141,34 @@ observations:
           pdf_page_index: 12
           section: Results
           note: row=Fe at 2000° K
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00005'
+              locator:
+                page: 13
+                published_page: 535
+                pdf_page_index: 12
+                section: Results
+                note: row=Fe at 2000° K
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 13
+                published_page: 535
+                pdf_page_index: 12
+                section: Results
+                note: row=Fe at 2000° K
+          output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
@@ -153,7 +180,29 @@ observations:
           section: Results
           note: row=Fe at 2000° K
     output_unit: Pa
-    references: []
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+        note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+    method:
+      state:
+        tag: value
+        value: Partial pressures of the observed species were estimated following the procedure described in reference [6].
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+    references:
+    - G. De Maria, M. Guido, L. Malaspina and B. Pesce (1965), J. Chem. Phys. 43, 4449 [6].
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_results_k_partial_pressure::T=1200:row=k-at-1200°-k:h=4ee64c24ced4
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -203,7 +252,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -227,10 +276,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6], but
-      the intermediate current and calibration inputs are not printed.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' own partial-pressure estimates, made using the procedure described in reference [6]; the intermediate
+      KEMS ion-current and calibration inputs are not printed.
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -280,9 +329,8 @@ observations:
         pdf_page_index: 12
         section: Results
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:de-maria-1969-rend-lincei
+    relation: The authors estimate the partial pressures following the procedure described in reference 6.
+    inputs: []
     parameters:
     - - original
       - state:
@@ -294,6 +342,34 @@ observations:
           pdf_page_index: 12
           section: Results
           note: row=K at 1200° K
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0001'
+              locator:
+                page: 13
+                published_page: 535
+                pdf_page_index: 12
+                section: Results
+                note: row=K at 1200° K
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 13
+                published_page: 535
+                pdf_page_index: 12
+                section: Results
+                note: row=K at 1200° K
+          output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
@@ -305,7 +381,29 @@ observations:
           section: Results
           note: row=K at 1200° K
     output_unit: Pa
-    references: []
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+        note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+    method:
+      state:
+        tag: value
+        value: Partial pressures of the observed species were estimated following the procedure described in reference [6].
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+    references:
+    - G. De Maria, M. Guido, L. Malaspina and B. Pesce (1965), J. Chem. Phys. 43, 4449 [6].
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_results_mass80_to_mass78_ion_intensity_ratio
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -377,9 +475,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; this is the reported average of three ratios, while the individual
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' reported average of the measured I+80/I+78 ion-intensity ratios at three temperatures; the individual
       ratios are not printed.
   admission:
     status: admitted
@@ -430,6 +528,33 @@ observations:
         pdf_page_index: 12
         section: Results
         note: The reported 10.2 is an average across 1550°, 1720°, and 1840° K; no single temperature for the average is stated.
+  derivation:
+    relation: Average of the I+80/I+78 ion-intensity ratios measured at the three printed temperatures.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+        note: The individual I+80/I+78 ratios are not printed; only their average is reported.
+    method:
+      state:
+        tag: value
+        value: The I+80/I+78 ion-intensity ratio measured at three temperatures; the reported value is their average.
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_results_na_partial_pressure::T=1200:row=na-at-1200°-k:h=c9a885e3a420
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -479,7 +604,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -503,10 +628,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6], but
-      the intermediate current and calibration inputs are not printed.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' own partial-pressure estimates, made using the procedure described in reference [6]; the intermediate
+      KEMS ion-current and calibration inputs are not printed.
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -556,9 +681,8 @@ observations:
         pdf_page_index: 12
         section: Results
   derivation:
-    relation: atm_to_Pa
-    inputs:
-    - pdf:de-maria-1969-rend-lincei
+    relation: The authors estimate the partial pressures following the procedure described in reference 6.
+    inputs: []
     parameters:
     - - original
       - state:
@@ -570,6 +694,34 @@ observations:
           pdf_page_index: 12
           section: Results
           note: row=Na at 1200° K
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00001'
+              locator:
+                page: 13
+                published_page: 535
+                pdf_page_index: 12
+                section: Results
+                note: row=Na at 1200° K
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                page: 13
+                published_page: 535
+                pdf_page_index: 12
+                section: Results
+                note: row=Na at 1200° K
+          output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
@@ -581,7 +733,29 @@ observations:
           section: Results
           note: row=Na at 1200° K
     output_unit: Pa
-    references: []
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+        note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+    method:
+      state:
+        tag: value
+        value: Partial pressures of the observed species were estimated following the procedure described in reference [6].
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+    references:
+    - G. De Maria, M. Guido, L. Malaspina and B. Pesce (1965), J. Chem. Phys. 43, 4449 [6].
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_results_sio_appearance_potential_prose_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -614,10 +788,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; the prose reports the SiO appearance potential determined from
-      the ionization-efficiency curve by linear extrapolation; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -671,6 +845,36 @@ observations:
         pdf_page_index: 11
         section: Results
         note: The prose appearance-potential statement gives no experiment temperature.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1210:row=1210:h=45083ab5eca0
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -795,6 +999,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1280:row=1280:h=998e4f6a85bf
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -919,6 +1125,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1350:row=1350:h=1a757e449ecd
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -1043,6 +1251,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1420:row=1420:h=78a7be81cee4
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -1167,6 +1377,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1500:row=1500:h=efd18503d68e
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -1291,6 +1503,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1560:row=1560:h=3acd98f23045
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -1415,6 +1629,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1600:row=1600:h=28a39831eece
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -1539,6 +1755,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1660:row=1660:h=c1e3dc52dea0
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -1663,6 +1881,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1710:row=1710:h=b45242fecced
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -1787,6 +2007,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23_row_1780_upper_limit_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -1915,6 +2137,8 @@ observations:
         pdf_page_index: 3
         section: Experimental Procedure
         note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24::T=1280:row=1280:h=2288d816c0f1
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -2039,6 +2263,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24::T=1350:row=1350:h=ac24d71d4caa
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -2163,6 +2389,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24::T=1600:row=1600:h=e2a78d67f38f
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -2287,6 +2515,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24::T=1660:row=1660:h=b8f63c8d50bf
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -2411,6 +2641,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24::T=1710:row=1710:h=6bcd01985342
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -2535,6 +2767,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24_row_1420_upper_limit_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -2663,6 +2897,8 @@ observations:
         pdf_page_index: 3
         section: Experimental Procedure
         note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24_row_1780_upper_limit_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -2791,6 +3027,8 @@ observations:
         pdf_page_index: 3
         section: Experimental Procedure
         note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1210:row=1210:h=919dca9227ae
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -2915,6 +3153,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1280:row=1280:h=ba9062851da8
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -3039,6 +3279,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1350:row=1350:h=aaf60ac6e543
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -3163,6 +3405,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1420:row=1420:h=ebe3e21c5bdf
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -3287,6 +3531,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1500:row=1500:h=e3b3ea5f74e7
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -3411,6 +3657,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1560:row=1560:h=a8330df4b3f6
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -3535,6 +3783,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1600:row=1600:h=1110594a2887
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -3659,6 +3909,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1660:row=1660:h=3373308a1f6c
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -3783,6 +4035,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1710:row=1710:h=f0ddf2208596
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -3907,6 +4161,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1780:row=1780:h=c7bc18ea153f
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -4031,6 +4287,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25_row_1830_upper_limit_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -4159,6 +4417,8 @@ observations:
         pdf_page_index: 3
         section: Experimental Procedure
         note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1210:row=1210:h=bee0c912a075
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -4283,6 +4543,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1280:row=1280:h=dab928d303c2
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -4407,6 +4669,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1350:row=1350:h=293ccefb3103
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -4531,6 +4795,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1420:row=1420:h=3f1817b100ad
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -4655,6 +4921,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1500:row=1500:h=0f63d390e198
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -4779,6 +5047,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1560:row=1560:h=b17c09cdb7b2
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -4903,6 +5173,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1600:row=1600:h=ca65733e9265
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -5027,6 +5299,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1660:row=1660:h=194021517981
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -5151,6 +5425,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1710:row=1710:h=25bea2d5278b
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -5275,6 +5551,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1780:row=1780:h=8f49398934c6
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -5399,6 +5677,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1830:row=1830:h=d01178048bc2
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -5523,6 +5803,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1880:row=1880:h=0af5d89b1df7
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -5647,6 +5929,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1900:row=1900:h=f0a3d0b621d4
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -5771,6 +6055,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26_row_1980_upper_limit_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -5899,6 +6185,8 @@ observations:
         pdf_page_index: 3
         section: Experimental Procedure
         note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_27::T=1660:row=1660:h=9b2ce032f4ff
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -6023,6 +6311,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_27::T=1710:row=1710:h=b3a30f40d238
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -6147,6 +6437,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_27::T=1780:row=1780:h=8310fe3de0f6
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -6271,6 +6563,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1210:row=1210:h=0bc9bab77d6c
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -6395,6 +6689,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1280:row=1280:h=a1f069641163
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -6519,6 +6815,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1350:row=1350:h=80d8b31bfdeb
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -6643,6 +6941,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1420:row=1420:h=822e92e8c625
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -6767,6 +7067,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1500:row=1500:h=5f0a67e42c6f
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -6891,6 +7193,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1560:row=1560:h=417595fe916b
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -7015,6 +7319,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1600:row=1600:h=9862366a224b
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -7139,6 +7445,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1660:row=1660:h=9fa355797166
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -7263,6 +7571,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1710:row=1710:h=fe43a3a3b546
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -7387,6 +7697,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1780:row=1780:h=cb2a092ff1fd
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -7511,6 +7823,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1830:row=1830:h=a44131f0f8d4
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -7635,6 +7949,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39_row_1880_upper_limit_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -7763,6 +8079,8 @@ observations:
         pdf_page_index: 3
         section: Experimental Procedure
         note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_40::T=1560:row=1560:h=9eb674417c75
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -7887,6 +8205,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_40::T=1660:row=1660:h=ed6a8fb554de
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -8011,6 +8331,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_40::T=1710:row=1710:h=579b104b0525
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -8135,6 +8457,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_44::T=1830:row=1830:h=45dff4e5b974
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -8259,6 +8583,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_44::T=1880:row=1880:h=0a35618b7bd5
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -8383,6 +8709,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_44::T=1900:row=1900:h=4fed37185620
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -8507,6 +8835,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_44::T=1980:row=1980:h=a826919e0ccb
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -8631,6 +8961,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_44::T=2150:row=2150:h=e5801b8a0470
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -8755,6 +9087,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_44::T=2250:row=2250:h=3ba776c0bf83
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -8879,6 +9213,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_44::T=2330:row=2330:h=a08cd219be9d
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9003,6 +9339,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_45::T=1880:row=1880:h=89e8b7e88ea8
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9127,6 +9465,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_45::T=1900:row=1900:h=5fea47064243
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9251,6 +9591,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_45::T=1980:row=1980:h=9c442b8b54b4
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9375,6 +9717,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_45::T=2150:row=2150:h=07048810edac
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9499,6 +9843,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_45::T=2250:row=2250:h=925666220b6e
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9623,6 +9969,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_45::T=2330:row=2330:h=cc821d310e37
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9747,6 +10095,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_46::T=1880:row=1880:h=23da42dd9783
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9871,6 +10221,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_46::T=1900:row=1900:h=eb69a97d87f1
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -9995,6 +10347,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_46::T=1980:row=1980:h=cfd126920a72
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -10119,6 +10473,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_46::T=2150:row=2150:h=71b543554a27
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -10243,6 +10599,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_46::T=2250:row=2250:h=004e4268f52a
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -10367,6 +10725,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_46::T=2330:row=2330:h=fa0522d062cf
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -10491,6 +10851,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1210:row=1210:h=827fa5e1d7ff
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -10615,6 +10977,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1280:row=1280:h=8b95c1dec50b
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -10739,6 +11103,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1350:row=1350:h=c383ee6681ed
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -10863,6 +11229,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1420:row=1420:h=8256ae551318
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -10987,6 +11355,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1500:row=1500:h=d82a48537032
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -11111,6 +11481,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1560:row=1560:h=4ec5f0135844
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -11235,6 +11607,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1600:row=1600:h=35bfe680125a
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -11359,6 +11733,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1660:row=1660:h=ecd0449b390f
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -11483,6 +11859,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1710:row=1710:h=731dc4742d20
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -11607,6 +11985,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1780:row=1780:h=8964527daabf
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -11731,6 +12111,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1830:row=1830:h=51b2e072bfd1
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -11855,6 +12237,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1880:row=1880:h=e831ba5596be
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -11979,6 +12363,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50_row_1900_upper_limit_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -12107,6 +12493,8 @@ observations:
         pdf_page_index: 3
         section: Experimental Procedure
         note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1210:row=1210:h=d36244d1f17c
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -12231,6 +12619,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1280:row=1280:h=d58e203caa42
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -12355,6 +12745,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1350:row=1350:h=1fa233fac908
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -12479,6 +12871,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1420:row=1420:h=368ba9baaf4a
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -12603,6 +12997,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1500:row=1500:h=142a35efa3a9
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -12727,6 +13123,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1560:row=1560:h=abe25219e20d
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -12851,6 +13249,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1600:row=1600:h=11074de86422
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -12975,6 +13375,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1660:row=1660:h=2257126b37ef
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -13099,6 +13501,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1710:row=1710:h=3569896b1a84
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -13223,6 +13627,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1780:row=1780:h=0d939467553e
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -13347,6 +13753,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1830:row=1830:h=db6a8f136833
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -13471,6 +13879,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1880:row=1880:h=9b18e666ca97
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -13595,6 +14005,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1900:row=1900:h=2e43c98b81a9
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -13719,6 +14131,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1210:row=1210:h=b05c00193548
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -13843,6 +14257,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1280:row=1280:h=d30959227b39
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -13967,6 +14383,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1350:row=1350:h=9e627dac3732
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -14091,6 +14509,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1420:row=1420:h=ccc0a86b3c1c
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -14215,6 +14635,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1500:row=1500:h=5c9e5059f938
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -14339,6 +14761,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1560:row=1560:h=6e9d14cad931
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -14463,6 +14887,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1600:row=1600:h=df8f7d1cb608
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -14587,6 +15013,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1660:row=1660:h=21731d530340
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -14711,6 +15139,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1710:row=1710:h=a3f9213159a2
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -14835,6 +15265,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1780:row=1780:h=2d30e55c31f6
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -14959,6 +15391,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1830:row=1830:h=15a152f7dd60
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -15083,6 +15517,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1880:row=1880:h=bf2e20291268
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -15207,6 +15643,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1900:row=1900:h=fb9d59cdf6e0
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -15331,6 +15769,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_56::T=1880:row=1880:h=fd21d18c847d
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -15455,6 +15895,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_56::T=1900:row=1900:h=bf3d0c0489ee
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -15579,6 +16021,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_56::T=1980:row=1980:h=31e1565c943c
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -15703,6 +16147,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_56_row_2150_upper_limit_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -15831,6 +16277,8 @@ observations:
         pdf_page_index: 3
         section: Experimental Procedure
         note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1210:row=1210:h=2936abd56365
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -15955,6 +16403,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1280:row=1280:h=b19842469713
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -16079,6 +16529,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1350:row=1350:h=1524d59fb3a2
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -16203,6 +16655,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1420:row=1420:h=2d69f32ee856
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -16327,6 +16781,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1500:row=1500:h=b02947039446
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -16451,6 +16907,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1560:row=1560:h=77d7be0abefd
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -16575,6 +17033,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1600:row=1600:h=890f6ca91643
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -16699,6 +17159,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1660:row=1660:h=f261d4304fe3
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -16823,6 +17285,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1710:row=1710:h=ba2d5f5883c5
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -16947,6 +17411,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1780:row=1780:h=e315f06570d0
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17071,6 +17537,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1830:row=1830:h=0f3d98d83738
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17195,6 +17663,8 @@ observations:
     parameters: []
     output_unit: amp
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_23_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17227,10 +17697,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17284,6 +17754,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_24_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17316,10 +17816,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17373,6 +17873,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_25_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17405,10 +17935,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17462,6 +17992,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_26_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17494,10 +18054,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17551,6 +18111,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_39_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17583,10 +18173,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17640,6 +18230,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_44_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17672,10 +18292,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17729,6 +18349,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_50_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17761,10 +18411,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17818,6 +18468,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_51_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17850,10 +18530,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17907,6 +18587,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_52_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -17939,10 +18649,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -17996,6 +18706,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_56_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -18028,10 +18768,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -18085,6 +18825,36 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas
 - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_78_appearance_potential_typed_refusal
   experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
   identity:
@@ -18117,10 +18887,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear extrapolation
-      from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using
+      Hg+ to calibrate the energy scale; curve points are not tabulated.
   admission:
     status: rejected
     reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss token.
@@ -18174,3 +18944,33 @@ observations:
         pdf_page_index: 11
         table: II
         note: Table II gives no temperature for the appearance-potential measurement.
+  derivation:
+    relation: Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated
+      energy scale.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined
+          by linear extrapolation.
+    method:
+      state:
+        tag: value
+        value: Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy
+          scale.
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+    references: []
+  provenance:
+    printed_phase: gas

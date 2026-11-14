@@ -16,7 +16,7 @@ from simulator.chemistry.kernel.capabilities import (
 )
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -134,7 +134,7 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
             return {}
         from simulator.state import GAS_CONSTANT
 
-        scale = GAS_CONSTANT * temperature_K / (volume_m3 * 1.0e5)
+        scale = GAS_CONSTANT * temperature_K / (volume_m3 * PA_PER_BAR)
         return {
             str(species): max(0.0, float(mol)) * scale
             for species, mol in dict(holdup_mol or {}).items()

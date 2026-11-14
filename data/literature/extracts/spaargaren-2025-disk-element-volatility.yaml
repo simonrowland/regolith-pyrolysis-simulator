@@ -1,0 +1,828 @@
+schema_version: literature_extract.v1
+source_id: spaargaren-2025-disk-element-volatility
+source:
+  citation: Spaargaren, Rob J., Herbort, Oliver, Wang, Haiyang S., Mojzsis, Stephen J., and Sossi, Paolo (2025),
+    Proto-planetary disk composition-dependent element volatility in the context of rocky planet formation, Astronomy
+    & Astrophysics.
+  year: 2025
+  doi: 10.1051/0004-6361/202556011
+  corpus_asset: raw/spaargaren-2025-disk-element-volatility/spaargaren-2025-disk-element-volatility.pdf
+  corpus_sha256: 5a3317c5c7b0c1448672ee7bb9309384062d34646a6b25e36eb4bc4f1d393568
+extraction:
+  method: Manual transcription checked digit by digit against rendered images of all 31 PDF pages at 200 dpi or
+    higher; Table 1 transcribed in full; figure curves not digitised.
+  date: '2026-10-05'
+  worker: codex-resume-72691-1791252001
+review_status: draft
+evidence_policy:
+  classification: model_derived_with_quoted_comparators_and_figure_only_results
+  measurement_claim: This is a computational condensation-sequence and planetary-composition study, not a laboratory
+    measurement paper. GGchem outputs are model_derived; the Lodders (2003) and Wood et al. (2019) table entries
+    are quoted_attributed; un-tabulated model curves are figure_only.
+  missing_values: Unprinted quantities are not inferred; no numerical curve values were digitised.
+model_generators:
+- GGchem (Woitke et al. 2018), local chemical and phase equilibrium; condensation temperature parametrisations and
+  derived planetary-composition calculations by the authors
+experiments:
+- experiment_id: spaargaren_2025_solar_disk_ggchem
+  method: engine_evaluation
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    section: 2.1 Condensation sequence model
+    table: '1'
+  conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: 0.0001
+      locator:
+        page: 3
+        section: '2.1'
+species:
+  Disk_model:
+    observations: []
+    context:
+    - observation_id: spaargaren_2025_table1_solar_condensation_temperatures
+      type: thermodynamic_example
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+      units: K
+      values:
+        quantity: solar_disk_50_percent_condensation_temperature_table
+        method_class: model_derived
+        attribution: GGchem values are calculated in this study; L03 and W19 are quoted comparators attributed to
+          Lodders (2003) and Wood et al. (2019).
+        composition: solar abundances from Lodders (2003)
+        total_pressure_bar_as_printed: 0.0001
+        stated_uncertainty_GGchem: ± 5 K
+        rows:
+        - element: O
+          L03_temperature_K: 180.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 183.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_upper_bound_K: 400.0
+          GGchem_comparator_as_printed: <
+        - element: Na
+          L03_temperature_K: 958.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 1035.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 941.0
+        - element: Mg
+          L03_temperature_K: 1336.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 1343.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 1336.0
+        - element: Al
+          L03_temperature_K: 1653.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 1652.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 1652.0
+        - element: Si
+          L03_temperature_K: 1310.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 1314.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 1320.0
+        - element: S
+          L03_temperature_K: 664.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 672.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 661.0
+        - element: Ca
+          L03_temperature_K: 1517.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 1535.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 1512.0
+        - element: Ti
+          L03_temperature_K: 1582.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 1565.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 1571.0
+        - element: Fe
+          L03_temperature_K: 1334.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 1338.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 1332.0
+        - element: Ni
+          L03_temperature_K: 1353.0
+          L03_method_class: quoted_attributed
+          L03_attribution: Lodders (2003)
+          W19_temperature_K: 1363.0
+          W19_method_class: quoted_attributed
+          W19_attribution: Wood et al. (2019)
+          GGchem_method_class: model_derived
+          GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+          GGchem_temperature_K: 1282.0
+    - observation_id: spaargaren_2025_model_scope_and_conditions
+      type: method
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.1 Condensation sequence model
+      units: as printed
+      values:
+        quantity: computational_model_scope_and_input_conditions
+        method: engine_evaluation
+        generator: GGchem (Woitke et al. 2018)
+        equilibrium: chemical and phase equilibrium by law of mass action under local thermodynamic equilibrium
+        starting_temperature_K: 2500
+        ending_temperature_K: 400
+        baseline_total_pressure_bar: 0.0001
+        pressure_context: representative solar-disk pressure at 1 AU; authors correct condensation temperatures
+          using Timmermann et al. (2023)
+        thermodynamic_databases:
+        - NIST-JANAF (Chase et al. 1982)
+        - SUPCRTBL (Johnson et al. 1992; Zimmer et al. 2016)
+        model_scope: 24 elements, 552 gaseous molecule species, and 240 condensate species in the code; this study
+          constrains O, Mg, Si, Fe, Ca, Al, Na, Ni, S and C, with additional H, He, Cl, K, Ti and N as described
+          by the authors
+        physical_apparatus:
+          state: {tag: not_applicable, reason: computational_study_without_physical_apparatus}
+        cell_material:
+          state: {tag: not_applicable, reason: no_physical_cell}
+        orifice:
+          diameter: {state: {tag: not_applicable, reason: no_physical_orifice}}
+          channel_length: {state: {tag: not_applicable, reason: no_physical_orifice}}
+        pressure_calibration:
+          method: {state: {tag: not_applicable, reason: no_mass_spectrometric_pressure_measurement}}
+        ionisation_energy_eV:
+          state: {tag: not_applicable, reason: no_mass_spectrometric_ionisation}
+        background_pressure:
+          state: {tag: not_applicable, reason: computational_study_no_chamber_background}
+        temperature_measurement:
+          sensor: {state: {tag: not_applicable, reason: temperature_is_a_model_input_or_state_variable}}
+        temperature_calibration:
+          method: {state: {tag: not_applicable, reason: temperature_is_a_model_input_or_state_variable}}
+        sample_preparation:
+          state: {tag: not_applicable, reason: disk_composition_set_from_stellar_and_solar_abundances}
+        activity_ions_and_standard_states:
+          state: {tag: not_applicable, reason: no_oxide_activities_reported}
+    - observation_id: spaargaren_2025_stellar_sample_and_selection
+      type: characterization
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2 Stellar abundances
+      units: as printed
+      values:
+        quantity: GALAH_stellar_abundance_sample_selection
+        catalogue: GALAH DR 3.2; solar normalisation Asplund et al. (2009)
+        final_sample_before_outlier_removal: 91982
+        outliers_removed: 780
+        sample_after_outlier_removal: 91202
+        condensation_sequence_sample_size: 1000
+        metallicity_range: 8.0–10.0
+        solar_metallicity: 8.99
+        filters: flag_sp=0; flag_x_fe=0 for C, O, Fe, Mg and Si; remove stars with log g < 3.5
+        nitrogen_abundance: '[N/O] parameterised from [O/H] following Nicholls et al. (2017)'
+        sulphur_abundance: '[S/Si]=0 adopted for all stars'
+        chlorine_abundance: solar value scaled to stellar metallicity
+        helium_abundance: H set to 12; He set to solar 10.93
+        source_qualification: N, S and Cl are absent from GALAH abundance measurements and are estimated as stated
+          by the authors
+    - observation_id: spaargaren_2025_model_uncertainty_and_qualifications
+      type: method
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        section: 2.1 Condensation sequence model
+      units: as printed
+      values:
+        quantity: stated_uncertainty_and_model_limitations
+        table_1_GGchem_uncertainty_K: ± 5 K
+        comparability: GGchem results match Lodders (2003) within 20 K for all elements except Ni, and Wood (1993)
+          within 25 K for all elements except Ni and Na
+        ni_phase_limit: GGchem does not include solid solutions such as metal alloys; Ni is modelled as pure Ni
+          metal, so it condenses at lower temperature than Fe-Ni alloys
+        oxygen_and_sulphur: C and S show non-monotonic condensation; effective condensation temperatures are proposed
+          for these cases and are explicitly not mathematically equivalent to 50% condensation temperatures
+        pressure_adjustment: authors state condensation temperatures scale linearly with pressure for all elements
+          except S
+        model_uncertainty: authors state the results provide a conservative lower bound on rocky-exoplanet compositional
+          diversity; planetary-accretion dynamics remain under-constrained for most systems
+        directional_claims_rechecked_against_page_images:
+        - quote: Fe and Ni only depend on their own abundances
+          locator: page 18, Conclusions; page 22, Appendix A.2
+        - quote: increasing Fe and Ni abundances raise the partial pressures of monatomic Fe and Ni gases, enhancing
+            their condensation temperatures
+          locator: page 5, §3.1
+        - quote: At low C/O, Tc shows a weak decrease with increasing C/O
+          locator: page 5, §3.2
+        - quote: their condensation temperatures drop by 150–200 K across this transition
+          locator: page 5, §3.2
+        - quote: TCAl is unaffected by disk Ca abundance. Instead, TCAl depends primarily on the Al abundance
+          locator: page 6, §3.2
+        - quote: the condensation of Mg, Si, Ca, and Al is primarily governed by oxygen availability and each element’s
+            abundance
+          locator: page 6, §3.2
+        - quote: condensation temperatures can vary by up to 100 K
+          locator: page 6, §3.2
+        - quote: the molar disk Mg/Si ratio influences T_C^Na more strongly (200 K shift) than the disk C/O ratio
+            (100 K shift)
+          locator: page 6, §3.3
+        - quote: the volatility order of rock-forming elements ... differs significantly from that at near-solar
+            C/O
+          locator: page 5, §3.2
+        - quote: The volatility of Fe and Ni only depend on their own abundances, and do not depend on other elemental
+            abundances
+          locator: page 18, Conclusions
+        - quote: In oxygen-rich environments, the condensation temperatures of rock-forming elements decrease with increasing C/O
+          locator: page 18, Conclusions
+        - quote: each element except Si becomes less volatile as their abundance increases; the volatility of Si
+            increases
+          locator: page 18, Conclusions
+        - quote: For disks with C/O > 1.04, all element volatilities become independent of C/O
+          locator: page 18, Conclusions
+        - quote: Sulphur remains moderately volatile in all disk environments, although it becomes somewhat more
+            refractory as oxygen is depleted
+          locator: page 18, Conclusions
+        - quote: carbon condensation as graphite is controlled by the ratio of oxide-forming elements to oxygen
+            rather than C/O alone
+          locator: page 19, Conclusions
+        - quote: At Mg/Si < 1.6, more Si condenses as the less refractory enstatite
+          locator: page 6, §3.2
+        - quote: At Mg/Si ≥ 1.5, albite is replaced by nepheline
+          locator: page 7, §3.3
+        - quote: the traditional 50% Tc description fails to capture the condensation behaviour of semi-volatile
+            elements like C, O, and S
+          locator: page 7, §4
+        - quote: C and S are not monotonic with decreasing temperature
+          locator: page 7, §4
+        - quote: the effective temperatures increase steadily with both increasing α and β
+          locator: page 28, Appendix C
+        - quote: Vesta uniformally has higher TC,eff and TS,eff than Earth, while Mars always has slightly lower temperatures
+          locator: page 28, Appendix C
+        - quote: the condensation temperature of graphite starts increasing considerably at C/O=1.04
+          locator: page 26, Appendix B
+        - quote: At high C/O, both Ca and Mg tend to form sulphides rather than oxides
+          locator: page 26, Appendix B
+        - quote: the stable Na phase shifts from albite to nepheline to sodium metasilicate
+          locator: page 27, Appendix B
+        - quote: Refractory elements transition to O-depleted condensation at higher C/O ratios ... than the moderately refractory elements
+          locator: page 5, §3.2
+        - quote: Although at near-solar C/O Si is the most volatile of these four elements, it becomes the most refractory at high C/O, followed by Ca and Al with Mg becoming the most volatile
+          locator: page 5, §3.2
+        - quote: T_C^Mg increases with both O and Mg abundances
+          locator: page 6, §3.2
+        - quote: At higher Ca/Al, the less refractory larnite ... reducing T_C^Ca
+          locator: page 6, §3.2
+        - quote: nepheline is more volatile
+          locator: page 7, §3.3
+        - quote: sodium metasilicate has an even lower condensation temperature
+          locator: page 7, §3.3
+        - quote: For Na, this T_C drop is less severe
+          locator: page 11, §6.1
+        - quote: Si becomes increasingly refractory as C/O rises above 1.02
+          locator: page 12, §6.1
+        - quote: Rock-forming elements scale more strongly with P and M the more refractory they are
+          locator: page 12, §6.1
+        - quote: Fe and Ni scale more strongly with P and more weakly with M
+          locator: page 12, §6.1
+        - quote: graphite depends strongly on metallicity but not at all on gas pressure, while SiC increases moderately with both
+          locator: page 12, §6.1
+        - quote: Mars is less volatile-depleted than Earth
+          locator: page 15, §6.3
+        - quote: Vesta has a much steeper, more volatile-depleted pattern
+          locator: page 15, §6.3
+        - quote: T_C^Cl is higher under sequential condensation
+          locator: page 16, §6.4
+        - quote: planets in high-C/O conditions may be more depleted in Na and K
+          locator: page 16, §6.4
+        - quote: increased volatility of Na, K, and S in solar-like compositions
+          locator: page 17, §6.4
+        - quote: sulphur becomes more refractory and oxygen more volatile
+          locator: page 17, §6.4
+        - quote: Graphite also remains stable to lower temperatures as C/O increases
+          locator: page 28, Appendix C
+        - quote: Vesta uniformally has higher effective condensation temperatures than Earth
+          locator: page 28, Appendix C
+    - observation_id: spaargaren_2025_un-tabulated_figure_results
+      type: figure_series
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        figure: 1–16; B.1–B.3; C.1–C.2; D.1–D.2
+      units: figure-only model output; no points digitised
+      values:
+        quantity: un-tabulated_condensation_and_planet_composition_model_curves
+        method_class: figure_only
+        generator: authors’ GGchem condensation-sequence and derived planet-composition calculations
+        figures:
+        - figure: '1'
+          page: 4
+          pdf_page_index: 3
+        - figure: '2'
+          page: 5
+          pdf_page_index: 4
+        - figure: '3'
+          page: 6
+          pdf_page_index: 5
+        - figure: '4'
+          page: 6
+          pdf_page_index: 5
+        - figure: '5'
+          page: 6
+          pdf_page_index: 5
+        - figure: '6'
+          page: 7
+          pdf_page_index: 6
+        - figure: '7'
+          page: 8
+          pdf_page_index: 7
+        - figure: '8'
+          page: 9
+          pdf_page_index: 8
+        - figure: '9'
+          page: 10
+          pdf_page_index: 9
+        - figure: '10'
+          page: 11
+          pdf_page_index: 10
+        - figure: '11'
+          page: 13
+          pdf_page_index: 12
+        - figure: '12'
+          page: 14
+          pdf_page_index: 13
+        - figure: '13'
+          page: 16
+          pdf_page_index: 15
+        - figure: '14'
+          page: 17
+          pdf_page_index: 16
+        - figure: '15'
+          page: 18
+          pdf_page_index: 17
+        - figure: '16'
+          page: 19
+          pdf_page_index: 18
+        - figure: B.1
+          page: 26
+          pdf_page_index: 25
+        - figure: B.2
+          page: 27
+          pdf_page_index: 26
+        - figure: B.3
+          page: 28
+          pdf_page_index: 27
+        - figure: C.1
+          page: 28
+          pdf_page_index: 27
+        - figure: C.2
+          page: 29
+          pdf_page_index: 28
+        - figure: D.1
+          page: 30
+          pdf_page_index: 29
+        - figure: D.2
+          page: 31
+          pdf_page_index: 30
+        digitized_values: none
+        semantics: model curves and distributions are not measured observations; numerical plot points are not transcribed
+    - observation_id: spaargaren_2025_numeric_prose_context
+      type: thermodynamic_example
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Abstract, Introduction, Methods, Results, Discussion, Conclusions and Appendices
+      units: as printed
+      values:
+        quantity: printed_numeric_context
+        abstract_C_O_classes: 'Earth-like: C/O ≤ 0.75; graphite-bearing: C/O > 0.75; intermediate class C/O 0.84–1.04'
+        other_printed_context: MVE condensation temperatures 600–1300 K; oxygen-poor fO2 < IW−6; low-Tc constraint
+          below 400 K; solar disk reference 1 AU and 10^-4 bar; stellar catalogue and model sample sizes and cutoffs
+          are retained in spaargaren_2025_stellar_sample_and_selection
+        numerical_discussion:
+        - locator: page 1, Abstract
+          statement: Earth-like planets are associated with C/O ≤ 0.75; graphite-bearing planets with C/O > 0.75;
+            an intermediate class spans C/O 0.84–1.04.
+        - locator: page 2, Introduction
+          statement: Moderately volatile elements are described as having condensation temperatures between 600
+            K and 1300 K; the cited oxygen-poor regime is fO2 < IW−6.
+        - locator: page 3, §2.1
+          statement: The gas parcel cools from 2500 K to 400 K; baseline pressure is 10^-4 bar and the pressure
+            correction is stated to be linear except for S.
+        - locator: page 3, §2.2
+          statement: After applying the criteria, the final dataset consists of 91,982 stars.
+        - locator: page 4, §2.2
+          statement: 780 outliers are removed, leaving 91,202 stars; 1,000 stars are selected for the condensation-
+            sequence sample; metallicity spans 8.0–10.0 and solar metallicity is 8.99.
+        - locator: page 5, §3.2
+          statement: The transition temperatures drop by 150–200 K; the critical C/O values printed for Ca, Al,
+            Mg and Si are 0.936, 0.94, 0.875 and 0.828. Calcium rises by about 40 K near C/O=1.045 and Si by
+            over 400 K across C/O=1.022–1.045.
+        - locator: page 6, §3.2–3.3
+          statement: The source states condensation temperatures vary by up to 100 K and change planetary bulk composition
+            by as much as 30%.
+        - locator: page 7, §4
+          statement: About 20% of disk oxygen condenses as silicates by temperatures as high as 1700 K; the oxygen
+            effective condensation temperature is 894 K; carbon effective condensation is 0 K in the solar disk
+            because it does not condense above the 400 K lower model limit.
+          method_class: model_derived
+        - locator: page 7, §4
+          statement: Wang et al. (2019a) report an oxygen effective condensation temperature range of 875±45 K and a
+            cited estimate for carbon effective condensation of 305 +73/−135 K.
+          method_class: quoted_attributed
+        - locator: page 10, §5
+          statement: For C/O from 0.8 to 1.0, Fe+Ni is 40–50 wt% versus 20–40 wt%; mantle minor elements rise from
+            nominally 5–12 mol% to as much as 20 mol%; bulk Mg/Si reaches 2.5, and at C/O > 1.04 is typically below
+            0.5.
+        - locator: page 11, §6.1
+          statement: This study finds Ca condensation stabilises at 1265 K and Al at 1230 K.
+          method_class: model_derived
+        - locator: page 11, §6.1
+          statement: Lodders and Fegley Jr. (1995) report graphite condensation rising from below 1000 K at C/O<0.98
+            to 2000 K at C/O=2.0; Lodders and Fegley Jr. give the Al comparator of 1316 K.
+          method_class: quoted_attributed
+        - locator: page 12, §6.1
+          statement: Pressure changes are stated as 40–80 K per order of magnitude in pressure and metallicity changes
+            as 70–160 K per order of magnitude; Earth-like CMF spans 25–38 wt% under M and P variation.
+        - locator: page 13, §6.2.1
+          statement: Low-C/O predicted core mass fractions are 19–41 wt%; intermediate C/O 0.84–1.02 reaches up
+            to 50 wt%.
+        - locator: page 14, §6.2.2
+          statement: The text gives C-bearing planets at C/O as low as 0.6 and C-free planets up to 0.95; 12.36%
+            of GALAH DR3.2 stars after quality filtering may host refractory-carbon planets.
+        - locator: page 15, §6.3
+          statement: Mars fit parameters are α=2.984±0.044 and β=−9.33±0.41; Vesta α=10.80±0.22 and β=−33.4±1.9;
+            Vesta-like exoplanets reach CMF up to 70 wt%.
+        - locator: page 16, §6.4
+          statement: Sequential condensation inhibition temperatures considered are 3000 K, 1400 K, 1000 K and 600 K.
+        - locator: page 17, §6.4
+          statement: An Fe grain of 1 metre is stated to convert fully to FeS within 1,000 years.
+        - locator: page 19, Conclusions
+          statement: The paper predicts 12% of rocky planets have more than 1 mol% C in their interiors; the high-C/O
+            intermediate population is C/O 0.84–1.04.
+        - locator: page 29, Appendix D
+          statement: At C/O ≥ 0.9, a Vesta-like body can reach CMF as high as 70 wt%; at low C/O (C/O ≤ 0.9),
+            Ca+Al reservoirs occur when planets primarily sample high-temperature space. At higher C/O, major Ca+Al
+            reservoirs occupy a small parameter-space region, primarily α>11; at high C/O the enrichment disappears
+            as graphite is stable to very high temperature.
+        additional_printed_numeric_context:
+        - locator: page 3, §2.2
+          statement: Of the 16 selected elements, only abundances of our five selection criteria elements (C, O Fe,
+            Mg, and Si), Na, Al, K, Ca, Ti, and Ni are commonly available in our dataset.
+        - locator: page 4, Eq. 2
+          statement: '[N/O] = log10(10^-1.732 + 10^(A_O - 12 + 2.19)).'
+        - locator: page 4, §2.2
+          statement: Across the GALAH metallicity span, condensation-temperature variations range from 72 K for Ni to 165 K for Al.
+        - locator: page 4, §2.3
+          statement: The 50% threshold is log10(0.5) = -0.301.
+        - locator: page 5, Eq. 4
+          statement: 'Wang et al. (2019a) devolatilisation law: log f_i = α log T_C^i + β, α = 3.676 ± 0.142, β = -11.556 ± 0.436.'
+          method_class: quoted_attributed
+        - locator: page 5, §3.2
+          statement: T_C^Mg at C/O=0.94 and T_C^Al at C/O=1.039 decrease by about 50 K before stabilising.
+        - locator: page 5, §3.2
+          statement: MgS is stable only over 20–100 K.
+        - locator: page 5, §3.2
+          statement: Mg O-depleted condensation occurs at C/O as low as 0.75 (Mg/O > 0.2) and as high as 0.92 (Mg/O < 0.05).
+        - locator: page 5, §3.2
+          statement: Transition widths are 0.05 C/O for Ca and Al, 0.26 for Si, and 0.17 for Mg.
+        - locator: page 5, §3.2
+          statement: Lodders (2003) gives forsterite T_C=1354 K and enstatite T_C=1316 K.
+        - locator: page 5, §3.2
+          statement: At Mg/Si > 1.6, forsterite is the primary Si- and Mg-bearing condensate.
+        - locator: page 6, Figs. 4–5 captions
+          statement: The solar C/O value is 0.55 and solar Mg/Si is 1.23.
+        - locator: page 6, §3.2
+          statement: Ca/Al < 2.0 gives gehlenite and perovskite; higher Ca/Al gives larnite.
+        - locator: page 6, §3.3
+          statement: The critical C/O for Na is 0.819.
+        - locator: page 7, §3.3
+          statement: Albite is about 50 K higher when quartz is stable, only at Mg/Si ≤ 0.83; nepheline remains stable up to Mg/Si=1.97.
+        - locator: page 7, §4
+          statement: Oxygen 50% T_C is reached only at 180 K (Lodders 2003); depletion exceeds 99%, while the Earth–Sun oxygen depletion factor is about 80%.
+        - locator: page 7, §4
+          statement: At C/O > 0.8, carbon initially condenses as graphite above 1100 K.
+        - locator: page 7, §4
+          statement: The fitted Fe relation is T_C^Fe = 4.776 A_Fe^2 + 12.77 A_Fe + 964.64.
+        - locator: page 8, §4
+          statement: Graphite begins at C/O≈0.7; Fig. 7 displays C/O=0.9 and 1.25 disks with a 0.25 mol% threshold.
+        - locator: page 9, Eq. 5
+          statement: Σ/O = (ε_C + 2ε_Si + ε_Mg + ε_Ca + 1.5ε_Al + 0.5ε_Na)/ε_O.
+        - locator: page 9, §5
+          statement: The graphite field extends at C/O > 1.04; CH4 is below 750 K; Earth devolatilisation cut-off is 1391 K; T_O,eff is always greater than 500 K.
+        - locator: page 9, §5
+          statement: FeS is primary at C/O < 0.8; MgS/CaS at Σ/O > 1.005; T_S,eff rarely exceeds 1000 K.
+        - locator: page 10, §5
+          statement: Mg-depleted planets occur at C/O > 1.04; Mg+Si-depleted at 0.84–1.04; star-like Fe/Mg/Si at C/O ≤ 0.84.
+        - locator: page 10, §5
+          statement: Ca and Al remain refractory up to C/O=0.95.
+        - locator: page 10, §6.1
+          statement: T_C^Si is forsterite only if Mg/Si > 1.5; MgO at Mg/Si ≥ 2.0; SiO2 at Mg/Si ≤ 0.87.
+        - locator: page 10, §6.1
+          statement: T_C drops by 100 K from C/O=0 to 0.8, followed by a rapid 100–300 K drop.
+        - locator: page 11, Fig. 10 caption
+          statement: The solar C/O is printed as 0.54 (Asplund et al. 2009), differing from 0.55 on page 6; both source values are retained as internally inconsistent.
+        - locator: page 11, §6.1
+          statement: Mg and Si are moderately volatile at C/O as low as 0.75; N/O restricts O only at N/O > 0.75, and all disks have N/O ≤ 0.25.
+        - locator: page 11, §6.1
+          statement: Previous Ca estimates are 1240 K (Larimer & Bartholomay (1979)) and 1295 K (Lodders & Fegley Jr
+            (1995)).
+        - locator: page 12, §6.1
+          statement: Si is refractory above C/O=1.02; SiC is primary at C/O as low as 0.75; less than 50% of Si is SiC below C/O=1.02; plateau C/O=1.10; T_C^SiC=1633 K; CaS limits Si to at most 6%.
+        - locator: page 12, §6.1
+          statement: T_C^Mg stabilises at 1060 K above C/O=0.94, versus 1080 K in Lodders et al.
+        - locator: page 12, §6.1
+          statement: At Σ/O > 1, T_S,eff rises by 100 K; pyrite occurs at [Fe/S] < -0.67, while the sample has [Fe/S] ≥ -0.45.
+        - locator: page 12, §6.1
+          statement: Silicates condense as liquid at P > 10^-2 bar (Ebel et al. 2006).
+        - locator: page 12, §6.2
+          statement: Core fraction is underestimated by about 0.3%; 0.8% of planets are Mg-depleted versus earlier 10–50%; Mg/Si < 1.0 versus prior <0.75 criterion; 5% have Mg/Si > 1.6.
+        - locator: page 13, §6.2.1
+          statement: C/O 0.9–1.02 planets rarely have cores below 40 wt%; the comparison is 40–50 wt% at C/O 0.85–1.0 versus 19–41 wt% below 0.75; oxidised Fe condenses below 500 K only.
+        - locator: page 14, §6.2.2
+          statement: Earlier graphite thresholds are C/O > 0.8 (Bond et al. 2010b) and as low as 0.65 (Moriarty et al. 2014).
+        - locator: page 14, §6.2.2
+          statement: GALAH stars with C/O > 0.8 are 11.90%; Hypatia within 200 pc gives 3.71% and 2.84%.
+        - locator: page 14, §6.2.2
+          statement: Planet carbon budget is 20–30 mol% at C/O=1.0, rising to 40–80 mol% above C/O=1.04; silicates still form below 1000 K.
+        - locator: page 14, §6.2.2
+          statement: MgS/CaS are stable mantle phases at fO2 < IW−2; fewer than 2% of the sample has more than 1 mol% S.
+        - locator: pages 15–16, §6.3–6.4
+          statement: Gas-solid reactions are rapid above 600 K; grains are smaller than 0.01 µm; sequential graphite extends to C/O=0.6 (Moriarty et al. 2014).
+        - locator: page 16, §6.4
+          statement: Sequential T_C equals equilibrium for T_C > 1000 K except Ca at T0 > 1800 K; sequential Na/K T_C is several 100 K lower.
+        - locator: page 17, §6.4
+          statement: Graphite is stable only above 700 K (T_C,eff^C=0 if T0<700 K); Lodders (2003) gives anorthite at 1387 K.
+        - locator: page 18, Conclusions
+          statement: Mantle sulphur does not typically exceed 1 mol%; graphite buffers gas to C/O=1.0.
+        - locator: page 26, Appendix B
+          statement: CaS is the primary Ca condensate at C/O as low as 0.8.
+        - locator: pages 27–28, Appendix B
+          statement: Figs. B.2/B.3 use stability threshold 10^-7 n_H; albite rises by 50 K once SiO2 is stable.
+        - locator: page 29, Appendix D
+          statement: CMF approaches 0 at α>11 and β<−35; low-C/O Ca+Al reservoirs occur at C/O≤0.9.
+    - observation_id: spaargaren_2025_appendix_a_model_parametrisations
+      type: method
+      locator:
+        page: 22
+        published_page: 22
+        pdf_page_index: 21
+        section: Appendix A, Eqs. A.1–A.12
+      units: as printed; condensation temperatures in K
+      values:
+        quantity: model_parametrisations
+        method_class: model_derived
+        attribution: Fitted by the authors from 1,000 GGchem simulations; equations are carried as located model context because the extract schema has no fitted-equation field.
+        metallicity_reference_M_sun: 8.99
+        C_O_1_30_series_note: Eq. A.1 carbon metallicity series adjusts C and O abundances to C/O=1.30 while keeping their sum constant.
+        equations:
+          A.1:
+            locator_page: 22
+            printed_forms:
+              Na: T_M^Na(M) = 6.08 M^2 - 33.16 M + 732.57
+              Mg: T_M^Mg(M) = 12.65 M^2 - 96.68 M + 1173.24
+              Al: T_M^Al(M) = 14.89 M^2 - 102.05 M + 1350.80
+              Si: T_M^Si(M) = 10.42 M^2 - 60.90 M + 1024.73
+              Ca: T_M^Ca(M) = 13.49 M^2 - 95.13 M + 1263.85
+              Fe: T_M^Fe(M) = 5.23 M^2 - 9.02 M + 988.58
+              Ni: T_M^Ni(M) = 3.94 M^2 + 2.92 + 931.38
+              C: T_M^C(M) = 24.97 M^3 - 687.27 M^2 + 6353.20 M - 18764.59
+              O: T_M^O(M) = 4.998 M^5 - 2.118·10^2 M^4 + 3.572·10^3 M^3 - 2.998·10^4 M^2 + 1.253·10^5 M - 2.077·10^5
+              S: T_M^S(M) = 2.59 M^5 - 1.085·10^2 M^4 + 1.81·10^3 M^3 - 1.51·10^4 M^2 + 6.26·10^4 M - 1.03·10^5
+            printed_numeric_coefficients:
+              Na: [6.08, -33.16, 732.57]
+              Mg: [12.65, -96.68, 1173.24]
+              Al: [14.89, -102.05, 1350.80]
+              Si: [10.42, -60.90, 1024.73]
+              Ca: [13.49, -95.13, 1263.85]
+              Fe: [5.23, -9.02, 988.58]
+              Ni: [3.94, 2.92, 931.38]
+              C: [24.97, -687.27, 6353.20, -18764.59]
+              O: [4.998, -211.8, 3572, -29980, 125300, -207700]
+              S: [2.59, -108.5, 1810, -15100, 62600, -103000]
+            source_internally_inconsistent: The printed Ni expression omits M after 2.92; retained as printed.
+          A.2:
+            locator_page: 22
+            printed_form: T_C^Fe = 4.776 A_Fe^2 + 12.77 A_Fe + 964.64 + T_M^Fe(M) - T_M^Fe(M_sun)
+            printed_numeric_coefficients: [4.776, 12.77, 964.64]
+          A.3:
+            locator_page: 22
+            printed_form: T_C^Ni = 4.396 A_Ni^2 + 18.97 A_Ni + 986.76 + T_M^Ni(M) - T_M^Ni(M_sun)
+            printed_numeric_coefficients: [4.396, 18.97, 986.76, 8.99]
+          A.4:
+            locator_page: 22
+            printed_form: f_asymptote(x) = a x'^n/(b + x'^n), where x' = αx + β and typically α < 0
+          A.5:
+            locator_page: 23
+            printed_form: Ca C/O middle segment = 3.052·10^3(C/O)^2 - 5.81·10^3(C/O) + 4.001·10^3; plateau 1265.77; C/O_crit=0.95-7.245(Ca/O-Ca/O_sun); upper=1.045; asymptote a=1919.6, b=1.356, n=0.1396, α=-1.76·10^5, β=1.726·10^5; abundance coefficients 39.52 and 53.91; Ca/Al polynomial = 2.83(Ca/Al)^4 - 17.39(Ca/Al)^3 + 27.78(Ca/Al)^2 - 12.05(Ca/Al) + 1497.29
+            printed_numeric_coefficients: [3052, -5810, 4001, 1265.77, 0.95, -7.245, 1.045, 1919.6, 1.356, 0.1396, -176000, 172600, 39.52, 53.91, 2.83, -17.39, 27.78, -12.05, 1497.29]
+          A.6:
+            locator_page: 23
+            printed_form: C/O' = C/O + 4.47 Al/O - 0.022; Al middle segment = -2.6649·10^5(C/O')^3 + 7.89·10^5(C/O')^2 - 7.79·10^5 C/O + 2.575·10^5; plateau 1231.46; C/O_crit=0.95, upper=1.039; asymptote a=9.563·10^4, b=75.65, n=0.03, α=-2.23·10^4, β=2.15·10^4; abundance coefficients 44.67 and 55.34
+            printed_numeric_coefficients: [4.47, -0.022, -266490, 789000, -779000, 257500, 1231.46, 0.95, 1.039, 95630, 75.65, 0.03, -22300, 21500, 44.67, 55.34]
+            source_internally_inconsistent: Eq. A.6 uses C/O in the linear polynomial term although the surrounding function is in C/O'; retained as printed.
+          A.7:
+            locator_page: 23
+            printed_form: C/O' = C/O + 1.184 Mg/O - 0.0856; Mg middle segment = -5.153·10^5(C/O')^3 + 1.418·10^6(C/O')^2 - 1.300·10^6 C/O + 3.983·10^5; upper segment = 1061.44 - 40.65(Mg/O-Mg/O_sun); C/O_crit=0.88, upper=0.94; asymptote a=1387.91, b=5.697, n=0.588, α=-8193.75, β=7787.28; abundance coefficients 36.33 and 31.86
+            printed_numeric_coefficients: [1.184, -0.0856, -515300, 1418000, -1300000, 398300, 1061.44, -40.65, 0.88, 0.94, 1387.91, 5.697, 0.588, -8193.75, 7787.28, 36.33, 31.86]
+            source_internally_inconsistent: Eq. A.7 uses C/O in the linear polynomial term although the surrounding function is in C/O'; retained as printed.
+          A.8:
+            locator_page: 24
+            printed_form: Si low-C/O includes f_asymptote(C/O)+f_Mg/Si(Mg/Si)+f_cations(Σ/O); middle polynomial = 1.142·10^4(C/O)^3 - 2.97·10^4(C/O)^2 + 2.57·10^4(C/O) - 2.765·10^3; next = -1.070·10^6(C/O)^3 + 3.252·10^6(C/O)^2 - 3.287·10^6(C/O) + 1.106·10^6; high segment = -3.650·10^5(Si/O)^4 + 2.261·10^5(Si/O)^3 - 4.990·10^4(Si/O)^2 + 4.927·10^3(Si/O) + 1.351·10^3; middle condition C/O_middle > C/O − 405.23 A_O ≥ C/O_crit; critical 0.85-1.8(Si/O-Si/O_sun), middle=1.022, upper=1.0445; asymptote a=750.48, b=5.7914·10^-2, n=3.333, α=-1, β=1.547; Mg/Si coefficients 117.69, -67.18(Mg/Si)^2, 206.82(Mg/Si), 161.89 with bounds 0.73,1.64; cation coefficients 8.523,448.63,-890.11,1401.59 with Σ/O_crit=1.0695
+            printed_numeric_coefficients: [11420, -29700, 25700, -2765, -1070000, 3252000, -3287000, 1106000, -365000, 226100, -49900, 4927, 1351, 405.23, 0.85, -1.8, 1.022, 1.0445, 750.48, 0.057914, 3.333, -1, 1.547, 117.69, -67.18, 206.82, 161.89, 0.73, 1.64, 8.523, 448.63, -890.11, 1401.59, 1.0695]
+          A.9:
+            locator_page: 24
+            printed_form: Na C/O middle = -55.844(C/O)+915.76; plateau=862.77; C/O_crit=0.77-28.82(Na/O-Na/O_sun); asymptote a=947.54,b=56.34,n=1463.62,α=-2.52·10^-3,β=1.007; Mg/Si segments 47.14, -182.86(Mg/Si-Mg/Si_middle), -148.80 with bounds 0.836,1.499,1.975; Na/Cl polynomial = 5.971·10^-2(Na/Cl)^3 - 1.879(Na/Cl)^2 + 18.96(Na/Cl) + 8.77.76
+            printed_numeric_coefficients: [-55.844, 915.76, 862.77, 0.77, -28.82, 947.54, 56.34, 1463.62, -0.00252, 1.007, 47.14, -182.86, -148.80, 0.836, 1.499, 1.975, 0.05971, -1.879, 18.96, 8.77, 76]
+            source_internally_inconsistent: The printed Na/Cl constant is garbled as “8.77.76”; retained exactly.
+          A.10:
+            locator_page: 25
+            printed_form: 'C T_O(C/O,Σ/O): 0 for Σ/O<1.0181; f_asymptote(Σ/O)+2413.80(Si/C)^2-1024.77(Si/C) for Σ/O≥1.0181 and C/O<1.079; f_asymptote(C/O)+743.10(Si/C) for C/O≥1.079; Σ/O_crit=1.0181; C/O_crit=1.079; first asymptote a=1575.77,b=0.491,n=0.613,α=1, printed “β - 1.015”; second a=1343.53,b=0.227,n=0.808,α=1,β=-0.899'
+            printed_numeric_coefficients: [2413.80, -1024.77, 743.10, 1.0181, 1.079, 1575.77, 0.491, 0.613, 1, 1.015, 1343.53, 0.227, 0.808, 1, -0.899]
+            source_internally_inconsistent: The first C asymptote parameter is printed “β - 1.015” without an equals sign; retained as printed.
+          A.11:
+            locator_page: 25
+            printed_form: Γ=(Σ-ε_C); T_Γ^O=f_lower(Γ/O)(1-t(C/O))+f_upper(Γ/O)t(C/O); f_lower=69.39(Γ/O)^2+605.66(Γ/O)+1251.52; f_upper=154.10(Γ/O)^2+588.53(Γ/O)+1012.52; t=1/[1+exp(-13.539(C/O-0.847))]
+            printed_numeric_coefficients: [69.39, 605.66, 1251.52, 154.10, 588.53, 1012.52, -13.539, 0.847]
+          A.12:
+            locator_page: 25
+            printed_form: Sulphur effective condensation temperature typically stays below 700 K in O-rich condensation and can reach 1100 K in O-depleted condensation at Σ/O=1.005; T_Σ/O^S=-35.40φ^3+811.91φ^2-6085.17φ+15540.68 for Σ/O≤1.005; otherwise T_Σ/O,upper^S(Σ/O)+T_Mg/S^S(Mg/S)+10480.54Ca/O; T_Mg/S=0.367(Mg/S)^5-9.076(Mg/S)^4+79.86(Mg/S)^3-302.50(Mg/S)^2+514.21(Mg/S); upper polynomial=-4.16·10^5(Σ/O)^4+1.897·10^6(Σ/O)^3-3.24·10^6(Σ/O)^2+2.45·10^6(Σ/O)-6.96·10^5 through 1.268, then 406.06
+            printed_numeric_coefficients: [-35.40, 811.91, -6085.17, 15540.68, 700, 1100, 1.005, 10480.54, 0.367, -9.076, 79.86, -302.50, 514.21, -416000, 1897000, -3240000, 2450000, -696000, 1.268, 406.06]
+            source_internally_inconsistent: Eq. A.12 is labelled T_C^O in print although it is the sulphur equation; retained as printed.
+        note: Fitted equations are transcribed as located context, not digitised figure curves.
+fidelity_samples:
+- species: Disk_model
+  observation_id: spaargaren_2025_table1_solar_condensation_temperatures
+  field: rows
+  value:
+  - element: O
+    L03_temperature_K: 180.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 183.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_upper_bound_K: 400.0
+    GGchem_comparator_as_printed: <
+  - element: Na
+    L03_temperature_K: 958.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 1035.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 941.0
+  - element: Mg
+    L03_temperature_K: 1336.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 1343.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 1336.0
+  - element: Al
+    L03_temperature_K: 1653.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 1652.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 1652.0
+  - element: Si
+    L03_temperature_K: 1310.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 1314.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 1320.0
+  - element: S
+    L03_temperature_K: 664.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 672.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 661.0
+  - element: Ca
+    L03_temperature_K: 1517.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 1535.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 1512.0
+  - element: Ti
+    L03_temperature_K: 1582.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 1565.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 1571.0
+  - element: Fe
+    L03_temperature_K: 1334.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 1338.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 1332.0
+  - element: Ni
+    L03_temperature_K: 1353.0
+    L03_method_class: quoted_attributed
+    L03_attribution: Lodders (2003)
+    W19_temperature_K: 1363.0
+    W19_method_class: quoted_attributed
+    W19_attribution: Wood et al. (2019)
+    GGchem_method_class: model_derived
+    GGchem_attribution: Calculated in the present study using GGchem; Table 1 uncertainty ±5 K.
+    GGchem_temperature_K: 1282.0
+  locator:
+    page: 3
+    table: '1'
+tables:
+- locator: tables/spaargaren-2025-disk-element-volatility/t1.csv
+  page: 3
+  table: '1'
+  rows: 10
+  completeness: full
+  provenance: tables/spaargaren-2025-disk-element-volatility/t1.provenance.yaml
+notes:
+- No oxide activity is reported; there are no defining ions or activity standard states in this source.
+- No physical apparatus, cell, orifice, ionisation calibration, or sample preparation is used or applicable. The
+  printed temperatures are computed model outputs.
+- The paper states Table 1 GGchem condensation temperatures have ±5 K uncertainty; this is retained verbatim. The
+  L03 and W19 comparator columns have no uncertainty stated in the table.
+- The figure-only context covers each figure locator. No plotted curve or distribution was digitised.
+- Model context retains the use of H=12, He=10.93, log g<3.5 exclusion, 780 outlier removals from 91,982 stars,
+  a 91,202-star catalogue after removal, 1,000 sampled stars, metallicity 8.0–10.0, and solar metallicity 8.99.
+- 'AMENDMENTS PROPOSED: no global schema change. Appendix A fitted equations are carried in the existing context area
+  as model_parametrisations; model outputs and printed comparators remain model_derived and quoted_attributed, and
+  un-tabulated figures remain figure_only context.'

@@ -22,6 +22,7 @@ from simulator.battery.enums import (
     Engine,
     NoticeKind,
     PerBasis,
+    Phase,
     Quantity,
     RefusalReason,
     ValueKind,
@@ -333,9 +334,23 @@ def test_b2131_cao_logkf_maps_mol_species_at_one_bar(tmp_path: Path) -> None:
     assert _cell_at(log_kf, "298.15").value.point == _reader_magnitude(
         document, Quantity.LOG10_KF, "298.15"
     )
+    gibbs = _observation(result, B2131, "high-temperature-p182", Quantity.DELTA_FG)
+    assert gibbs.identity.per.value is PerBasis.MOL_SPECIES
+    assert ":313-315" in gibbs.identity.per.reason
+    assert gibbs.identity.standard_pressure_Pa.value == bar_to_pa(1)
+    heat = _observation(result, B2131, "high-temperature-p182", Quantity.CP)
+    assert heat.identity.per.value is PerBasis.MOL_SPECIES
+    assert heat.identity.per.reason is None
+    assert heat.identity.standard_pressure_Pa.is_unknown
+    # Cubic crystals are one window, so the cell is generic-solid CaO.
+    # 298.15 K is below the Ca(s) segment, so the fit refuses the clamp.
     attempt = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(log_kf, "298.15"))
+    assert log_kf.identity.species.phase.value is Phase.CR
     assert attempt.value is None
-    assert attempt.refusal_detail["reason"] == "ellingham-phase-or-polymorph-not-in-fit"
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "ellingham-formation-outside-segment"
+    assert "generic-solid" in (attempt.call_evidence or "")
+    assert "outside-segment" in (attempt.call_evidence or "")
 
 
 def test_b689_ags_cp_converter_basis_is_independent_of_enthalpy(tmp_path: Path) -> None:
@@ -416,9 +431,26 @@ def test_b592_aluminum_gas_outside_interval_uses_converter_basis(tmp_path: Path)
 
 def test_b2131_silver_stays_unmapped(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B2131, "high-temperature-p067.json")
-    log_kf = _observation(result, B2131, "high-temperature-p067", Quantity.LOG10_KF)
-    assert _per_is_unknown(log_kf)
-    attempt = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(log_kf, "1600"))
+    liquid = _observation(
+        result,
+        B2131,
+        "high-temperature-p067",
+        Quantity.LOG10_KF,
+        contains="log10_Kf:w1",
+    )
+    crystal = _observation(
+        result,
+        B2131,
+        "high-temperature-p067",
+        Quantity.LOG10_KF,
+        contains="log10_Kf:w0",
+    )
+    assert _per_is_unknown(liquid)
+    assert _per_is_unknown(crystal)
+    assert liquid.identity.species.phase.value is Phase.L
+    assert Decimal("1600") in {point[0] for point in liquid.value.series}
+    assert Decimal("1600") not in {point[0] for point in crystal.value.series}
+    attempt = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(liquid, "1600"))
     assert attempt.refusal_detail["reason"] == _MISSING_PER
 
 

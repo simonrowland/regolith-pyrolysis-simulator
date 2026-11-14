@@ -1,0 +1,537 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.isijint-2020-752
+  citation: Iwahashi, K., Hashimoto, S., Yamauchi, R., Saito, K. & Hasegawa, M. (2021). Phase Relationship and Activities
+    of Components in CaO–SiO2–Cr2O3 Ternary System. ISIJ International, 61(5), 1404–1411.
+  source_ids:
+  - iwahashi-2021-cr-oxide-solid-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:iwahashi-2021-cr-oxide-solid-activities
+      role: pdf
+      path: raw/iwahashi-2021-cr-oxide-solid-activities/iwahashi-2021-cr-oxide-solid-activities.pdf
+      sha256:
+        tag: value
+        value: 6d7380b00e79a73fa6ade46a3e7caa4e4090794b6318c5d63cd11a0163b410fc
+    - asset_id: pdftotext:iwahashi-2021-cr-oxide-solid-activities
+      role: pdftotext
+      path: text/iwahashi-2021-cr-oxide-solid-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:iwahashi-2021-cr-oxide-solid-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.isijint-2020-752
+experiments:
+- experiment_id: 10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 1406
+        pdf_page_index: 2
+        paragraph: Activity measurements at 1 573 K.
+        section: 2. Experimental Aspects
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1406
+        pdf_page_index: 2
+        paragraph: The gas phase is at one atmospheric pressure.
+        section: 2. Experimental Aspects
+        note: Unit conversion from the printed one-atmosphere condition.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 3
+              published_page: 1406
+              pdf_page_index: 2
+              paragraph: The gas phase is at one atmospheric pressure.
+              section: 2. Experimental Aspects
+              note: Unit conversion from the printed one-atmosphere condition.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 1406
+              pdf_page_index: 2
+              paragraph: The gas phase is at one atmospheric pressure.
+              section: 2. Experimental Aspects
+              note: Unit conversion from the printed one-atmosphere condition.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Ar + H2 + CO2 gas partial pressures vary across the Table 2 activity runs.
+      locator:
+        page: 3
+        published_page: 1406
+        pdf_page_index: 2
+        section: 2. Experimental Aspects
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime is not reported.
+  work_id: 10.2355/isijinternational.isijint-2020-752
+  locator:
+    page: 3
+    published_page: 1406
+    pdf_page_index: 2
+    paragraph: The gas phase is at one atmospheric pressure.
+    section: 2. Experimental Aspects
+- experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'equilibration' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2020-752
+  locator:
+    page: 4
+    published_page: 1407
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=1-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
+context:
+- observation_id: iwahashi_2021_cr_oxide_solid_activities_table1_row_1
+  type: context_record
+  units: wt%
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1407
+    table: '1'
+    row_label: '1'
+    column_header: Starting materials / Bulk composition / Equilibrium phases
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: gas phase at one atmospheric pressure
+        note: Pa conversion from the explicitly printed one-atmosphere condition.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '1.033515e-10'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+        note: Converted from the printed equilibrium oxygen partial pressure 1.02 × 10⁻¹⁵ atm; see values.oxygen_partial_pressure.
+    fO2_control:
+      state:
+        tag: value
+        value: Ar + H2 + CO2; initial pH2=2.50 × 10⁻¹ atm; initial pCO2=1.67 × 10⁻³ atm
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mass_percent
+          amount_basis: wt_percent
+          components:
+          - - CaO
+            - '34.5'
+          - - SiO2
+            - '21.9'
+          - - Cr2O3
+            - '43.6'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1407
+        table: '1'
+        row_label: '1'
+        column_header: Starting materials / Bulk composition / Equilibrium phases
+    phase_assemblage:
+      state:
+        tag: value
+        value: Ca2SiO4 + Ca3Si2O7 + Cr2O3
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1407
+        table: '1'
+        row_label: '1'
+        column_header: Starting materials / Bulk composition / Equilibrium phases
+  values:
+    quantity: solid_phase_assemblage_as_reported
+    admission_status: typed_refusal
+    schema_gap: 'The measured result is a solid phase assemblage. No exact scored observation type or quantity token represents
+      a phase-assemblage result: tools/validate_literature_extracts.py::OBSERVATION_TYPES is closed; simulator/battery/migrate.py::QUANTITY_ALIASES
+      and simulator/battery/migrate.py::TYPE_QUANTITY contain no matching token; simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe phase composition amounts/roles, not a list of coexisting phases.
+      The equilibrium_phase_composition precedent in park-2021 stores a component amount in one phase, not assemblage membership.'
+    sample_number_as_published: '1'
+    starting_phases_as_reported: Ca3Si2O7 + CaCr2O4 + Cr2O3
+    bulk_composition_wt_pct:
+      CaO: '34.5'
+      SiO2: '21.9'
+      Cr2O3: '43.6'
+    bulk_composition_units_as_printed: mass%
+    equilibrium_phases_as_reported: Ca2SiO4 + Ca3Si2O7 + Cr2O3
+    initial_gas_pressures_as_published:
+      H2_atm: 2.50 × 10^−1
+      CO2_atm: 1.67 × 10^−3
+    oxygen_partial_pressure:
+      value: 1.02 × 10^−15
+      units: atm
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    method_class: measured_direct
+    method_as_printed: Samples heated at 1 573 K on a molybdenum pedestal under an Ar + H2 + CO2 gas mixture for about 100
+      hours, then cooled inside the reaction tube and examined by X-ray diffraction; repetition continued until diffraction
+      patterns did not change.
+    cooling_statement_as_printed: The sample was cooled inside the reaction tube; the source does not assert that high-temperature
+      assemblages were preserved during cooling.
+    quench_preservation: not_stated
+    quench_statement_locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 1406
+      section: 2. Experimental Aspects
+      paragraph: 2.1 Solid Phase Relationship
+  context_id: iwahashi-2021-cr-oxide-solid-activities::context::iwahashi_2021_cr_oxide_solid_activities_table1_row_1
+  work_id: 10.2355/isijinternational.isijint-2020-752
+  source_id: iwahashi-2021-cr-oxide-solid-activities
+  species: Cr2O3
+- observation_id: iwahashi_2021_cr_oxide_solid_activities_table1_row_2
+  type: context_record
+  units: wt%
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1407
+    table: '1'
+    row_label: '2'
+    column_header: Starting materials / Bulk composition / Equilibrium phases
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: gas phase at one atmospheric pressure
+        note: Pa conversion from the explicitly printed one-atmosphere condition.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '1.033515e-10'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+        note: Converted from the printed equilibrium oxygen partial pressure 1.02 × 10⁻¹⁵ atm; see values.oxygen_partial_pressure.
+    fO2_control:
+      state:
+        tag: value
+        value: Ar + H2 + CO2; initial pH2=2.50 × 10⁻¹ atm; initial pCO2=1.67 × 10⁻³ atm
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mass_percent
+          amount_basis: wt_percent
+          components:
+          - - CaO
+            - '45.7'
+          - - SiO2
+            - '19.7'
+          - - Cr2O3
+            - '34.6'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1407
+        table: '1'
+        row_label: '2'
+        column_header: Starting materials / Bulk composition / Equilibrium phases
+    phase_assemblage:
+      state:
+        tag: value
+        value: Ca2SiO4 + CaCr2O4 + Cr2O3
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1407
+        table: '1'
+        row_label: '2'
+        column_header: Starting materials / Bulk composition / Equilibrium phases
+  values:
+    quantity: solid_phase_assemblage_as_reported
+    admission_status: typed_refusal
+    schema_gap: 'The measured result is a solid phase assemblage. No exact scored observation type or quantity token represents
+      a phase-assemblage result: tools/validate_literature_extracts.py::OBSERVATION_TYPES is closed; simulator/battery/migrate.py::QUANTITY_ALIASES
+      and simulator/battery/migrate.py::TYPE_QUANTITY contain no matching token; simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe phase composition amounts/roles, not a list of coexisting phases.
+      The equilibrium_phase_composition precedent in park-2021 stores a component amount in one phase, not assemblage membership.'
+    sample_number_as_published: '2'
+    starting_phases_as_reported: Ca2SiO4 + Ca3Si2O7 + CaCr2O4
+    bulk_composition_wt_pct:
+      CaO: '45.7'
+      SiO2: '19.7'
+      Cr2O3: '34.6'
+    bulk_composition_units_as_printed: mass%
+    equilibrium_phases_as_reported: Ca2SiO4 + CaCr2O4 + Cr2O3
+    initial_gas_pressures_as_published:
+      H2_atm: 2.50 × 10^−1
+      CO2_atm: 1.67 × 10^−3
+    oxygen_partial_pressure:
+      value: 1.02 × 10^−15
+      units: atm
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    method_class: measured_direct
+    method_as_printed: Samples heated at 1 573 K on a molybdenum pedestal under an Ar + H2 + CO2 gas mixture for about 100
+      hours, then cooled inside the reaction tube and examined by X-ray diffraction; repetition continued until diffraction
+      patterns did not change.
+    cooling_statement_as_printed: The sample was cooled inside the reaction tube; the source does not assert that high-temperature
+      assemblages were preserved during cooling.
+    quench_preservation: not_stated
+    quench_statement_locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 1406
+      section: 2. Experimental Aspects
+      paragraph: 2.1 Solid Phase Relationship
+  context_id: iwahashi-2021-cr-oxide-solid-activities::context::iwahashi_2021_cr_oxide_solid_activities_table1_row_2
+  work_id: 10.2355/isijinternational.isijint-2020-752
+  source_id: iwahashi-2021-cr-oxide-solid-activities
+  species: Cr2O3
+- observation_id: iwahashi_2021_cr_oxide_solid_activities_table1_row_3
+  type: context_record
+  units: wt%
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1407
+    table: '1'
+    row_label: '3'
+    column_header: Starting materials / Bulk composition / Equilibrium phases
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: gas phase at one atmospheric pressure
+        note: Pa conversion from the explicitly printed one-atmosphere condition.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '1.033515e-10'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+        note: Converted from the printed equilibrium oxygen partial pressure 1.02 × 10⁻¹⁵ atm; see values.oxygen_partial_pressure.
+    fO2_control:
+      state:
+        tag: value
+        value: Ar + H2 + CO2; initial pH2=2.50 × 10⁻¹ atm; initial pCO2=1.67 × 10⁻³ atm
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mass_percent
+          amount_basis: wt_percent
+          components:
+          - - CaO
+            - '35.3'
+          - - SiO2
+            - '45.5'
+          - - Cr2O3
+            - '19.2'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1407
+        table: '1'
+        row_label: '3'
+        column_header: Starting materials / Bulk composition / Equilibrium phases
+    phase_assemblage:
+      state:
+        tag: value
+        value: CaSiO3 + SiO2 + Ca3Cr2Si3O12
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1407
+        table: '1'
+        row_label: '3'
+        column_header: Starting materials / Bulk composition / Equilibrium phases
+  values:
+    quantity: solid_phase_assemblage_as_reported
+    admission_status: typed_refusal
+    schema_gap: 'The measured result is a solid phase assemblage. No exact scored observation type or quantity token represents
+      a phase-assemblage result: tools/validate_literature_extracts.py::OBSERVATION_TYPES is closed; simulator/battery/migrate.py::QUANTITY_ALIASES
+      and simulator/battery/migrate.py::TYPE_QUANTITY contain no matching token; simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and simulator/battery/enums.py::PhaseRole describe phase composition amounts/roles, not a list of coexisting phases.
+      The equilibrium_phase_composition precedent in park-2021 stores a component amount in one phase, not assemblage membership.'
+    sample_number_as_published: '3'
+    starting_phases_as_reported: CaSiO3 + SiO2 + Cr2O3
+    bulk_composition_wt_pct:
+      CaO: '35.3'
+      SiO2: '45.5'
+      Cr2O3: '19.2'
+    bulk_composition_units_as_printed: mass%
+    equilibrium_phases_as_reported: CaSiO3 + SiO2 + Ca3Cr2Si3O12
+    initial_gas_pressures_as_published:
+      H2_atm: 2.50 × 10^−1
+      CO2_atm: 1.67 × 10^−3
+    oxygen_partial_pressure:
+      value: 1.02 × 10^−15
+      units: atm
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1406
+        section: 2. Experimental Aspects
+        paragraph: 2.1 Solid Phase Relationship
+    method_class: measured_direct
+    method_as_printed: Samples heated at 1 573 K on a molybdenum pedestal under an Ar + H2 + CO2 gas mixture for about 100
+      hours, then cooled inside the reaction tube and examined by X-ray diffraction; repetition continued until diffraction
+      patterns did not change.
+    cooling_statement_as_printed: The sample was cooled inside the reaction tube; the source does not assert that high-temperature
+      assemblages were preserved during cooling.
+    quench_preservation: not_stated
+    quench_statement_locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 1406
+      section: 2. Experimental Aspects
+      paragraph: 2.1 Solid Phase Relationship
+  context_id: iwahashi-2021-cr-oxide-solid-activities::context::iwahashi_2021_cr_oxide_solid_activities_table1_row_3
+  work_id: 10.2355/isijinternational.isijint-2020-752
+  source_id: iwahashi-2021-cr-oxide-solid-activities
+  species: Cr2O3

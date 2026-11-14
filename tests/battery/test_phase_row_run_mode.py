@@ -6,7 +6,10 @@ from types import SimpleNamespace
 
 from simulator.battery.enums import Engine
 from simulator.battery.score import _equilibrate_phase_assemblage
-from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+from simulator.diagnostic_helpers.binary_pot_battery import (
+    EngineHandle,
+    normalize_engine_settings,
+)
 
 
 def _handle(name: str, equilibrate) -> EngineHandle:
@@ -73,3 +76,39 @@ def test_phase_row_thermoengine_does_not_receive_subprocess_run_mode(
         "fO2_log": -4.31,
         "pressure_bar": 2010.0,
     }
+
+
+def test_phase_row_preserves_phase_maps_when_engine_cache_is_configured(
+    monkeypatch, tmp_path
+) -> None:
+    calls = 0
+
+    def equilibrate(**_kwargs):
+        nonlocal calls
+        calls += 1
+        return SimpleNamespace(
+            status="ok",
+            phase_assemblage_available=True,
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 100.0}},
+        )
+
+    handle = _handle("alphamelts", equilibrate)
+    handle.engine_settings = normalize_engine_settings("alphamelts", None)
+    monkeypatch.setenv(
+        "REGOLITH_ENGINE_CACHE", str(tmp_path / "engine-cache.sqlite")
+    )
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+
+    for _ in range(2):
+        result = _equilibrate_phase_assemblage(
+            Engine.ALPHAMELTS,
+            temperature_C=1030.0,
+            composition_kg={"SiO2": 0.05},
+            fO2_log=-4.31,
+            pressure_bar=2010.0,
+            handles={"alphamelts": handle},
+        )
+        assert result.phase_compositions == {"liquid": {"SiO2": 100.0}}
+
+    assert calls == 2

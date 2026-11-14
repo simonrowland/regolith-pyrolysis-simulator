@@ -1,0 +1,361 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  citation: W. V. Bielefeldt, A. C. F. Vilela and N. C. Heck, "Thermodynamic Evaluation of the Slag System CaO-MgO-SiO2-Al2O3",
+    15th GTT Workshop/User Meeting, Herzogenrath, Germany, 3-5 July 2013 (presentation slides).
+  source_ids:
+  - bielefeldt-2013-factsage-slag
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:bielefeldt-2013-factsage-slag
+      role: pdf
+      path: raw/bielefeldt-2013-factsage-slag/bielefeldt-2013-factsage-slag.pdf
+      sha256:
+        tag: value
+        value: 074059782e5ae5b4f03d350fc889bbd3eca27f3ea644e4c1beaf23217b6884b7
+    - asset_id: pdftotext:bielefeldt-2013-factsage-slag
+      role: pdftotext
+      path: text/bielefeldt-2013-factsage-slag
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:bielefeldt-2013-factsage-slag
+      role: table_csv
+      path: tables/bielefeldt-2013-factsage-slag
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:bielefeldt-2013-factsage-slag
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: bielefeldt2013_conclusions
+  type: literature_comparison
+  locator:
+    page: 22
+    published_page: 22
+    section: General Conclusions
+  units: qualitative
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    conclusions_as_printed:
+    - The 1600 °C isotherm of the Slag Atlas 20 wt% Al2O3 diagram and the FactSage diagram show acceptable similarity
+    - Some FactSage periclase-saturation MgO contents are somewhat smaller than the Slag Atlas data
+    - The Slag Atlas gives no viscosity values for B2 = 2; for some compositions at 1,500 °C it shows some consistency with
+      FactSage values
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_conclusions
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_effective_viscosity_model
+  type: model_parameter_context
+  locator:
+    page: 19
+    published_page: 19
+    equation: Roscoe-Einstein (Pretorius and Carlisle)
+  units: dimensionless
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    equation_as_printed: η_e = η (1 − 1.35 Θ)^(−5/2)
+    symbols:
+      η_e: effective viscosity of the slag
+      η: viscosity of the molten (Liquid) slag
+      Θ: fraction of precipitated solid phases
+    attribution: Pretorius and Carlisle effective-viscosity concept, based on the Roscoe-Einstein model (slide 19)
+    applied_case: 'Figure 10: effective viscosity for the liquid slag 10.3 wt% MgO, 20 wt% Al2O3, 46.5 wt% CaO, 23.3 wt% SiO2
+      at 1,600 °C (slide 21); curve figure_only'
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_effective_viscosity_model
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_figures_context
+  type: figure_only
+  locator:
+    page: 5
+    published_page: 5
+    figure: 1-10
+  units: figure-only context
+  values:
+    method_class: figure_only
+    evidence_class: figure_only
+    figures:
+    - 1 Slag Atlas C-M-S-A at 20 wt% Al2O3 (slide 5)
+    - 2 schematic quaternary (slide 8)
+    - 3-5 FactSage CaO-rich pseudo-ternary sections at 1500/1550/1600 °C with the B2 = 2 line (slides 9-11)
+    - 6-8 FactSage phase masses vs MgO 0-35 wt% at B2 = 2 (slides 12-14)
+    - isothermal section 1600 °C (slide 15)
+    - 9 solid fraction (slide 20)
+    - 10 effective viscosity (slide 21)
+    digitization_status: Not digitised; all figure content is model output (FactSage) or a reproduced Slag Atlas diagram.
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_figures_context
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_simulation_setup
+  type: method_note
+  locator:
+    page: 7
+    published_page: 7
+    section: Materials and Methods
+  units: as printed
+  values:
+    method_class: method_only
+    evidence_class: method_only
+    software: FactSage 6.3, Equilibrium module, FToxid sub-systems (phase equilibria); melts database (viscosity)
+    conditions_as_printed:
+    - wt.% CaO / wt.% SiO2 (binary basicity, B2) kept constant (generally B2 = 2) for any MgO content
+    - fixed amount of 20 wt.% Al2O3 for all simulations
+    - constant total mass of 100 g
+    - temperatures of 1,500°C; 1,550°C; 1,600°C
+    goals_as_printed: (1) thermodynamic study of the phases at equilibrium at B2 = 2 in C-M-S-A slags; (2) evaluate slag viscosity
+      vs composition and temperature against literature data (slide 6)
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_simulation_setup
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t1_factsage_1500c
+  type: model_comparison_context
+  locator:
+    page: 16
+    published_page: 16
+    table: '1'
+  units: wt% MgO
+  values:
+    quantity: MgO_wt_percent_at_liquid_and_periclase_saturation_limits
+    source_of_value: FactSage
+    temperature_C: 1500
+    system: CaO-MgO-SiO2-Al2O3 at 20 wt% Al2O3 and wt% CaO / wt% SiO2 = 2
+    MgO_wt_percent_100pct_liquid_as_printed: '8.6'
+    MgO_wt_percent_periclase_saturation_as_printed: '8.8'
+    delta_MgO_wt_percent_as_printed: '0.2'
+    method_class: model_derived
+    evidence_class: model_derived
+    model_note: FactSage 6.3 Equilibrium module with FToxid; CaO/SiO2 = 2 (wt), 20 wt% Al2O3, total mass 100 g, MgO varied
+      (slide 7).
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t1_factsage_1500c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t1_factsage_1550c
+  type: model_comparison_context
+  locator:
+    page: 16
+    published_page: 16
+    table: '1'
+  units: wt% MgO
+  values:
+    quantity: MgO_wt_percent_at_liquid_and_periclase_saturation_limits
+    source_of_value: FactSage
+    temperature_C: 1550
+    system: CaO-MgO-SiO2-Al2O3 at 20 wt% Al2O3 and wt% CaO / wt% SiO2 = 2
+    MgO_wt_percent_100pct_liquid_as_printed: '7.3'
+    MgO_wt_percent_periclase_saturation_as_printed: '9.5'
+    delta_MgO_wt_percent_as_printed: '2.2'
+    method_class: model_derived
+    evidence_class: model_derived
+    model_note: FactSage 6.3 Equilibrium module with FToxid; CaO/SiO2 = 2 (wt), 20 wt% Al2O3, total mass 100 g, MgO varied
+      (slide 7).
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t1_factsage_1550c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t1_factsage_1600c
+  type: model_comparison_context
+  locator:
+    page: 16
+    published_page: 16
+    table: '1'
+  units: wt% MgO
+  values:
+    quantity: MgO_wt_percent_at_liquid_and_periclase_saturation_limits
+    source_of_value: FactSage
+    temperature_C: 1600
+    system: CaO-MgO-SiO2-Al2O3 at 20 wt% Al2O3 and wt% CaO / wt% SiO2 = 2
+    MgO_wt_percent_100pct_liquid_as_printed: '5.9'
+    MgO_wt_percent_periclase_saturation_as_printed: '10.3'
+    delta_MgO_wt_percent_as_printed: '4.4'
+    method_class: model_derived
+    evidence_class: model_derived
+    model_note: FactSage 6.3 Equilibrium module with FToxid; CaO/SiO2 = 2 (wt), 20 wt% Al2O3, total mass 100 g, MgO varied
+      (slide 7).
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t1_factsage_1600c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t1_slagatlas_1500c
+  type: model_comparison_context
+  locator:
+    page: 16
+    published_page: 16
+    table: '1'
+  units: wt% MgO
+  values:
+    quantity: MgO_wt_percent_at_liquid_and_periclase_saturation_limits
+    source_of_value: Slag Atlas
+    temperature_C: 1500
+    system: CaO-MgO-SiO2-Al2O3 at 20 wt% Al2O3 and wt% CaO / wt% SiO2 = 2
+    MgO_wt_percent_100pct_liquid_as_printed: '*'
+    MgO_wt_percent_periclase_saturation_as_printed: '*'
+    delta_MgO_wt_percent_as_printed: '-'
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Slag Atlas CMSA phase diagram at 20 wt% Al2O3 (as read by the authors; Figure 1, slide 5)
+    footnote_as_printed: '* B2 isobasicity line equal to 2 does not cross the Liquid slag phase field.'
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t1_slagatlas_1500c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t1_slagatlas_1550c
+  type: model_comparison_context
+  locator:
+    page: 16
+    published_page: 16
+    table: '1'
+  units: wt% MgO
+  values:
+    quantity: MgO_wt_percent_at_liquid_and_periclase_saturation_limits
+    source_of_value: Slag Atlas
+    temperature_C: 1550
+    system: CaO-MgO-SiO2-Al2O3 at 20 wt% Al2O3 and wt% CaO / wt% SiO2 = 2
+    MgO_wt_percent_100pct_liquid_as_printed: '9.5'
+    MgO_wt_percent_periclase_saturation_as_printed: '11.9'
+    delta_MgO_wt_percent_as_printed: '2.4'
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Slag Atlas CMSA phase diagram at 20 wt% Al2O3 (as read by the authors; Figure 1, slide 5)
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t1_slagatlas_1550c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t1_slagatlas_1600c
+  type: model_comparison_context
+  locator:
+    page: 16
+    published_page: 16
+    table: '1'
+  units: wt% MgO
+  values:
+    quantity: MgO_wt_percent_at_liquid_and_periclase_saturation_limits
+    source_of_value: Slag Atlas
+    temperature_C: 1600
+    system: CaO-MgO-SiO2-Al2O3 at 20 wt% Al2O3 and wt% CaO / wt% SiO2 = 2
+    MgO_wt_percent_100pct_liquid_as_printed: '8.0'
+    MgO_wt_percent_periclase_saturation_as_printed: '12.7'
+    delta_MgO_wt_percent_as_printed: '4.7'
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Slag Atlas CMSA phase diagram at 20 wt% Al2O3 (as read by the authors; Figure 1, slide 5)
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t1_slagatlas_1600c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t2_factsage_1500c
+  type: model_comparison_context
+  locator:
+    page: 17
+    published_page: 17
+    table: '2'
+  units: poise
+  values:
+    quantity: liquid_slag_viscosity_poise
+    source_of_value: FactSage
+    temperature_C: 1500
+    system: CaO-MgO-SiO2-Al2O3 at 10 wt% MgO and 20 wt% Al2O3, SiO2 35-50 wt%
+    viscosity_poise_by_SiO2_wt_percent_as_printed:
+      '35': '3.1'
+      '40': '4.9'
+      '45': '8.9'
+      '50': '19.0'
+    unit_note: Printed in poise (1 P = 0.1 Pa s); no conversion applied in the row.
+    method_class: model_derived
+    evidence_class: model_derived
+    model_note: Viscosity of the pure liquid slag calculated via FactSage using the melts database (slide 17).
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t2_factsage_1500c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t2_factsage_1550c
+  type: model_comparison_context
+  locator:
+    page: 17
+    published_page: 17
+    table: '2'
+  units: poise
+  values:
+    quantity: liquid_slag_viscosity_poise
+    source_of_value: FactSage
+    temperature_C: 1550
+    system: CaO-MgO-SiO2-Al2O3 at 10 wt% MgO and 20 wt% Al2O3, SiO2 35-50 wt%
+    viscosity_poise_by_SiO2_wt_percent_as_printed:
+      '35': '2.4'
+      '40': '3.6'
+      '45': '6.4'
+      '50': '13.2'
+    unit_note: Printed in poise (1 P = 0.1 Pa s); no conversion applied in the row.
+    method_class: model_derived
+    evidence_class: model_derived
+    model_note: Viscosity of the pure liquid slag calculated via FactSage using the melts database (slide 17).
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t2_factsage_1550c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t2_factsage_1600c
+  type: model_comparison_context
+  locator:
+    page: 17
+    published_page: 17
+    table: '2'
+  units: poise
+  values:
+    quantity: liquid_slag_viscosity_poise
+    source_of_value: FactSage
+    temperature_C: 1600
+    system: CaO-MgO-SiO2-Al2O3 at 10 wt% MgO and 20 wt% Al2O3, SiO2 35-50 wt%
+    viscosity_poise_by_SiO2_wt_percent_as_printed:
+      '35': '1.8'
+      '40': '2.8'
+      '45': '4.7'
+      '50': '9.3'
+    unit_note: Printed in poise (1 P = 0.1 Pa s); no conversion applied in the row.
+    method_class: model_derived
+    evidence_class: model_derived
+    model_note: Viscosity of the pure liquid slag calculated via FactSage using the melts database (slide 17).
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t2_factsage_1600c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO
+- observation_id: bielefeldt2013_t2_slagatlas_1500c
+  type: model_comparison_context
+  locator:
+    page: 17
+    published_page: 17
+    table: '2'
+  units: poise
+  values:
+    quantity: liquid_slag_viscosity_poise
+    source_of_value: Slag Atlas
+    temperature_C: 1500
+    system: CaO-MgO-SiO2-Al2O3 at 10 wt% MgO and 20 wt% Al2O3, SiO2 35-50 wt%
+    viscosity_poise_by_SiO2_wt_percent_as_printed:
+      '35': '4'
+      '40': '7'
+      '45': '11'
+      '50': '22'
+    unit_note: Printed in poise (1 P = 0.1 Pa s); no conversion applied in the row.
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Slag Atlas viscosity data (as tabulated by the authors, slide 17)
+  context_id: bielefeldt-2013-factsage-slag::context::bielefeldt2013_t2_slagatlas_1500c
+  work_id: 163bc03bb237959a0b51540ab97071a8d5166be6788d2caf98e63fcd866c4b16
+  source_id: bielefeldt-2013-factsage-slag
+  species: MgO

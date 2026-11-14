@@ -1,0 +1,2361 @@
+schema_version: literature_extract.v1
+source_id: kems-215-schneider-1980-nbsir-80-2183
+source:
+  citation: Schneider, S. J. (project manager) (1980), MHD Materials—Seed/Slag Interactions and Effects, Quarterly Progress Report, July 1–September 30, 1980, NBSIR 80-2183.
+  year: 1980
+  corpus_asset: raw/kems-215-schneider-1980-nbsir-80-2183/kems-215-schneider-1980-nbsir-80-2183.pdf
+  sha256: dd09f837f03bd5620044129c474660dc7b30fd5896ad7cd2811fe6fff979bbc0
+extraction:
+  method: >-
+    All 72 pages were rendered at 220 dpi and visually reviewed. Tables 1 and 2 in the KEMS section were transcribed from the page images, with every numeric cell checked digit by digit; no other data tables were present in the remaining phase-equilibrium, conductivity, and corrosion sections. KEMS Figure 1-a is retained as figure-only context and was not digitized. The remaining figures are phase diagrams, conductivity plots, micrographs, and EDX spectra outside the KEMS result series and were not digitized.
+  date: '2026-10-05'
+  worker: codex-resume-75697-1791226674
+review_status: draft
+fidelity_samples:
+- species: K
+  observation_id: schneider_1980_q3_table1_vp3_composition
+  field: composition_wt_pct
+  value:
+    K2O: 12.5
+    CaO: 28.0
+    Al2O3: 13.5
+    SiO2: 46.0
+  locator:
+    published_page: 4
+    pdf_page_index: 9
+    table: '1'
+- species: K
+  observation_id: schneider_1980_q3_table2_vp3_8_18_80
+  field: A
+  value: 16948
+  locator:
+    published_page: 5
+    pdf_page_index: 10
+    table: '2'
+benches:
+- id: schneider-1980-q3-kcas-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen-effusion, modulated beam mass spectrometric method
+    locator:
+      published_page: 2
+      pdf_page_index: 7
+      section: Vaporization Studies
+  method:
+    state:
+      tag: value
+      value: Modulated beam mass spectrometry
+    locator:
+      published_page: 2
+      pdf_page_index: 7
+      section: Vaporization Studies
+  detector:
+    state:
+      tag: value
+      value: Mass spectrometer
+    locator:
+      published_page: 2
+      pdf_page_index: 7
+      section: Vaporization Studies
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 2
+      pdf_page_index: 7
+      section: Vaporization Studies
+      note: The cell material and liner are not identified in the KEMS description.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Orifice diameter is not stated.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Orifice channel length is not stated.
+  ionization:
+    ions_used_for_K_pressure:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Potassium vapour pressure is reported, but the measured ion or mass channel is not stated.
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Ionization energy is not stated.
+    cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Ionization cross-sections are not stated.
+    cross_section_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: No cross-section source is stated.
+    multiplier_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Multiplier correction is not stated.
+    isotope_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Isotope correction is not stated.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: The KEMS description does not identify a temperature sensor.
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Temperature calibration and uncertainty are not stated.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Chamber background pressure is not stated; this is not sample vapour pressure.
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No measurement sweep gas is stated.}
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+        locator:
+          published_page: 2
+          pdf_page_index: 7
+          section: Vaporization Studies
+experiments:
+- experiment_id: schneider-1980-q3-kcas-vp1
+  bench_id: schneider-1980-q3-kcas-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 2
+    pdf_page_index: 7
+    section: Vaporization Studies
+    note: KCAS-VP-1 vaporization sample series.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Mineral constituents listed in Table 1; physical form and mixing/preparation procedure are not specified.
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: 14.8
+          CaO: 27.5
+          Al2O3: 22.2
+          SiO2: 35.5
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+        note: Starting composition.
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 8
+        section: Vaporization Studies
+        note: Unreacted starting materials such as K2CO3 are mentioned as a source of error in the initial data; no pretreatment
+          procedure is reported.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        pdf_page_index: 10
+        table: '2'
+        note: Table 2 gives fitted pressure parameters over K2O-composition ranges; individual run temperatures are not tabulated.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2
+          pdf_page_index: 7
+          section: Vaporization Studies
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2
+          pdf_page_index: 7
+          section: Vaporization Studies
+    calibration:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No signal-to-pressure calibration method is stated.}
+      reference_substance:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No pressure calibration reference substance is stated.}
+      conversion_relation:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No ion-current-to-pressure conversion relation is stated.}
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No measurement sweep gas is stated.}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+- experiment_id: schneider-1980-q3-kcas-vp2
+  bench_id: schneider-1980-q3-kcas-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 2
+    pdf_page_index: 7
+    section: Vaporization Studies
+    note: KCAS-VP-2 vaporization sample series.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Mineral constituents listed in Table 1; physical form and mixing/preparation procedure are not specified.
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: 11.5
+          CaO: 17.6
+          Al2O3: 33.7
+          SiO2: 37.2
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+        note: Starting composition.
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 8
+        section: Vaporization Studies
+        note: Unreacted starting materials such as K2CO3 are mentioned as a source of error in the initial data; no pretreatment
+          procedure is reported.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        pdf_page_index: 10
+        table: '2'
+        note: Table 2 gives fitted pressure parameters over K2O-composition ranges; individual run temperatures are not tabulated.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2
+          pdf_page_index: 7
+          section: Vaporization Studies
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2
+          pdf_page_index: 7
+          section: Vaporization Studies
+    calibration:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No signal-to-pressure calibration method is stated.}
+      reference_substance:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No pressure calibration reference substance is stated.}
+      conversion_relation:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No ion-current-to-pressure conversion relation is stated.}
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No measurement sweep gas is stated.}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+- experiment_id: schneider-1980-q3-kcas-vp3
+  bench_id: schneider-1980-q3-kcas-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 2
+    pdf_page_index: 7
+    section: Vaporization Studies
+    note: KCAS-VP-3 vaporization sample series.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Mineral constituents listed in Table 1; physical form and mixing/preparation procedure are not specified.
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: 12.5
+          CaO: 28.0
+          Al2O3: 13.5
+          SiO2: 46.0
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+        note: Starting composition.
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 8
+        section: Vaporization Studies
+        note: Unreacted starting materials such as K2CO3 are mentioned as a source of error in the initial data; no pretreatment
+          procedure is reported.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        pdf_page_index: 10
+        table: '2'
+        note: Table 2 gives fitted pressure parameters over K2O-composition ranges; individual run temperatures are not tabulated.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2
+          pdf_page_index: 7
+          section: Vaporization Studies
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2
+          pdf_page_index: 7
+          section: Vaporization Studies
+    calibration:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No signal-to-pressure calibration method is stated.}
+      reference_substance:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No pressure calibration reference substance is stated.}
+      conversion_relation:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No ion-current-to-pressure conversion relation is stated.}
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 7
+        section: Vaporization Studies
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No measurement sweep gas is stated.}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+species:
+  K:
+    observations: []
+    context:
+    - observation_id: schneider_1980_q3_table1_vp1_composition
+      type: sample_composition
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+      units: wt% oxide composition as printed
+      values:
+        quantity: starting_sample_composition
+        sample_id: KCAS-VP-1
+        mineral_constituents:
+          - {formula: KAlSiO4, wt_pct: 49.8}
+          - {formula: Ca2SiO4, wt_pct: 16.5}
+          - {formula: Ca2Al2SiO7, wt_pct: 16.5}
+          - {formula: Ca3Si2O8, wt_pct: 17.2}
+        composition_wt_pct: {K2O: 14.8, CaO: 27.5, Al2O3: 22.2, SiO2: 35.5}
+    - observation_id: schneider_1980_q3_table1_vp2_composition
+      type: sample_composition
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+      units: wt% oxide composition as printed
+      values:
+        quantity: starting_sample_composition
+        sample_id: KCAS-VP-2
+        mineral_constituents:
+          - {formula: KAlSiO4, wt_pct: 28.6}
+          - {formula: KAlSi2O6, wt_pct: 13.8}
+          - {formula: Ca2Al2SiO7, wt_pct: 28.9}
+          - {formula: CaAl2Si2O8, wt_pct: 28.7}
+        composition_wt_pct: {K2O: 11.5, CaO: 17.6, Al2O3: 33.7, SiO2: 37.2}
+    - observation_id: schneider_1980_q3_table1_vp3_composition
+      type: sample_composition
+      locator:
+        published_page: 4
+        pdf_page_index: 9
+        table: '1'
+      units: wt% oxide composition as printed
+      values:
+        quantity: starting_sample_composition
+        sample_id: KCAS-VP-3
+        mineral_constituents:
+          - {formula: KAlSiO4, wt_pct: 42.0}
+          - {formula: CaSiO3, wt_pct: 58.0}
+        composition_wt_pct: {K2O: 12.5, CaO: 28.0, Al2O3: 13.5, SiO2: 46.0}
+    - observation_id: schneider_1980_q3_table2_vp1_3_13_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp1
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-1
+        experiment_id_as_printed: 3-13-80
+        K2O_wt_pct_range_start: 14.8
+        K2O_wt_pct_range_end: 12.4
+        A: -20047
+        sigma_A: 391
+        B: 8.144
+        sigma_B: 0.255
+    - observation_id: schneider_1980_q3_table2_vp1_3_14_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp1
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-1
+        experiment_id_as_printed: 3-14-80
+        K2O_wt_pct_range_start: 12.4
+        K2O_wt_pct_range_end: 9.3
+        A: -19071
+        sigma_A: 524
+        B: 7.278
+        sigma_B: 0.334
+    - observation_id: schneider_1980_q3_table2_vp1_3_18_80_a
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp1
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-1
+        experiment_id_as_printed: 3-18-80
+        K2O_wt_pct_range_start: 9.3
+        K2O_wt_pct_range_end: 7.2
+        A: -17429
+        sigma_A: 452
+        B: 6.058
+        sigma_B: 0.289
+    - observation_id: schneider_1980_q3_table2_vp1_3_18_80_b
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp1
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-1
+        experiment_id_as_printed: 3-18-80
+        K2O_wt_pct_range_start: 6.2
+        K2O_wt_pct_range_end: 4.8
+        A: -16372
+        sigma_A: 210
+        B: 5.068
+        sigma_B: 0.129
+    - observation_id: schneider_1980_q3_table2_vp1_3_21_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp1
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-1
+        experiment_id_as_printed: 3-21-80
+        K2O_wt_pct_range_start: 4.8
+        K2O_wt_pct_range_end: 4.0
+        A: -16896
+        sigma_A: 279
+        B: 5.289
+        sigma_B: 0.178
+    - observation_id: schneider_1980_q3_table2_vp2_5_14_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp2
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-2
+        experiment_id_as_printed: 5-14-80
+        K2O_wt_pct_range_start: 11.4
+        K2O_wt_pct_range_end: 10.7
+        A: -14632
+        sigma_A: 434
+        B: 4.200
+        sigma_B: 0.278
+    - observation_id: schneider_1980_q3_table2_vp2_5_15_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp2
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-2
+        experiment_id_as_printed: 5-15-80
+        K2O_wt_pct_range_start: 10.7
+        K2O_wt_pct_range_end: 8.6
+        A: -16366
+        sigma_A: 180
+        B: 5.097
+        sigma_B: 0.112
+    - observation_id: schneider_1980_q3_table2_vp2_5_16_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp2
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-2
+        experiment_id_as_printed: 5-16-80
+        K2O_wt_pct_range_start: 8.6
+        K2O_wt_pct_range_end: 6.5
+        A: -17571
+        sigma_A: 257
+        B: 5.656
+        sigma_B: 0.158
+    - observation_id: schneider_1980_q3_table2_vp2_5_19_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp2
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-2
+        experiment_id_as_printed: 5-19-80
+        K2O_wt_pct_range_start: 6.5
+        K2O_wt_pct_range_end: 6.2
+        A: -16606
+        sigma_A: 526
+        B: 4.992
+        sigma_B: 0.321
+    - observation_id: schneider_1980_q3_table2_vp3_8_13_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp3
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-3
+        experiment_id_as_printed: 8-13-80
+        K2O_wt_pct_range_start: 12.5
+        K2O_wt_pct_range_end: 10.8
+        A: -15052
+        sigma_A: 775
+        B: 4.983
+        sigma_B: 0.512
+    - observation_id: schneider_1980_q3_table2_vp3_8_14_80_a
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp3
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-3
+        experiment_id_as_printed: 8-14-80
+        K2O_wt_pct_range_start: 10.8
+        K2O_wt_pct_range_end: 10.3
+        A: -17512
+        sigma_A: 453
+        B: 6.282
+        sigma_B: 0.298
+    - observation_id: schneider_1980_q3_table2_vp3_8_14_80_b
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp3
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-3
+        experiment_id_as_printed: 8-14-80
+        K2O_wt_pct_range_start: 10.3
+        K2O_wt_pct_range_end: 7.4
+        A: -15441
+        sigma_A: 612
+        B: 4.732
+        sigma_B: 0.374
+    - observation_id: schneider_1980_q3_table2_vp3_8_15_80_a
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp3
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-3
+        experiment_id_as_printed: 8-15-80
+        K2O_wt_pct_range_start: 7.4
+        K2O_wt_pct_range_end: 6.0
+        A: -16006
+        sigma_A: 581
+        B: 5.178
+        sigma_B: 0.362
+    - observation_id: schneider_1980_q3_table2_vp3_8_15_80_b
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp3
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-3
+        experiment_id_as_printed: 8-15-80
+        K2O_wt_pct_range_start: 6.0
+        K2O_wt_pct_range_end: 3.9
+        A: -15390
+        sigma_A: 320
+        B: 4.544
+        sigma_B: 0.197
+    - observation_id: schneider_1980_q3_table2_vp3_8_18_80
+      type: fit_parameter_context
+      experiment: schneider-1980-q3-kcas-vp3
+      locator: {published_page: 5, pdf_page_index: 10, table: '2'}
+      units: printed coefficients and standard errors for log P = A/T + B
+      values:
+        quantity: fitted_potassium_pressure_coefficients
+        method_class: author_estimate
+        sample_id: KCAS-VP-3
+        experiment_id_as_printed: 8-18-80
+        K2O_wt_pct_range_start: 3.9
+        K2O_wt_pct_range_end: 3.2
+        A: 16948
+        sigma_A: 801
+        B: 5.417
+        sigma_B: 0.505
+        note: A is printed without a minus sign; retain as printed.
+    - observation_id: schneider_1980_q3_figure1a_k_pressure_composition
+      type: figure_curve_context
+      experiment: schneider-1980-q3-kcas-vp3
+      locator: {published_page: 6, pdf_page_index: 11, figure: '1-a'}
+      units: Potassium pressure in atm versus wt% K2O at 1667 K; plotted values not digitized
+      values:
+        quantity: potassium_pressure_curve_comparison
+        method_class: figure_only
+        samples_as_printed: KCAS-VP-1, KCAS-VP-2, KCAS-VP-3
+        temperature_K: 1667
+        note: VP-1 and VP-2 points were calculated from Table 2 least-squares constants; VP-3 curve was fitted assuming linear dependence of log P_K on sample wt% K2O.
+    - observation_id: schneider_1980_q3_activity_standard_state
+      type: experiment_fact_context
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies}
+      units: K2O activity definition and standard state
+      values:
+        quantity: K2O_activity_definition
+        activity_component: K2O
+        activity_ion_or_ions:
+          state: {tag: unknown, reason: not_published}
+          locator:
+            published_page: 2
+            pdf_page_index: 7
+            section: Vaporization Studies
+            note: The report discusses K2O activity but does not specify an ion used to calculate it.
+        standard_state:
+          state: {tag: unknown, reason: not_published}
+          locator:
+            published_page: 2
+            pdf_page_index: 7
+            section: Vaporization Studies
+            note: No K2O activity standard state is stated.
+        note: Potassium vapour pressure is discussed as evidence bearing on K2O activity, but no activity values are tabulated.
+    - observation_id: schneider_1980_q3_o2_pressure_scope
+      type: experiment_fact_context
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies}
+      units: vapor species reported
+      values:
+        quantity: pressure_dataset_scope
+        statement: The report states that K and O2 vapor pressures were measured, but Table 2 contains K pressure fit parameters only; no O2 pressure values are tabulated.
+    - observation_id: schneider_1980_q3_sample_characterization_scope
+      type: experiment_fact_context
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, table: '1'}
+      units: sample preparation and analysis facts as reported
+      values:
+        quantity: sample_characterization_scope
+        purity:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No purity for the starting minerals is stated in the vaporization-study description or Table 1.}
+        post_run_composition:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies, note: No post-run sample composition or analytical method is reported for the vaporization samples.}
+        starting_composition: Table 1 reports mineral constituents and starting oxide compositions for KCAS-VP-1, KCAS-VP-2, and KCAS-VP-3.
+    - observation_id: schneider_1980_q3_other_chapter_numeric_context
+      type: qualifying_statement_context
+      locator: {published_page: 1, pdf_page_index: 6, section: Summary of Progress to Date}
+      units: verbatim numeric summary facts outside the KEMS series
+      values:
+        quantity: other_report_sections_numeric_summary
+        quote: >-
+          The measurements support the suggestion made in previous reports that above 1385 °C, ionic conductivity is the predominant transport mechanism in this particular slag which contains a relatively large amount of iron. Type 316 stainless steel tubes were exposed to an oxygen-rich and fuel-rich environment seeded with K2SO4 and K2CO3. The samples were maintained at 500 °C and 590 °C wall temperature using internal air cooling. In the coming quarter the plans are to continue the study of Type 316 stainless steels using SEM-EDX analysis and to collect and analyze x-ray diffraction data on residue salt deposit material from fuel-rich and oxygen-rich system. Also, the feasibility of using metal and ceramic coatings on mild steel (with the testing of specific materials at 590 °C) will be examined.
+        note: These summary claims concern other report chapters; their measured curves and corrosion imagery were not digitized into KEMS observations.
+    - observation_id: schneider_1980_q3_non_kems_figures_scope
+      type: figure_curve_context
+      locator: {published_page: '7–65', section: Phase Equilibria; Electrical Conductivity and Polarization; Corrosion of Downstream Components}
+      units: figures reviewed, no data digitized
+      values:
+        quantity: non_kems_figure_scope
+        method_class: figure_only
+        note: The remainder contains phase-equilibrium figures, conductivity plots, micrographs, and EDX spectra. They are outside the vapor-pressure series; no curves or spectra were digitized.
+    - observation_id: schneider_1980_q3_prior_calcia_effect
+      type: qualifying_statement_context
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies}
+      units: verbatim comparison with prior reports
+      values:
+        method_class: quoted_unattributed
+        quantity: previously_reported_CaO_effect
+        quote: >-
+          Previous reports have described and compared the potassium pressure measurements on a K2O-Al2O3-SiO2 composition in the absence of CaO with results obtained on two K2O-CaO-Al2O3-SiO2 samples. These results showed that calcia has a major effect on K2O retention and increases the K2O activity by orders of magnitude at calcia concentrations which would be characteristic of Western slags obtained by combustion of Western coals (for example, Rosebud) in a seeded MHD combustion process.
+    - observation_id: schneider_1980_q3_summary_claims
+      type: qualifying_statement_context
+      locator: {published_page: 1, pdf_page_index: 6, section: Summary of Progress to Date}
+      units: verbatim qualitative summary
+      values:
+        method_class: quoted_unattributed
+        quantity: K-pressure and K2O-activity comparisons
+        quote: >-
+          Vapor pressure data of K over K2O-CaO-Al2O3-SiO2 samples are reported and compared. The K pressure at equal K2O and CaO concentrations is insensitive to variation in the Al2O3 and SiO2 concentration (probably within limits) if the sum of the Al2O3 and SiO2 concentrations is constant. The K2O activity of two samples at equal K2O concentrations is reduced by increased Al2O3 + SiO2 concentration and reduced CaO concentration, but remains proportional at varying K2O concentrations.
+    - observation_id: schneider_1980_q3_sample_selection_and_goal
+      type: qualifying_statement_context
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies}
+      units: verbatim experiment scope and sample qualification
+      values:
+        method_class: quoted_unattributed
+        quantity: vaporization_measurements_and_sample_selection
+        quote: >-
+          Measurements of the K and O2 vapor pressures over a third sample in the K2O-CaO-Al2O3-SiO2 system were completed. These data were obtained using a Knudsen-effusion, modulated beam mass spectrometric method. The objective of these measurements is to produce sufficient experimental results to provide a data base for the construction of a simple empirical model for prediction of alkali seed retention of real slags produced by combustion of Western sub-bituminous coals in an MHD seeded environment. This report includes new data obtained on a third K2O-CaO-Al2O3-SiO2 model slag. As in the previous work, this slag model is based on the 4 component phase diagram and has been selected so that the initial composition lies close to an invariant melting point. We believe that such compositions will tend to give rise to liquid solutions which will have vaporization properties similar to slag solutions once melting has taken place. Later work will be extended to include compositions in which one or more solid phases may be present.
+    - observation_id: schneider_1980_q3_vp1_vp3_comparison
+      type: qualifying_statement_context
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies}
+      units: verbatim pressure comparison and composition values
+      values:
+        method_class: quoted_unattributed
+        quantity: comparative_K_pressures_and_compositions
+        quote: >-
+          The CaO concentrations in KCAS-VP-1 and KCAS-VP-3 are 27.5 and 28.0 wt% respectively and the observed K pressures at equal K2O concentrations agree within reasonable experimental error (certainly ±30 percent). This is true despite the changes in the Al2O3 and SiO2 concentrations which are 22.2 and 35.5 wt% respectively for the KCAS-VP-1 sample and 13.5 and 46.0 wt% respectively for the KCAS-VP-3 sample. This indicates that within a limited composition range, Al2O3 and SiO2 can be interchanged on a wt% basis with essentially no effect on the K2O activity. Comparison of the K pressures of KCAS-VP-2 and KCAS-VP-3 at equal K2O concentrations shows that the KCAS-VP-3 pressures are about 2.3 times as great as the KCAS-VP-2 pressures independent of the K2O concentration. This difference is attributed to the lower calcia content of the KCAS-VP-2 sample but part of the effect may also be due to the higher Al2O3 + SiO2 concentration.
+    - observation_id: schneider_1980_q3_vp3_fit_and_temperature
+      type: qualifying_statement_context
+      locator: {published_page: 2, pdf_page_index: 7, section: Vaporization Studies}
+      units: verbatim figure description and fit method
+      values:
+        method_class: quoted_unattributed
+        quantity: figure_1a_description
+        quote: >-
+          These results are illustrated in figure 1-a which shows the K pressure as a function of wt% K2O at a temperature of 1667 K. The points for the KCAS-VP-1 and KCAS-VP-2 data were calculated at the average K2O concentrations from the least squares constants listed in Table 2 while the curve for KCAS-VP-3 was obtained from a fit of the data to an equation assuming a linear dependence of log P_K on the wt% K2O in the sample.
+    - observation_id: schneider_1980_q3_initial_run_reliability
+      type: qualifying_statement_context
+      locator: {published_page: 3, pdf_page_index: 8, section: Vaporization Studies, table: '2'}
+      units: verbatim fit and reliability qualification
+      values:
+        method_class: quoted_unattributed
+        quantity: initial_data_reliability_and_off_composition
+        quote: >-
+          Generally the observed slopes are in reasonably good agreement except for the initial data for each sample. The initial data in each series is subject to more error due to evaporation of unreacted starting materials such as unreacted K2CO3 and is believed, therefore, to be less reliable. The initial data in the KCAS-VP-1 series shows slopes which are more characteristic of evaporation of K from KAlSiO4 than from slag solutions. This may possibly be due to having a sample which is somewhat off-composition.
+    - observation_id: schneider_1980_q3_n01
+      type: qualifying_statement_context
+      locator:
+        published_page: 1
+        pdf_page_index: 6
+        section: Summary of Progress to Date
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N01
+        method_class: quoted_unattributed
+        statement: Four-probe AC measurements on slag from a coal-burning steam plant at Bow, New Hampshire, were compared with four-probe
+          DC measurements; agreement and anomalies were discussed. The ionic-transport conclusion is limited to this relatively
+          iron-rich slag above 1385 °C.
+        probe_count: 4
+    - observation_id: schneider_1980_q3_n02
+      type: qualifying_statement_context
+      locator:
+        published_page: 7
+        pdf_page_index: 12
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N02
+        method_class: quoted_unattributed
+        statement: Earlier trials found no flowage or wetting of the container for certain carbonate-rich mixtures even at temperatures
+          as high as 1300 °C. Intermediate compounds or solid solutions were initially thought possible.
+        temperature_as_high_as_C: 1300
+    - observation_id: schneider_1980_q3_n03
+      type: qualifying_statement_context
+      locator:
+        published_page: 7
+        pdf_page_index: 12
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N03
+        method_class: quoted_unattributed
+        statement: 'Four principal types of experiments on carefully homogenized K2CO3/KAlO2 mixtures: pellet heating; double-capsule
+          quenching; powder vaporization; high-temperature X-ray diffraction. These are phase experiments, not KCAS KEMS sample
+          preparation.'
+        experiment_type_count: 4
+    - observation_id: schneider_1980_q3_n04
+      type: qualifying_statement_context
+      locator:
+        published_page: 7
+        pdf_page_index: 12
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N04
+        method_class: quoted_unattributed
+        statement: Pressed pellets, 25–50 mg and 6.4 mm diameter, were dried at 800 °C, weighed, then heated 5–15 minutes at 1150
+          °C in a covered 15 ml platinum crucible. Weight loss was always less than 10%. Post-heating characterization used X-ray
+          diffraction and SEM/EDX.
+        pellet_mass_mg:
+        - 25
+        - 50
+        pellet_diameter_mm: 6.4
+        drying_temperature_C: 800
+        heating_time_min:
+        - 5
+        - 15
+        crucible_volume_ml: 15
+        heating_temperature_C: 1150
+        weight_loss_percent_upper_bound_exclusive: 10
+    - observation_id: schneider_1980_q3_n05
+      type: qualifying_statement_context
+      locator:
+        published_page: 7
+        pdf_page_index: 12
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N05
+        method_class: quoted_unattributed
+        statement: Powders in loosely crimped platinum capsules of 2.6 mm inside diameter were enclosed in welded platinum capsules
+          of 4.6 mm inside diameter, held at constant temperature for about one hour and quenched. Material in the outer capsule
+          would indicate melting because molten carbonate wets platinum.
+        inner_capsule_inside_diameter_mm: 2.6
+        outer_capsule_inside_diameter_mm: 4.6
+        hold_time_about_h: 1
+    - observation_id: schneider_1980_q3_n06
+      type: qualifying_statement_context
+      locator:
+        published_page: 7
+        pdf_page_index: 12
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N06
+        method_class: quoted_unattributed
+        statement: Several hundred mg of powder in a platinum foil boat inside a covered 15 ml platinum crucible was heated in
+          a muffle furnace, cooled in dry air and weighed. A portion was taken for X-ray diffraction; the remainder was reweighed
+          and the cycle continued until all carbonate evaporated, in 2–6 hours. No exact mass is supplied by several hundred mg.
+        crucible_volume_ml: 15
+        total_time_h:
+        - 2
+        - 6
+        initial_mass_as_printed: several hundred mg
+    - observation_id: schneider_1980_q3_n07
+      type: qualifying_statement_context
+      locator:
+        published_page: 8
+        pdf_page_index: 13
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N07
+        method_class: quoted_unattributed
+        statement: K2CO3/KAlO2 pellet compositions 50/50, 60/40, 70/30, 80/20 and 90/10 retained their shape and, if bonded at
+          all, were loosely bonded to platinum. The 90/10 material was coarse crystalline; EDX suggested homogeneous Al distribution
+          and voids were observed.
+        qualification: Some platinum reaction may be associated with green coloration, but need not be its cause. Platinum appears concentrated almost exclusively in small layered platelet groups and does not appear an important constituent of the major crystalline phase.
+        composition_pairs_K2CO3_KAlO2:
+        - - 50
+          - 50
+        - - 60
+          - 40
+        - - 70
+          - 30
+        - - 80
+          - 20
+        - - 90
+          - 10
+    - observation_id: schneider_1980_q3_n08
+      type: qualifying_statement_context
+      locator:
+        published_page: 8
+        pdf_page_index: 13
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N08
+        method_class: quoted_unattributed
+        statement: Melting/wetting occurred from K2CO3/KAlO2 92/08 to 100/0; 92/08 suggested partial rather than complete melting. Two surface
+          types in 92/08 included one possibly crystallized melt and another jagged surface suggesting, without proving, crystallinity.
+        composition_range_pairs_K2CO3_KAlO2:
+        - - 92
+          - 8
+        - - 100
+          - 0
+        surface_type_count: 2
+    - observation_id: schneider_1980_q3_n09
+      type: qualifying_statement_context
+      locator:
+        published_page: 8
+        pdf_page_index: 13
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N09
+        method_class: quoted_attributed
+        statement: 'Footnote: synthesis of K3AlO3 was reported in reference [5], A. Bon, C. Gleitzer, A. Courtois and J. Protas,
+          C. R. Acad. Sci. Paris 278C, 785 (1974). It apparently cannot be synthesized using the carbonate and may not be stable
+          above 500–600 °C.'
+        possible_instability_above_C:
+        - 500
+        - 600
+        attribution: Reference [5]; footnote on p. 8
+    - observation_id: schneider_1980_q3_n10
+      type: qualifying_statement_context
+      locator:
+        published_page: 9
+        pdf_page_index: 14
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N10
+        method_class: quoted_unattributed
+        statement: The pure-carbonate 100/0 specimen exhibited oriented rod intergrowths suggesting two phases or at least two
+          crystallographic orientations with different surface tensions; this is a tentative alternative interpretation, not two
+          confirmed phases.
+        composition_pair_K2CO3_KAlO2:
+        - 100
+        - 0
+        suggested_alternative_count: 2
+    - observation_id: schneider_1980_q3_n11
+      type: qualifying_statement_context
+      locator:
+        published_page: 9
+        pdf_page_index: 14
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N11
+        method_class: quoted_unattributed
+        statement: Platinum was distributed uniformly at a low estimated concentration, less than 1 wt%, in the grains regardless
+          of grain structure.
+        estimated_Pt_wt_percent_upper_bound_exclusive: 1
+    - observation_id: schneider_1980_q3_n12
+      type: qualifying_statement_context
+      locator:
+        published_page: 9
+        pdf_page_index: 14
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N12
+        method_class: quoted_unattributed
+        statement: High-temperature X-ray diffraction under dry nitrogen on 80/20 K2CO3/KAlO2 indicated at least two reversible
+          subsolidus changes and recrystallization near the reported 901 °C melting point of K2CO3, reference [6]. A visual change
+          near 900 °C suggests but does not prove melting; recrystallization/densification is possible.
+        composition_pair_K2CO3_KAlO2:
+        - 80
+        - 20
+        reversible_subsolidus_change_count_lower_bound: 2
+        reported_K2CO3_melting_point_C: 901
+        visual_change_near_C: 900
+        melting_point_attribution: Reference [6], JANAF Thermochemical Tables, 2nd ed. (1971)
+    - observation_id: schneider_1980_q3_n13
+      type: qualifying_statement_context
+      locator:
+        published_page: 9
+        pdf_page_index: 14
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N13
+        method_class: quoted_unattributed
+        statement: Room-temperature X-ray patterns after the experiments, at 25 °C, showed extra lines at 16.7°, 17.4°, 19.3°
+          and approximately 29° in 2θ, Cu Kα. These lines were absent from heated pure components. The 17.4°/19.3° lines were
+          correlated reasonably well with potassium platinate [9]; the strong 16.7° line remained unassigned.
+        continuation_locator: {published_page: 10, pdf_page_index: 15}
+        qualification: The broad peak near 29° correlated to a lesser degree, but its intensity did not agree with the platinate pattern. All four extra lines remained relatively constant until all carbonate evaporated, then vanished with the coloration.
+        attribution: Reference [9], C. L. McDaniel, NBS, personal communication (1980), listed on p. 12 / PDF index 17.
+        XRD_temperature_C: 25
+        extra_lines_2theta_degrees:
+        - 16.7
+        - 17.4
+        - 19.3
+        extra_line_approximately_2theta_degrees: 29
+    - observation_id: schneider_1980_q3_n14
+      type: qualifying_statement_context
+      locator:
+        published_page: 10
+        pdf_page_index: 15
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N14
+        method_class: quoted_unattributed
+        statement: Certain compositions exhibited low-angle periodicities of 50–100 Å. The patterns were preparation sensitive,
+          difficult to reproduce and rapidly lost on atmospheric exposure. High K2O/carbonate vapor pressure was proposed as essential;
+          lamellar structures were a possible explanation, not measured layer sizes.
+        periodicity_Angstrom:
+        - 50
+        - 100
+    - observation_id: schneider_1980_q3_n15
+      type: qualifying_statement_context
+      locator:
+        published_page: 10
+        pdf_page_index: 15
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N15
+        method_class: quoted_unattributed
+        statement: The abrupt apparent melting change between 90/10 and 92/08 K2CO3/KAlO2 at 1150 °C requires explanation. Proposed
+          alternatives were an unquenchable solid or an intermediate solid-liquid mesomorphic state. High-temperature XRD did
+          not support the former, but vaporization and recrystallization complicate interpretation.
+        composition_pairs_K2CO3_KAlO2:
+        - - 90
+          - 10
+        - - 92
+          - 8
+        temperature_C: 1150
+    - observation_id: schneider_1980_q3_n16
+      type: qualifying_statement_context
+      locator:
+        published_page: 10
+        pdf_page_index: 15
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N16
+        method_class: quoted_attributed
+        statement: Knudsen-effusion potassium pressures over 60/40 K2CO3/KAlO2 were close to those of pure carbonate at 900–1100
+          °C [10], suggesting weak structural interaction if any. Reference [10] on p. 13 identifies E. R. Plante, NBS, personal
+          communication (1980). No absolute pressure numbers are printed.
+        composition_pair_K2CO3_KAlO2:
+        - 60
+        - 40
+        temperature_range_C:
+        - 900
+        - 1100
+        attribution:
+          name: E. R. Plante
+          institution: NBS
+          kind: personal communication
+          year: 1980
+          reference: '10'
+          locator:
+            published_page: 13
+            pdf_page_index: 18
+    - observation_id: schneider_1980_q3_n17
+      type: qualifying_statement_context
+      locator:
+        published_page: 10
+        pdf_page_index: 15
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N17
+        method_class: quoted_unattributed
+        statement: Room-temperature monoclinic K2CO3 is not stable above 500–600 °C; the transition to a hexagonal structure in
+          pure carbonate [12] also occurs in mixtures. Extra room-temperature diffraction features may be metastable and require
+          caution.
+        monoclinic_instability_above_C:
+        - 500
+        - 600
+    - observation_id: schneider_1980_q3_n18
+      type: qualifying_statement_context
+      locator:
+        published_page: 15
+        pdf_page_index: 20
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N18
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 2: SEM of 90/10 K2CO3/KAlO2 heated at 1150 °C for 5 minutes; bar 100 µm. Sharp edges, lack of melting
+          and coarse crystals are qualitative observations.'
+        composition_pair_K2CO3_KAlO2:
+        - 90
+        - 10
+        temperature_C: 1150
+        time_min: 5
+        scale_bar_um: 100
+        figure: '2'
+    - observation_id: schneider_1980_q3_n19
+      type: qualifying_statement_context
+      locator:
+        published_page: 15
+        pdf_page_index: 20
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N19
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 3: 92/08 (a) and 100/0 (b) K2CO3/KAlO2 heated at 1150 °C for 5 minutes; bars 100 µm and 1 mm respectively.
+          Partial melting without corner coalescence in (a), coalescence in (b).'
+        panels:
+          a:
+            composition_pair_K2CO3_KAlO2:
+            - 92
+            - 8
+            scale_bar_um: 100
+          b:
+            composition_pair_K2CO3_KAlO2:
+            - 100
+            - 0
+            scale_bar_mm: 1
+        temperature_C: 1150
+        time_min: 5
+        figure: '3'
+    - observation_id: schneider_1980_q3_n20
+      type: qualifying_statement_context
+      locator:
+        published_page: 16
+        pdf_page_index: 21
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N20
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 4: surface of melted 92/08 K2CO3/KAlO2 specimen; SEM bar 10 µm.'
+        composition_pair_K2CO3_KAlO2:
+        - 92
+        - 8
+        scale_bar_um: 10
+        figure: '4'
+    - observation_id: schneider_1980_q3_n21
+      type: qualifying_statement_context
+      locator:
+        published_page: 16
+        pdf_page_index: 21
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N21
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 5: same melted 92/08 specimen; SEM bars 10 µm (a), 1 µm (b).'
+        scale_bars_um:
+          a: 10
+          b: 1
+        figure: '5'
+    - observation_id: schneider_1980_q3_n22
+      type: qualifying_statement_context
+      locator:
+        published_page: 17
+        pdf_page_index: 22
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N22
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 6: melted 100/0 K2CO3/KAlO2; SEM bars 10 µm.'
+        composition_pair_K2CO3_KAlO2:
+        - 100
+        - 0
+        scale_bar_um: 10
+        figure: '6'
+    - observation_id: schneider_1980_q3_n23
+      type: qualifying_statement_context
+      locator:
+        published_page: 18
+        pdf_page_index: 23
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N23
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 7: pure K2CO3 starting material (a) dried in vacuum at 160 °C; vaporization series (b–d) at 1250
+          °C. XRD traces remain figure-only.'
+        vacuum_drying_temperature_C: 160
+        vaporization_temperature_C: 1250
+        figure: '7'
+    - observation_id: schneider_1980_q3_n24
+      type: qualifying_statement_context
+      locator:
+        published_page: 18
+        pdf_page_index: 23
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N24
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 7: weight-loss-determined K2CO3/KAlO2 compositions (b) 60/40, (c) 10/90, (d) 0/100; no diffraction-curve
+          values are digitized.'
+        composition_pairs_K2CO3_KAlO2:
+          b:
+          - 60
+          - 40
+          c:
+          - 10
+          - 90
+          d:
+          - 0
+          - 100
+        figure: '7'
+    - observation_id: schneider_1980_q3_n25
+      type: qualifying_statement_context
+      locator:
+        published_page: 19
+        pdf_page_index: 24
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N25
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 8: 50/50 powder formed by evaporation of excess K2CO3 at 1250 °C; cumulative heating times, starting
+          at the right, 30, 45, 60, 90 and 120 minutes. Low-angle XRD traces are not digitized.'
+        composition_pair_K2CO3_KAlO2:
+        - 50
+        - 50
+        temperature_C: 1250
+        cumulative_times_min_starting_at_right:
+        - 30
+        - 45
+        - 60
+        - 90
+        - 120
+        figure: '8'
+    - observation_id: schneider_1980_q3_n26
+      type: qualifying_statement_context
+      locator:
+        published_page: 19
+        pdf_page_index: 24
+        section: Phase Equilibria
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N26
+        method_class: quoted_unattributed
+        statement: 'Phase Fig. 9: fracture surfaces of lamellar material near 65/35 K2CO3/KAlO2; SEM bar 100 nm. No lamellar thickness
+          inferred from the image.'
+        composition_pair_near_K2CO3_KAlO2:
+        - 65
+        - 35
+        scale_bar_nm: 100
+        figure: '9'
+    - observation_id: schneider_1980_q3_n27
+      type: qualifying_statement_context
+      locator:
+        published_page: 25
+        pdf_page_index: 30
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N27
+        method_class: quoted_unattributed
+        statement: At constant DC current, each point was taken after the probe potential V23 approached equilibrium, changing
+          by less than 1% over 15 minutes.
+        potential_change_percent_upper_bound_exclusive: 1
+        equilibration_interval_min: 15
+    - observation_id: schneider_1980_q3_n28
+      type: qualifying_statement_context
+      locator:
+        published_page: 25
+        pdf_page_index: 30
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N28
+        method_class: quoted_unattributed
+        statement: Increasing- and decreasing-temperature curves differ below 1300 °C. Above 1300 °C, DC f(V) rises markedly except
+          f12, interpreted as enhanced ionic polarization.
+        heat_cool_difference_below_C: 1300
+        enhanced_polarization_above_C: 1300
+    - observation_id: schneider_1980_q3_n29
+      type: qualifying_statement_context
+      locator:
+        published_page: 25
+        pdf_page_index: 30
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N29
+        method_class: quoted_unattributed
+        statement: An electric field of approximately 1 volt/cm was used to avoid permanent polarization; f(V) is greater at higher
+          fields.
+        electric_field_approximately_V_per_cm: 1
+    - observation_id: schneider_1980_q3_n30
+      type: qualifying_statement_context
+      locator:
+        published_page: 25
+        pdf_page_index: 30
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N30
+        method_class: quoted_unattributed
+        statement: AC measurements covered 40 Hz–40 kHz, limited by voltage-sensor response, at the same equilibrium temperature
+          points. Conductivity Figs. 4 (heating) and 5 (cooling) show 40 Hz results.
+        frequency_lower_Hz: 40
+        frequency_upper_kHz: 40
+    - observation_id: schneider_1980_q3_n31
+      type: qualifying_statement_context
+      locator:
+        published_page: 25
+        pdf_page_index: 30
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N31
+        method_class: quoted_unattributed
+        statement: 'Voltage accuracy was 0.3% of reading plus 0.04% of the 10 V range. AC was not constant current: the generator
+          was adjusted for nearly 1 V at the probes; current was obtained from the standard adjustable resistor.'
+        accuracy_reading_percent: 0.3
+        accuracy_range_percent: 0.04
+        voltage_range_V: 10
+        probe_voltage_nearly_V: 1
+    - observation_id: schneider_1980_q3_n32
+      type: qualifying_statement_context
+      locator:
+        published_page: 26
+        pdf_page_index: 31
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N32
+        method_class: quoted_unattributed
+        statement: Relatively rapid cooling from 1500 °C after final filling and before electrical contacts were applied probably
+          produced microcracks or crystal variations; slower cooling should minimize cracking.
+        cooling_from_C: 1500
+    - observation_id: schneider_1980_q3_n33
+      type: qualifying_statement_context
+      locator:
+        published_page: 26
+        pdf_page_index: 31
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N33
+        method_class: quoted_unattributed
+        statement: On cooling, AC f34 is negative and nearly constant below 1300 °C while f12 is positive and rises as temperature
+          falls. Material between probes 3/4 appears unchanged while 1/2 changes; compensation makes f14 near zero and can conceal
+          inhomogeneity.
+        temperature_below_C: 1300
+    - observation_id: schneider_1980_q3_n34
+      type: qualifying_statement_context
+      locator:
+        published_page: 26
+        pdf_page_index: 31
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N34
+        method_class: quoted_unattributed
+        statement: AC and DC curves are similar below 1300 °C, favoring inhomogeneity or microcracks over polarization. Ionic
+          polarization should be absent at 40 Hz but present with DC; the lower-temperature range was therefore not judged predominantly
+          ionic.
+        temperature_below_C: 1300
+        comparison_AC_frequency_Hz: 40
+    - observation_id: schneider_1980_q3_n35
+      type: qualifying_statement_context
+      locator:
+        published_page: 26
+        pdf_page_index: 31
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N35
+        method_class: quoted_unattributed
+        statement: The increase in conductivity with frequency at low temperature may be lead-pair capacitance. Estimated capacitive
+          impedance at 40 kHz is of the same order as measured resistance; a room-temperature reactance measurement confirmed
+          this effect.
+        lead_reactance_comparison_frequency_kHz: 40
+    - observation_id: schneider_1980_q3_n36
+      type: qualifying_statement_context
+      locator:
+        published_page: 26
+        pdf_page_index: 31
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N36
+        method_class: quoted_unattributed
+        statement: Above 1300 °C, AC f(V) at 40 Hz remains near zero, unlike DC. Polarization was not observed at 40 Hz or over
+          the frequency range used.
+        temperature_above_C: 1300
+        AC_frequency_Hz: 40
+    - observation_id: schneider_1980_q3_n37
+      type: qualifying_statement_context
+      locator:
+        published_page: 26
+        pdf_page_index: 31
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N37
+        method_class: quoted_unattributed
+        statement: 'On heating, conductivity Fig. 8 compares 40 Hz AC and DC: a maximum about 1100 °C, minimum at 1150 °C, nearly
+          a factor of two difference at the minimum, and nearly exact agreement above 1385 °C where the slag is considered predominantly
+          ionic.'
+        maximum_about_C: 1100
+        minimum_C: 1150
+        difference_factor_nearly: 2
+        agreement_above_C: 1385
+        AC_frequency_Hz: 40
+    - observation_id: schneider_1980_q3_n38
+      type: qualifying_statement_context
+      locator:
+        published_page: 27
+        pdf_page_index: 32
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N38
+        method_class: quoted_unattributed
+        statement: The report prints near equality below 100 °C, where slag is solid and probably electronic. The apparent temperature
+          anomaly is preserved as printed; 100 has not been changed to 1000.
+        printed_temperature_below_C: 100
+        source_anomaly: Printed 100 °C retained; apparent inconsistency with the surrounding temperature discussion.
+    - observation_id: schneider_1980_q3_n39
+      type: qualifying_statement_context
+      locator:
+        published_page: 27
+        pdf_page_index: 32
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N39
+        method_class: quoted_unattributed
+        statement: On cooling, conductivity Fig. 9 shows an inflection near 1150 °C and an approximately factor-of-two difference
+          between 40 Hz AC and DC. The reason for different heating/cooling shapes is unclear despite equilibration.
+        inflection_near_C: 1150
+        difference_factor_about: 2
+        AC_frequency_Hz: 40
+    - observation_id: schneider_1980_q3_n40
+      type: qualifying_statement_context
+      locator:
+        published_page: 27
+        pdf_page_index: 32
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N40
+        method_class: quoted_unattributed
+        statement: Previous measurements quenched to 900 °C, below softening, to freeze Fe2+/Fe3+. The present equilibrium ratio
+          can change with temperature at least above 900 °C. No numerical Fe2+/Fe3+ ratio is printed.
+        previous_quench_temperature_C: 900
+        equilibrium_ratio_change_at_least_above_C: 900
+    - observation_id: schneider_1980_q3_n41
+      type: qualifying_statement_context
+      locator:
+        published_page: 36
+        pdf_page_index: 41
+        section: Electrical Conductivity of Slag
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N41
+        method_class: quoted_unattributed
+        statement: 'Conductivity Fig. 9: DC and AC (40 Hz) conductivity on decreasing temperature from above 1500 °C. Curves remain
+          figure-only.'
+        starting_temperature_above_C: 1500
+        AC_frequency_Hz: 40
+        figure: '9'
+    - observation_id: schneider_1980_q3_n42
+      type: qualifying_statement_context
+      locator:
+        published_page: 37
+        pdf_page_index: 42
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N42
+        method_class: quoted_unattributed
+        statement: Type 316 tubular specimens were exposed to propane-rich or oxygen-rich hot gas seeded with K2SO4 or K2SO4/K2CO3
+          for approximately four hours excluding warmup/cooldown; 250 g salt was injected during the first 25 minutes.
+        exposure_approximately_h: 4
+        seed_mass_g: 250
+        seed_injection_first_min: 25
+    - observation_id: schneider_1980_q3_n43
+      type: qualifying_statement_context
+      locator:
+        published_page: 37
+        pdf_page_index: 42
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N43
+        method_class: quoted_unattributed
+        statement: 'Four stainless-steel specimens were internally air cooled: three at 590 °C wall temperature and one at 500
+          °C.'
+        specimen_count: 4
+        wall_temperature_groups:
+        - count: 3
+          temperature_C: 590
+        - count: 1
+          temperature_C: 500
+    - observation_id: schneider_1980_q3_n44
+      type: qualifying_statement_context
+      locator:
+        published_page: 37
+        pdf_page_index: 42
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N44
+        method_class: quoted_unattributed
+        statement: A Pt/Pt–10%Rh thermocouple was welded at wall midlength; a separate thermocouple of the same composition near
+          the specimen measured gas temperature approximately 1300 °C. These thermocouples belong to the corrosion apparatus,
+          not the KCAS KEMS bench.
+        thermocouple_Rh_percent: 10
+        gas_temperature_approximately_C: 1300
+    - observation_id: schneider_1980_q3_n45
+      type: qualifying_statement_context
+      locator:
+        published_page: 37
+        pdf_page_index: 42
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N45
+        method_class: quoted_unattributed
+        statement: Specimens were removed at approximately 40 °C and immediately encapsulated in epoxy to prevent contamination
+          and reduce the possibility of hydration. A section 10 mm from midlength was cut, ground and polished using non-aqueous media and stored in evacuated
+          desiccators.
+        removal_temperature_approximately_C: 40
+        section_distance_from_midlength_mm: 10
+    - observation_id: schneider_1980_q3_n46
+      type: qualifying_statement_context
+      locator:
+        published_page: 37
+        pdf_page_index: 42
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N46
+        method_class: quoted_unattributed
+        statement: Corrosion specimens 8-6, 9-6 and 6-6 had 590 °C wall temperatures; specimen 5-6 had 500 °C.
+        specimen_wall_temperatures_C:
+          8-6: 590
+          9-6: 590
+          6-6: 590
+          5-6: 500
+    - observation_id: schneider_1980_q3_n47
+      type: qualifying_statement_context
+      locator:
+        published_page: 37
+        pdf_page_index: 42
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N47
+        method_class: quoted_unattributed
+        statement: Specimen 8-6 was oxygen rich and 9-6 fuel rich, with 80 wt% K2CO3 and 20 wt% K2SO4 at 590 °C. Preserve these
+          explicit sample/environment bindings.
+        specimen_environments:
+          8-6: oxygen rich
+          9-6: fuel rich
+        seed_wt_percent:
+          K2CO3: 80
+          K2SO4: 20
+        wall_temperature_C: 590
+    - observation_id: schneider_1980_q3_n48
+      type: qualifying_statement_context
+      locator:
+        published_page: 37
+        pdf_page_index: 42
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N48
+        method_class: quoted_unattributed
+        statement: 'Deposit thicknesses: specimen 8-6 top 0.3 mm, drip 2 mm; 9-6 top 0.1 mm, drip 1.6 mm. Fuel-rich specimen 9-6
+          had unusual dendritic fume deposits. Deposits are thinner on top than in drip regions, thinner at higher wall temperatures,
+          and thinner in fuel-rich than oxygen-rich conditions.'
+        deposit_thickness_mm:
+          8-6:
+            top: 0.3
+            drip: 2
+          9-6:
+            top: 0.1
+            drip: 1.6
+    - observation_id: schneider_1980_q3_n49
+      type: qualifying_statement_context
+      locator:
+        published_page: 39
+        pdf_page_index: 44
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N49
+        method_class: quoted_unattributed
+        statement: 'Specimen 6-6: K2SO4 seed, fuel-rich gas, wall 590 °C; leading-edge coating 0.1 mm, drip 1 mm. Fume showed
+          minimal corrosion. Cr and Fe penetrated; Ni absence was unexplained, not demonstrated Ni loss.'
+        specimen: 6-6
+        seed: K2SO4
+        environment: fuel rich
+        wall_temperature_C: 590
+        leading_edge_coating_mm: 0.1
+        drip_coating_mm: 1
+    - observation_id: schneider_1980_q3_n50
+      type: qualifying_statement_context
+      locator:
+        published_page: 40
+        pdf_page_index: 45
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N50
+        method_class: quoted_unattributed
+        statement: 'Specimen 5-6: K2SO4 seed, fuel-rich gas, wall 500 °C. Corrosion material was high in Cr and Fe without high
+          Ni concentration; the drip region fumed less.'
+        specimen: 5-6
+        seed: K2SO4
+        environment: fuel rich
+        wall_temperature_C: 500
+    - observation_id: schneider_1980_q3_n51
+      type: qualifying_statement_context
+      locator:
+        published_page: 41
+        pdf_page_index: 46
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N51
+        method_class: quoted_unattributed
+        statement: 'Corrosion Fig. 2: SEM 45 X, region T drip deposit of specimen 8-6. Fig. 1 is the oxygen-rich mixed-seed Type
+          316 tube at 590 °C.'
+        figure: '2'
+        specimen: 8-6
+        region: T
+        magnification_X: 45
+    - observation_id: schneider_1980_q3_n52
+      type: qualifying_statement_context
+      locator:
+        published_page: 42
+        pdf_page_index: 47
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N52
+        method_class: quoted_unattributed
+        statement: 'Corrosion Fig. 3: SEM 92 X, region T drip deposit; Fig. 4: SEM 5460 X, region 1Z at the metal-salt reaction
+          interface of specimen 8-6.'
+        specimen: 8-6
+        figures:
+          '3':
+            region: T
+            magnification_X: 92
+          '4':
+            region: 1Z
+            magnification_X: 5460
+    - observation_id: schneider_1980_q3_n53
+      type: qualifying_statement_context
+      locator:
+        published_page: 47
+        pdf_page_index: 52
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N53
+        method_class: quoted_unattributed
+        statement: 'Corrosion Fig. 13: SEM 1800 X, region T drip deposit of specimen 8-6. The image prints 1800, not the OCR reading
+          1300.'
+        figure: '13'
+        specimen: 8-6
+        region: T
+        magnification_X: 1800
+    - observation_id: schneider_1980_q3_n54
+      type: qualifying_statement_context
+      locator:
+        published_page: 51
+        pdf_page_index: 56
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N54
+        method_class: quoted_unattributed
+        statement: 'Corrosion Fig. 21: SEM 1800 X, region Y fume interface of specimen 8-6.'
+        figure: '21'
+        specimen: 8-6
+        region: Y
+        magnification_X: 1800
+    - observation_id: schneider_1980_q3_n55
+      type: qualifying_statement_context
+      locator:
+        published_page: 53
+        pdf_page_index: 58
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N55
+        method_class: quoted_unattributed
+        statement: 'Corrosion Fig. 25: SEM 1720 X, region 2Z of specimen 9-6, the fuel-rich mixed-seed tube.'
+        figure: '25'
+        specimen: 9-6
+        region: 2Z
+        magnification_X: 1720
+    - observation_id: schneider_1980_q3_n56
+      type: qualifying_statement_context
+      locator:
+        published_page: 58
+        pdf_page_index: 63
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N56
+        method_class: quoted_unattributed
+        statement: 'Corrosion Fig. 36: SEM 1720 X, region 3Z of Fig. 35, specimen 6-6, the fuel-rich K2SO4 tube at 590 °C. Lettered
+          regions correspond to EDX spectra Figs. 37–43.'
+        figure: '36'
+        specimen: 6-6
+        region: 3Z
+        magnification_X: 1720
+    - observation_id: schneider_1980_q3_n57
+      type: qualifying_statement_context
+      locator:
+        published_page: 63
+        pdf_page_index: 68
+        section: Metal Corrosion
+      units: Source units retained in the statement and numeric field names; no curve digitization.
+      values:
+        quantity: full_report_numeric_fact_N57
+        method_class: quoted_unattributed
+        statement: 'Corrosion Fig. 45: SEM 1160 X, region 4Z of Fig. 44, specimen 5-6, the fuel-rich K2SO4 tube at 500 °C. Lettered
+          regions correspond to EDX Figs. 46–49; the image shows reaction at the metal-salt interface.'
+        figure: '45'
+        specimen: 5-6
+        region: 4Z
+        magnification_X: 1160
+    - observation_id: schneider_1980_q3_e02_ideal_liquidus
+      type: qualifying_statement_context
+      locator:
+        published_page: 11
+        pdf_page_index: 16
+        section: Phase Equilibria
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: ideal_solution_liquidus_relation
+        method_class: author_estimate
+        relation: −ln X_A^melt = −ln X_A^(xℓA) + (ΔH_A^fusion/R)(1/T − 1/T_A^fusion)
+        definitions_locator:
+          published_page: 12
+          pdf_page_index: 17
+        definitions: X is mole fraction; A/B are endmembers; R is gas constant; T is absolute temperature in kelvin; ΔH^fusion
+          is fusion enthalpy; T^fusion is endmember melting temperature. xℓA and xℓB are crystalline-phase labels, not measured
+          powers.
+        assumptions: Ideal liquid solution; corresponding crystalline-phase activity/composition term. Model calculation, not
+          a measured liquidus point.
+    - observation_id: schneider_1980_q3_e03_ideal_liquidus
+      type: qualifying_statement_context
+      locator:
+        published_page: 11
+        pdf_page_index: 16
+        section: Phase Equilibria
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: ideal_solution_liquidus_relation
+        method_class: author_estimate
+        relation: −ln X_B^melt = −ln X_B^(xℓB) + (ΔH_B^fusion/R)(1/T − 1/T_B^fusion)
+        definitions_locator:
+          published_page: 12
+          pdf_page_index: 17
+        definitions: X is mole fraction; A/B are endmembers; R is gas constant; T is absolute temperature in kelvin; ΔH^fusion
+          is fusion enthalpy; T^fusion is endmember melting temperature. xℓA and xℓB are crystalline-phase labels, not measured
+          powers.
+        assumptions: Ideal liquid solution; corresponding crystalline-phase activity/composition term. Model calculation, not
+          a measured liquidus point.
+    - observation_id: schneider_1980_q3_e04_conductivity
+      type: qualifying_statement_context
+      locator:
+        published_page: 24
+        pdf_page_index: 29
+        section: Electrical Conductivity of Slag
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: probe_voltage_normalization_relation
+        method_class: author_estimate
+        printed_equation_number: '1'
+        relation: f14(V) = (V12 + V23 + V34)/(V23*d14/d23) − 1
+        definitions: Vij is the potential difference between probes i and j; dij is their separation. Pt probes 1/4 introduce
+          current; 2/3 measure bulk potential with a high-input-impedance voltmeter. Uniform cross-sectional area is assumed unless
+          normalization is adjusted.
+        qualification: A near-zero f14 usually suggests no polarization or inhomogeneity but opposite V12/V34 deviations can cancel;
+          f12 and f34 must then be examined. Wide departures can reflect polarization or inhomogeneity; this is a diagnostic definition,
+          not a measured f value.
+    - observation_id: schneider_1980_q3_e05_conductivity
+      type: qualifying_statement_context
+      locator:
+        published_page: 24
+        pdf_page_index: 29
+        section: Electrical Conductivity of Slag
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: probe_voltage_normalization_relation
+        method_class: author_estimate
+        printed_equation_number: '2'
+        relation: f12(V) = V12/(V23*d12/d23) − 1
+        definitions: Vij is the potential difference between probes i and j; dij is their separation. Pt probes 1/4 introduce
+          current; 2/3 measure bulk potential with a high-input-impedance voltmeter. Uniform cross-sectional area is assumed unless
+          normalization is adjusted.
+        qualification: A near-zero f14 usually suggests no polarization or inhomogeneity but opposite V12/V34 deviations can cancel;
+          f12 and f34 must then be examined. Wide departures can reflect polarization or inhomogeneity; this is a diagnostic definition,
+          not a measured f value.
+    - observation_id: schneider_1980_q3_e06_conductivity
+      type: qualifying_statement_context
+      locator:
+        published_page: 25
+        pdf_page_index: 30
+        section: Electrical Conductivity of Slag
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: probe_voltage_normalization_relation
+        method_class: author_estimate
+        printed_equation_number: '3'
+        relation: f34(V) = V34/(V23*d34/d23) − 1
+        definitions: Vij is the potential difference between probes i and j; dij is their separation. Pt probes 1/4 introduce
+          current; 2/3 measure bulk potential with a high-input-impedance voltmeter. Uniform cross-sectional area is assumed unless
+          normalization is adjusted.
+        qualification: A near-zero f14 usually suggests no polarization or inhomogeneity but opposite V12/V34 deviations can cancel;
+          f12 and f34 must then be examined. Wide departures can reflect polarization or inhomogeneity; this is a diagnostic definition,
+          not a measured f value.
+    - observation_id: schneider_1980_q3_phase_handling_and_xrd
+      type: qualifying_statement_context
+      locator:
+        published_page: 7
+        pdf_page_index: 12
+        section: Phase Equilibria
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: phase_experiment_method_qualification
+        method_class: quoted_unattributed
+        statement: Hygroscopic samples required dry handling. X-ray diffraction used Cu Kα radiation, a dry cell and graphite
+          monochromator; high-temperature diffraction used dry nitrogen. SEM/EDX characterized products. Platinum containers,
+          powder drying and nitrogen atmosphere in this chapter do not identify the KCAS KEMS bench or sample preparation.
+        qualifications:
+        - Preparation, purity and handling procedures for these hygroscopic phase materials were described in reference [3]; no numeric purity is supplied here.
+        - The high-temperature X-ray apparatus of reference [4] required pressed pellets because of weight loss at cold surfaces. This introduced temperature and lattice-parameter errors, so observations were only qualitative.
+        - Sealed-capsule experiments showed no indication of platinum reaction or color change, suggesting the anomalous melting behavior was independent of platinum reaction or interaction with air.
+        qualification_locators: [{published_page: 7, pdf_page_index: 12}, {published_page: 9, pdf_page_index: 14}]
+    - observation_id: schneider_1980_q3_liquidus_input_provenance
+      type: qualifying_statement_context
+      locator:
+        published_page: 8
+        pdf_page_index: 13
+        section: Phase Equilibria
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: ideal_liquidus_input_sources
+        method_class: quoted_attributed
+        sources:
+        - 'K2CO3 thermochemical data: [6], JANAF Thermochemical Tables, 2nd ed. (1971).'
+        - 'KAlO2 melting temperature: [7], R. S. Roth, in press.'
+        - 'KAlO2 heat of fusion: [8], Spencer, Hendrie and Bienstock (1975).'
+        qualification: These are model inputs from references, not measurements from the KCAS KEMS bench.
+    - observation_id: schneider_1980_q3_phase_lattice_hypotheses
+      type: qualifying_statement_context
+      locator:
+        published_page: 11
+        pdf_page_index: 16
+        section: Phase Equilibria
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: tentative_lattice_intergrowth_interpretation
+        method_class: author_estimate
+        statement: MATCH 1 compared idealized primitive hexagonal carbonate and m3m aluminate potassium sites. A K2CO3 (001)/KAlO2
+          (111) interface has negligible cumulative mismatch over several hundred Å in the model. Proposed KAlO2 (110)/(100) intergrowth,
+          possible potassium/platinum intercalation and vacancy ordering are hypotheses for extra diffraction lines, not observed
+          quantitative layer dimensions.
+        model_distance_as_printed: several hundred Å
+    - observation_id: schneider_1980_q3_liquidus_model_qualifications
+      type: qualifying_statement_context
+      locator:
+        published_page: 12
+        pdf_page_index: 17
+        section: Phase Equilibria
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: ideal_solution_model_limitations
+        method_class: author_estimate
+        statement: Measured eutectics from prior reports/references were compared with ideal-solution liquidus curves. Marked
+          disagreement implies nonideality; solid solutions also affect the comparison. KAlSiO4–KAlSi2O6 is an exception, but
+          its agreement may be fortuitous because phase-derived inputs came from reference [8]. Plotted curve coordinates and
+          eutectics were not digitized.
+    - observation_id: schneider_1980_q3_corrosion_mobility_and_source_conflict
+      type: qualifying_statement_context
+      locator:
+        published_page: 38
+        pdf_page_index: 43
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: corrosion_directional_qualifications
+        method_class: quoted_unattributed
+        statements:
+        - Fe was most mobile, followed by Cr; Ni was least mobile and did not penetrate the deposit except at the interface. Preferential
+          Cr/Fe leaching left Ni-rich layering.
+        - Oxygen-rich specimens had the clearer reaction band. Fume was less separated into cations, possibly because it formed
+          by vaporization rather than direct molten-salt contact.
+        - Fuel-rich reaction zones were less distinct; S associated with higher Ni could indicate nickel-sulfur compounds, rather than proving their
+          formation.
+        - The text on p. 38 calls 8-6 fuel rich, conflicting with the explicit oxygen-rich identification on p. 37 and the caption
+          on p. 41. The source conflict is retained rather than silently reversing the sample binding.
+        source_conflict_locators:
+        - published_page: 37
+          pdf_page_index: 42
+        - published_page: 38
+          pdf_page_index: 43
+        - published_page: 41
+          pdf_page_index: 46
+        later_discussion_locator:
+          published_page: 39
+          pdf_page_index: 44
+    - observation_id: schneider_1980_q3_corrosion_conclusion_qualification
+      type: qualifying_statement_context
+      locator:
+        published_page: 40
+        pdf_page_index: 45
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: corrosion_interpretation_limits
+        method_class: quoted_unattributed
+        statement: Corrosion occurred readily in both environments; differences were minimal overall, though the oxygen-rich reaction
+          band was more definable. Fe and Cr were more mobile and Ni relatively unreacted. In oxygen-rich material Ni remained
+          at the interface as Fe left; fuel-rich material did not show high Ni. Migration of metal cations accounts for corrosion
+          in both. In sulfate specimen 6-6 the absence of Ni could reflect loss or displacement; the reason was not resolved.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p43
+      type: qualifying_statement_context
+      locator:
+        published_page: 43
+        pdf_page_index: 48
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '5': 'A/B: slight Ni increase at interface B'
+          '6': 'C/D: bulk K'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p44
+      type: qualifying_statement_context
+      locator:
+        published_page: 44
+        pdf_page_index: 49
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '7': 'E/F: high Cr'
+          '8': 'G/H: low Ni'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p45
+      type: qualifying_statement_context
+      locator:
+        published_page: 45
+        pdf_page_index: 50
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '9': 'I/J: high K'
+          '10': 'K/L: high Fe and K'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p46
+      type: qualifying_statement_context
+      locator:
+        published_page: 46
+        pdf_page_index: 51
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '11': 'M/N: high K'
+          '12': 'O/P: Fe with trace Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p47
+      type: qualifying_statement_context
+      locator:
+        published_page: 47
+        pdf_page_index: 52
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '14': 'A/B: high Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p48
+      type: qualifying_statement_context
+      locator:
+        published_page: 48
+        pdf_page_index: 53
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '15': 'C/D: high Cr'
+          '16': 'E/F: high Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p49
+      type: qualifying_statement_context
+      locator:
+        published_page: 49
+        pdf_page_index: 54
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '17': 'G/H: high Ni and Cr'
+          '18': 'I/J: high Ni and Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p50
+      type: qualifying_statement_context
+      locator:
+        published_page: 50
+        pdf_page_index: 55
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '19': 'K/L: high Ni and Cr'
+          '20': 'M/N: high S and K with trace Fe'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p51
+      type: qualifying_statement_context
+      locator:
+        published_page: 51
+        pdf_page_index: 56
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '22': 'A/B: high Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p52
+      type: qualifying_statement_context
+      locator:
+        published_page: 52
+        pdf_page_index: 57
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '23': 'C/D: absence of Ni'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p53
+      type: qualifying_statement_context
+      locator:
+        published_page: 53
+        pdf_page_index: 58
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '26': 'A/B: high Cr and Ni'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p54
+      type: qualifying_statement_context
+      locator:
+        published_page: 54
+        pdf_page_index: 59
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '27': 'C/D: high Cr and Ni'
+          '28': 'E/F: high Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p55
+      type: qualifying_statement_context
+      locator:
+        published_page: 55
+        pdf_page_index: 60
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '29': 'G/H: high Cr'
+          '30': 'I/J: high Fe'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p56
+      type: qualifying_statement_context
+      locator:
+        published_page: 56
+        pdf_page_index: 61
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '31': 'K/L: high Fe'
+          '32': 'M/N: Fe'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p57
+      type: qualifying_statement_context
+      locator:
+        published_page: 57
+        pdf_page_index: 62
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '33': 'O/P: trace Fe'
+          '34': 'Q/R: trace Fe'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p59
+      type: qualifying_statement_context
+      locator:
+        published_page: 59
+        pdf_page_index: 64
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '37': 'A/B: high Cr and absence of Ni'
+          38 (scanned caption resembles 33): 'C/D: high Cr and absence of Ni'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p60
+      type: qualifying_statement_context
+      locator:
+        published_page: 60
+        pdf_page_index: 65
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '39': 'E/F: high Cr and absence of Ni'
+          '40': 'G/H: high Cr and absence of Ni'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p61
+      type: qualifying_statement_context
+      locator:
+        published_page: 61
+        pdf_page_index: 66
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '41': 'I/J: high Ni and absence of Cr'
+          '42': 'K/L: high K with trace Fe and Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p62
+      type: qualifying_statement_context
+      locator:
+        published_page: 62
+        pdf_page_index: 67
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '43': 'M/N: high K with trace Fe and Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p63
+      type: qualifying_statement_context
+      locator:
+        published_page: 63
+        pdf_page_index: 68
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '46': 'A/B: high Cr and low Ni'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p64
+      type: qualifying_statement_context
+      locator:
+        published_page: 64
+        pdf_page_index: 69
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '47': 'C/D: high Cr and no Ni'
+          '48': 'E/F: high Fe with slight trace Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.
+    - observation_id: schneider_1980_q3_corrosion_edx_captions_p65
+      type: qualifying_statement_context
+      locator:
+        published_page: 65
+        pdf_page_index: 70
+        section: Metal Corrosion
+      units: As defined in source; symbolic relations and qualitative context, no digitization.
+      values:
+        quantity: qualitative_EDX_caption_observations
+        method_class: figure_only
+        figures:
+          '49': 'G/H: Fe with trace Cr'
+        qualification: Printed qualitative captions only; no spectral ordinate or numeric elemental concentration inferred. Regions
+          bind to the preceding SEM figure and its specimen.

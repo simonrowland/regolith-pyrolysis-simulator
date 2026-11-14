@@ -1,0 +1,417 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c923fdd9db36574a3471cf72855edee97ab5e787350b574bfc1485a9848ad801
+  citation: Shornikov, S. I., and Yakovlev, O. I. (2021). Experimental and theoretical investigations of evaporation of chondrule
+    melts of the Saratov chondrite. 84th Annual Meeting of the Meteoritical Society, LPI Contribution No. 2609, abstract 6077.
+  source_ids:
+  - shornikov-2021-saratov-chondrule-alkali-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:shornikov-2021-saratov-chondrule-alkali-evaporation
+      role: pdf
+      path: raw/shornikov-2021-saratov-chondrule-alkali-evaporation/shornikov-2021-saratov-chondrule-alkali-evaporation.pdf
+      sha256:
+        tag: value
+        value: 38c214500212ffabf807d9c287a7c1eede34100caa796f8257371fe365b5ea57
+    - asset_id: pdftotext:shornikov-2021-saratov-chondrule-alkali-evaporation
+      role: pdftotext
+      path: text/shornikov-2021-saratov-chondrule-alkali-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2021-saratov-chondrule-alkali-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: shornikov_2021_background_and_directional_claims
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 6077
+    pdf_page_index: 1
+    section: Introduction
+    paragraph: 1
+  units: statements as printed
+  values:
+    quantity: background_and_prior_relative_volatility_claims
+    method_class: quoted_unattributed
+    claims:
+    - “Potassium in elementary, oxide, chloride, and other simple forms is more volatile than sodium, that was also observed
+      in the evaporation experiments of basaltic and more basic melts [2–4].”
+    - “Other authors suggest the higher volatility of sodium than the potassium volatility[1].”
+    - “The question of the chondrule formation is one of the most important in meteoritics. Despite the success of modern
+      experimental studies, formation and evaporation conditions of chondrule melts remain unclear [1].”
+    - “It is believed that the study of the alkali evaporation will provide a key for understanding physical and chemical
+      conditions of the chondrule formation.”
+    note: These are background statements and conflicting literature claims, not measurements made in this abstract. The missing
+      space before [1] is present in the printed text.
+  context_id: shornikov-2021-saratov-chondrule-alkali-evaporation::context::shornikov_2021_background_and_directional_claims
+  work_id: c923fdd9db36574a3471cf72855edee97ab5e787350b574bfc1485a9848ad801
+  source_id: shornikov-2021-saratov-chondrule-alkali-evaporation
+  species: K
+- observation_id: shornikov_2021_figures_only
+  type: experiment_series
+  locator:
+    page: 2
+    published_page: 6077
+    pdf_page_index: 1
+    section: Figures 1–2
+  units: axes, series labels, and captions as printed
+  values:
+    quantity: non_tabulated_pressure_and_pressure_ratio_curves
+    method_class: figure_only
+    axis_labels_and_ticks_as_printed:
+      figure_1: lg p, atm (-6, -7, -8); T, °C (1200, 1400, 1600).
+      figure_2a: p_K/p_Na (0.0, 0.5, 1.0, 1.5, 2.0); K2O/(K2O+Na2O), wt. (0.2, 0.4, 0.6).
+      figure_2b: T, °C (1100, 1200, 1300, 1400); series 1, 2, 3; pressure-ratio scale shared with panel a.
+    figure_1_caption: 'The partial pressure of vapor species over the chondrule melts of Saratov chondrite at evaporation
+      from tungsten effusion cell [5]: K (1); Na (2); Fe (3); SiO (4); Mg (5).'
+    figure_2_caption: The pK / pNa ratio over the K2O–Na2O–SiO2 melts (1, 2) and the chondrule melts of Saratov chondrite
+      (3) vs. the melt composition at 1200 °C (a) and vs. temperature (b). Compositions contained 35 (1) and 55 (2) wt. %
+      SiO2 (a, b) with a ratio of K2O / Na2O ≈ 3 / 4 (b); data for chondrul of Saratov chondrite (3) are taken from [5].
+    data_origin: The Saratov pressure series is attributed to Yakovlev et al. (1987); the model comparisons are attributed
+      to Shornikov and Yakovlev (2020).
+    semantics: bound_not_point
+    note: Neither figure was digitized; the 3/4 ratio is in the caption, not read from the plotted curves.
+  context_id: shornikov-2021-saratov-chondrule-alkali-evaporation::context::shornikov_2021_figures_only
+  work_id: c923fdd9db36574a3471cf72855edee97ab5e787350b574bfc1485a9848ad801
+  source_id: shornikov-2021-saratov-chondrule-alkali-evaporation
+  species: K
+- observation_id: shornikov_2021_model_comparison_and_ratio_claims
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 6077
+    pdf_page_index: 1
+    section: Experimental and Theoretical Investigations
+    paragraph: 2
+  units: statements as printed
+  values:
+    quantity: model_comparison_and_partial_pressure_ratio_interpretation
+    method_class: model_derived
+    model_inputs_as_printed:
+      temperature_range: 1100–1500 °C
+      silica_contents: 35–55 wt. % SiO2
+      melt_system: K2O–Na2O–SiO2
+      model_basis: theory of associated solutions
+      model_details_reference: '[8]'
+    directional_and_comparative_claims:
+    - “The temperature dependences of the partial pressures (p) of vapor species over the chondrule melts at evaporation are
+      shown in Fig. 1.”
+    - “As it is shown on Fig. 2, the obtained experimental data are in agreement with those calculated at 1100–1500 °C for
+      the K2O–Na2O–SiO2 melts, containing from 35 to 55 wt. % SiO2 at different K2O / Na2O ratios [7].”
+    - “Comparing the pK / pNa ratios at 1200 °C over compositions simulating ultrabasic and medium-acid melts (containing
+      35 and 55 wt. % SiO2), it is possible to see the preponderance of pK over pNa at evaporation of the ultrabasic melt
+      (pK / pNa > 1).”
+    - “In the case of the medium-acidity melt evaporation at relatively low K2O contents, the ratio of pK / pNa < 1 (Fig.
+      2a).”
+    - “Thus, the pK / pNa ratio over the melts with different acidity can experience an inversion of relative volatility,
+      which also depends on the content of alkalis in the melt.”
+    - “In our opinion, this is the reason for the different ideas about the relative volatility of K2O and Na2O at the chondrule
+      evaporation.”
+    - “It follows from the calculations that the temperature dependence of the pK / pNa ratio can be determined by the acid-base
+      parameters of the melt.”
+    - “Fig. 2b shows decrease in the pK / pNa ratio with the temperature increasing in the ultrabasic melt and the absence
+      of such in the medium acidity melt.”
+    note: The reported ratio concerns gas-phase K and Na partial pressures over model melts; the abstract gives no oxide activities
+      or oxide activity coefficients and states no activity standard state.
+  context_id: shornikov-2021-saratov-chondrule-alkali-evaporation::context::shornikov_2021_model_comparison_and_ratio_claims
+  work_id: c923fdd9db36574a3471cf72855edee97ab5e787350b574bfc1485a9848ad801
+  source_id: shornikov-2021-saratov-chondrule-alkali-evaporation
+  species: K
+- observation_id: shornikov_2021_printed_citation_metadata
+  type: method
+  locator:
+    page: 2
+    published_page: 6077
+    pdf_page_index: 1
+    section: Affiliation, support statement and References
+    note: Cover metadata has its separate PDF page index 0; all other items are on abstract page 6077.
+  units: citation and affiliation metadata as printed; not experimental observations
+  values:
+    method_class: quoted_attributed
+    attribution: Shornikov and Yakovlev (2021), supplied cover and abstract.
+    quantity: printed_source_metadata
+    cover_as_printed: Meteoritics & Planetary Science, Volume 56, Number S1, 2021 August; 84th Annual Meeting of the Meteoritical
+      Society, Chicago (PDF page 1, index 0).
+    cover_production_metadata:
+      filename_and_folio_as_printed: maps_v56_s1_cover.indd  1
+      date_and_time_as_printed: 8/6/2021  7:50:22 PM
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Bottom printer footer
+      note: Printer production metadata; not experimental observations.
+    affiliation_as_printed: Vernadsky Institute of Geochemistry & Analytical Chemistry of RAS, Kosygin st. 19, Moscow 119991,
+      Russia.
+    support_as_printed: 'Russian Foundation for Basic Research, grant #19-05-00801A.'
+    references_as_printed:
+    - '[1] Ebel D. et al. (2018) In Chondrules. Records of Protoplanetary Disk Processes (Russell S., Connolly H. C., Krot
+      A. N.) Cambridge University Press 151–174.'
+    - '[2] Yakovlev O. I. et al. (1972) Doklady Earth Sciences, 206:970–973.'
+    - '[3] Kreutzberger M. E. et al. (1986) GCA 50:91–98.'
+    - '[4] Ustunişik G. et al. (2014) LPS XXXXV, Abstract #2171.'
+    - '[5] Yakovlev O. I. et al. (1987) Meteoritika, 46:104–118 (in Russian).'
+    - '[6] Yakovlev O. I. et al. (1984) Meteoritika, 43:126–132 (in Russian).'
+    - '[7] Shornikov S. I. and Yakovlev O. I. (2020) In Proc. XXI Int. Conf. Physico-Chemical & Petrophysical Research in
+      the Earth Sciences IGEM RAS, Moscow 293–296.'
+    - '[8] Shornikov S. I. (2019) Geochem. Int., 57:865–872.'
+  context_id: shornikov-2021-saratov-chondrule-alkali-evaporation::context::shornikov_2021_printed_citation_metadata
+  work_id: c923fdd9db36574a3471cf72855edee97ab5e787350b574bfc1485a9848ad801
+  source_id: shornikov-2021-saratov-chondrule-alkali-evaporation
+  species: K
+- observation_id: shornikov_2021_saratov_prior_experiment_and_duplicate
+  type: experiment_series
+  locator:
+    page: 2
+    published_page: 6077
+    pdf_page_index: 1
+    section: Experimental and Theoretical Investigations
+    paragraph: 2
+    note: The abstract summarizes prior Saratov chondrule work; it reports no new experiment.
+  units: as printed
+  values:
+    quantity: prior_saratov_chondrule_evaporation_summary
+    method_class: quoted_attributed
+    attribution: Yakovlev et al. (1987), reference [5]; apparatus details referred to Yakovlev et al. (1984), reference [6].
+      Referral does not establish that each absent apparatus field is present in that cited paper.
+    duplicate_of: shornikov-2025-saratov-alkali-evaporation
+    relation: This abstract recaps the Saratov chondrule experiment and composition also recorded in the related Saratov extract.
+      It attributes the underlying KEMS experiment and pressure data to Yakovlev et al. (1987) and refers apparatus details
+      to Yakovlev et al. (1984).
+    method: knudsen_effusion
+    method_as_printed: evaporation from a tungsten cell (according to Knudsen)
+    temperature_range_as_printed: 1000–2100 °C
+    sample_as_printed: pyroxene chondrules of the Saratov chondrite, IIB type
+    preparation:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+    purity:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+    composition_record: Same Saratov chondrule composition as extracts/shornikov-2025-saratov-alkali-evaporation.yaml; the
+      eight printed values are also transcribed here so this source's migrated context retains them without resolving the
+      duplicate link.
+    composition_wt_pct_as_printed:
+      SiO2: '54.44'
+      TiO2: '0.13'
+      Al2O3: '3.20'
+      FeO: '13.17'
+      MgO: '24.98'
+      CaO: '2.24'
+      Na2O: '1.44'
+      K2O: '0.40'
+    postrun_composition:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+    data_origin: Figure 1's Saratov pressure curves are attributed to reference [5], Yakovlev et al. (1987), Meteoritika 46:104–118.
+      No point values are tabulated in this abstract.
+  equipment:
+    apparatus_family:
+      value: Knudsen mass spectrometric effusion apparatus
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+    cell_material_and_liner:
+      value: tungsten cell; liner not stated
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+    cell_materials:
+      value:
+      - W
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+    temperature_measurement:
+      value:
+        sensor:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            page: 2
+            published_page: 6077
+            pdf_page_index: 1
+            section: Experimental and Theoretical Investigations
+            paragraph: 2
+        stated_uncertainty:
+          state:
+            tag: unknown
+            reason: not_stated_in_this_source
+          locator:
+            page: 2
+            published_page: 6077
+            pdf_page_index: 1
+            section: Experimental and Theoretical Investigations
+            paragraph: 2
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+        note: Apparatus details are referred to Yakovlev et al. (1984).
+    temperature_calibration:
+      value:
+        method:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            page: 2
+            published_page: 6077
+            pdf_page_index: 1
+            section: Experimental and Theoretical Investigations
+            paragraph: 2
+        reference:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            page: 2
+            published_page: 6077
+            pdf_page_index: 1
+            section: Experimental and Theoretical Investigations
+            paragraph: 2
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+        note: Apparatus details are referred to Yakovlev et al. (1984).
+    ionization:
+      value:
+        electron_energy_eV:
+          state:
+            tag: unknown
+            reason: in_cited_source
+        cross_sections:
+          state:
+            tag: unknown
+            reason: in_cited_source
+        cross_sections_source:
+          state:
+            tag: unknown
+            reason: in_cited_source
+        multiplier_corrections:
+          state:
+            tag: unknown
+            reason: in_cited_source
+        isotope_corrections:
+          state:
+            tag: unknown
+            reason: in_cited_source
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+        note: Apparatus details are referred to Yakovlev et al. (1984).
+    orifice_diameter_mm:
+      value:
+        state:
+          tag: unknown
+          reason: in_cited_source
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+        note: Orifice geometry is referred to Yakovlev et al. (1984).
+    orifice_channel_length_m:
+      value:
+        state:
+          tag: unknown
+          reason: in_cited_source
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+        note: Orifice geometry is referred to Yakovlev et al. (1984).
+    total_pressure_Pa:
+      value:
+        state:
+          tag: unknown
+          reason: in_cited_source
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+        note: The chamber background pressure is not stated.
+    other_facts:
+      value:
+      - name: pressure_conversion_method
+        unit: as printed
+        value:
+          state:
+            tag: unknown
+            reason: in_cited_source
+      - name: calibration_substance
+        unit: as printed
+        value:
+          state:
+            tag: unknown
+            reason: in_cited_source
+      - name: liner_material
+        unit: as printed
+        value:
+          state:
+            tag: unknown
+            reason: not_stated_in_this_source
+      locator:
+        page: 2
+        published_page: 6077
+        pdf_page_index: 1
+        section: Experimental and Theoretical Investigations
+        paragraph: 2
+        note: Details are referred to Yakovlev et al. (1984).
+  context_id: shornikov-2021-saratov-chondrule-alkali-evaporation::context::shornikov_2021_saratov_prior_experiment_and_duplicate
+  work_id: c923fdd9db36574a3471cf72855edee97ab5e787350b574bfc1485a9848ad801
+  source_id: shornikov-2021-saratov-chondrule-alkali-evaporation
+  species: K

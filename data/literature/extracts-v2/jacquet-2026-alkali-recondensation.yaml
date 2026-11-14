@@ -962,7 +962,7 @@ observations:
     table: '2'
     note: row=Rb; column=delta_chd
   read_from: pdf:jacquet-2026-alkali-recondensation
-- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=chb:h=377d3f25b134
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=chb:h=2de1a10e05cc
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
     quantity:
@@ -988,10 +988,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
     reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
@@ -1011,7 +1010,7 @@ observations:
     table: '3'
     note: row=CHB
   read_from: pdf:jacquet-2026-alkali-recondensation
-- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=cmo:h=b632702e119a
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=cmo:h=560a45afd32f
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
     quantity:
@@ -1037,10 +1036,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
     reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
@@ -1060,7 +1058,7 @@ observations:
     table: '3'
     note: row=CMO
   read_from: pdf:jacquet-2026-alkali-recondensation
-- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=cr:h=49a4fe74fc35
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=cr:h=db363ee24bfa
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
     quantity:
@@ -1086,10 +1084,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
     reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
@@ -1109,7 +1106,7 @@ observations:
     table: '3'
     note: row=CR
   read_from: pdf:jacquet-2026-alkali-recondensation
-- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=eh:h=be714d5dbb4d
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=eh:h=d0fd93b1c7dd
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
     quantity:
@@ -1135,10 +1132,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
     reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
@@ -1158,7 +1154,7 @@ observations:
     table: '3'
     note: row=EH
   read_from: pdf:jacquet-2026-alkali-recondensation
-- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=oc:h=428e62c3314e
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=oc:h=3add4d348773
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
     quantity:
@@ -1184,10 +1180,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
     status: rejected
     reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
@@ -1649,7 +1644,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1672,9 +1667,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
@@ -1742,6 +1737,37 @@ observations:
       locator:
         page: 37
         table: A.5
+  derivation:
+    relation: The authors calculated the activity coefficients from the initial slopes in Mathieu (2009), Fig. V.18, using
+      the action mass law as Eq. (A.3), with experiments in Mathieu (2009), Table V.5.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    method:
+      state:
+        tag: value
+        value: calculation using the action mass law and initial slopes from Mathieu (2009), Fig. V.18
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    references:
+    - Mathieu (2009), Fig. V.18 and Table V.5.
+  provenance:
+    printed_phase: melt
 - observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.55:h=a7f027a631de
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
@@ -1792,7 +1818,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1815,9 +1841,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
@@ -1885,6 +1911,37 @@ observations:
       locator:
         page: 37
         table: A.5
+  derivation:
+    relation: The authors calculated the activity coefficients from the initial slopes in Mathieu (2009), Fig. V.18, using
+      the action mass law as Eq. (A.3), with experiments in Mathieu (2009), Table V.5.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    method:
+      state:
+        tag: value
+        value: calculation using the action mass law and initial slopes from Mathieu (2009), Fig. V.18
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    references:
+    - Mathieu (2009), Fig. V.18 and Table V.5.
+  provenance:
+    printed_phase: melt
 - observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.60:h=1ee15365bdb6
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
@@ -1935,7 +1992,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1958,9 +2015,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
@@ -2028,6 +2085,37 @@ observations:
       locator:
         page: 37
         table: A.5
+  derivation:
+    relation: The authors calculated the activity coefficients from the initial slopes in Mathieu (2009), Fig. V.18, using
+      the action mass law as Eq. (A.3), with experiments in Mathieu (2009), Table V.5.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    method:
+      state:
+        tag: value
+        value: calculation using the action mass law and initial slopes from Mathieu (2009), Fig. V.18
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    references:
+    - Mathieu (2009), Fig. V.18 and Table V.5.
+  provenance:
+    printed_phase: melt
 - observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.65:h=c58e68b695c9
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
@@ -2078,7 +2166,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2101,9 +2189,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
@@ -2171,6 +2259,37 @@ observations:
       locator:
         page: 37
         table: A.5
+  derivation:
+    relation: The authors calculated the activity coefficients from the initial slopes in Mathieu (2009), Fig. V.18, using
+      the action mass law as Eq. (A.3), with experiments in Mathieu (2009), Table V.5.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    method:
+      state:
+        tag: value
+        value: calculation using the action mass law and initial slopes from Mathieu (2009), Fig. V.18
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    references:
+    - Mathieu (2009), Fig. V.18 and Table V.5.
+  provenance:
+    printed_phase: melt
 - observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.72:h=be425f40dddc
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:
@@ -2221,7 +2340,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2244,9 +2363,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
@@ -2314,6 +2433,37 @@ observations:
       locator:
         page: 37
         table: A.5
+  derivation:
+    relation: The authors calculated the activity coefficients from the initial slopes in Mathieu (2009), Fig. V.18, using
+      the action mass law as Eq. (A.3), with experiments in Mathieu (2009), Table V.5.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    method:
+      state:
+        tag: value
+        value: calculation using the action mass law and initial slopes from Mathieu (2009), Fig. V.18
+      locator:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        section: Appendix A. Calculation of activity coefficients
+        equation: (A.3)
+    references:
+    - Mathieu (2009), Fig. V.18 and Table V.5.
+  provenance:
+    printed_phase: melt
 - observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_te_table2_quoted_isotope_data::points:row=te:h=38f2da8655b8
   experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
   identity:

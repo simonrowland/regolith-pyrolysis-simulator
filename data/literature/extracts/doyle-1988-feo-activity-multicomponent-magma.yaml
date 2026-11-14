@@ -26,13 +26,61 @@ extraction:
 review_status: draft
 experiments:
 - experiment_id: doyle_1988_feo_activity_measurement
-  method: gas_metal_equilibration
-  method_as_printed: Each sample is suspended on a 99.94% Fe-wire loop and equilibrated with a COHN gas at 1600
-    K in the hot zone of a vertical quench furnace.
+  method: quench_equilibration
+  method_as_printed: each sample is suspended on a 99.94% Fe-wire loop and is equilibrated with a COHN gas at 1600 K in the hot zone of the Deltech MoSi₂ vertical quench furnace.
+  method_detail_as_printed: &doyle_1988_method_detail
+    fO2_control:
+      control:
+        as_printed: "aluminosilicate liquids are equilibrated with reagent-grade (99.94%) metallic iron-wire under controlled oxygen fugacity at 1600 K."
+        locator:
+          page: 2
+          published_page: 1828
+          pdf_page_index: 1
+          section: Control of the Activity of FeO
+      gas_mixing:
+        as_printed: "each sample is suspended on a 99.94% Fe-wire loop and is equilibrated with a COHN gas at 1600 K in the hot zone of the Deltech MoSi₂ vertical quench furnace."
+        locator:
+          page: 2
+          published_page: 1828
+          pdf_page_index: 1
+          section: Experimental and Analytical Methods
+      fugacity_calculation:
+        as_printed: "Fugacities of the gaseous species in the hot zone are calculated by BRINKLEY's (1946) method using the algorithm of VAN ZEGGEREN and STOREY (1970)."
+        locator:
+          page: 2
+          published_page: 1828
+          pdf_page_index: 1
+          section: Experimental and Analytical Methods
+      gas_flow_locator:
+        page: 5
+        published_page: 1831
+        pdf_page_index: 4
+        table: 1B
+        note: 'Table 1B. Compositions of input gases (c.c.s/min) used in the experiments to determine aFeO at 1600±2K in [SiO₂-KAlO₂-CaAl₂Si₂O₈]-FeO liquids.'
+    metal_phase:
+      phase_as_printed: "reagent-grade (99.94%) metallic iron-wire"
+      phase_locator:
+        page: 2
+        published_page: 1828
+        pdf_page_index: 1
+        section: Control of the Activity of FeO
+      activity_as_printed: 'Because the metallic iron is almost pure ( $a_{\mathrm{Fe}}^{\mathrm{metal}} = 1$ )'
+      activity_locator:
+        page: 2
+        published_page: 1828
+        pdf_page_index: 1
+        section: Control of the Activity of FeO
+    FeO_standard_state:
+      standard_state_as_printed: 'The standard state is molten Fe $_{0.947}$ O (COUGHLIN, 1954).'
+      locator:
+        page: 2
+        published_page: 1828
+        pdf_page_index: 1
+        section: Control of the Activity of FeO
   locator:
-    page: 3
-    published_page: 1829
-    pdf_page_index: 2
+    page: 2
+    published_page: 1828
+    pdf_page_index: 1
     section: Experimental and Analytical Methods
 species:
   FeO:
@@ -173,6 +221,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -327,6 +376,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -481,6 +531,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -635,6 +686,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -789,6 +841,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -947,6 +1000,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -1101,6 +1155,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -1255,6 +1310,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -1409,6 +1465,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -1563,6 +1620,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -1721,6 +1779,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -1875,6 +1934,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -2029,6 +2089,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -2183,6 +2244,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -2341,6 +2403,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -2495,6 +2558,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -2649,6 +2713,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -2803,6 +2868,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -2957,6 +3023,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -3111,6 +3178,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -3265,6 +3333,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -3419,6 +3488,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -3577,6 +3647,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -3731,6 +3802,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -3885,6 +3957,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -4039,6 +4112,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -4193,6 +4267,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -4347,6 +4422,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -4501,6 +4577,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -4655,6 +4732,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -4802,6 +4880,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0170
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -4945,6 +5024,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0170
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -5088,6 +5168,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0170
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -5231,6 +5312,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0170
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -5374,6 +5456,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0170
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -5521,6 +5604,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -5664,6 +5748,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -5807,6 +5892,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -5950,6 +6036,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -6093,6 +6180,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -6236,6 +6324,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -6379,6 +6468,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -6526,6 +6616,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -6669,6 +6760,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -6812,6 +6904,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -6955,6 +7048,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -7098,6 +7192,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -7241,6 +7336,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -7384,6 +7480,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -7527,6 +7624,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -7670,6 +7768,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -7813,6 +7912,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -7956,6 +8056,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -8099,6 +8200,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -8242,6 +8344,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -8385,6 +8488,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -8528,6 +8632,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -8671,6 +8776,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -8814,6 +8920,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -8957,6 +9064,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -9100,6 +9208,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -9243,6 +9352,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -9386,6 +9496,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -9529,6 +9640,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -9672,6 +9784,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -9815,6 +9928,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -9958,6 +10072,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -10101,6 +10216,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -10244,6 +10360,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -10387,6 +10504,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -10530,6 +10648,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -10673,6 +10792,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -10816,6 +10936,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -10959,6 +11080,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -11102,6 +11224,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -11245,6 +11368,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -11388,6 +11512,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -11531,6 +11656,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -11674,6 +11800,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -11817,6 +11944,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -11960,6 +12088,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -12103,6 +12232,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -12246,6 +12376,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -12389,6 +12520,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -12532,6 +12664,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -12675,6 +12808,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -12818,6 +12952,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -12961,6 +13096,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -13104,6 +13240,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -13247,6 +13384,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -13390,6 +13528,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -13533,6 +13672,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -13676,6 +13816,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -13819,6 +13960,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -13962,6 +14104,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -14105,6 +14248,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -14248,6 +14392,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -14391,6 +14536,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -14534,6 +14680,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -14677,6 +14824,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -14820,6 +14968,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -14963,6 +15112,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -15106,6 +15256,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -15249,6 +15400,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -15392,6 +15544,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -15535,6 +15688,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -15678,6 +15832,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -15821,6 +15976,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -15964,6 +16120,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -16107,6 +16264,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -16250,6 +16408,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -16393,6 +16552,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -16536,6 +16696,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -16679,6 +16840,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -16822,6 +16984,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -16965,6 +17128,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -17108,6 +17272,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -17251,6 +17416,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -17394,6 +17560,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -17537,6 +17704,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -17680,6 +17848,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -17823,6 +17992,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -17966,6 +18136,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -18109,6 +18280,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -18252,6 +18424,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -18395,6 +18568,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -18538,6 +18712,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -18681,6 +18856,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:
@@ -18824,6 +19000,7 @@ species:
       derived_from:
       - doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
       derivation:
+        method_detail_as_printed: *doyle_1988_method_detail
         relation: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5); Table 1A values are assigned from the matching
           printed Table 1B setpoint.
         inputs:

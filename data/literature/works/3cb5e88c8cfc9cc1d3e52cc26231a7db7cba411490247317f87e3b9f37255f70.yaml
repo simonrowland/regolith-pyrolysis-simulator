@@ -1,0 +1,269 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 3cb5e88c8cfc9cc1d3e52cc26231a7db7cba411490247317f87e3b9f37255f70
+  citation: Supplement to Yang, L., Zeng, Y., Fabrichnaya, O., Zhang, L., Liu, Y., & Du, Y. (2025). Thermodynamic description
+    of the Na2O–CaO–SiO2 system and its application to solidification and heat treatment design. Journal of the American Ceramic
+    Society, 108(8), e20565.
+  source_ids:
+  - yang-2025-na2o-cao-silica-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdftotext:yang-2025-na2o-cao-silica-thermodynamics
+      role: pdftotext
+      path: text/yang-2025-na2o-cao-silica-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yang-2025-na2o-cao-silica-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: yang_2025_thermocalc_database_and_new_parameters
+  type: thermodynamic_example
+  locator:
+    source_path: text/yang-2025-na2o-cao-silica-thermodynamics/database-as-printed.txt
+    line_range: 1-512
+    note: Complete supplied DOCX database supplement; line locators refer to the transcription. Reviewer rendering uses 40-line
+      pages; native Word pagination is unverified and the parent article PDF is absent.
+  units: Thermo-Calc database syntax; free-energy expression units are not stated in the supplement.
+  values:
+    quantity: Na2O-CaO-SiO2 thermodynamic database definitions
+    method_class: model_derived
+    evidence_class: thermodynamic_model_parameter
+    attribution: Yang et al. (2025) supplementary database; only the two new_parameter_sections blocks are marked 'New parameters
+      from this work'. Individual literature attribution for the remaining database definitions is not supplied.
+    model: Thermo-Calc-style thermodynamic database for the Na2O-CaO-SiO2 system
+    system: Na2O-CaO-SiO2
+    database_elements_as_printed:
+    - NA
+    - SI
+    - CA
+    - O
+    database_written: '2024-10-23'
+    database_format: Thermo-Calc-style text definitions
+    experimental_results_in_supplement: false
+    activity_values_reported: false
+    new_parameter_sections:
+    - section: Na2O-CaO-SiO2 liquid interaction parameters
+      source_line_range: 275-283
+      definitions_as_printed: "$--------------------------------New parameters from this work---------------\n$--------------------------------NA2O-CAO-SIO2-LIQ---------------------------\n\
+        \  PARAMETER L(IONIC_LIQ,NA+1,CA+2:O-2,SIO2;0)    298.15 -262200.403\n+16.87663*T; 6000 N !\n\n  PARAMETER L(IONIC_LIQ,NA+1,CA+2:SIO4-4,SIO2;0)\
+        \ 298.15 -310235.711\n+117.3783*T; 6000 N !\n  PARAMETER L(IONIC_LIQ,NA+1,CA+2:SIO4-4,SIO2;1) 298.15 +19308.7561;\
+        \ 6000 N !\n  PARAMETER L(IONIC_LIQ,NA+1,CA+2:SIO4-4,SIO2;2) 298.15 +0; 6000 N !\n"
+    - section: Ternary intermediate compounds and model functions
+      source_line_range: 390-508
+      definitions_as_printed: "$--------------------------------New parameters from this work---------------\n$---------------------------Ternary-intermidiate-compounds-------------------\n\
+        $----------------------------------------------------------------------------\n$--------------------------NA2CASIO4ss(N1C1S1ss)-----------------------------\n\
+        FUNCTION GN1C1S1 298.15 -2275400.7080982+496.8230442*T-87.82216*T*LN(T)\n-0.0997884*T**2-389112*T**(-1); 830 Y\n-2334663.35454+1488.22368*T-236.43784*T*LN(T)-0.00539736*T**2;\
+        \ 6000 N !\nFUNCTION GNNSO 298.15 +1.5*GNA2OS#+GQUARTZ#+0.5*GHSEROO#; 6000 N !\nFUNCTION GCVSO 298.15 +GC2S1#+75056.91655-32.89857*T;\
+        \ 6000 N !\nFUNCTION GCNSO 298.15 +2*GN1C1S1#-GNNSO#+23.05244*T; 6000 N !\nFUNCTION GNVSO 298.15 +GNNSO#+GCVSO#-GCNSO#-17652.92559;\
+        \ 6000 N !\n\n$(NA+1,CA+2)2 (NA+1,VA)1 (SI+4)1 (O-2)4\n PHASE N1C1S1SS % 4 2 1 1 4 !\n    CONSTITUENT N1C1S1SS :NA+1,CA+2:NA+1,VA:SI+4:O-2\
+        \ : !\n PARAMETER G(N1C1S1SS,NA+1:NA+1:SI+4:O-2;0)  298.15 +GNNSO#; 6000 N !\n PARAMETER G(N1C1S1SS,NA+1:VA:SI+4:O-2;0)\
+        \    298.15 +GNVSO#; 6000 N !\n PARAMETER G(N1C1S1SS,CA+2:NA+1:SI+4:O-2;0)  298.15 +GCNSO#; 6000 N !\n PARAMETER G(N1C1S1SS,CA+2:VA:SI+4:O-2;0)\
+        \    298.15 +GCVSO#; 6000 N !\n\n$--------------------------ANA2CASIO4ss(AN1C1S1ss)---------------------------\nFUNCTION\
+        \ GAN1C1S1 298.15 +GN1C1S1#-669.44+0.80655422*T; 6000 N !\n\n PHASE AN1C1S1SS % 4 2 1 1 4 !\n    CONSTITUENT AN1C1S1SS\
+        \ :NA+1:CA+2:SI+4:O-2 : !\n PARAMETER G(AN1C1S1SS,NA+1:CA+2:SI+4:O-2;0)  298.15 +GAN1C1S1#; 6000 N !\n\n$--------------------------NA2CA2SI3O9SS(COMBEITE)---------------------------\n\
+        FUNCTION GN1C2S3 298.15 -4907547.188657+1191.42243041*T-210.32968*T*LN(T)\n-0.14091712*T**2+158992*T**(-1); 750 Y\n\
+        -4941500+2000*T-337.94168*T*LN(T)-0.03188208*T**2; 6000 N !\nFUNCTION GN3C3S6 298.15 +3*GNA2OS#+3*GCAOS#+6*GQUARTZ#\n\
+        -1016468.33-5*T; 6000 N !\nFUNCTION GCVC 298.15 +6*GC1S1#+64972.3655; 6000 N !\nFUNCTION GCVN 298.15 +GCVC#; 6000\
+        \ N !\nFUNCTION GCNN 298.15 +3*GNA2OS#+3*GCAOS#+6*GQUARTZ#\n+189276.015; 6000 N !\nFUNCTION GCNC 298.15 +GCNN#; 6000\
+        \ N !\nFUNCTION GNVC 298.15 +GNA2OS#+4*GCAOS#+6*GQUARTZ#+GHSEROO#; 6000 N !\nFUNCTION GNNC 298.15 +3*GN1C2S3#-0.5*GNVC+23.81508*T;\
+        \ 6000 N !\nFUNCTION GNNN 298.15 +3*GN3C3S6#-2*GNNC#+47.63016*T; 6000 N !\nFUNCTION GNVN 298.15 +GNNN#+GNVC#-GNNC#;\
+        \ 6000 N !\n\n$(NA+1,CA+2)2M1 (NA+1,VA)3M2 (CA+2,NA+1)3M3 (CA+2)1M4 (SI+4)6(O-2)18\nPHASE COMBEITE %  6  2 3 3 1 6\
+        \ 18 !\nCONSTITUENT COMBEITE :NA+1,CA+2:NA+1,VA:CA+2,NA+1:CA+2:SI+4:O-2: !\nPARAMETER G(COMBEITE,CA+2:VA:CA+2:CA+2:SI+4:O-2;0)\
+        \ 298.15 +GCVC#; 6000 N !\nPARAMETER G(COMBEITE,CA+2:VA:NA+1:CA+2:SI+4:O-2;0) 298.15 +GCVN#; 6000 N !\nPARAMETER G(COMBEITE,CA+2:NA+1:NA+1:CA+2:SI+4:O-2;0)\
+        \ 298.15 +GCNN#; 6000 N !\nPARAMETER G(COMBEITE,CA+2:NA+1:CA+2:CA+2:SI+4:O-2;0) 298.15 +GCNC#; 6000 N !\nPARAMETER\
+        \ G(COMBEITE,NA+1:NA+1:NA+1:CA+2:SI+4:O-2;0) 298.15 +GNNN#; 6000 N !\nPARAMETER G(COMBEITE,NA+1:NA+1:CA+2:CA+2:SI+4:O-2;0)\
+        \ 298.15 +GNNC#; 6000 N !\nPARAMETER G(COMBEITE,NA+1:VA:CA+2:CA+2:SI+4:O-2;0) 298.15 +GNVC#; 6000 N !\nPARAMETER G(COMBEITE,NA+1:VA:NA+1:CA+2:SI+4:O-2;0)\
+        \ 298.15 +GNVN#; 6000 N !\n\nPARAMETER L(COMBEITE,NA+1,CA+2:*:*:CA+2:SI+4:O-2;0)  298.15 -2E6; 6000 N !\n\n$--------------------------ANA2CA2SI3O9SS(ACOMBEITE)-------------------------\n\
+        FUNCTION GAN1C2S3 298.15 +GN1C2S3#-6485.2+8.6469333*T; 6000 N !\nFUNCTION GAN3C3S6 298.15 +GN3C3S6#-12970.4+17.29386667*T;\
+        \ 6000 N !\nFUNCTION GACVC 298.15 +GCVC#-12970.4+17.29386667*T; 6000 N !\nFUNCTION GACVN 298.15 +GACVC#; 6000 N !\n\
+        FUNCTION GACNN 298.15 +GCNN#-12970.4+17.29386667*T; 6000 N !\nFUNCTION GACNC 298.15 +GACNN#; 6000 N !\nFUNCTION GANVC\
+        \ 298.15 +GNVC#-12970.4+17.29386667*T; 6000 N !\nFUNCTION GANNC 298.15 +3*GAN1C2S3#-0.5*GANVC+23.81508*T; 6000 N !\n\
+        FUNCTION GANNN 298.15 +3*GAN3C3S6#-2*GANNC#+47.63016*T; 6000 N !\nFUNCTION GANVN 298.15 +GANNN#+GANVC#-GANNC#; 6000\
+        \ N !\n\n$(NA+1,CA+2)2M1 (NA+1,VA)3M2 (CA+2,NA+1)3M3 (CA+2)1M4 (SI+4)6(O-2)18\nPHASE ACOMBEITE %  6  2 3 3 1 6 18\
+        \ !\nCONSTITUENT ACOMBEITE :NA+1,CA+2:NA+1,VA:CA+2,NA+1:CA+2:SI+4:O-2: !\nPARAMETER G(ACOMBEITE,CA+2:VA:CA+2:CA+2:SI+4:O-2;0)\
+        \ 298.15 +GACVC#; 6000 N !\nPARAMETER G(ACOMBEITE,CA+2:VA:NA+1:CA+2:SI+4:O-2;0) 298.15 +GACVN#; 6000 N !\nPARAMETER\
+        \ G(ACOMBEITE,CA+2:NA+1:NA+1:CA+2:SI+4:O-2;0) 298.15 +GACNN#; 6000 N !\nPARAMETER G(ACOMBEITE,CA+2:NA+1:CA+2:CA+2:SI+4:O-2;0)\
+        \ 298.15 +GACNC#; 6000 N !\nPARAMETER G(ACOMBEITE,NA+1:NA+1:NA+1:CA+2:SI+4:O-2;0) 298.15 +GANNN#; 6000 N !\nPARAMETER\
+        \ G(ACOMBEITE,NA+1:NA+1:CA+2:CA+2:SI+4:O-2;0) 298.15 +GANNC#; 6000 N !\nPARAMETER G(ACOMBEITE,NA+1:VA:CA+2:CA+2:SI+4:O-2;0)\
+        \ 298.15 +GANVC#; 6000 N !\nPARAMETER G(ACOMBEITE,NA+1:VA:NA+1:CA+2:SI+4:O-2;0) 298.15 +GANVN#; 6000 N !\n\nPARAMETER\
+        \ L(ACOMBEITE,NA+1,CA+2:*:*:CA+2:SI+4:O-2;0)  298.15 -2E6; 6000 N !\n\n$--------------------------NA4CASI3O9(N2C1S3)----------------------------\n\
+        \ PHASE N2C1S3 % 4 4 1 3 9 !\n    CONSTITUENT N2C1S3 : NA+1 : CA+2 : SI+4 : O-2 : !\nPARAMETER G(N2C1S3,NA+1:CA+2:SI+4:O-2;0)\
+        \ 298.15 -4891690.545654+2354.160598*T\n-392.58472*T*LN(T)-0.02962272*T**2+4418304*T**(-1); 6000 N !\n\n$--------------------------NA2CA3SI6O16(N1C3S6)------------------------------\n\
+        \ PHASE N1C3S6 % 4 2 3 6 16 !\n    CONSTITUENT N1C3S6 : NA+1 : CA+2 : SI+4 : O-2 : !\nPARAMETER G(N1C3S6,NA+1:CA+2:SI+4:O-2;0)\
+        \ 298.15 -556212.1549+6.789265*T\n+3*GCAOS+1*GNA2OS+6*GQUARTZ; 6000 N !\n\n$--------------------------NA2CA6SI4O15(N1C6S4)------------------------------\n\
+        \ PHASE N1C6S4 % 4 2 6 4 15 !\n    CONSTITUENT N1C6S4 : NA+1 : CA+2 : SI+4  : O-2 : !\nPARAMETER G(N1C6S4,NA+1:CA+2:SI+4:O-2;0)\
+        \  298.15  -553300-94*T\n+6*GCAOS+1*GNA2OS+4*GQUARTZ; 6000 N !\n\n$--------------------------NA2CA2SI2O7(N1C2S2)---------------------------\n\
+        \ PHASE N1C2S2 % 4 2 2 2 7 !\n    CONSTITUENT N1C2S2 : NA+1 : CA+2 : SI+4 : O-2 : !\nPARAMETER G(N1C2S2,NA+1:CA+2:SI+4:O-2;0)\
+        \  298.15 -3987353.477579+1800.38697*T\n-299.28152*T*LN(T)-0.02397432*T**2+3338832*T**(-1); 6000 N !\n\n$--------------------------NA8CA3SI5O17(N4C3S5)---------------------------\n\
+        \ PHASE N4C3S5 % 4 8 3 5 17 !\n    CONSTITUENT N4C3S5 : NA+1 : CA+2 : SI+4 : O-2 : !\nPARAMETER G(N4C3S5,NA+1:CA+2:SI+4:O-2;0)\
+        \    298.15 -1130000+3*T\n+3*GCAOS+4*GNA2OS+5*GQUARTZ; 6000 N !\n\n$--------------------------NA2CA1SI5O12(NCS5)---------------------------\n\
+        \ PHASE N1C1S5 % 4 2 1 5 12 !\n    CONSTITUENT N1C1S5 : NA+1 : CA+2 : SI+4 : O-2 : !\nPARAMETER G(N1C1S5,NA+1:CA+2:SI+4:O-2;0)\
+        \    298.15 -341749.3492-0.812422*T\n+GCAOS+GNA2OS+5*GQUARTZ; 6000 N !\n"
+    remaining_database_sections:
+    - section: Elemental, species, reference-function, gas and liquid binary definitions
+      source_line_range: 1-274
+      definitions_as_printed: "$ Database of the Na2O-CaO-SiO2 system\n$ Database file written 2024-10-23\n ELEMENT /-   ELECTRON_GAS\
+        \              0.0000E+00  0.0000E+00  0.0000E+00!\n ELEMENT VA   VACUUM                    0.0000E+00  0.0000E+00\
+        \  0.0000E+00!\n ELEMENT NA   BCC_A2                    2.2990E+01  6.4475E+03  5.1447E+01!\n ELEMENT SI   DIAMOND_A4\
+        \                2.8085E+01  3.2175E+03  1.8820E+01!\n ELEMENT CA   FCC_A1                    4.0080E+01  6.1965E+03\
+        \  4.1589E+01!\n ELEMENT O    1/2_MOLE_O2(GAS)          1.5999E+01  4.3410E+03  1.0252E+02!\n\n SPECIES NA+1     \
+        \                   NA1/+1!\n SPECIES NA2O                        NA2O1!\n SPECIES SI+4                        SI1/+4!\n\
+        \ SPECIES SIO4-4                      SI1O4/-4!\n SPECIES SIO2                        SI1O2!\n SPECIES CA+2      \
+        \                  CA1/+2!\n SPECIES CA1O1                       CA1O1!\n SPECIES CA2                         CA2!\n\
+        \ SPECIES CAO                         CA1O1!\n SPECIES E-                          VA1/-1!\n SPECIES O-2         \
+        \                O1/-2!\n SPECIES O2                          O2!\n SPECIES O2-2                        O2/-2!\n SPECIES\
+        \ O3                          O3!\n SPECIES NA2+2                      NA2/+2!\n\nFUNCTION HALFLNT 298.15 +.5*LN(T);\
+        \ 6000 N !\n\n$--------------------------------NA2O----------------------------------------\n$------------------------------NA2O_SOLID------------------------------------\n\
+        FUNCTION GNA2OS 298.15 -430663.482+146.385926*T-27.21985*T*LN(T)\n-0.076745*T**2+1.60958483E-5*T**3-209099.6*T**(-1);\
+        \  600.00 Y\n-450304.11+485.311402*T-80.99387*T*LN(T)-0.01093656*T**2+9.42725E-7*T**3\n+1147232*T**(-1); 1023.20 Y\n\
+        -446703.464+489.879062*T-82.56287*T*LN(T)-0.00617663*T**2; 1405.20 Y\n-465473.746+654.281075*T-104.6*T*LN(T);    3500.00\
+        \ N !\n\n$------------------------------NA2O_LIQ--------------------------------------\nFUNCTION GNA2OL 298.15 -380898.282+340.194807*T-66.2160007*T*LN(T)\n\
+        -2.193255101E-2*T**2+406685.009*T**(-1)+2.347916731E-6*T**3;  1405.00 Y\n-403977.404+608.846124*T-104.600000*T*LN(T);\
+        \ 6000 N !\n\n$-------------------------------SiO2-----------------------------------------\n$----------------------------SIO2_LIQ----------------------------------------\n\
+        FUNCTION GSIO2L 298.15 -923689.98+316.24766*T-52.17*T*LN(T)-0.012002*T**2\n +6.78E-7*T**3+665550*T**(-1);  2980 Y\n\
+        \ -957614.21+580.01419*T-87.428*T*LN(T);  4000 N !\n\n$--------------------------CRISTOBALITE--------------------------------------\n\
+        FUNCTION GCRISTOBALITE 298.15 -601467.73-8140.2255*T+1399.8908*T*LN(T)\n -2.8579085*T**2+0.0010408145*T**3-13144016*T**(-1);\
+        \  373 Y\n -1498711.3+13075.913*T-2178.3561*T*LN(T)+3.493609*T**2-0.0010762132*T**3\n +29100273*T**(-1);  453 Y\n\
+        \ -3224538.7+47854.938*T-7860.2125*T*LN(T)+11.817149*T**2-0.0033651832*T**3\n +1.2750272E8*T**(-1);  543 Y\n -943127.51+493.26056*T-77.5875*T*LN(T)+0.003040245*T**2-4.63118E-7*T**3\n\
+        \ +2227125*T**(-1);  3300 Y\n -973891.99+587.05606*T-87.373*T*LN(T);  4000 N !\n\n$--------------------------TRIDYMITE-----------------------------------------\n\
+        FUNCTION GTRIDYMITE 298.15 -918008.73+140.55925*T-25.1574*T*LN(T)\n -0.0148714*T**2-2.2791833E-5*T**3+66331*T**(-1);\
+        \  388 Y\n -921013.31+224.53808*T-37.8701*T*LN(T)-0.02368535*T**2\n -1.6835E-7*T**3;  433 Y\n -919633.42+210.51651*T-35.605*T*LN(T)-0.03049985*T**2+4.6255E-6*T**3\n\
+        \ -162026*T**(-1);  900 Y\n -979377.7+848.3098*T-128.434*T*LN(T)+0.03387055*T**2-3.786883E-6*T**3\n +7070800*T**(-1);\
+        \  1688 Y\n -943685.26+493.58035*T-77.5875*T*LN(T)+0.003040245*T**2-4.63118E-7*T**3\n +2227125*T**(-1);  3300 Y\n\
+        \ -974449.74+587.37585*T-87.373*T*LN(T);  4000 N !\n\n$----------------------------QUARTZ------------------------------------------\n\
+        FUNCTION GQUARTZ 298.15 -900936.64-360.892175*T+61.1323*T*LN(T)\n -0.189203605*T**2+4.9509742E-5*T**3-854401*T**(-1);\
+        \  540 Y\n -1091466.54+2882.67275*T-452.1367*T*LN(T)+0.428883845*T**2\n -9.0917706E-5*T**3+12476689*T**(-1);  770\
+        \ Y\n -1563481.44+9178.58655*T-1404.5352*T*LN(T)+1.28404426*T**2\n -2.35047657E-4*T**3+56402304*T**(-1);  848 Y\n\
+        \ -928732.923+356.218325*T-58.4292*T*LN(T)-0.00515995*T**2-2.47E-10*T**3\n -95113*T**(-1);  1800 Y\n -924076.574+281.229013*T-47.451*T*LN(T)-0.01200315*T**2+6.78127E-7*T**3\n\
+        \ +665385*T**(-1);  2960 Y\n -957997.4+544.992084*T-82.709*T*LN(T);  4000 N !\n\n$--------------------------CAO-----------------------------------------------\n\
+        $--------------------------CAO_LIQ-------------------------------------------\nFUNCTION GCAOL 298.15 -585630.854+300.654841*T-52.862*T*LN(T)-1.5545E-4*T**2\n\
+        \ -1.89185E-7*T**3+489415*T**(-1);  1830.00 Y\n -793806.269+1510.9933*T-212.686*T*LN(T)+0.0549185*T**2-3.789867E-6*T**3\n\
+        \ +51730500*T**(-1);  2880.00 Y\n -4191941.74+15458.9937*T-1961.24*T*LN(T)+0.4554355*T**2-2.1019333E-5*T**3\n +1.291855E9*T**(-1);\
+        \  3172.00 Y\n -663523.922+573.648795*T-84*T*LN(T);  6000 N !\n\n$--------------------------CAO_SOLID-----------------------------------------\n\
+        FUNCTION GCAOS 298.15 -653631.356+315.221233*T-51.8583*T*LN(T)\n -0.0012193*T**2-2.4E-11*T**3+468306*T**(-1);  3172.00\
+        \ Y\n 81436.321-2001.82115*T+227.015259*T*LN(T)-0.045385463*T**2+1.171193E-6*T**3\n -3.4861455E8*T**(-1);  6000 N\
+        \ !\n\n$------------------------------NA2O-SIO2-------------------------------------\n$----NA4SIO4----\nFUNCTION GNA4SIO4\
+        \ 298.15 -2164437.12155+915.446194*T-162.589*T*LN(T)\n     -.0371137*T**2+3.18333333E-10*T**3-15*T**(-1);  1393 Y\n\
+        \      -2226789.04155+1606.79571*T-259.048*T*LN(T)+6.66666667E-12*T**3\n     +50*T**(-1); 2000 N !\n\n$----NA2SIO3----\n\
+        FUNCTION GNA2SIO3 298.15 -1601488.76135+674.660805*T-112.781*T*LN(T)\n     -.03833995*T**2+2.99612333E-06*T**3+985210*T**(-1);\
+        \ 1200 Y\n      -1599566.13135+695.636835*T-116.728*T*LN(T)-.03188845*T**2\n     +1.80452833E-06*T**3+92995*T**(-1);\
+        \ 1362 Y\n      -1631917.21135+1116.61543*T-177.318*T*LN(T); 2500 N !\n\n$----NA2SI2O5----\nFUNCTION GNA2SI2O5L 298.15\
+        \ -2522518.46+722.4430*T-120.789*T*LN(T)\n     -.1189697*T**2+1.875545E-05*T**3+1097505*T**(-1); 951 Y\n      -2608535.15+1898.0439*T-292.88*T*LN(T);\
+        \ 980 Y\n      -2608535.15+1898.0439*T-292.88*T*LN(T); 1147 Y\n      -2572206.20+1643.2376*T-261.207*T*LN(T)-3.33333333E-12*T**3\n\
+        \     -20*T**(-1); 2000 N !\n\n$----IONIC_LIQ----\nFUNCTION LNASI00 298.15 -226924.038855+2.3229205*T; 6000 N !\n\
+        FUNCTION LNASI01 298.15 -237820.216023+88.6239*T; 6000 N !\nFUNCTION LNASI02 298.15 -174004.586+26.930233*T; 6000\
+        \ N !\nFUNCTION LNASI03 298.15  -101705.130967; 6000 N !\n\n$------------------------------CAO-SIO2--------------------------------------\n\
+        $----IONIC_LIQ----\nFUNCTION LCASI00 298.15 -34.8213994*T; 6000 N !\nFUNCTION LCASI01 298.15 -131148.943+55.8484556*T;\
+        \ 6000 N !\nFUNCTION LCASI02 298.15 +38208-14.3524231*T; 6000 N !\nFUNCTION LCASI03 298.15 -41296; 6000 N !\n\n$----C3S2----\n\
+        FUNCTION GC3S2 298.15 -4045517+2413089*T**(-1)+1517.453*T-251.3748*T*LN(T)\n-0.02949058*T**2; 6000 N !\n\n$----C2S1----\n\
+        FUNCTION GC2S1 298.15 -2368387+899049*T**(-1)+785.792*T-131.4803*T*LN(+T)\n-.0262301*T**2; 6000 N !\n\n$----C1S1----\n\
+        FUNCTION GC1S1 298.15 -1677904+1437818*T**(-1)+691.4274*T-112.3476*T*LN(T)\n-0.008026701*T**2; 6000 N !\n\n$---------------------------------GAS----------------------------------------\n\
+        FUNCTION F13634T   298.15 +243206.494-20.8612587*T-21.01555*T*LN(T)\n     +1.2687055E-04*T**2-1.23131283E-08*T**3-42897.09*T**(-1);\
+        \ 2950 Y\n     +252301.423-52.0847285*T-17.21188*T*LN(T)-5.413565E-04*T**2\n     +7.64520667E-09*T**3-3973170.5*T**(-1);\
+        \ 6000 N !\nFUNCTION F14003T   298.15 -6960.69252-51.1831473*T-22.25862*T*LN(T)\n     -.01023867*T**2+1.339947E-06*T**3-76749.55*T**(-1);\
+        \ 900 Y\n     -13136.0172+24.743296*T-33.55726*T*LN(T)-.0012348985*T**2\n     +1.66943333E-08*T**3+539886*T**(-1);\
+        \ 3700 Y\n      +14154.6461-51.4854586*T-24.47978*T*LN(T)-.002634759*T**2\n     +6.01544333E-08*T**3-15120935*T**(-1);\
+        \ 9600 Y\n     -314316.628+515.068037*T-87.56143*T*LN(T)+.0025787245*T**2\n     -1.878765E-08*T**3+2.9052515E+08*T**(-1);\
+        \ 18500 Y\n     -108797.175+288.483019*T-63.737*T*LN(T)+.0014375*T**2-9E-09*T**3\n     +.25153895*T**(-1); 20000 N\
+        \ !\n FUNCTION F14300T   298.15 +130696.944-37.9096651*T-27.58118*T*LN(T)\n     -.02763076*T**2+4.60539333E-06*T**3+99530.45*T**(-1);\
+        \ 700 Y\n     +114760.623+176.626736*T-60.10286*T*LN(T)+.00206456*T**2\n     -5.17486667E-07*T**3+1572175*T**(-1);\
+        \ 1300 Y\n     +49468.3958+710.094819*T-134.3696*T*LN(T)+.039707355*T**2\n     -4.10457667E-06*T**3+12362250*T**(-1);\
+        \ 2100 Y\n     +866367.075-3566.80563*T+421.2001*T*LN(T)-.1284109*T**2\n     +5.44768833E-06*T**3-2.1304835E+08*T**(-1);\
+        \ 2800 Y\n     +409416.384-1950.70834*T+223.4437*T*LN(T)-.0922361*T**2\n     +4.306855E-06*T**3-21589870*T**(-1);\
+        \ 3500 Y\n     -1866338.6+6101.13383*T-764.8435*T*LN(T)+.09852775*T**2\n     -2.59784667E-06*T**3+9.610855E+08*T**(-1);\
+        \ 4900 Y\n     +97590.0432+890.79836*T-149.9608*T*LN(T)+.01283575*T**2\n     -3.555105E-07*T**3-2.1699975E+08*T**(-1);\
+        \ 6000 N !\n\n$-------------------------OO-------------------------------------------------\nFUNCTION GHSEROO 298.15\
+        \ -3480.87-25.503038*T\n -11.1355*T*LN(T)-.005098875*T**2+6.61845833E-07*T**3\n -38365*T**(-1); 1000 Y\n    -6568.763+12.65988*T-16.8138*T*LN(T)-5.95798E-4*T**2+6.781E-09*T**3\n\
+        \    +262905*T**(-1); 3300 Y\n    -13986.728+31.259625*T-18.9536*T*LN(T)-4.25243E-4*T**2+1.0721E-08*T**3\n    +4383200*T**(-1);\
+        \ 6000 N !\n\n\n TYPE_DEFINITION % SEQ *!\n DEFINE_SYSTEM_DEFAULT ELEMENT 2 !\n DEFAULT_COMMAND DEF_SYS_ELEMENT VA\
+        \ /- !\n\n PHASE GAS:G  %  1  1.0  !\n    CONSTITUENT GAS:G :O,O2,O3 :  !\n   PARAMETER G(GAS,O;0)               \
+        \    298.15 +F13634T#+R#*T*LN(1E-05*P);\n  6000 N  !\n   PARAMETER G(GAS,O2;0)                  298.15 +F14003T#+R#*T*LN(1E-05*P);\n\
+        \  6000 N  !\n   PARAMETER G(GAS,O3;0)                  298.15 +F14300T#+R#*T*LN(1E-05*P);\n  6000 N  !\n\n$-----------------------------A-NA2O-----------------------------------------\n\
+        PHASE ANA2O % 2 2 1!\n   CONSTITUENT ANA2O :NA+1:O-2: !\n   PARAMETER G(ANA2O,NA+1:O-2;0)               298.15 +GNA2OS\n\
+        +13681.7-11.3091539*T; 6000 N !\n\n$-----------------------------B-NA2O-----------------------------------------\n\
+        PHASE BNA2O % 2 2 1!\n   CONSTITUENT BNA2O :NA+1:O-2: !\n   PARAMETER G(BNA2O,NA+1:O-2;0)               298.15 +GNA2OS\n\
+        +1757.3-1.71745504*T; 6000 N !\n\n$-----------------------------Y-NA2O-----------------------------------------\n\
+        PHASE YNA2O % 2 2 1!\n   CONSTITUENT YNA2O :NA+1:O-2: !\n   PARAMETER G(YNA2O,NA+1:O-2;0)               298.15 +GNA2OS;\
+        \ 6000 N !\n\n$----------------------Cristobalite, SiO2-----------------------\n PHASE CRISTOBALITE  %  2 1   2 !\n\
+        \    CONSTITUENT CRISTOBALITE  :SI+4 : O-2 :  !\nPARAMETER G(CRISTOBALITE,SI+4:O-2;0) 298.15 +GCRISTOBALITE;\n 4000\
+        \ N !\n\n$------------------------Ttidymite, SiO2------------------------\n PHASE TRIDYMITE  %  2 1   2 !\n    CONSTITUENT\
+        \ TRIDYMITE  :SI+4 : O-2 :  !\nPARAMETER G(TRIDYMITE,SI+4:O-2;0) 298.15 +GTRIDYMITE; 4000 N  !\n\n$------------------------------Quartz,\
+        \ SiO2----------------------\n PHASE QUARTZ  %  2 1   2 !\n    CONSTITUENT QUARTZ  :SI+4 : O-2 :  !\nPARAMETER G(QUARTZ,SI+4:O-2;0)\
+        \ 298.15 +GQUARTZ; 4000 N  !\n\n$----------------------------------CAO---------------------------------------\n PHASE\
+        \ CAO:I  %  2 1  1 !\n    CONSTITUENT CAO:I  :CA+2 : O-2 :  !\n PARAMETER G(CAO,CA+2:O-2;0) 298.15 +GCAOS; 6000 N\
+        \ !\n\n$-------------------------------IONIC LIQUID---------------------------------\nPHASE IONIC_LIQ:Y % 2 1 1 !\n\
+        \   CONSTITUENT IONIC_LIQ:Y :NA+1,CA+2:O-2,SIO4-4,SIO2: !\n  PARAMETER G(IONIC_LIQ,SIO2;0)                  298.15\
+        \ +GSIO2L; 6000 N !\n  PARAMETER G(IONIC_LIQ,NA+1:O-2;0)          298.15 +GNA2OL; 6000 N !\n  PARAMETER G(IONIC_LIQ,NA+1:SIO4-4;0)\
+        \       298.15 +GNA4SIO4#\n+241979.780427-71.178851*T; 6000 N !\n  PARAMETER G(IONIC_LIQ,CA+2:O-2;0)          298.15\
+        \ +2*GCAOL; 6000 N !\n  PARAMETER G(IONIC_LIQ,CA+2:SIO4-4;0)    298.15 +4*GCAOL+2*GSIO2L\n-392874.98+0.739049*T; 6000\
+        \ N !\n\n$---------------------------------NA2O-SIO2-LIQ------------------------------\n  PARAMETER L(IONIC_LIQ,NA+1:O-2,SIO2;0)\
+        \     298.15 +LNASI00; 6000 N !\n  PARAMETER L(IONIC_LIQ,NA+1:O-2,SIO2;1)     298.15 +LNASI01; 6000 N !\n  PARAMETER\
+        \ L(IONIC_LIQ,NA+1:O-2,SIO2;2)     298.15 +LNASI02; 6000 N !\n  PARAMETER L(IONIC_LIQ,NA+1:O-2,SIO2;3)     298.15\
+        \ +LNASI03; 6000 N !\n\n  PARAMETER L(IONIC_LIQ,NA+1:SIO4-4,SIO2;0)  298.15 +2*LNASI00; 6000 N !\n  PARAMETER L(IONIC_LIQ,NA+1:SIO4-4,SIO2;1)\
+        \  298.15 +2*LNASI01; 6000 N !\n  PARAMETER L(IONIC_LIQ,NA+1:SIO4-4,SIO2;2)  298.15 +2*LNASI02; 6000 N !\n  PARAMETER\
+        \ L(IONIC_LIQ,NA+1:SIO4-4,SIO2;3)  298.15 +2*LNASI03; 6000 N !\n\n  PARAMETER L(IONIC_LIQ,NA+1:O-2,SIO4-4;0)  298.15\
+        \ -210949.73437-97.13479*T;\n  6000 N !\n\n$---------------------------------CAO-SIO2-LIQ-------------------------------\n\
+        \  PARAMETER L(IONIC_LIQ,CA+2:O-2,SiO2;0)     298.15 +LCASI00; 6000 N  !\n  PARAMETER L(IONIC_LIQ,CA+2:O-2,SiO2;1)\
+        \     298.15 +LCASI01; 6000 N  !\n  PARAMETER L(IONIC_LIQ,CA+2:O-2,SiO2;2)     298.15 +LCASI02; 6000 N  !\n  PARAMETER\
+        \ L(IONIC_LIQ,CA+2:O-2,SiO2;3)     298.15 +LCASI03; 6000 N  !\n\n  PARAMETER L(IONIC_LIQ,CA+2:SIO4-4,SiO2;0) 298.15\
+        \ +2*LCASI00; 6000 N  !\n  PARAMETER L(IONIC_LIQ,CA+2:SIO4-4,SiO2;1) 298.15 +2*LCASI01; 6000 N  !\n  PARAMETER L(IONIC_LIQ,CA+2:SIO4-4,SiO2;2)\
+        \ 298.15 +2*LCASI02; 6000 N  !\n  PARAMETER L(IONIC_LIQ,CA+2:SIO4-4,SiO2;3) 298.15 +2*LCASI03; 6000 N  !\n\n"
+    - section: Remaining binary compound definitions and low-temperature qualifier
+      source_line_range: 284-389
+      definitions_as_printed: "\n\n$--------------------------------NA2O-SIO2-----------------------------------\n$----------------------------------NA10SIO7---------------------------\n\
+        PHASE NA10SIO7 % 3 10 1 7 !\n   CONSTITUENT NA10SIO7 :NA+1:SI+4:O-2: !\n   PARAMETER G(NA10SIO7,NA+1:SI+4:O-2;0) \
+        \ 298.15 +5*GNA2OS#+GQUARTZ#\n -239832.31058-180.772715*T; 6000 N !\n\n$--------------------------NA4SIO4----------------------------\n\
+        $----BNA4SIO4_L----\nPHASE BNA4SIO4_L % 3 4 1 4 !\n   CONSTITUENT BNA4SIO4_L :NA+1:SI+4:O-2: !\n   PARAMETER G(BNA4SIO4_L,NA+1:SI+4:O-2;0)\
+        \     298.15 +GNA4SIO4#; 6000 N !\n\n$----ANA4SIO4_H----\nPHASE ANA4SIO4_H % 3 4 1 4 !\n   CONSTITUENT ANA4SIO4_H\
+        \ :NA+1:SI+4:O-2: !\n   PARAMETER G(ANA4SIO4_H,NA+1:SI+4:O-2;0)     298.15 +GNA4SIO4#\n+500-0.4055*T; 6000 N !\n\n\
+        $---------------------------NA6SI2O7-------------------------\nPHASE NA6SI2O7 % 3 6 2 7 !\n   CONSTITUENT NA6SI2O7\
+        \ :NA+1:SI+4:O-2: !\n   PARAMETER G(NA6SI2O7,NA+1:SI+4:O-2;0)   298.15 -3750682.75+2221.74312*T\n  -3.76131766E2*T*LN(T)-2.15075904E-2*T**2+4.37113263E6*T**(-1);\
+        \ 6000 N !\n\n$----------------------------NA2SIO3--------------------------\nPHASE NA2SIO3 % 3 2 1 3 !\n   CONSTITUENT\
+        \ NA2SIO3 :NA+1:SI+4:O-2: !\n   PARAMETER G(NA2SIO3,NA+1:SI+4:O-2;0)       298.15 +GNA2SIO3#; 6000 N !\n\n$-------------------------NA2SI2O5----------------------------\n\
+        $----YNA2SI2O5_L----\nPHASE YNA2SI2O5_L % 3 2 2 5 !\n   CONSTITUENT YNA2SI2O5_L :NA+1:SI+4:O-2: !\n   PARAMETER G(YNA2SI2O5_L,NA+1:SI+4:O-2;0)\
+        \    298.15 +GNA2SI2O5L; 6000 N !\n\n$----BNA2SI2O5_M----\nPHASE BNA2SI2O5_M % 3 2 2 5 !\n   CONSTITUENT BNA2SI2O5_M\
+        \ :NA+1:SI+4:O-2: !\n   PARAMETER G(BNA2SI2O5_M,NA+1:SI+4:O-2;0)    298.15 +GNA2SI2O5L\n+418-0.4395*T; 6000 N !\n\n\
+        $----ANA2SI2O5_H----\nPHASE ANA2SI2O5_H % 3 2 2 5 !\n   CONSTITUENT ANA2SI2O5_H :NA+1:SI+4:O-2: !\n   PARAMETER G(ANA2SI2O5_H,NA+1:SI+4:O-2;0)\
+        \    298.15 +GNA2SI2O5L\n+1046-1.0804*T; 6000 N !\n\n$---------------------------NA6SI8O19----------------------------------------\n\
+        PHASE NA6SI8O19 % 3 6 8 19 !\n   CONSTITUENT NA6SI8O19 :NA+1:SI+4:O-2: !\n PARAMETER G(NA6SI8O19,NA+1:SI+4:O-2;0)\
+        \    298.15 -9371811.41+3399.7138*T\n-5.9022778E2*T*LN(T)-1.15978997E-1*T**2+1.00E6*T**(-1); 6000 N !\n\n$----------------------------------CAO-SIO2----------------------------------\n\
+        $-----------------------------Olivine--2CAO SiO2-----------------------------\n PHASE C2S1  %  3 2   1  4 !\n    CONSTITUENT\
+        \ C2S1  :CA+2 : SI+4 : O-2 :  !\n PARAMETER G(C2S1,CA+2:SI+4:O-2;0) 298.15 -2368387+899049*T**(-1)+785.792*T\n -131.4803*T*LN(+T)-.0262301*T**2;\
+        \ 6000 N !\n\n$----------------------------AAC2S1--2CAO SiO2-------------------------------\n PHASE AAC2S1  %  3 2\
+        \   1  4 !\n    CONSTITUENT AAC2S1  :CA+2 : SI+4 : O-2 :  !\n PARAMETER G(AAC2S1,CA+2:SI+4:O-2;0) 298.15  -2353361+1415193*T**(-1)\n\
+        \ +828.63*T-140.266091*T*LN(+T)-.02173678*T**2; 6000 N !\n\n$-----------------------------AC2S1--2CAO SiO2-------------------------------\n\
+        \ PHASE AC2S1  %  3 2   1  4 !\n    CONSTITUENT AC2S1  :CA+2 : SI+4 : O-2 :  !\n PARAMETER G(AC2S1,CA+2:SI+4:O-2;0)\
+        \ 298.15 -2361997+1003.543*T\n +2226266*T**(-1)-165.478538*T*LN(+T)-.01147512*T**2; 6000 N !\n\n$----------------------------Larnite--2CAO\
+        \ SiO2------------------------------\n PHASE LC2S1  %  3 2   1  4 !\n    CONSTITUENT LC2S1  :CA+2 : SI+4 : O-2 : \
+        \ !\n PARAMETER G(LC2S1,CA+2:SI+4:O-2;0) 298.15 -2364246+1350830*T**(-1)\n +877.631*T-145.8038*T*LN(+T)-.0213037*T**2;\
+        \ 6000 N !\n\n$----------------------------Wollastonite--CAO SiO2--------------------------\n$----Low-Temperature<1397K----\n\
+        \ PHASE BC1S1  %  3 1   1  3 !\n    CONSTITUENT BC1S1  :CA+2 : SI+4 : O-2 :  !\n PARAMETER G(BC1S1,CA+2:SI+4:O-2;0)\
+        \ 298.15 -1677904+1437818*T**(-1)\n +691.4274*T-112.3476*T*LN(T)-0.008026701*T**2; 6000 N !\n\n$----------------------------Pseudowollastonite--CAO\
+        \ SiO2--------------------\n PHASE AC1S1  %  3 1   1  3 !\n    CONSTITUENT AC1S1  :CA+2 : SI+4 : O-2 :  !\n PARAMETER\
+        \ G(AC1S1,CA+2:SI+4:O-2;0) 298.15 -1666584+1164947*T**(-1)\n +650.5635*T-107.5227*T*LN(T)-0.009488068*T**2; 6000 N\
+        \ !\n\n$-----------------------------Hatruite--3CAO SiO2----------------------------\n PHASE C3S1  %  3 3   1  5 !\n\
+        \    CONSTITUENT C3S1  :CA+2 : SI+4 : O-2 :  !\n PARAMETER G(C3S1,CA+2:SI+4:O-2;0) 298.15 -3015646+2246338*T**(-1)\n\
+        \ +1283.552*T-211.4487*T*LN(T)-.0180651*T**2; 6000 N !\n\n$-----------------------------Rankinite--3CAO 2SiO2--------------------------\n\
+        \ PHASE C3S2  %  3 3   2  7 !\n    CONSTITUENT C3S2  : CA+2 : SI+4 : O-2 :  !\n PARAMETER G(C3S2,CA+2:SI+4:O-2;0)\
+        \ 298.15 +GC3S2; 6000 N !\n\n\n"
+    - section: Printed reference-list scaffold (no individual references supplied)
+      source_line_range: 509-512
+      definitions_as_printed: " LIST_OF_REFERENCES\n NUMBER  SOURCE\n\n  !\n"
+    note: The supplement supplies a thermodynamic model database. It gives no experimental apparatus, runs, measured partial
+      pressures, or measured activities. All supplied definitions and comments are embedded in the located new and remaining
+      database sections, including the printed Wollastonite low-temperature qualifier <1397K for BC1S1 at line 366. No derived
+      values were calculated; free-energy units are not stated.
+  context_id: yang-2025-na2o-cao-silica-thermodynamics::context::yang_2025_thermocalc_database_and_new_parameters
+  work_id: 3cb5e88c8cfc9cc1d3e52cc26231a7db7cba411490247317f87e3b9f37255f70
+  source_id: yang-2025-na2o-cao-silica-thermodynamics
+  species: Na2O

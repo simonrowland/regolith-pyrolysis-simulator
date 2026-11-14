@@ -55,7 +55,7 @@ This guide is for contributors and coding agents that need to find the right fil
 - `engines/__init__.py` documents the chemistry-engine refactor: kernel-shadow provider source lives here; backend adapters stay in `simulator/melt_backend/`.
 - `engines/builtin/` is the live authoritative chemistry plane — seventeen `ChemistryProvider` classes: sixteen registered at kernel build (fifteen rows in `PyrolysisSimulator._BUILTIN_PROVIDER_REGISTRATIONS` plus the separately wired `BuiltinVaporPressureProvider`) and one, `BuiltinMetalPhaseStratificationProvider`, registered on first use by the extraction mixin. Every `LedgerTransitionProposal` they emit is routed through `ChemistryKernel.commit_batch` (the sole writer to `AtomLedger`); no `simulator/*.py` module mutates the ledger directly anymore.
   - `engines/builtin/_common.py` provides shared helpers: `reject_wrong_intent`, `unpack_controls`, and `composition_wt_pct_from_account_view` (fail-closed via `UnknownSpeciesError`, mirroring `_load_ledger_account`).
-  - `engines/builtin/cco_redox_buffer.py`, `foulant_disposition.py` and `melt_effect_adjustment.py` hold dataclasses and typed results; they define no provider class.
+  - `simulator/oxygen_buffers.py` owns oxygen-buffer equations; `engines/builtin/foulant_disposition.py` and `melt_effect_adjustment.py` hold dataclasses and typed results; they define no provider class.
   - `engines/builtin/README.md` documents how to add a builtin provider.
 
   Provider to intent mapping (registered by `PyrolysisSimulator._build_chemistry_kernel` in `simulator/core.py`):

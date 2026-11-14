@@ -72,6 +72,7 @@ import importlib
 import math
 from dataclasses import dataclass, field
 from importlib import metadata as importlib_metadata
+from simulator.physical_constants import PA_PER_BAR
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Union
 
 # Gas constant, J/(mol·K). Matches SulfLiq Phase::R in Phase.cc (8.31468),
@@ -324,7 +325,7 @@ class SulfLiqMatteProvider:
         try:
             sl = _call_sulfliq(self._module, 'pySulfLiq')
             _call_sulfliq(sl, 'setTK', T_K_f)
-            _call_sulfliq(sl, 'setPa', P_bar_f * 1.0e5)
+            _call_sulfliq(sl, 'setPa', P_bar_f * PA_PER_BAR)
             _call_sulfliq(sl, 'setComps', component_values)
             _call_sulfliq(sl, 'setSpeciateTolerance', 1.0e-16)
         except _SulfLiqCallError as exc:

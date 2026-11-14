@@ -6,8 +6,8 @@ import pytest
 
 from simulator.chemistry.graphite_c_co import (
     is_c_co_buffer_token,
-    log10_fo2_c_co_bar,
 )
+from simulator.oxygen_buffers import log10_fo2_c_co_bar
 
 
 @pytest.mark.parametrize(

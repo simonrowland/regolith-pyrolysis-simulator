@@ -88,7 +88,8 @@ def test_sossi_fegley_2018_added_numeric_rows_are_pinned() -> None:
     ]
 
     assert len(rows) == 44
-    assert _sha256(rows) == "93581dc4938d429a86d24bcdb11af405c27a659990ae6f69752972a1df018c5e"
+    # SC-456 36db9c3f0 removes non-source metadata from the reviewed row pin.
+    assert _sha256(rows) == "09e1242d0f0e4624d52a02dd40eab1947d2e72dad81f1d3797c91465dcdd4ba6"
     assert all(
         not {"standard_state_as_printed", "notes_as_printed"}.intersection(row)
         for species in doc["species"].values()
@@ -265,12 +266,12 @@ def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
         == "Beckett 2002"
     ]
     assert len(beckett_model_rows) == 2
+    # SC-456 36db9c3f0 relabels the cited ranges as quoted attribution, not model output.
     assert all(
         observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-        and observation.evidence.model
-        == "Berman silicate-melt model as reported by Beckett (2002)"
-        and observation.derived_from == ("tables:kems-041-sossi-fegley-2018",)
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and observation.evidence.attribution == "Beckett 2002"
+        and observation.derived_from is None
         for observation in beckett_model_rows
     )
     assert {
@@ -292,11 +293,12 @@ def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
         and observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
         for observation in observations
     ) == 3
+    # SC-456 36db9c3f0 adds CaO and MgO to the quoted-attributed cohort.
     assert sum(
         observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in observations
-    ) == 3
+    ) == 5
     for observation in observations:
         printed_row = observation.provenance[
             "activity_coefficient_table_row_as_printed"
@@ -318,10 +320,9 @@ def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
         elif printed_row["references_as_published"] == "Beckett 2002" and printed_row[
             "oxide"
         ] in {"CaO", "MgO"}:
-            assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-            assert observation.evidence.model == (
-                "Berman silicate-melt model as reported by Beckett (2002)"
-            )
+            # SC-456 36db9c3f0 records these as attributed ranges from Beckett.
+            assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+            assert observation.evidence.attribution == "Beckett 2002"
         else:
             assert "evidence_model" not in printed_row
             assert observation.evidence.class_.value is EvidenceClass.MEASURED_TABULATED

@@ -4,6 +4,7 @@ import json
 import hashlib
 import re
 from html.parser import HTMLParser
+from pathlib import Path
 
 import pytest
 import yaml
@@ -242,6 +243,16 @@ def test_manifest_record_and_toc_census_coverage_are_identical():
     assert sum(section["record_count"] for section in census["sections"]) == 1571
     assert manifest["compilation_role"]["validation_measurement"] is False
     assert manifest["compilation_role"]["scoring_eligible"] is False
+
+
+def test_source_pdf_manifest_path_is_corpus_root_relative():
+    source_pdf = next(
+        item for item in load_manifest()["source_files"] if item["path"].endswith(".pdf")
+    )
+    assert source_pdf["path"] == (
+        "raw/pankratz-1984-usbm-b677/pankratz-1984-usbm-b677.pdf"
+    )
+    assert not Path(source_pdf["path"]).is_absolute()
 
 
 def test_feedstock_element_coverage_uses_existing_coverage_contract():

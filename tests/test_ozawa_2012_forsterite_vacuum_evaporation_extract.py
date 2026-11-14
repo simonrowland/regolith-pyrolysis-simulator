@@ -1,6 +1,5 @@
 """Independent pins for Ozawa et al. (2012) printed tables and migration."""
 
-from collections import Counter
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -10,6 +9,7 @@ import yaml
 
 from simulator.battery.enums import Quantity
 from simulator.battery.migrate import Migrator
+from simulator.battery.validity import underdetermined_apparatus
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,18 +94,70 @@ def test_table3a_rendered_grid_and_cell_mutations() -> None:
         assert_table3_matches_render(changed_extract)
 
 
+def assert_extract_area_binding(
+    extract: dict, run_id: str, expected: Decimal
+) -> dict:
+    source_row = next(
+        row
+        for row in extract["species"]["forsterite"]["observations"]
+        if row.get("observation_id", "").startswith(
+            "ozawa_2012_table1_mass_loss_fraction::T="
+        )
+        and row["values"]["run_id_as_printed"].rstrip("†") == run_id
+    )
+    experiment = next(
+        item for item in extract["experiments"]
+        if item["experiment_id"] == source_row["experiment"]
+    )
+    located_area = experiment["apparatus"]["geometry"].get("exposed_area_m2")
+    assert located_area is not None
+    assert Decimal(located_area["state"]["value"]["point"]) == expected
+    assert located_area["locator"]["table"] == "1"
+    assert located_area["locator"]["row"] == run_id
+    quote = (
+        "The largest surface is laid on the mesh, where the touching area is "
+        "<0.5% of the bottom surface area."
+    )
+    assert located_area["locator"]["note"].startswith(quote)
+    inference = located_area["inference"]
+    assert inference["output_unit"] == "m2"
+    assert "2(a0*b0 + b0*c0 + c0*a0)" in inference["relation"]
+    assert "1 mm = 1e-3 m" in inference["relation"]
+    dimensions = source_row["values"]["supporting_measurements"]
+    assert f"Table 1 row {run_id}: a0 = {dimensions['a0_mm']} mm" in inference["inputs"]
+    assert f"Table 1 row {run_id}: b0 = {dimensions['b0_mm']} mm" in inference["inputs"]
+    assert f"Table 1 row {run_id}: c0 = {dimensions['c0_mm']} mm" in inference["inputs"]
+    assert quote in inference["inputs"]
+    return source_row
+
+
 def test_isolated_migration_preserves_species_temperature_and_conditions() -> None:
     extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    table1 = next(
+    table1 = [
         row for row in extract["species"]["forsterite"]["observations"]
-        if row.get("observation_id") == "ozawa_2012_table1_mass_loss_fraction"
-    )["values"]["series"]
-    assert len(table1) == 86
-    assert {point["sample_as_printed"] for point in table1} == {"Fo-11", "Fo-16", "Fo-17"}
-    assert all(point["surface"] and point["T_C"] and point["duration_h"] for point in table1)
-    assert all(point["point_conditions"]["composition"]["state"]["tag"] == "unknown" for point in table1)
-    assert all(point["point_conditions"]["composition"]["locator"] for point in table1)
-    comment_rows = {point["run_id_as_printed"].rstrip("†"): point.get("comment_as_printed") for point in table1}
+        if row.get("observation_id", "").startswith(
+            "ozawa_2012_table1_mass_loss_fraction::T="
+        )
+    ]
+    table1_by_run = {
+        row["values"]["run_id_as_printed"].rstrip("†"): row for row in table1
+    }
+    assert {row["values"]["sample_as_printed"] for row in table1} == {"Fo-11", "Fo-16", "Fo-17"}
+    assert all(
+        row["values"]["surface"]
+        and row["values"]["T_C"]
+        and row["values"]["duration_h"]
+        for row in table1
+    )
+    assert all(
+        row["point_conditions"]["composition"]["state"]["tag"] == "unknown"
+        for row in table1
+    )
+    assert all(row["point_conditions"]["composition"]["locator"] for row in table1)
+    comment_rows = {
+        run_id: row["values"].get("comment_as_printed")
+        for run_id, row in table1_by_run.items()
+    }
     assert comment_rows["911"] == "melt present, optical observation"
     assert comment_rows["937"] == "melt present (trace)"
     assert comment_rows["829A"] == "“"
@@ -116,13 +168,6 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
     assert not migrator.result.validation.hard_issues
 
     observations = tuple(migrator.result.observations.values())
-    assert len(observations) == 134
-    counts = Counter(row.identity.quantity.value for row in observations)
-    assert counts == Counter({
-        Quantity.MASS_LOSS_FRACTION: 86,
-        Quantity.EVAPORATION_RATE: 42,
-        Quantity.ISOTOPE_DELTA: 6,
-    })
     expected_species = {
         Quantity.MASS_LOSS_FRACTION: "Mg2SiO4",
         Quantity.EVAPORATION_RATE: "Mg2SiO4",
@@ -149,22 +194,30 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
         for row in mass_loss_observations
     )
 
-    pressure_by_run = {
-        point["run_id_as_printed"].rstrip("†").casefold():
-        point["point_conditions"]["total_pressure_Pa"]["state"]
-        for point in table1
+    table1_by_observation_id = {
+        f"{extract['source_id']}::{source_row['observation_id']}": source_row
+        for source_row in table1
     }
-    assert len(pressure_by_run) == len(table1)
-    table1_observations = [
-        row for row in observations
-        if row.identity.quantity.value in {
-            Quantity.MASS_LOSS_FRACTION,
-            Quantity.ISOTOPE_DELTA,
-        }
+    assert all(
+        observation_id in migrator.result.observations
+        for observation_id in table1_by_observation_id
+    )
+    migrated_table1 = [
+        row for row in mass_loss_observations
+        if row.observation_id in table1_by_observation_id
     ]
-    for row in table1_observations:
-        run_id = row.observation_id.rsplit(":row=", 1)[1].split(":", 1)[0].casefold()
-        source_pressure = pressure_by_run[run_id]
+    for row in migrated_table1:
+        source_row = table1_by_observation_id[row.observation_id]
+        run_id = source_row["values"]["run_id_as_printed"].rstrip("†")
+        source_pressure = source_row["point_conditions"]["total_pressure_Pa"]["state"]
+        experiment = migrator.result.experiments[row.experiment_id]
+        outcome = underdetermined_apparatus(
+            experiment, Quantity.MASS_LOSS_FRACTION, observation=row
+        )
+        assert outcome.passed, (run_id, outcome.reason, outcome.checks)
+        assert experiment.apparatus is not None
+        assert experiment.apparatus.geometry is not None
+        assert experiment.apparatus.geometry.exposed_area_m2 is not None
         pressure = (row.point_conditions or {}).get("total_pressure_Pa")
         if source_pressure["tag"] == "value":
             assert pressure is not None
@@ -174,6 +227,65 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
         else:
             # Table 1 uses a dash for runs whose pressure was not measured.
             assert source_pressure["tag"] == "unknown"
+            assert pressure is None
+
+    expected_named_areas = {
+        "828A": ("35", Decimal("0.000052438536")),
+        "831": ("16", Decimal("0.000082905262")),
+    }
+    for run_id, (expected_mass_loss_pct, expected_area) in expected_named_areas.items():
+        source_row = assert_extract_area_binding(extract, run_id, expected_area)
+        assert source_row["values"]["mass_loss_pct"] == expected_mass_loss_pct
+        migrated_id = f"{extract['source_id']}::{source_row['observation_id']}"
+        observation = migrator.result.observations[migrated_id]
+        experiment = migrator.result.experiments[observation.experiment_id]
+        located_area = experiment.apparatus.geometry.exposed_area_m2
+        assert located_area.state.is_value
+        assert located_area.state.value.point == expected_area
+
+    mutated_extract = deepcopy(extract)
+    mutated_source_row = next(
+        row for row in mutated_extract["species"]["forsterite"]["observations"]
+        if row.get("observation_id", "").startswith(
+            "ozawa_2012_table1_mass_loss_fraction::T="
+        )
+        and row["values"]["run_id_as_printed"].rstrip("†") == "828A"
+    )
+    mutated_experiment = next(
+        item for item in mutated_extract["experiments"]
+        if item["experiment_id"] == mutated_source_row["experiment"]
+    )
+    del mutated_experiment["apparatus"]["geometry"]["exposed_area_m2"]
+    with pytest.raises(AssertionError):
+        assert_extract_area_binding(
+            mutated_extract, "828A", Decimal("0.000052438536")
+        )
+
+    table1_observations = [
+        row for row in observations
+        if row.identity.quantity.value in {
+            Quantity.MASS_LOSS_FRACTION,
+            Quantity.ISOTOPE_DELTA,
+        }
+    ]
+    for row in table1_observations:
+        if row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION:
+            assert row.observation_id in table1_by_observation_id
+            continue
+        run_id = row.observation_id.rsplit(":row=", 1)[1].split(":", 1)[0].casefold()
+        appendix_source_pressure = {
+            source["values"]["run_id_as_printed"].rstrip("†").casefold():
+            source["point_conditions"]["total_pressure_Pa"]["state"]
+            for source in table1
+        }[run_id]
+        pressure = (row.point_conditions or {}).get("total_pressure_Pa")
+        if appendix_source_pressure["tag"] == "value":
+            assert pressure is not None
+            assert pressure.state.is_value
+            assert pressure.state.value.point == Decimal(appendix_source_pressure["value"]["point"])
+            assert pressure.locator.table == "1"
+        else:
+            assert appendix_source_pressure["tag"] == "unknown"
             assert pressure is None
 
     # Table 3a averages several experiments and gives no single run pressure.

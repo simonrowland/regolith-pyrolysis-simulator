@@ -111,8 +111,6 @@ def _expected_quantity_unknown_ids() -> set[str]:
     expected.update(
         {
             f"{SID}::nagahara_ozawa_1996_equation_2_pressure_dependent_flux_fit",
-            f"{SID}::nagahara_ozawa_1996_alpha_vacuum",
-            f"{SID}::nagahara_ozawa_1996_alpha_1e-4_bar",
         }
     )
     return expected
@@ -149,7 +147,8 @@ def test_table_rows_render_pins_migration_and_unprinted_conditions() -> None:
     ]
     assert len(observations) == 191
     assert not result.validation.hard_issues
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 146
+    # t-1596 maps the printed J_exp/J_vacuum Hertz-Knudsen ratio to alpha.
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 144
     assert all(row.identity.species.phase.is_value for row in observations)
     assert all(row.identity.species.phase.value is Phase.CR for row in observations)
 
@@ -290,6 +289,8 @@ def test_table_rows_render_pins_migration_and_unprinted_conditions() -> None:
         alpha = _migrated_observation(
             observations, f"nagahara_ozawa_1996_{suffix}"
         )
-        assert alpha.identity.quantity.is_unknown
-        assert alpha.value.kind is ValueKind.UNAVAILABLE
-        assert "condensation" in alpha.value.unavailable_reason
+        assert alpha.identity.quantity.is_value
+        assert alpha.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        assert alpha.value.kind is ValueKind.POINT
+        assert alpha.value.point == Decimal(value)
+        assert alpha.provenance["alpha_definition"] == "j_exp_over_hk_maximum"

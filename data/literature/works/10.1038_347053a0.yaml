@@ -1,0 +1,167 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1038/347053a0
+  citation: Hashimoto, A. (1990). Evaporation kinetics of forsterite and implications for the early solar nebula. Nature 347,
+    53–55.
+  source_ids:
+  - hashimoto-1990-forsterite-evaporation-kinetics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+      role: pdf
+      path: raw/hashimoto-1990-forsterite-evaporation-kinetics/hashimoto-1990-forsterite-evaporation-kinetics.pdf
+      sha256:
+        tag: value
+        value: 82ada3f8de262f0413bd4eaf661c1e90a80c8e51ff8836bc4e6b2b6095e636e5
+    - asset_id: pdftotext:hashimoto-1990-forsterite-evaporation-kinetics
+      role: pdftotext
+      path: text/hashimoto-1990-forsterite-evaporation-kinetics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:hashimoto-1990-forsterite-evaporation-kinetics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1038/347053a0
+experiments:
+- experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/347053a0
+  locator:
+    page: 1
+    published_page: 53
+    pdf_page_index: 0
+    section: Results and discussion
+    note: Alpha for solid MgO at the printed 1600–1900 °C range.
+context:
+- observation_id: hashimoto_1990_forsterite_fig1_fluxes
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 54
+    figure: '1'
+    panel: c
+  units: mol Si gram-atom cm^-2 s^-1; inverse temperature K^-1
+  values:
+    quantity: evaporation_rate
+    method_class: figure_only
+    species_as_printed: Mg2SiO4
+    axes_as_printed:
+      x: 1/T (K) × 10^4
+      y: log10 J (Si gram-atom cm^-2 s^-1)
+    series_as_printed:
+    - 'J_v,s and J_v,l: free evaporation rates from solid and liquid forsterite'
+    - 'J_e,s and J_e,l: theoretical maximum rates for equilibrium vapour species'
+    - 'J_e-,s and J_e-,l: rates for the specified MgO and SiO2 vapour mechanism'
+    digitisation: deferred; no values read from the figure
+  context_id: hashimoto-1990-forsterite-evaporation-kinetics::context::hashimoto_1990_forsterite_fig1_fluxes
+  work_id: 10.1038/347053a0
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  species: Mg2SiO4
+- observation_id: hashimoto_1990_forsterite_residue_stoichiometry
+  type: characterization
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 55
+    section: Results and discussion
+    note: Source reports the residue stoichiometry by condensed-phase state.
+  units: composition as described by the source
+  values:
+    quantity: residue_stoichiometry_as_printed
+    solid_state_as_printed: stoichiometric evaporation at experimental temperatures
+    solid_T_range_C_as_printed:
+    - '1600'
+    - '1800'
+    molten_state_as_printed: almost stoichiometric evaporation
+    molten_temperature_as_printed: not stated with this residue-composition statement
+    note: The author separately describes the most highly evaporated residues as containing approximately 5 vol% SiO2-rich
+      glass with approximately 65 wt% SiO2; those numeric composition statements are stored as observations.
+  context_id: hashimoto-1990-forsterite-evaporation-kinetics::context::hashimoto_1990_forsterite_residue_stoichiometry
+  work_id: 10.1038/347053a0
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  species: Mg2SiO4
+- observation_id: hashimoto_1990_mgo_fig1_fluxes
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 54
+    figure: '1'
+    panel: b
+  units: mol Mg gram-atom cm^-2 s^-1; inverse temperature K^-1
+  values:
+    quantity: evaporation_rate
+    method_class: figure_only
+    species_as_printed: MgO
+    axes_as_printed:
+      x: 1/T (K) × 10^4
+      y: log10 J (Mg gram-atom cm^-2 s^-1)
+    series_as_printed:
+    - 'J_v,s: free evaporation rate from solid MgO'
+    - 'J_e,s: theoretical maximum rate for Mg species'
+    - 'J_e-,s: theoretical rate for the specific MgO gas mechanism'
+    digitisation: deferred; no values read from the figure
+  context_id: hashimoto-1990-forsterite-evaporation-kinetics::context::hashimoto_1990_mgo_fig1_fluxes
+  work_id: 10.1038/347053a0
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  species: MgO
+- observation_id: hashimoto_1990_sio2_fig1_fluxes
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 54
+    figure: '1'
+    panel: a
+  units: mol Si gram-atom cm^-2 s^-1; inverse temperature K^-1
+  values:
+    quantity: evaporation_rate
+    method_class: figure_only
+    species_as_printed: SiO2
+    axes_as_printed:
+      x: 1/T (K) × 10^4
+      y: log10 J (Si gram-atom cm^-2 s^-1)
+    series_as_printed:
+    - 'J_v,s: free evaporation rate from solid silica'
+    - 'J_v,l: free evaporation rate from liquid silica'
+    - 'J_e,s and J_e,l: theoretical maximum rates for Si-bearing gases'
+    - 'J_e-,s and J_e-,l: rates for the specific SiO2(g) mechanism'
+    digitisation: deferred; no values read from the figure
+  context_id: hashimoto-1990-forsterite-evaporation-kinetics::context::hashimoto_1990_sio2_fig1_fluxes
+  work_id: 10.1038/347053a0
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  species: SiO2

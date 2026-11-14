@@ -47,6 +47,8 @@ observations:
     paragraph: glassy residue predominantly contained nonvolatile elements (Al, Ca, Ti)
     section: '4.2'
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_glass
 - observation_id: kems-044-robinot-2026::robinot_2026_deposit_Ca_qualitative
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -92,6 +94,8 @@ observations:
     paragraph: glassy residue predominantly contained nonvolatile elements (Al, Ca, Ti)
     section: '4.2'
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_glass
 - observation_id: kems-044-robinot-2026::robinot_2026_deposit_Fe_qualitative
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -137,6 +141,8 @@ observations:
     paragraph: major elements in oxides found on the sample holder were Na and Fe
     section: '4.2'
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_deposits
 - observation_id: kems-044-robinot-2026::robinot_2026_deposit_K_qualitative
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -182,6 +188,8 @@ observations:
     paragraph: trace levels of Mg, P, and K on the sample holder
     section: '4.2'
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_deposits
 - observation_id: kems-044-robinot-2026::robinot_2026_deposit_Mg_qualitative
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -227,6 +235,8 @@ observations:
     paragraph: the glassy residue predominantly contained nonvolatile elements (Al, Ca, Ti) along with some Mg and Si
     section: '4.2'
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_deposits
 - observation_id: kems-044-robinot-2026::robinot_2026_deposit_Na_qualitative
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -273,6 +283,8 @@ observations:
     paragraph: major elements in oxides found on the sample holder were Na and Fe
     section: '4.2'
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_deposits
 - observation_id: kems-044-robinot-2026::robinot_2026_deposit_Si_qualitative
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -318,6 +330,8 @@ observations:
     paragraph: The condenser contained roughly one-third Si
     section: '4.2'
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_deposits
 - observation_id: kems-044-robinot-2026::robinot_2026_deposit_Ti_qualitative
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -363,6 +377,8 @@ observations:
     paragraph: glassy residue predominantly contained nonvolatile elements (Al, Ca, Ti)
     section: '4.2'
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_glass
 - observation_id: kems-044-robinot-2026::robinot_2026_eac1_composition_quoted_sesko
   experiment_id: 10.1016/j.asr.2026.02.003::kems-044-robinot-2026
   identity:
@@ -648,6 +664,8 @@ observations:
         published_page: 3
         pdf_page_index: 4
         paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+  provenance:
+    printed_phase: lunar_regolith_simulant_EAC-1
 - observation_id: kems-044-robinot-2026::robinot_2026_fig1_hsc_figure_only
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -680,9 +698,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: admission_from_legacy_token:figure_only
@@ -698,6 +716,30 @@ observations:
     figure: '1'
     note: HSC 10 O and O2 mass fraction vs T at 1e-2, 1e-7, and 3e-15 bar
   read_from: pdf:kems-044-robinot-2026
+  derived_from:
+  - kems-044-robinot-2026::robinot_2026_eac1_composition_quoted_sesko
+  derivation:
+    relation: Fig. 1 plots the authors' Gibbs energy minimization results from HSC Chemistry version 10 for the EAC-1 simulant
+      at the stated pressures.
+    inputs:
+    - kems-044-robinot-2026::robinot_2026_eac1_composition_quoted_sesko
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Gibbs energy minimization using HSC Chemistry version 10
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 4
+        section: 2. Thermodynamic equilibrium modelling of the EAC-1 simulant pyrolysis
+        note: “Thermodynamic analysis was conducted based on the Gibbs energy minimization method using HSC Chemistry version
+          10.”
+    references:
+    - Šeško et al. (2024), EAC-1 composition; the HSC 10 database species data have no cited source in the located method.
+  provenance:
+    printed_phase: HSC_Chemistry_10_EAC-1_equilibrium
 - observation_id: kems-044-robinot-2026::robinot_2026_fig5_eds_figure_only
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -747,6 +789,8 @@ observations:
     figure: '5'
     note: Stacked elemental mass-fraction bars for EAC-1, Glass, Holder, Window, Condenser, Filter
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_pyrolysis_deposits
 - observation_id: kems-044-robinot-2026::robinot_2026_fig8_80kg_astronaut_o2
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -807,6 +851,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: scaleup_from_measured_yield
 - observation_id: kems-044-robinot-2026::robinot_2026_mass_balance_fig4c_bar_labels
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -852,6 +898,8 @@ observations:
     figure: 4c
     note: Printed bar labels on Fig. 4c; not axis-digitised
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_vacuum_pyrolysis_products
 - observation_id: kems-044-robinot-2026::robinot_2026_mass_balance_text
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -898,6 +946,8 @@ observations:
     section: '4.1'
     note: Mass-balance numbers printed in §4.1 prose
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_vacuum_pyrolysis_products
 - observation_id: kems-044-robinot-2026::robinot_2026_o2_comparable_run_1p17
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -990,6 +1040,8 @@ observations:
     section: '4.1'
     note: Comparable yield 1.17 %; figure in supplementary data not in this PDF
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_vacuum_pyrolysis
 - observation_id: kems-044-robinot-2026::robinot_2026_o2_fig4ab_figure_only
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -1039,32 +1091,74 @@ observations:
     figure: '4'
     note: Fig. 4a O2 ppm and solar power vs time; Fig. 4b cumulative O2 mg and energy Wh
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_vacuum_pyrolysis
 - observation_id: kems-044-robinot-2026::robinot_2026_o2_hsc_expected_1p37_model
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'equilibrium_molecular_oxygen_yield'
+      tag: value
+      value: yield_fraction
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'HSC_Chemistry_10_EAC-1_equilibrium' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile yield_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile yield_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile yield_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile yield_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile yield_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '1000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile yield_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_molecular_oxygen_yield'; refusing
-      to pick a number
-    approximate: false
+    kind: point
+    point: '0.0137'
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -1073,17 +1167,21 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
-    reason: admission_from_legacy_token:model_output_not_measurement
-  notices:
-  - kind: admission_from_legacy_token
-    affected_quantities: []
-    reason: admission_from_legacy_token:model_output_not_measurement
-    origin: kems-044-robinot-2026::robinot_2026_o2_hsc_expected_1p37_model
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-033
+      date: '2026-09-12'
+      evidence:
+        published_page: 11
+        pdf_page_index: 12
+        paragraph: an oxygen yield of around 1.37 % was expected by thermodynamic simulation
+        section: '4.3'
+  notices: []
   source_id: kems-044-robinot-2026
   locator:
     published_page: 11
@@ -1092,6 +1190,15 @@ observations:
     section: '4.3'
   read_from: pdf:kems-044-robinot-2026
   point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        section: '4.3'
+        note: The authors state the modeled yield at 10 mbar.
     temperature_K:
       state:
         tag: value
@@ -1127,6 +1234,30 @@ observations:
               section: '4.3'
         output_unit: K
         references: []
+  derived_from:
+  - kems-044-robinot-2026::robinot_2026_eac1_composition_quoted_sesko
+  derivation:
+    relation: Gibbs energy minimization with HSC Chemistry version 10 produces the reported equilibrium oxygen yield for the
+      stated EAC-1 composition, temperature, and pressure.
+    inputs:
+    - kems-044-robinot-2026::robinot_2026_eac1_composition_quoted_sesko
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Gibbs energy minimization using HSC Chemistry version 10
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 4
+        section: 2. Thermodynamic equilibrium modelling of the EAC-1 simulant pyrolysis
+        note: “Thermodynamic analysis was conducted based on the Gibbs energy minimization method using HSC Chemistry version
+          10.”
+    references:
+    - Šeško et al. (2024), EAC-1 composition; the HSC 10 database species data have no cited source in the located method.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-044-robinot-2026::robinot_2026_o2_prose_rate_points
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -1173,6 +1304,8 @@ observations:
     section: '4.1'
     note: Printed power / time / ppm points in §4.1 prose (not digitised from Fig. 4a)
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: EAC-1_solar_vacuum_pyrolysis
 - observation_id: kems-044-robinot-2026::robinot_2026_o2_yield_measured::field:fraction_of_feedstock_oxygen_percent
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -1272,6 +1405,8 @@ observations:
     section: '4.1'
     note: Oxygen production and mass yield from the reported EAC-1 run
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: gas
 - observation_id: kems-044-robinot-2026::robinot_2026_o2_yield_measured::field:mass_yield_percent
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -1371,3 +1506,5 @@ observations:
     section: '4.1'
     note: Oxygen production and mass yield from the reported EAC-1 run
   read_from: pdf:kems-044-robinot-2026
+  provenance:
+    printed_phase: gas

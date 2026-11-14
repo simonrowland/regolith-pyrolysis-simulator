@@ -94,6 +94,16 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: &yan_2020_table1_total_pressure_unknown
+            state:
+              tag: unknown
+              reason: "The source does not report the total gas pressure for this run. Section 2.1 gives the CO/CO2 ratio and gas flow rates but no chamber total pressure."
+            locator:
+              source_path: raw/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.pdf
+              pdf_page_index: 4
+              page: 5
+              section: "2.1 Determination of phase equilibria in the CaO–SiO2–VOx system"
+              note: "Run pressure is not stated in the experimental procedure."
           pO2_Pa:
             state:
               tag: value
@@ -147,6 +157,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -200,6 +211,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -253,6 +265,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -299,6 +312,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -345,6 +359,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -391,6 +406,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -444,6 +460,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -497,6 +514,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -550,6 +568,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -596,6 +615,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -642,6 +662,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -688,6 +709,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -741,6 +763,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -794,6 +817,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -847,6 +871,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -893,6 +918,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -939,6 +965,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -985,6 +1012,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1038,6 +1066,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1091,6 +1120,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1144,6 +1174,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1190,6 +1221,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1236,6 +1268,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1282,6 +1315,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1335,6 +1369,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1388,6 +1423,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1441,6 +1477,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1487,6 +1524,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1533,6 +1571,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1579,6 +1618,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1632,6 +1672,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1685,6 +1726,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1738,6 +1780,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1784,6 +1827,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1830,6 +1874,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1876,6 +1921,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1929,6 +1975,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1982,6 +2029,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2035,6 +2083,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2081,6 +2130,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2127,6 +2177,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2173,6 +2224,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2226,6 +2278,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2279,6 +2332,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2332,6 +2386,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2378,6 +2433,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2424,6 +2480,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2470,6 +2527,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2523,6 +2581,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2576,6 +2635,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2629,6 +2689,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2675,6 +2736,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2721,6 +2783,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2767,6 +2830,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2820,6 +2884,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2873,6 +2938,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2926,6 +2992,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2972,6 +3039,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3018,6 +3086,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3064,6 +3133,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3117,6 +3187,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3170,6 +3241,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3223,6 +3295,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3269,6 +3342,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3315,6 +3389,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3361,6 +3436,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3414,6 +3490,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3467,6 +3544,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3520,6 +3598,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3566,6 +3645,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3612,6 +3692,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3658,6 +3739,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3711,6 +3793,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3764,6 +3847,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3817,6 +3901,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3863,6 +3948,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3909,6 +3995,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3955,6 +4042,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4008,6 +4096,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4061,6 +4150,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4114,6 +4204,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4160,6 +4251,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4206,6 +4298,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4253,6 +4346,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4307,6 +4401,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4361,6 +4456,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4415,6 +4511,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4462,6 +4559,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4509,6 +4607,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4556,6 +4655,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4610,6 +4710,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4664,6 +4765,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4718,6 +4820,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4765,6 +4868,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4812,6 +4916,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4859,6 +4964,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4913,6 +5019,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4967,6 +5074,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5021,6 +5129,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5068,6 +5177,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5115,6 +5225,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5162,6 +5273,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5216,6 +5328,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5270,6 +5383,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5324,6 +5438,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5371,6 +5486,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5418,6 +5534,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5464,6 +5581,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5517,6 +5635,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5570,6 +5689,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5623,6 +5743,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5669,6 +5790,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5715,6 +5837,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6391,6 +6514,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6444,6 +6568,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6497,6 +6622,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6550,6 +6676,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6596,6 +6723,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6642,6 +6770,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6688,6 +6817,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6741,6 +6871,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6794,6 +6925,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6847,6 +6979,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6893,6 +7026,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6939,6 +7073,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6985,6 +7120,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7038,6 +7174,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7091,6 +7228,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7144,6 +7282,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7190,6 +7329,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7236,6 +7376,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7282,6 +7423,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7335,6 +7477,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7388,6 +7531,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7441,6 +7585,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7487,6 +7632,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7533,6 +7679,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7579,6 +7726,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7632,6 +7780,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7685,6 +7834,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7738,6 +7888,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7784,6 +7935,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7830,6 +7982,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8579,6 +8732,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8632,6 +8786,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8685,6 +8840,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8738,6 +8894,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8784,6 +8941,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8830,6 +8988,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8876,6 +9035,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8929,6 +9089,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8982,6 +9143,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9035,6 +9197,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9081,6 +9244,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9127,6 +9291,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9173,6 +9338,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9226,6 +9392,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9279,6 +9446,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9332,6 +9500,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9378,6 +9547,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9424,6 +9594,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9470,6 +9641,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9523,6 +9695,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9576,6 +9749,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9629,6 +9803,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9675,6 +9850,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9721,6 +9897,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9767,6 +9944,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9820,6 +9998,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9873,6 +10052,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9926,6 +10106,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9972,6 +10153,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -10018,6 +10200,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -13721,10 +13904,13 @@ experiments:
     tag: unknown
     reason: source does not assign a single mapped method token to this row
 - experiment_id: yan_2020_yan_2020_gamma_ca_calculated
-  locator: *id148
-  method:
-    tag: unknown
-    reason: source does not assign a single mapped method token to this row
+  locator:
+    source_path: raw/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.pdf
+    pdf_page_index: 4
+    page: 5
+    section: "2.2 Measurement of the standard Gibbs energy of formation of the vanadium compounds"
+    note: "The paper names this the chemical equilibrium method. The described experiments equilibrate at 1873 K for 24 h and then quench; mapped to the existing quench_equilibration method token."
+  method: quench_equilibration
 - experiment_id: yan_2020_yan_2020_gamma_si_quoted
   locator: *id149
   method:

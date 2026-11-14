@@ -1240,7 +1240,7 @@ payload = transport._equilibrate_in_process(
 )
 if (
     payload.solved_fO2_log is None
-    or abs(float(payload.solved_fO2_log) - {target_fO2_log!r}) >= 1.0e-3
+    or abs(float(payload.solved_fO2_log) - {target_fO2_log!r}) >= {_FO2_ECHO_TOLERANCE!r}
 ):
     raise RuntimeError(
         'ThermoEngine smoke equilibrium did not solve at requested absolute fO2: '

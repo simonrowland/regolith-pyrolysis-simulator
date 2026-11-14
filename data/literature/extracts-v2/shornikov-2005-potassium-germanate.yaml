@@ -115,6 +115,37 @@ observations:
         paragraph: partial vaporization coefficients
         note: Evaluated from the discrepancy between crucible data [28] and effusion-cell data [30], Sv/sor about 3000. The
           arithmetic is not shown.
+  derivation:
+    relation: The paper calculates alpha by comparing GeO2 vaporization data from cylindrical crucibles [28] and effusion
+      cells [30] with vaporization-area to orifice-area ratio about 3000.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        paragraph: partial vaporization coefficients
+        note: The paper names the comparison sources and area ratio but does not reproduce the underlying pressure series
+          or alpha arithmetic.
+    method:
+      state:
+        tag: value
+        value: Evaluate the partial vaporization coefficients from the discrepancy between cylindrical-crucible data and effusion-cell
+          data at area ratio about 3000.
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        paragraph: partial vaporization coefficients
+    references:
+    - Kazenas, Chizhikov, Tsvetkov, and Vasyuta, Mass Spectrometric Study of GeO2 Sublimation [28]
+    - Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen
+      System [30]
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_alpha_o2
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -228,6 +259,37 @@ observations:
         paragraph: partial vaporization coefficients
         note: Evaluated from the discrepancy between crucible data [28] and effusion-cell data [30], Sv/sor about 3000. The
           arithmetic is not shown.
+  derivation:
+    relation: The paper calculates alpha by comparing GeO2 vaporization data from cylindrical crucibles [28] and effusion
+      cells [30] with vaporization-area to orifice-area ratio about 3000.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        paragraph: partial vaporization coefficients
+        note: The paper names the comparison sources and area ratio but does not reproduce the underlying pressure series
+          or alpha arithmetic.
+    method:
+      state:
+        tag: value
+        value: Evaluate the partial vaporization coefficients from the discrepancy between cylindrical-crucible data and effusion-cell
+          data at area ratio about 3000.
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        paragraph: partial vaporization coefficients
+    references:
+    - Kazenas, Chizhikov, Tsvetkov, and Vasyuta, Mass Spectrometric Study of GeO2 Sublimation [28]
+    - Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen
+      System [30]
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_54_80
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -1339,6 +1401,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_02
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -1456,6 +1520,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_03
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -1568,12 +1634,43 @@ observations:
         note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
           – 1100–1308; column_header=p(i, 1300 K), atm
   derivation:
-    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
-    inputs:
-    - pdf:shornikov-2005-potassium-germanate
+    relation: Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values
+      are evaluated from earlier thermodynamic data [23, 24].; species.phase=gas derived from quantity=partial_pressure (partial
+      pressure is a gas-phase quantity)
+    inputs: []
     parameters: []
-    output_unit: Pa
-    references: []
+    output_unit: atm
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+        note: The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental
+          series used in the fit.
+    method:
+      state:
+        tag: value
+        value: Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental
+          data [29, 30].
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+    references:
+    - 'Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]'
+    - Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]
+    - Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]
+    - Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen
+      System [30]
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_04
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -1691,6 +1788,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_05
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -1803,12 +1902,43 @@ observations:
         note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
           Pt 1092–1305; column_header=p(i, 1300 K), atm
   derivation:
-    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
-    inputs:
-    - pdf:shornikov-2005-potassium-germanate
+    relation: Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values
+      are evaluated from earlier thermodynamic data [23, 24].; species.phase=gas derived from quantity=partial_pressure (partial
+      pressure is a gas-phase quantity)
+    inputs: []
     parameters: []
-    output_unit: Pa
-    references: []
+    output_unit: atm
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+        note: The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental
+          series used in the fit.
+    method:
+      state:
+        tag: value
+        value: Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental
+          data [29, 30].
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+    references:
+    - 'Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]'
+    - Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]
+    - Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]
+    - Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen
+      System [30]
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_06
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -1921,12 +2051,43 @@ observations:
         note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
           Mo 1174–1298; column_header=p(i, 1300 K), atm
   derivation:
-    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
-    inputs:
-    - pdf:shornikov-2005-potassium-germanate
+    relation: Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values
+      are evaluated from earlier thermodynamic data [23, 24].; species.phase=gas derived from quantity=partial_pressure (partial
+      pressure is a gas-phase quantity)
+    inputs: []
     parameters: []
-    output_unit: Pa
-    references: []
+    output_unit: atm
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+        note: The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental
+          series used in the fit.
+    method:
+      state:
+        tag: value
+        value: Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental
+          data [29, 30].
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+    references:
+    - 'Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]'
+    - Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]
+    - Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]
+    - Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen
+      System [30]
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_o2_07
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2044,6 +2205,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_o2_08
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2156,12 +2319,43 @@ observations:
         note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
           – 1100–1308; column_header=p(i, 1300 K), atm
   derivation:
-    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
-    inputs:
-    - pdf:shornikov-2005-potassium-germanate
+    relation: Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values
+      are evaluated from earlier thermodynamic data [23, 24].; species.phase=gas derived from quantity=partial_pressure (partial
+      pressure is a gas-phase quantity)
+    inputs: []
     parameters: []
-    output_unit: Pa
-    references: []
+    output_unit: atm
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+        note: The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental
+          series used in the fit.
+    method:
+      state:
+        tag: value
+        value: Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental
+          data [29, 30].
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+    references:
+    - 'Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]'
+    - Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]
+    - Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]
+    - Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen
+      System [30]
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_o2_09
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2279,6 +2473,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_o2_10
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2391,12 +2587,43 @@ observations:
         note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
           Mo 1205–1298; column_header=p(i, 1300 K), atm
   derivation:
-    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
-    inputs:
-    - pdf:shornikov-2005-potassium-germanate
+    relation: Table 1 prints the 1300 K pressure cell and coefficients a and b for equation (5); its caption says the values
+      are evaluated from earlier thermodynamic data [23, 24].; species.phase=gas derived from quantity=partial_pressure (partial
+      pressure is a gas-phase quantity)
+    inputs: []
     parameters: []
-    output_unit: Pa
-    references: []
+    output_unit: atm
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+        note: The article prints a, b, and the 1300 K pressure cell in Table 1; it does not reproduce the underlying experimental
+          series used in the fit.
+    method:
+      state:
+        tag: value
+        value: Equation (5), log(p⁰(i), K₄(T)) = −a/T + b; the paper says a and b are evaluated by least-squares fitting experimental
+          data [29, 30].
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        section: K2O and GeO2 vaporization and thermodynamic properties
+        equation: '5'
+    references:
+    - 'Glushko et al. (eds.), Thermodynamic Properties of Individual Substances: A Handbook [23]'
+    - Lamoreaux, Hildenbrand, and Brewer, High-Temperature Vaporization Behavior of Oxides [24]
+    - Shul’ts, Stolyarova, and Semenov, Thermodynamic Properties of GeO2–V2O3 Melts Studied by Mass Spectrometry [29]
+    - Kazenas, Bol’shikh, and Petrov, Thermodynamics of Vaporization, Dissociation, and Gas-Phase Reactions in the Germanium–Oxygen
+      System [30]
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_Tm
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2471,7 +2698,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Table 2.
+    attribution: 'Table 2 caption: earlier data [20, 21, 51–53].'
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2500,6 +2727,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=3Na2O·8SiO2; column_header=Tm, K
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_dfusH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2603,6 +2832,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=3Na2O·8SiO2; column_header=ΔmH, kJ/mol
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_dfusS
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2675,9 +2906,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Table 2.
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Authors' calculation in Table 2 from earlier data [20, 21, 51–53].
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2708,6 +2940,39 @@ observations:
         table: '2'
         note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=3Na2O·8SiO2; column_header=ΔmS,
           J/(mol K)
+  derivation:
+    relation: Table 2 calculation reported by the authors; the numerical relation is not printed.
+    inputs: []
+    parameters: []
+    output_unit: J/mol K
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+        note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each
+          fusion entropy.
+    method:
+      state:
+        tag: value
+        value: Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53].
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+    references:
+    - Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]
+    - Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]
+    - Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]
+    - Richet et al. (1994), Premelting effects in minerals [52]
+    - Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_melt_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2820,6 +3085,8 @@ observations:
     parameters: []
     output_unit: kJ/mol
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_solid_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2924,6 +3191,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_Tm
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -2998,7 +3267,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Table 2.
+    attribution: 'Table 2 caption: earlier data [20, 21, 51–53].'
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3027,6 +3296,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=K2O·2SiO2; column_header=Tm, K
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_dfusH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3130,6 +3401,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=K2O·2SiO2; column_header=ΔmH, kJ/mol
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_dfusS
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3202,9 +3475,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Table 2.
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Authors' calculation in Table 2 from earlier data [20, 21, 51–53].
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3235,6 +3509,39 @@ observations:
         table: '2'
         note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=K2O·2SiO2; column_header=ΔmS,
           J/(mol K)
+  derivation:
+    relation: Table 2 calculation reported by the authors; the numerical relation is not printed.
+    inputs: []
+    parameters: []
+    output_unit: J/mol K
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+        note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each
+          fusion entropy.
+    method:
+      state:
+        tag: value
+        value: Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53].
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+    references:
+    - Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]
+    - Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]
+    - Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]
+    - Richet et al. (1994), Premelting effects in minerals [52]
+    - Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_melt_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3347,6 +3654,8 @@ observations:
     parameters: []
     output_unit: kJ/mol
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_solid_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3451,6 +3760,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_4SiO2_Tm
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3525,7 +3836,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Table 2.
+    attribution: 'Table 2 caption: earlier data [20, 21, 51–53].'
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3554,6 +3865,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=K2O·4SiO2; column_header=Tm, K
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_4SiO2_solid_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3658,6 +3971,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_Tm
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3732,7 +4047,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Table 2.
+    attribution: 'Table 2 caption: earlier data [20, 21, 51–53].'
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3761,6 +4076,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=K2O·SiO2; column_header=Tm, K
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_dfusH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3864,6 +4181,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=K2O·SiO2; column_header=ΔmH, kJ/mol
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_dfusS
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -3936,9 +4255,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Table 2.
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Authors' calculation in Table 2 from earlier data [20, 21, 51–53].
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3969,6 +4289,39 @@ observations:
         table: '2'
         note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=K2O·SiO2; column_header=ΔmS,
           J/(mol K)
+  derivation:
+    relation: Table 2 calculation reported by the authors; the numerical relation is not printed.
+    inputs: []
+    parameters: []
+    output_unit: J/mol K
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+        note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each
+          fusion entropy.
+    method:
+      state:
+        tag: value
+        value: Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53].
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+    references:
+    - Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]
+    - Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]
+    - Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]
+    - Richet et al. (1994), Premelting effects in minerals [52]
+    - Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_melt_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4081,6 +4434,8 @@ observations:
     parameters: []
     output_unit: kJ/mol
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_solid_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4185,6 +4540,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_Tm
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4259,7 +4616,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Table 2.
+    attribution: 'Table 2 caption: earlier data [20, 21, 51–53].'
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4288,6 +4645,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=Na2O·2SiO2; column_header=Tm, K
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_dfusH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4391,6 +4750,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=Na2O·2SiO2; column_header=ΔmH, kJ/mol
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_dfusS
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4463,9 +4824,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Table 2.
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Authors' calculation in Table 2 from earlier data [20, 21, 51–53].
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4496,6 +4858,39 @@ observations:
         table: '2'
         note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=Na2O·2SiO2; column_header=ΔmS,
           J/(mol K)
+  derivation:
+    relation: Table 2 calculation reported by the authors; the numerical relation is not printed.
+    inputs: []
+    parameters: []
+    output_unit: J/mol K
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+        note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each
+          fusion entropy.
+    method:
+      state:
+        tag: value
+        value: Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53].
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+    references:
+    - Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]
+    - Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]
+    - Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]
+    - Richet et al. (1994), Premelting effects in minerals [52]
+    - Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_melt_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4608,6 +5003,8 @@ observations:
     parameters: []
     output_unit: kJ/mol
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_solid_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4712,6 +5109,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_Tm
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4786,7 +5185,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Table 2.
+    attribution: 'Table 2 caption: earlier data [20, 21, 51–53].'
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4815,6 +5214,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=Na2O·SiO2; column_header=Tm, K
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_dfusH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4918,6 +5319,8 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: row_label=Na2O·SiO2; column_header=ΔmH, kJ/mol
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_dfusS
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -4990,9 +5393,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Table 2.
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Authors' calculation in Table 2 from earlier data [20, 21, 51–53].
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -5023,6 +5427,39 @@ observations:
         table: '2'
         note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=Na2O·SiO2; column_header=ΔmS,
           J/(mol K)
+  derivation:
+    relation: Table 2 calculation reported by the authors; the numerical relation is not printed.
+    inputs: []
+    parameters: []
+    output_unit: J/mol K
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+        note: The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each
+          fusion entropy.
+    method:
+      state:
+        tag: value
+        value: Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53].
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        section: Conclusions
+    references:
+    - Zaitsev et al. (2000), Thermodynamics of Na2O–SiO2 melts [20]
+    - Zaitsev et al. (2000), Thermodynamic properties of K2O–SiO2 melts [21]
+    - Takahashi and Yoshio (1970), Energy relations in alkali silicates [51]
+    - Richet et al. (1994), Premelting effects in minerals [52]
+    - Richet and Bottinga (1986), Thermochemical properties of silicate glasses and liquids [53]
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_melt_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -5135,6 +5572,8 @@ observations:
     parameters: []
     output_unit: kJ/mol
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_solid_dfH
   experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
   identity:
@@ -5239,3 +5678,5 @@ observations:
         pdf_page_index: 9
         table: '2'
         note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+  provenance:
+    printed_phase: cr
