@@ -22,7 +22,13 @@ _SETATTR_SIGNATURE = inspect.signature(_ORIGINAL_SETATTR)
 _CURRENT_NODEID: str | None = None
 _SIGNATURE_LOOKUP_SKIPS = 0
 _COLLECT_SIGNATURES = os.environ.get("SIGNATURE_DOUBLE_GUARD_COLLECT") == "1"
+_COLLECT_FILE = os.environ.get("SIGNATURE_DOUBLE_GUARD_COLLECT_FILE")
 _COLLECTED_SIGNATURE_MISMATCHES: dict[str, str] = {}
+
+if _COLLECT_SIGNATURES and not _COLLECT_FILE:
+    raise RuntimeError(
+        "SIGNATURE_DOUBLE_GUARD_COLLECT_FILE is required when collecting signatures"
+    )
 
 
 def _guarded_setattr(self: MonkeyPatch, *args: Any, **kwargs: Any) -> Any:
@@ -74,12 +80,20 @@ def signature_guard_test_context(request):
 
 def pytest_sessionfinish(session, exitstatus):
     reporter = session.config.pluginmanager.get_plugin("terminalreporter")
+    if _COLLECT_SIGNATURES:
+        collected_path = Path(f"{_COLLECT_FILE}.{os.getpid()}")
+        collected_path.parent.mkdir(parents=True, exist_ok=True)
+        with collected_path.open("a", encoding="utf-8") as collected_file:
+            for key, reason in sorted(_COLLECTED_SIGNATURE_MISMATCHES.items()):
+                collected_file.write(f"{key} # {reason}\n")
     if reporter is not None:
         reporter.write_line(
             "signature double guard: "
             f"{_SIGNATURE_LOOKUP_SKIPS} unavailable signature lookup(s) skipped"
         )
         if _COLLECT_SIGNATURES:
-            reporter.write_line("signature double guard collected allowlist entries:")
-            for key, reason in sorted(_COLLECTED_SIGNATURE_MISMATCHES.items()):
-                reporter.write_line(f"{key} # {reason}")
+            reporter.write_line(
+                "signature double guard collected "
+                f"{len(_COLLECTED_SIGNATURE_MISMATCHES)} entries to "
+                f"{_COLLECT_FILE}.{os.getpid()}"
+            )

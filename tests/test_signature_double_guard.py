@@ -7,7 +7,6 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
 
 from signature_double_guard import (
     allowlist_key_for_node,
