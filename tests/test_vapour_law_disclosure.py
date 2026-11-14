@@ -464,6 +464,8 @@ def test_ranked_output_shows_flagged_law_without_dropping_the_metric(
 
 
 def test_battery_rows_stamp_the_active_disclosure() -> None:
+    import json
+
     from simulator.battery.residue import _stamp_law_disclosure_metadata
 
     source = (_ROOT / "simulator" / "battery" / "residue.py").read_text(
@@ -479,7 +481,7 @@ def test_battery_rows_stamp_the_active_disclosure() -> None:
     with disclosure_scope(inherit=False):
         empty: dict[str, str] = {}
         _stamp_law_disclosure_metadata(empty)
-        assert "law_disclosures" not in empty
+        assert json.loads(empty["law_disclosures"]) == []
         _fe_pressure("FeO_association_gas")
         stamped: dict[str, str] = {}
         _stamp_law_disclosure_metadata(stamped)
@@ -2530,6 +2532,7 @@ def test_disclosure_survives_every_publication_point(
     from simulator.battery.enums import (
         Engine,
         EvidenceClass,
+        ExecutionState,
         MethodToken,
         Phase,
         Polymorph,
@@ -2751,10 +2754,12 @@ def test_disclosure_survives_every_publication_point(
         lambda *_a, **_k: (lambda _inventory, _logp: {}),
     )
     evaluations = {"n": 0}
+    execute_flagged_law = {"enabled": True}
 
     def _integrate(inventory, *_args, **_kwargs):
         evaluations["n"] += 1
-        _fe_pressure("FeO_association_gas")
+        if execute_flagged_law["enabled"]:
+            _fe_pressure("FeO_association_gas")
         return SimpleNamespace(
             refusal=None,
             evaporated_mol={},
@@ -2837,6 +2842,25 @@ def test_disclosure_survives_every_publication_point(
     publications["battery score row"] = tuple(
         dict(item) for item in score_disclosures
     )
+
+    execute_flagged_law["enabled"] = False
+    empty_result = predict_mass_loss_fraction(
+        "internal-analytical",
+        experiment,
+        temperature_K=1800.0,
+        observation=observation,
+    )
+    assert json.loads(empty_result.engine_metadata["law_disclosures"]) == []
+    empty_score_prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        score_observation,
+        experiment=experiment,
+    )
+    assert empty_score_prediction.execution.state is ExecutionState.PRODUCED
+    assert empty_score_prediction.value == Decimal(
+        str(empty_result.mass_loss_fraction)
+    )
+    assert empty_score_prediction.law_disclosures == ()
 
     catalog_experiment = F.tabulation_experiment(
         experiment_id="catalog-disclosure-probe",
@@ -2934,7 +2958,7 @@ def test_disclosure_survives_every_publication_point(
 
 @pytest.mark.parametrize(
     "raw_disclosures",
-    ([{}], [{"law_id": _FE_ASSOCIATION_LAW_ID}]),
+    (None, [{}], [{"law_id": _FE_ASSOCIATION_LAW_ID}]),
 )
 def test_scoring_refuses_incomplete_residue_disclosures(
     monkeypatch, raw_disclosures
@@ -2978,16 +3002,16 @@ def test_scoring_refuses_incomplete_residue_disclosures(
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="no-extract-for-malformed-disclosure-test",
     )
+    metadata = {"alpha_sources": "[]"}
+    if raw_disclosures is not None:
+        metadata["law_disclosures"] = json.dumps(raw_disclosures)
     monkeypatch.setattr(
         residue,
         "predict_mass_loss_fraction",
         lambda *_args, **_kwargs: SimpleNamespace(
             mass_loss_fraction=0.25,
             engine_flags=(),
-            engine_metadata={
-                "law_disclosures": json.dumps(raw_disclosures),
-                "alpha_sources": "[]",
-            },
+            engine_metadata=metadata,
         ),
     )
 
