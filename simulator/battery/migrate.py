@@ -26453,6 +26453,17 @@ class Migrator:
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
         )
+        declared_schema_gap = _declared_schema_gap(values)
+        if (
+            q_token is None
+            and declared_schema_gap is not None
+            and value.kind is ValueKind.UNAVAILABLE
+            and admission.status is AdmissionStatus.ADMITTED
+        ):
+            admission = Admission(
+                status=AdmissionStatus.REJECTED,
+                reason=declared_schema_gap,
+            )
         observation_provenance = _printed_scalar_provenance(
             observation_provenance, values, value_sel
         )

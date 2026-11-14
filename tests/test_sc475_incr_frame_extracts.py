@@ -2789,6 +2789,57 @@ def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows()
                 ), observation_id
 
 
+def _assert_schema_gap_refusals(migrator, source_id, expected_reasons, *, report):
+    for observation_id, expected_reason in expected_reasons.items():
+        migrated = [
+            row
+            for key, row in migrator.result.observations.items()
+            if key == f"{source_id}::{observation_id}"
+            or key.startswith(f"{source_id}::{observation_id}::")
+        ]
+        assert len(migrated) == 1, observation_id
+        actual_reasons = [row.value.unavailable_reason for row in migrated]
+        admissions = [row.admission.status.value for row in migrated]
+        if report:
+            print(
+                f"SC-475 class reason {source_id}::{observation_id}: "
+                f"expected={expected_reason!r}; actual={actual_reasons!r}; "
+                f"admission={admissions!r}"
+            )
+        assert all(not row.identity.quantity.is_value for row in migrated)
+        assert all(row.value.kind.value == "unavailable" for row in migrated)
+        assert all(reason == expected_reason for reason in actual_reasons), observation_id
+        assert all(status != "admitted" for status in admissions), observation_id
+
+
+def _migrate_shornikov_rows(source_id, hit_rows, *, report):
+    path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    expected_reasons = {
+        observation_id: _records(document)[observation_id]["values"]["schema_gap"]
+        for observation_id in hit_rows
+    }
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    _assert_schema_gap_refusals(
+        migrator, source_id, expected_reasons, report=report
+    )
+
+
+def _install_schema_gap_loss_mutation(monkeypatch, should_drop):
+    select_declared_source = migrate_module.select_declared_source
+
+    def drop_declared_reason(declared, units, payload):
+        if isinstance(payload, dict) and should_drop(payload):
+            payload = {key: value for key, value in payload.items() if key != "schema_gap"}
+        return select_declared_source(declared, units, payload)
+
+    monkeypatch.setattr(
+        migrate_module, "select_declared_source", drop_declared_reason
+    )
+
+
 def test_stack_shornikov_frame_rows_keep_printed_evidence_and_locator_pins():
     for source_id, hit_rows in S4_SHORNIKOV_ROWS.items():
         path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
@@ -2801,22 +2852,26 @@ def test_stack_shornikov_frame_rows_keep_printed_evidence_and_locator_pins():
         with pytest.raises(AssertionError):
             _assert_stack_shornikov_rows(mutated, hit_rows)
 
-        migrator = Migrator(root=ROOT, index={}, aliases={})
-        migrator._migrate_extract(path)
-        migrator.finalize()
-        for observation_id in hit_rows:
-            migrated = [
-                row
-                for key, row in migrator.result.observations.items()
-                if key == f"{source_id}::{observation_id}"
-                or key.startswith(f"{source_id}::{observation_id}::")
-            ]
-            assert len(migrated) == 1
-            assert not migrated[0].identity.quantity.is_value
-            assert migrated[0].value.kind.value == "unavailable"
+        _migrate_shornikov_rows(source_id, hit_rows, report=True)
 
 
-def test_stack_zaitsev_table4_from_oxides_rows_remain_unavailable():
+def test_shornikov_reason_assertions_catch_reason_loss_mutation(monkeypatch):
+    _install_schema_gap_loss_mutation(
+        monkeypatch,
+        lambda payload: payload.get("schema_gap") == FRAME_REASON
+        and payload.get("quantity_as_printed")
+        in {
+            printed
+            for hit_rows in S4_SHORNIKOV_ROWS.values()
+            for printed, _, _, _ in hit_rows.values()
+        },
+    )
+    with pytest.raises(AssertionError):
+        for source_id, hit_rows in S4_SHORNIKOV_ROWS.items():
+            _migrate_shornikov_rows(source_id, hit_rows, report=False)
+
+
+def _migrate_zaitsev_rows(*, report):
     source_id = "zaitsev-2006-magnesium-silicate-thermodynamics"
     path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
     document = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -2836,7 +2891,28 @@ def test_stack_zaitsev_table4_from_oxides_rows_remain_unavailable():
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(path)
     migrator.finalize()
-    for observation_id in ZAITSEV_HIT_ROWS:
-        row = migrator.result.observations[f"{source_id}::{observation_id}"]
-        assert not row.identity.quantity.is_value
-        assert row.value.kind.value == "unavailable"
+    _assert_schema_gap_refusals(
+        migrator,
+        source_id,
+        {
+            observation_id: rows[observation_id]["values"]["schema_gap"]
+            for observation_id in ZAITSEV_HIT_ROWS
+        },
+        report=report,
+    )
+
+
+def test_stack_zaitsev_table4_from_oxides_rows_remain_unavailable():
+    _migrate_zaitsev_rows(report=True)
+
+
+def test_zaitsev_reason_assertions_catch_reason_loss_mutation(monkeypatch):
+    _install_schema_gap_loss_mutation(
+        monkeypatch,
+        lambda payload: payload.get("schema_gap") == FRAME_REASON
+        and payload.get("quantity_as_printed") == "ΔfG(298 K)"
+        and payload.get("reference_state_as_printed")
+        == "formation from crystalline MgO and β-cristobalite",
+    )
+    with pytest.raises(AssertionError):
+        _migrate_zaitsev_rows(report=False)
