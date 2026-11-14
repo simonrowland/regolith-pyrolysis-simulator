@@ -671,15 +671,21 @@ def test_cro_disproportionation_and_cro2_products() -> None:
     assert cro2.o2_mol_per_mol_vapour == pytest.approx(-0.25)
 
 
-def test_query_outside_every_cited_interval_refuses() -> None:
-    with pytest.raises(WallSaturationLawRefusal) as exc_info:
-        resolve_wall_saturation(
-            _species_rows()["SiO"],
-            species_id="SiO",
-            T_K=250.0,
-            pO2_Pa=_PO2_PA,
-        )
-    assert exc_info.value.reason == "wall_condensation_thermo_out_of_interval"
+def test_query_outside_every_cited_interval_predicts_and_flags_extrapolation() -> None:
+    resolved = resolve_wall_saturation(
+        _species_rows()["SiO"],
+        species_id="SiO",
+        T_K=250.0,
+        pO2_Pa=_PO2_PA,
+    )
+    assert math.isfinite(resolved.pressure_Pa) and resolved.pressure_Pa > 0.0
+    assert "wall_condensation_thermo_extrapolated" in resolved.notices
+    extrapolated = [
+        item for item in resolved.participants
+        if item.authority_level == "extrapolated"
+    ]
+    assert extrapolated
+    assert all(item.valid_range_K for item in extrapolated)
 
 
 def test_perturbing_the_gibbs_term_the_resolver_reads_moves_psat(monkeypatch) -> None:
@@ -692,10 +698,10 @@ def test_perturbing_the_gibbs_term_the_resolver_reads_moves_psat(monkeypatch) ->
     original = wall_module._nasa_record_state
 
     def shifted(record_id: str, temperature_K: float):
-        g_over_rt, phase = original(record_id, temperature_K)
+        g_over_rt, phase, authority, valid_range = original(record_id, temperature_K)
         if record_id == "NG-1135":
-            return g_over_rt + 0.1, phase
-        return g_over_rt, phase
+            return g_over_rt + 0.1, phase, authority, valid_range
+        return g_over_rt, phase, authority, valid_range
 
     monkeypatch.setattr(wall_module, "_nasa_record_state", shifted)
     moved = resolve_wall_saturation(
