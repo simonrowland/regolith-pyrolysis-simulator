@@ -15,10 +15,14 @@ from tests.test_run_executor import _run
 from tests.test_runner_smoke import SCENARIOS
 
 
-def _execute(*, hours=2, dt_hr=0.25):
-    run = _run(hours=hours, dt_hr=dt_hr)
+def _isothermal_session(dt_hr):
+    run = _run(
+        hours=2, dt_hr=dt_hr,
+        runtime_campaign_overrides={"C2A": {"ramp_rate": 0.0}},
+    )
     session = run._start_session()
-    return run, session, RunExecutor().execute_session(session, hours=hours)
+    session.simulator.melt.temperature_C = 1450.0
+    return session
 
 
 @pytest.mark.parametrize("seconds", [77.4, 1002.0])
@@ -79,19 +83,19 @@ def _endpoint(session):
         sim.O2_vented_cumulative_kg,
         sim.O2_stored_cumulative_kg,
         sim.energy_tracker.cumulative_breakdown(),
-        sim._alpha_authority_status_by_species_engaged,
+        dict(getattr(sim, "_alpha_authority_status_by_species_engaged", {})),
     )
 
 
 def test_equal_segmentation_retains_inventories_gases_energy_and_flags():
     endpoints = []
     for segments in ([2.0], [1.0, 1.0], [0.25] * 8):
-        run = _run(hours=2, dt_hr=0.25)
-        session = run._start_session()
+        session = _isothermal_session(0.25)
         for duration in segments:
             execution = RunExecutor().execute_session(session, hours=duration)
             assert execution.status == "ok", execution.error_message
         assert session.simulator.melt.hour == 2
+        assert session.simulator.atom_ledger.assert_balanced()
         for snapshot in session.simulator.record.snapshots:
             assert abs(snapshot.mass_balance_error_pct) < 5e-12
         endpoints.append(_endpoint(session))
@@ -104,15 +108,22 @@ def test_first_order_campaign_refinement():
     # This compares full inventories, not a tolerance tuned to one gas yield.
     endpoints = []
     for dt_hr in (1 / 16, 1 / 32, 1 / 64):
-        _, session, execution = _execute(hours=0.25, dt_hr=dt_hr)
+        session = _isothermal_session(dt_hr)
+        execution = RunExecutor().execute_session(session, hours=0.25)
         assert execution.status == "ok", execution.error_message
         sim = session.simulator
-        endpoints.append(sim.atom_ledger.mol_by_account("process.cleaned_melt"))
+        endpoints.append({
+            (account, species): amount
+            for account, rows in sim.atom_ledger.mol_by_account().items()
+            for species, amount in rows.items()
+        })
+        assert sim.atom_ledger.assert_balanced()
         assert abs(execution.snapshots[-1].mass_balance_error_pct) < 5e-12
     species = set().union(*endpoints)
     coarse = max(abs(endpoints[0].get(s, 0) - endpoints[1].get(s, 0)) for s in species)
     fine = max(abs(endpoints[1].get(s, 0) - endpoints[2].get(s, 0)) for s in species)
     roundoff = 64 * math.ulp(max(max(row.values()) for row in endpoints))
+    assert coarse > roundoff, "refinement must exercise changing inventories"
     assert fine <= coarse + roundoff
 
 
@@ -138,3 +149,45 @@ def test_explicit_hour_is_byte_identical_to_ordinary_hourly_run(scenario):
 def test_invalid_elapsed_duration_refuses_before_execution(value):
     with pytest.raises((RunnerError, ValueError, TypeError)):
         _run(hours=value)
+
+
+@pytest.mark.parametrize("dt_hr", [0, -0.01, math.nan, math.inf, True])
+def test_invalid_substep_refuses_before_execution(dt_hr):
+    with pytest.raises((RunnerError, ValueError, TypeError)):
+        _run(dt_hr=dt_hr)
+
+
+def test_rate_energy_scales_with_elapsed_time_without_rescaling_mre_energy():
+    from simulator.energy import EnergyTracker
+    from simulator.state import EvaporationFlux, MeltState, OverheadGas
+    from tests.test_energy_budget import _na_vapor_pressures
+
+    arguments = (
+        MeltState(), OverheadGas(turbine_shaft_power_kW=4.0),
+        EvaporationFlux(species_kg_hr={"Na": 1.0}),
+    )
+    records = [EnergyTracker().calculate_hour(
+        *arguments, mre_kWh=3.0, vapor_pressures=_na_vapor_pressures(), dt_hr=dt
+    ) for dt in (1.0, 0.25)]
+    assert records[1].turbine_kWh == 1.0  # Physical definition of kWh.
+    assert records[1].mre_kWh == records[0].mre_kWh == 3.0
+    assert records[1].evaporation_thermal_kWh == records[0].evaporation_thermal_kWh / 4
+
+
+@pytest.mark.parametrize("campaign", ["C2A", "C2B", "C3_K", "C3_NA", "C4", "C5", "C6"])
+def test_participating_provider_controls_receive_real_dt(campaign, monkeypatch):
+    session = _run(campaign=campaign, hours=0.25, dt_hr=0.25)._start_session()
+    sim = session.simulator
+    observed = []
+    dispatch = sim._dispatch_only
+
+    def record_duration(intent, *, control_inputs, **kwargs):
+        if "dt_hr" in control_inputs:
+            observed.append((intent, control_inputs["dt_hr"]))
+        return dispatch(intent, control_inputs=control_inputs, **kwargs)
+
+    monkeypatch.setattr(sim, "_dispatch_only", record_duration)
+    execution = RunExecutor().execute_session(session, hours=0.25)
+    assert execution.status in {"ok", "refused"}, execution.error_message
+    assert observed, campaign
+    assert all(dt == 0.25 for _, dt in observed), observed

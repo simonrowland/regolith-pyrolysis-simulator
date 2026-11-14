@@ -916,9 +916,12 @@ def drive_session(
             interval = min(interval, next_schedule_boundary_h(
                 schedule, float(sim.melt.campaign_hour)
             ) - float(sim.melt.campaign_hour))
+        previous_hour = sim.melt.hour
         result = session.advance() if interval == 1.0 else session.advance(dt_hr=interval)
         remaining = target_hour - sim.melt.hour
         yield result
+        if sim.melt.hour == previous_hour:
+            return
         if stop_at_stage0_exit and _at_stage0_exit(session):
             return
 
