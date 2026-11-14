@@ -4472,8 +4472,10 @@ def _prepare_sio_campaign_start(
 
     base_get_temp_target = sim.campaign_mgr.get_temp_target
 
-    def _sio_twindow_temp_target(campaign, campaign_hour, melt):
-        target, ramp_rate = base_get_temp_target(campaign, campaign_hour, melt)
+    def _sio_twindow_temp_target(campaign, campaign_hour, melt, *, dt_hr=1.0):
+        target, ramp_rate = base_get_temp_target(
+            campaign, campaign_hour, melt, dt_hr=dt_hr,
+        )
         if campaign == CampaignPhase.C2A:
             if ramp_c_per_hr is not None:
                 if not is_declared_real_scalar(
