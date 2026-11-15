@@ -30,10 +30,19 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import Quantity, Rail
+from simulator.battery.enums import (
+    AdmissionStatus,
+    Engine,
+    EvidenceClass,
+    Phase,
+    Quantity,
+    Rail,
+    ResidualStatus,
+)
 from simulator.battery.identity import State
-from simulator.battery.records import CandidateRequest, Value
+from simulator.battery.records import CandidateRequest, Species, Value
 import simulator.battery.score as score_mod
+from tests.battery import factories as F
 from tests.battery.test_score import _streaming_score_fixture
 
 HEADING = "# Battery score report (schema v2.1)"
@@ -1974,6 +1983,161 @@ def test_direct_and_streamed_score_outputs_match_byte_pins(
         _without_certified_counts(got["direct_report"]).encode("utf-8")
         == _without_certified_counts(PIN_REPORT).encode("utf-8")
     )
+
+
+def test_retained_nasa_liquid_thermo_rows_keep_numeric_output_and_bands(
+    tmp_path: Path,
+) -> None:
+    """All output writers retain real NASA-9 liquid Cp score rows and bands."""
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    identity = replace(
+        F.o2_identity(Decimal("298.15")),
+        quantity=Quantity.CP,
+        species=Species("H2O", Phase.L),
+        reaction=State.not_applicable("pure standard-state thermo"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    observations = tuple(
+        F.observation(
+            f"output-pin-h2o-liquid-cp-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            admission=AdmissionStatus.PENDING,
+            source_id=f"output-pin-source-{index}",
+        )
+        for index, value in enumerate(("75", "75.3", "76"))
+    )
+    context = score_mod.ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={row.observation_id: row for row in observations},
+        origins={
+            row.observation_id: f"compilations-janaf/{row.observation_id}.yaml"
+            for row in observations
+        },
+        extract_review={row.source_id: None for row in observations},
+        hostname="test",
+    )
+    bands, _band_records, _no_band_reasons = score_mod._source_band_catalog(
+        context, {}
+    )
+    assert len(bands) == 1
+    expected_band = next(iter(bands.values()))
+    engines = (Engine.NASA_CEA_9,)
+    residuals, candidates = score_mod.score_store(context, engines=engines)
+    expected_values = {
+        observations[0].observation_id: Decimal("0.35055745293062"),
+        observations[1].observation_id: Decimal("0.05055745293062"),
+        observations[2].observation_id: Decimal("-0.64944254706938"),
+    }
+    by_reference = {row.reference: row for row in residuals}
+    assert set(by_reference) == set(expected_values)
+    for reference, expected_value in expected_values.items():
+        residual = by_reference[reference]
+        assert residual.numeric is not None
+        assert residual.numeric.value == expected_value
+        assert residual.numeric.unit == "J_per_declared_mol_basis_per_K"
+        assert residual.numeric.decision_band is not None
+        assert residual.numeric.decision_band.rule.startswith("derived_scatter:")
+        assert residual.status is ResidualStatus.MATCH
+        assert score_mod.flagged_strata(residual.notices) == ()
+
+    root = score_mod.REPO_ROOT
+    direct_jsonl = tmp_path / "retained-direct.jsonl"
+    score_mod.write_residuals_jsonl(residuals, candidates, direct_jsonl, root=root)
+    streamed_jsonl = tmp_path / "retained-streamed.jsonl"
+    written, metadata = score_mod._score_store_to_jsonl(
+        context, streamed_jsonl, root=root, engines=engines
+    )
+    partial = streamed_jsonl.with_name(streamed_jsonl.name + ".partial")
+    assert written == 3
+    assert partial.read_bytes() == direct_jsonl.read_bytes()
+    jsonl_rows = [
+        json.loads(line)
+        for line in partial.read_text(encoding="utf-8").splitlines()
+    ]
+    numeric_rows = {
+        row["reference"]: row
+        for row in jsonl_rows
+        if row.get("reference") in expected_values
+    }
+    assert set(numeric_rows) == set(expected_values)
+    for reference, expected_value in expected_values.items():
+        row = numeric_rows[reference]
+        numeric = row["numeric"]
+        assert numeric["value"] == str(expected_value)
+        assert numeric["unit"] == "J_per_declared_mol_basis_per_K"
+        assert numeric["operation"] == "absolute"
+        assert numeric["decision_band"]["band_basis"] == "derived_scatter"
+        assert numeric["decision_band"]["unit"] == "J_per_declared_mol_basis_per_K"
+        assert numeric["decision_band"]["value"] == str(expected_band.value)
+        assert row["status"] == ResidualStatus.MATCH.value
+
+    stamp = score_mod.derive_store_stamp(root)
+    direct_summary = tmp_path / "retained-direct-summary.json"
+    streamed_summary = tmp_path / "retained-streamed-summary.json"
+    score_mod.write_headline_summary_json(
+        residuals, direct_summary, context=context, engines=engines, root=root
+    )
+    assert metadata.aggregate is not None
+    score_mod._write_headline_summary_from_accumulator_json(
+        metadata.aggregate, streamed_summary, store_stamp=stamp
+    )
+    assert direct_summary.read_bytes() == streamed_summary.read_bytes()
+    direct_report = score_mod.render_score_report(
+        residuals, context=context, engines=engines, root=root
+    )
+    streamed_report = score_mod._render_score_report_from_payloads_legacy(
+        score_mod._ResidualJsonlRows(partial, metadata=metadata),
+        context=context,
+        engines=engines,
+        store_stamp=stamp,
+        _aggregate=metadata.aggregate,
+    )
+    assert streamed_report == direct_report
+    payload_rows = score_mod._ResidualJsonlRows(partial)
+    payload_summary = tmp_path / "retained-payload-summary.json"
+    score_mod.write_headline_summary_from_payloads_json(
+        payload_rows,
+        payload_summary,
+        engines=engines,
+        observations=context.observations,
+        origins=context.origins,
+        store_stamp=stamp,
+    )
+    payload_report = score_mod.render_score_report_from_payloads(
+        payload_rows,
+        engines=engines,
+        hostname=context.hostname,
+        store_stamp=stamp,
+        observations=context.observations,
+        origins=context.origins,
+    )
+    for output in (
+        direct_report,
+        streamed_report,
+        payload_report,
+    ):
+        assert "0.05055745293062" in output
+        assert "nasa_cea_9" in output
+        assert "derived_scatter" in output
+        assert str(expected_band.value) in output
+    payload_summary_doc = json.loads(payload_summary.read_text(encoding="utf-8"))
+    direct_summary_doc = json.loads(direct_summary.read_text(encoding="utf-8"))
+    for summary in (payload_summary_doc, direct_summary_doc):
+        thermo_records = [
+            record
+            for record in summary["records"]
+            if record.get("tier") == "all_numeric"
+            and record.get("rail") == Rail.THERMOCHEMISTRY.value
+            and record.get("engine") == Engine.NASA_CEA_9.value
+        ]
+        assert thermo_records
+        assert sum(record["n"] for record in thermo_records) == 3
 
 
 def test_corrupt_certified_aggregates_miss_fixture_assertions(
