@@ -104,6 +104,24 @@ def test_open_vacuum_alumina_self_buffers_and_closes_mass_flux() -> None:
     assert result.solver_residual_norm < 2.0e-7
 
 
+def test_r04_refractory_effusion_flux_pre_move_hex() -> None:
+    result = solve_congruent_vaporization("Al2O3", 1800.0)
+    actual = tuple(
+        (item.species, item.net_molar_flux_mol_m2_s.hex())
+        for item in result.species
+    )
+    assert actual == (
+        ("Al", "0x1.a462f1ba5ae76p-23"),
+        ("Al2", "0x1.e7956b0c4eca2p-57"),
+        ("AlO", "0x1.ca36ffee219d2p-27"),
+        ("AlO2", "0x1.490807cca48bep-43"),
+        ("Al2O", "0x1.1810b53bd0d6ep-30"),
+        ("Al2O2", "0x1.a01d410836ccbp-39"),
+        ("O", "0x1.411475e192a47p-22"),
+        ("O2", "0x1.c7c3dfcc86b4ap-30"),
+    )
+
+
 def test_alumina_Al_bearing_vapor_crosses_nasa_screen(
     literature: dict,
 ) -> None:
