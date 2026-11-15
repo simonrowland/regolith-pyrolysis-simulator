@@ -485,7 +485,7 @@ def test_freeze_gate_phase_fraction_requires_sampled_curve_support(
         _melt_redox_gate_record_is_admitted=lambda _record: True,
     )
 
-    phase_fraction, source, continuation, projection_notice = (
+    phase_fraction, source, continuation, projection_notice, phase_detail = (
         EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction(sim)
     )
 
@@ -497,6 +497,7 @@ def test_freeze_gate_phase_fraction_requires_sampled_curve_support(
     )
     assert continuation == expected_continuation
     assert projection_notice is None
+    assert phase_detail is None
 
 
 def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> None:
@@ -556,7 +557,7 @@ def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> No
         _melt_redox_gate_record_is_admitted=lambda _record: True,
     )
 
-    phase_fraction, source, continuation, phase_notice = (
+    phase_fraction, source, continuation, phase_notice, phase_detail = (
         EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction(sim)
     )
 
@@ -564,18 +565,20 @@ def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> No
     assert source == f'freeze_gate_authority:{projected_source}'
     assert continuation is None
     assert phase_notice == projection_notice
+    assert phase_detail is None
 
     record['repair_notices'].append({
         'type': 'typed_notice',
         'kind': 'freeze_gate_curve_repaired',
     })
-    phase_fraction, source, continuation, phase_notice = (
+    phase_fraction, source, continuation, phase_notice, phase_detail = (
         EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction(sim)
     )
     assert phase_fraction is None
     assert source == 'freeze_gate_authority_missing_or_invalid'
     assert continuation is None
     assert phase_notice is None
+    assert phase_detail["code"] == "gate_curve_repaired"
 
 
 def test_refused_freeze_gate_phase_lookup_keeps_vapor_pressure_refresh() -> None:
@@ -610,6 +613,11 @@ def test_refused_freeze_gate_phase_lookup_keeps_vapor_pressure_refresh() -> None
     controls = calls[0][1]['control_inputs']
     assert controls['liquid_fraction'] is None
     assert controls['phase_basis_source'] == 'freeze_gate_authority_refused'
+    phase_detail = sim._last_vapor_pressure_diagnostic['phase_basis_detail']
+    assert phase_detail['code'] == 'no admitted phase authority'
+    assert phase_detail['diagnostic']['reason_refused'] == (
+        'freeze_gate_no_liquidus_authority'
+    )
     assert result.vapor_pressures_Pa == {'Na': 12.5}
 
 

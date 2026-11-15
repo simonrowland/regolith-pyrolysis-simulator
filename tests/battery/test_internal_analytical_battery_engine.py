@@ -1046,8 +1046,13 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
         assert record["vapor_pressures_source"]["SiO"].startswith(
             expected_sio_source
         )
+        scored_notices = json.dumps(candidate.get("notices") or ())
         if expected_notice is not None:
             assert any(
                 notice["code"] == expected_notice
                 for notice in record["notices"]
             )
+            assert expected_notice in scored_notices
+        if expected_basis == "missing":
+            assert record["phase_basis_detail"]["code"]
+            assert record["phase_basis_detail"]["diagnostic"]
