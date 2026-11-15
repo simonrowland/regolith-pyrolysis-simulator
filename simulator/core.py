@@ -14692,6 +14692,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._establish_melt_redox_gate_authority_for_current_hour()
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
+            gate_authority = getattr(
+                self,
+                '_melt_redox_gate_authority_this_tick',
+                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+            )
+            if isinstance(gate_authority, Mapping):
+                # The forecast's temperature sweep does not change this
+                # composition-derived curve. Preserve the already-resolved
+                # record and curve through the existing deepcopy memo, so
+                # its origin, notices, and provider admission remain intact.
+                memo[id(gate_authority)] = gate_authority
+                gate_curve = gate_authority.get('curve')
+                if isinstance(gate_curve, Mapping):
+                    memo[id(gate_curve)] = gate_curve
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
             sulfsat_gate = getattr(self, '_sulfsat_gate', None)
