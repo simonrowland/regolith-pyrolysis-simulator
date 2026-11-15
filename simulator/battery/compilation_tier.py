@@ -295,10 +295,20 @@ def _compilation_engines_for_scoring(
     return _compilation_engines_for_pair(engines, observation.identity)
 
 
+class _SelectedResiduals(tuple):
+    """Keep pre-score selection beside the legacy residual tuple."""
+
+    def __new__(cls, residuals, selected_ids):
+        result = super().__new__(cls, residuals)
+        result.selected = frozenset(selected_ids)
+        return result
+
+
 def unrouted_compilation_summary_lines(
     observations: Mapping[str, Observation],
     origins: Mapping[str, str],
     engines: Sequence[Engine],
+    selected_observation_ids: Iterable[str],
 ) -> list[str]:
     """Aggregate compilation engine pairs omitted by the production router."""
 
@@ -308,7 +318,14 @@ def unrouted_compilation_summary_lines(
     )
 
     counts: dict[tuple[str, str, str], int] = defaultdict(int)
-    for observation in observations.values():
+    selected_ids = {
+        parent_observation_id(observation_id)
+        for observation_id in selected_observation_ids
+    }
+    for observation_id in sorted(selected_ids):
+        observation = observations.get(observation_id)
+        if observation is None:
+            continue
         origin = origins.get(observation.observation_id)
         if not (
             is_compilation_evidence(observation)
@@ -326,12 +343,12 @@ def unrouted_compilation_summary_lines(
                 if point.identity.species is not None
                 else None
             )
+            routed = (
+                ()
+                if is_internal_consistency(origin)
+                else _compilation_engines_for_pair(engines, point.identity)
+            )
             for engine in engines:
-                routed = (
-                    ()
-                    if is_internal_consistency(origin)
-                    else _compilation_engines_for_pair(engines, point.identity)
-                )
                 if engine not in routed:
                     phase_name = "unknown" if phase is None else phase.value
                     counts[(engine.value, quantity.value, phase_name)] += 1
@@ -3830,6 +3847,7 @@ def _median_abs(values: Sequence[Decimal]) -> str | None:
 
 @dataclass(frozen=True)
 class _TierCell:
+    observation_id: str
     rail: str
     engine: str
     status: ResidualStatus
@@ -3904,6 +3922,7 @@ class _TierMarkdownAccumulator:
         self.typed_band_values = (
             {} if typed_band_values is None else typed_band_values
         )
+        self.selected: set[str] = set()
         self.by_engine: dict[str, _TierAggregate] = defaultdict(_TierAggregate)
         self.by_source: dict[tuple[str, str], _TierAggregate] = defaultdict(_TierAggregate)
         self.by_family_rail_engine_quantity: dict[
@@ -3911,6 +3930,7 @@ class _TierMarkdownAccumulator:
         ] = defaultdict(_TierAggregate)
 
     def add(self, cell: _TierCell) -> None:
+        self.selected.add(cell.observation_id)
         self.by_engine[cell.engine].add(cell, keep_values=False)
         self.by_source[(cell.family, cell.quantity)].add(cell, keep_values=True)
         if (
@@ -4079,6 +4099,7 @@ def _cell_from_observation(
         if headline_rail is not None:
             rail = headline_rail.value
     return _TierCell(
+        observation_id=observation.observation_id,
         rail=rail,
         engine=engine,
         status=status,
@@ -4178,6 +4199,7 @@ def _tier_cell_from_payload_fields(
     band_rule = "" if band is None else str(band.get("rule") or "")
     band_value = None if band is None else str(band["value"])
     return _TierCell(
+        observation_id=str(row.get("reference") or ""),
         rail=rail,
         engine=engine or "unknown",
         status=ResidualStatus(str(row.get("status"))),
@@ -4282,7 +4304,14 @@ def _compilation_tier_lines_from_accumulator(
     engines: Sequence[Engine],
 ) -> list[str]:
     lines = _tier_markdown((), accumulator=accumulator)
-    lines.extend(unrouted_compilation_summary_lines(observations, origins, engines))
+    lines.extend(
+        unrouted_compilation_summary_lines(
+            observations,
+            origins,
+            engines,
+            accumulator.selected,
+        )
+    )
     return lines
 
 
@@ -4292,8 +4321,26 @@ def _compilation_tier_report_lines_from_payloads(
     origins: Mapping[str, str] | None,
     engines: Sequence[Engine],
 ) -> list[str]:
-    lines = compilation_tier_lines_from_payloads(rows, observations, origins)
-    lines.extend(unrouted_compilation_summary_lines(observations, origins or {}, engines))
+    from simulator.battery.score import _flagged_payload_strata
+
+    selected_observation_ids: set[str] = set()
+
+    def selected_rows() -> Iterable[Mapping[str, object]]:
+        for row in rows:
+            reference = str(row.get("reference") or "")
+            if reference:
+                selected_observation_ids.add(reference)
+            if not _flagged_payload_strata(row):
+                yield row
+
+    lines = compilation_tier_lines_from_payloads(
+        selected_rows(), observations, origins
+    )
+    lines.extend(
+        unrouted_compilation_summary_lines(
+            observations, origins or {}, engines, selected_observation_ids
+        )
+    )
     return lines
 
 

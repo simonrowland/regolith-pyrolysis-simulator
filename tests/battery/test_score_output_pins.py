@@ -1641,7 +1641,7 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
 }
 """
 
-# Route pin: routed-away compilation engine pairs now appear once in the payload report summary.
+# Payload reports count routed-away pairs only for references present in their rows.
 PIN_PAYLOAD_REPORT = """\
 # Battery score report (schema v2.1)
 
@@ -1736,15 +1736,6 @@ zero: |residual| ≤ ticket line.
 |---|---|---:|---:|---:|---:|---|
 | (none) |  | 0 | 0 | 0 | — |  |
 
-
-### Unrouted compilation engine pairs
-
-Each row summarizes compilation cells skipped before engine scoring.
-
-| engine | quantity | phase | skipped cells |
-|---|---|---|---:|
-| internal-analytical | S | g | 2 |
-| internal-analytical | delta_fG | g | 13 |
 
 ## Refusal census
 

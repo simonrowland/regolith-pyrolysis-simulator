@@ -18409,7 +18409,7 @@ def _score_store_with_decisions(
         is Quantity.RESIDUE_COMPONENT_COMPOSITION
     )
     if _stream is not None:
-        _stream.selected_reference_count = len(refs)
+        _stream.selected_reference_ids.update(obs.observation_id for obs in refs)
         if species_formulas:
             print(
                 f"species references selected={len(refs)} "
@@ -18417,7 +18417,7 @@ def _score_store_with_decisions(
                 flush=True,
             )
     from simulator.battery.compilation_tier import (
-        _compilation_engines_for_scoring,
+        _SelectedResiduals, _compilation_engines_for_scoring,
         _is_compilation_thermo_reference,
         _compilation_series_point_count,
         _iter_compilation_series_cells,
@@ -18751,7 +18751,7 @@ def _score_store_with_decisions(
             r.key,
         )
     )
-    scored = tuple(residuals)
+    scored = _SelectedResiduals(residuals, (obs.observation_id for obs in refs))
     return scored, candidates, _compilation_decision_strata(scored, context)
 
 
@@ -18798,7 +18798,7 @@ def _score_store_to_jsonl(
             tier_band_values=dict(stream.tier_band_values),
             aggregate=stream.report_aggregate,
             static_refusals=stream.static_refusals,
-            selected_reference_count=stream.selected_reference_count,
+            selected_reference_count=len(stream.selected_reference_ids),
         )
     finally:
         stream.close()
@@ -22907,6 +22907,7 @@ def candidate_rail_census(
 class _ResidualRowsPayloadView:
     def __init__(self, residuals: Sequence[Residual], context: ScoreContext) -> None:
         self.residuals = residuals
+        self.selected = getattr(residuals, "selected", ())
         family_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         headline_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
         tier_values: dict[tuple[str, str, str, str, str, str], set[str]] = defaultdict(set)
@@ -23444,7 +23445,7 @@ class _ResidualJsonlStream:
         ] = defaultdict(set)
         self.report_aggregate: _ScorePayloadAccumulator | None = None
         self.count = 0
-        self.selected_reference_count = 0
+        self.selected_reference_ids: set[str] = set()
         self._last_flush = time.monotonic()
 
     @property
@@ -23530,6 +23531,7 @@ class _ResidualJsonlStream:
             typed_headline_band_values=self.headline_band_values,
             typed_tier_band_values=self.tier_band_values,
         )
+        report_aggregate.tier_accumulator.selected = self.selected_reference_ids
         temporary_path: Path | None = None
         try:
             with tempfile.NamedTemporaryFile(
@@ -24009,16 +24011,17 @@ class _ScorePayloadAccumulator:
         context: ScoreContext,
         engines: Sequence[Engine],
     ) -> _ScorePayloadAccumulator:
-        aggregate = cls(
+        report = cls(
             context,
             engines,
             typed_family_band_values=getattr(rows, "_typed_family_band_values", None),
             typed_headline_band_values=getattr(rows, "_typed_headline_band_values", None),
             typed_tier_band_values=getattr(rows, "_typed_tier_band_values", None),
         )
+        report.tier_accumulator.selected.update(getattr(rows, "selected", ()))
         for row in rows:
-            aggregate.add(row)
-        return aggregate
+            report.add(row)
+        return report
 
     @staticmethod
     def _engine(row: Mapping[str, object]) -> str:
@@ -24683,7 +24686,7 @@ def render_score_report_from_payloads(
         # unflagged rows whose reference is a compilation observation.
         compilation_rows = _FilteredPayloadRows(unflagged_rows, is_compilation)
         compilation_lines = _compilation_tier_report_lines_from_payloads(
-            unflagged_rows, observations, origins, engines
+            rows, observations, origins, engines
         )
     all_numeric_records = all_numeric_payload_records(
         rows, engines=engines, observations=observations, origins=origins

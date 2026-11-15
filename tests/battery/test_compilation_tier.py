@@ -795,6 +795,112 @@ def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> 
     )
 
 
+def test_unrouted_summary_resolves_each_selected_cell_once(monkeypatch) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    from simulator.battery.score import SCORE_ENGINE_SET
+
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "selected-na2o-dfg",
+        experiment.experiment_id,
+        _na2o_liquid(),
+        Decimal("-3.886"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    real_attempt = compilation_tier._ellingham_attempt
+    calls = []
+
+    def count_attempt(*args, **kwargs):
+        calls.append(args[0])
+        return real_attempt(*args, **kwargs)
+
+    monkeypatch.setattr(compilation_tier, "_ellingham_attempt", count_attempt)
+    lines = compilation_tier.unrouted_compilation_summary_lines(
+        {observation.observation_id: observation},
+        {},
+        SCORE_ENGINE_SET,
+        {observation.observation_id},
+    )
+
+    assert lines
+    assert len(calls) == 1
+
+
+def test_unrouted_summary_uses_filtered_population_for_all_report_paths(
+    tmp_path: Path,
+) -> None:
+    import simulator.battery.score as score_module
+    from simulator.battery.score import SCORE_ENGINE_SET
+
+    experiment = F.tabulation_experiment()
+    water = F.observation(
+        "a-water-liquid-cp",
+        experiment.experiment_id,
+        replace(
+            _gas_thermo("H2O", Quantity.CP, Decimal("298.15")),
+            species=Species("H2O", Phase.L),
+        ),
+        Decimal("75"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    crystal = F.observation(
+        "z-unselected-crystal-cp",
+        experiment.experiment_id,
+        _pure_phase_identity(),
+        Decimal("55"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    context = _context(water, crystal)
+    engines = SCORE_ENGINE_SET
+    selection = {
+        "engines": engines,
+        "species_formulas": ("H2O",),
+        "limit": 1,
+        "include_diagnostics": True,
+    }
+
+    residuals, _candidates, _strata = score_module._score_store_with_decisions(
+        context, **selection
+    )
+    assert {row.reference for row in residuals} == {water.observation_id}
+    direct_report = score_module.render_score_report(
+        residuals, context=context, engines=engines
+    )
+
+    residuals_path = tmp_path / "residuals.jsonl"
+    _count, metadata = score_module._score_store_to_jsonl(
+        context, residuals_path, **selection
+    )
+    partial_path = residuals_path.with_name(residuals_path.name + ".partial")
+    streamed_rows = score_module._ResidualJsonlRows(
+        partial_path, metadata=metadata
+    )
+    assert {
+        row["reference"] for row in score_module.load_residuals_jsonl(partial_path)
+    } == {water.observation_id}
+    streamed_report = score_module._render_score_report_from_payloads_legacy(
+        streamed_rows,
+        context=context,
+        engines=engines,
+        _aggregate=metadata.aggregate,
+    )
+    payload_report = score_module.render_score_report_from_payloads(
+        score_module._ResidualJsonlRows(partial_path, metadata=metadata),
+        engines=engines,
+        hostname=context.hostname,
+        observations=context.observations,
+        origins=context.origins,
+    )
+
+    for report in (direct_report, streamed_report, payload_report):
+        assert "| internal-analytical | cp | l | 1 |" in report
+        assert "| internal-analytical | cp | cr |" not in report
+        assert "| nasa_cea_9 | cp | cr |" not in report
+
+
 def _assert_compilation_routing_retains_numeric_residuals() -> None:
     from simulator.battery.score import flagged_strata, score_store
 
