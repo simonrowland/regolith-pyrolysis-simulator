@@ -197,6 +197,179 @@ def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
     return _ENGINE_THERMO_QUANTITIES.get(engine, frozenset())
 
 
+def _compilation_engines_for_pair(
+    engines: Sequence[Engine], identity: Identity
+) -> tuple[Engine, ...]:
+    """Keep engines whose owners declare a capability for this identity."""
+
+    from simulator.battery.score import MELTS_ENGINES
+
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return tuple(engines)
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        return tuple(engine for engine in engines if engine in MELTS_ENGINES)
+    if quantity is Quantity.P_PARTIAL:
+        return tuple(engine for engine in engines if engine is not Engine.MAGEMIN)
+    if quantity is Quantity.FE3_FE2_RATIO:
+        return tuple(
+            engine
+            for engine in engines
+            if engine not in {Engine.MAGEMIN, Engine.VAPOROCK}
+        )
+    if quantity not in _THERMO_QUANTITIES:
+        return tuple(engines)
+    species = identity.species
+    phase = phase_token(species) if species is not None else None
+    routed: list[Engine] = []
+    for engine in engines:
+        if quantity not in _engine_thermo_quantities(engine):
+            continue
+        # An unresolved phase is missing input, not evidence of no engine
+        # capability. Keep it so the scorer can emit its typed refusal.
+        if species is None or phase is None:
+            routed.append(engine)
+            continue
+        if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
+            symbol, reason = _resolve_symbol(engine, identity)
+            if symbol is not None or reason not in {
+                "pure-phase-is-crystal-only",
+                "pure-phase-symbol-unmapped",
+            }:
+                routed.append(engine)
+            continue
+        if engine is Engine.NASA_CEA_9:
+            record, reason = _nasa_cea_9_record_for_species(species)
+            if record is not None or reason not in {
+                "nasa-cea-formula-not-covered",
+                "nasa-cea-phase-not-covered",
+            }:
+                routed.append(engine)
+            continue
+        if engine is Engine.VAPOROCK:
+            if _vaporock_gas_phase_capability(identity) is not False:
+                routed.append(engine)
+            continue
+        if engine is Engine.INTERNAL_ANALYTICAL and quantity in _ENGINE_ELLINGHAM_QUANTITIES:
+            temperature = _state_value(identity.temperature_K)
+            if temperature is not None and as_decimal(temperature) > 0:
+                attempt = _ellingham_attempt(
+                    identity,
+                    quantity,
+                    as_decimal(temperature),
+                    origin="compilation-routing",
+                )
+                if attempt.refusal_detail.get("reason") in {
+                    "engine-thermo-does-not-emit",
+                    "ellingham-phase-or-polymorph-not-in-fit",
+                }:
+                    continue
+        # Internal Analytical's fusion evaluator remains the capability
+        # owner; only its declared fusion quantities are routed here.
+        routed.append(engine)
+    return tuple(routed)
+
+
+def _compilation_engines_for_scoring(
+    engines: Sequence[Engine],
+    observation: Observation,
+    origin: str | None,
+    *,
+    production_scoring: bool,
+) -> tuple[Engine, ...]:
+    """Apply production compilation filtering before building residuals."""
+
+    if not production_scoring:
+        return tuple(engines)
+    from simulator.battery.score import is_compilation_source, is_internal_consistency
+
+    if not (
+        is_compilation_evidence(observation)
+        or is_compilation_source(observation.source_id, origin)
+    ):
+        return tuple(engines)
+    if is_internal_consistency(origin):
+        return ()
+    if not isinstance(observation.identity, Identity):
+        return tuple(engines)
+    return _compilation_engines_for_pair(engines, observation.identity)
+
+
+class _SelectedResiduals(tuple):
+    """Keep pre-score selection beside the legacy residual tuple."""
+
+    def __new__(cls, residuals, selected_ids):
+        result = super().__new__(cls, residuals)
+        result.selected = frozenset(selected_ids)
+        return result
+
+
+def unrouted_compilation_summary_lines(
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str],
+    engines: Sequence[Engine],
+    selected_observation_ids: Iterable[str],
+) -> list[str]:
+    """Aggregate compilation engine pairs omitted by the production router."""
+
+    from simulator.battery.score import (
+        is_compilation_source,
+        is_internal_consistency,
+    )
+
+    counts: dict[tuple[str, str, str], int] = defaultdict(int)
+    selected_ids = {
+        parent_observation_id(observation_id)
+        for observation_id in selected_observation_ids
+    }
+    for observation_id in sorted(selected_ids):
+        observation = observations.get(observation_id)
+        if observation is None:
+            continue
+        origin = origins.get(observation.observation_id)
+        if not (
+            is_compilation_evidence(observation)
+            or is_compilation_source(observation.source_id, origin)
+        ):
+            continue
+        for point in _iter_compilation_series_cells(observation, origin):
+            if not isinstance(point.identity, Identity):
+                continue
+            quantity = quantity_token(point.identity)
+            if quantity is None:
+                continue
+            phase = (
+                phase_token(point.identity.species)
+                if point.identity.species is not None
+                else None
+            )
+            routed = (
+                ()
+                if is_internal_consistency(origin)
+                else _compilation_engines_for_pair(engines, point.identity)
+            )
+            for engine in engines:
+                if engine not in routed:
+                    phase_name = "unknown" if phase is None else phase.value
+                    counts[(engine.value, quantity.value, phase_name)] += 1
+    if not counts:
+        return []
+    lines = [
+        "",
+        "### Unrouted compilation engine pairs",
+        "",
+        "Each row summarizes compilation cells skipped before engine scoring.",
+        "",
+        "| engine | quantity | phase | skipped cells |",
+        "|---|---|---|---:|",
+    ]
+    lines.extend(
+        f"| {engine} | {quantity} | {phase} | {count} |"
+        for (engine, quantity, phase), count in sorted(counts.items())
+    )
+    return lines
+
+
 @dataclass(frozen=True)
 class _Product:
     formula: str
@@ -324,6 +497,28 @@ def is_compilation_evidence(observation: Observation) -> bool:
     evidence = observation.evidence.class_
     return bool(
         evidence.is_value and evidence.value is EvidenceClass.COMPILATION_ASSESSED
+    )
+
+
+def _is_compilation_thermo_reference(
+    observation: Observation, origin: str | None
+) -> bool:
+    is_compilation_source, is_internal_consistency, is_sf04_workbook, _parse = (
+        _score_predicates()
+    )
+    quantity = (
+        quantity_token(observation.identity)
+        if isinstance(observation.identity, Identity)
+        else None
+    )
+    compilation = is_compilation_evidence(observation) or is_compilation_source(
+        observation.source_id, origin
+    )
+    return bool(
+        quantity in FORMATION_QUANTITIES | PURE_STANDARD_THERMO | FUSION_QUANTITIES
+        and compilation
+        and not is_internal_consistency(origin)
+        and not is_sf04_workbook(observation)
     )
 
 
@@ -2948,6 +3143,15 @@ def _vaporock_tabulated_gas_attempt(
     )
 
 
+def _vaporock_gas_phase_capability(identity: Identity) -> bool | None:
+    """VapoRock's gas-only branch; None means the phase is unresolved."""
+
+    if identity.species is None:
+        return None
+    phase = phase_token(identity.species)
+    return None if phase is None else phase is Phase.G
+
+
 def _vaporock_gas_attempt(
     observation: Observation,
     identity: Identity,
@@ -2967,17 +3171,12 @@ def _vaporock_gas_attempt(
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value},
         )
-    phase = identity.species.phase
     phase_refusal = _b1259_element_reference_phase_refusal(
         observation, identity, quantity, origin=origin
     )
     if phase_refusal is not None:
         return phase_refusal
-    if (
-        not isinstance(phase, State)
-        or not phase.is_value
-        or phase.value is not Phase.G
-    ):
+    if _vaporock_gas_phase_capability(identity) is not True:
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "engine-thermo-does-not-emit",
@@ -3648,6 +3847,7 @@ def _median_abs(values: Sequence[Decimal]) -> str | None:
 
 @dataclass(frozen=True)
 class _TierCell:
+    observation_id: str
     rail: str
     engine: str
     status: ResidualStatus
@@ -3722,6 +3922,7 @@ class _TierMarkdownAccumulator:
         self.typed_band_values = (
             {} if typed_band_values is None else typed_band_values
         )
+        self.selected: set[str] = set()
         self.by_engine: dict[str, _TierAggregate] = defaultdict(_TierAggregate)
         self.by_source: dict[tuple[str, str], _TierAggregate] = defaultdict(_TierAggregate)
         self.by_family_rail_engine_quantity: dict[
@@ -3729,6 +3930,7 @@ class _TierMarkdownAccumulator:
         ] = defaultdict(_TierAggregate)
 
     def add(self, cell: _TierCell) -> None:
+        self.selected.add(cell.observation_id)
         self.by_engine[cell.engine].add(cell, keep_values=False)
         self.by_source[(cell.family, cell.quantity)].add(cell, keep_values=True)
         if (
@@ -3897,6 +4099,7 @@ def _cell_from_observation(
         if headline_rail is not None:
             rail = headline_rail.value
     return _TierCell(
+        observation_id=observation.observation_id,
         rail=rail,
         engine=engine,
         status=status,
@@ -3996,6 +4199,7 @@ def _tier_cell_from_payload_fields(
     band_rule = "" if band is None else str(band.get("rule") or "")
     band_value = None if band is None else str(band["value"])
     return _TierCell(
+        observation_id=str(row.get("reference") or ""),
         rail=rail,
         engine=engine or "unknown",
         status=ResidualStatus(str(row.get("status"))),
@@ -4091,6 +4295,54 @@ def compilation_tier_lines_from_payloads(
         cells(),
         typed_band_values=getattr(rows, "_typed_tier_band_values", None),
     )
+
+
+def _compilation_tier_lines_from_accumulator(
+    accumulator: _TierMarkdownAccumulator,
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str],
+    engines: Sequence[Engine],
+) -> list[str]:
+    lines = _tier_markdown((), accumulator=accumulator)
+    lines.extend(
+        unrouted_compilation_summary_lines(
+            observations,
+            origins,
+            engines,
+            accumulator.selected,
+        )
+    )
+    return lines
+
+
+def _compilation_tier_report_lines_from_payloads(
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str] | None,
+    engines: Sequence[Engine],
+) -> list[str]:
+    from simulator.battery.score import _flagged_payload_strata
+
+    selected_reference_ids = getattr(rows, "selected_reference_ids", None)
+    selected_observation_ids = set(selected_reference_ids or ())
+
+    def selected_rows() -> Iterable[Mapping[str, object]]:
+        for row in rows:
+            reference = str(row.get("reference") or "")
+            if reference and selected_reference_ids is None:
+                selected_observation_ids.add(reference)
+            if not _flagged_payload_strata(row):
+                yield row
+
+    lines = compilation_tier_lines_from_payloads(
+        selected_rows(), observations, origins
+    )
+    lines.extend(
+        unrouted_compilation_summary_lines(
+            observations, origins or {}, engines, selected_observation_ids
+        )
+    )
+    return lines
 
 
 def write_compilation_comparisons_jsonl(context, path: Path) -> int:
@@ -4633,7 +4885,7 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                     identity=point.identity,
                     value=Value.point_of(as_decimal(fit_value)),
                 )
-                for engine in engines:
+                for engine in _compilation_engines_for_pair(engines, point.identity):
                     attempt = predict_thermo_attempt(
                         engine,
                         fit_reference,

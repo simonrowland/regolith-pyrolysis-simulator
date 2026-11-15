@@ -49,6 +49,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.P_REFERENCE: MetricOperation.DEX,
     Quantity.ACTIVITY: MetricOperation.DEX,
     Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,
+    Quantity.DELTA_FH: MetricOperation.ABSOLUTE,
     Quantity.DELTA_FG: MetricOperation.ABSOLUTE,
     Quantity.ENTHALPY_OF_FUSION: MetricOperation.ABSOLUTE,
     Quantity.ENTROPY_OF_FUSION: MetricOperation.ABSOLUTE,
