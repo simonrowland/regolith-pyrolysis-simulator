@@ -3639,52 +3639,104 @@ def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
         sim._melt_redox_liquidus_gate_record()
 
 
-@pytest.mark.parametrize(("composition_wt_pct", "projected_retry"), [
-    ({"SiO2": 50.0, "MgO": 50.0}, False),
-    ({"SiO2": 20.0, "MgO": 80.0}, False),
-    (
-        {
-            "SiO2": 50.0,
-            "MgO": 29.0,
-            "FeO": 10.0,
-            "P2O5": 10.0,
-            "MnO": 1.0,
-        },
-        True,
-    ),
-    ({"SiO2": 79.0, "MgO": 16.0, "P2O5": 5.0}, True),
-    ({"SiO2": 29.0, "MgO": 66.0, "P2O5": 5.0}, True),
-    (
-        {
-            "SiO2": 50.0,
-            "MgO": 35.0,
-            "FeO": 5.0,
-            "FeOt": 5.0,
-            "P2O5": 5.0,
-        },
-        True,
-    ),
-    ({"SiO2": 20.0, "MgO": 20.0, "NaCl": 60.0}, False),
-    (
-        {
-            "SiO2": 49.0,
-            "MgO": 20.0,
-            "Al2O3": 20.0,
-            "CaO": 8.5,
-            "H2O": 2.5,
-        },
-        False,
-    ),
-])
+@pytest.mark.parametrize(
+    ("composition_wt_pct", "projected_retry", "expected_gate_input"),
+    [
+        (
+            {"SiO2": 50.0, "MgO": 50.0},
+            False,
+            # 50+50=100 wt%; the submitted values are unchanged.
+            {"SiO2": 50.0, "MgO": 50.0},
+        ),
+        (
+            {"SiO2": 20.0, "MgO": 80.0},
+            False,
+            # 20+80=100 wt%; the submitted values are unchanged.
+            {"SiO2": 20.0, "MgO": 80.0},
+        ),
+        (
+            {
+                "SiO2": 50.0,
+                "MgO": 29.0,
+                "FeO": 10.0,
+                "P2O5": 10.0,
+                "MnO": 1.0,
+            },
+            True,
+            # Retained mass is 50+29+10=89; 100*(50,29,10)/89 gives
+            # (56.17977528089888, 32.58426966292135, 11.235955056179776).
+            {
+                "SiO2": 56.17977528089888,
+                "MgO": 32.58426966292135,
+                "FeO": 11.235955056179776,
+            },
+        ),
+        (
+            {"SiO2": 79.0, "MgO": 16.0, "P2O5": 5.0},
+            True,
+            # P2O5 is dropped; 100*(79,16)/95 gives (83.15789473684211,
+            # 16.842105263157894).
+            {"SiO2": 83.15789473684211, "MgO": 16.842105263157894},
+        ),
+        (
+            {"SiO2": 29.0, "MgO": 66.0, "P2O5": 5.0},
+            True,
+            # P2O5 is dropped; 100*(29,66)/95 gives (30.526315789473685,
+            # 69.47368421052632).
+            {"SiO2": 30.526315789473685, "MgO": 69.47368421052632},
+        ),
+        (
+            {
+                "SiO2": 50.0,
+                "MgO": 35.0,
+                "FeO": 5.0,
+                "O": 5.0,
+                "P2O5": 5.0,
+            },
+            True,
+            # FeO 5 + O 5 contributes 10 g FeO-equivalent; after dropping
+            # P2O5, 50+35+10=95 and 100*(50,35,10)/95 gives these values.
+            {
+                "SiO2": 52.63157894736842,
+                "MgO": 36.8421052631579,
+                "FeO": 10.526315789473685,
+            },
+        ),
+        (
+            {"SiO2": 20.0, "MgO": 20.0, "NaCl": 60.0},
+            False,
+            # NaCl is dropped; 20+20=40 and 100*(20,20)/40=(50,50).
+            {"SiO2": 50.0, "MgO": 50.0},
+        ),
+        (
+            {
+                "SiO2": 49.0,
+                "MgO": 20.0,
+                "Al2O3": 20.0,
+                "CaO": 8.5,
+                "H2O": 2.5,
+            },
+            False,
+            # 49+20+20+8.5+2.5=100 wt%; these values stay unchanged.
+            {
+                "SiO2": 49.0,
+                "MgO": 20.0,
+                "Al2O3": 20.0,
+                "CaO": 8.5,
+                "H2O": 2.5,
+            },
+        ),
+    ],
+)
 def test_magemin_cache_classifier_matches_live_gate_decision(
     monkeypatch,
     composition_wt_pct,
     projected_retry,
+    expected_gate_input,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
-    from simulator.feedstock_composition import iron_oxide_values
     from simulator.melt_backend.base import project_melt_to_oxide_projection
     from simulator.melt_backend.magemin import MAGEMinBackend
     import simulator.melt_backend.magemin as magemin_module
@@ -3782,29 +3834,9 @@ def test_magemin_cache_classifier_matches_live_gate_decision(
     )
     assert len(owner_calls[0][2]) == 1
     assert len(owner_calls[1][2]) == 1
-    for bulk, _verdict, gate_input in owner_calls:
-        if bulk is None:
-            continue
-        submitted = dict(bulk.composition_wt_pct)
-        feot_present = 'FeOt' in submitted
-        feot = float(submitted.pop('FeOt', 0.0))
-        oxygen = float(submitted.pop('O', 0.0))
-        if feot_present:
-            feo, fe2o3 = iron_oxide_values({'FeOt': feot + oxygen})
-            if feo > 0.0:
-                submitted['FeO'] = submitted.get('FeO', 0.0) + feo
-            if fe2o3 > 0.0:
-                submitted['Fe2O3'] = submitted.get('Fe2O3', 0.0) + fe2o3
-        elif oxygen > 0.0:
-            submitted['O'] = oxygen
-        normalized = project_melt_to_oxide_projection(
-            composition_kg=submitted,
-            composition_mol=None,
-            oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
-            species_formula_registry=sim.species_formula_registry,
-        ).oxide_wt_pct
-        assert set(gate_input[0]) == set(normalized)
-        for species, amount in normalized.items():
+    for _bulk, _verdict, gate_input in owner_calls:
+        assert set(gate_input[0]) == set(expected_gate_input)
+        for species, amount in expected_gate_input.items():
             assert gate_input[0][species] == pytest.approx(
                 amount, rel=0.0, abs=1e-9
             )
