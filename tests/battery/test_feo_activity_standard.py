@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 
+import simulator.battery.feo_standard as feo_standard_module
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
@@ -127,7 +128,7 @@ def test_internal_analytical_zero_offset_preserves_residual_bytes() -> None:
     sources = ("nasa-cea-thermo",)
     expected_digest = _RESIDUAL_SHA256_BEFORE_STANDARD_STEP
     context, _experiment, reference, prediction = _case(engine, sources)
-    resolver = getattr(score_module, "_resolve_feo_activity_standard", None)
+    resolver = getattr(feo_standard_module, "_resolve_feo_activity_standard", None)
     converter = getattr(score_module, "_canonicalize_feo_activity_prediction", None)
     assert callable(resolver)
     assert callable(converter)
@@ -172,7 +173,7 @@ def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
     # At 1600 K this is 27778.965828 - 10.961554232*1600 =
     # 10240.4790568 J/mol; at 1650 K it is 9692.4013452 J/mol.
     identity = _melt_pack_identity("default")
-    standard, refusal = score_module._resolve_feo_activity_standard(
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
         Engine.OPENIMCC,
         _openimcc_sources(
             pack_version=identity["pack_version"],
@@ -187,7 +188,7 @@ def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
     assert standard is not None
     assert standard.name == "DG46-MASSON65"
     assert standard.offset_j_mol == expected_delta_g_j_mol
-    shift = score_module._canonical_log10_feo_activity(
+    shift = feo_standard_module._canonical_log10_feo_activity(
         Decimal(0), temperature_K, standard.offset_j_mol
     )
     # The source quotes these shifts rounded to four decimals, hence half of
@@ -221,7 +222,7 @@ def test_melt_pack_shift_matches_condensate_gibbs_rows_as_crosscheck() -> None:
         (Decimal("1600"), Decimal("10240.5")),
         (Decimal("1650"), Decimal("9692.4")),
     ):
-        standard, refusal = score_module._resolve_feo_activity_standard(
+        standard, refusal = feo_standard_module._resolve_feo_activity_standard(
             Engine.OPENIMCC,
             _openimcc_sources(
                 pack_version=identity["pack_version"],
@@ -277,11 +278,11 @@ def test_non_v1_pack_without_feo_liquid_candidate_refuses(
 ) -> None:
     identity = _melt_pack_identity("default")
     monkeypatch.setattr(
-        score_module,
+        feo_standard_module,
         "_openimcc_pack_identity_and_payload",
         lambda _pack_name: (identity, {}),
     )
-    standard, refusal = score_module._resolve_feo_activity_standard(
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
         Engine.OPENIMCC,
         _openimcc_sources(
             pack_version=identity["pack_version"],
@@ -300,7 +301,7 @@ def test_non_v1_pack_without_feo_liquid_candidate_refuses(
 
 def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> None:
     actual_digest = "c" * 64
-    standard, refusal = score_module._resolve_feo_activity_standard(
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
         Engine.OPENIMCC,
         (f"openimcc-redox-pack:sha256:{actual_digest}",),
         melt_pack_identity=_melt_pack_identity("default"),
@@ -313,7 +314,7 @@ def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> No
     assert refusal.detail == {
         "reason": "openimcc_feo_redox_pack_digest_mismatch",
         "expected_redox_pack_digest": (
-            score_module._OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
+            feo_standard_module._OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
         ),
         "actual_redox_pack_digest": actual_digest,
     }
@@ -400,7 +401,7 @@ def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> Non
         pack_digest="b" * 64,
         condensate_digest="d" * 64,
     )
-    standard, refusal = score_module._resolve_feo_activity_standard(
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
         Engine.OPENIMCC,
         sources,
         melt_pack_identity={
@@ -418,7 +419,7 @@ def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> Non
 
 
 def test_nonzero_feo_standard_conversion_matches_hand_value() -> None:
-    converter = getattr(score_module, "_canonical_log10_feo_activity", None)
+    converter = getattr(feo_standard_module, "_canonical_log10_feo_activity", None)
     assert callable(converter)
 
     canonical = converter(
@@ -441,10 +442,10 @@ def test_compile_residual_applies_nonzero_standard_conversion_exactly_once(
         temperature_K=Decimal("1649.15"),
     )
     monkeypatch.setattr(
-        score_module,
+        feo_standard_module,
         "_resolve_feo_activity_standard",
         lambda _engine, _sources: (
-            score_module._FeOActivityStandard(
+            feo_standard_module._FeOActivityStandard(
                 name="hand-value test",
                 offset_j_mol=Decimal("9701.7"),
             ),
@@ -504,8 +505,8 @@ def test_openimcc_feo_prediction_is_normalized_and_carries_notice_and_provenance
 
 def test_scorer_refuses_an_openimcc_feo_prediction_without_normalisation_record() -> None:
     sources = _openimcc_sources(
-        pack_version=score_module._OPENIMCC_DEFAULT_PACK_VERSION,
-        pack_digest=score_module._OPENIMCC_DEFAULT_PACK_DIGEST,
+        pack_version=feo_standard_module._OPENIMCC_DEFAULT_PACK_VERSION,
+        pack_digest=feo_standard_module._OPENIMCC_DEFAULT_PACK_DIGEST,
         condensate_digest="e" * 64,
     )
     context, _experiment, reference, prediction = _case(Engine.OPENIMCC, sources)
