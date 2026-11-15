@@ -536,20 +536,27 @@ def _first_liner_state_refusal(raw_state: Mapping[str, Any]) -> dict[str, Any] |
     return None
 
 
-def interface_first_melt_from_liner_state(
-    liner_state: Mapping[str, Any],
+def _interface_first_melt_from_liner_states(
+    liner_states_by_campaign: Sequence[Mapping[str, Any] | None],
 ) -> Limiter:
-    """Adapt runner recurrence bounds to the lifecycle diagnostic stack."""
+    """Evaluate each campaign's own liner forecast on its relative timeline."""
 
-    segments = liner_state.get("segments")
-    if not isinstance(segments, Mapping):
-        refusal = {
-            "reason": "liner_state_segments_missing",
-            "detail": "liner-state-v1 has no segment records",
-        }
+    forecasts: list[
+        tuple[list[tuple[str, int]], dict[str, Any] | None] | None
+    ] = []
+    for liner_state in liner_states_by_campaign:
+        if not isinstance(liner_state, Mapping):
+            forecasts.append(None)
+            continue
+        segments = liner_state.get("segments")
+        if not isinstance(segments, Mapping):
+            refusal = {
+                "reason": "liner_state_segments_missing",
+                "detail": "liner-state-v1 has no segment records",
+            }
+            forecasts.append(([], refusal))
+            continue
         selected: list[tuple[str, int]] = []
-    else:
-        selected = []
         for raw_name, raw_state in segments.items():
             if not isinstance(raw_state, Mapping):
                 continue
@@ -562,6 +569,7 @@ def interface_first_melt_from_liner_state(
                 and not isinstance(interval[0], bool)
             ):
                 selected.append((str(raw_name), interval[0]))
+        selected.sort(key=lambda item: (item[1], item[0]))
         refusal = None
         if not selected:
             for raw_state in segments.values():
@@ -575,13 +583,46 @@ def interface_first_melt_from_liner_state(
                     "reason": "liner_campaign_interval_unavailable",
                     "detail": "liner state has no finite reactive campaign bound",
                 }
+        forecasts.append((selected, refusal))
 
-    selected.sort(key=lambda item: (item[1], item[0]))
+    first_state_index = next(
+        (index for index, forecast in enumerate(forecasts) if forecast is not None),
+        None,
+    )
 
     def evaluate(
         _snapshot: FoulingTerminalSnapshot,
         campaign_index: int,
     ) -> LimiterEvaluation:
+        position = campaign_index - 1
+        if first_state_index is None:
+            refusal = {
+                "reason": "liner_state_missing",
+                "detail": "no campaign supplied liner-state-v1 metadata",
+            }
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal=refusal,
+            )
+        if position < first_state_index:
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+            )
+        if position >= len(forecasts) or forecasts[position] is None:
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal={
+                    "reason": "liner_state_missing_for_campaign",
+                    "detail": f"campaign {campaign_index} has no liner-state-v1 metadata",
+                },
+            )
+        selected, refusal = forecasts[position]
         if not selected:
             return LimiterEvaluation(
                 name=INTERFACE_FIRST_MELT_LIMITER,
@@ -590,16 +631,25 @@ def interface_first_melt_from_liner_state(
                 refusal=refusal,
             )
         segment, onset_campaign = selected[0]
+        relative_campaign_index = campaign_index - first_state_index
         return LimiterEvaluation(
             name=INTERFACE_FIRST_MELT_LIMITER,
-            fired=campaign_index >= onset_campaign,
+            fired=relative_campaign_index >= onset_campaign,
             segment=segment,
-            value=float(campaign_index),
+            value=float(relative_campaign_index),
             limit=float(onset_campaign),
             campaign_index=campaign_index,
         )
 
     return interface_first_melt_limiter(evaluate)
+
+
+def interface_first_melt_from_liner_state(
+    liner_state: Mapping[str, Any],
+) -> Limiter:
+    """Preserve the single-state adapter while delegating to sequence logic."""
+
+    return _interface_first_melt_from_liner_states((liner_state,))
 
 
 def _interface_first_melt_diagnostic(

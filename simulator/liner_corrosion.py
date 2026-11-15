@@ -769,7 +769,7 @@ def _tier_b_melt_activity_rating(
         for index in range(1, len(temperatures)) if onset_bracket is None else ():
             lower_temperature = temperatures[index - 1]
             upper_temperature = temperatures[index]
-            if upper_temperature >= bulk_low:
+            if upper_temperature > bulk_low:
                 break
             contaminated_liquid = _checked_liquid_fraction(
                 _sample_liquid_fraction(

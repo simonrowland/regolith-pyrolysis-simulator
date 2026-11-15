@@ -493,6 +493,45 @@ def test_tier_b_onset_at_first_scan_point_is_an_unresolved_lower_boundary():
     assert liner_corrosion._tier_b_onset_at_service_temperature(activity, 450.0)
 
 
+def test_tier_b_scans_the_pure_bulk_lower_boundary_for_contaminated_onset():
+    class BulkBoundarySampler:
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            if temperature_C < 1550.0:
+                pure = 0.0
+            elif temperature_C < 1575.0:
+                pure = 0.044
+            else:
+                pure = 1.0
+            if composition.get("Na2O", 0.0) > 0.0 and temperature_C == 1550.0:
+                return pure + 0.01
+            return pure
+
+    sampler = BulkBoundarySampler()
+    liner = {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0}
+    reference = liner_corrosion._tier_b_reference_profile(
+        sampler,
+        liner,
+        pressure_bar=1.0,
+        literature_melting_temperature_C=1553.0,
+    )
+    activity = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        {"SiO2": 49.0, "Al2O3": 30.0, "CaO": 20.0, "Na2O": 1.0},
+        {"Na": 1.0},
+        sampler=sampler,
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=1553.0,
+        pure_reference=reference,
+    )
+
+    assert reference["bulk_melt_bracket_C"] == [1550.0, 1575.0]
+    assert activity["contaminated_melt_bracket_C"] == [1525.0, 1550.0]
+    # Independent d-419 rating arithmetic uses the lower contaminated endpoint:
+    # 1553 + (1525 - 1550) - 25 = 1503 C, below the 1528 C pure cap.
+    assert activity["rating_temperature_C"] == 1503.0
+
+
 def test_rankin_end_member_melting_points_are_excluded_from_compound_rows():
     records = [
         row

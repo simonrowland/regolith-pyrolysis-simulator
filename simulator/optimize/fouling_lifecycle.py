@@ -12,7 +12,7 @@ from simulator.coating_lifespan import (
     LifecycleProjection,
     NestedDeposit,
     campaigns_to_resinter_total,
-    interface_first_melt_from_liner_state,
+    _interface_first_melt_from_liner_states,
     merge_run_snapshot,
     project_lifecycle,
 )
@@ -114,7 +114,7 @@ class FoulingLifecycleHarness:
         ledgers: list[Any] = []
         snapshots_authoritative = True
         snapshot_notices: list[Mapping[str, Any]] = []
-        interface_first_melt = None
+        liner_states_by_campaign: list[Mapping[str, Any] | None] = []
 
         for campaign_index, campaign_input in enumerate(campaign_inputs, start=1):
             artifact = _coerce_run_artifact(self._run_campaign(campaign_input))
@@ -129,10 +129,9 @@ class FoulingLifecycleHarness:
                 if isinstance(run_metadata, Mapping)
                 else None
             )
-            if interface_first_melt is None and isinstance(liner_state, Mapping):
-                interface_first_melt = interface_first_melt_from_liner_state(
-                    liner_state
-                )
+            liner_states_by_campaign.append(
+                liner_state if isinstance(liner_state, Mapping) else None
+            )
             mass_balance_error_pct = _mass_balance_error_pct(artifact)
             if (
                 mass_balance_error_pct is not None
@@ -233,6 +232,11 @@ class FoulingLifecycleHarness:
             carried = cumulative
 
         cumulative_snapshots = tuple(record.cumulative_snapshot for record in records)
+        interface_first_melt = (
+            _interface_first_melt_from_liner_states(liner_states_by_campaign)
+            if any(isinstance(state, Mapping) for state in liner_states_by_campaign)
+            else None
+        )
         return FoulingLifecycleHarnessResult(
             campaigns_to_resinter_total=(
                 records[-1].campaigns_to_resinter_total

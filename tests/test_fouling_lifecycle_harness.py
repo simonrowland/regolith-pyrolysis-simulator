@@ -104,6 +104,62 @@ def test_project_lifecycle_consumes_runner_liner_recurrence_when_selected():
     assert interface["campaign_index"] == 2
 
 
+def test_liner_onset_counts_from_first_campaign_with_metadata():
+    document = {
+        "run_metadata": {
+            "liner_state": {
+                "schema": "liner-state-v1",
+                "segments": {"hot_wall": {"campaigns_to_runaway": [2, 4]}},
+            }
+        }
+    }
+
+    result = FoulingLifecycleHarness(
+        lambda has_liner: _artifact(
+            {}, result_document=document if has_liner else {"run_metadata": {}}
+        ),
+        segment_area_m2={},
+    ).run((False, False, True, True))
+
+    interface = result.lifecycle_projection.to_dict()["interface_first_melt"]
+    assert interface["fired"] is True
+    assert interface["campaign_index"] == 4
+    assert interface["value"] == 2.0
+
+
+def test_later_campaign_liner_state_can_move_the_forecast_onset_earlier():
+    def run_campaign(forecast_and_deposit):
+        onset_campaign, na_deposit_kg = forecast_and_deposit
+        document = {
+            "run_metadata": {
+                "liner_state": {
+                    "schema": "liner-state-v1",
+                    "segments": {
+                        "hot_wall": {
+                            "campaigns_to_runaway": [
+                                onset_campaign,
+                                onset_campaign,
+                            ],
+                            "deposit_kg_by_species": {"Na": na_deposit_kg},
+                        }
+                    },
+                }
+            }
+        }
+        return _artifact({}, result_document=document)
+
+    result = FoulingLifecycleHarness(
+        run_campaign,
+        segment_area_m2={},
+    ).run(((4, 0.1), (4, 0.1), (2, 0.5), (2, 0.5)))
+
+    interface = result.lifecycle_projection.to_dict()["interface_first_melt"]
+    assert interface["fired"] is True
+    assert interface["campaign_index"] == 3
+    assert interface["value"] == 3.0
+    assert interface["limit"] == 2.0
+
+
 def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:
     return {
         "vapour_carrier_authority_by_species": {
