@@ -11619,7 +11619,7 @@ def test_k02_zr_th_and_pending_anchors_are_unavailable_domains() -> None:
         assert lo in blob and hi in blob, fname
 
 
-def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
+def test_k03_ledger_missing_phase_is_not_candidate_queued(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
         yaml.safe_dump(
@@ -11648,8 +11648,7 @@ def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
         for e in result.queue
         if e.observation_id == "ledger-unknown-phase" and "phase" in (e.axes or ())
     ]
-    assert phase_entries
-    assert any("phase" in (e.why or "").lower() for e in phase_entries)
+    assert phase_entries == []
 
 
 def _quantity_state(obs) -> tuple[object, str | None]:
@@ -11692,7 +11691,10 @@ def test_l01_type_does_not_assign_contradicted_alpha(tmp_path: Path) -> None:
     assert token is None
     blob = " ".join(filter(None, [reason, _queue_blob(result, obs.observation_id)]))
     assert "not_hkl_langmuir_coefficient" in blob or "HKL" in blob
-    assert any("quantity" in (e.axes or ()) for e in result.queue)
+    assert not any(
+        e.observation_id == obs.observation_id and "quantity" in (e.axes or ())
+        for e in result.queue
+    )
 
 
 def test_l01_gibbs_type_does_not_assign_dissociation_note(tmp_path: Path) -> None:
@@ -11712,7 +11714,7 @@ def test_l01_gibbs_type_does_not_assign_dissociation_note(tmp_path: Path) -> Non
     assert token is None
     blob = " ".join(filter(None, [reason, _queue_blob(result, obs.observation_id)]))
     assert "dissociation" in blob.lower()
-    assert any("quantity" in (e.axes or ()) for e in result.queue)
+    assert not any(e.observation_id == obs.observation_id for e in result.queue)
 
 
 def test_l01_gibbs_type_does_not_assign_vapor_pressure_equations(tmp_path: Path) -> None:
@@ -11729,7 +11731,7 @@ def test_l01_gibbs_type_does_not_assign_vapor_pressure_equations(tmp_path: Path)
     obs = next(iter(result.observations.values()))
     token, _reason = _quantity_state(obs)
     assert token is None
-    assert any("quantity" in (e.axes or ()) for e in result.queue)
+    assert not any(e.observation_id == obs.observation_id for e in result.queue)
 
 
 def test_l01_activity_type_does_not_assign_ordering_units(tmp_path: Path) -> None:
@@ -11782,7 +11784,7 @@ def test_l01_alpha_field_is_not_hkl_when_flagged(tmp_path: Path) -> None:
     token, _reason = _quantity_state(obs)
     assert token is None
     assert obs.value.kind is ValueKind.UNAVAILABLE
-    assert any("quantity" in (e.axes or ()) for e in result.queue)
+    assert not any(e.observation_id == obs.observation_id for e in result.queue)
 
 
 def test_l01_janaf_evaluator_gibbs_table_stays_delta_fg(tmp_path: Path) -> None:
@@ -12602,7 +12604,7 @@ def test_l05g0_atomic_weight_rows_are_not_delta_fg(tmp_path: Path) -> None:
     token, reason = _quantity_state(obs)
     assert token is None
     assert reason and "closed quantity" in reason
-    assert any(
+    assert not any(
         e.observation_id == obs.observation_id and "quantity" in (e.axes or ())
         for e in result.queue
     )
@@ -15365,7 +15367,11 @@ def test_l04_log10_psat_over_p0_is_not_a_pressure(tmp_path: Path) -> None:
     assert quantity_token(obs.identity) is not Quantity.P_SAT
     assert quantity_token(obs.identity) is not Quantity.P_PARTIAL
     assert obs.value.kind is ValueKind.UNAVAILABLE
-    assert any(reason == (e.why or "") for e in result.queue if e.observation_id == obs.observation_id)
+    assert not any(
+        reason == (e.why or "")
+        for e in result.queue
+        if e.observation_id == obs.observation_id
+    )
 
 
 
@@ -15520,7 +15526,7 @@ def test_g3_vaporization_lift_mutation_proof(tmp_path: Path) -> None:
     assert mutant_obs.identity.quantity.is_unknown
     assert quantity_token(mutant_obs.identity) is not Quantity.DELTA_FG
     assert mutant_obs.value.kind is ValueKind.UNAVAILABLE
-    assert any(
+    assert not any(
         reason == (e.why or "")
         for e in mutant.queue
         if e.observation_id == mutant_obs.observation_id
@@ -16175,7 +16181,7 @@ def test_migration_report_headline_is_accepted_by_scorer(tmp_path: Path) -> None
     assert f"queue backlog: {len(result.queue)}\n" in report
 
 
-def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
+def test_l05c5_internal_ledger_unavailable_value_is_not_queued(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="delta_fG",
         units="",
@@ -16205,12 +16211,7 @@ def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
     result = migrate(root, write=False)
     logk = result.observations["ledger-logk"]
     assert logk.value.kind is ValueKind.UNAVAILABLE
-    assert any(
-        e.observation_id == "ledger-logk"
-        and "value" in (e.axes or ())
-        and ("log10_Kf" in (e.why or "") or "field" in (e.why or ""))
-        for e in result.queue
-    )
+    assert not any(e.observation_id == "ledger-logk" for e in result.queue)
 
 
 _USGS_F1_FAMILIES = (

@@ -33617,10 +33617,12 @@ class Migrator:
             validation.issues + tuple(self.result.registry_issues),
             validation.notices,
         )
+        # Re-homed rows may still need source-link repair; that is not comparison work.
         self.result.queue[:] = [
             entry
             for entry in self.result.queue
             if entry.observation_id not in self.result.observations
+            or "read_from" in (entry.axes or ())
             or not is_non_observation(
                 self.result.observations[entry.observation_id],
                 self._obs_source.get(entry.observation_id, entry.source),
