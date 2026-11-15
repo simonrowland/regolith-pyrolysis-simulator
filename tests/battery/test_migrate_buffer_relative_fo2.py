@@ -2,22 +2,28 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
+import yaml
 
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import NoticeKind, ValueKind
 from simulator.battery.migrate import (
     PrintedOxygenFacts,
     _delta_iw_ideal_ratio_notice,
     _log_fO2_to_pa,
+    _point_condition_from_plain,
     printed_oxygen_decision,
 )
-from simulator.battery.records import Located
+from simulator.battery.records import Located, Value
 from simulator.state_types import State
 from simulator.oxygen_buffers import (
     frost_buffer_log10_fO2_bar,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def _decision(raw: dict, *, temperature_K: int = 1000, **kwargs):
@@ -29,6 +35,133 @@ def _decision(raw: dict, *, temperature_K: int = 1000, **kwargs):
         run_temperature_K=Decimal(temperature_K),
         **kwargs,
     )
+
+
+def _source_mapping_with_key(source_id: str, key: str) -> Mapping:
+    source = yaml.safe_load(
+        (ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml")
+        .read_text(encoding="utf-8")
+    )
+    pending = [source]
+    while pending:
+        value = pending.pop()
+        if isinstance(value, Mapping):
+            if key in value:
+                return value
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+    raise AssertionError(f"{source_id} has no source mapping with {key!r}")
+
+
+def test_real_air_condition_is_retained_as_degenerate_interval() -> None:
+    source = yaml.safe_load(
+        (
+            ROOT
+            / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    pending = [source]
+    air_text = None
+    while pending:
+        value = pending.pop()
+        if isinstance(value, str) and "equilibrated in air" in value.casefold():
+            air_text = value
+            break
+        if isinstance(value, Mapping):
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+    assert air_text is not None
+    decision = printed_oxygen_decision(
+        PrintedOxygenFacts(),
+        raw_item={"atmosphere_as_published": air_text},
+        point_conditions=None,
+        scope="row",
+        total_pressure_pa=Decimal("100000"),
+    )
+
+    assert decision is not None and decision.kind == "interval"
+    condition = decision.interval_condition
+    assert condition is not None and condition.state.is_value
+    value = condition.state.value
+    assert isinstance(value, Value) and value.kind is ValueKind.INTERVAL
+    assert value.interval_low == value.interval_high
+    assert "pO2=0.20946*P_total" in condition.inference.relation
+    assert "degenerate_air_interval" in decision.interval_notice_reason
+    assert decision.state.is_unknown
+
+
+def test_real_below_iw_condition_stays_a_named_bound() -> None:
+    source = yaml.safe_load(
+        (ROOT / "data/literature/extracts/llnl-2021-cai-aerodynamic-levitation.yaml")
+        .read_text(encoding="utf-8")
+    )
+    pending = [source]
+    relation = None
+    while pending:
+        value = pending.pop()
+        if isinstance(value, Mapping):
+            if "oxygen_fugacity_buffer_relation" in value:
+                relation = value["oxygen_fugacity_buffer_relation"]
+                break
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+    assert isinstance(relation, str)
+    decision = printed_oxygen_decision(
+        PrintedOxygenFacts(),
+        raw_item={"oxygen_fugacity_buffer_relation": relation},
+        point_conditions=None,
+        scope="row",
+    )
+
+    assert decision is not None and decision.interval_condition is not None
+    condition = decision.interval_condition
+    assert condition.state.is_value
+    value = condition.state.value
+    assert isinstance(value, Value) and value.kind is ValueKind.BOUND
+    assert value.bound_operator == "<"
+    assert "buffer=iron-wustite buffer" in condition.inference.relation
+    assert "buffer=iron-wustite buffer" in decision.interval_notice_reason
+
+
+def test_real_explicit_fo2_inequality_stays_a_typed_bound() -> None:
+    source = yaml.safe_load(
+        (ROOT / "data/literature/extracts/volovetskii-2012-iron-redox.yaml")
+        .read_text(encoding="utf-8")
+    )
+    pending = [source]
+    row = None
+    while pending:
+        value = pending.pop()
+        if isinstance(value, Mapping):
+            conditions = value.get("point_conditions")
+            if isinstance(conditions, Mapping):
+                oxygen = conditions.get("fO2_log")
+                state = oxygen.get("state") if isinstance(oxygen, Mapping) else None
+                typed = state.get("value") if isinstance(state, Mapping) else None
+                if isinstance(typed, Mapping) and typed.get("kind") == "bound":
+                    row = value
+                    break
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+    assert row is not None
+    raw_condition = row["point_conditions"]["fO2_log"]
+    condition = _point_condition_from_plain(raw_condition, key="fO2_log")
+    decision = printed_oxygen_decision(
+        PrintedOxygenFacts(),
+        raw_item={"point_conditions": {"fO2_log": raw_condition}},
+        point_conditions={"fO2_log": condition},
+        scope="row",
+    )
+
+    assert decision is not None and decision.interval_condition is not None
+    value = decision.interval_condition.state.value
+    assert isinstance(value, Value) and value.kind is ValueKind.BOUND
+    assert value.bound_operator == "<"
+    assert value.bound_value == Decimal("-11.5")
 
 
 def test_printed_calibration_is_used_exactly() -> None:

@@ -19975,6 +19975,8 @@ class PrintedOxygenDecision:
     notices: tuple[PrintedOxygenNotice, ...] = ()
     buffer_request: _BufferRequest | None = None
     pressure_pa_used: Decimal | None = None
+    interval_condition: Located[Value] | None = None
+    interval_notice_reason: str | None = None
 
 
 def _oxygen_pressure_point(located: object) -> Decimal | None:
@@ -19991,7 +19993,7 @@ def _oxygen_pressure_point(located: object) -> Decimal | None:
 
 
 _ATM_BAR = Decimal("1.01325")
-_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
+_AIR_O2_MOLE_FRACTION = Decimal("0.20946")
 
 
 def _atmosphere_kind(
@@ -21672,6 +21674,156 @@ def _refresh_buffer_decision(
     return _decision_for_buffer(decision.buffer_request, total_pressure_pa)
 
 
+def _printed_fo2_interval(
+    raw_item: object,
+    point_conditions: Mapping[str, Any] | None,
+    *,
+    temperature_K: Decimal | None,
+    total_pressure_pa: Decimal | None,
+) -> tuple[Located[Value], str] | None:
+    """Retain a printed fO2 bound or qualitative air/buffer condition."""
+
+    located = (point_conditions or {}).get("fO2_log")
+    if isinstance(located, Located) and located.state.is_value:
+        value = located.state.value
+        if isinstance(value, Value) and value.kind in {
+            ValueKind.BOUND,
+            ValueKind.INTERVAL,
+        }:
+            return (
+                located,
+                "bound_type=printed_inequality; interval condition not yet scorable",
+            )
+
+    mappings = list(_buffer_mappings(raw_item, point_conditions))
+    texts: list[tuple[str, str]] = []
+    for mapping in mappings:
+        for key in (
+            "fO2_control",
+            "oxygen_buffer_as_published",
+            "oxygen_fugacity_buffer_relation",
+            "atmosphere_as_published",
+            "atmosphere",
+        ):
+            candidates = [mapping.get(key)]
+            if key == "fO2_control" and isinstance(mapping.get(key), Mapping):
+                candidates.append(mapping[key].get("buffer"))
+            for candidate in candidates:
+                for text in _text_pieces(candidate):
+                    texts.append((key, text.strip()))
+
+    for key, text in texts:
+        atmosphere = _atmosphere_kind(text)
+        is_air = (
+            atmosphere is not None and atmosphere[0] == "air"
+        ) or (
+            "/" not in text
+            and not re.search(r"\b(?:ratio|mixture)\b", text, re.IGNORECASE)
+            and bool(re.search(r"\bair\b", text, re.IGNORECASE))
+        )
+        if is_air:
+            total_pa = total_pressure_pa
+            explicit_total_bar = atmosphere[2] if atmosphere is not None else None
+            if explicit_total_bar is not None:
+                total_pa = explicit_total_bar * PA_PER_BAR_DEC
+            elif total_pa is None and "ambient" in text.casefold():
+                total_pa = PA_PER_ATM_DEC
+            if total_pa is None or total_pa <= 0 or not total_pa.is_finite():
+                continue
+            po2_pa = total_pa * _AIR_O2_MOLE_FRACTION
+            log_bar = (po2_pa / PA_PER_BAR_DEC).log10()
+            value = Value(
+                ValueKind.INTERVAL, interval_low=log_bar, interval_high=log_bar
+            )
+            locator = _locator_from_plain(
+                (mappings[0].get("locator") if mappings else None)
+            )
+            condition = Located(
+                State.of(value),
+                locator=locator,
+                inference=Derivation(
+                    relation=(
+                        "air_interval_from_total_pressure; "
+                        "pO2=0.20946*P_total; degenerate interval"
+                    ),
+                    inputs=(f"{key}={text}", "point_conditions.total_pressure_Pa"),
+                    parameters=(),
+                    output_unit="log10(fO2/bar)",
+                ),
+            )
+            return (
+                condition,
+                "bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; "
+                "interval condition not yet scorable",
+            )
+
+        bound_match = re.search(
+            r"(?:(?P<distance>\d+(?:\.\d+)?)\s*(?:log\s+units?\s+)?)?"
+            r"\b(?P<direction>below|under|less than|above|over|greater than)\s+"
+            r"(?P<buffer>IW|FMQ|QFM|NNO|iron[- ]w[uü]stite(?:\s+buffer)?)\b",
+            text,
+            re.IGNORECASE,
+        )
+        if bound_match is None:
+            continue
+        buffer = _canonical_buffer_name(bound_match.group("buffer"))
+        direction = (
+            BoundDirection.UPPER
+            if bound_match.group("direction").casefold()
+            in {"below", "under", "less than"}
+            else BoundDirection.LOWER
+        )
+        bound = -Decimal(bound_match.group("distance") or "0")
+        frame = f"log10({buffer})"
+        calibration_notice = ""
+        calibration_text = _printed_buffer_calibration(
+            raw_item, None, point_conditions
+        )
+        pressure_bar = (
+            float(total_pressure_pa / PA_PER_BAR_DEC)
+            if total_pressure_pa is not None and total_pressure_pa > 0
+            else 1.0
+        )
+        if temperature_K is not None and temperature_K.is_finite() and temperature_K > 0:
+            calibrated = _relative_buffer_calibration(
+                buffer,
+                float(temperature_K),
+                pressure_bar,
+                calibration_text,
+            )
+            if calibrated is not None:
+                bound += Decimal(str(calibrated[0]))
+                frame = "log10(fO2/bar)"
+                calibration_notice = f"; calibration={calibrated[1]}"
+        value = Value(
+            ValueKind.BOUND,
+            bound_operator="<" if direction is BoundDirection.UPPER else ">",
+            bound_value=bound,
+        )
+        locator = _locator_from_plain(
+            (mappings[0].get("locator") if mappings else None)
+        )
+        condition = Located(
+            State.of(value),
+            locator=locator,
+            inference=Derivation(
+                relation=(
+                    f"buffer_relative_fO2_inequality; buffer={buffer}; "
+                    f"frame={frame}{calibration_notice}"
+                ),
+                inputs=(f"{key}={text}",),
+                parameters=(),
+                output_unit=frame,
+            ),
+        )
+        return (
+            condition,
+            f"bound_type={direction.value}; buffer={buffer}; frame={frame}{calibration_notice}; "
+            "interval condition not yet scorable",
+        )
+    return None
+
+
 def printed_oxygen_decision(
     facts: PrintedOxygenFacts,
     *,
@@ -21752,6 +21904,24 @@ def printed_oxygen_decision(
         if not absolute
         else None
     )
+    interval = (
+        _printed_fo2_interval(
+            raw_item,
+            point_conditions,
+            temperature_K=run_temperature_K,
+            total_pressure_pa=total_pressure_pa,
+        )
+        if not absolute
+        else None
+    )
+    if interval is not None:
+        interval_condition, interval_notice = interval
+        return PrintedOxygenDecision(
+            "interval",
+            State.unknown("bounded or qualitative fO2 retained as a typed condition"),
+            interval_condition=interval_condition,
+            interval_notice_reason=interval_notice,
+        )
     # An absolute log is an explicit point even when the same source row also
     # reports its buffer-relative offset. The absolute value takes precedence.
     if not absolute and not facts.rejected_log_fO2 and non_point_reason is None:
@@ -22025,6 +22195,37 @@ def _printed_oxygen_state_for(
     ):
         return None
     return decision.state
+
+
+def _retain_printed_fo2_interval(
+    point_conditions: Mapping[str, Located[Any]] | None,
+    decision: PrintedOxygenDecision | None,
+) -> Mapping[str, Located[Any]] | None:
+    if decision is None or decision.interval_condition is None:
+        return point_conditions
+    return {
+        **(point_conditions or {}),
+        "fO2_log": decision.interval_condition,
+    }
+
+
+def _printed_fo2_interval_notice(
+    decision: PrintedOxygenDecision | None,
+    quantity: object,
+    origin: str,
+) -> Notice | None:
+    if (
+        decision is None
+        or decision.interval_notice_reason is None
+        or not isinstance(quantity, Quantity)
+    ):
+        return None
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=decision.interval_notice_reason,
+        origin=origin,
+    )
 
 
 def _fO2_conventional_reference_pressure_pa(condition: object) -> Decimal | None:
@@ -27787,6 +27988,9 @@ class Migrator:
             total_pressure_pa=_positive_pressure_pa(pressure_for_oxygen),
             printed_atmospheres=printed_atmospheres,
         )
+        point_conditions = _retain_printed_fo2_interval(
+            point_conditions, oxygen_decision
+        )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(
                 quantity,
@@ -27799,6 +28003,7 @@ class Migrator:
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
+        oxygen_applied = False
         if (
             q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
@@ -27807,6 +28012,7 @@ class Migrator:
             )
         ):
             ident_kwargs["fO2_Pa"] = oxygen_state
+            oxygen_applied = True
         identity_for_profile = (
             Identity(
                 quantity=State.of(q_token),
@@ -28889,6 +29095,11 @@ class Migrator:
         )
         if oxygen_conversion_notice is not None:
             observation_notices.append(oxygen_conversion_notice)
+        interval_notice = _printed_fo2_interval_notice(
+            oxygen_decision, q_token, obs_id
+        )
+        if interval_notice is not None:
+            observation_notices.append(interval_notice)
         observation_notices.extend(
             _buffer_conversion_notices(
                 oxygen_decision,
@@ -30761,6 +30972,9 @@ class Migrator:
             ),
             printed_atmospheres=printed_atmospheres,
         )
+        point_conditions = _retain_printed_fo2_interval(
+            point_conditions, oxygen_decision
+        )
         oxygen_state = _printed_oxygen_state_for(
             identity,
             oxygen_decision,
@@ -31172,6 +31386,11 @@ class Migrator:
         )
         if oxygen_conversion_notice is not None:
             child_notices.append(oxygen_conversion_notice)
+        interval_notice = _printed_fo2_interval_notice(
+            oxygen_decision, q_token_point, point_id
+        )
+        if interval_notice is not None:
+            child_notices.append(interval_notice)
         child_notices.extend(
             _buffer_conversion_notices(
                 oxygen_decision,
