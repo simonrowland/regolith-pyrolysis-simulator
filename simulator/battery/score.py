@@ -6342,6 +6342,55 @@ def _combine_independent_standard_uncertainties(
     return (first**2 + second**2).sqrt()
 
 
+def _textual_printed_confidence_level(
+    uncertainty: Uncertainty,
+) -> str | None:
+    raw = uncertainty.verbatim
+    if isinstance(raw, Mapping):
+        text = " ".join(
+            str(value)
+            for key, value in raw.items()
+            if key not in {"confidence_level", "locator", "parent", "k"}
+            and isinstance(value, str)
+        )
+    elif isinstance(raw, str):
+        text = raw
+    else:
+        return None
+    if re.search(
+        r"\b95\s*%?\s*(?:ci|confidence interval)\b",
+        text,
+        re.IGNORECASE,
+    ):
+        return "ci95"
+    if re.search(
+        r"\b(?:2|two)\s*[- ]?\s*(?:sigma|σ)\b",
+        text,
+        re.IGNORECASE,
+    ):
+        return "two_sigma"
+    if re.search(
+        r"\b(?:1|one)\s*[- ]?\s*(?:sigma|σ)\b"
+        r"|\bstandard\s+(?:deviation|error)\b"
+        r"|\bSD\b",
+        text,
+        re.IGNORECASE,
+    ):
+        return "one_sigma"
+    return None
+
+
+def _stated_printed_confidence_level(
+    uncertainty: Uncertainty,
+) -> str | None:
+    raw = uncertainty.verbatim
+    if isinstance(raw, Mapping):
+        confidence_level = raw.get("confidence_level", "not_stated")
+        if confidence_level != "not_stated":
+            return str(confidence_level)
+    return _textual_printed_confidence_level(uncertainty)
+
+
 def _confidence_level_notice(
     quantity: Quantity,
     uncertainty: Uncertainty,
@@ -6351,11 +6400,7 @@ def _confidence_level_notice(
     confidence_level_override: str | None = None,
     assumed_one_sigma: bool = False,
 ) -> Notice | None:
-    confidence_level = (
-        uncertainty.verbatim.get("confidence_level", "not_stated")
-        if isinstance(uncertainty.verbatim, Mapping)
-        else "not_stated"
-    )
+    confidence_level = _stated_printed_confidence_level(uncertainty) or "not_stated"
     if confidence_level == "not_stated" and confidence_level_override is not None:
         confidence_level = confidence_level_override
     if (confidence_level != "not_stated" and not assumed_one_sigma) or (
@@ -6490,6 +6535,7 @@ def _printed_uncertainty_band(
                 source_observation=source_observation,
                 method=method,
                 band_basis="row_printed",
+                confidence_level_override=confidence_level_override,
             )
             if printed.refusal is not None:
                 return printed
@@ -6513,6 +6559,19 @@ def _printed_uncertainty_band(
             if printed.band is not None
             else "derived_bound: standard-pressure kJ/mol ambiguity is the only band source"
         )
+        two_sigma_band = (
+            None
+            if printed.two_sigma_band is None
+            else DecisionBand(
+                printed.two_sigma_band.value + pressure_ticket,
+                QUANTITY_UNITS[quantity],
+                (
+                    f"{printed.two_sigma_band.rule}; "
+                    "standard-pressure ambiguity added linearly"
+                ),
+                band_basis=band_basis,
+            )
+        )
         return _PrintedBandResolution(
             DecisionBand(
                 total_ticket,
@@ -6521,6 +6580,7 @@ def _printed_uncertainty_band(
                 band_basis=band_basis,
             ),
             notice=printed.notice,
+            two_sigma_band=two_sigma_band,
         )
     if uncertainty.kind is not UncertaintyKind.PRINTED:
         return _PrintedBandResolution()
@@ -6539,11 +6599,8 @@ def _printed_uncertainty_band(
             )
         )
     raw_text = _uncertainty_original(uncertainty)
-    confidence_level = (
-        uncertainty.verbatim.get("confidence_level", "not_stated")
-        if isinstance(uncertainty.verbatim, Mapping)
-        else "not_stated"
-    )
+    stated_confidence_level = _stated_printed_confidence_level(uncertainty)
+    confidence_level = stated_confidence_level or "not_stated"
     if confidence_level == "not_stated" and confidence_level_override is not None:
         confidence_level = confidence_level_override
     log10_activity_sigma = (
@@ -6675,16 +6732,14 @@ def _printed_uncertainty_band(
         uncertainty,
         source_observation,
         source_value,
-        confidence_level_override=confidence_level_override,
+        confidence_level_override=(
+            stated_confidence_level or confidence_level_override
+        ),
         assumed_one_sigma=(
             kind == "printed_1sigma"
             and confidence_level_override is None
+            and stated_confidence_level is None
             and not log10_activity_sigma
-            and (
-                not isinstance(uncertainty.verbatim, Mapping)
-                or uncertainty.verbatim.get("confidence_level", "not_stated")
-                == "not_stated"
-            )
         ),
     )
     standard_uncertainty_dex = None
@@ -17699,9 +17754,8 @@ def _compile_residual_with_lineage(
         elif band_uncertainty.kind is UncertaintyKind.PRINTED:
             band_basis = "row_printed"
             row_confidence_level = (
-                band_uncertainty.verbatim.get("confidence_level", "not_stated")
-                if isinstance(band_uncertainty.verbatim, Mapping)
-                else "not_stated"
+                _stated_printed_confidence_level(band_uncertainty)
+                or "not_stated"
             )
             if (
                 row_confidence_level == "not_stated"
