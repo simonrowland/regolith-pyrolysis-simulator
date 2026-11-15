@@ -21,11 +21,11 @@ SCHEMA = "literature_index.v1"
 STATUS_SCHEMA = "literature_source_status.v1"
 STORE_SUMMARY_SCHEMA = "literature_observation_store_summary.v1"
 OBSERVATION_ID_MARKER = b"\n- observation_id:"
-# Generated INDEX/SOURCE_STATUS plus the 14 MB species-rail ledger (2 ids, neither an
-# extract/pdf row). Parsing it is not a consumer scan; it is a timeout.
+# Generated indexes and engine-output ledgers are not literature measurement inputs.
 CONSUMER_SKIP_NAMES = frozenset({
     "INDEX.yaml",
     "SOURCE_STATUS.yaml",
+    "gibbs_battery_residual_ledger.yaml",
     "species_rail_differential_ledger.yaml",
 })
 SIDECAR_FIELDS = ("citation", "doi", "license_or_oa_basis", "sha256", "retrieved_date", "retrieval_url")

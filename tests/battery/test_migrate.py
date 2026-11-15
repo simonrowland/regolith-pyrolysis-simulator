@@ -60,7 +60,6 @@ from simulator.battery.migrate import (
     _notice_from_plain,
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
-    DuplicateObservationIdError,
     _convert_compilation_amount,
     FE3_FE2_RATIO_PRINTED_FIELDS,
     fe3_fe2_ratio_from_ferric_fraction,
@@ -116,7 +115,6 @@ from simulator.battery.migrate import (
     reference_state_from_extract,
     _mole_fraction_composition_from_values,
     _standard_state_from_plain,
-    lift_vaporization_reaction_from_ledger_note,
     pressure_from_equipment,
     resolve_equipment_context,
     to_plain,
@@ -371,7 +369,6 @@ from simulator.battery.records import (
     Located,
     Locator,
     Notice,
-    Reaction,
     Species,
     State,
     Value,
@@ -3261,30 +3258,47 @@ def test_h10_migrate_has_no_validation_bypass() -> None:
     assert "validate" not in inspect.signature(Migrator.finalize).parameters
 
 
-def test_h06_ledger_unknown_rail_spelling_raises(tmp_path: Path) -> None:
+def test_engine_output_ledgers_are_not_migrated(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
-    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "points": [
-                    {
-                        "key": "gibbs-rail-probe",
-                        "source_id": "janaf",
-                        "species": "Na",
-                        "comparison_quantity": "delta_fG",
-                        "temperature_K": 298.15,
-                        "table_kJ_mol": 0.0,
-                        "rail": "gibbs_thermochemistry",
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    with pytest.raises(UnknownRailSpellingError):
-        migrate(root, write=False)
+    artifacts = {
+        "gibbs_battery_residual_ledger.yaml": "gibbs-output-row",
+        "species_rail_differential_ledger.yaml": "species-rail-output-row",
+    }
+    original_bytes = {}
+    for filename, observation_id in artifacts.items():
+        path = root / "data" / "literature" / filename
+        path.write_text(
+            yaml.safe_dump(
+                {
+                    "schema_version": 1,
+                    "points": [
+                        {
+                            "key": observation_id,
+                            "source_id": "janaf",
+                            "species": "Na",
+                            "comparison_quantity": "delta_fG",
+                            "temperature_K": 298.15,
+                            "table_kJ_mol": 0.0,
+                            "rail": "not-a-literature-rail",
+                        }
+                    ],
+                },
+                sort_keys=False,
+            ),
+            encoding="utf-8",
+        )
+        original_bytes[filename] = path.read_bytes()
+
+    result = migrate(root, write=True)
+
+    for filename, observation_id in artifacts.items():
+        assert observation_id not in result.observations
+        assert f"data/literature/{filename}" not in result.source_counts
+        assert not any(entry.observation_id == observation_id for entry in result.queue)
+        assert not (root / "data" / "literature" / "observations-v2" / filename).exists()
+        assert (root / "data" / "literature" / filename).read_bytes() == original_bytes[filename]
+
+
 
 
 def test_g13_unknown_rail_spelling_raises_during_migrate(tmp_path: Path) -> None:
@@ -3354,35 +3368,6 @@ def test_j03_compilation_nested_row_unknown_rail_still_raises(tmp_path: Path) ->
         migrate(root, write=False)
 
 
-def test_j04_named_source_fallthrough_includes_unmapped_token(tmp_path: Path) -> None:
-    root = _write_min_tree(tmp_path)
-    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "points": [
-                    {
-                        "key": "named-source-fallthrough",
-                        "source_id": "janaf",
-                        "species": "Na",
-                        "comparison_quantity": "delta_fG",
-                        "temperature_K": 298.15,
-                        "table_kJ_mol": 0.0,
-                        "method_class": "independent_tabulation",
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=False)
-    obs = result.observations["named-source-fallthrough"]
-    from simulator.battery.enums import EvidenceClass
-
-    assert obs.evidence.class_.is_value
-    assert obs.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
-    assert obs.evidence.original_method_class == "independent_tabulation"
 
 
 def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
@@ -7216,41 +7201,12 @@ def test_g07_unsupported_quantity_is_unknown_not_relabeled(tmp_path: Path) -> No
         ),
         encoding="utf-8",
     )
-    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "points": [
-                    {
-                        "key": "janaf::Mg-nbp-sanity:T=1363::vapour_rail_psat::log10_Psat_over_P0",
-                        "source_id": "janaf",
-                        "species": "Mg",
-                        "comparison_quantity": "log10_Psat_over_P0",
-                        "temperature_K": 1363,
-                        "table_kJ_mol": 0.0,
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
     result = migrate(root, write=False)
     charge = result.observations[
         "yu_2025_hollow_anode_measurements:one_hour:mre_applied_charge_C"
     ]
     assert charge.identity.quantity.is_unknown
     assert quantity_token(charge.identity) is not Quantity.MASS_LOSS_FRACTION
-    psat = result.observations[
-        "janaf::Mg-nbp-sanity:T=1363::vapour_rail_psat::log10_Psat_over_P0"
-    ]
-    assert psat.identity.quantity.is_unknown
-    assert quantity_token(psat.identity) is not Quantity.DELTA_FG
-    assert quantity_token(psat.identity) is not Quantity.P_SAT
-    assert (psat.identity.quantity.reason or "") == (
-        "the table value is the Gibbs energy of the vaporization "
-        "reaction and the reaction identity is not lifted"
-    )
 
 
 def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
@@ -7310,50 +7266,8 @@ def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
     assert result.measured.tabulated_lists == 0
 
 
-def test_g05_identical_duplicate_keys_are_aliased(tmp_path: Path) -> None:
-    root = _write_min_tree(tmp_path)
-    point = {
-        "key": "pankratz-dup::T=336.35::delta_fG_kJ_mol",
-        "source_id": "pankratz-1987-usbm-b689",
-        "species": "AgS",
-        "temperature_K": 336.35,
-        "table_kJ_mol": 1.0,
-    }
-    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
-        yaml.safe_dump({"schema_version": 1, "points": [point, dict(point)]}, sort_keys=False),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=True)
-    oid = point["key"]
-    assert oid in result.observations
-    assert len(result.observations) == 3  # fixture extract 2 points + 1 unique ledger
-    aliases = [a for a in result.dedupe_aliases if a.observation_id == oid]
-    assert aliases
-    assert aliases[0].row_indices == (0, 1)
-    ledger_count = result.source_counts["data/literature/gibbs_battery_residual_ledger.yaml"]
-    assert ledger_count.rows_in == 2
-    assert ledger_count.observations_out == 1
-    store_obs = sum(c.observations_out for c in result.source_counts.values())
-    assert store_obs == len(result.observations)
 
 
-def test_g05_conflicting_duplicate_key_is_hard_error(tmp_path: Path) -> None:
-    root = _write_min_tree(tmp_path)
-    a = {
-        "key": "conflict-key",
-        "source_id": "pankratz-1987-usbm-b689",
-        "species": "AgS",
-        "temperature_K": 300,
-        "table_kJ_mol": 1.0,
-    }
-    b = dict(a)
-    b["table_kJ_mol"] = 2.0
-    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
-        yaml.safe_dump({"schema_version": 1, "points": [a, b]}, sort_keys=False),
-        encoding="utf-8",
-    )
-    with pytest.raises(DuplicateObservationIdError):
-        migrate(root, write=False)
 
 
 def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
@@ -11285,7 +11199,6 @@ _BOUNDARY_INGEST_CALLERS = frozenset(
         "_migrate_langmuir",
         "_migrate_refractory",
         "_migrate_vacuum_pyrolysis",
-        "_migrate_ledger",
         "_migrate_compilation_file",
     }
 )
@@ -11394,25 +11307,6 @@ def test_k01_boundary_migrates_declared_observation(tmp_path: Path) -> None:
         },
     )
     root = _write_min_tree(tmp_path, extract)
-    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "points": [
-                    {
-                        "key": "ledger-unknown-phase",
-                        "source_id": "fixture-source",
-                        "species": "Na",
-                        "comparison_quantity": "delta_fG",
-                        "temperature_K": 1200,
-                        "table_kJ_mol": 1,
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
     (root / "data" / "literature" / "kems_measurements.yaml").write_text(
         yaml.safe_dump(
             {
@@ -11615,37 +11509,6 @@ def test_k02_zr_th_and_pending_anchors_are_unavailable_domains() -> None:
         assert lo in blob and hi in blob, fname
 
 
-def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
-    root = _write_min_tree(tmp_path)
-    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "points": [
-                    {
-                        "key": "ledger-unknown-phase",
-                        "source_id": "fixture-source",
-                        "species": "Na",
-                        "comparison_quantity": "delta_fG",
-                        "temperature_K": 1200,
-                        "table_kJ_mol": 1,
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=False)
-    obs = result.observations["ledger-unknown-phase"]
-    assert obs.identity.species.phase.is_unknown
-    phase_entries = [
-        e
-        for e in result.queue
-        if e.observation_id == "ledger-unknown-phase" and "phase" in (e.axes or ())
-    ]
-    assert phase_entries
-    assert any("phase" in (e.why or "").lower() for e in phase_entries)
 
 
 def _quantity_state(obs) -> tuple[object, str | None]:
@@ -15286,246 +15149,16 @@ def test_l05c1_costa_owner_fe_control_is_not_condensation() -> None:
     ]
 
 
-def test_l03_per_mol_o2_ledger_lifts_delta_fg(tmp_path: Path) -> None:
-    root = _write_min_tree(tmp_path)
-    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "metric_units": "kJ/mol",
-                "comparison_quantity": "delta_fG_kJ_mol",
-                "points": [
-                    {
-                        "key": "janaf::Al-096:T=1100::ellingham::delta_fG_kJ_per_mol_O2",
-                        "source_id": "fixture-source",
-                        "species": "Al",
-                        "comparison_quantity": "delta_fG_kJ_per_mol_O2",
-                        "temperature_K": 1100,
-                        "table_kJ_mol": -885.524,
-                        "note": "rescaled 2*dfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] -> Al",
-                        "provenance_class": "independent_tabulation",
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=False)
-    obs = result.observations[
-        "janaf::Al-096:T=1100::ellingham::delta_fG_kJ_per_mol_O2"
-    ]
-    assert quantity_token(obs.identity) is Quantity.DELTA_FG
-    assert obs.identity.per.is_value
-    from simulator.battery.enums import PerBasis
-
-    assert obs.identity.per.value is PerBasis.MOL_O2
-    assert obs.value.kind is ValueKind.POINT
-    assert obs.value.point == as_decimal("-885.524")
-    assert obs.derivation is not None
-    assert "rescaled" in obs.derivation.relation
-    assert obs.evidence.class_.is_value
-    from simulator.battery.enums import EvidenceClass
-
-    assert obs.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
-
-
-def test_l04_log10_psat_over_p0_is_not_a_pressure(tmp_path: Path) -> None:
-    root = _write_min_tree(tmp_path)
-    reason = (
-        "the table value is the Gibbs energy of the vaporization "
-        "reaction and the reaction identity is not lifted"
-    )
-    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "metric_units": "kJ/mol",
-                "points": [
-                    {
-                        "key": "janaf::Al-005:T=100::log10_Psat_over_P0",
-                        "source_id": "fixture-source",
-                        "species": "Al",
-                        "comparison_quantity": "log10_Psat_over_P0",
-                        "temperature_K": 100,
-                        "table_kJ_mol": 316.034,
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=False)
-    obs = result.observations["janaf::Al-005:T=100::log10_Psat_over_P0"]
-    assert quantity_token(obs.identity) is not Quantity.P_SAT
-    assert quantity_token(obs.identity) is not Quantity.P_PARTIAL
-    assert obs.value.kind is ValueKind.UNAVAILABLE
-    assert any(reason == (e.why or "") for e in result.queue if e.observation_id == obs.observation_id)
 
 
 
 
-def test_g3_vaporization_note_lifts_reaction_and_delta_fg() -> None:
-    """Printed dfG(g)-dfG(cr|l) note lifts reaction identity onto delta_fG."""
-    note_cr = (
-        "janaf p°=0.1 MPa; ln(P_sat/P0)=-[dfG(g)-dfG(cr)]/(R T); "
-        "P0=100000 Pa; rail_id=Al; condensed_record=Al-002"
-    )
-    lifted = lift_vaporization_reaction_from_ledger_note("Al", note_cr)
-    assert lifted is not None
-    reaction, p0 = lifted
-    assert p0 == as_decimal("100000")
-    assert isinstance(reaction, Reaction)
-    phases = {term.species.phase.value for term in reaction.terms}
-    assert phases == {Phase.G, Phase.CR}
-    coeffs = {
-        term.species.phase.value: term.coefficient for term in reaction.terms
-    }
-    assert coeffs[Phase.G] == 1
-    assert coeffs[Phase.CR] == -1
-
-    note_l = (
-        "janaf p°=0.1 MPa; ln(P_sat/P0)=-[dfG(g)-dfG(l)]/(R T); P0=100000 Pa"
-    )
-    lifted_l = lift_vaporization_reaction_from_ledger_note("Al", note_l)
-    assert lifted_l is not None
-    phases_l = {term.species.phase.value for term in lifted_l[0].terms}
-    assert phases_l == {Phase.G, Phase.L}
-
-    assert lift_vaporization_reaction_from_ledger_note("Al", "janaf p°=0.1 MPa") is None
-    assert lift_vaporization_reaction_from_ledger_note("Al", "") is None
 
 
-def test_g3_vaporization_ledger_admits_delta_fg_with_reaction(tmp_path: Path) -> None:
-    root = _write_min_tree(tmp_path)
-    note = (
-        "janaf p°=0.1 MPa; ln(P_sat/P0)=-[dfG(g)-dfG(cr)]/(R T); "
-        "P0=100000 Pa; rail_id=Al; condensed_record=Al-002; "
-        "a_melt=1; mechanism=compilation_disagreement"
-    )
-    oid = "janaf::Al-005:T=100::vapour_rail_psat::log10_Psat_over_P0"
-    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "metric_units": "kJ/mol",
-                "points": [
-                    {
-                        "key": oid,
-                        "source_id": "fixture-source",
-                        "species": "Al",
-                        "comparison_quantity": "log10_Psat_over_P0",
-                        "temperature_K": 100,
-                        "table_kJ_mol": 316.034,
-                        "note": note,
-                        "provenance_class": "independent_tabulation",
-                        "engine_channel": "vapour_rail_psat",
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=False)
-    obs = result.observations[oid]
-    assert quantity_token(obs.identity) is Quantity.DELTA_FG
-    assert quantity_token(obs.identity) is not Quantity.P_SAT
-    assert obs.value.kind is ValueKind.POINT
-    assert obs.value.point == as_decimal("316.034")
-    assert obs.identity.species.phase.is_value
-    assert obs.identity.species.phase.value is Phase.G
-    assert obs.identity.reaction is not None and obs.identity.reaction.is_value
-    reaction = obs.identity.reaction.value
-    assert reaction is not None
-    phases = {term.species.phase.value for term in reaction.terms}
-    assert phases == {Phase.G, Phase.CR}
-    assert obs.identity.per is not None and obs.identity.per.is_value
-    assert obs.identity.per.value is PerBasis.MOL_SPECIES
-    assert obs.identity.standard_pressure_Pa is not None
-    assert obs.identity.standard_pressure_Pa.is_value
-    assert obs.identity.standard_pressure_Pa.value == as_decimal("100000")
-    reason = (
-        "the table value is the Gibbs energy of the vaporization "
-        "reaction and the reaction identity is not lifted"
-    )
-    assert not any(
-        reason == (e.why or "")
-        for e in result.queue
-        if e.observation_id == obs.observation_id
-    )
-    assert not any(
-        set(e.axes or ()) >= {"quantity", "value"}
-        and reason in (e.why or "")
-        for e in result.queue
-        if e.observation_id == obs.observation_id
-    )
 
 
-def test_g3_vaporization_lift_mutation_proof(tmp_path: Path) -> None:
-    """Stripping the reaction lift restores the paired quantity/value refusal."""
-    import simulator.battery.migrate as migrate_mod
 
-    root = _write_min_tree(tmp_path)
-    note = (
-        "janaf p°=0.1 MPa; ln(P_sat/P0)=-[dfG(g)-dfG(l)]/(R T); "
-        "P0=100000 Pa; rail_id=Al; condensed_record=Al-003"
-    )
-    oid = "janaf::Al-005:T=1200::vapour_rail_psat::log10_Psat_over_P0"
-    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "metric_units": "kJ/mol",
-                "points": [
-                    {
-                        "key": oid,
-                        "source_id": "fixture-source",
-                        "species": "Al",
-                        "comparison_quantity": "log10_Psat_over_P0",
-                        "temperature_K": 1200,
-                        "table_kJ_mol": 250.0,
-                        "note": note,
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    live = migrate(root, write=False)
-    live_obs = live.observations[oid]
-    assert quantity_token(live_obs.identity) is Quantity.DELTA_FG
-    assert live_obs.value.kind is ValueKind.POINT
 
-    reason = (
-        "the table value is the Gibbs energy of the vaporization "
-        "reaction and the reaction identity is not lifted"
-    )
-    saved = migrate_mod.lift_vaporization_reaction_from_ledger_note
-    try:
-        migrate_mod.lift_vaporization_reaction_from_ledger_note = (
-            lambda formula, note: None  # type: ignore[assignment]
-        )
-        mutant = migrate(root, write=False)
-    finally:
-        migrate_mod.lift_vaporization_reaction_from_ledger_note = saved
-
-    mutant_obs = mutant.observations[oid]
-    assert mutant_obs.identity.quantity.is_unknown
-    assert quantity_token(mutant_obs.identity) is not Quantity.DELTA_FG
-    assert mutant_obs.value.kind is ValueKind.UNAVAILABLE
-    assert any(
-        reason == (e.why or "")
-        for e in mutant.queue
-        if e.observation_id == mutant_obs.observation_id
-    )
-
-    restored = migrate(root, write=False)
-    restored_obs = restored.observations[oid]
-    assert quantity_token(restored_obs.identity) is Quantity.DELTA_FG
-    assert restored_obs.value.kind is ValueKind.POINT
 
 
 
@@ -15554,30 +15187,6 @@ def test_l05c3_tm_k_and_delta_f_g_298_and_table_log10_kf(tmp_path: Path) -> None
     }
     extract["species"]["Na"]["observations"].append(se)
     root = _write_min_tree(tmp_path, extract)
-    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "metric_units": "kJ/mol",
-                "points": [
-                    {
-                        "key": "janaf::B-133:T=300::table_self_check::log10_Kf",
-                        "source_id": "fixture-source",
-                        "species": "B",
-                        "comparison_quantity": "log10_Kf",
-                        "temperature_K": 300,
-                        "table_kJ_mol": -5516.922,
-                        "table_log10_Kf": 966.926,
-                        "provenance_class": "engine_own_input",
-                        "status": "mismatch",
-                        "finding_class": "compilation_table_self_check",
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
     result = migrate(root, write=False)
     fusion = result.observations["fixture-source::LH84_Na2O_fusion"]
     assert quantity_token(fusion.identity) is Quantity.TRANSITION_TEMPERATURE
@@ -15594,13 +15203,6 @@ def test_l05c3_tm_k_and_delta_f_g_298_and_table_log10_kf(tmp_path: Path) -> None
     assert se2.value.point == as_decimal("92.4")
     assert se2.identity.temperature_K.is_value
     assert se2.identity.temperature_K.value == as_decimal("298.15")
-    logk = result.observations["janaf::B-133:T=300::table_self_check::log10_Kf"]
-    assert quantity_token(logk.identity) is Quantity.LOG10_KF
-    assert logk.value.kind is ValueKind.POINT
-    assert logk.value.point == as_decimal("966.926")
-    assert logk.value.point != as_decimal("-5516.922")
-    assert logk.notices
-    assert "compilation_table_self_check" in logk.notices[0].reason
 
 
 def test_l05g2b_langmuir_range_is_in_temperature_reason(tmp_path: Path) -> None:
@@ -16038,42 +15640,6 @@ def test_migration_report_headline_is_accepted_by_scorer(tmp_path: Path) -> None
     assert f"queue backlog: {len(result.queue)}\n" in report
 
 
-def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
-    extract = _scalar_extract(
-        quantity="delta_fG",
-        units="",
-        values={"quantity": "delta_fG", "method_class": "measured_direct"},
-        obs_type="gibbs_table",
-    )
-    root = _write_min_tree(tmp_path, extract)
-    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "metric_units": "kJ/mol",
-                "points": [
-                    {
-                        "key": "ledger-logk",
-                        "source_id": "fixture-source",
-                        "species": "B",
-                        "comparison_quantity": "log10_Kf",
-                        "temperature_K": 300,
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=False)
-    logk = result.observations["ledger-logk"]
-    assert logk.value.kind is ValueKind.UNAVAILABLE
-    assert any(
-        e.observation_id == "ledger-logk"
-        and "value" in (e.axes or ())
-        and ("log10_Kf" in (e.why or "") or "field" in (e.why or ""))
-        for e in result.queue
-    )
 
 
 _USGS_F1_FAMILIES = (
@@ -17782,102 +17348,9 @@ def test_d036_dangling_equipment_context_fk_refuses_typed(tmp_path: Path) -> Non
     )
 
 
-def test_species_rail_janaf_token_migrates_under_ledger_label(tmp_path: Path) -> None:
-    """The species-rail ledger's ``source_id: janaf`` names the compilation
-    compared against, not a battery work; the migrated work is the ledger
-    itself, labelled ``species-rail-differential``."""
-    root = _write_min_tree(tmp_path)
-    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "metric_units": "kJ/mol",
-                "points": [
-                    {
-                        "key": "janaf::Mg-001:T=1363::nasa_cea_9::delta_fG_kJ_mol",
-                        "source_id": "janaf",
-                        "observation_id": "Mg-001",
-                        "species": "Mg",
-                        "comparison_quantity": "delta_fG_kJ_mol",
-                        "temperature_K": 1363,
-                        "table_kJ_mol": -500.0,
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=False)
-    ledger_works = [
-        work for work in result.works.values() if "species-rail-differential" in work.source_ids
-    ]
-    assert len(ledger_works) == 1
-    work = ledger_works[0]
-    assert work.source_ids == ("species-rail-differential",)
-    assert work.citation == "species-rail-differential"
-    assert all("janaf" not in candidate.source_ids for candidate in result.works.values())
-    assert "janaf" not in result.aliases
-    assert result.aliases["species-rail-differential"] == work.work_id
-    observation = result.observations["janaf::Mg-001:T=1363::nasa_cea_9::delta_fG_kJ_mol"]
-    assert observation.source_id == "species-rail-differential"
-    experiment_ids = result.experiments_by_work[work.work_id]
-    assert experiment_ids == [f"{work.work_id}::species-rail-differential"]
 
 
-def test_committed_aliases_pin_species_rail_ledger_not_janaf() -> None:
-    """The alias registry resolves the ledger label to the historical work id
-    (keeping experiment ids stable) and no longer claims a ``janaf`` work."""
-    from simulator.battery.migrate import load_aliases
 
-    aliases = load_aliases()
-    assert "janaf" not in aliases
-    assert aliases["species-rail-differential"] == citation_hash("janaf")
-    assert aliases["janaf-4th"] == aliases["nist-janaf-4th"]
-
-def test_species_rail_pankratz_token_also_files_under_ledger_label(tmp_path: Path) -> None:
-    """Comparison-compilation tokens other than janaf must not land ledger
-    residuals on the real compilation work (USBM B689)."""
-    root = _write_min_tree(tmp_path)
-    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 1,
-                "metric_units": "kJ/mol",
-                "points": [
-                    {
-                        "key": "pankratz-1987-usbm-b689::page-0003:T=298.15::nasa_cea_9::delta_fG_kJ_mol",
-                        "source_id": "pankratz-1987-usbm-b689",
-                        "observation_id": "page-0003",
-                        "species": "MgO",
-                        "comparison_quantity": "delta_fG_kJ_mol",
-                        "temperature_K": 298.15,
-                        "table_kJ_mol": -500.0,
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    result = migrate(root, write=False)
-    ledger_works = [
-        work for work in result.works.values()
-        if "species-rail-differential" in work.source_ids
-    ]
-    assert len(ledger_works) == 1
-    work = ledger_works[0]
-    assert all(
-        "pankratz-1987-usbm-b689" not in candidate.source_ids
-        for candidate in result.works.values()
-    )
-    observation = result.observations[
-        "pankratz-1987-usbm-b689::page-0003:T=298.15::nasa_cea_9::delta_fG_kJ_mol"
-    ]
-    assert observation.source_id == "species-rail-differential"
-    assert result.experiments_by_work[work.work_id] == [
-        f"{work.work_id}::species-rail-differential"
-    ]
 
 # ---------------------------------------------------------------------------
 # 2026-09-22 hardening (latent, none live in the corpus): cross-work

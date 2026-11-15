@@ -146,6 +146,14 @@ def test_score_eligible_conjuncts_cover_the_spec() -> None:
     assert score_eligible_from_conjuncts(_green_conjuncts()) is True
 
 
+def test_engine_output_ledgers_are_internal_consistency_exclusions() -> None:
+    for filename in (
+        "gibbs_battery_residual_ledger.yaml",
+        "species_rail_differential_ledger.yaml",
+    ):
+        assert score_mod.is_internal_consistency(filename)
+
+
 @pytest.mark.parametrize("conjunct", SCORE_ELIGIBLE_CONJUNCTS)
 def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
     green = _green_conjuncts()

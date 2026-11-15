@@ -7,8 +7,7 @@ Sibling files, not an in-place ``battery_v2`` block:
 * ``data/literature/extracts-v2/<source_id>.yaml`` — Observation payloads
   for each extract. The original extract files are never rewritten.
 * ``data/literature/observations-v2/<stem>.yaml`` — Observation payloads
-  for every other listed source (compilations, measurement sidecars,
-  residual ledgers).
+  for compilations and measurement sidecars.
 * ``data/literature/works/<fs_safe(work_id)>.yaml`` — Work + its Experiments.
 * ``data/literature/works/ALIASES.yaml`` — explicit alias registry
   (source_id / raw DOI → canonical work_id). Never title-only merging.
@@ -349,15 +348,6 @@ def compilation_family_from_store_path(path: Path) -> str | None:
     return None
 QUEUE_PATH = BATTERY_DIR / "migration-queue.yaml"
 REPORT_PATH = BATTERY_DIR / "migration-report.md"
-
-NAMED_SOURCES = (
-    "kems_measurements.yaml",
-    "mre_measurements.yaml",
-    "langmuir_knudsen_flux_validation.yaml",
-    "refractory_vaporization_validation.yaml",
-    "gibbs_battery_residual_ledger.yaml",
-    "species_rail_differential_ledger.yaml",
-)
 
 CORPUS_REPO_DEFAULT = "regolith-corpus"
 
@@ -13268,53 +13258,6 @@ def uncertainty_for(raw: object) -> Uncertainty:
 
 # Wimpenny's printed isotope rows use this explicit 2-sigma column name.
 _WIMPENNY_DELTA_2SIGMA_FIELD = "delta66Zn_2sigma_permil"
-
-
-_VAPORIZATION_DFG_RE = re.compile(
-    r"dfG\(g\)-dfG\((cr|l)\)"
-)
-_VAPORIZATION_P0_RE = re.compile(
-    r"P0=([0-9.+(?:eE][0-9.+-]*)\s*Pa"
-)
-_VAPORIZATION_CONDENSED_PHASE = {
-    "cr": Phase.CR,
-    "l": Phase.L,
-}
-
-
-def lift_vaporization_reaction_from_ledger_note(
-    formula: str, note: object
-) -> tuple[Reaction, Decimal | None] | None:
-    """Lift condensed→gas vaporization reaction identity from a ledger note.
-
-    Ledger vapour-rail points print
-    ``ln(P_sat/P0)=-[dfG(g)-dfG(cr|l)]/(R T)`` with ``P0=... Pa``. The table
-    cell is ΔvapG, not log10(Psat/P0). Returns None when that reaction
-    identity is not printed.
-    """
-
-    if note is None:
-        return None
-    flat = " ".join(str(note).split())
-    if not flat:
-        return None
-    match = _VAPORIZATION_DFG_RE.search(flat)
-    if match is None:
-        return None
-    condensed_phase = _VAPORIZATION_CONDENSED_PHASE[match.group(1)]
-    gas = make_species(formula, Phase.G)
-    condensed = make_species(formula, condensed_phase)
-    reaction = Reaction(
-        terms=(
-            ReactionTerm(species=gas, coefficient=Fraction(1)),
-            ReactionTerm(species=condensed, coefficient=Fraction(-1)),
-        )
-    )
-    p0: Decimal | None = None
-    p0_match = _VAPORIZATION_P0_RE.search(flat)
-    if p0_match is not None:
-        p0 = as_decimal(p0_match.group(1))
-    return reaction, p0
 
 
 def make_species(
@@ -31374,7 +31317,7 @@ class Migrator:
             )
 
     # ------------------------------------------------------------------
-    # Named sidecars + ledgers + compilations
+    # Named sidecars + compilations
     # ------------------------------------------------------------------
 
     def migrate_named_sources(self) -> None:
@@ -31384,8 +31327,6 @@ class Migrator:
         self._migrate_langmuir(lit / "langmuir_knudsen_flux_validation.yaml")
         self._migrate_refractory(lit / "refractory_vaporization_validation.yaml")
         self._migrate_vacuum_pyrolysis(lit / "vacuum_pyrolysis_measurements.yaml")
-        self._migrate_ledger(lit / "gibbs_battery_residual_ledger.yaml")
-        self._migrate_ledger(lit / "species_rail_differential_ledger.yaml")
 
     def _work_from_citation(
         self, citation: str, doi: str | None, source_id: str
@@ -32099,225 +32040,6 @@ class Migrator:
                     derivation=derivation,
                 )
 
-    def _migrate_ledger(self, path: Path) -> None:
-        if not path.is_file():
-            return
-        rel = path.relative_to(self.root).as_posix()
-        count = self._count(rel)
-        doc = load_yaml(path)
-        if not isinstance(doc, Mapping):
-            return
-        # battery field is a ledger name, not a rail token — do not rail-map it.
-        metric_units = str(doc.get("metric_units") or "").strip()
-        energy_unit_ok = metric_units in {"", "kJ/mol", "kJ_per_mol"}
-        points = doc.get("points") or []
-        if not isinstance(points, list):
-            return
-        for row_index, point in enumerate(points):
-            if not isinstance(point, Mapping):
-                continue
-            require_rail_if_stated(point)
-            count.rows_in += 1
-            source_id = str(point.get("source_id") or path.stem)
-            if path.name == "species_rail_differential_ledger.yaml":
-                # Every point's source_id names the compilation compared against
-                # (janaf, pankratz-1987-usbm-b689, …), not a battery work. The
-                # work migrated from this file is always the differential
-                # ledger. works/ALIASES.yaml pins species-rail-differential to
-                # citation_hash("janaf") so historical janaf-token experiment
-                # ids stay stable; pankratz-token ledger experiments move onto
-                # that same ledger work (off the real USBM B689 work).
-                source_id = "species-rail-differential"
-            citation = source_id
-            index_row = self.index.get(source_id)
-            work = self._work_from_citation(
-                str((index_row or {}).get("citation") or citation),
-                extract_doi((index_row or {}).get("doi")),
-                source_id,
-            )
-            loc = Locator(
-                record=str(point.get("observation_id") or point.get("key")),
-                table=str(point.get("observation_id") or ""),
-            )
-            formula = str(point.get("species") or "unknown")
-            stated_q = point.get("comparison_quantity") or point.get("quantity")
-            obs_id = str(
-                point.get("key")
-                or f"{source_id}:{point.get('observation_id')}:{point.get('temperature_K')}"
-            )
-            log10_psat_reason = (
-                "the table value is the Gibbs energy of the vaporization "
-                "reaction and the reaction identity is not lifted"
-            )
-            per: PerBasis | None = None
-            derivation = None
-            notices: tuple[Notice, ...] = ()
-            value_reason = None
-            reaction: Reaction | None = None
-            standard_pressure_Pa: Decimal | None = None
-            obs_species = make_species(formula, map_phase(point.get("phase"))[0])
-            if stated_q == "log10_Psat_over_P0":
-                note = str(point.get("note") or "")
-                lifted = lift_vaporization_reaction_from_ledger_note(formula, note)
-                if lifted is None:
-                    ledger_quantity = State.unknown(log10_psat_reason)
-                    self.result.add_queue(
-                        work.work_id,
-                        loc,
-                        ["quantity", "value"],
-                        log10_psat_reason,
-                        source=rel,
-                        observation_id=obs_id,
-                    )
-                    table_sel = _unavailable_selection(log10_psat_reason)
-                    value_reason = log10_psat_reason
-                else:
-                    reaction, p0 = lifted
-                    ledger_quantity = State.of(Quantity.DELTA_FG)
-                    per = PerBasis.MOL_SPECIES
-                    obs_species = make_species(formula, Phase.G)
-                    if p0 is not None:
-                        standard_pressure_Pa = p0
-                    units = "kJ_per_mol" if energy_unit_ok else None
-                    if not energy_unit_ok:
-                        table_sel = _unavailable_selection(
-                            f"ledger header metric_units {metric_units!r} is not kJ/mol"
-                        )
-                        value_reason = table_sel.reason
-                    else:
-                        table_sel = select_declared_source(
-                            Quantity.DELTA_FG, units, point
-                        )
-                    if note:
-                        derivation = Derivation(
-                            relation=note,
-                            inputs=(choose_read_from(work, loc),),
-                            parameters=(),
-                            output_unit="kJ/mol",
-                        )
-            else:
-                quantity_payload = dict(point)
-                if stated_q and not quantity_payload.get("quantity"):
-                    quantity_payload["quantity"] = stated_q
-                units = "kJ_per_mol" if energy_unit_ok else None
-                if not energy_unit_ok and stated_q not in {"log10_Kf", "log10_kf"}:
-                    ledger_quantity = State.unknown(
-                        f"ledger header metric_units {metric_units!r} is not kJ/mol"
-                    )
-                    q_reason = ledger_quantity.reason
-                    table_sel = _unavailable_selection(
-                        f"ledger header metric_units {metric_units!r} is not kJ/mol"
-                    )
-                    value_reason = table_sel.reason
-                else:
-                    ledger_quantity, q_reason = map_quantity(
-                        None, quantity_payload, units=units, row=point
-                    )
-                    select_q = ledger_quantity
-                    if stated_q == "log10_Kf":
-                        select_q = Quantity.LOG10_KF
-                        ledger_quantity = State.of(Quantity.LOG10_KF)
-                        q_reason = None
-                    table_sel = select_declared_source(
-                        select_q,
-                        None if stated_q == "log10_Kf" else units,
-                        point,
-                    )
-                    if (
-                        stated_q == "log10_Kf"
-                        and table_sel.field_name == "table_kJ_mol"
-                    ):
-                        table_sel = _unavailable_selection(
-                            "table_kJ_mol is Gibbs energy, not log10_Kf"
-                        )
-                if q_reason:
-                    self.result.add_queue(
-                        work.work_id,
-                        loc,
-                        ["quantity"],
-                        q_reason,
-                        source=rel,
-                        observation_id=obs_id,
-                    )
-                if stated_q == "delta_fG_kJ_per_mol_O2":
-                    ledger_quantity = State.of(Quantity.DELTA_FG)
-                    per = PerBasis.MOL_O2
-                    if energy_unit_ok:
-                        table_sel = select_declared_source(
-                            Quantity.DELTA_FG, units, point
-                        )
-                    note = str(point.get("note") or "")
-                    if note:
-                        derivation = Derivation(
-                            relation=note,
-                            inputs=(choose_read_from(work, loc),),
-                            parameters=(),
-                            output_unit="kJ/mol",
-                        )
-            t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, point)
-            t = t_sel.amount if t_sel.available else None
-            value = table_sel.value
-            finding = str(point.get("finding_class") or "")
-            if finding == "compilation_table_self_check":
-                q_for_notice = (
-                    ledger_quantity.value
-                    if isinstance(ledger_quantity, Quantity)
-                    else (
-                        ledger_quantity.value
-                        if isinstance(ledger_quantity, State) and ledger_quantity.is_value
-                        else Quantity.LOG10_KF
-                    )
-                )
-                notices = (
-                    Notice(
-                        kind=NoticeKind.DERIVATION_USES_COMPILATION,
-                        affected_quantities=(q_for_notice,),
-                        reason=(
-                            "diagnostic compilation_table_self_check; "
-                            f"provenance_class={point.get('provenance_class')} "
-                            f"status={point.get('status')}; not a scoring residual"
-                        ),
-                        origin=obs_id,
-                    ),
-                )
-            evidence = Evidence(
-                class_=State.of(EvidenceClass.COMPILATION_ASSESSED),
-                original_method_class=str(
-                    point.get("method_class")
-                    or point.get("provenance_class")
-                    or "compilation"
-                ),
-                model=str(point.get("finding_class") or point.get("provenance_class") or ""),
-            )
-            self._generic_obs(
-                work=work,
-                source_id=source_id,
-                source_key=rel,
-                observation_id=obs_id,
-                locator=loc,
-                quantity=ledger_quantity,
-                species=obs_species,
-                value=value,
-                evidence=evidence,
-                temperature_K=t if t is not None and t > 0 else None,
-                standard_pressure_Pa=standard_pressure_Pa,
-                method=map_method(point.get("method") or point.get("regime")),
-                source_row_index=row_index,
-                derivation=derivation,
-                per=per,
-                reaction=reaction,
-                notices=notices,
-                value_reason=value_reason,
-            )
-            if t is not None and t <= 0:
-                self.result.add_queue(
-                    work.work_id,
-                    loc,
-                    ["temperature_K"],
-                    "nonpositive temperature is not a physical T; stored unknown",
-                    source=rel,
-                    observation_id=obs_id,
-                )
 
     def migrate_compilations(self, directory: Path | None = None) -> None:
         root = directory or (self.literature / "compilations")

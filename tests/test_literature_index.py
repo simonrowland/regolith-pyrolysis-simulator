@@ -820,9 +820,9 @@ def test_observation_store_summary_matches_full_scan():
         f"{len(excluded)} non-compilation store files must be absent from the summary; "
         f"leaked {leaked}"
     )
-    assert len(excluded) == 7, (
+    assert len(excluded) == 5, (
         "non-compilation store files excluded from the summary: "
-        f"expected 7, got {len(excluded)} {sorted(excluded)}"
+        f"expected 5, got {len(excluded)} {sorted(excluded)}"
     )
 
 
@@ -842,6 +842,40 @@ def test_load_v21_store_uses_summary_without_rereading_payloads(monkeypatch):
     assert store["janaf"]["total_rows"] == store["nist-janaf-4th"]["total_rows"]
     assert store["janaf"]["total_rows"] > 0
     assert store["janaf"]["usable_rows"] == 0
+
+
+def test_engine_output_ledgers_are_not_literature_census_inputs(tmp_path: Path) -> None:
+    lit = tmp_path / "data" / "literature"
+    observations = lit / "observations-v2"
+    observations.mkdir(parents=True)
+    filenames = (
+        "gibbs_battery_residual_ledger.yaml",
+        "species_rail_differential_ledger.yaml",
+    )
+    for filename in filenames:
+        (lit / filename).write_text(
+            yaml.safe_dump({"points": [{"key": "engine-output", "source_id": "janaf"}]}),
+            encoding="utf-8",
+        )
+        (observations / filename).write_text(
+            yaml.safe_dump(
+                {
+                    "schema_version": "battery_observations.v2.1",
+                    "sources": [f"data/literature/{filename}"],
+                    "observations": [
+                        {"observation_id": "engine-output", "source_id": "janaf"}
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    measurements, _presets = builder.load_consumers(tmp_path)
+    summary = builder.build_observation_store_summary(tmp_path)
+
+    assert not {record["path"] for record in measurements}
+    assert builder.load_v21_store(tmp_path) == {}
+    assert summary["shards"] == {}
 
 
 def test_compilation_manifest_identity_matches_yaml():
