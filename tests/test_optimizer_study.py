@@ -7645,9 +7645,9 @@ def test_cli_rejects_incoherent_constrained_max_args(
 
 
 def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> None:
-    # One-hour C2A_continuous smoke. It qualifies wall deposit, and the
-    # resinter threshold is null, so lifespan is unpriced rather than a
-    # number. A C0 start would continue through later steps. The live
+    # One-hour C2A_continuous smoke. Source activity is unavailable before
+    # Cr oxide vapour can be materialized, so wall lifetime is unpriced.
+    # A C0 start would continue through later steps. The live
     # continuation pin is test_lunar_highland_c0_horizon_changes_extracted_metals.
     out_dir = tmp_path / "constrained-max"
     cli_profile = _write_cli_physics_smoke_profile(tmp_path)
