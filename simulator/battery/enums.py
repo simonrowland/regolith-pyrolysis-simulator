@@ -652,6 +652,14 @@ class SourceRelation(StrEnum):
     UNKNOWN = "unknown"
 
 
+class MembershipCompleteness(StrEnum):
+    """Whether a calibration Work lists all of its training sources."""
+
+    COMPLETE = "complete"
+    PARTIAL = "partial"
+    UNKNOWN = "unknown"
+
+
 class MetricOperation(StrEnum):
     ABSOLUTE = "absolute"
     RELATIVE = "relative"

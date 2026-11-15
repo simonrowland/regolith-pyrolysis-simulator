@@ -1,0 +1,18 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: engine-calibration-magemin-ig-40ed109d
+  citation: "MAGEMin ig thermodynamic database at engine pin 40ed109d07d4246001cab59382596d33fed79086; database source membership unknown"
+  source_ids: []
+  membership_completeness: unknown
+  source_files:
+    corpus_repo: MAGEMin_C.jl
+    corpus_commit:
+      tag: value
+      value: 40ed109d07d4246001cab59382596d33fed79086
+    files:
+    - asset_id: magemin-database:ig:40ed109d
+      role: compilation_record
+      path: https://github.com/ComputationalThermodynamics/MAGEMin_C.jl/tree/40ed109d07d4246001cab59382596d33fed79086
+      sha256:
+        tag: unknown
+        reason: pinned database release source; no local byte digest recorded

@@ -364,6 +364,39 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
     assert decoded_legacy.authority is None
     assert decoded_legacy.certification is None
     assert to_plain(decoded_legacy) == legacy
+
+
+def test_work_membership_completeness_is_typed_and_round_trips() -> None:
+    from simulator.battery.enums import AssetRole, MembershipCompleteness
+    from simulator.battery.migrate import to_plain, work_from_plain
+    from simulator.battery.records import SourceFile, SourceFiles, Work
+    from simulator.state_types import State
+
+    work = Work(
+        work_id="engine-calibration-unknown",
+        citation="Calibration database with unsourced membership",
+        source_ids=(),
+        source_files=SourceFiles(
+            corpus_repo="test",
+            corpus_commit=State.unknown("test source version not pinned"),
+            files=(
+                SourceFile(
+                    "calibration-record",
+                    AssetRole.COMPILATION_RECORD,
+                    "https://example.invalid/calibration",
+                    State.unknown("test hash not held"),
+                ),
+            ),
+        ),
+        membership_completeness=MembershipCompleteness.UNKNOWN,
+    )
+    payload = to_plain(work)
+    assert payload["membership_completeness"] == "unknown"
+    assert work_from_plain(payload) == work
+
+    payload["membership_completeness"] = "guessed"
+    with pytest.raises(ValueError, match="MembershipCompleteness"):
+        work_from_plain(payload)
 from simulator.battery.records import (
     Bench,
     BenchIdentity,

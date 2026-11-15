@@ -12031,7 +12031,7 @@ def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
     assert table_residual.source_relation is SourceRelation.INDEPENDENT
 
 
-def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
+def test_openimcc_candidate_alias_resolves_to_its_calibration_work() -> None:
     from simulator.battery.score import (
         ENGINE_COEFFICIENT_SOURCES,
         expand_coefficient_sources,
@@ -12051,13 +12051,125 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     )
     expanded = expand_coefficient_sources(candidate_sources)
     assert "openimcc-v1.0.2" in candidate_sources
-    assert "sf04-magma-companion-workbook" in expanded
+    assert "engine-calibration-openimcc-1.0.2" in expanded
     assert lineage_complete_for(candidate_sources) is True
     d066_source = openimcc_pack_coefficient_sources("1.0.3-d066-v1")
     assert d066_source == ("openimcc-v1.0.3-d066-v1",)
-    assert "sf04-magma-companion-workbook" in expand_coefficient_sources(
+    assert "engine-calibration-openimcc-1.0.3-d066-v1" in expand_coefficient_sources(
         d066_source
     )
+
+
+def test_calibration_membership_decides_only_cited_engine_source_overlap() -> None:
+    from simulator.battery.enums import MembershipCompleteness
+    from simulator.battery.score import (
+        COEFFICIENT_SOURCE_STORE_IDS,
+        ENGINE_COEFFICIENT_SOURCES,
+        expand_coefficient_sources,
+        lineage_complete_for,
+    )
+    from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
+
+    melts_work = replace(
+        F.work("engine-calibration-melts-family"),
+        source_ids=("berman-1988-internally-consistent-mineral-thermodynamic-data",),
+        membership_completeness=MembershipCompleteness.PARTIAL,
+    )
+    magemin_work = replace(
+        F.work("engine-calibration-magemin-ig-40ed109d"),
+        source_ids=(),
+        membership_completeness=MembershipCompleteness.UNKNOWN,
+    )
+    openimcc_work = replace(
+        F.work("engine-calibration-openimcc-1.0.2"),
+        source_ids=("no27-fegley-cameron-1987-epsl",),
+        membership_completeness=MembershipCompleteness.PARTIAL,
+    )
+    works = {
+        work.work_id: work for work in (melts_work, magemin_work, openimcc_work)
+    }
+    identity = F.o2_identity()
+    source_experiment = F.tabulation_experiment()
+
+    def relation(source_id: str, sources: tuple[str, ...]) -> SourceRelation:
+        reference = F.observation(
+            f"calibration-member:{source_id}",
+            source_experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=source_id,
+        )
+        observations = {reference.observation_id: reference}
+        experiments = {source_experiment.experiment_id: source_experiment}
+        return resolve_source_relation(
+            reference,
+            sources,
+            lineage_complete_for(
+                sources,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            ),
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        )
+
+    melts_aliases = tuple(
+        ENGINE_COEFFICIENT_SOURCES[engine]
+        for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+    )
+    assert melts_aliases[0] == melts_aliases[1]
+    for aliases in melts_aliases:
+        assert relation(
+            "berman-1988-internally-consistent-mineral-thermodynamic-data",
+            expand_coefficient_sources(aliases),
+        ) is SourceRelation.TRAINING
+        assert relation(
+            "unlisted-melts-source", expand_coefficient_sources(aliases)
+        ) is SourceRelation.UNKNOWN
+
+    magemin_sources = expand_coefficient_sources(
+        ENGINE_COEFFICIENT_SOURCES[Engine.MAGEMIN]
+    )
+    assert COEFFICIENT_SOURCE_STORE_IDS["magemin"] == (
+        "engine-calibration-magemin-ig-40ed109d",
+    )
+    assert relation(
+        "unlisted-magemin-source", magemin_sources
+    ) is SourceRelation.UNKNOWN
+
+    openimcc_sources = openimcc_pack_coefficient_sources("1.0.2")
+    assert expand_coefficient_sources(openimcc_sources) == (openimcc_work.work_id,)
+    assert relation(
+        "no27-fegley-cameron-1987-epsl", openimcc_sources
+    ) is SourceRelation.TRAINING
+    assert relation(
+        "unlisted-openimcc-source", openimcc_sources
+    ) is SourceRelation.UNKNOWN
+
+    complete_melts_work = replace(
+        melts_work, membership_completeness=MembershipCompleteness.COMPLETE
+    )
+    complete_works = {**works, complete_melts_work.work_id: complete_melts_work}
+    reference = F.observation(
+        "complete-membership-nonmember",
+        source_experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="unlisted-melts-source",
+    )
+    complete_relation = resolve_source_relation(
+        reference,
+        expand_coefficient_sources(ENGINE_COEFFICIENT_SOURCES[Engine.ALPHAMELTS]),
+        True,
+        works=complete_works,
+        observations={reference.observation_id: reference},
+        experiments={source_experiment.experiment_id: source_experiment},
+    )
+    assert complete_relation is SourceRelation.INDEPENDENT
 
 
 @pytest.mark.parametrize(

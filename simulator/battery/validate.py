@@ -58,6 +58,7 @@ from simulator.battery.enums import (
     FO2Channel,
     IdentityEqualKind,
     MEASURED_EVIDENCE,
+    MembershipCompleteness,
     NoticeKind,
     Phase,
     QUANTITY_UNITS,
@@ -865,6 +866,25 @@ def validate_work(work: Work, path: str = "work") -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     if not work.work_id:
         issues.append(_issue(f"{path}.work_id", RefusalReason.CONDITIONAL_FIELD, "missing work_id"))
+    if not isinstance(work.membership_completeness, MembershipCompleteness):
+        issues.append(
+            _issue(
+                f"{path}.membership_completeness",
+                RefusalReason.CONDITIONAL_FIELD,
+                "requires complete, partial, or unknown",
+            )
+        )
+    elif (
+        work.membership_completeness is not MembershipCompleteness.UNKNOWN
+        and not work.source_ids
+    ):
+        issues.append(
+            _issue(
+                f"{path}.source_ids",
+                RefusalReason.CONDITIONAL_FIELD,
+                "complete or partial calibration membership requires source_ids",
+            )
+        )
     for source_id, uncertainty in (work.source_method_uncertainties or {}).items():
         field = f"{path}.source_method_uncertainties.{source_id}"
         if not isinstance(uncertainty, SourceMethodUncertainty):
@@ -1108,6 +1128,8 @@ def _source_owners(works: Mapping[str, Work] | None) -> dict[str, str]:
         return owners
     ambiguous: set[str] = set()
     for work in works.values():
+        if work.is_calibration_membership:
+            continue
         for source_id in work.source_ids:
             previous = owners.get(source_id)
             if previous is not None and previous != work.work_id:
@@ -1791,8 +1813,9 @@ def _work_file_indexes(
     # Direct work ids take precedence over source and file aliases.
     work_by_alias.update(works)
     for work in works.values():
-        for source_id in work.source_ids:
-            work_by_alias.setdefault(source_id, work)
+        if not work.is_calibration_membership:
+            for source_id in work.source_ids:
+                work_by_alias.setdefault(source_id, work)
         for asset in work.source_files.files:
             asset_ids.add(asset.asset_id)
             if asset.role is AssetRole.TABLE_CSV:

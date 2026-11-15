@@ -61,6 +61,7 @@ from simulator.battery.enums import (
     FUSION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
     MEASURED_EVIDENCE,
+    MembershipCompleteness,
     MELT_ACTIVITY_QUANTITIES,
     MetricOperation,
     MethodToken,
@@ -491,6 +492,8 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.ALPHAMELTS: ("alphamelts",),
     Engine.THERMOENGINE: ("thermoengine",),
     Engine.MAGEMIN: ("magemin",),
+    # OpenIMCC's selected pack alias is added from its loaded version below;
+    # pinning every optional pack here would assert ancestry for packs not run.
     Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
     Engine.NASA_CEA_9: ("nasa-glenn",),
@@ -515,9 +518,8 @@ def _attempt_coefficient_sources(
 
 
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
-# Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
-# a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
-# IMCC consumes the SF04 magma companion workbook.
+# Engine aliases resolve to Works. Calibration Works carry their source
+# membership separately from the source Works that own those ids.
 COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "vaporock": ("janaf-4th",),
     "nasa-glenn": ("nasa-glenn",),
@@ -528,13 +530,30 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     # B677 and B689 are different bulletins from the B672 Mn rows and
     # are not coefficient sources.
     "ellingham": ("janaf-4th", "nasa-cea-thermo", "nasa-glenn"),
+    "alphamelts": ("engine-calibration-melts-family",),
+    "thermoengine": ("engine-calibration-melts-family",),
+    "magemin": ("engine-calibration-magemin-ig-40ed109d",),
     "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
     "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.2": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.2-ext-sp-2": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    "openimcc-v1.0.2": ("engine-calibration-openimcc-1.0.2",),
+    "openimcc-v1.0.2-ext-sp-2": ("engine-calibration-openimcc-1.0.2-ext-sp-2",),
+    "openimcc-v1.0.3-d066-v1": ("engine-calibration-openimcc-1.0.3-d066-v1",),
+    "openimcc-v1.0.3-d066-ext-v1": ("engine-calibration-openimcc-1.0.3-d066-ext-v1",),
+    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": (
+        "engine-calibration-openimcc-1.0.3-d066-v1-kcaalsi2o7",
+    ),
+    "openimcc-redox-pack:sha256:a7f44ddeb2f88bfa56fc50556c262e81598e4b82d7773e498aa3d5040ecc3501": (
+        "engine-calibration-openimcc-redox-1.4.0",
+    ),
+    "openimcc-redox-pack:sha256:a2327fd582dc9fb4e2b7e1a49cee7bfacbd72510e06ce0e706495ef8107d5809": (
+        "engine-calibration-openimcc-redox-1.4.0-cr-candidate",
+    ),
+    "openimcc-redox-pack:sha256:31d7bf5532a92983a3bbb593bf65e3cd9d398d64699a0c0e87fb05071d0f17dc": (
+        "engine-calibration-openimcc-redox-1.5.0-ti-candidate",
+    ),
+    "openimcc-redox-pack:sha256:850dfe9f7e61dae9b9786d9f56508236b352e293198fbdc63a8daf5f51d37034": (
+        "engine-calibration-openimcc-redox-1.6.0-cr-ti-candidate",
+    ),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -5235,6 +5254,46 @@ def _candidate_lineage_for_sources(
     cached = indexes.candidate_lineages.get(source_key)
     if cached is not None:
         return cached
+    calibration_works = tuple(
+        work
+        for src in expanded
+        if (work := indexes.work_by_alias.get(src)) is not None
+        and work.is_calibration_membership
+    )
+    if calibration_works:
+        # A partial list can prove a member overlap below, but cannot establish
+        # complete candidate ancestry for sources absent from that subset.
+        if any(
+            work.membership_completeness is not MembershipCompleteness.COMPLETE
+            for work in calibration_works
+        ):
+            result = (False, None)
+            indexes.candidate_lineages[source_key] = result
+            return result
+        calibration_ids = {work.work_id for work in calibration_works}
+        ordinary_sources = tuple(
+            src
+            for src in expanded
+            if (work := indexes.work_by_alias.get(src)) is None
+            or not work.is_calibration_membership
+        )
+        if ordinary_sources:
+            ordinary_lineage = _resolve_coefficient_sources(
+                ordinary_sources,
+                observations,
+                works,
+                experiments,
+                _indexes=indexes,
+            )
+            if not ordinary_lineage.complete:
+                result = (False, None)
+                indexes.candidate_lineages[source_key] = result
+                return result
+            assert ordinary_lineage.ids is not None
+            calibration_ids.update(ordinary_lineage.ids)
+        result = (True, Ancestry.of(calibration_ids))
+        indexes.candidate_lineages[source_key] = result
+        return result
     candidate_lineage = _resolve_coefficient_sources(
         expanded, observations, works, experiments, _indexes=indexes
     )
@@ -5252,9 +5311,9 @@ def lineage_complete_for(
 ) -> bool:
     """True when every engine alias is mapped and store ids resolve.
 
-    Without a store, completeness is the mapping itself: unmapped MELTS
-    aliases stay incomplete. With a store, the resolver must return a
-    complete ancestry. An incomplete result is not independence.
+    Without a store, completeness is the alias mapping itself. With a store,
+    calibration memberships and ordinary source ancestry must resolve; partial
+    memberships do not establish independence for unlisted sources.
     """
 
     complete, _candidate_lineage = _candidate_lineage_for_sources(
@@ -5296,11 +5355,20 @@ def _resolve_source_relation_with_indexes(
     experiments: Mapping[str, Experiment],
     _indexes: _ValidationIndexes | None,
 ) -> SourceRelation:
-    if not lineage_complete:
-        return SourceRelation.UNKNOWN
     indexes = _indexes
     if indexes is None or not indexes.matches(works, observations, experiments):
         indexes = _build_validation_indexes(works, observations, experiments)
+    membership_relation = _calibration_membership_relation(
+        reference, coefficient_sources, indexes
+    )
+    if membership_relation is SourceRelation.TRAINING:
+        return membership_relation
+    if membership_relation is SourceRelation.UNKNOWN:
+        return membership_relation
+    if membership_relation is SourceRelation.INDEPENDENT:
+        return membership_relation
+    if not lineage_complete:
+        return SourceRelation.UNKNOWN
     reference_lineage = _observation_lineage(
         reference.observation_id,
         observations,
@@ -5316,6 +5384,36 @@ def _resolve_source_relation_with_indexes(
         _indexes=indexes,
     )
     return _source_relation_from_lineages(reference_lineage, candidate_lineage)
+
+
+def _calibration_membership_relation(
+    reference: Observation,
+    coefficient_sources: Sequence[str],
+    indexes: _ValidationIndexes,
+) -> SourceRelation | None:
+    """Use only registered calibration membership to decide training overlap."""
+
+    expanded_sources = expand_coefficient_sources(
+        coefficient_lineage_sources(coefficient_sources)
+    )
+    calibration_works = tuple(
+        work
+        for src in expanded_sources
+        if (work := indexes.work_by_alias.get(src)) is not None
+        and work.is_calibration_membership
+    )
+    if not calibration_works:
+        return None
+    if any(reference.source_id in work.source_ids for work in calibration_works):
+        return SourceRelation.TRAINING
+    if len(calibration_works) != len(expanded_sources):
+        return None
+    if all(
+        work.membership_completeness is MembershipCompleteness.COMPLETE
+        for work in calibration_works
+    ):
+        return SourceRelation.INDEPENDENT
+    return SourceRelation.UNKNOWN
 
 
 def _source_relation_from_lineages(
@@ -5371,6 +5469,13 @@ class _ScoringLineageResolver:
         self, reference: Observation, sources: Sequence[str]
     ) -> tuple[bool, SourceRelation]:
         complete, candidate_lineage = self._candidate_lineage(sources)
+        membership_relation = _calibration_membership_relation(
+            reference, sources, self.indexes
+        )
+        if membership_relation is SourceRelation.TRAINING:
+            return True, SourceRelation.TRAINING
+        if membership_relation is SourceRelation.UNKNOWN:
+            return False, SourceRelation.UNKNOWN
         if not complete or candidate_lineage is None:
             return complete, SourceRelation.UNKNOWN
 

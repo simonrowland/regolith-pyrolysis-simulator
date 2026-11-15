@@ -45,6 +45,7 @@ from simulator.battery.enums import (
     ExperimentKind,
     FO2Channel,
     Fo2Mode,
+    MembershipCompleteness,
     MethodToken,
     MetricOperation,
     NoticeKind,
@@ -1366,19 +1367,36 @@ class Work:
     source_files: SourceFiles
     doi: str | None = None
     source_method_uncertainties: Mapping[str, SourceMethodUncertainty] | None = None
+    membership_completeness: MembershipCompleteness = MembershipCompleteness.UNKNOWN
 
     def __post_init__(self) -> None:
         if not self.work_id:
             raise ValueError("Work.work_id is required")
         if not self.citation:
             raise ValueError("Work.citation is required")
-        if not self.source_ids:
+        if not isinstance(self.membership_completeness, MembershipCompleteness):
+            raise ValueError(
+                "Work.membership_completeness must be a MembershipCompleteness"
+            )
+        if (
+            not self.source_ids
+            and self.membership_completeness is not MembershipCompleteness.UNKNOWN
+        ):
             raise ValueError("Work.source_ids is required")
         uncertainties = dict(self.source_method_uncertainties or {})
         if not set(uncertainties).issubset(self.source_ids):
             raise ValueError("source method uncertainty must name a source_id on the Work")
         object.__setattr__(
             self, "source_method_uncertainties", uncertainties or None
+        )
+
+    @property
+    def is_calibration_membership(self) -> bool:
+        """Identify Works with a declared list or its empty, typed-unknown state."""
+
+        return (
+            not self.source_ids
+            or self.membership_completeness is not MembershipCompleteness.UNKNOWN
         )
 
 

@@ -135,6 +135,7 @@ from simulator.battery.enums import (
     FO2Channel,
     IdentityEqualKind,
     KINETIC_YIELD_QUANTITIES,
+    MembershipCompleteness,
     MEASURED_EVIDENCE,
     MELT_ACTIVITY_QUANTITIES,
     MethodToken,
@@ -3601,6 +3602,9 @@ def work_from_plain(payload: object) -> Work:
         ),
         doi=payload.get("doi"),
         source_method_uncertainties=source_method_uncertainties,
+        membership_completeness=MembershipCompleteness(
+            str(payload.get("membership_completeness") or "unknown")
+        ),
     )
 
 
@@ -23861,6 +23865,11 @@ class Migrator:
             source_files=replace(pack, files=tuple(merged)),
             doi=self._work_dois[work_id],
             source_method_uncertainties=source_method_uncertainties or None,
+            membership_completeness=(
+                existing_work.membership_completeness
+                if existing_work is not None
+                else MembershipCompleteness.UNKNOWN
+            ),
         )
         self.result.works[work_id] = work
         return work
@@ -23868,6 +23877,9 @@ class Migrator:
     def _rebuild_works(self) -> None:
         rebuilt: dict[str, Work] = {}
         for work_id, work in self.result.works.items():
+            if work.is_calibration_membership:
+                rebuilt[work_id] = work
+                continue
             source_ids = tuple(self._work_source_ids[work_id] or work.source_ids)
             files: list[SourceFile] = []
             seen_assets: set[str] = set()
@@ -23897,6 +23909,7 @@ class Migrator:
                 ),
                 doi=work.doi,
                 source_method_uncertainties=work.source_method_uncertainties,
+                membership_completeness=work.membership_completeness,
             )
         self.result.works = rebuilt
 

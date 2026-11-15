@@ -16,6 +16,17 @@ Mode-labeled residual keys include that token so records from distinct
 conditions remain separate. Residuals without a resolved or requested fO2
 mode omit the field.
 
+## Calibration Work membership
+
+An engine calibration database or versioned coefficient pack is stored as a
+`Work`. Its `source_ids` are the literature sources known to have contributed
+to that calibration, and `membership_completeness` is `complete`, `partial`,
+or `unknown` (the default for existing Works). `complete` is permitted only
+when the cited source enumerates the whole membership set. A listed member
+resolves to `training`; a nonmember resolves to `independent` only for a
+complete list. A nonmember of a partial list, and every source under an
+unknown list, remains `unknown`.
+
 The `composition_binary_complement` notice records a binary composition
 derived as the complement of a printed caption mole percent. Such residuals
 remain visible in the `binary-complement-composition` flagged stratum.
