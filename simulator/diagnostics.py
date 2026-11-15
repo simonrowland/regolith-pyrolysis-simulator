@@ -51,6 +51,44 @@ WALL_DEPOSIT_ALIAS_CONFLICT_CODE = (
     "wall_deposit_payload_alias_conflict"
 )
 
+
+def achieved_melt_bakeout(
+    snapshots: Sequence[Any],
+    *,
+    setpoint_C: float,
+    tolerance_C: float,
+) -> dict[str, float]:
+    """Measure peak melt temperature and achieved hold from committed hours."""
+
+    setpoint = finite_float(setpoint_C)
+    tolerance = finite_float(tolerance_C)
+    if setpoint is None or tolerance is None or tolerance < 0.0:
+        raise ValueError("bakeout_temperature_input_invalid")
+    if not snapshots:
+        raise ValueError("bakeout_operating_history_missing")
+    peak_temperature_C: float | None = None
+    held_duration_h = 0.0
+    threshold_C = setpoint - tolerance
+    for index, snapshot in enumerate(snapshots):
+        temperature = finite_float(getattr(snapshot, "temperature_C", None))
+        duration = finite_float(getattr(snapshot, "duration_h", None))
+        if temperature is None or duration is None or duration < 0.0:
+            raise ValueError(f"bakeout_operating_history_invalid: snapshot {index}")
+        peak_temperature_C = (
+            temperature
+            if peak_temperature_C is None
+            else max(peak_temperature_C, temperature)
+        )
+        if temperature >= threshold_C:
+            held_duration_h += duration
+    if peak_temperature_C is None:
+        raise ValueError("bakeout_operating_history_missing")
+    return {
+        "peak_melt_temperature_C": peak_temperature_C,
+        "hold_threshold_C": threshold_C,
+        "hold_duration_h": held_duration_h,
+    }
+
 # Distinct from WALL_STICKING_ALPHA_NOTICE_CODE on purpose.  That code says
 # "every deposited species carries cited sticking provenance", which is
 # VACUOUSLY TRUE when nothing was deposited *and* when nothing was measured.

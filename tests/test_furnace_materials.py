@@ -47,6 +47,12 @@ PURE_OXIDE_DIAGNOSTIC_FURNACE_MATERIALS = {
     "pure_TiO2",
 }
 
+# Disabled until the no-local-simulator rump generator has produced and
+# sourced its composition and service envelope.
+RUMP_LINER_DIAGNOSTIC_FURNACE_MATERIALS = {
+    "rump_liner_lunar_mare_low_ti",
+}
+
 # Enabled furnace materials with a finite service rating -- the set whose resolved
 # applied ceiling must be admissible to CampaignManager (BUG-076 / BUG-108).
 _ENABLED_FINITE_FURNACE_MATERIALS = sorted(
@@ -135,6 +141,7 @@ def test_furnace_material_caps_track_wall_material_temperature_anchors():
         | LITERATURE_GROUNDED_FURNACE_MATERIALS
         | UNANCHORED_FURNACE_MATERIALS
         | PURE_OXIDE_DIAGNOSTIC_FURNACE_MATERIALS
+        | RUMP_LINER_DIAGNOSTIC_FURNACE_MATERIALS
     )
     for pure_id in PURE_OXIDE_DIAGNOSTIC_FURNACE_MATERIALS:
         row = furnace_materials[pure_id]
@@ -201,6 +208,18 @@ def test_catalog_disabled_materials_are_not_selectable():
     catalog = load_furnace_materials()
 
     assert catalog["graphite_inert"]["enabled"] is False
+    assert catalog["rump_liner_lunar_mare_low_ti"]["enabled"] is False
+
+
+def test_generated_rump_interface_chemistry_refuses_until_artifact_exists():
+    from simulator.furnace_materials import (
+        InterfaceChemistryRefusal,
+        load_interface_chemistry,
+    )
+
+    with pytest.raises(InterfaceChemistryRefusal) as refused:
+        load_interface_chemistry("rump_liner_lunar_mare_low_ti")
+    assert refused.value.reason == "rump_composition_not_generated"
 
 
 def test_resolver_clamps_requested_cap_to_material_max():

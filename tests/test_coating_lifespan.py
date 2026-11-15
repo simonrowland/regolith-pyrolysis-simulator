@@ -13,7 +13,9 @@ from simulator.coating_lifespan import (
     THICKNESS_PROXY_LIMITER,
     FoulingProjectionError,
     FoulingTerminalSnapshot,
+    LimiterEvaluation,
     campaigns_to_resinter_total,
+    interface_first_melt_from_liner_state,
     merge_run_snapshot,
     merge_snapshot_sequence,
     project_lifecycle,
@@ -517,11 +519,111 @@ def test_limiter_stack_provisional_verdict_and_threshold_parametric_motion() -> 
 
     assert placeholder.end_condition_stack == (THICKNESS_PROXY_LIMITER,)
     assert placeholder.limiter_fired == THICKNESS_PROXY_LIMITER
+    assert "interface_first_melt" not in placeholder.to_dict()
     assert placeholder.service_life_campaigns == pytest.approx(2.0)
     assert placeholder.worst_segment_campaigns_provisional == pytest.approx(1.25)
     assert placeholder.service_life_authoritative is False
     assert placeholder.grounding_status == GROUNDING_PROVISIONAL
     assert moved.service_life_campaigns == pytest.approx(3.0)
+
+
+def test_interface_first_melt_is_instrumented_before_gate_and_diagnostic_only():
+    snapshots = merge_snapshot_sequence((
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.30})),
+    )).trajectory
+    sampled_campaigns = []
+
+    def evaluate(_snapshot, campaign_index):
+        sampled_campaigns.append(campaign_index)
+        return LimiterEvaluation(
+            name="caller_supplied_name",
+            fired=campaign_index == 3,
+            segment="duct_a",
+            value=float(campaign_index),
+            limit=3.0,
+        )
+
+    projection = project_lifecycle(
+        snapshots,
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.00025,
+        interface_first_melt=evaluate,
+    )
+
+    assert sampled_campaigns == [1, 2, 3]
+    assert projection.end_condition_stack == (
+        "interface_first_melt",
+        THICKNESS_PROXY_LIMITER,
+    )
+    assert projection.service_life_campaigns == pytest.approx(2.0)
+    assert projection.limiter_fired == THICKNESS_PROXY_LIMITER
+    assert projection.to_dict()["interface_first_melt"]["campaign_index"] == 3
+    assert projection.to_dict()["interface_first_melt"]["diagnostic_only"] is True
+
+
+def test_interface_first_melt_refusal_does_not_change_existing_lifecycle_gate():
+    snapshots = merge_snapshot_sequence((
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.30})),
+    )).trajectory
+
+    class TypedRefusal(ValueError):
+        reason = "liner_first_melt_engine_out_of_domain"
+
+    def evaluate(_snapshot, _campaign_index):
+        raise TypedRefusal("SiO2 fraction is outside MAGEMin's domain")
+
+    projection = project_lifecycle(
+        snapshots,
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.00025,
+        interface_first_melt=evaluate,
+    )
+
+    assert projection.service_life_campaigns == pytest.approx(2.0)
+    assert projection.limiter_fired == THICKNESS_PROXY_LIMITER
+    assert projection.to_dict()["interface_first_melt"]["refusal"]["reason"] == (
+        "liner_first_melt_engine_out_of_domain"
+    )
+
+
+def test_refused_liner_state_preserves_its_singular_refusal_in_lifecycle_output():
+    snapshots = merge_snapshot_sequence((
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20})),
+    )).trajectory
+    limiter = interface_first_melt_from_liner_state(
+        {
+            "schema": "liner-state-v1",
+            "segments": {
+                "rump-wall": {
+                    "status": "refused",
+                    "refusal": {
+                        "reason": "rump_composition_not_generated",
+                        "detail": "generated rump artifact is absent",
+                    },
+                }
+            },
+        }
+    )
+
+    projection = project_lifecycle(
+        snapshots,
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.00025,
+        interface_first_melt=limiter,
+    )
+
+    assert projection.service_life_campaigns == pytest.approx(2.0)
+    assert projection.to_dict()["interface_first_melt"]["refusal"]["reason"] == (
+        "rump_composition_not_generated"
+    )
 
 
 def test_campaigns_to_resinter_total_mirrors_runner_null_threshold_string_basis() -> None:

@@ -236,10 +236,17 @@ def condensed_by_species_from_snapshots(
     return result
 
 
+WALL_DEPOSIT_REPORT_EPSILON_KG = 1.0e-12
 WALL_DEPOSIT_ZONE_NAMES = ("Hottest", "Hot", "Rest")
 
 
 def wall_zone_by_segment(sim: Any) -> dict[str, str]:
+    return bucket_wall_segments_by_temperature(wall_temperature_by_segment_C(sim))
+
+
+def wall_temperature_by_segment_C(sim: Any) -> dict[str, float]:
+    """Maximum observed wall temperature, with the static segment fallback."""
+
     model = getattr(sim, "condensation_model", None)
     temperatures: dict[str, float] = {}
     for entry in tuple(getattr(model, "operating_history", ()) or ()):
@@ -270,7 +277,32 @@ def wall_zone_by_segment(sim: Any) -> dict[str, str]:
             continue
         if math.isfinite(temperature):
             temperatures[name] = temperature
-    return bucket_wall_segments_by_temperature(temperatures)
+    return temperatures
+
+
+def nested_wall_deposit_by_segment_species(
+    values: Mapping[tuple[str, str], float],
+) -> dict[str, dict[str, float]]:
+    """Project the trace's tuple-keyed wall mass into segment/species maps."""
+
+    nested: dict[str, dict[str, float]] = {}
+    for key, raw_kg in values.items():
+        if not isinstance(key, tuple) or len(key) != 2:
+            raise ValueError(f"wall deposit key must be (segment, species): {key!r}")
+        try:
+            mass_kg = float(raw_kg)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"non-numeric wall deposit kg: {raw_kg!r}") from exc
+        if not math.isfinite(mass_kg):
+            raise ValueError(f"non-finite wall deposit kg: {raw_kg!r}")
+        if mass_kg == 0.0:
+            continue
+        segment, species = (str(value) for value in key)
+        nested.setdefault(segment, {})[species] = mass_kg
+    return {
+        segment: dict(sorted(species_kg.items()))
+        for segment, species_kg in sorted(nested.items())
+    }
 
 
 def bucket_wall_segments_by_temperature(

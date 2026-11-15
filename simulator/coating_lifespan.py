@@ -45,6 +45,7 @@ from simulator.vapour_rail.instrumentation import (
 GROUNDING_UNGROUNDED = "ungrounded_threshold"
 GROUNDING_PROVISIONAL = "PROVISIONAL"
 THICKNESS_PROXY_LIMITER = "thickness_proxy_vs_placeholder"
+INTERFACE_FIRST_MELT_LIMITER = "interface_first_melt"
 EPSILON_KG = 1.0e-12
 
 
@@ -156,6 +157,7 @@ class LimiterEvaluation:
     value: float | None = None
     limit: float | None = None
     campaign_index: int | None = None
+    refusal: Mapping[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -167,9 +169,10 @@ class LifecycleProjection:
     service_life_authoritative: bool
     limiter_fired: str | None
     end_condition_stack: tuple[str, ...] = (THICKNESS_PROXY_LIMITER,)
+    interface_first_melt_diagnostic: Mapping[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "service_life_campaigns": self.service_life_campaigns,
             "worst_segment_campaigns_provisional": (
                 self.worst_segment_campaigns_provisional
@@ -180,6 +183,11 @@ class LifecycleProjection:
             "limiter_fired": self.limiter_fired,
             "end_condition_stack": list(self.end_condition_stack),
         }
+        if self.interface_first_melt_diagnostic is not None:
+            result["interface_first_melt"] = dict(
+                self.interface_first_melt_diagnostic
+            )
+        return result
 
 
 @dataclass(frozen=True)
@@ -468,14 +476,317 @@ def phase_a_end_condition_stack(
     thickness_limit_m: float | None,
     rho_deposit_kg_m3: float | Mapping[str, float] | None,
     segment_area_m2: Mapping[str, float],
+    interface_first_melt: Limiter | None = None,
 ) -> tuple[Limiter, ...]:
-    return (
+    stack: list[Limiter] = []
+    if interface_first_melt is not None:
+        stack.append(interface_first_melt)
+    stack.append(
         thickness_proxy_vs_placeholder(
             thickness_limit_m=thickness_limit_m,
             rho_deposit_kg_m3=rho_deposit_kg_m3,
             segment_area_m2=segment_area_m2,
-        ),
+        )
     )
+    return tuple(stack)
+
+
+def interface_first_melt_limiter(
+    evaluate: Limiter,
+) -> Limiter:
+    """Adapt a pure liner-corrosion evaluation to the lifecycle limiter stack."""
+
+    def normalized(
+        snapshot: FoulingTerminalSnapshot,
+        campaign_index: int,
+    ) -> LimiterEvaluation:
+        try:
+            result = evaluate(snapshot, campaign_index)
+        except Exception as exc:  # noqa: BLE001 - diagnostic cannot gate lifecycle
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal={
+                    "reason": str(
+                        getattr(
+                            exc,
+                            "reason",
+                            "interface_first_melt_evaluation_failed",
+                        )
+                    ),
+                    "detail": str(exc),
+                },
+            )
+        if not isinstance(result, LimiterEvaluation):
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal={
+                    "reason": "interface_first_melt_result_invalid",
+                    "detail": "evaluator must return LimiterEvaluation",
+                },
+            )
+        return LimiterEvaluation(
+            name=INTERFACE_FIRST_MELT_LIMITER,
+            fired=bool(result.fired),
+            segment=result.segment,
+            value=result.value,
+            limit=result.limit,
+            campaign_index=(
+                result.campaign_index
+                if result.campaign_index is not None
+                else campaign_index
+            ),
+            refusal=result.refusal,
+        )
+
+    return normalized
+
+
+def _first_liner_state_refusal(raw_state: Mapping[str, Any]) -> dict[str, Any] | None:
+    refusal = raw_state.get("refusal")
+    if isinstance(refusal, Mapping) and refusal.get("reason"):
+        return dict(refusal)
+    refusals = raw_state.get("refusals", ())
+    if isinstance(refusals, Sequence) and not isinstance(refusals, (str, bytes)):
+        for item in refusals:
+            if isinstance(item, Mapping) and item.get("reason"):
+                return dict(item)
+    return None
+
+
+def _interface_first_melt_from_liner_states(
+    liner_states_by_campaign: Sequence[Mapping[str, Any] | None],
+) -> Limiter:
+    """Fire on the first d-419 onset in each campaign's carried liner state."""
+
+    first_state_index = next(
+        (
+            index
+            for index, liner_state in enumerate(liner_states_by_campaign)
+            if isinstance(liner_state, Mapping)
+        ),
+        None,
+    )
+
+    def evaluate(
+        _snapshot: FoulingTerminalSnapshot,
+        campaign_index: int,
+    ) -> LimiterEvaluation:
+        position = campaign_index - 1
+        if first_state_index is None:
+            refusal = {
+                "reason": "liner_state_missing",
+                "detail": "no campaign supplied liner-state-v1 metadata",
+            }
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal=refusal,
+            )
+        if position < first_state_index:
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+            )
+        if position >= len(liner_states_by_campaign) or not isinstance(
+            liner_states_by_campaign[position], Mapping
+        ):
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal={
+                    "reason": "liner_state_missing_for_campaign",
+                    "detail": f"campaign {campaign_index} has no liner-state-v1 metadata",
+                },
+            )
+        liner_state = liner_states_by_campaign[position]
+        segments = liner_state.get("segments")
+        if not isinstance(segments, Mapping):
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal={
+                    "reason": "liner_state_segments_missing",
+                    "detail": "liner-state-v1 has no segment records",
+                },
+            )
+        from simulator.liner_corrosion import deposit_oxide_equivalent_mass_by_oxide
+
+        cumulative_by_segment = _snapshot.deposit_plain()
+        fired_segments: list[str] = []
+        refusals: list[dict[str, Any]] = []
+        evaluated_segments: list[str] = []
+        no_onset_segments: list[str] = []
+        for raw_name, raw_state in segments.items():
+            segment = str(raw_name)
+            if not isinstance(raw_state, Mapping):
+                continue
+            if raw_state.get("status") == "refused":
+                refusals.append(
+                    _first_liner_state_refusal(raw_state)
+                    or {"reason": "liner_state_refused", "detail": segment}
+                )
+                continue
+            try:
+                expected_oxide_mass = deposit_oxide_equivalent_mass_by_oxide(
+                    cumulative_by_segment.get(segment, {})
+                )
+            except Exception as exc:  # noqa: BLE001 - diagnostic cannot gate lifecycle
+                refusals.append(
+                    {
+                        "reason": str(
+                            getattr(exc, "reason", "liner_cumulative_deposit_invalid")
+                        ),
+                        "detail": str(exc),
+                    }
+                )
+                continue
+            recorded_oxide_mass = raw_state.get(
+                "cumulative_deposit_oxide_equivalent_kg_by_oxide"
+            )
+            if not isinstance(recorded_oxide_mass, Mapping):
+                refusals.append(
+                    {
+                        "reason": "liner_cumulative_oxide_deposit_missing",
+                        "detail": f"{segment} has no cumulative oxide-equivalent vector",
+                    }
+                )
+                continue
+            if any(not isinstance(oxide, str) for oxide in recorded_oxide_mass):
+                refusals.append(
+                    {
+                        "reason": "liner_cumulative_oxide_deposit_invalid",
+                        "detail": f"{segment} oxide vector keys must be strings",
+                    }
+                )
+                continue
+            all_oxides = set(expected_oxide_mass) | set(recorded_oxide_mass)
+            mismatch = False
+            for oxide in all_oxides:
+                raw_value = recorded_oxide_mass.get(oxide, 0.0)
+                if not is_declared_real_scalar(raw_value):
+                    mismatch = True
+                    break
+                try:
+                    value = float(raw_value)
+                except (TypeError, ValueError):
+                    mismatch = True
+                    break
+                if not math.isfinite(value) or not math.isclose(
+                    value,
+                    expected_oxide_mass.get(oxide, 0.0),
+                    rel_tol=1.0e-9,
+                    abs_tol=1.0e-12,
+                ):
+                    mismatch = True
+                    break
+            if mismatch:
+                refusals.append(
+                    {
+                        "reason": "liner_cumulative_oxide_deposit_mismatch",
+                        "detail": f"{segment} vector does not match cumulative wall deposit",
+                    }
+                )
+                continue
+            onset = raw_state.get("onset")
+            if not isinstance(onset, bool):
+                refusals.append(
+                    {
+                        "reason": "liner_accumulated_onset_missing",
+                        "detail": f"{segment} has no d-419 onset evaluation",
+                    }
+                )
+                continue
+            evaluated_segments.append(segment)
+            if onset:
+                fired_segments.append(segment)
+            else:
+                no_onset_segments.append(segment)
+        if fired_segments:
+            segment = sorted(fired_segments)[0]
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=True,
+                segment=segment,
+                campaign_index=campaign_index,
+            )
+        if refusals and (evaluated_segments or len(refusals) > 1):
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal={
+                    "reason": "liner_segment_coverage_incomplete",
+                    "detail": "one or more liner segments could not be evaluated",
+                    "no_onset_segments": sorted(no_onset_segments),
+                    "refusals": refusals,
+                },
+            )
+        if not evaluated_segments:
+            refusal = refusals[0] if refusals else {
+                "reason": "liner_accumulated_onset_missing",
+                "detail": "no segment has a verified cumulative d-419 onset result",
+            }
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal=refusal,
+            )
+        return LimiterEvaluation(
+            name=INTERFACE_FIRST_MELT_LIMITER,
+            fired=False,
+            campaign_index=campaign_index,
+        )
+
+    return interface_first_melt_limiter(evaluate)
+
+
+def interface_first_melt_from_liner_state(
+    liner_state: Mapping[str, Any],
+) -> Limiter:
+    """Preserve the single-state adapter while delegating to sequence logic."""
+
+    return _interface_first_melt_from_liner_states((liner_state,))
+
+
+def _interface_first_melt_diagnostic(
+    trajectory: Sequence[FoulingTerminalSnapshot],
+    limiter: Limiter | None,
+) -> dict[str, Any] | None:
+    if limiter is None:
+        return None
+    last: LimiterEvaluation | None = None
+    for campaign_index, snapshot in enumerate(trajectory, start=1):
+        last = limiter(snapshot, campaign_index)
+        if last.fired or last.refusal is not None:
+            break
+    if last is None:
+        return {
+            "name": INTERFACE_FIRST_MELT_LIMITER,
+            "fired": False,
+            "campaign_index": None,
+            "diagnostic_only": True,
+        }
+    return {
+        "name": INTERFACE_FIRST_MELT_LIMITER,
+        "fired": last.fired,
+        "segment": last.segment,
+        "value": last.value,
+        "limit": last.limit,
+        "campaign_index": last.campaign_index,
+        "diagnostic_only": True,
+        "refusal": (
+            dict(last.refusal) if last.refusal is not None else None
+        ),
+    }
 
 
 def thickness_proxy_vs_placeholder(
@@ -523,7 +834,13 @@ def project_lifecycle(
     rho_deposit_kg_m3: float | Mapping[str, float] | None,
     thickness_limit_m: float | None,
     resinter_threshold_kg: float | None = None,
+    interface_first_melt: Limiter | None = None,
 ) -> LifecycleProjection:
+    interface_limiter = (
+        interface_first_melt_limiter(interface_first_melt)
+        if interface_first_melt is not None
+        else None
+    )
     if thickness_limit_m is not None:
         thickness_limit_m = _positive_finite(
             thickness_limit_m,
@@ -548,6 +865,9 @@ def project_lifecycle(
             threshold_params["rho_deposit_kg_m3"],
         )
     ):
+        interface_diagnostic = _interface_first_melt_diagnostic(
+            trajectory, interface_limiter
+        )
         return LifecycleProjection(
             service_life_campaigns=None,
             worst_segment_campaigns_provisional=None,
@@ -555,8 +875,17 @@ def project_lifecycle(
             grounding_status=GROUNDING_UNGROUNDED,
             service_life_authoritative=False,
             limiter_fired=None,
+            end_condition_stack=(
+                (INTERFACE_FIRST_MELT_LIMITER, THICKNESS_PROXY_LIMITER)
+                if interface_limiter is not None
+                else (THICKNESS_PROXY_LIMITER,)
+            ),
+            interface_first_melt_diagnostic=interface_diagnostic,
         )
     if thickness_limit_m is None or rho_deposit_kg_m3 is None:
+        interface_diagnostic = _interface_first_melt_diagnostic(
+            trajectory, interface_limiter
+        )
         return LifecycleProjection(
             service_life_campaigns=None,
             worst_segment_campaigns_provisional=None,
@@ -564,21 +893,55 @@ def project_lifecycle(
             grounding_status=GROUNDING_UNGROUNDED,
             service_life_authoritative=False,
             limiter_fired=None,
+            end_condition_stack=(
+                (INTERFACE_FIRST_MELT_LIMITER, THICKNESS_PROXY_LIMITER)
+                if interface_limiter is not None
+                else (THICKNESS_PROXY_LIMITER,)
+            ),
+            interface_first_melt_diagnostic=interface_diagnostic,
         )
 
     stack = phase_a_end_condition_stack(
         thickness_limit_m=thickness_limit_m,
         rho_deposit_kg_m3=rho_deposit_kg_m3,
         segment_area_m2=segment_area_m2,
+        interface_first_melt=interface_limiter,
     )
     fired: LimiterEvaluation | None = None
+    interface_evaluation: LimiterEvaluation | None = None
     for campaign_index, snapshot in enumerate(trajectory, start=1):
         for limiter in stack:
+            if fired is not None and limiter is not interface_limiter:
+                continue
+            if (
+                limiter is interface_limiter
+                and interface_evaluation is not None
+                and (
+                    interface_evaluation.fired
+                    or interface_evaluation.refusal is not None
+                )
+            ):
+                continue
             evaluation = limiter(snapshot, campaign_index)
-            if evaluation.fired:
+            if evaluation.name == INTERFACE_FIRST_MELT_LIMITER:
+                if evaluation.refusal is not None:
+                    interface_evaluation = evaluation
+                elif evaluation.fired and (
+                    interface_evaluation is None or not interface_evaluation.fired
+                ):
+                    interface_evaluation = evaluation
+                elif interface_evaluation is None:
+                    interface_evaluation = evaluation
+                continue
+            if evaluation.fired and fired is None:
                 fired = evaluation
-                break
-        if fired is not None:
+        if fired is not None and (
+            interface_limiter is None
+            or (
+                interface_evaluation is not None
+                and (interface_evaluation.fired or interface_evaluation.refusal is not None)
+            )
+        ):
             break
 
     worst_campaigns = _worst_segment_campaigns_from_trajectory(
@@ -599,6 +962,29 @@ def project_lifecycle(
         grounding_status=GROUNDING_PROVISIONAL,
         service_life_authoritative=False,
         limiter_fired=THICKNESS_PROXY_LIMITER if service_life is not None else None,
+        end_condition_stack=(
+            (INTERFACE_FIRST_MELT_LIMITER, THICKNESS_PROXY_LIMITER)
+            if interface_limiter is not None
+            else (THICKNESS_PROXY_LIMITER,)
+        ),
+        interface_first_melt_diagnostic=(
+            {
+                "name": INTERFACE_FIRST_MELT_LIMITER,
+                "fired": interface_evaluation.fired,
+                "segment": interface_evaluation.segment,
+                "value": interface_evaluation.value,
+                "limit": interface_evaluation.limit,
+                "campaign_index": interface_evaluation.campaign_index,
+                "diagnostic_only": True,
+                "refusal": (
+                    dict(interface_evaluation.refusal)
+                    if interface_evaluation.refusal is not None
+                    else None
+                ),
+            }
+            if interface_evaluation is not None
+            else None
+        ),
     )
 
 
