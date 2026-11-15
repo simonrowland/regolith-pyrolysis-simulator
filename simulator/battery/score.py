@@ -77,6 +77,7 @@ from simulator.battery.enums import (
     PURE_STANDARD_THERMO,
     QuenchDirection,
     QuenchState,
+    QuotedTargetKind,
     Quantity,
     ReferenceStateConvention,
     Rail,
@@ -5305,6 +5306,7 @@ def _resolve_source_relation_with_indexes(
         reference.observation_id,
         observations,
         indexes.table_ids,
+        experiments=experiments,
         asset_ids=indexes.asset_ids,
         _cache=indexes.observation_lineages,
     )
@@ -5382,6 +5384,7 @@ class _ScoringLineageResolver:
                 reference.observation_id,
                 self.context.observations,
                 self.indexes.table_ids,
+                experiments=self.context.experiments,
                 asset_ids=self.indexes.asset_ids,
                 _cache=self.indexes.observation_lineages,
             )
@@ -17300,6 +17303,7 @@ def _compile_residual_with_lineage(
             relation_reference.observation_id,
             context.observations,
             validation_indexes.table_ids,
+            experiments=context.experiments,
             asset_ids=validation_indexes.asset_ids,
             _cache=validation_indexes.observation_lineages,
         )
@@ -18163,11 +18167,22 @@ def _is_compilation_thermo_reference(
     )
 
 
-def _has_duplicate_observation_link(observation: Observation) -> bool:
+def _has_duplicate_observation_link(
+    observation: Observation,
+    experiments: Mapping[str, Experiment] | None = None,
+) -> bool:
     provenance = observation.provenance
-    return (
+    explicit_duplicate = (
         isinstance(provenance, Mapping)
         and "duplicate_of_observation_id" in provenance
+    )
+    experiment = (
+        experiments.get(observation.experiment_id)
+        if experiments is not None
+        else None
+    )
+    return explicit_duplicate or (
+        experiment is not None and experiment.quoted_from is not None
     )
 
 
@@ -18175,8 +18190,34 @@ def _duplicate_observation_refusal_detail(
     context: ScoreContext, observation: Observation
 ) -> dict[str, object]:
     provenance = observation.provenance
-    assert isinstance(provenance, Mapping)
-    target = provenance["duplicate_of_observation_id"]
+    has_explicit_duplicate = (
+        isinstance(provenance, Mapping)
+        and "duplicate_of_observation_id" in provenance
+    )
+    explicit_target = (
+        provenance["duplicate_of_observation_id"]
+        if has_explicit_duplicate
+        else None
+    )
+    if not has_explicit_duplicate:
+        experiment = context.experiments.get(observation.experiment_id)
+        quoted_from = experiment.quoted_from if experiment is not None else None
+        assert quoted_from is not None
+        if quoted_from.target_kind is QuotedTargetKind.EXPERIMENT:
+            primary_ids = sorted(
+                candidate.observation_id
+                for candidate in context.observations.values()
+                if candidate.experiment_id == quoted_from.target_id
+            )
+            return {
+                "reason": "duplicate_of",
+                "primary_experiment_id": quoted_from.target_id,
+                "primary_observation_ids": primary_ids,
+                "resolution": "excluded" if primary_ids else "primary_missing",
+            }
+        explicit_target = quoted_from.target_id
+
+    target = explicit_target
     detail: dict[str, object] = {
         "reason": "duplicate_of",
         "primary_observation_id": target,
@@ -18232,7 +18273,7 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
         ev = obs.evidence.class_
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
             continue
-        if _has_duplicate_observation_link(obs):
+        if _has_duplicate_observation_link(obs, context.experiments):
             continue
         origin = getattr(context, "origins", {}).get(obs.observation_id)
         if is_internal_consistency(origin):
@@ -18381,7 +18422,10 @@ def _score_store_with_decisions(
                 refs.append(obs)
                 seen.add(obs.observation_id)
     for obs in context.observations.values():
-        if _has_duplicate_observation_link(obs) and obs.observation_id not in seen:
+        if (
+            _has_duplicate_observation_link(obs, context.experiments)
+            and obs.observation_id not in seen
+        ):
             refs.append(obs)
             seen.add(obs.observation_id)
     if measured_only:
@@ -18512,7 +18556,7 @@ def _score_store_with_decisions(
                 origin = origins.get(obs.observation_id)
                 duplicate_detail = (
                     _duplicate_observation_refusal_detail(context, obs)
-                    if _has_duplicate_observation_link(obs)
+                    if _has_duplicate_observation_link(obs, context.experiments)
                     else None
                 )
                 for point in _iter_compilation_series_cells(obs, origin):

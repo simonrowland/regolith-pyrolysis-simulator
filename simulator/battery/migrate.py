@@ -19556,6 +19556,11 @@ def _merge_experiment_lab_params(
         pretreatment=_prefer_located(
             existing.sample.pretreatment, sample.pretreatment
         ),
+        initial_composition_inherited_from=(
+            sample.initial_composition_inherited_from
+            if sample.initial_composition_inherited_from is not None
+            else existing.sample.initial_composition_inherited_from
+        ),
     )
     return replace(
         existing,

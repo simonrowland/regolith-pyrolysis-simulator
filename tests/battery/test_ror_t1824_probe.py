@@ -13,11 +13,10 @@ from simulator.battery.enums import (
     QuotedTargetKind,
     RefusalReason,
 )
-from simulator.battery.records import Composition, QuotedFrom, State
 from simulator.battery import migrate as M
 from simulator.battery import validate as V
+from simulator.battery.records import Composition, QuotedFrom, Sample, State
 from simulator.battery.validate import validate_corpus
-from simulator.battery.records import Sample
 from tests.battery import factories as F
 from tests.battery import test_quoted_from as Q
 
@@ -78,6 +77,34 @@ def test_inherited_values_must_match_the_cited_primary(
     assert issues[
         "experiment[quoted-experiment].sample.initial_composition_inherited_from"
     ]
+
+
+@pytest.mark.parametrize("target_kind", tuple(QuotedTargetKind))
+def test_inherited_values_require_primary_values(
+    target_kind: QuotedTargetKind,
+) -> None:
+    primary, primary_observation, quoted = _quoted_records(target_kind)
+    primary = replace(
+        primary,
+        method=State.unknown("primary method is not stated"),
+        sample=replace(primary.sample, initial_composition=None),
+    )
+    report = validate_corpus(
+        [F.work()],
+        [primary, quoted],
+        [primary_observation],
+    )
+
+    issues = {
+        issue.path
+        for issue in report.hard_issues
+        if issue.reason is RefusalReason.CONDITIONAL_FIELD
+    }
+    assert "experiment[quoted-experiment].method_inherited_from" in issues
+    assert (
+        "experiment[quoted-experiment].sample.initial_composition_inherited_from"
+        in issues
+    )
 
 
 @pytest.mark.parametrize(
