@@ -271,6 +271,9 @@ def test_source_id_comparisons_are_decrease_only() -> None:
 def test_source_id_comparison_ratchet_catches_literals_constants_and_membership() -> None:
     source = """
 from simulator.battery.generators.sample import SOURCE_ID as sample_source
+from simulator.battery.source_declarations import HASHIMOTO_SOURCE_ID as review_source
+SOURCE_ID = "review-source"
+REVIEW_SOURCE_IDS = {"review-source"}
 _SAMPLE_SOURCE_ID = "sample-source"
 def matches(source_id, observation):
     return (
@@ -278,11 +281,76 @@ def matches(source_id, observation):
         or observation.source_id == _SAMPLE_SOURCE_ID
         or source_id in {"first-source", "second-source"}
         or source_id == sample_source
+        or source_id == SOURCE_ID
+        or source_id in REVIEW_SOURCE_IDS
+        or source_id == review_source
     )
 """
     sites = _source_id_comparison_sites_in_source(source, "synthetic.py")
 
-    assert len(sites) == 4, "all source-id comparison forms must enter the ratchet"
+    assert len(sites) == 7, "all source-id comparison forms must enter the ratchet"
+
+
+def test_compilation_source_ids_reuse_reference_data_owners() -> None:
+    declaration_path = REPO_ROOT / "simulator/battery/source_declarations.py"
+    declaration_tree = ast.parse(declaration_path.read_text(encoding="utf-8"))
+    owners = {
+        "B1259_SOURCE_ID": "simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader",
+        "B1452_SOURCE_ID": "simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader",
+    }
+    declaration_imports = {
+        (alias.asname or alias.name, alias.name): node.module
+        for node in declaration_tree.body
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+    assert all(
+        declaration_imports.get((name, "SOURCE_ID")) == module
+        for name, module in owners.items()
+    )
+
+    declarations = next(
+        node.value
+        for node in declaration_tree.body
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == "SOURCE_DECLARATIONS"
+            for target in node.targets
+        )
+    )
+    assert isinstance(declarations, ast.Dict)
+    declaration_keys = {
+        key.id for key in declarations.keys if isinstance(key, ast.Name)
+    }
+    assert set(owners) <= declaration_keys
+
+    migration_path = REPO_ROOT / "simulator/battery/migrate.py"
+    migration_tree = ast.parse(migration_path.read_text(encoding="utf-8"))
+    migration_imports = {
+        (alias.asname or alias.name, alias.name): node.module
+        for node in migration_tree.body
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+    migration_names = {
+        "B1259_SOURCE_ID": "_B1259_SOURCE_ID",
+        "B1452_SOURCE_ID": "_B1452_SOURCE_ID",
+    }
+    assert all(
+        migration_imports.get((local_name, "SOURCE_ID")) == owners[owner_name]
+        for owner_name, local_name in migration_names.items()
+    )
+    assert not any(
+        isinstance(node, (ast.Assign, ast.AnnAssign))
+        and any(
+            isinstance(target, ast.Name)
+            and target.id in migration_names.values()
+            for target in (
+                node.targets if isinstance(node, ast.Assign) else [node.target]
+            )
+        )
+        for node in migration_tree.body
+    )
 
 
 def test_finite_numeric_helpers_are_frozen() -> None:
