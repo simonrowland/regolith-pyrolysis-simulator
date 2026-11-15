@@ -14061,6 +14061,26 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
 ) -> None:
     from simulator.battery import score as score_module
 
+    original_combine = getattr(
+        score_module, "_combine_independent_standard_uncertainties", None
+    )
+    combine_calls = []
+    combined_by_measurement = {}
+
+    def capture_combine(measurement_sigma, conversion_sigma):
+        combine_calls.append((measurement_sigma, conversion_sigma))
+        if original_combine is None:
+            return Decimal(0)
+        combined = original_combine(measurement_sigma, conversion_sigma)
+        combined_by_measurement[measurement_sigma] = combined
+        return combined
+
+    monkeypatch.setattr(
+        score_module,
+        "_combine_independent_standard_uncertainties",
+        capture_combine,
+        raising=False,
+    )
     temperature = Decimal("2000")
     composition = Composition(
         basis="printed_mole_fraction",
@@ -14089,7 +14109,7 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
         ),
         uncertainty=Uncertainty(
             kind=UncertaintyKind.PRINTED,
-            verbatim="±0.10 standard deviation of log10(a) as printed",
+            verbatim="±0.10 dex",
             locator=F.loc(page=4, table="2"),
         ),
     )
@@ -14117,17 +14137,37 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
         reference,
         Engine.INTERNAL_ANALYTICAL,
         context=_context(F.work(), experiment, reference, review="reviewed"),
-        prediction=_predict(converted.value.point, converted.identity),
+        prediction=_predict(
+            converted.value.point * Decimal("1.4125375446227544"),
+            converted.identity,
+        ),
     )
 
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
+    assert residual.status is ResidualStatus.MATCH
     band = residual.numeric.decision_band
     assert band.band_basis == "fusion_combined_row_printed"
     assert band.value > Decimal("0.10") * score_module.NORMAL_95_TICKET_MULTIPLIER
     # sigma_conv = 1 kJ/mol * 1000 J/kJ / (8.31441 J/(mol K) * 2000 K * ln(10));
     # sigma_total = sqrt(0.10^2 + sigma_conv^2) dex; ticket = 1.959963984540054 * sigma_total.
     assert band.value.quantize(Decimal("0.00001")) == Decimal("0.20257")
+    # The two-sigma reading treats the same printed width as 0.05 dex.
+    # With the same JANAF conversion sigma its ticket is 0.11056 dex.
+    assert [measurement for measurement, _conversion in combine_calls] == [
+        Decimal("0.10"),
+        Decimal("0.05"),
+    ]
+    assert combine_calls[0][1] == combine_calls[1][1]
+    assert (
+        score_module.NORMAL_95_TICKET_MULTIPLIER
+        * combined_by_measurement[Decimal("0.05")]
+    ).quantize(Decimal("0.00001")) == Decimal("0.11056")
+    assert any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+        and "two_sigma_reading_verdict=mismatch" in (notice.band or "")
+        for notice in residual.notices
+    )
     assert any(
         item.reason.startswith("reference_converted_via_fusion;")
         for item in residual.notices

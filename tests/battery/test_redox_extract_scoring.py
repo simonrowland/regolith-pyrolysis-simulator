@@ -499,6 +499,27 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     residuals, _ = score_store(
         context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
     )
+    sossi_sd_ids = {
+        observation_id
+        for observation_id, observation in _observations.items()
+        if observation.source_id == "sossi-2020-magma-ocean-redox"
+        and isinstance(observation.uncertainty.verbatim, dict)
+        and "confidence_level" not in observation.uncertainty.verbatim
+    }
+    assert len(sossi_sd_ids) == 11
+    sossi_sd_residuals = [
+        residual for residual in residuals if residual.reference in sossi_sd_ids
+    ]
+    assert len(sossi_sd_residuals) == 11
+    for residual in sossi_sd_residuals:
+        assert residual.numeric is not None
+        assert residual.numeric.decision_band is not None
+        assert residual.numeric.decision_band.rule.startswith("printed_1sigma:")
+        assert not any(
+            notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+            or "two_sigma_reading_verdict=" in (notice.band or "")
+            for notice in residual.notices
+        )
     encoded = json.dumps(
         [residual_to_plain(residual) for residual in residuals],
         sort_keys=True,
