@@ -918,6 +918,54 @@ def test_tier_a_uses_bulk_compatibility_invariant_and_congruent_compound():
     }
     assert first_liquid_tier_a(table, c3a) == 1535.0
 
+    # Table 6 row 2 is the C12A7-C3A eutectic at 1395 C. C3A is CaO 62.27
+    # wt% by the formula owner, so 62/38 is not the pure phase at the cited
+    # 0.01 wt% source resolution; it lies between 48.54 wt% C12A7 and 62.27
+    # wt% C3A. Caller spelling must not alter that physical classification.
+    for bulk in (
+        {"CaO": 62, "Al2O3": 38},
+        {"CaO": 62.0, "Al2O3": 38.0},
+        {"CaO": 62.00, "Al2O3": 38.00},
+    ):
+        assert first_liquid_tier_a(table, bulk) == 1395.0
+
+
+def test_zero_mass_deposit_preserves_tier_a_subsystem_membership():
+    table = load_interface_invariant_table(
+        "source-backed",
+        catalog={
+            "source-backed": {
+                "interface_chemistry": {
+                    "composition": {"CaO": 59.0, "Al2O3": 41.0},
+                    "citation": "Morey 1964, Table 6",
+                    "invariant_table": {
+                        "loader": "liner_corrosion_source_extracts",
+                        "subsystems": ["CaO-Al2O3"],
+                    },
+                }
+            }
+        },
+    )
+    liner = {"CaO": 59.0, "Al2O3": 41.0}
+    no_deposit = contaminated_interface_composition(
+        liner,
+        {},
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+    )["composition_wt_pct"]
+    zero_na_deposit = contaminated_interface_composition(
+        liner,
+        {"Na": 0.0},
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+    )["composition_wt_pct"]
+
+    assert zero_na_deposit == no_deposit
+    assert first_liquid_tier_a(table, no_deposit) == 1395.0
+    assert first_liquid_tier_a(table, zero_na_deposit) == 1395.0
+
 
 def test_tier_a_anorthite_row_supplies_cited_pure_melting_temperature():
     table = load_interface_invariant_table(

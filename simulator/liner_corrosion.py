@@ -154,6 +154,18 @@ def validate_oxide_composition(composition_wt_pct: Mapping[str, Any]) -> dict[st
     return result
 
 
+def _positive_oxide_composition(
+    composition_wt_pct: Mapping[str, float],
+) -> dict[str, float]:
+    """Drop zero-weight oxide keys before selecting a cited subsystem."""
+
+    return {
+        oxide: wt_pct
+        for oxide, wt_pct in composition_wt_pct.items()
+        if wt_pct > 0.0
+    }
+
+
 def _checked_deposit(deposit_kg_by_species: Mapping[str, Any]) -> dict[str, float]:
     if not isinstance(deposit_kg_by_species, Mapping):
         raise LinerCorrosionRefusal("deposit_by_species_invalid")
@@ -245,6 +257,8 @@ def deposit_oxide_composition(
     checked = _oxide_equivalent_kg_by_species(deposit_kg_by_species)
     oxide_kg: dict[str, float] = {}
     for species, kg in checked.items():
+        if kg <= 0.0:
+            continue
         oxide = DEPOSIT_OXIDE_BY_SPECIES[species]
         oxide_kg[oxide] = oxide_kg.get(oxide, 0.0) + kg
     total = math.fsum(oxide_kg.values())
@@ -331,6 +345,8 @@ def contaminated_interface_composition(
         for oxide, wt_pct in liner.items()
     }
     for species, kg in deposits.items():
+        if kg <= 0.0:
+            continue
         oxide = DEPOSIT_OXIDE_BY_SPECIES[species]
         interface[oxide] = interface.get(oxide, 0.0) + 100.0 * kg / denominator_kg
     total_wt_pct = math.fsum(interface.values())
@@ -1139,7 +1155,7 @@ def _is_liquid_phase(phase: Any) -> bool:
 
 
 def _printed_half_digit(value: Any) -> float:
-    """Return half of the last printed digit for one source/input value."""
+    """Return half of the last printed digit for a source value."""
 
     text = str(value).strip().lower()
     mantissa, marker, exponent = text.partition("e")
@@ -1160,6 +1176,35 @@ def _source_precision_matches(
     return all(
         abs(left[oxide] - right[oxide]) <= _printed_half_digit(printed[oxide])
         for oxide in left
+    )
+
+
+def _phase_formula_matches_at_source_precision(
+    composition: Mapping[str, float],
+    phase_composition: Mapping[str, float],
+    source_row_composition: Mapping[str, Any],
+) -> bool:
+    """Match a formula-owner phase at source-row and formula precision.
+
+    The source row provides its transcribed liquid-composition precision;
+    phase identity is also bounded by the formula-derived composition at the
+    hundredth-wt-percent resolution. Use the tighter half-digit tolerance so
+    a coarse printed liquid point cannot make a nearby bulk into a pure phase.
+    Neither tolerance comes from the caller's number notation.
+    """
+
+    if (
+        set(composition) != set(phase_composition)
+        or set(composition) != set(source_row_composition)
+    ):
+        return False
+    return all(
+        abs(composition[oxide] - phase_composition[oxide])
+        <= min(
+            _printed_half_digit(source_row_composition[oxide]),
+            _printed_half_digit(f"{phase_composition[oxide]:.2f}"),
+        )
+        for oxide in composition
     )
 
 
@@ -1306,7 +1351,9 @@ def _tier_a_pure_phase_melting_reference(
 
     if not isinstance(invariant_table, Mapping):
         return None
-    liner = validate_oxide_composition(liner_composition_wt_pct)
+    liner = _positive_oxide_composition(
+        validate_oxide_composition(liner_composition_wt_pct)
+    )
     rows = invariant_table.get("invariants")
     if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
         return None
@@ -1389,11 +1436,9 @@ def first_liquid_tier_a(
     peritectic transition. A liquid composition by itself is not a bulk field.
     """
 
-    composition = validate_oxide_composition(composition_wt_pct)
-    input_precision = {
-        str(oxide).strip(): raw_value
-        for oxide, raw_value in composition_wt_pct.items()
-    }
+    composition = _positive_oxide_composition(
+        validate_oxide_composition(composition_wt_pct)
+    )
     _raise_tier_a_acquisition_gap(invariant_table, composition)
     rows = invariant_table.get("invariants") if isinstance(invariant_table, Mapping) else None
     if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)) or not rows:
@@ -1507,12 +1552,16 @@ def first_liquid_tier_a(
                 ):
                     continue
                 phase_composition = phases_by_name[solid_side[0]]
-                if set(composition) == set(phase_composition) and all(
-                    abs(composition[oxide] - phase_composition[oxide])
-                    <= _printed_half_digit(
-                        input_precision.get(oxide, composition[oxide])
+                # Phase identity uses source-row precision and formula-owner
+                # stoichiometry, never the caller's notation.
+                # C3A is CaO 62.27 wt%, so 62/38 lies in the C12A7-C3A field
+                # and takes Morey Table 6 row 2 (1395 C), while formula C3A
+                # takes row 1 (1535 C).
+                if (
+                    isinstance(liquid_composition, Mapping)
+                    and _phase_formula_matches_at_source_precision(
+                        composition, phase_composition, liquid_composition
                     )
-                    for oxide in composition
                 ):
                     # A peritectic row applies at its single solid reactant;
                     # the adjacent compatibility segment is tested below.
@@ -1777,6 +1826,7 @@ def _tier_a_saturated_deposit_fraction(
             "tier_a_saturation_data_at_service_temperature_missing"
         )
     deposit_oxides = deposit_oxide_composition(deposits)
+    mixed_components = set(_positive_oxide_composition(mixed_composition))
     matches: set[float] = set()
     for row in rows:
         if not isinstance(row, Mapping) or _first_liquid_exclusion_reason(row):
@@ -1787,7 +1837,7 @@ def _tier_a_saturated_deposit_fraction(
         if (
             not isinstance(liquid, Mapping)
             or not isinstance(subsystem, str)
-            or set(subsystem.split("-")) != set(mixed_composition)
+            or set(subsystem.split("-")) != mixed_components
             or temperature is None
         ):
             continue
