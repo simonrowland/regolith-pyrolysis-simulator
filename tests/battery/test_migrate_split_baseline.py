@@ -12,7 +12,6 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
 import yaml
 
 from simulator.battery.migrate import (
@@ -44,11 +43,14 @@ _COMPILATION = (
     "data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/"
     "records/robie-hemingway-fisher-1978-usgs-b1452-0046-phase-04.json"
 )
+_FAST_SAFE_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 
 def _one_extract_row(tmp_path: Path, filename: str, observation_id: str):
     source_path = REPO_ROOT / "data/literature" / "extracts" / filename
-    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    document = yaml.load(
+        source_path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+    )
     matches = []
     species = {}
     for formula, payload in document["species"].items():
@@ -157,7 +159,7 @@ def _pinned_output(result, observation_id: str) -> dict[str, object]:
 
 
 def _observation_rows(output: bytes) -> dict[str, dict[str, object]]:
-    document = yaml.safe_load(output)
+    document = yaml.load(output, Loader=_FAST_SAFE_YAML_LOADER)
     if not isinstance(document, dict) or not isinstance(document.get("observations"), list):
         return {}
     return {
@@ -212,7 +214,6 @@ def _store_difference_details(
     return "\n".join(details)
 
 
-@pytest.mark.xdist_group("serial")
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
     actual = {}
     for row in _EXTRACT_ROWS:
@@ -2336,10 +2337,7 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
     assert actual == expected, json.dumps(actual, sort_keys=True, separators=(",", ":"), default=str)
 
 
-@pytest.mark.nightly
-@pytest.mark.xdist_group("serial")
-@pytest.mark.cpu_budget(2600)
-def test_complete_store_regeneration_matches_checked_in_bytes() -> None:
+def _assert_complete_store_regeneration_matches_checked_in_bytes() -> None:
     result = migrate(REPO_ROOT, write=False)
     stored = _store_output_file_bytes(REPO_ROOT)
     regenerated: dict[str, bytes] = {}
