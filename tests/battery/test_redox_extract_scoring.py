@@ -539,10 +539,12 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # 1ab48f4d30da838c5ae5a6445b3a773bee1c04738637e2693f7b2e17263d46b2
     # and the twelve Sossi rows were refused input_phase_assemblage_unstated.
     # Those twelve now score. The six Aithala rows are byte-identical.
-    # d-341 assumes 1 sigma for unstated printed ± values, changing the scored
-    # verdicts and serialized bands for the Sossi rows.
+    # d-341 assumes 1 sigma only where neither metadata nor printed text states
+    # the level. P1 recognizes the Sossi rows' printed SD caption, preserving
+    # their primary 1-sigma verdicts while removing the false assumption and
+    # alternative-reading notices from their serialized payloads.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "972d3290592dc026f0b481e4648faa0bb34510ea58190730d2fe837ccc9ffd26"
+        "480b681919b0775dcb311cf43bc51d0c4f097a429d9699736ce2cfad20ef69d0"
     )
 
 
