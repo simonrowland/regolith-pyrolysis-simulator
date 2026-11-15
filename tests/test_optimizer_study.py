@@ -47,7 +47,6 @@ from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import (
     FailureCategory,
-    MASS_BALANCE_ABORT_PCT,
     RunReference,
     ScoredResult,
     _build_eval_inputs,
@@ -188,11 +187,7 @@ def _run_reference(**kwargs: Any) -> RunReference:
     return RunReference(product_summary=product_summary, **kwargs)
 
 
-def _write_cli_physics_smoke_profile(
-    tmp_path: Path,
-    *,
-    include_coating: bool = False,
-) -> Path:
+def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
     profile = copy.deepcopy(PROFILE)
     profile["profile_id"] = "cli-physics-smoke"
     # Stay on the profile's one-hour campaign. A C0 pyrolysis start follows
@@ -202,11 +197,8 @@ def _write_cli_physics_smoke_profile(
     # test_lunar_highland_c0_horizon_changes_extracted_metals.
     # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
     profile["run"]["allow_unmeasured_alpha_fallback"] = True
-    gates = ["furnace_temperature"]
-    if include_coating:
-        gates.append("coating")
     profile["constraints"] = {
-        "gates": gates,
+        "gates": ["furnace_temperature"],
         "furnace_T_max_C": 1800.0,
     }
     path = tmp_path / "cli-physics-smoke.yaml"
@@ -7412,12 +7404,6 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     if instrumented_env.get("PYTHONPATH"):
         pythonpath.append(instrumented_env["PYTHONPATH"])
     instrumented_env["PYTHONPATH"] = os.pathsep.join(pythonpath)
-    # The d-401 wall-supply booking is published by the coating report, so
-    # this end-to-end booking pin explicitly activates that gate.
-    cli_profile = _write_cli_physics_smoke_profile(
-        tmp_path,
-        include_coating=True,
-    )
     good = subprocess.run(
         [
             sys.executable,
@@ -7469,11 +7455,14 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     assert events_by_pid[evaluator_pids[0]].get("magemin_initialize", 0) == 1
     assert events_by_pid[evaluator_pids[0]].get("magemin_equilibrate", 0) == 48
     assert (out_dir / "pareto.json").exists()
-    # The explicit coating gate publishes the CrO2 wall-saturation-pressure
-    # refusal for this one-hour C2A_continuous run. d-401 bounds its source
-    # supply below ledger resolution, books the authorized zero, and keeps
-    # the candidate priced. Furnace amortization remains available at zero
-    # cost.
+    # This smoke profile explicitly enables only the furnace_temperature
+    # gate, so no coating report publishes a wall-saturation-pressure
+    # refusal. Studio summaries at green and the merged tip have no refused
+    # wall-pressure species; CrO2's carrier authority is instead refused for
+    # missing_evidence (no assemblage/potential evidence and no Henrian upper
+    # bound). d-401 books wall-saturation-pressure refusals, so this run has
+    # no CrO2 wall-supply booking. Furnace amortization remains available at
+    # zero cost.
     # This profile evaluates its one-hour C2A_continuous campaign. It does
     # not enter the C0 AUTO_APPLY sequence or encounter a C6 refusal. The
     # returned priced objective makes the single feasible candidate rankable.
@@ -7491,27 +7480,20 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
         row for row in pareto["pareto"] if row.get("candidate_id") == winner_id
     ]
     assert winner_rows
-    booked = [
-        (row.get("product_summary") or {}, booking)
-        for row in winner_rows
-        for booking in (row.get("product_summary") or {}).get(
-            "wall_supply_bound_bookings",
-            (),
-        )
-        if booking.get("species") == "CrO2"
-    ]
-    assert len(booked) == 1
-    summary, cro2 = booked[0]
+    summary = winner_rows[0].get("product_summary") or {}
     assert summary["furnace_amortization_status"] == "available"
-    assert cro2["reason"] == "below_wall_supply_upper_bound"
-    assert cro2["deposit_kg"] == 0.0
-    assert cro2["supply_upper_bound_kg"] <= cro2["ledger_resolution_kg"]
-    assert cro2["ledger_resolution_kg"] == pytest.approx(
-        1000.0 * MASS_BALANCE_ABORT_PCT / 100.0
-    )
     authority = summary["wall_deposit_sticking_authority"]
-    assert "CrO2" in list(
-        authority.get("wall_saturation_pressure_refused_species") or []
+    assert summary.get("wall_supply_bound_bookings") is None
+    assert authority.get("wall_saturation_pressure_refused_species") in (None, [])
+    assert (
+        authority["vapour_carrier_authority_status_by_species"]["CrO2"]
+        == "refused"
+    )
+    assert (
+        authority["vapour_carrier_authority_by_species"]["CrO2"]["pressure"][
+            "code"
+        ]
+        == "missing_evidence"
     )
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
