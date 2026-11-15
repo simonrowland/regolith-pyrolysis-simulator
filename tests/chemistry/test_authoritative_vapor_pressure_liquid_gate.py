@@ -384,7 +384,7 @@ def test_internal_analytical_refresh_treats_freeze_gate_fallback_as_missing() ->
         (1200.0, 0.0),
         (1250.0, 0.1),
         (1300.0, 0.2),
-        (1350.0, 0.6),
+        (1350.0, 0.6000000000000001),
         (1400.0, 1.0),
         (1450.0, 1.0),
     ),
@@ -403,8 +403,9 @@ def test_freeze_gate_curve_interpolation_matches_parent_golden(
     expected_fraction,
 ) -> None:
     # Parent 602581452 arithmetic: the 1250 C segment is 0 + .2 * .5 = .1;
-    # the 1350 C segment is .2 + (1.0 - .2) * .5 = .6. Exact knots and the
-    # legacy solidus/liquidus boundary branches return their sampled endpoints.
+    # the 1350 C segment is .2 + (1.0 - .2) * .5 = 0.6000000000000001.
+    # Exact knots and the legacy solidus/liquidus boundary branches return
+    # their sampled endpoints.
     curve = {
         'solidus_T_C': 1200.0,
         'liquidus_T_C': 1400.0,
