@@ -125,6 +125,7 @@ from simulator.battery.migrate import (
 
 )
 from simulator.battery.stable_ids import series_point_id, series_row_extra
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 
 _FAST_SAFE_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
@@ -13094,29 +13095,24 @@ def test_ohta_feto_standard_state_lifts_liquid_reference(tmp_path: Path) -> None
     assert reference_state.value.endmember.phase.value is Phase.L
 
 
-def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
+def test_stolyarova_table3_reference_states_are_stable(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
         tmp_path, "stolyarova-1996-cao-alumina-silica-kems.yaml"
     )
-    rows = sorted(
-        (oid, obs)
+    actual = {
+        oid: to_plain(obs.identity.reference_state)
         for oid, obs in result.observations.items()
         if "stolyarova_1996_table3_" in oid
+    }
+    expected = load_named_manifest(
+        REPO_ROOT
+        / "tests"
+        / "manifests"
+        / "stolyarova_table3_reference_states.jsonl"
     )
-    assert len(rows) == 137
-    payload = [(oid, to_plain(obs.identity.reference_state)) for oid, obs in rows]
-    digest = hashlib.sha256(
-        json.dumps(
-            payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
-        ).encode()
-    ).hexdigest()
-    # t-1353 stores the physical PDF page on locator.page, so the content-stable
-    # point ids move. The Table 2-3 run conditions move the same :h= suffix.
-    # The digest pins 30 unknown SiO2 polymorph states copied from the extract (no cristobalite).
-    # d-338 inference lives in score.py::_decide_omitted_reference_polymorph, not migration.
-    assert digest == "1e5fd93f852bd4c9c65ae8a0454d8a40a4d04ee1b2ab37efbc25924dda5f403d"
+    assert_named_rows(actual, expected, label="Stolyarova 1996 Table 3 reference states")
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
@@ -13186,7 +13182,6 @@ def test_stolyarova_1996_comparison_provenance_is_activity_only(
         and obs.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
     ]
 
-    assert len(activities) == 137
     assert all(
         obs.provenance is not None
         and obs.provenance.get("comparison_method", {}).get("kind")
@@ -13344,10 +13339,29 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         if "stolyarova_1996_fig2_" in obs.observation_id
         and "_digitized" in obs.observation_id
     ]
+    table3_candidates = [
+        obs
+        for obs in table_candidates
+        if "stolyarova_1996_table3_" in obs.observation_id
+    ]
+    table3_manifest = load_named_manifest(
+        REPO_ROOT
+        / "tests"
+        / "manifests"
+        / "stolyarova_table3_reference_states.jsonl"
+    )
+    assert_named_rows(
+        {
+            obs.observation_id: to_plain(obs.identity.reference_state)
+            for obs in table3_candidates
+        },
+        table3_manifest,
+        label="Stolyarova 1996 Table 3 comparison candidates",
+    )
     assert _rail_counter(table_candidates) == {
         "None": 6,
         "SiO_evolution": 45,
-        "melt_activity": 137,
+        "melt_activity": len(table3_manifest),
         "vapour": 118,
     }
     assert _rail_counter(figure_candidates) == {"melt_activity": 277}
