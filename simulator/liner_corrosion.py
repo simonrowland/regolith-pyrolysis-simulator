@@ -63,6 +63,7 @@ TIER_B_MELT_SCAN_MIN_C = 500.0
 TIER_B_MELT_SCAN_MAX_C = 1600.0
 TIER_B_MELT_SCAN_STEP_C = 25.0
 TIER_B_COMPOSITION_NEIGHBOUR_DELTA_WT_PCT = 0.01
+# d-419 first-liquid output flags identify engine eutectics, closure, and resolution.
 ENGINE_MINOR_PHASE_EUTECTIC_FLAG = "engine_minor_phase_eutectic"
 PHASE_CLOSURE_UNVERIFIED_FLAG = "phase_closure_unverified"
 DEPOSIT_MELT_BELOW_RESOLUTION_FLAG = "deposit_melt_below_resolution"
@@ -576,7 +577,9 @@ def _campaign_branch(
     invariant_table: Mapping[str, Any] | None = None,
 ) -> tuple[int | str, dict[str, float], float, dict[str, Any] | None]:
     deposits = _checked_deposit(initial_deposit_kg_by_species)
-    service_sample_C = _finite_real(temperature_C, "temperature_C") - _finite_real(
+    # Tier A's binary field sampler tests onset at T_service + margin because
+    # the safety allowance lowers the equivalent service rating by margin.
+    service_sample_C = _finite_real(temperature_C, "temperature_C") + _finite_real(
         margin_C, "margin_C"
     )
     pressure = (
@@ -1288,20 +1291,27 @@ def _tier_a_fallback_melt_activity(
         "tier_a_contaminated_first_liquid_T_C",
     )
     margin = _finite_real(margin_C, "margin_C")
-    # Tier A's existing onset gate evaluates the cited first-liquid point at
-    # service_temperature - margin; the equivalent service rating is T_first + margin.
-    rating = contaminated_temperature + margin
     literature_temperature = (
         _finite_real(literature_melting_temperature_C, "literature_melting_temperature_C")
         if literature_melting_temperature_C is not None
         else None
     )
     literature_source = "cited_literature" if literature_temperature is not None else None
+    # A positive safety margin lowers the usable temperature: the rating is
+    # T_first - margin, capped at the pure-liner T_lit - margin.
+    rating_cap = (
+        literature_temperature - margin
+        if literature_temperature is not None
+        else None
+    )
+    rating = contaminated_temperature - margin
+    if rating_cap is not None:
+        rating = min(rating, rating_cap)
     service_excess = 0.0
     onset_at_service = False
     if service_temperature_C is not None and deposits:
-        onset_at_service = contaminated_temperature <= (
-            _finite_real(service_temperature_C, "service_temperature_C") - margin
+        onset_at_service = rating <= (
+            _finite_real(service_temperature_C, "service_temperature_C")
         )
         service_excess = float(onset_at_service)
     result = {
@@ -1325,7 +1335,7 @@ def _tier_a_fallback_melt_activity(
             "literature_reference_citation"
         ),
         "rating_temperature_C": rating,
-        "rating_cap_temperature_C": None,
+        "rating_cap_temperature_C": rating_cap,
         "tier_a_fallback": True,
         "engine_composition_sensitive": dict(sensitivity),
         "composition_continuity": {
@@ -2292,7 +2302,7 @@ def tier_a_first_liquid_onset(
     margin_C: float,
 ) -> dict[str, Any]:
     first_liquid_C = first_liquid_tier_a(invariant_table, composition_wt_pct)
-    service_limit_C = _finite_real(service_temperature_C, "service_temperature_C") - _finite_real(
+    service_limit_C = _finite_real(service_temperature_C, "service_temperature_C") + _finite_real(
         margin_C, "margin_C"
     )
     return {
@@ -2419,7 +2429,6 @@ def _interface_state_at_depth(
         area_m2=area_m2,
         reacted_layer_depth_m=reacted_layer_depth_m,
     )
-    sample_temperature_C = service_temperature_C - margin_C
     if criterion_tier == "A":
         if not isinstance(invariant_table, Mapping) or not invariant_table:
             raise LinerCorrosionRefusal("liner_invariant_table_missing")
@@ -2431,7 +2440,9 @@ def _interface_state_at_depth(
             "mixed": mixed,
             "first_melt_T_C": first_melt_C,
             "liquid_fraction": None,
-            "onset": first_melt_C <= sample_temperature_C,
+            # The service rating is T_first - margin, so the equivalent
+            # first-liquid lookup is at T_service + margin.
+            "onset": first_melt_C <= service_temperature_C + margin_C,
         }
     if criterion_tier != "B":
         raise LinerCorrosionRefusal("liner_criterion_tier_invalid", criterion_tier)
@@ -2471,7 +2482,7 @@ def _interface_state_at_depth(
         liquid_fraction = _tier_b_sample_at_temperature_with_reference(
             sampler,
             mixed["composition_wt_pct"],
-            sample_temperature_C,
+            service_temperature_C,
             pressure_bar,
             continuity_reference,
             context=continuity_context,
@@ -2769,7 +2780,7 @@ def build_liner_state_segment(
     melt_activity = interface_state.get("melt_activity")
     if isinstance(melt_activity, Mapping):
         flags.extend(melt_activity.get("flags", ()))
-    sample_temperature_C = service_C - margin_C
+    sample_temperature_C = service_C
     if tier == "B":
         flags.append("tier_b_liquid_fraction_only_no_solidus_claim")
 

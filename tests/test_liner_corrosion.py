@@ -1109,11 +1109,13 @@ def test_tier_b_neighbour_disagreement_uses_tier_a_or_refuses():
         margin_C=25.0,
         literature_melting_temperature_C=None,
         pure_reference=fallback,
-        service_temperature_C=1500.0,
+        service_temperature_C=1450.0,
         invariant_table=table,
     )
     assert fallback_activity["tier_a_fallback"] is True
-    assert fallback_activity["rating_temperature_C"] == 1475.0
+    # A 25 C safety allowance lowers the 1450 C first-liquid rating to 1425 C.
+    assert fallback_activity["rating_temperature_C"] == 1425.0
+    assert fallback_activity["rating_cap_temperature_C"] is None
     assert fallback_activity["criterion_signal_at_service_temperature"] == 1.0
 
 
@@ -1772,6 +1774,12 @@ def test_tier_a_anorthite_row_supplies_cited_pure_melting_temperature():
     )
     assert reference["citation"]["observation_id"] == "morey1964_t26_r6"
     assert reference["citation"]["locator"]["published_page"] == "L71"
+    assert tier_a_first_liquid_onset(
+        table,
+        anorthite,
+        service_temperature_C=1550.0,
+        margin_C=25.0,
+    )["onset"]
 
 
 def test_tier_a_refuses_when_cited_transition_lacks_solid_phase_data():
@@ -2094,6 +2102,62 @@ def test_tier_a_invariant_signal_runs_the_campaign_recurrence_without_engine_pre
     )
     assert result["campaigns_to_runaway"] == [1, 1]
     assert result["criterion_signal_at_horizon_or_onset"]["reactive_upper_bound"] == 1.0
+
+
+def test_tier_a_margin_triggers_anorthite_onset_at_1550_c():
+    table = _anorthite_tier_a_table()
+    anorthite = _formula_derived_anorthite()
+
+    at_1550 = tier_a_first_liquid_onset(
+        table,
+        anorthite,
+        service_temperature_C=1550.0,
+        margin_C=25.0,
+    )
+    below_rating = tier_a_first_liquid_onset(
+        table,
+        anorthite,
+        service_temperature_C=1527.0,
+        margin_C=25.0,
+    )
+    # Morey Table 26 row 6 gives T_first=1553 C, so T_rating=1553-25=1528 C.
+    assert at_1550["service_limit_T_C"] == 1575.0
+    assert at_1550["onset"] is True
+    assert below_rating["onset"] is False
+
+    fallback_activity = liner_corrosion._tier_a_fallback_melt_activity(
+        anorthite,
+        deposits={},
+        invariant_table=table,
+        pure_reference={"flags": [], "literature_melting_temperature_C": 1553.0},
+        literature_melting_temperature_C=1553.0,
+        margin_C=25.0,
+        service_temperature_C=None,
+        sensitivity={"status": "test"},
+    )
+    assert fallback_activity["rating_temperature_C"] == 1528.0
+    assert fallback_activity["rating_cap_temperature_C"] == 1528.0
+
+    recurrence = corrosion_campaign_recurrence(
+        anorthite,
+        {},
+        {},
+        {},
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+        temperature_C=1550.0,
+        pressure_bar=None,
+        margin_C=25.0,
+        horizon=0,
+        sampler=TierAInvariantSampler(table),
+    )
+    assert recurrence["campaigns_to_runaway"] == [0, 0]
+    assert recurrence["criterion_signal_at_horizon_or_onset"] == {
+        "reactive_upper_bound": 1.0,
+        "inert": 1.0,
+        "coupled": 1.0,
+    }
 
 
 def test_tier_a_dissolution_uses_the_matched_source_liquid_composition():
