@@ -64,6 +64,7 @@ from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
+    INHERIT_PROCESS_GROUP_ENV,
     WarmEngineWorker,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -4539,6 +4540,11 @@ def _bootstrap_isolated_cell_engine(
     engine_settings: Mapping[str, Any] | None = None,
 ) -> tuple[_IsolatedCellEngine, str]:
     """Resolve the battery engine before WarmEngineWorker signals ready."""
+    if engine == "internal-analytical":
+        # The isolated-cell worker owns this process group. Keep nested
+        # MAGEMin workers and their binary in it so timeout cleanup reaches
+        # the full descendant tree.
+        os.environ[INHERIT_PROCESS_GROUP_ENV] = "1"
     settings = dict(engine_settings or {})
     handle = _open_battery_engine_with_settings(engine, settings or None)
     return _IsolatedCellEngine(handle, settings), engine
