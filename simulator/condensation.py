@@ -108,6 +108,7 @@ from simulator.transport_regime import (
 )
 from simulator.physical_constants import (
     AVOGADRO,
+    BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT_10SIG,
     STANDARD_ATMOSPHERE_PA,
@@ -152,6 +153,8 @@ from simulator.state import (
 )
 
 
+# Public compatibility alias consumed by web/routes.py and tests.
+BOLTZMANN_CONSTANT_J_K = BOLTZMANN
 AVOGADRO_MOL = AVOGADRO
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
