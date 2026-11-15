@@ -4200,11 +4200,8 @@ def _corpus_stems_including_aliases() -> set[str]:
     return present
 
 
-def test_pilot_extract_count_exact_and_merge_smoke():
-    """Pilot census (68) remains; live corpus may grow with post-policy extracts.
-
-    Merge produces species + coverage + consistency over the full live set.
-    """
+def _assert_pilot_extract_count() -> list[Path]:
+    """Keep the frozen pilot census covered without running the full merge."""
     files = vle.discover_extracts()
     policy = _fidelity_policy_doc()
     closed = set(policy["closed_set_source_ids"])
@@ -4213,6 +4210,18 @@ def test_pilot_extract_count_exact_and_merge_smoke():
     assert closed - RETIRED_DUPLICATE_SOURCE_IDS <= present
     assert RETIRED_DUPLICATE_SOURCE_IDS.isdisjoint({path.stem for path in files})
     assert len(files) >= 68  # live corpus may include t-509 OCR extracts
+    return files
+
+
+def test_pilot_extract_count_exact():
+    """Pilot census (68) remains; live corpus may grow with post-policy extracts."""
+    _assert_pilot_extract_count()
+
+
+@pytest.mark.nightly
+def test_pilot_extract_count_exact_and_merge_smoke():
+    """Merge produces species + coverage + consistency over the full live set."""
+    files = _assert_pilot_extract_count()
     extracts = em.load_extracts(require_valid=True)
     assert len(extracts) == len(files)
     view = em.build_by_species(extracts)

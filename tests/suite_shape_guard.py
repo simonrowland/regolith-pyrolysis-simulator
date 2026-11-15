@@ -173,17 +173,34 @@ NIGHTLY_YIELD_HEAVY_ROSTER = frozenset(
 )
 
 
-def _nightly_yield_violations() -> list[str]:
-    yield_module = import_module("tests.test_yield_root_cause")
+def _nightly_marker_violations() -> list[str]:
+    required = (
+        (
+            "tests.test_yield_root_cause",
+            tuple(sorted(name for _, name in NIGHTLY_YIELD_HEAVY_ROSTER)),
+        ),
+        (
+            "tests.perf.test_perf_ratchet",
+            (
+                "test_optimizer_60h_stage_records_real_cold_work",
+                "test_perf_ratchet_guards_call_volume_and_cpu_cost",
+            ),
+        ),
+        (
+            "tests.test_literature_extracts",
+            ("test_pilot_extract_count_exact_and_merge_smoke",),
+        ),
+    )
     violations = []
-    for relpath, name in sorted(NIGHTLY_YIELD_HEAVY_ROSTER):
-        test_function = getattr(yield_module, name, None)
-        marks = getattr(test_function, "pytestmark", ())
-        if not any(mark.name == "nightly" for mark in marks):
-            violations.append(
-                f"{relpath}::{name}: yield full-track node must be marked "
-                "nightly to stay out of the PR tier"
-            )
+    for module_name, names in required:
+        module = import_module(module_name)
+        for name in names:
+            test_function = getattr(module, name, None)
+            marks = getattr(test_function, "pytestmark", ())
+            if not any(mark.name == "nightly" for mark in marks):
+                violations.append(
+                    f"{module_name}::{name}: load-sensitive test must be marked nightly"
+                )
     return violations
 
 
@@ -297,7 +314,7 @@ def pytest_collection_finish(session: pytest.Session) -> None:
         check_phantoms=full_suite,
     )
     if full_suite:
-        violations.extend(_nightly_yield_violations())
+        violations.extend(_nightly_marker_violations())
         collected_groups = {
             group
             for item in items
