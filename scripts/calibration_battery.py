@@ -221,9 +221,8 @@ def extract_rows():
         kind = "derived measurement" if obs.obs_type == "activity_coefficient" else "direct experiment"
         if obs.obs_type in {"gibbs_table", "transition_point"}:
             kind = "literature correlation"
-        calibration_kind = SOURCE_DECLARATIONS.get(obs.source_id or "", {}).get(
-            "calibration_kind"
-        )
+        source_rules = SOURCE_DECLARATIONS.get(obs.source_id or "", {})
+        calibration_kind = source_rules.get("calibration_kind")
         if calibration_kind is not None:
             kind = str(calibration_kind.value)
         method = str(e._evidence_marker(obs.values, "method_class") or "")
@@ -234,6 +233,9 @@ def extract_rows():
             kind = "literature correlation"
         if method.startswith("model_derived"):
             kind = "derived measurement"
+        calibration_kind_override = source_rules.get("calibration_kind_override")
+        if calibration_kind_override is not None:
+            kind = str(calibration_kind_override.value)
         if "qualitative" in method or quantity.startswith("qualitative_"):
             kind = "qualitative"
         if e._evidence_marker(obs.values, "evidence_class") == "thermodynamic_model_parameter" or quantity in {"SOLGASMIX_alkali_speciation", "equilibrium_molecular_oxygen_yield"}:

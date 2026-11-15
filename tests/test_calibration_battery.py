@@ -140,6 +140,7 @@ def test_calibration_source_kind_uses_source_declaration(
 
     obs = extract_comparator("match")
     obs.source_id = source_id
+    obs.values["fit"] = True
 
     rows = extract_rows()
 

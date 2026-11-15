@@ -75,7 +75,10 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
     },
     "kems-005-fedkin-2006": {
         "calibration_kind": SourceRule(
-            "derived measurement", "Calibration report classification for Fedkin (2006)"
+            "literature correlation", "Calibration report classification for Fedkin (2006)"
+        ),
+        "calibration_kind_override": SourceRule(
+            "derived measurement", "Calibration report override for Fedkin (2006)"
         ),
     },
     "kems-008-schaefer-fegley-2004": {
