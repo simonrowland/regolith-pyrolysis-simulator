@@ -7246,6 +7246,7 @@ def test_studio_dispatch_uses_caller_host(
                 str(engine_cache_path),
             ]
         )
+    assert "REGOLITH_ENGINE_CACHE" not in os.environ
 
 
 def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:

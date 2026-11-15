@@ -19,14 +19,14 @@ import threading
 import time
 import zlib
 from collections import OrderedDict
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 from urllib.parse import quote
 
 ENGINE_CHEMISTRY_VERSION = {
@@ -112,6 +112,11 @@ class RuntimeIdentityUnknown:
 _RUNTIME_IDENTITIES: dict[str, str | RuntimeIdentityUnknown] = {}
 _CACHE_BYPASSED: ContextVar[bool] = ContextVar(
     "regolith_engine_cache_bypassed", default=False
+)
+_ENGINE_CACHE_PATH_UNSET = object()
+_ENGINE_CACHE_PATH_OVERRIDE: ContextVar[str | None | object] = ContextVar(
+    "regolith_engine_cache_path_override",
+    default=_ENGINE_CACHE_PATH_UNSET,
 )
 
 ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
@@ -276,8 +281,38 @@ def _cache_environment_setting(
     return os.environ.get(name, default)
 
 
+@contextmanager
+def _engine_cache_path_scope(path: str | Path | None) -> Iterator[None]:
+    """Set a cache path for one score run without changing process environment."""
+    token = _ENGINE_CACHE_PATH_OVERRIDE.set(None if path is None else str(path))
+    try:
+        yield
+    finally:
+        _ENGINE_CACHE_PATH_OVERRIDE.reset(token)
+
+
+def _engine_cache_path_scope_state() -> tuple[bool, str | None]:
+    """Return the scoped path override for propagation to spawned score workers."""
+    path = _ENGINE_CACHE_PATH_OVERRIDE.get()
+    if path is _ENGINE_CACHE_PATH_UNSET:
+        return False, None
+    return True, cast(str | None, path)
+
+
+def _set_engine_cache_path_scope_state(
+    state: tuple[bool, str | None],
+) -> None:
+    """Install an explicit scope in a newly spawned, single-run worker."""
+    configured, path = state
+    if configured:
+        _ENGINE_CACHE_PATH_OVERRIDE.set(path)
+
+
 def _configured_engine_cache_path() -> str | None:
     """Return the configured cache path, or None when caching is disabled."""
+    path = _ENGINE_CACHE_PATH_OVERRIDE.get()
+    if path is not _ENGINE_CACHE_PATH_UNSET:
+        return path or None
     return _cache_environment_setting("REGOLITH_ENGINE_CACHE") or None
 
 
@@ -432,7 +467,7 @@ def runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
 
 def record_engine_open(engine_id: str, backend: Any | None = None) -> str | None:
     """Capture and report staleness once, outside the request-key path."""
-    if not _cache_environment_setting("REGOLITH_ENGINE_CACHE"):
+    if _configured_engine_cache_path() is None:
         return None
     if engine_id in _RUNTIME_IDENTITIES:
         identity = _RUNTIME_IDENTITIES[engine_id]

@@ -66,6 +66,7 @@ from simulator.battery.score import (  # noqa: E402
     _write_headline_summary_from_accumulator_json,
     measured_engine_rail_records,
 )
+from simulator.engine_cache import _engine_cache_path_scope  # noqa: E402
 from scripts.battery_cache_equivalence import (  # noqa: E402
     _engine_cache_path,
     _studio_host,
@@ -285,16 +286,17 @@ def _run_measured_headline(
                 close_engine_handle(openimcc_handle)
                 openimcc_handle = None
             score_handles = {}
-        written, metadata = _score_store_to_jsonl(
-            context,
-            residuals_path,
-            engines=engines,
-            root=root,
-            include_diagnostics=False,
-            measured_only=True,
-            handles=score_handles,
-            workers=workers,
-        )
+        with _engine_cache_path_scope(engine_cache_path):
+            written, metadata = _score_store_to_jsonl(
+                context,
+                residuals_path,
+                engines=engines,
+                root=root,
+                include_diagnostics=False,
+                measured_only=True,
+                handles=score_handles,
+                workers=workers,
+            )
         residuals = _ResidualJsonlRows(
             residuals_partial,
             metadata=metadata,
@@ -649,9 +651,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.workers < 1:
         parser.error("--workers must be at least 1")
 
-    if args.engine_cache is not None:
-        _engine_cache_path(str(args.engine_cache.expanduser()))
-    cache_path_value = _engine_cache_path()
+    cache_path_value = (
+        str(args.engine_cache.expanduser())
+        if args.engine_cache is not None
+        else _engine_cache_path()
+    )
     engine_cache_path = (
         None if not cache_path_value else Path(cache_path_value).expanduser()
     )
@@ -833,17 +837,18 @@ def main(argv: list[str] | None = None) -> int:
         )
         engines = tuple(laptop)
 
-    written, metadata = _score_store_to_jsonl(
-        context,
-        residuals_path,
-        root=args.root,
-        engines=engines,
-        rail=rail,
-        species_formulas=species_formulas,
-        work_id=args.work,
-        limit=args.limit,
-        workers=args.workers,
-    )
+    with _engine_cache_path_scope(engine_cache_path):
+        written, metadata = _score_store_to_jsonl(
+            context,
+            residuals_path,
+            root=args.root,
+            engines=engines,
+            rail=rail,
+            species_formulas=species_formulas,
+            work_id=args.work,
+            limit=args.limit,
+            workers=args.workers,
+        )
     partial_path = residuals_path.with_name(residuals_path.name + ".partial")
     payloads = _ResidualJsonlRows(
         partial_path,

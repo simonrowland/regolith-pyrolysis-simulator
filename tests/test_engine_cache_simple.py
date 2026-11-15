@@ -39,6 +39,27 @@ def _engine_cache_counters(*, reset: bool = False):
     return counters(reset=reset)
 
 
+def test_engine_cache_path_scope_overrides_without_mutating_environment(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", "ambient-cache.sqlite")
+    scoped_path = tmp_path / "scoped-cache.sqlite"
+
+    with engine_cache._engine_cache_path_scope(scoped_path):
+        assert engine_cache._configured_engine_cache_path() == str(scoped_path)
+        assert engine_cache._engine_cache_path_scope_state() == (
+            True,
+            str(scoped_path),
+        )
+        assert os.environ["REGOLITH_ENGINE_CACHE"] == "ambient-cache.sqlite"
+
+    assert engine_cache._configured_engine_cache_path() == "ambient-cache.sqlite"
+    with engine_cache._engine_cache_path_scope(None):
+        assert engine_cache._configured_engine_cache_path() is None
+        assert os.environ["REGOLITH_ENGINE_CACHE"] == "ambient-cache.sqlite"
+
+
 @pytest.mark.parametrize(
     "engine", tuple(engine_cache._ENGINE_CACHE_SETTINGS_PROJECTIONS)
 )

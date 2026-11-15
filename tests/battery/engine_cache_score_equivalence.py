@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Mapping
 
 from simulator.battery.enums import Engine, Rail
 from simulator.battery.score import _score_store_to_jsonl, load_score_context
+from simulator.engine_cache import _engine_cache_path_scope
 from tests.battery.test_engine_cache_equivalence import _canonical_residual_rows
 
 
@@ -30,12 +30,7 @@ def assert_residue_score_cache_equivalence(
         *,
         workers: int = 1,
     ) -> tuple[bytes, Mapping[str, Mapping[str, object]]]:
-        previous = os.environ.get("REGOLITH_ENGINE_CACHE")
-        if cache_path is None:
-            os.environ.pop("REGOLITH_ENGINE_CACHE", None)
-        else:
-            os.environ["REGOLITH_ENGINE_CACHE"] = str(cache_path)
-        try:
+        with _engine_cache_path_scope(cache_path):
             path = tmp_path / f"{label}.jsonl"
             _row_count, metadata = _score_store_to_jsonl(
                 context,
@@ -47,11 +42,6 @@ def assert_residue_score_cache_equivalence(
                 workers=workers,
                 _test_experiment_ids=test_experiment_ids,
             )
-        finally:
-            if previous is None:
-                os.environ.pop("REGOLITH_ENGINE_CACHE", None)
-            else:
-                os.environ["REGOLITH_ENGINE_CACHE"] = previous
         return (
             _canonical_residual_rows(path.with_name(path.name + ".partial")),
             metadata.engine_cache_counters or {},

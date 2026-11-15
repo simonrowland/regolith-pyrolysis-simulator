@@ -29,25 +29,15 @@ from simulator.battery.score import (  # noqa: E402
     is_store_stamp_payload,
     load_score_context,
 )
+from simulator.engine_cache import _engine_cache_path_scope  # noqa: E402
 
 
-_ENVIRONMENT_UNSET = object()
+def _environment_setting(name: str) -> str | None:
+    return os.environ.get(name)
 
 
-def _environment_setting(name: str, value: object = _ENVIRONMENT_UNSET) -> str | None:
-    environment = os.environ
-    if value is _ENVIRONMENT_UNSET:
-        return environment.get(name)
-    if value is None:
-        environment.pop(name, None)
-        return None
-    rendered = str(value)
-    environment[name] = rendered
-    return rendered
-
-
-def _engine_cache_path(value: object = _ENVIRONMENT_UNSET) -> str | None:
-    return _environment_setting("REGOLITH_ENGINE_CACHE", value)
+def _engine_cache_path() -> str | None:
+    return _environment_setting("REGOLITH_ENGINE_CACHE")
 
 
 def _studio_host() -> str | None:
@@ -111,9 +101,7 @@ def _run_slice(
     workers: int,
     cache_path: Path | None,
 ) -> tuple[list[str], dict[str, dict[str, Any]]]:
-    previous_cache_path = _engine_cache_path()
-    _engine_cache_path(cache_path)
-    try:
+    with _engine_cache_path_scope(cache_path):
         _row_count, metadata = _score_store_to_jsonl(
             context,
             output_path,
@@ -124,8 +112,6 @@ def _run_slice(
             limit=limit,
             workers=workers,
         )
-    finally:
-        _engine_cache_path(previous_cache_path)
     residuals_path = output_path.with_name(output_path.name + ".partial")
     return _canonical_rows(residuals_path), dict(metadata.engine_cache_counters or {})
 

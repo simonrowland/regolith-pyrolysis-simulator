@@ -25,6 +25,7 @@ from simulator.battery.score import (  # noqa: E402
 )
 import simulator.battery.score as battery_score  # noqa: E402
 from simulator.battery.enums import Engine, Rail  # noqa: E402
+from simulator.engine_cache import _engine_cache_path_scope  # noqa: E402
 from simulator.battery.migrate import (  # noqa: E402
     iter_observation_store_paths,
     iter_work_store_paths,
@@ -37,7 +38,6 @@ from simulator.battery.migrate import (  # noqa: E402
 from scripts.battery_cache_equivalence import (  # noqa: E402
     _canonical_rows,
     _dispatch_scratch_directory,
-    _engine_cache_path,
 )
 
 
@@ -228,7 +228,6 @@ def _run(
     workers: int,
     cache_path: Path | None,
 ) -> tuple[list[str], dict[str, dict[str, int]], float, float]:
-    _engine_cache_path(cache_path)
     before_wall, before_cpu = time.perf_counter(), _cpu_seconds()
     counters: dict[str, dict[str, int]] = {}
     rows: list[str] = []
@@ -277,17 +276,18 @@ def _run(
 
         battery_score._prepare_score_run = prepare_exact_refs
         try:
-            _count, metadata = _score_store_to_jsonl(
-                context,
-                output,
-                root=root,
-                engines=engines,
-                rail=case.rail,
-                work_id=case.source,
-                limit=None if exact_ids is not None else limit,
-                include_diagnostics=True,
-                workers=workers,
-            )
+            with _engine_cache_path_scope(cache_path):
+                _count, metadata = _score_store_to_jsonl(
+                    context,
+                    output,
+                    root=root,
+                    engines=engines,
+                    rail=case.rail,
+                    work_id=case.source,
+                    limit=None if exact_ids is not None else limit,
+                    include_diagnostics=True,
+                    workers=workers,
+                )
         finally:
             battery_score._prepare_score_run = original_prepare
         rows.extend(_canonical_rows(output.with_name(output.name + ".partial")))
