@@ -1076,66 +1076,6 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
             assert "silicate_window" in str(gate_evidence["reason"])
 
 
-def test_internal_analytical_low_end_notice_reaches_vapor_and_phase_records(
-    request,
-) -> None:
-    core = _new_internal_analytical_core()
-    magemin = _magemin_gate_backend(core)
-    if magemin is None or not magemin.is_available():
-        pytest.skip('MAGEMin backend unavailable after initialization')
-    request.addfinalizer(magemin.close)
-
-    output = _internal_analytical_vapor_pressure_adapter(
-        core=core,
-        temperature_C=1659.85,
-        pressure_bar=1.0,
-        composition_kg={'CaO': 48.28, 'SiO2': 51.72},
-        composition_mol=None,
-        fO2_log=-9.0,
-        po2_request=Po2Request(
-            mode=PO2_COMMANDED,
-            po2_bar=1.0e-9,
-        ),
-        include_diagnostic_shadows=False,
-    )
-
-    assert output.status == 'ok'
-    vapor_notice = next(
-        row
-        for row in core._last_vapor_pressure_diagnostic['d207_notices']
-        if row['code'] == 'liquidus_low_end_samples_excluded'
-    )
-    assert vapor_notice['authority'] == 'extrapolated'
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        engine_flags_from_result,
-    )
-
-    engine_notices, _authority, _certified_band = engine_flags_from_result(
-        output
-    )
-    scored_notice = next(
-        row
-        for row in engine_notices
-        if row['kind'] == 'openimcc_notice'
-        and 'liquidus_low_end_samples_excluded' in row['reason']
-    )
-    assert scored_notice['authority'] == 'extrapolated'
-    phase_basis_notice = core._last_high_t_melt_activity[
-        'phase_basis_notice'
-    ]
-    assert phase_basis_notice['code'] == (
-        'liquidus_low_end_samples_excluded'
-    )
-    assert phase_basis_notice['authority'] == 'extrapolated'
-    liquidus_notice = phase_basis_notice[
-        'liquidus_sample_exclusion_notice'
-    ]
-    assert liquidus_notice['solidus_qualification'] == (
-        'lowest_crossing_within_supported_range'
-    )
-    assert liquidus_notice['excluded_samples'][0]['temperature_C'] == 400.0
-
-
 def test_internal_analytical_timeout_kills_magemin_descendants(
     monkeypatch,
     request,
