@@ -524,6 +524,18 @@ def interface_first_melt_limiter(
     return normalized
 
 
+def _first_liner_state_refusal(raw_state: Mapping[str, Any]) -> dict[str, Any] | None:
+    refusal = raw_state.get("refusal")
+    if isinstance(refusal, Mapping) and refusal.get("reason"):
+        return dict(refusal)
+    refusals = raw_state.get("refusals", ())
+    if isinstance(refusals, Sequence) and not isinstance(refusals, (str, bytes)):
+        for item in refusals:
+            if isinstance(item, Mapping) and item.get("reason"):
+                return dict(item)
+    return None
+
+
 def interface_first_melt_from_liner_state(
     liner_state: Mapping[str, Any],
 ) -> Limiter:
@@ -555,10 +567,7 @@ def interface_first_melt_from_liner_state(
             for raw_state in segments.values():
                 if not isinstance(raw_state, Mapping):
                     continue
-                for item in raw_state.get("refusals", ()) or ():
-                    if isinstance(item, Mapping) and item.get("reason"):
-                        refusal = dict(item)
-                        break
+                refusal = _first_liner_state_refusal(raw_state)
                 if refusal is not None:
                     break
             if refusal is None:

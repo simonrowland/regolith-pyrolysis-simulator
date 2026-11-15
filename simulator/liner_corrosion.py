@@ -65,6 +65,7 @@ ENGINE_MINOR_PHASE_EUTECTIC_FLAG = "engine_minor_phase_eutectic"
 PHASE_CLOSURE_UNVERIFIED_FLAG = "phase_closure_unverified"
 DEPOSIT_MELT_BELOW_RESOLUTION_FLAG = "deposit_melt_below_resolution"
 ENGINE_BULK_MELT_REFERENCE_FALLBACK_FLAG = "engine_first_liquid_residual"
+ONSET_BELOW_SCAN_RANGE_FLAG = "onset_below_scan_range"
 
 
 class LinerCorrosionRefusal(ValueError):
@@ -510,13 +511,18 @@ def _campaign_branch(
                 pressure_bar=pressure,
                 margin_C=margin_C,
                 service_temperature_C=temperature_C,
-                literature_melting_temperature_C=None,
+                literature_melting_temperature_C=pure_reference.get(
+                    "literature_melting_temperature_C"
+                ),
                 pure_reference=pure_reference,
             )
             criterion_signal = float(
                 last_activity["excess_liquid_fraction_at_service_temperature"]
             )
-            onset = temperature_C >= last_activity["rating_temperature_C"]
+            onset = _tier_b_onset_at_service_temperature(
+                last_activity,
+                temperature_C,
+            )
         if onset:
             return completed, deposits, criterion_signal, last_activity
         if completed == horizon:
@@ -655,6 +661,32 @@ def _tier_b_reference_profile(
     return result
 
 
+def _tier_b_reference_profile_for_liner(
+    sampler: LiquidFractionSampler,
+    liner_composition_wt_pct: Mapping[str, Any],
+    *,
+    pressure_bar: float,
+    invariant_table: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    literature_reference = _tier_a_pure_phase_melting_reference(
+        invariant_table,
+        liner_composition_wt_pct,
+    )
+    profile = _tier_b_reference_profile(
+        sampler,
+        liner_composition_wt_pct,
+        pressure_bar=pressure_bar,
+        literature_melting_temperature_C=(
+            literature_reference["temperature_C"]
+            if literature_reference is not None
+            else None
+        ),
+    )
+    if literature_reference is not None:
+        profile["literature_reference_citation"] = literature_reference["citation"]
+    return profile
+
+
 def _tier_b_melt_activity_rating(
     liner_composition_wt_pct: Mapping[str, Any],
     interface_composition_wt_pct: Mapping[str, Any],
@@ -692,6 +724,10 @@ def _tier_b_melt_activity_rating(
     bulk_low = float(pure_reference["bulk_melt_bracket_C"][0])
     reference_flags = list(pure_reference.get("flags", ()))
     if literature_melting_temperature_C is None:
+        literature_melting_temperature_C = pure_reference.get(
+            "literature_melting_temperature_C"
+        )
+    if literature_melting_temperature_C is None:
         # d-415's fallback remains in force when no cited pure-phase T_lit is
         # available: use the engine's pure bulk lower bracket as T_lit.
         literature_temperature = bulk_low
@@ -704,11 +740,33 @@ def _tier_b_melt_activity_rating(
         )
         literature_source = "cited_literature"
     cap = literature_temperature - margin
-    onset_bracket: list[float] | None = None
+    onset_bracket: list[float | None] | None = None
     excess_at_upper: float | None = None
     service_excess = 0.0
+    onset_below_scan_range = False
     if deposits:
-        for index in range(1, len(temperatures)):
+        first_temperature = temperatures[0]
+        contaminated_first = _checked_liquid_fraction(
+            _sample_liquid_fraction(
+                sampler,
+                interface,
+                deposits,
+                liner,
+                first_temperature,
+                pressure,
+            )
+        )
+        first_excess = (
+            contaminated_first - float(pure_liquid[first_temperature])
+        )
+        if first_excess > LIQUIDUS_SOLID_EPSILON:
+            # The profile has no lower sample to establish a bracket. Keep the
+            # boundary explicit; for service at or above this first sample,
+            # conservatively treat melt onset as already reached.
+            onset_bracket = [None, first_temperature]
+            excess_at_upper = first_excess
+            onset_below_scan_range = True
+        for index in range(1, len(temperatures)) if onset_bracket is None else ():
             lower_temperature = temperatures[index - 1]
             upper_temperature = temperatures[index]
             if upper_temperature >= bulk_low:
@@ -728,7 +786,10 @@ def _tier_b_melt_activity_rating(
                 onset_bracket = [lower_temperature, upper_temperature]
                 excess_at_upper = excess
                 break
-    if onset_bracket is None:
+    if onset_below_scan_range:
+        rating = None
+        flags = [*reference_flags, ONSET_BELOW_SCAN_RANGE_FLAG]
+    elif onset_bracket is None:
         rating = cap
         flags = [*reference_flags, DEPOSIT_MELT_BELOW_RESOLUTION_FLAG]
     else:
@@ -783,13 +844,16 @@ def _tier_b_melt_activity_rating(
         "excess_liquid_fraction_at_service_temperature": service_excess,
         "literature_melting_temperature_C": literature_temperature,
         "literature_reference_source": literature_source,
+        "literature_reference_citation": pure_reference.get(
+            "literature_reference_citation"
+        ),
         "rating_temperature_C": rating,
         "rating_cap_temperature_C": cap,
         "flags": list(dict.fromkeys(flags)),
     }
 
 
-def corrosion_campaign_recurrence(
+def _corrosion_campaign_recurrence_impl(
     liner_composition_wt_pct: Mapping[str, Any],
     initial_deposit_kg_by_species: Mapping[str, Any],
     deposit_inert_kg_by_species: Mapping[str, Any],
@@ -803,6 +867,7 @@ def corrosion_campaign_recurrence(
     margin_C: float,
     horizon: int,
     sampler: LiquidFractionSampler,
+    invariant_table: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
     """Explicitly project the two sticking bounds and coupled recurrence."""
 
@@ -838,10 +903,11 @@ def corrosion_campaign_recurrence(
     if not isinstance(sampler, TierAInvariantSampler):
         if pressure_bar is None:
             raise LinerCorrosionRefusal("liner_service_pressure_missing")
-        pure_reference = _tier_b_reference_profile(
+        pure_reference = _tier_b_reference_profile_for_liner(
             sampler,
             liner,
             pressure_bar=pressure_bar,
+            invariant_table=invariant_table,
         )
 
     # Compute both stipulated deposition branches independently: composition
@@ -978,6 +1044,67 @@ def corrosion_campaign_recurrence(
     }
 
 
+def _tier_b_onset_at_service_temperature(
+    melt_activity: Mapping[str, Any], service_temperature_C: float
+) -> bool:
+    rating = melt_activity.get("rating_temperature_C")
+    if rating is not None:
+        return _finite_real(service_temperature_C, "service_temperature_C") >= _finite_real(
+            rating, "rating_temperature_C"
+        )
+    bracket = melt_activity.get("contaminated_melt_bracket_C")
+    if (
+        ONSET_BELOW_SCAN_RANGE_FLAG in set(melt_activity.get("flags", ()))
+        and isinstance(bracket, Sequence)
+        and not isinstance(bracket, (str, bytes))
+        and len(bracket) == 2
+        and bracket[0] is None
+    ):
+        # No lower temperature was sampled, so assume onset already reached
+        # for any service point; this deliberately biases the campaign bound
+        # toward earlier runaway instead of inventing a finite rating.
+        _finite_real(service_temperature_C, "service_temperature_C")
+        return True
+    raise LinerCorrosionRefusal(
+        "liner_onset_below_scan_range",
+        "service-temperature onset cannot be bounded below the first Tier B scan sample",
+    )
+
+
+def corrosion_campaign_recurrence(
+    liner_composition_wt_pct: Mapping[str, Any],
+    initial_deposit_kg_by_species: Mapping[str, Any],
+    deposit_inert_kg_by_species: Mapping[str, Any],
+    deposit_reactive_kg_by_species: Mapping[str, Any] | None,
+    *,
+    density_kg_m3: float,
+    area_m2: float,
+    reacted_layer_depth_m: float,
+    temperature_C: float,
+    pressure_bar: float | None,
+    margin_C: float,
+    horizon: int,
+    sampler: LiquidFractionSampler,
+) -> dict[str, Any]:
+    """Project campaigns without changing the public sampler-only API."""
+
+    return _corrosion_campaign_recurrence_impl(
+        liner_composition_wt_pct,
+        initial_deposit_kg_by_species,
+        deposit_inert_kg_by_species,
+        deposit_reactive_kg_by_species,
+        density_kg_m3=density_kg_m3,
+        area_m2=area_m2,
+        reacted_layer_depth_m=reacted_layer_depth_m,
+        temperature_C=temperature_C,
+        pressure_bar=pressure_bar,
+        margin_C=margin_C,
+        horizon=horizon,
+        sampler=sampler,
+        invariant_table=None,
+    )
+
+
 def _first_liquid_exclusion_reason(row: Mapping[str, Any]) -> str | None:
     """Classify source transitions that are not first-liquid observations."""
     phases = row.get("phases")
@@ -996,6 +1123,74 @@ def _is_liquid_phase(phase: Any) -> bool:
     return label.lower() == "liquid" or re.fullmatch(
         r"L\d*(?:\s*\([^)]*\))?", label, re.IGNORECASE
     ) is not None
+
+
+def _tier_a_pure_phase_melting_reference(
+    invariant_table: Mapping[str, Any] | None,
+    liner_composition_wt_pct: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Find an exact cited congruent-melting row for the pure liner phase."""
+
+    if not isinstance(invariant_table, Mapping):
+        return None
+    liner = validate_oxide_composition(liner_composition_wt_pct)
+    rows = invariant_table.get("invariants")
+    if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
+        return None
+    matches: list[tuple[float, Mapping[str, Any]]] = []
+    for row in rows:
+        if not isinstance(row, Mapping) or _first_liquid_exclusion_reason(row):
+            continue
+        phases = row.get("phases")
+        if (
+            not isinstance(phases, Sequence)
+            or isinstance(phases, (str, bytes))
+            or sum(_is_liquid_phase(phase) for phase in phases) != 1
+            or len(phases) != 2
+            or str(row.get("invariant_type", "")).lower() != "congruent melting"
+        ):
+            continue
+        liquid_composition = row.get("liquid_composition")
+        if not isinstance(liquid_composition, Mapping):
+            continue
+        try:
+            liquid = validate_oxide_composition(liquid_composition)
+        except LinerCorrosionRefusal:
+            continue
+        if set(liquid) != set(liner) or not all(
+            math.isclose(liquid[oxide], liner[oxide], rel_tol=0.0, abs_tol=1.0e-9)
+            for oxide in liner
+        ):
+            continue
+        temperature = _finite_real(row.get("T_invariant_C"), "T_invariant_C")
+        matches.append((temperature, row))
+    if not matches:
+        return None
+    temperatures = {temperature for temperature, _ in matches}
+    if len(temperatures) > 1:
+        raise LinerCorrosionRefusal(
+            "liner_pure_melting_reference_ambiguous",
+            ", ".join(
+                f"{row.get('source_id')}:{row.get('observation_id')}={temperature} C"
+                for temperature, row in matches
+            ),
+        )
+    temperature, row = sorted(
+        matches,
+        key=lambda item: (
+            str(item[1].get("source_id", "")),
+            str(item[1].get("observation_id", "")),
+        ),
+    )[0]
+    return {
+        "temperature_C": temperature,
+        "citation": {
+            "source_id": row.get("source_id"),
+            "observation_id": row.get("observation_id"),
+            "locator": row.get("locator"),
+            "phase_reaction_as_printed": row.get("phase_reaction_as_printed"),
+        },
+    }
 
 
 def first_liquid_tier_a(
@@ -1193,7 +1388,7 @@ def _run_corrosion_recurrence(
         recurrence_sampler = sampler
     else:
         raise LinerCorrosionRefusal("liner_criterion_tier_invalid", criterion_tier)
-    return corrosion_campaign_recurrence(
+    return _corrosion_campaign_recurrence_impl(
         liner,
         initial_deposit,
         deposit_inert,
@@ -1206,6 +1401,7 @@ def _run_corrosion_recurrence(
         margin_C=margin_C,
         horizon=horizon,
         sampler=recurrence_sampler,
+        invariant_table=invariant_table,
     )
 
 
@@ -1260,10 +1456,11 @@ def _interface_state_at_depth(
             pressure_bar,
         )
     )
-    pure_reference = _tier_b_reference_profile(
+    pure_reference = _tier_b_reference_profile_for_liner(
         sampler,
         liner_composition_wt_pct,
         pressure_bar=pressure_bar,
+        invariant_table=invariant_table,
     )
     melt_activity = _tier_b_melt_activity_rating(
         liner_composition_wt_pct,
@@ -1272,7 +1469,9 @@ def _interface_state_at_depth(
         sampler=sampler,
         pressure_bar=pressure_bar,
         margin_C=margin_C,
-        literature_melting_temperature_C=None,
+        literature_melting_temperature_C=pure_reference.get(
+            "literature_melting_temperature_C"
+        ),
         pure_reference=pure_reference,
         service_temperature_C=service_temperature_C,
     )
@@ -1284,7 +1483,10 @@ def _interface_state_at_depth(
             else None
         ),
         "liquid_fraction": liquid_fraction,
-        "onset": service_temperature_C >= melt_activity["rating_temperature_C"],
+        "onset": _tier_b_onset_at_service_temperature(
+            melt_activity,
+            service_temperature_C,
+        ),
         "melt_activity": melt_activity,
     }
 
@@ -1446,7 +1648,7 @@ def build_liner_state_segment(
         raise LinerCorrosionRefusal("campaign_horizon_invalid")
 
     tier = str(interface_chemistry.get("criterion_tier") or "B").upper()
-    table = interface_chemistry.get("invariant_table") if tier == "A" else None
+    table = interface_chemistry.get("invariant_table")
     interface_state = _interface_state_at_depth(
         liner,
         deposits,
@@ -1965,7 +2167,9 @@ def build_liner_state_for_run(
         if chemistry is None:
             return None
         tier = str(chemistry.get("criterion_tier") or "B").upper()
-        if tier == "A":
+        if tier == "A" or chemistry.get("invariant_table") or chemistry.get(
+            "invariant_table_file"
+        ):
             chemistry["invariant_table"] = load_interface_invariant_table(
                 str(material_id), catalog=catalog
             )
@@ -2166,10 +2370,12 @@ def _check_element_closure(
             ELEMENT_CLOSURE_FLAG, "reported liquid fraction disagrees with phase masses"
         )
     masses: dict[str, float] = {}
+    all_phase_masses: dict[str, float] = {}
     for phase, raw_mass in phase_masses.items():
         mass = _finite_real(raw_mass, f"phase_masses_kg[{phase!r}]")
         if mass < 0.0:
             raise LinerCorrosionRefusal(ELEMENT_CLOSURE_FLAG, "negative phase mass")
+        all_phase_masses[str(phase)] = mass
         if mass > 0.0:
             masses[str(phase)] = mass
     total_mass = math.fsum(masses.values())
@@ -2184,6 +2390,24 @@ def _check_element_closure(
             validate_oxide_composition(reported_bulk),
             context="reported bulk composition",
         )
+    if isinstance(phase_compositions, Mapping):
+        for phase, raw_composition in phase_compositions.items():
+            if not isinstance(raw_composition, Mapping) or not raw_composition:
+                continue
+            phase_name = str(phase)
+            phase_mass = all_phase_masses.get(phase_name)
+            if phase_mass is None:
+                raise LinerCorrosionRefusal(
+                    ELEMENT_CLOSURE_FLAG,
+                    f"reported phase {phase_name} has no matching mass",
+                )
+            phase_composition = validate_oxide_composition(raw_composition)
+            _require_phase_inventory_not_above_bulk(
+                input_composition,
+                phase_composition,
+                phase_mass / total_mass,
+                phase_name,
+            )
     complete_phase_compositions = isinstance(phase_compositions, Mapping) and all(
         isinstance(phase_compositions.get(phase), Mapping)
         and bool(phase_compositions.get(phase))
@@ -2277,14 +2501,16 @@ def _require_phase_inventory_not_above_bulk(
     phase_mass_fraction: float,
     phase_name: str,
 ) -> None:
-    for oxide in set(bulk) | set(phase_composition):
-        phase_mass = phase_mass_fraction * phase_composition.get(oxide, 0.0)
-        bulk_mass = bulk.get(oxide, 0.0)
-        scale = max(abs(bulk_mass), 1.0e-12)
-        if (phase_mass - bulk_mass) / scale > ELEMENT_CLOSURE_REL_TOLERANCE:
+    bulk_elements = _element_moles_from_oxide_weights(bulk)
+    phase_elements = _element_moles_from_oxide_weights(phase_composition)
+    for element in set(bulk_elements) | set(phase_elements):
+        phase_moles = phase_mass_fraction * phase_elements.get(element, 0.0)
+        bulk_moles = bulk_elements.get(element, 0.0)
+        scale = max(abs(bulk_moles), 1.0e-12)
+        if (phase_moles - bulk_moles) / scale > ELEMENT_CLOSURE_REL_TOLERANCE:
             raise LinerCorrosionRefusal(
                 ELEMENT_CLOSURE_FLAG,
-                f"reported {phase_name} mass exceeds bulk {oxide} inventory",
+                f"reported {phase_name} inventory exceeds bulk {element} inventory",
             )
 
 

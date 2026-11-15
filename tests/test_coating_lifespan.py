@@ -15,6 +15,7 @@ from simulator.coating_lifespan import (
     FoulingTerminalSnapshot,
     LimiterEvaluation,
     campaigns_to_resinter_total,
+    interface_first_melt_from_liner_state,
     merge_run_snapshot,
     merge_snapshot_sequence,
     project_lifecycle,
@@ -500,6 +501,40 @@ def test_interface_first_melt_refusal_does_not_change_existing_lifecycle_gate():
     assert projection.limiter_fired == THICKNESS_PROXY_LIMITER
     assert projection.to_dict()["interface_first_melt"]["refusal"]["reason"] == (
         "liner_first_melt_engine_out_of_domain"
+    )
+
+
+def test_refused_liner_state_preserves_its_singular_refusal_in_lifecycle_output():
+    snapshots = merge_snapshot_sequence((
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20})),
+    )).trajectory
+    limiter = interface_first_melt_from_liner_state(
+        {
+            "schema": "liner-state-v1",
+            "segments": {
+                "rump-wall": {
+                    "status": "refused",
+                    "refusal": {
+                        "reason": "rump_composition_not_generated",
+                        "detail": "generated rump artifact is absent",
+                    },
+                }
+            },
+        }
+    )
+
+    projection = project_lifecycle(
+        snapshots,
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.00025,
+        interface_first_melt=limiter,
+    )
+
+    assert projection.service_life_campaigns == pytest.approx(2.0)
+    assert projection.to_dict()["interface_first_melt"]["refusal"]["reason"] == (
+        "rump_composition_not_generated"
     )
 
 

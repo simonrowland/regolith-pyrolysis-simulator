@@ -219,6 +219,26 @@ def test_magemin_closure_uses_reported_phase_mass_and_liquid_composition():
         MageminLinerSampler(UnclosedBackend())(composition, 1500.0, 1.0e-6)
     assert unclosed.value.reason == "engine_phase_closure_failed"
 
+    class PartialContradictoryBackend(_FakeMageminBackend):
+        def equilibrate(self, *_args, **_kwargs):
+            return SimpleNamespace(
+                status="ok",
+                liquid_fraction=0.0,
+                phase_masses_kg={"solid-a": 0.5, "solid-b": 0.5},
+                phase_compositions={"solid-a": {"TiO2": 100.0}},
+                liquid_composition_wt_pct={},
+                phases_present=["solid-a", "solid-b"],
+                warnings=[],
+            )
+
+    with pytest.raises(LinerCorrosionRefusal) as partial_contradiction:
+        MageminLinerSampler(PartialContradictoryBackend())(
+            composition,
+            1500.0,
+            1.0e-6,
+        )
+    assert partial_contradiction.value.reason == "engine_phase_closure_failed"
+
 
 def test_magemin_phi_curve_is_cached_and_interpolated():
     backend = _FakeMageminBackend()
@@ -431,6 +451,46 @@ def test_tier_b_rating_uses_excess_melt_and_the_lower_temperature_bracket():
         0.01
     )
     assert "deposit_melt_below_resolution" not in rated["flags"]
+
+
+def test_tier_b_onset_at_first_scan_point_is_an_unresolved_lower_boundary():
+    class BoundarySampler:
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            if temperature_C < 1550.0:
+                pure = 0.0
+            elif temperature_C < 1575.0:
+                pure = 0.044
+            else:
+                pure = 1.0
+            if composition.get("Na2O", 0.0) > 0.0 and temperature_C == 500.0:
+                return pure + 0.01
+            return pure
+
+    sampler = BoundarySampler()
+    liner = {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0}
+    reference = liner_corrosion._tier_b_reference_profile(
+        sampler,
+        liner,
+        pressure_bar=1.0,
+        literature_melting_temperature_C=1553.0,
+    )
+    activity = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        {"SiO2": 49.0, "Al2O3": 30.0, "CaO": 20.0, "Na2O": 1.0},
+        {"Na": 1.0},
+        sampler=sampler,
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=1553.0,
+        pure_reference=reference,
+        service_temperature_C=750.0,
+    )
+
+    assert activity["contaminated_melt_bracket_C"] == [None, 500.0]
+    assert activity["rating_temperature_C"] is None
+    assert "onset_below_scan_range" in activity["flags"]
+    assert liner_corrosion._tier_b_onset_at_service_temperature(activity, 750.0)
+    assert liner_corrosion._tier_b_onset_at_service_temperature(activity, 450.0)
 
 
 def test_rankin_end_member_melting_points_are_excluded_from_compound_rows():
@@ -797,6 +857,41 @@ def test_tier_a_loader_rows_are_consumed_without_interpolating_source_points():
     ) == 1535.0
 
 
+def test_tier_a_anorthite_row_supplies_cited_pure_melting_temperature():
+    table = load_interface_invariant_table(
+        "anorthite-liner",
+        catalog={
+            "anorthite-liner": {
+                "interface_chemistry": {
+                    "composition": {
+                        "CaO": 20.16,
+                        "Al2O3": 36.65,
+                        "SiO2": 43.19,
+                    },
+                    "citation": "Morey 1964, Table 26",
+                    "criterion_tier": "B",
+                    "invariant_table": {
+                        "loader": "liner_corrosion_source_extracts",
+                        "subsystems": ["CaO-Al2O3-SiO2"],
+                    },
+                }
+            }
+        },
+    )
+
+    reference = liner_corrosion._tier_a_pure_phase_melting_reference(
+        table,
+        {"CaO": 20.16, "Al2O3": 36.65, "SiO2": 43.19},
+    )
+
+    assert reference["temperature_C"] == 1553.0
+    assert reference["citation"]["source_id"] == (
+        "morey-1964-usgs-pp440l-phase-equilibria"
+    )
+    assert reference["citation"]["observation_id"] == "morey1964_t26_r6"
+    assert reference["citation"]["locator"]["published_page"] == "L71"
+
+
 def test_tier_a_fe_aluminate_gap_is_a_typed_refusal_that_names_the_gap():
     with pytest.raises(LinerCorrosionRefusal) as refused:
         tier_a_first_liquid_onset(
@@ -968,6 +1063,82 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
         refusal["reason"] == "tier_b_saturated_liquid_fraction_not_reached"
         for refusal in missing_segment["refusals"]
     )
+
+
+def test_production_anorthite_metadata_uses_literature_temperature_anchor(monkeypatch):
+    from simulator import furnace_materials, liner_corrosion
+    from simulator.state import PipeSegment
+
+    catalog = {
+        "anorthite-liner": {
+            "interface_chemistry": {
+                "composition": {"CaO": 20.16, "Al2O3": 36.65, "SiO2": 43.19},
+                "citation": "Morey 1964, Table 26, row 6",
+                "criterion_tier": "B",
+                "invariant_table": {
+                    "loader": "liner_corrosion_source_extracts",
+                    "subsystems": ["CaO-Al2O3-SiO2"],
+                },
+                "density_kg_m3": 1000.0,
+                "reacted_layer_depth_m": 0.001,
+                "margin_C": 25.0,
+                "horizon_campaigns": 3,
+                "porosity_fraction": 0.0,
+            }
+        }
+    }
+    monkeypatch.setattr(furnace_materials, "load_furnace_materials", lambda: catalog)
+
+    class SourceAnchoredSampler(liner_corrosion.CurveLiquidFractionSampler):
+        flags = []
+
+        def __call__(self, _composition, temperature_C, _pressure_bar):
+            if temperature_C < 1550.0:
+                return 0.0
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+        def curve(self, *_args, **_kwargs):
+            raise AssertionError("a deposit-free anchor needs no phi(f) curve")
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(liner_corrosion, "MageminLinerSampler", SourceAnchoredSampler)
+    segment = PipeSegment(
+        name="anorthite-wall",
+        upstream_stage="stage_0",
+        downstream_stage="stage_1",
+        wall_temperature_C=1500.0,
+        length_m=1.0,
+        inner_diameter_m=0.12,
+    )
+    model = SimpleNamespace(
+        pipe_segments=(segment,),
+        operating_history=({"pipe_segment_temperatures_C": {"anorthite-wall": 1500.0}},),
+        overhead_pressure_mbar=10.0,
+    )
+    trace = SimpleNamespace(wall_deposit_by_segment_species_kg={}, snapshots=())
+    simulator = SimpleNamespace(condensation_model=model)
+    metadata = {"furnace_material_id": "anorthite-liner"}
+
+    state = attach_liner_state_metadata(
+        metadata,
+        "anorthite-liner",
+        simulator,
+        trace,
+    )
+
+    segment_state = state["segments"]["anorthite-wall"]
+    assert metadata["liner_state"] is state
+    assert segment_state["rating_temperature_C"] == 1528.0
+    activity = segment_state["melt_activity"]
+    assert activity["rating_temperature_C"] == 1528.0
+    assert activity["literature_reference_citation"]["observation_id"] == (
+        "morey1964_t26_r6"
+    )
+    assert activity["bulk_melt_residual_vs_literature_C"] == [-3.0, 22.0]
 
 
 def test_tier_a_invariant_signal_runs_the_campaign_recurrence_without_engine_pressure():
