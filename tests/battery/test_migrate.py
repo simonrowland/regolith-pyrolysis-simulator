@@ -19404,13 +19404,13 @@ def test_bare_log_accepts_printed_gas_mix_from_full_balance_band(
     gas_as_printed: str,
 ) -> None:
     from simulator.battery.enums import Authority, NoticeKind
-    from simulator.battery.migrate import (
-        _bare_log_frame_decision,
-        _janaf_gas_formation_inputs,
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.oxygen_identity import (
         _printed_sccm_gas_mixture,
     )
     from simulator.chemistry.offgas_fo2 import (
         _full_balance_fo2_with_janaf_band,
+        _janaf_gas_formation_inputs,
         load_buffer_polynomials,
     )
 
