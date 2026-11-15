@@ -515,9 +515,13 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # 1ab48f4d30da838c5ae5a6445b3a773bee1c04738637e2693f7b2e17263d46b2
     # and the twelve Sossi rows were refused input_phase_assemblage_unstated.
     # Those twelve now score. The six Aithala rows are byte-identical.
-    # The previous pin was already stale at that base.
+    # t-1792 validates the ten Sossi gas-ratio rows against their printed
+    # atmosphere. Nine fO2 identities match green again; fO2-10 keeps its
+    # pressure. Their residual notices now carry the certified atmosphere
+    # frame instead of the prior 1-bar-convention notice. The two Sossi rows
+    # without gas ratios and all six Aithala rows are unchanged.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "5035aea8b78ad081fda458e8565b4f1bb49fd2e9381af7fedc68d111ae93dd23"
+        "2f13d472331c6ccb9234a7b04c45ad9f351434ad2dc22fc201119a6497634a26"
     )
 
 

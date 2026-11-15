@@ -543,7 +543,7 @@ def _full_balance_fo2_with_janaf_band(
             methane_formation_gibbs_J_per_mol=methane_formation_gibbs_J_per_mol,
         )
         methane_shift = abs(methane.log10_fO2 - janaf.log10_fO2)
-        if methane_shift >= band:
+        if methane_shift > band:
             domain_reasons += (
                 "CH4 not negligible: equilibrium methane shifts log10(fO2) "
                 f"by {methane_shift:.3g} dex versus a {band:.3g} dex "

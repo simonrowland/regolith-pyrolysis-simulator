@@ -19882,6 +19882,65 @@ def _oxygen_pressure_point(located: object) -> Decimal | None:
     return None
 
 
+def _gas_mixture_evaluation_temperature(
+    stated_temperature: Located[Any] | None,
+    run_temperature_K: Decimal | None,
+) -> tuple[Decimal | None, PrintedOxygenNotice | None, str | None]:
+    """Use the source's gas-fO2 temperature, or visibly fall back to run T."""
+
+    if stated_temperature is None:
+        if (
+            run_temperature_K is None
+            or not run_temperature_K.is_finite()
+            or run_temperature_K <= 0
+        ):
+            return None, None, None
+        return (
+            run_temperature_K,
+            PrintedOxygenNotice(
+                kind=NoticeKind.INPUT_OMITTED,
+                reason=(
+                    "source does not state the gas-fO2 evaluation temperature; "
+                    f"run temperature {_dec_str(run_temperature_K)} K used "
+                    "for the gas-mixture check"
+                ),
+            ),
+            None,
+        )
+
+    if not isinstance(stated_temperature, Located) or not stated_temperature.state.is_value:
+        reason = (
+            stated_temperature.state.reason
+            if isinstance(stated_temperature, Located)
+            else "malformed temperature evidence"
+        )
+        return (
+            None,
+            None,
+            "gas_mix_fo2_band_unavailable: source gas-fO2 evaluation "
+            f"temperature is not a point: {reason or 'unknown'}",
+        )
+
+    raw = stated_temperature.state.value
+    temperature = (
+        raw.point
+        if isinstance(raw, Value) and raw.kind is ValueKind.POINT
+        else raw if isinstance(raw, Decimal) else None
+    )
+    if (
+        temperature is None
+        or not temperature.is_finite()
+        or temperature <= 0
+    ):
+        return (
+            None,
+            None,
+            "gas_mix_fo2_band_unavailable: source gas-fO2 evaluation "
+            "temperature must be a positive finite point",
+        )
+    return temperature, None, None
+
+
 _ATM_BAR = Decimal("1.01325")
 _AIR_O2_MOLE_FRACTION = Decimal("0.2095")
 
@@ -20065,8 +20124,10 @@ def _bare_log_frame_decision(
     *,
     printed_atmospheres: Sequence[str] = (),
     total_pressure_pa: Decimal | None = None,
+    gas_fO2_evaluation_temperature_K: Located[Any] | None = None,
+    require_bare_log_convention: bool = True,
 ) -> PrintedOxygenDecision:
-    """Apply the IW plausibility window, then printed atmosphere consistency.
+    """Check a printed fO2 against its stated atmosphere.
 
     These anchors are all log10(fO2/bar): air is -0.6788 at 1 bar total and
     -0.6731 at 1 atm total (0.2095 × 1.01325 bar); pure O2 is 0.0000 at
@@ -20076,6 +20137,9 @@ def _bare_log_frame_decision(
     minimum printed tolerance.
     No atmosphere is inferred: only these explicit prints can open the frame
     check; every other gas needs its equilibrium owner and sized band.
+    ``require_bare_log_convention`` applies the IW plausibility window only
+    when a unitless value has no known bar frame; a known bar-frame value can
+    still be checked against a linked gas mixture without changing its scale.
     """
 
     candidates = tuple(item.strip() for item in printed_atmospheres if item.strip())
@@ -20107,7 +20171,10 @@ def _bare_log_frame_decision(
             ),
         )
 
-    state, notice = _bare_log_convention(log10_fO2, temperature_K)
+    if require_bare_log_convention:
+        state, notice = _bare_log_convention(log10_fO2, temperature_K)
+    else:
+        state, notice = State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)), None
     explicit_mix_candidates = any(
         _printed_sccm_gas_mixture(atmosphere) is not None
         for atmosphere in candidates
@@ -20118,6 +20185,7 @@ def _bare_log_frame_decision(
     tolerance = max(_last_printed_digit(log10_fO2), Decimal("0.01"))
     checked: list[tuple[str, Decimal, Decimal]] = []
     unsupported: list[str] = []
+    evaluation_notices: list[PrintedOxygenNotice] = []
 
     def checked_gas_mix_decision(
         atmosphere: str,
@@ -20131,7 +20199,7 @@ def _bare_log_frame_decision(
         if abs(log10_fO2 - expected) > tolerance + owner_band:
             return None
         reason = (
-            "bare fO2 frame matched printed atmosphere "
+            "printed fO2 frame matched printed atmosphere "
             f"{atmosphere!r}; expected JANAF full-balance log10(fO2/bar)="
             f"{_display_fo2_dex(expected)}; {band_text}"
         )
@@ -20149,7 +20217,24 @@ def _bare_log_frame_decision(
         kind = _atmosphere_kind(atmosphere)
         if kind is None:
             parsed_mix = _printed_sccm_gas_mixture(atmosphere)
-            if parsed_mix is not None and temperature_K is not None:
+            if parsed_mix is not None:
+                evaluation_temperature_K, evaluation_notice, temperature_error = (
+                    _gas_mixture_evaluation_temperature(
+                        gas_fO2_evaluation_temperature_K,
+                        temperature_K,
+                    )
+                )
+                if evaluation_notice is not None and evaluation_notice not in evaluation_notices:
+                    evaluation_notices.append(evaluation_notice)
+                if temperature_error is not None:
+                    unsupported.append(f"{atmosphere!r} ({temperature_error})")
+                    continue
+                if evaluation_temperature_K is None:
+                    unsupported.append(
+                        f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
+                        "run temperature is unavailable for the gas-mixture check)"
+                    )
+                    continue
                 species_mol, relative_precision = parsed_mix
                 formation_gibbs: dict[str, float] | None = None
                 thermo_missing_reason = ""
@@ -20157,7 +20242,7 @@ def _bare_log_frame_decision(
                     formation_gibbs, janaf_gas_constant = (
                         _janaf_gas_formation_inputs(
                             ("CO", "CO2", "H2", "H2O", "O2", "CH4"),
-                            temperature_K,
+                            evaluation_temperature_K,
                         )
                     )
                 except (
@@ -20185,7 +20270,7 @@ def _bare_log_frame_decision(
                     resolution, _cea_log_fO2, full_balance_band = (
                         _full_balance_fo2_with_janaf_band(
                             {name: float(amount) for name, amount in species_mol.items()},
-                            float(temperature_K),
+                            float(evaluation_temperature_K),
                             formation_gibbs,
                             janaf_gas_constant,
                             load_buffer_polynomials(),
@@ -20221,13 +20306,14 @@ def _bare_log_frame_decision(
                         ),
                     ),
                 ) if domain_reasons else ()
+                mix_notices = (*domain_notice, *evaluation_notices)
                 decision = checked_gas_mix_decision(
                     atmosphere,
                     expected,
                     full_band,
                     band_text,
                     Authority.EXTRAPOLATED if domain_reasons else Authority.CERTIFIED,
-                    notices=domain_notice,
+                    notices=mix_notices,
                 )
                 if decision is not None:
                     return decision
@@ -20280,7 +20366,7 @@ def _bare_log_frame_decision(
         checked.append((atmosphere, matched_expected, Decimal(0)))
         if abs(log10_fO2 - matched_expected) <= tolerance:
             message = (
-                "bare fO2 frame matched printed atmosphere "
+                "printed fO2 frame matched printed atmosphere "
                 f"{atmosphere!r}; expected log10(fO2/bar)="
                 f"{_display_fo2_dex(matched_expected)}; {matched_anchor}; "
                 "bar-vs-atm unit ambiguity (0.0057 dex) is below the printed "
@@ -20317,13 +20403,17 @@ def _bare_log_frame_decision(
             ),
         )
         return PrintedOxygenDecision(
-            "refusal", State.unknown(reason), notices=notices
+            "refusal",
+            State.unknown(reason),
+            notices=(*notices, *evaluation_notices),
         )
     if unsupported:
         reason = "gas_mix_fo2_band_unavailable: " + ", ".join(
             repr(item) for item in unsupported
         )
-        return PrintedOxygenDecision("refusal", State.unknown(reason))
+        return PrintedOxygenDecision(
+            "refusal", State.unknown(reason), notices=tuple(evaluation_notices)
+        )
     return PrintedOxygenDecision(
         "refusal", State.unknown(_BARE_LOG_SCALE_UNKNOWN)
     )
@@ -21637,6 +21727,7 @@ def printed_oxygen_decision(
     source_id: str | None = None,
     total_pressure_pa: Decimal | None = None,
     printed_atmospheres: Sequence[str] = (),
+    gas_fO2_evaluation_temperature_K: Located[Any] | None = None,
 ) -> PrintedOxygenDecision | None:
     """Turn one oxygen scope into one identity state, for every quantity.
 
@@ -21720,17 +21811,28 @@ def printed_oxygen_decision(
         if buffer_decision is not None:
             return buffer_decision
     if has_log:
-        if facts.bare_log:
+        row_atmospheres = _row_printed_atmospheres(
+            raw_item, printed_atmospheres
+        )
+        has_gas_mixture = any(
+            _printed_sccm_gas_mixture(atmosphere) is not None
+            for atmosphere in row_atmospheres
+        )
+        if facts.bare_log or (
+            facts.log_fO2_reference_Pa == _BAR_PA and has_gas_mixture
+        ):
             resolved_pressure = _point_total_pressure_pa(point_conditions)
             if resolved_pressure is None:
                 resolved_pressure = total_pressure_pa
             return _bare_log_frame_decision(
                 log_point,
                 run_temperature_K,
-                printed_atmospheres=_row_printed_atmospheres(
-                    raw_item, printed_atmospheres
-                ),
+                printed_atmospheres=row_atmospheres,
                 total_pressure_pa=resolved_pressure,
+                gas_fO2_evaluation_temperature_K=(
+                    gas_fO2_evaluation_temperature_K
+                ),
+                require_bare_log_convention=facts.bare_log,
             )
         return PrintedOxygenDecision(
             "log",
@@ -21834,6 +21936,7 @@ def _scoped_oxygen_decision(
     source_id: str | None = None,
     total_pressure_pa: Decimal | None = None,
     printed_atmospheres: Sequence[str] = (),
+    gas_fO2_evaluation_temperature_K: Located[Any] | None = None,
 ) -> tuple[PrintedOxygenDecision | None, bool]:
     """Row oxygen first. Inherited facts fill only when the row has none."""
 
@@ -21851,6 +21954,7 @@ def _scoped_oxygen_decision(
         source_id=source_id,
         total_pressure_pa=resolved_pressure,
         printed_atmospheres=printed_atmospheres,
+        gas_fO2_evaluation_temperature_K=gas_fO2_evaluation_temperature_K,
     )
     if row_decision is not None or not from_fallback:
         return row_decision, False
@@ -21868,6 +21972,14 @@ def _scoped_oxygen_decision(
         ),
         True,
     )
+
+
+def _experiment_gas_fO2_evaluation_temperature(
+    experiment: Experiment | None,
+) -> Located[Any] | None:
+    if experiment is None:
+        return None
+    return experiment.conditions.get("gas_fO2_evaluation_temperature_K")
 
 
 def _row_scope_oxygen_decision(
@@ -25640,6 +25752,20 @@ class Migrator:
         printed_atmospheres = _printed_atmospheres_for_experiment(
             context, experiment_key
         )
+        raw_derived_from = obs.get("derived_from")
+        if isinstance(raw_derived_from, (list, tuple)):
+            parent_ids = {str(parent_id) for parent_id in raw_derived_from}
+            context_atmospheres = tuple(
+                atmosphere
+                for context_row in self.result.context_by_work.get(
+                    work.work_id, ()
+                )
+                if str(context_row.get("context_id")) in parent_ids
+                for atmosphere in _row_printed_atmospheres(context_row, ())
+            )
+            printed_atmospheres = tuple(
+                dict.fromkeys((*printed_atmospheres, *context_atmospheres))
+            )
         experiment_source_row = (
             context.get("experiment_source_rows", {}).get(experiment_key)
             if isinstance(experiment_key, str)
@@ -27801,6 +27927,11 @@ class Migrator:
             source_id=source_id,
             total_pressure_pa=_positive_pressure_pa(pressure_for_oxygen),
             printed_atmospheres=printed_atmospheres,
+            gas_fO2_evaluation_temperature_K=(
+                _experiment_gas_fO2_evaluation_temperature(
+                    self.result.experiments.get(experiment_id)
+                )
+            ),
         )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(
@@ -30785,6 +30916,11 @@ class Migrator:
                 getattr(identity, "total_pressure_Pa", None)
             ),
             printed_atmospheres=printed_atmospheres,
+            gas_fO2_evaluation_temperature_K=(
+                _experiment_gas_fO2_evaluation_temperature(
+                    self.result.experiments.get(experiment_id)
+                )
+            ),
         )
         oxygen_state = _printed_oxygen_state_for(
             identity,

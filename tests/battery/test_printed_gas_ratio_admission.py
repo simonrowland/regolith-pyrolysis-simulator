@@ -6,14 +6,16 @@ from pathlib import Path
 import yaml
 import pytest
 
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import Authority, NoticeKind
 from simulator.battery.migrate import (
+    Migrator,
     _bare_log_frame_decision,
     _janaf_gas_formation_inputs,
     _printed_sccm_gas_mixture,
     _quoted_atmosphere_values,
     _row_printed_atmospheres,
 )
+from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.chemistry.offgas_fo2 import (
     _full_balance_fo2_with_janaf_band,
     _full_element_balance_fo2,
@@ -99,63 +101,138 @@ def test_sossi_and_doyle_real_rows_reach_bare_log_admission_with_pins() -> None:
     assert Decimal(str(doyle_band)).quantize(Decimal("0.0001")) == Decimal("0.0004")
 
 
-def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatch() -> None:
-    records: list[tuple[str, Decimal, Decimal, str]] = []
+def test_real_sossi_and_doyle_migrations_preserve_gas_fugacity_identity() -> None:
     sossi = _source_doc("sossi-2020-magma-ocean-redox.yaml")
-    for experiment in sossi["experiments"]:
-        conditions = experiment.get("conditions", {})
-        mixture = conditions.get("gas_mixture_as_printed", {})
-        state = mixture.get("state", {}) if isinstance(mixture, dict) else {}
-        ratio = state.get("value") if isinstance(state, dict) else None
-        if not isinstance(ratio, str) or ":" not in ratio:
-            continue
-        log_state = conditions["log_fO2_as_printed"]["state"]["value"]
-        candidates = _quoted_atmosphere_values(conditions, experiment["locator"])
-        records.append((experiment["experiment_id"], Decimal(str(log_state)), Decimal("2173.15"), candidates[0]))
-
     doyle = _source_doc("doyle-1989-tio2-feo-activity-magma.yaml")
-    for block in doyle["species"].values():
-        for row in block.get("context", []):
-            if row.get("type") != "typed_context":
-                continue
-            values = row.get("values", {})
-            mixture = values.get("gas_mixture_as_printed")
-            if not isinstance(mixture, str) or "CO2:H2:N2" not in mixture:
-                continue
-            records.append(
-                (
-                    row["observation_id"],
-                    Decimal(str(values["minus_log10_fO2_as_printed"])) * -1,
-                    Decimal("1600"),
-                    _row_printed_atmospheres(row, ())[0],
-                )
-            )
+    root = Path(__file__).resolve().parents[2]
+    source_paths = (
+        root / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml",
+        root / "data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml",
+    )
+    migrator = Migrator(root)
+    for path in source_paths:
+        migrator._migrate_extract(path)
+    migrator.finalize()
 
-    assert len(records) == 15
-    admitted = 0
-    refused = 0
-    for record_id, printed, temperature, atmosphere in records:
-        decision = _bare_log_frame_decision(
-            printed,
-            temperature,
-            printed_atmospheres=(atmosphere,),
-            total_pressure_pa=(Decimal("100000") if record_id.startswith("sossi") else None),
+    def point(field: dict) -> Decimal:
+        value = field["state"]["value"]
+        if isinstance(value, dict) and value.get("kind") == "point":
+            value = value["point"]
+        return Decimal(str(value))
+
+    sossi_experiments = {
+        experiment["experiment_id"]: experiment
+        for experiment in sossi["experiments"]
+    }
+    sossi_rows = [
+        row
+        for row in sossi["species"]["Fe"]["observations"]
+        if ":" in sossi_experiments[row["experiment"]]["conditions"][
+            "gas_mixture_as_printed"
+        ]["state"]["value"]
+    ]
+    assert len(sossi_rows) == 10
+    green_fO2_Pa = {
+        "sossi_2020_per_f_o2_3_xanes": Decimal("295.1209226666"),
+        "sossi_2020_per_f_o2_6_xanes": Decimal("263.0267991895"),
+        "sossi_2020_per_f_o2_7_xanes": Decimal("190.5460717963"),
+        "sossi_2020_per_f_o2_8_xanes": Decimal("100"),
+        "sossi_2020_per_f_o2_9_xanes": Decimal("12.0226443462"),
+        "sossi_2020_per_f_o2_10_xanes": Decimal("0.4786300923226383439220877393"),
+        "sossi_2020_per_f_o2_11_xanes": Decimal("0.0181970085861"),
+        "sossi_2020_per_f_o2_12_xanes": Decimal("0.00138038426460"),
+        "sossi_2020_per_ts1_xanes": Decimal("190.5460717963"),
+        "sossi_2020_per_ts2_xanes": Decimal("190.5460717963"),
+    }
+    assert set(green_fO2_Pa) == {row["observation_id"] for row in sossi_rows}
+    for row in sossi_rows:
+        experiment = sossi_experiments[row["experiment"]]
+        conditions = experiment["conditions"]
+        run_temperature_K = point(conditions["temperature_K"])
+        evaluation_temperature_K = point(
+            conditions["gas_fO2_evaluation_temperature_K"]
         )
-        if decision.state.is_value:
-            assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-            assert decision.notice_authority.value == "certified"
-            admitted += 1
-        else:
-            assert decision.state.is_unknown
-            assert decision.state.reason.startswith("gas_mix_fo2_band_mismatch:")
-            assert all(
-                notice.kind is not NoticeKind.PROBABLE_SOURCE_MISPRINT
-                for notice in decision.notices
-            )
-            assert "mismatch=" in decision.state.reason
-            assert "dex" in decision.state.reason
-            refused += 1
-    assert (admitted, refused) == (15, 0)
+        assert evaluation_temperature_K == Decimal("2173.15")
+        observation_id = f"sossi-2020-magma-ocean-redox::{row['observation_id']}"
+        observation = migrator.result.observations[observation_id]
+        assert observation.identity.temperature_K.value == run_temperature_K
+
+        printed_log_fO2 = point(conditions["log_fO2"])
+        expected_fO2_Pa = log10_fo2_to_pa(printed_log_fO2)
+        assert observation.identity.fO2_Pa.value == expected_fO2_Pa
+        assert abs(expected_fO2_Pa - green_fO2_Pa[row["observation_id"]]) < Decimal(
+            "0.000000001"
+        )
+
+        atmosphere = _quoted_atmosphere_values(conditions, experiment["locator"])[0]
+        balance, _cea_log_fO2, band = _resolution(
+            atmosphere, evaluation_temperature_K, 1.0
+        )
+        assert abs(printed_log_fO2 - Decimal(str(balance.log10_fO2))) <= (
+            Decimal("0.01") + Decimal(str(band))
+        )
+        frame_notices = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+        ]
+        assert len(frame_notices) == 1
+        assert frame_notices[0].authority is Authority.CERTIFIED
+
+    doyle_contexts = {
+        f"doyle-1989-tio2-feo-activity-magma::context::{row['observation_id']}": row
+        for block in doyle["species"].values()
+        for row in block.get("context", [])
+        if row.get("type") == "typed_context"
+        and "CO2:H2:N2" in row.get("values", {}).get("gas_mixture_as_printed", "")
+    }
+    assert len(doyle_contexts) == 5
+    linked_doyle_rows = [
+        (observation, context_id)
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "doyle-1989-tio2-feo-activity-magma"
+        for context_id in observation.derived_from
+        if context_id in doyle_contexts
+    ]
+    assert linked_doyle_rows
+    assert {context_id for _observation, context_id in linked_doyle_rows} == set(
+        doyle_contexts
+    )
+    for observation, context_id in linked_doyle_rows:
+        values = doyle_contexts[context_id]["values"]
+        printed_log_fO2 = -Decimal(str(values["minus_log10_fO2_as_printed"]))
+        assert observation.identity.temperature_K.value == Decimal("1600")
+        assert observation.identity.fO2_Pa.value == log10_fo2_to_pa(printed_log_fO2)
+        assert any(
+            notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            for notice in observation.notices
+        ), tuple(
+            (notice.kind.value, notice.reason) for notice in observation.notices
+        )
+        assert any(
+            notice.kind is NoticeKind.INPUT_OMITTED
+            and "run temperature 1600 K used for the gas-mixture check"
+            in notice.reason
+            for notice in observation.notices
+        ), tuple(
+            (notice.kind.value, notice.reason) for notice in observation.notices
+        )
+
+
+def test_run_temperature_fallback_for_gas_mix_is_visible() -> None:
+    decision = _bare_log_frame_decision(
+        Decimal("-2.53"),
+        Decimal("2134.15"),
+        printed_atmospheres=("99CO2:1H2",),
+        total_pressure_pa=Decimal("100000"),
+    )
+
+    assert decision.state.is_unknown
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "run temperature 2134.15 K used" in notice.reason
+        for notice in decision.notices
+    )
 
 
 def test_n2_dilution_only_cancels_when_dissociation_is_negligible_and_ratio_moves_fo2() -> None:

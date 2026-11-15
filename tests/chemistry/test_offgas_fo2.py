@@ -21,6 +21,10 @@ import math
 
 import pytest
 
+from simulator.battery.generators.janaf import (
+    JANAF_R_J_PER_MOL_K,
+    _janaf_gas_formation_gibbs_J_per_mol,
+)
 from simulator.oxygen_buffers import FROST_IW_COEFFICIENTS
 from simulator.chemistry.offgas_fo2 import (
     _COUPLE_RECORDS,
@@ -31,6 +35,7 @@ from simulator.chemistry.offgas_fo2 import (
     H2_COUPLE_ONLY,
     WGS_EQUILIBRATED,
     OffgasFO2Unavailable,
+    _full_balance_fo2_with_janaf_band,
     _full_element_balance_fo2,
     imposed_fo2,
     load_buffer_polynomials,
@@ -351,6 +356,30 @@ def test_corrupt_unmodelled_species_still_refuses(polys):
             1473.15,
             polys,
         )
+
+
+def test_zero_band_without_carbon_or_hydrogen_has_no_methane_caveat(polys):
+    temperature_K = 1000.0
+    formulas = ("CO", "CO2", "H2", "H2O", "O2", "CH4")
+    formation_gibbs = {
+        formula: float(
+            _janaf_gas_formation_gibbs_J_per_mol(formula, temperature_K)
+        )
+        for formula in formulas
+    }
+    for gas in ({"O2": 1.0}, {"O2": 0.2, "N2": 0.8}):
+        result, _cea_log_fO2, band = _full_balance_fo2_with_janaf_band(
+            gas,
+            temperature_K,
+            formation_gibbs,
+            float(JANAF_R_J_PER_MOL_K),
+            polys,
+            initial_total_pressure_bar=1.0,
+            methane_formation_gibbs_J_per_mol=formation_gibbs["CH4"],
+        )
+
+        assert band == 0.0
+        assert not any("CH4 not negligible" in reason for reason in result.domain_reasons)
 
 
 def test_realistic_primary_pyrolysis_gas(polys):
