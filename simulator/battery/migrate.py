@@ -5514,6 +5514,11 @@ def _unrecognized_printed_chemical_components(
     green_read_maps: Sequence[Mapping[str, Any]] = (),
     dropped_sources: dict[str, str] | None = None,
 ) -> dict[str, Decimal]:
+    composition_components = {
+        _mass_percent_component_key(str(raw_name))[0]
+        for component_map in (wt, declared_component_map or {})
+        for raw_name in component_map
+    }
     source_map: dict[str, tuple[Any, str]] = {
         str(name): (amount, _GREEN_READ_OXIDE_MAP)
         for name, amount in wt.items()
@@ -5561,8 +5566,9 @@ def _unrecognized_printed_chemical_components(
             # Explicit ppm units are not mass-percent amounts for closure.
             or str(raw_name).strip().casefold().endswith(("_ppm", " ppm"))
             or (volatile is not None and volatile[0] != "Cl")
-            # Only Cl is a recognized composition component that this
-            # conversion deliberately omits; its mass still counts as dropped.
+            # Chlorine in the composition map is an independent component;
+            # chlorine found only as a closure sibling remains unsupported.
+            or (name == "Cl" and name in composition_components)
             or (name in _COMPOSITION_COMPONENTS and name != "Cl")
             or (equivalent is not None and equivalent[0] != "Cl")
             or (
@@ -6157,7 +6163,9 @@ def _oxide_mass_percent_components(
             continue
         component = _COMPOSITION_COMPONENTS.get(name)
         if component is not None:
-            if _is_closure_only_volatile(name):
+            # In melt analyses Cl is an independent formula component, not an
+            # oxide or oxygen correction. It also remains a closure input.
+            if _is_closure_only_volatile(name) and name != "Cl":
                 continue
             oxide = component[1]
         else:

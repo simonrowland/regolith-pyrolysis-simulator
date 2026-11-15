@@ -8241,7 +8241,7 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             True,
             id="m1-nested-unknown-label-over-trace-limit",
         ),
-        # The combined dropped mass stays within the inclusive 0.5 wt% limit.
+        # Cl is kept as a composition component; only XxO counts as dropped.
         pytest.param(
             "formula-unknown-and-chloride-traces",
             {"SiO2": "50", "MgO": "49.5", "XxO": "0.3", "Cl": "0.2"},
@@ -8457,9 +8457,11 @@ def test_mass_closure_refusal_check_order(
             expected_dropped = {
                 "formula-unknown-trace": ("XxO",),
                 "unknown-component-trace": ("unknown-component",),
-                "formula-unknown-and-chloride-traces": ("XxO", "Cl"),
+                "formula-unknown-and-chloride-traces": ("XxO",),
             }[case]
             assert notice.dropped == expected_dropped, case
+            if case == "formula-unknown-and-chloride-traces":
+                assert converted["Cl"] == Decimal("0.2")
         return
 
     assert converted is None, case

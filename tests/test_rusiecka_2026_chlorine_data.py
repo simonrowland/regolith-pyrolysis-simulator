@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import re
 import subprocess
 from decimal import Decimal
@@ -11,7 +12,14 @@ from openpyxl import load_workbook
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, PhaseRole, Quantity, ValueKind
+from simulator.battery.enums import (
+    AmountBasis,
+    NoticeKind,
+    Phase,
+    PhaseRole,
+    Quantity,
+    ValueKind,
+)
 from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -38,13 +46,111 @@ def _displayed_decimal(cell) -> Decimal:
     return Decimal(format(value, ".15g"))
 
 
+def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path: Path) -> None:
+    migrated = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in result.observations.values()
+    }
+    mapped = []
+    mapped_rows = set()
+    for container in doc["species"].values():
+        for source in container.get("observations", []):
+            values = source.get("values", {})
+            if (
+                values.get("quantity") != "equilibrium_phase_composition"
+                or "composition_wt_pct" not in values
+            ):
+                continue
+            row_number = int(
+                re.search(r"row(\d+)_", source["observation_id"]).group(1)
+            )
+            mapped_rows.add(row_number)
+            mapped.append((row_number, source, migrated[source["observation_id"]]))
+    assert len(mapped) == 1241
+    assert len(mapped_rows) == 73
+
+    for row_number, source, row in mapped:
+        assert row.identity.composition.is_value
+        composition = row.identity.composition.value
+        assert composition.basis == "printed_oxides"
+        assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+        projected = dict(composition.components)
+        assert abs(sum(projected.values(), Decimal("0")) - Decimal("1")) < Decimal("1e-24")
+        source_components = source["values"]["composition_wt_pct"]
+        if Decimal(source_components["Cl"]) > 0:
+            assert projected["Cl"] > 0
+        point_composition = row.point_conditions["composition"]
+        assert point_composition.locator is not None
+        assert point_composition.locator.record == (
+            f"sheet data, cells B{row_number}:R{row_number}"
+        )
+        assert point_composition.inference is not None
+        assert point_composition.inference.relation == "wt_pct_to_mole_fraction"
+        assert point_composition.inference.output_unit == "mole_fraction"
+        assert "x_i = (w_i / M_i) / Σ_j (w_j / M_j)" in point_composition.inference.inputs
+        assert any(
+            name == "original_Cl_wt_pct"
+            for name, _value in point_composition.inference.parameters
+        )
+        assert row.identity.temperature_K.is_value
+        for condition_name in ("total_pressure_Pa", "fO2_bar", "fCl2_bar"):
+            condition = row.point_conditions[condition_name]
+            assert condition.state.is_value
+            assert condition.locator is not None
+        if row_number in {58, 59}:
+            excluded_re = "4.36" if row_number == 58 else "4.32"
+            assert "Re" not in projected
+            assert not any(
+                name == "original_Re_wt_pct"
+                for name, _value in point_composition.inference.parameters
+            )
+            notices = [
+                notice
+                for notice in row.notices
+                if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+            ]
+            assert len(notices) == 1
+            assert notices[0].dropped == ("Re",)
+            assert f"Re={excluded_re} wt%" in notices[0].reason
+            assert "physical page 7" in notices[0].reason
+            assert f"N{row_number}" in notices[0].reason
+
+    mutated_doc = deepcopy(doc)
+    mutated_si = next(
+        observation
+        for container in mutated_doc["species"].values()
+        for observation in container.get("observations", [])
+        if observation["observation_id"] == "rusiecka_2026_data_row6_sio2"
+    )
+    mutated_components = mutated_si["values"]["composition_wt_pct"]
+    assert mutated_components is mutated_si["point_conditions"]["composition"]["state"]["value"]["components"]
+    mutated_components["Cl"] = "0.92"
+    mutated_result = _migrate_real_extract(
+        tmp_path / "chloride-mutated", EXTRACT_NAME, extract_doc=mutated_doc
+    )
+    base_projection = dict(
+        migrated["rusiecka_2026_data_row6_sio2"].identity.composition.value.components
+    )
+    changed = next(
+        row
+        for row in mutated_result.observations.values()
+        if row.observation_id.endswith("::rusiecka_2026_data_row6_sio2")
+    )
+    changed_projection = dict(changed.identity.composition.value.components)
+    assert changed_projection["Cl"] > base_projection["Cl"]
+    assert changed_projection["SiO2"] < base_projection["SiO2"]
+
+
 def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
-    workbook = _workbook_or_skip()
-    ws = load_workbook(workbook, data_only=True, read_only=False)["data"]
+    workbook = regolith_corpus_root() / "raw" / SOURCE_ID / WORKBOOK_NAME
     doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
     result = _migrate_real_extract(tmp_path / "migration", EXTRACT_NAME)
     assert result.validation is not None
     assert not result.validation.hard_issues, result.validation.hard_issues
+    if not workbook.is_file():
+        _assert_projected_compositions_without_workbook(doc, result, tmp_path)
+        return
+    ws = load_workbook(workbook, data_only=True, read_only=False)["data"]
 
     raw_rows = {
         observation["observation_id"]: (formula, observation)
@@ -157,7 +263,25 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
             ws.cell(row_number, 24)
         )
         assert row.point_conditions["fCl2_bar"].locator is not None
-        assert not row.notices
+        assert all(
+            notice.kind
+            in {NoticeKind.COMPOSITION_PROJECTED, NoticeKind.TOTAL_IRON_REPORTED_AS_FEO}
+            for notice in row.notices
+        )
+        if row_number in {58, 59}:
+            projection_notices = [
+                notice
+                for notice in row.notices
+                if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+            ]
+            assert len(projection_notices) == 1
+            projection_notice = projection_notices[0]
+            excluded_re = "4.36" if row_number == 58 else "4.32"
+            assert projection_notice.dropped == ("Re",)
+            assert f"Re={excluded_re} wt%" in projection_notice.reason
+            assert "physical page 7" in projection_notice.reason
+            assert f"N{row_number}" in projection_notice.reason
+            assert "normalized over those remaining components" in projection_notice.reason
 
     bound_compositions = [
         observation
@@ -187,8 +311,25 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         assert printed.state.is_value
         assert printed.state.value == expected_composition
         assert printed.locator is not None
-        assert row.identity.composition.is_unknown
-        assert "unsupported numeric component(s)" in (row.identity.composition.reason or "")
+        assert row.identity.composition.is_value
+        composition = row.identity.composition.value
+        assert composition.basis == "printed_oxides"
+        assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+        projected = dict(composition.components)
+        assert abs(sum(projected.values(), Decimal("0")) - Decimal("1")) < Decimal("1e-24")
+        if Decimal(expected_composition["Cl"]) > 0:
+            assert "Cl" in projected
+        located = row.point_conditions["composition"]
+        assert located.locator is not None
+        assert located.locator.record == f"sheet data, cells B{row_number}:R{row_number}"
+        assert located.inference is not None
+        assert located.inference.relation == "wt_pct_to_mole_fraction"
+        assert located.inference.output_unit == "mole_fraction"
+        assert "x_i = (w_i / M_i) / Σ_j (w_j / M_j)" in located.inference.inputs
+        assert any(name == "original_Cl_wt_pct" for name, _value in located.inference.parameters)
+        if row_number in {58, 59}:
+            assert "Re" not in projected
+            assert not any(name == "original_Re_wt_pct" for name, _value in located.inference.parameters)
         bound_rows.add(row_number)
     assert len(bound_rows) == 73
 
@@ -236,6 +377,29 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
     assert and1.value.point == Decimal("0.23")
     assert and1.point_conditions["total_pressure_Pa"].state.value == Decimal("1050000000.00")
     assert and1.point_conditions["fO2_bar"].state.value == Decimal("5.54E-10")
+
+    mutated_doc = deepcopy(doc)
+    mutated_si = next(
+        observation
+        for container in mutated_doc["species"].values()
+        for observation in container.get("observations", [])
+        if observation["observation_id"] == "rusiecka_2026_data_row6_sio2"
+    )
+    mutated_components = mutated_si["values"]["composition_wt_pct"]
+    assert mutated_components is mutated_si["point_conditions"]["composition"]["state"]["value"]["components"]
+    mutated_components["Cl"] = "0.92"
+    mutated_result = _migrate_real_extract(
+        tmp_path / "chloride-mutated", EXTRACT_NAME, extract_doc=mutated_doc
+    )
+    base_projection = dict(migrated["rusiecka_2026_data_row6_sio2"].identity.composition.value.components)
+    mutated_row = next(
+        row
+        for row in mutated_result.observations.values()
+        if row.observation_id.endswith("::rusiecka_2026_data_row6_sio2")
+    )
+    changed_projection = dict(mutated_row.identity.composition.value.components)
+    assert changed_projection["Cl"] > base_projection["Cl"]
+    assert changed_projection["SiO2"] < base_projection["SiO2"]
 
 
 def test_companion_table2_locator_and_sample_list_disagreement() -> None:
