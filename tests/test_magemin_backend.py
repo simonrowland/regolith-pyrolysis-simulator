@@ -3220,8 +3220,11 @@ def test_magemin_pure_phase_probe_argument_vector_is_preserved(
         f'--buffer_n={buffer_n:.6f}',
         '--out_matlab=1',
     ]
+    readback = backend._fo2_operating_point(-9.0, None, False)
     assert (stdout, matlab_text, warnings) == (
-        'probe stdout', 'matlab output', list(buffer_warnings)
+        'probe stdout',
+        'matlab output',
+        [*buffer_warnings, f'MAGEMin pure-phase native fO2 readback: {readback}'],
     )
 
 

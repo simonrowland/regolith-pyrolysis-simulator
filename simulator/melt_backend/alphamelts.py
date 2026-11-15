@@ -74,6 +74,7 @@ from simulator.chemistry.melt_activity import (
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
+    resolve_alphamelts_subprocess_model,
     resolve_alphamelts_subprocess_settings,
 )
 from simulator.melt_backend.base import (
