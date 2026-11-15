@@ -722,6 +722,7 @@ def test_liquid_vapour_selection_carries_published_sio_band_notice() -> None:
         "n": 45,
     }
     assert "no mare-composition SiO evidence below 1950 K" in notice["message"]
+    assert "the band was measured only from 1700 K" in notice["message"]
     assert notice["revisit_seekq"] == "mare-basalt-liquid-sio-pressure-1700-1950k"
 
 

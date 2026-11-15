@@ -304,6 +304,7 @@ def test_internal_analytical_refresh_uses_admitted_freeze_gate_curve() -> None:
         temperature_C=sim.melt.temperature_C,
         pressure_bar=1e-6,
         liquid_fraction=None,
+        phase_assemblage_available=False,
         vapor_pressures_Pa={},
     )
 
@@ -314,6 +315,7 @@ def test_internal_analytical_refresh_uses_admitted_freeze_gate_curve() -> None:
     assert controls['phase_basis_source'] == (
         'freeze_gate_authority:gate_liquid_fraction'
     )
+    assert controls['phase_basis_continuation'] == 'above_sampled_liquidus'
     phase_basis = _openimcc_vapour_phase_basis(controls['liquid_fraction'])
     assert phase_basis == 'liquid'
     assert openimcc_binding_selected_by_inputs(
@@ -354,6 +356,7 @@ def test_internal_analytical_refresh_treats_freeze_gate_fallback_as_missing() ->
         temperature_C=sim.melt.temperature_C,
         pressure_bar=1e-6,
         liquid_fraction=None,
+        phase_assemblage_available=False,
         vapor_pressures_Pa={},
     )
 
@@ -372,6 +375,227 @@ def test_internal_analytical_refresh_treats_freeze_gate_fallback_as_missing() ->
         quantity_class='vapour',
         phase_basis=phase_basis,
     ) is False
+
+
+@pytest.mark.parametrize(
+    (
+        'temperature_C',
+        'path',
+        'expected_fraction',
+        'expected_continuation',
+    ),
+    (
+        (
+            1526.85,
+            ((1200.0, 0.0), (1400.0, 1.0)),
+            1.0,
+            'above_sampled_liquidus',
+        ),
+        (
+            1526.85,
+            ((1200.0, 0.0), (1400.0, 0.99)),
+            None,
+            None,
+        ),
+        (
+            1100.0,
+            ((1200.0, 0.0), (1400.0, 1.0)),
+            0.0,
+            'below_sampled_range_solid_bearing',
+        ),
+        (
+            1100.0,
+            ((1200.0, 1.0), (1400.0, 1.0)),
+            None,
+            None,
+        ),
+    ),
+    ids=(
+        'above-sampled-liquidus',
+        'above-incomplete-samples',
+        'below-sampled-range-solid-bearing',
+        'below-fully-liquid-samples',
+    ),
+)
+def test_freeze_gate_phase_fraction_requires_sampled_curve_support(
+    temperature_C,
+    path,
+    expected_fraction,
+    expected_continuation,
+) -> None:
+    sim = types.SimpleNamespace(
+        melt=types.SimpleNamespace(temperature_C=temperature_C),
+        _register_freeze_gate_liquid_fraction_providers=lambda: None,
+        _melt_redox_liquidus_gate_record=lambda: {
+            'curve': {
+                'source': 'gate_liquid_fraction',
+                'path': path,
+            },
+            'origin': {},
+            'repair_notices': [],
+            'disposition': 'live',
+            'provider_outcome': 'produced',
+        },
+        _melt_redox_gate_record_is_admitted=lambda _record: True,
+    )
+
+    phase_fraction, source, continuation = (
+        EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction(sim)
+    )
+
+    assert phase_fraction == expected_fraction
+    assert source == (
+        'freeze_gate_authority:gate_liquid_fraction'
+        if expected_fraction is not None
+        else 'freeze_gate_authority_missing_or_invalid'
+    )
+    assert continuation == expected_continuation
+
+
+def test_refused_freeze_gate_phase_lookup_keeps_vapor_pressure_refresh() -> None:
+    sim, calls = _sim_with_vapor_dispatch({'Na': 12.5})
+    sim.melt.temperature_C = 1800.0 - 273.15
+    sim._vapor_pressure_freeze_gate_phase_fraction = types.MethodType(
+        EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction,
+        sim,
+    )
+    sim._register_freeze_gate_liquid_fraction_providers = lambda: None
+
+    def refuse_phase_authority():
+        raise EvaporationFluxRefusal(
+            'no admitted phase authority',
+            {'reason_refused': 'freeze_gate_no_liquidus_authority'},
+        )
+
+    sim._melt_redox_liquidus_gate_record = refuse_phase_authority
+    sim._melt_redox_gate_record_is_admitted = lambda _record: True
+    result = types.SimpleNamespace(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=1e-6,
+        liquid_fraction=None,
+        vapor_pressures_Pa={},
+        vapor_pressures_source={},
+        warnings=[],
+    )
+
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+
+    assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
+    controls = calls[0][1]['control_inputs']
+    assert controls['liquid_fraction'] is None
+    assert controls['phase_basis_source'] == 'freeze_gate_authority_refused'
+    assert result.vapor_pressures_Pa == {'Na': 12.5}
+
+
+def test_internal_analytical_default_core_uses_real_magemin_gate_fallback(
+    request,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        _internal_analytical_vapor_pressure_adapter,
+        _new_internal_analytical_core,
+        composition_kg_and_mol,
+    )
+    from simulator.melt_backend import openimcc_bridge
+    from tests.engine_availability import magemin_binary_available
+
+    if not magemin_binary_available():
+        pytest.skip('MAGEMin binary unavailable for the real gate contract')
+
+    core = _new_internal_analytical_core()
+    assert core._liquid_fraction_provider == 'magemin'
+    core._register_freeze_gate_liquid_fraction_providers()
+    gate_provider = core._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert gate_provider is not None
+    magemin = gate_provider._ensure_backend()
+    if magemin is None or not magemin.is_available():
+        pytest.skip('MAGEMin backend unavailable after initialization')
+    request.addfinalizer(magemin.close)
+    gate_curve_rebuilds_before_refresh = int(
+        getattr(core, '_freeze_gate_cache_rebuild_count', 0)
+    )
+
+    _, composition_mol = composition_kg_and_mol({
+        'SiO2': 49.0,
+        'Al2O3': 14.0,
+        'FeO': 10.0,
+        'MgO': 9.0,
+        'CaO': 11.0,
+        'Na2O': 3.0,
+        'K2O': 1.0,
+        'TiO2': 2.0,
+        'Cr2O3': 1.0,
+    })
+    output = _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        temperature_C=1800.0 - 273.15,
+        pressure_bar=1.0,
+        composition_kg=None,
+        composition_mol=composition_mol,
+        fO2_log=-9.0,
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+        include_diagnostic_shadows=False,
+    )
+
+    authority = core._last_high_t_melt_activity
+    assert output.status == 'ok'
+    assert authority['vapour_channel_phase_basis'] == 'liquid'
+    assert authority['phase_basis_source'] == (
+        'freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow'
+    )
+    assert authority['vapour_channel_switch_K'] == (
+        openimcc_bridge._temperature_domain_K()[0]
+    )
+    gate_curve_rebuilds_after_refresh = int(
+        core._freeze_gate_cache_rebuild_count
+    )
+    assert gate_curve_rebuilds_after_refresh == gate_curve_rebuilds_before_refresh + 1
+    core._melt_redox_liquidus_gate_record()
+    assert core._freeze_gate_cache_rebuild_count == gate_curve_rebuilds_after_refresh
+
+
+def test_internal_analytical_real_kress_floor_stays_missing_phase() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        _internal_analytical_vapor_pressure_adapter,
+        _new_internal_analytical_core,
+        composition_kg_and_mol,
+    )
+
+    core = _new_internal_analytical_core()
+    _, composition_mol = composition_kg_and_mol({
+        'SiO2': 81.0,
+        'Na2O': 19.0,
+    })
+    output = _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        temperature_C=1800.0 - 273.15,
+        pressure_bar=1.0,
+        composition_kg=None,
+        composition_mol=composition_mol,
+        fO2_log=-9.0,
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+        include_diagnostic_shadows=False,
+    )
+
+    authority = core._last_high_t_melt_activity
+    gate_record = core._freeze_gate_liquid_fraction_cache
+    assert output.status == 'ok'
+    assert gate_record['curve']['source'] == 'kress91_liquid_calibration_floor'
+    assert gate_record['provider_outcome'].value == 'stable_refusal'
+    assert authority['vapour_channel_phase_basis'] == 'missing'
+    assert authority['vapour_channel_switch_K'] == 1950.0
+    assert authority['phase_basis_source'] == (
+        'freeze_gate_authority_fallback_or_projected'
+    )
+    assert any(
+        notice['code'] == 'openimcc_vapour_phase_signal_missing'
+        for notice in authority['notices']
+    )
 
 
 @pytest.mark.parametrize('temperature_C', [0.0, 1000.0, 1600.0])

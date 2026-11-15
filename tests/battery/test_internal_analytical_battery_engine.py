@@ -26,6 +26,7 @@ from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Species, State, Value
 from simulator.battery import score as battery_score
 from simulator.battery.score import predict_with_engine
+from simulator.chemistry.kernel import ChemistryIntent
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BinaryPot,
     PO2_COMMANDED,
@@ -33,6 +34,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     _InternalAnalyticalInputRefusal,
     _new_internal_analytical_core,
     _internal_analytical_vapor_pressure_adapter,
+    close_battery_engine_handle,
     composition_kg_and_mol,
     equilibrate_cell,
     open_battery_engine,
@@ -885,48 +887,58 @@ def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
 
 
 def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
-    monkeypatch,
+    request,
 ) -> None:
     from simulator.melt_backend import openimcc_bridge
+    from tests.engine_availability import magemin_binary_available
 
-    core = _new_internal_analytical_core()
-    curve = {
-        "source": "gate_liquid_fraction",
-        "solidus_T_C": 1200.0,
-        "liquidus_T_C": 1400.0,
-        "path": ((1200.0, 0.0), (1400.0, 1.0)),
-    }
-    record = {
-        "curve": curve,
-        "origin": {},
-        "repair_notices": [],
-        "disposition": "live",
-    }
-    monkeypatch.setattr(
-        core, "_register_freeze_gate_liquid_fraction_providers", lambda: None,
-    )
-    monkeypatch.setattr(
-        core, "_melt_redox_liquidus_gate_record", lambda: record,
-    )
-    monkeypatch.setattr(
-        core, "_melt_redox_gate_record_is_admitted", lambda _record: True,
-    )
+    if not magemin_binary_available():
+        pytest.skip('MAGEMin binary unavailable for the real battery contract')
 
-    _internal_analytical_vapor_pressure_adapter(
-        core=core,
-        temperature_C=1800.0 - 273.15,
-        pressure_bar=1.0e-6,
-        composition_kg=None,
-        composition_mol={"SiO2": 0.5, "FeO": 0.3, "MgO": 0.2},
-        fO2_log=-9.0,
-        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
-        include_diagnostic_shadows=False,
+    handle = open_battery_engine('internal-analytical')
+    request.addfinalizer(lambda: close_battery_engine_handle(handle))
+    core = handle.backend._core
+    assert core._liquid_fraction_provider == 'magemin'
+    core._register_freeze_gate_liquid_fraction_providers()
+    gate_provider = core._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert gate_provider is not None
+    magemin = gate_provider._ensure_backend()
+    if magemin is None or not magemin.is_available():
+        pytest.skip('MAGEMin backend unavailable after initialization')
+    request.addfinalizer(magemin.close)
+
+    pot = BinaryPot(
+        pot_id='internal-analytical-liquid-phase-contract',
+        kato_1993_table4_system=None,
+        why='real freeze-gate phase basis through equilibrate_cell',
+        composition_wt_pct={
+            'SiO2': 49.0,
+            'Al2O3': 14.0,
+            'FeO': 10.0,
+            'MgO': 9.0,
+            'CaO': 11.0,
+            'Na2O': 3.0,
+            'K2O': 1.0,
+            'TiO2': 2.0,
+            'Cr2O3': 1.0,
+        },
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1800.0,
+        po2=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+        timeout_s=60.0,
+        isolated=False,
     )
 
     authority = core._last_high_t_melt_activity
+    assert cell.status == 'ok'
     assert authority["vapour_channel_phase_basis"] == "liquid"
     assert authority["phase_basis_source"] == (
-        "freeze_gate_authority:gate_liquid_fraction"
+        "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow"
     )
     assert authority["vapour_channel_switch_K"] == (
         openimcc_bridge._temperature_domain_K()[0]
