@@ -484,7 +484,7 @@ def test_freeze_gate_phase_fraction_requires_sampled_curve_support(
         _melt_redox_gate_record_is_admitted=lambda _record: True,
     )
 
-    phase_fraction, source, continuation = (
+    phase_fraction, source, continuation, projection_notice = (
         EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction(sim)
     )
 
@@ -495,6 +495,79 @@ def test_freeze_gate_phase_fraction_requires_sampled_curve_support(
         else 'freeze_gate_authority_missing_or_invalid'
     )
     assert continuation == expected_continuation
+    assert projection_notice is None
+
+
+def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> None:
+    projected_source = (
+        'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
+    )
+    projection_notice = {
+        'kind': 'composition_projected',
+        'reason': 'composition_projected',
+        'authority': 'extrapolated',
+        'certified_band': {
+            'engine': 'magemin',
+            'database': 'ig',
+            'bulk_components': ['SiO2'],
+        },
+        'dropped_components': [
+            {'component': 'MnO', 'mass_fraction': 0.002},
+        ],
+    }
+    source_repair = {
+        'type': 'typed_notice',
+        'kind': 'freeze_gate_curve_source_replaced',
+        'site': 'SR19',
+        'failed_source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'replacement_source': projected_source,
+    }
+    fallback_provider = types.SimpleNamespace(
+        capability_profile=lambda: types.SimpleNamespace(
+            provider_id='magemin-shadow',
+        ),
+    )
+    record = {
+        'curve': {
+            'source': projected_source,
+            'composition_projected_notice': projection_notice,
+            'path': ((1200.0, 0.0), (1400.0, 1.0)),
+        },
+        'repair_notices': [source_repair],
+        'disposition': 'live',
+        'provider_outcome': 'stable_refusal',
+    }
+    sim = types.SimpleNamespace(
+        melt=types.SimpleNamespace(temperature_C=1300.0),
+        _liquid_fraction_provider='magemin',
+        _chem_registry=types.SimpleNamespace(
+            fallback_for=lambda _intent: fallback_provider,
+        ),
+        _register_freeze_gate_liquid_fraction_providers=lambda: None,
+        _melt_redox_liquidus_gate_record=lambda: record,
+        _melt_redox_gate_record_is_admitted=lambda _record: True,
+    )
+
+    phase_fraction, source, continuation, phase_notice = (
+        EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction(sim)
+    )
+
+    assert phase_fraction == 0.5
+    assert source == f'freeze_gate_authority:{projected_source}'
+    assert continuation is None
+    assert phase_notice == projection_notice
+
+    record['repair_notices'].append({
+        'type': 'typed_notice',
+        'kind': 'freeze_gate_curve_repaired',
+    })
+    phase_fraction, source, continuation, phase_notice = (
+        EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction(sim)
+    )
+    assert phase_fraction is None
+    assert source == 'freeze_gate_authority_missing_or_invalid'
+    assert continuation is None
+    assert phase_notice is None
 
 
 def test_refused_freeze_gate_phase_lookup_keeps_vapor_pressure_refresh() -> None:
@@ -655,8 +728,26 @@ def test_internal_analytical_runner_uses_real_equilibrium_phase_result(
     authority = sim._last_high_t_melt_activity
     assert authority['vapour_channel_phase_basis'] == 'liquid'
     assert authority['phase_basis_source'] == (
-        'freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow'
+        'freeze_gate_authority:'
+        'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
     )
+    phase_notice = authority['phase_basis_notice']
+    assert phase_notice['authority'] == 'extrapolated'
+    assert phase_notice['certified_band']['engine'] == 'magemin'
+    assert phase_notice['certified_band']['database']
+    assert {
+        row['component'] for row in phase_notice['dropped_components']
+    } == {'MnO', 'P2O5'}
+    assert all(
+        isinstance(row['mass_fraction'], float)
+        and 0.0 < row['mass_fraction'] <= 1.0
+        for row in phase_notice['dropped_components']
+    )
+    sio_band_notice = next(
+        notice for notice in authority['notices']
+        if notice['code'] == 'openimcc_liquid_sio_below_1950K_band'
+    )
+    assert sio_band_notice['phase_basis_notice'] == phase_notice
     assert authority['vapour_channel_switch_K'] == (
         openimcc_bridge._temperature_domain_K()[0]
     )
