@@ -31,6 +31,7 @@ def _ambient_pressure_result(
     exploded: bool = False,
     pressure_basis: str | None = None,
     residue_container: str | None = None,
+    oxygen_buffer_as_published: str | None = None,
 ):
     source_id = "ambient-pressure-fixture"
     extract_dir = tmp_path / "data" / "literature" / "extracts"
@@ -53,6 +54,10 @@ def _ambient_pressure_result(
             if exploded
             else {"P": 25}
         )
+        if oxygen_buffer_as_published is not None:
+            partial_values["oxygen_buffer_as_published"] = oxygen_buffer_as_published
+            # Buffer-relative oxygen needs a row temperature to resolve.
+            partial_values["T_K"] = 1200
         observation = {
             "observation_id": "partial-pressure",
             "experiment": "open",
@@ -306,6 +311,51 @@ def test_open_furnace_evidence_fills_required_pressure_with_authority_and_notice
         entry.axes == ["total_pressure_Pa"]
         and entry.why == "source does not state a numeric total_pressure_Pa"
         for entry in migrator.result.queue
+    )
+
+
+def test_open_furnace_pressure_refreshes_applied_buffer_fugacity(
+    tmp_path, monkeypatch
+) -> None:
+    refresh_calls = []
+    refresh_buffer_decision = migrate_module._refresh_buffer_decision
+
+    def capture_refresh(decision, total_pressure_pa):
+        refreshed = refresh_buffer_decision(decision, total_pressure_pa)
+        refresh_calls.append((decision, total_pressure_pa, refreshed))
+        return refreshed
+
+    monkeypatch.setattr(
+        migrate_module, "_refresh_buffer_decision", capture_refresh
+    )
+    _migrator, observation = _ambient_pressure_result(
+        tmp_path,
+        quantity=Quantity.P_PARTIAL,
+        oxygen_buffer_as_published="IW",
+    )
+
+    assert observation.identity.total_pressure_Pa.value == Decimal("101325")
+    ambient_refresh = next(
+        (before, after)
+        for before, pressure, after in refresh_calls
+        if pressure == Decimal("101325")
+    )
+    before, refreshed = ambient_refresh
+    assert refreshed is not None
+    assert refreshed is not before
+    assert refreshed.pressure_pa_used == Decimal("101325")
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa == refreshed.state
+    # simulator.oxygen_buffers.oneill_iw_log10_fO2_bar owns IW: for
+    # 1184 <= T < 1450 K, μO2=-551159+269.404T-16.9484T ln T (J/mol),
+    # then log10(fO2/bar)=μO2/(R T ln 10). At 1200 K, μO2=-372072.749892161
+    # J/mol; R=8.31446261815324 J mol^-1 K^-1. Migration adds Frost's
+    # 0.055 K/bar × (P_bar - 1 bar)/T: at 101325 Pa=1.01325 bar, the log is
+    # -372072.749892161 J/mol ÷ (R × 1200 K × ln 10) +
+    # 0.055 K/bar × 0.01325 bar ÷ 1200 K = -16.195588288609166 dex;
+    # fO2_Pa=10^-16.195588288609166 × 100000 Pa/bar=6.3739948962e-12 Pa.
+    assert observation.identity.fO2_Pa.value == Decimal(
+        "6.373994896233276620146294356E-12"
     )
 
 

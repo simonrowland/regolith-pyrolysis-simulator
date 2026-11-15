@@ -55,12 +55,9 @@ import math
 from dataclasses import dataclass
 from decimal import Decimal
 
+import simulator.physical_constants as physical_constants
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
-from simulator.physical_constants import (
-    GAS_CONSTANT,
-    GAS_CONSTANT_DECIMAL,
-    _ONEILL_1987_R_J_PER_MOL_K,
-)
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -96,7 +93,9 @@ ONEILL_QFM_UNCERTAINTY_J_MOL = 200.0
 
 
 _ONEILL_LN10 = Decimal(10).ln()
-_ONEILL_1987_R = Decimal(str(_ONEILL_1987_R_J_PER_MOL_K))
+_ONEILL_1987_R = Decimal(
+    str(physical_constants._ONEILL_1987_R_J_PER_MOL_K)
+)
 
 
 def _oneill_mu_o2_to_log10_fO2_bar(
@@ -148,6 +147,8 @@ ONEILL_IW_TEMPERATURE_RANGES_K = (
     (1184.0, 1450.0),
 )
 ONEILL_IW_UNCERTAINTY_J_MOL = 100.0
+_ONEILL_IW_R = GAS_CONSTANT
+_ONEILL_IW_LN10 = math.log(10.0)
 
 
 def oneill_iw_log10_fO2_bar(temperature_K: float) -> float:
@@ -159,32 +160,51 @@ def oneill_iw_log10_fO2_bar(temperature_K: float) -> float:
     uncertainty is metadata and does not shift μ°.
     """
     temperature = _require_finite_positive(temperature_K, "temperature_K")
-    return float(_oneill_iw_log10_fO2_bar_decimal(Decimal(str(temperature))))
+    # Preserve the public float resolver's historical IEEE result; Decimal
+    # callers below keep their Decimal precision through the same equation.
+    return float(_oneill_iw_log10_fO2_bar_value(temperature))
 
 
 def _oneill_iw_log10_fO2_bar_decimal(temperature_K: Decimal) -> Decimal:
-    if temperature_K < Decimal(1042):
+    return _oneill_iw_log10_fO2_bar_value(temperature_K)
+
+
+def _oneill_iw_log10_fO2_bar_value(
+    temperature_K: Decimal | float,
+) -> Decimal | float:
+    decimal_evaluation = isinstance(temperature_K, Decimal)
+    number = Decimal if decimal_evaluation else float
+    log_temperature = (
+        temperature_K.ln()
+        if decimal_evaluation
+        else math.log(temperature_K)
+    )
+    if temperature_K < number(1042):
         mu_o2 = (
-            Decimal("-605812")
-            + Decimal("1366.718") * temperature_K
-            - Decimal("182.7955") * temperature_K * temperature_K.ln()
-            + Decimal("0.10359") * temperature_K * temperature_K
+            number("-605812")
+            + number("1366.718") * temperature_K
+            - number("182.7955") * temperature_K * log_temperature
+            + number("0.10359") * temperature_K * temperature_K
         )
-    elif temperature_K < Decimal(1184):
+    elif temperature_K < number(1184):
         mu_o2 = (
-            Decimal("-519357")
-            + Decimal("59.427") * temperature_K
-            + Decimal("8.9276") * temperature_K * temperature_K.ln()
+            number("-519357")
+            + number("59.427") * temperature_K
+            + number("8.9276") * temperature_K * log_temperature
         )
     else:
         mu_o2 = (
-            Decimal("-551159")
-            + Decimal("269.404") * temperature_K
-            - Decimal("16.9484") * temperature_K * temperature_K.ln()
+            number("-551159")
+            + number("269.404") * temperature_K
+            - number("16.9484") * temperature_K * log_temperature
         )
-    return _oneill_mu_o2_to_log10_fO2_bar(
-        mu_o2, temperature_K, GAS_CONSTANT_DECIMAL
+    gas_constant = (
+        physical_constants.GAS_CONSTANT_DECIMAL
+        if decimal_evaluation
+        else _ONEILL_IW_R
     )
+    ln10 = _ONEILL_LN10 if decimal_evaluation else _ONEILL_IW_LN10
+    return mu_o2 / (gas_constant * temperature_K * ln10)
 
 
 ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K = (
