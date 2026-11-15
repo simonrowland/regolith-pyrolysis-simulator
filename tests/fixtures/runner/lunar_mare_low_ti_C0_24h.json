@@ -206842,6 +206842,8 @@
         "temperature_K": 1873.15,
         "vaporock_cap_K": 1950.0,
         "above_vaporock_cap": false,
+        "vapour_channel_switch_K": 1950.0,
+        "vapour_channel_phase_basis": "missing",
         "fallback": false,
         "provider": "openimcc",
         "composition_policy": {
@@ -207846,7 +207848,14 @@
             "message": "ferric component collapsed until d-072"
           }
         },
-        "notices": [],
+        "notices": [
+          {
+            "code": "openimcc_vapour_phase_signal_missing",
+            "type": "typed_notice",
+            "authority": "equilibrium_result.liquid_fraction",
+            "message": "The equilibrium liquid_fraction phase signal was missing; the charge is not treated as all-liquid and keeps the 1950 K vapour switch."
+          }
+        ],
         "seam": {
           "Na2O": {
             "below_cap_activity": 7.581398346320963e-06,
@@ -224628,6 +224637,8 @@
         "temperature_K": 1873.15,
         "vaporock_cap_K": 1950.0,
         "above_vaporock_cap": false,
+        "vapour_channel_switch_K": 1950.0,
+        "vapour_channel_phase_basis": "missing",
         "fallback": false,
         "provider": "openimcc",
         "composition_policy": {
@@ -225632,7 +225643,14 @@
             "message": "ferric component collapsed until d-072"
           }
         },
-        "notices": [],
+        "notices": [
+          {
+            "code": "openimcc_vapour_phase_signal_missing",
+            "type": "typed_notice",
+            "authority": "equilibrium_result.liquid_fraction",
+            "message": "The equilibrium liquid_fraction phase signal was missing; the charge is not treated as all-liquid and keeps the 1950 K vapour switch."
+          }
+        ],
         "seam": {
           "Na2O": {
             "below_cap_activity": 7.551258877819653e-06,
@@ -259224,6 +259242,8 @@
         "temperature_K": 2023.15,
         "vaporock_cap_K": 1950.0,
         "above_vaporock_cap": true,
+        "vapour_channel_switch_K": 1950.0,
+        "vapour_channel_phase_basis": "missing",
         "fallback": false,
         "provider": "openimcc",
         "composition_policy": {
@@ -260228,7 +260248,23 @@
             "message": "ferric component collapsed until d-072"
           }
         },
-        "notices": [],
+        "notices": [
+          {
+            "code": "openimcc_vapour_phase_signal_missing",
+            "type": "typed_notice",
+            "authority": "equilibrium_result.liquid_fraction",
+            "message": "The equilibrium liquid_fraction phase signal was missing; the charge is not treated as all-liquid and keeps the 1950 K vapour switch."
+          },
+          {
+            "code": "openimcc_activity_cap_step_exceeds_0_1_dex",
+            "type": "typed_notice",
+            "temperature_K": 2023.15,
+            "cap_K": 1950.0,
+            "max_abs_ratio_dex": 1.042593621895382,
+            "threshold_dex": 0.1,
+            "message": "openimcc/below-cap activity source switch exceeds the provisional cap seam screen"
+          }
+        ],
         "seam": {
           "Na2O": {
             "below_cap_activity": 7.518997847205378e-06,
