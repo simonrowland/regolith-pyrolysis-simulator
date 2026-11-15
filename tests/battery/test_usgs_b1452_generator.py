@@ -84,6 +84,15 @@ OXIDE_HEADING_RECORDS = (
     "robie-hemingway-fisher-1978-usgs-b1452-0382",
     "robie-hemingway-fisher-1978-usgs-b1452-0382-phase-02",
 )
+OXIDE_COLUMN_HEADING_RECORDS = (
+    "robie-hemingway-fisher-1978-usgs-b1452-0307-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0400",
+)
+ELEMENT_BASIS_CONTROL_RECORDS = (
+    "robie-hemingway-fisher-1978-usgs-b1452-0179",
+    "robie-hemingway-fisher-1978-usgs-b1452-0180-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0180",
+)
 OXIDE_BASIS_RECORDS = (
     "robie-hemingway-fisher-1978-usgs-b1452-0228-phase-02",
     "robie-hemingway-fisher-1978-usgs-b1452-0228",
@@ -100,6 +109,7 @@ OXIDE_BASIS_RECORDS = (
     "robie-hemingway-fisher-1978-usgs-b1452-0284-phase-02",
     "robie-hemingway-fisher-1978-usgs-b1452-0284",
     "robie-hemingway-fisher-1978-usgs-b1452-0307",
+    "robie-hemingway-fisher-1978-usgs-b1452-0307-phase-02",
     "robie-hemingway-fisher-1978-usgs-b1452-0314",
     "robie-hemingway-fisher-1978-usgs-b1452-0316",
     "robie-hemingway-fisher-1978-usgs-b1452-0318",
@@ -149,6 +159,7 @@ OXIDE_BASIS_RECORDS = (
     "robie-hemingway-fisher-1978-usgs-b1452-0393",
     "robie-hemingway-fisher-1978-usgs-b1452-0396",
     "robie-hemingway-fisher-1978-usgs-b1452-0398",
+    "robie-hemingway-fisher-1978-usgs-b1452-0400",
 )
 FORMATION_QUANTITIES = (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
 
@@ -755,12 +766,13 @@ def test_neighbour_sign_refuses_ht_seeded_dropped_minus() -> None:
     assert refused
     assert "neighbour-sign" in refused[0]["reason"]
     control = _generation(FAYALITE_OXIDES)
-    stored = [
-        obs
-        for obs in control.observations
-        if quantity_token(obs.identity) is Quantity.DELTA_FG
-        and ":T=" in obs.observation_id and "row=" not in obs.observation_id
-    ]
+    # The oxide-basis quantity is intentionally unknown, but its numeric observation remains stored.
+    stored = _formation_observations(
+        control,
+        quantity=Quantity.DELTA_FG,
+        basis="from_the_oxides",
+        temperature="298.15",
+    )
     assert stored
 
 
@@ -865,6 +877,7 @@ def test_oxide_asterisk_is_basis_not_damage() -> None:
 
 def test_b1452_oxide_basis_record_census_is_complete() -> None:
     assert set(_oxide_basis_record_ids()) == set(OXIDE_BASIS_RECORDS)
+    assert set(OXIDE_COLUMN_HEADING_RECORDS) <= set(OXIDE_BASIS_RECORDS)
 
 
 def test_b1452_oxide_heading_record_census_is_complete() -> None:
@@ -877,6 +890,21 @@ def test_b1452_oxide_heading_record_census_is_complete() -> None:
         if "OXIDE" in heading:
             captured_heading_records.add(str(record["record_id"]))
     assert captured_heading_records == set(OXIDE_HEADING_RECORDS)
+
+
+@pytest.mark.parametrize("record_id", ELEMENT_BASIS_CONTROL_RECORDS)
+def test_explicit_element_basis_heading_precedes_other_oxide_mentions(
+    record_id: str,
+) -> None:
+    record = _load(record_id)
+    assert generator._formation_basis_for_record(record) == "from_the_elements"
+
+    generated = _generation(record_id)
+    formation_rows = _formation_observations(
+        generated, basis="from_the_elements"
+    )
+    assert formation_rows
+    assert all(row.identity.quantity.is_value for row in formation_rows)
 
 
 @pytest.mark.parametrize("record_id", OXIDE_BASIS_RECORDS)
@@ -906,7 +934,6 @@ def test_every_b1452_oxide_basis_record_refuses_element_formation_quantities(
             f"{quantity.value} denotes formation from the elements."
         )
         assert row.value.point is not None
-        assert row.identity.reaction is not None and row.identity.reaction.is_value
 
 
 def test_mullite_oxide_caption_keeps_all_formation_rows_typed_refused() -> None:

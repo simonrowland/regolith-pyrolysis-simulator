@@ -339,6 +339,13 @@ def _formation_basis_for_record(record: Mapping[str, Any]) -> str | None:
         return "from_the_elements"
     if _record_has_oxide_asterisks(record):
         return "from_the_oxides"
+    basis_heading = _normalized_letters(
+        str(record.get("formation_basis_header_as_published") or "")
+    )
+    if "OXIDE" in basis_heading:
+        return "from_the_oxides"
+    if "ELEMENT" in basis_heading or "ELE" in basis_heading:
+        return "from_the_elements"
     letters = _normalized_letters(_header_text(record))
     if "OXIDE" in letters:
         return "from_the_oxides"
