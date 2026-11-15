@@ -794,6 +794,16 @@ def _openimcc_vapour_phase_basis(liquid_fraction: Any) -> str:
     return "liquid" if regime is MeltRegime.MOLTEN else "solid_bearing"
 
 
+def _openimcc_vapour_phase_signal_notice(
+    phase_basis: str,
+) -> dict[str, Any] | None:
+    if phase_basis == "missing":
+        return dict(OPENIMCC_VAPOUR_PHASE_SIGNAL_MISSING_NOTICE)
+    if phase_basis == "invalid":
+        return dict(OPENIMCC_VAPOUR_PHASE_SIGNAL_INVALID_NOTICE)
+    return None
+
+
 def _openimcc_vapour_switch_K(phase_basis: str) -> float:
     if phase_basis == "liquid":
         return float(openimcc_bridge._temperature_domain_K()[0])
@@ -1094,14 +1104,9 @@ def _build_high_t_melt_activity_authority(
     phase_basis_notice = controls.get("phase_basis_notice")
     if isinstance(phase_basis_notice, Mapping):
         base["phase_basis_notice"] = dict(phase_basis_notice)
-    if phase_basis == "missing":
-        base["notices"].append(
-            dict(OPENIMCC_VAPOUR_PHASE_SIGNAL_MISSING_NOTICE)
-        )
-    elif phase_basis == "invalid":
-        base["notices"].append(
-            dict(OPENIMCC_VAPOUR_PHASE_SIGNAL_INVALID_NOTICE)
-        )
+    phase_signal_notice = _openimcc_vapour_phase_signal_notice(phase_basis)
+    if phase_signal_notice is not None:
+        base["notices"].append(phase_signal_notice)
     vapour_selected = openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K,
         controls=controls,
@@ -3115,6 +3120,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             phase_basis=vapour_phase_basis,
             phase_basis_source=phase_basis_source,
         )
+        d207_notices: list[dict[str, Any]] = []
+        phase_signal_notice = _openimcc_vapour_phase_signal_notice(
+            vapour_phase_basis
+        )
+        if phase_signal_notice is not None:
+            d207_notices.append(phase_signal_notice)
+        if high_t_activity_authority is not None:
+            d207_notices.extend(
+                dict(notice)
+                for notice in high_t_activity_authority.get("notices", ())
+                if isinstance(notice, Mapping)
+                and notice.get("code")
+                == OPENIMCC_LIQUID_SIO_BELOW_1950K_NOTICE["code"]
+            )
         vapour_activity_authority = (
             high_t_activity_authority
             if openimcc_binding_selected_by_inputs(
@@ -4693,6 +4712,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
 
         diagnostic = {
+            "phase_basis": vapour_phase_basis,
+            "phase_basis_source": phase_basis_source,
+            "applied_vapour_switch_K": _openimcc_vapour_switch_K(
+                vapour_phase_basis
+            ),
+            "phase_basis_notice": (
+                dict(controls["phase_basis_notice"])
+                if isinstance(controls.get("phase_basis_notice"), Mapping)
+                else None
+            ),
+            "d207_notices": d207_notices,
             "vapor_pressures_Pa": vapor_pressures,
             "vapor_pressures_source": vapor_pressure_sources,
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,

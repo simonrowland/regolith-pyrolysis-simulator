@@ -18,6 +18,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
+    Rail,
     AdmissionStatus,
     RefusalReason,
     ResidualStatus,
@@ -949,3 +950,104 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
     assert authority["vapour_channel_switch_K"] == (
         openimcc_bridge._temperature_domain_K()[0]
     )
+
+
+def test_internal_analytical_battery_score_records_vapour_phase_basis(
+    tmp_path: Path,
+) -> None:
+    from tests.engine_availability import magemin_binary_available
+
+    if not magemin_binary_available():
+        pytest.skip("MAGEMin binary unavailable for the real scorer contract")
+
+    root = Path(__file__).resolve().parents[2]
+    cases = (
+        (
+            "stolyarova-1996-cao-alumina-silica-kems",
+            "stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table2_pSiO_1933k::T=1933.00:h=0bf22dda389c",
+            "missing",
+            1950.0,
+            "openimcc_vapour_phase_signal_missing",
+            "builtin_authoritative",
+        ),
+        (
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_09",
+            "liquid",
+            None,
+            "openimcc_liquid_sio_below_1950K_band",
+            "openimcc",
+        ),
+        (
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_03",
+            "solid_bearing",
+            1950.0,
+            None,
+            "builtin_authoritative",
+        ),
+    )
+
+    contexts = {}
+    for index, (
+        source_id,
+        observation_id,
+        expected_basis,
+        expected_switch,
+        expected_notice,
+        expected_sio_source,
+    ) in enumerate(cases):
+        if source_id not in contexts:
+            contexts[source_id] = battery_score.load_score_context(
+                root, sources=(source_id,)
+            )
+        context = contexts[source_id]
+        observation = context.observations[observation_id]
+        scoped_context = replace(
+            context,
+            observations={observation_id: observation},
+            origins={
+                observation_id: context.origins.get(observation_id, "")
+            },
+        )
+        output_path = tmp_path / f"phase-basis-{index}.jsonl"
+        written, _metadata = battery_score._score_store_to_jsonl(
+            scoped_context,
+            output_path,
+            root=root,
+            engines=(Engine.INTERNAL_ANALYTICAL,),
+            rail=Rail.SIO_EVOLUTION,
+            workers=1,
+        )
+        scored_rows = [
+            json.loads(line)
+            for line in output_path.with_name(output_path.name + ".partial")
+            .read_text(encoding="utf-8")
+            .splitlines()
+            if line.strip()
+        ]
+        candidate = next(
+            row["candidate_observation"]
+            for row in scored_rows
+            if isinstance(row.get("candidate_observation"), dict)
+            and row["candidate_observation"].get("observation_id")
+            == f"engine:internal-analytical:{observation_id}"
+        )
+        assert written == 1
+        engine = candidate["engine"]
+        record = json.loads(engine["version"])
+        assert record["phase_basis"] == expected_basis
+        assert record["phase_basis_source"]
+        if expected_switch is None:
+            from simulator.melt_backend import openimcc_bridge
+
+            expected_switch = openimcc_bridge._temperature_domain_K()[0]
+        assert record["applied_vapour_switch_K"] == expected_switch
+        assert record["vapor_pressures_source"]["SiO"].startswith(
+            expected_sio_source
+        )
+        if expected_notice is not None:
+            assert any(
+                notice["code"] == expected_notice
+                for notice in record["notices"]
+            )
