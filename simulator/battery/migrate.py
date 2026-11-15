@@ -77,6 +77,7 @@ import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import SOURCE_DECLARATIONS
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
@@ -12109,9 +12110,7 @@ def map_quantity(
     if quantity_absent and obs_type in TYPE_QUANTITY:
         inferred = TYPE_QUANTITY[obs_type]
         if not _quantity_corroborated(inferred, values, units, row):
-            reason = (
-                "row type is a curation label, not a statement of the observable"
-            )
+            reason = "row type is a curation label, not a statement of the observable"
             contradiction = _quantity_contradiction(
                 inferred, obs_type, values, units, row
             )
@@ -17778,6 +17777,8 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if (gap_selection := sg.gap_selection(_unavailable_selection, declared, payload, condition_ranges, unused)) is not None:
+        return gap_selection
     if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
         oxide_fields, invalid_fields = _residue_component_field_sets(payload)
         for field in ("residue_ppm", *oxide_fields):
@@ -25382,6 +25383,7 @@ class Migrator:
                 if _row_is_phase_analysis(row):
                     phase_analysis_parent_ids.add(f"{source_id}::{record_id}")
         source_context = dict(pressure_identity_context or {})
+        source_context = sg.attach_extract_declarations(source_context, doc)
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["printed_atmospheres_for_set"] = (
             printed_atmospheres_for_set
@@ -25754,9 +25756,7 @@ class Migrator:
             else None
         )
         obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
-        quantity, q_reason = map_quantity(
-            obs_type, values, units=obs.get("units"), row=obs
-        )
+        quantity, q_reason, declared_schema_gap = sg.map_quantity(map_quantity, source_id, raw_obs_id, values, context, obs)
         q_token = quantity.value if quantity.is_value else None
         identity_profile_uses_composition = _composition_axis_is_required(
             q_token,
@@ -26700,6 +26700,7 @@ class Migrator:
                 else f"source admission_status={raw_source_admission}"
             )
             admission = Admission(status=AdmissionStatus.PENDING, reason=reason)
+        admission = sg.admission(admission, q_token, declared_schema_gap, value.kind.value, admission.status.value, admission_for, extraction, locator)
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (
@@ -28603,7 +28604,7 @@ class Migrator:
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
-                    parent_values=values,
+                    parent_values=sg.point_context(values, declared_schema_gap),
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
@@ -28802,11 +28803,7 @@ class Migrator:
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
-                        parent_values=(
-                            _values_without_row_lists(values)
-                            if non_yield_points
-                            else values
-                        ),
+                        parent_values=sg.point_context(values, declared_schema_gap, _values_without_row_lists if non_yield_points else None),
                         composition_datum_declared=declares_composition_datum,
                         provenance=observation_provenance,
                         parent_point_conditions=(
@@ -29777,7 +29774,7 @@ class Migrator:
                     **raw_item,
                     "gas_species": parent_values["gas_species"],
                 }
-            value_sel = select_declared_source(q_token, units, selection_payload)
+            value_sel = sg.point_value(select_declared_source, q_token, units, parent_values, selection_payload)
             provenance = _printed_scalar_provenance(
                 provenance, raw_item, value_sel
             )
