@@ -953,7 +953,14 @@ def test_magemin_binding_probe_forwards_redox_state_to_request(
     monkeypatch.setattr(
         admission,
         'selected_binding_provenance',
-        lambda *_args: {'binding_provenance_verifiable': True},
+        lambda *_args: {
+            'binding_provenance_verifiable': True,
+            'runtime_version': {
+                'tag': 'value',
+                'value': 'MAGEMin fixture runtime',
+                'reason': None,
+            },
+        },
     )
     monkeypatch.setattr(
         'engines.magemin.provider.MAGEMinShadowProvider',
@@ -1765,7 +1772,13 @@ def test_live_admission_error_does_not_keep_provider_finalizer_alive(
             patch.setattr(
                 admission,
                 "current_backend_provenance",
-                lambda _identity, _backend: {"runtime_version": "fixture"},
+                lambda _identity, _backend: {
+                    "runtime_version": {
+                        "tag": "value",
+                        "value": "MAGEMin fixture runtime",
+                        "reason": None,
+                    },
+                },
             )
             patch.setattr(admission, "authorize_binding", reject)
             admission.publish_live_backend_admission(provider.backend)

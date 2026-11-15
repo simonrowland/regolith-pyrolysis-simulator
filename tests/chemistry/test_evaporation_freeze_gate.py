@@ -1392,6 +1392,11 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
         ),
         provenance_override={
             "binding_provenance_verifiable": True,
+            "runtime_version": {
+                "tag": "value",
+                "value": "MAGEMin fixture runtime",
+                "reason": None,
+            },
             "runtime_artifacts": {
                 "magemin_selected_binary": {"sha256": "a" * 64},
             },
@@ -6622,6 +6627,11 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
     first_digest = 'a' * 64
     provenance = [{
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': first_digest},
         },
@@ -6646,6 +6656,11 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
     }
     provenance[0] = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'b' * 64},
         },
@@ -6806,6 +6821,11 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
     provenance_calls = []
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': None},
         },
@@ -6993,6 +7013,11 @@ def test_gate_memo_reuses_live_curve_without_metadata_receipt_digests(
     )
     provenance = {
         'binding_provenance_verifiable': False,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'a' * 64},
         },
@@ -7043,6 +7068,11 @@ def test_gate_capture_rejects_foreign_origin_with_valid_consumer_receipt(
     )
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'a' * 64},
         },
@@ -7126,6 +7156,11 @@ def test_gate_capture_requires_curve_associated_with_active_record(
     )
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'a' * 64},
         },
