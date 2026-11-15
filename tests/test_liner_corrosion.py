@@ -288,14 +288,17 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
     alumina = parse_formula("Al2O3").molar_mass_g_per_mol()
     silica = parse_formula("SiO2").molar_mass_g_per_mol()
     total = cao + alumina + 2 * silica
-    anorthite = {
+    formula_derived_anorthite = {
         "CaO": 100.0 * cao / total,
         "Al2O3": 100.0 * alumina / total,
         "SiO2": 200.0 * silica / total,
     }
-    assert anorthite["CaO"] == pytest.approx(20.16, abs=0.01)
-    assert anorthite["Al2O3"] == pytest.approx(36.65, abs=0.01)
-    assert anorthite["SiO2"] == pytest.approx(43.19, abs=0.01)
+    assert formula_derived_anorthite["CaO"] == pytest.approx(20.16, abs=0.01)
+    assert formula_derived_anorthite["Al2O3"] == pytest.approx(36.65, abs=0.01)
+    assert formula_derived_anorthite["SiO2"] == pytest.approx(43.19, abs=0.01)
+    # Match the ruling's cited oxide precision for the live engine request;
+    # formula-derived values above independently verify the stoichiometry.
+    anorthite = {"CaO": 20.16, "Al2O3": 36.65, "SiO2": 43.19}
     from simulator.melt_backend.magemin import MAGEMinBackend
 
     backend = MAGEMinBackend()
@@ -313,7 +316,6 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                     pressure_bar=1.0,
                 )
                 assert direct.status == "ok", direct.warnings
-                assert direct.liquid_fraction == pytest.approx(0.0, abs=1e-12)
                 sampled_liquid_fraction = sampler(anorthite, temperature_C, 1.0)
                 assert sampled_liquid_fraction == pytest.approx(
                     direct.liquid_fraction
@@ -321,17 +323,107 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                     f"sampler/direct mismatch at {temperature_C} C: "
                     f"{sampled_liquid_fraction} vs {direct.liquid_fraction}"
                 )
-            solid = sampler(anorthite, 1500.0, 1.0)
-            liquid = sampler(anorthite, 1600.0, 1.0)
+                assert direct.liquid_fraction == pytest.approx(0.0, abs=1e-12)
+            profile = liner_corrosion._tier_b_reference_profile(
+                sampler,
+                anorthite,
+                pressure_bar=1.0,
+            )
         except LinerCorrosionRefusal as exc:
             if exc.reason == "engine_unavailable":
                 pytest.skip("MAGEMin is required for the anorthite anchor")
             raise
-        assert solid <= LIQUIDUS_SOLID_EPSILON
-        assert liquid >= 1.0 - LIQUIDUS_LIQUID_EPSILON
+        assert profile["liquid_fraction_by_temperature_C"][800.0] == 0.0
+        assert profile["liquid_fraction_by_temperature_C"][1000.0] == 0.0
+        assert profile["bulk_melt_bracket_C"] == [1550.0, 1575.0]
+        assert profile["engine_minor_phase_eutectic"]["temperature_bracket_C"] == [
+            1000.0,
+            1025.0,
+        ]
+        assert profile["engine_minor_phase_eutectic"]["plateau_liquid_fraction"] == (
+            pytest.approx(0.0026, abs=0.0002)
+        )
+        assert profile["engine_minor_phase_eutectic"]["phases"]
+        assert "phase_closure_unverified" in profile["flags"]
+        pure_rating = liner_corrosion._tier_b_melt_activity_rating(
+            anorthite,
+            anorthite,
+            {},
+            sampler=sampler,
+            pressure_bar=1.0,
+            margin_C=25.0,
+            literature_melting_temperature_C=1553.0,
+            pure_reference=profile,
+        )
+        assert pure_rating["rating_temperature_C"] == 1528.0
+        assert "deposit_melt_below_resolution" in pure_rating["flags"]
     finally:
         sampler.close()
         direct_backend.close()
+
+
+def test_tier_b_rating_uses_excess_melt_and_the_lower_temperature_bracket():
+    class ProfileSampler:
+        flags = ["engine_phase_closure_unverified"]
+
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            if temperature_C < 1025.0:
+                pure = 0.0
+            elif temperature_C < 1550.0:
+                pure = 0.0026
+            elif temperature_C < 1575.0:
+                pure = 0.044
+            else:
+                pure = 1.0
+            excess = (
+                0.01
+                if composition.get("Na2O", 0.0) > 5.0
+                and 1100.0 <= temperature_C < 1550.0
+                else 0.0
+            )
+            return min(1.0, pure + excess)
+
+        def sample_diagnostics(self, _composition, temperature_C, _pressure_bar):
+            return {"phases": ["fsp", "cpx"] if temperature_C >= 1025.0 else []}
+
+    sampler = ProfileSampler()
+    liner = {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0}
+    reference = liner_corrosion._tier_b_reference_profile(
+        sampler,
+        liner,
+        pressure_bar=1.0,
+    )
+    pure = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        liner,
+        {},
+        sampler=sampler,
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=1553.0,
+        pure_reference=reference,
+    )
+    contaminated = {"SiO2": 45.0, "Al2O3": 27.0, "CaO": 18.0, "Na2O": 10.0}
+    rated = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        contaminated,
+        {"Na": 1.0},
+        sampler=sampler,
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=1553.0,
+        pure_reference=reference,
+    )
+
+    assert pure["rating_temperature_C"] == 1528.0
+    assert rated["contaminated_melt_bracket_C"] == [1075.0, 1100.0]
+    # T_lit + (T_contaminated,lo - T_bulk,pure,lo) - margin
+    # = 1553 + (1075 - 1550) - 25 = 1053 C; the upper cap is 1528 C.
+    assert rated["rating_temperature_C"] == 1053.0
+    assert rated["excess_liquid_fraction_at_upper_bracket"] == pytest.approx(
+        0.01
+    )
+    assert "deposit_melt_below_resolution" not in rated["flags"]
 
 
 def test_rankin_end_member_melting_points_are_excluded_from_compound_rows():
