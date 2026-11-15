@@ -44,6 +44,7 @@ from typing import (
 
 import yaml
 
+from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
@@ -225,7 +226,10 @@ from simulator.battery.score_report import (
     render_payload_score_report_markdown,
     store_stamp_has_known_revision,
 )
-from simulator.battery.score_report_data import element_retention_report_data
+from simulator.battery.score_report_data import (
+    eligibility_failure_census,
+    element_retention_report_data,
+)
 from simulator.battery.score_run import (
     _ScoreShardResult,
     _partition_score_refs,
@@ -1137,7 +1141,7 @@ def parse_species_formula(
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
-    text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
+    text = fold_subscript_digits(text)
     # formula_composition reads the ASCII-dot water-adduct separator as a
     # decimal count. Refuse that normalized form first; raw fast-path results
     # and explicit middle-dot hydrates stay unchanged.
@@ -22640,6 +22644,12 @@ def _render_score_report_from_payloads_legacy(
     if not report_engine_names:
         report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
     report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
+    eligibility_census = eligibility_failure_census(
+        rows,
+        conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
+        observations=context.observations,
+        engine_for_row=_engine_from_payload,
+    )
     pending = 0
     admitted = 0
     for observation in comparison_candidates(context):
@@ -22658,6 +22668,7 @@ def _render_score_report_from_payloads_legacy(
         all_numeric_records=aggregate.all_numeric.records(
             engine.value for engine in engines
         ),
+        eligibility_census=eligibility_census,
         headline_rows=aggregate.headline_records(engines=report_engines),
         e15_lines=_e15_report_lines(aggregate.e15_points, context.observations),
         flagged_rows=aggregate.flagged_records(),
@@ -24372,6 +24383,12 @@ def render_score_report_from_payloads(
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
 ) -> str:
+    eligibility_census = eligibility_failure_census(
+        rows,
+        conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
+        observations=observations,
+        engine_for_row=_engine_from_payload,
+    )
     unflagged_rows = _FilteredPayloadRows(
         rows, lambda row: not _flagged_payload_strata(row)
     )
@@ -24464,6 +24481,7 @@ def render_score_report_from_payloads(
         engines=engines,
         observations_present=observations is not None,
         all_numeric_records=all_numeric_records,
+        eligibility_census=eligibility_census,
         measured_headline_rows=measured_headline_rows,
         e15_lines=e15_lines,
         flagged_rows=flagged_rows,

@@ -104,7 +104,21 @@ the extract gate, and the literature index all call
 `certify_extract_source_fidelity` and refuse while any count is non-zero.
 
 Coverage is by leaf address. A measured leaf is a finite int or float
-(not a boolean), or a string that contains any digit [0-9]. A quantity
+(not a boolean), or a string that contains any digit [0-9]. String values
+under the closed `ANNOTATION_KEYS` set (`attribution`, `note`, `reason`,
+`schema_gap`, `composition_derivation`, `parents_not_printed`) are excluded
+as a direct child of `values` (`values.note`, `values.attribution`, and
+the other keys in that set) except `reason`. A `reason` string is excluded
+only when its parent is a condition-state mapping, at any depth, whose `tag`
+is a non-value `StateTag` (`unknown` or `not_applicable`; the set is
+`StateTag` other than `value`). A `reason` beside `tag: value`, or in a
+mapping with no state tag, stays a leaf at the observation root and nested
+under `values`. A nested `locator.note` stays a leaf. Numbers under those
+keys remain leaves. Those excluded strings are the extractor's paraphrase,
+provenance, reasoning, schema notes, or refusal reasons, not printed evidence.
+A key stays outside the set when its sampled values
+transcribe a printed citation, cell, label, id, caption, or standard state.
+`citation` and `standard_state` stay outside for that reason. A quantity
 name, a unit on its own, or another label with no digit is not a leaf.
 The evidence tree is the observation's `values` plus each scored numeric
 condition the temperature payload copies beside it: `T_range_K`, `T_K`,
@@ -118,8 +132,9 @@ such as `quantity: pressure` is not a measured leaf and does not cover a
 sibling measurement, including a printed value such as `0.91Pa` that the
 numeric grammar does not read. Two samples may pin different addresses of
 the same observation. Evidence with no measured leaf is covered by a pin
-of that evidence only when the evidence also contains no digit. Zero
-recognised leaves in a block that still contains a digit is not coverage.
+of that evidence only when the evidence also contains no digit outside an
+annotation string. Zero recognised leaves in a block that still contains
+such a digit is not coverage.
 An equipment pin does not contribute.
 A bare integer bracket such as `observations[0]` is a list position, not
 an id, so it does not contribute. Structured samples address `values`
@@ -138,7 +153,12 @@ If a path is absent there, it resolves under the offline corpus mount set by
 `REGOLITH_CORPUS_ROOT` (for example, `~/Repos/regolith-corpus`). The root is a
 lookup location, not a policy switch. An unset root refuses with
 `corpus_root_unset`; a missing file refuses with `corpus_artifact_missing`,
-and a path outside the mount refuses with `corpus_path_outside_root`. Each
+and a path outside the mount refuses with `corpus_path_outside_root`. A
+top-level prefix directory that is not on the mount (`text/`, `tables/`,
+`raw/`, and the other source prefixes) leaves pins under that prefix
+unverified (`corpus_prefix_unmounted`). Those pins are not opened and are
+not missing files. A pin whose prefix directory is present is opened in
+full: a missing file, a wrong digest, or an absent token fails. Each
 corpus-resolved locator must include `source_sha256`, the lowercase
 64-character SHA-256 of the exact bytes opened. A missing digest refuses with
 `artifact_digest_missing`; a mismatch refuses with
@@ -150,13 +170,34 @@ Repository files under `raw/`, `corpus/`, `text/`, `tables/`,
 `supporting/`, and `docs/references/` use this same repository-first lookup.
 The extract document and program source are not source artifacts, including
 a copy parked on a source root.
+CI without a corpus mount verifies coverage and source-attestation shape;
+token fidelity for corpus-resolved pins is verified in jobs that mount the
+corpus. A sparse mount verifies only the prefixes whose directories it
+contains. If every corpus pin is unverified, that check is skipped.
 A numeric pin matches only a complete token: the sign and the exponent
 belong to the token, so `0.24` is not `-0.24` or `0.24e-5`, and `1.0` is
 not `1`. The whole stored value, including a spaced or attached unit, must
 match, and the characters on either side must not extend it. An extending
 character is an ASCII letter or digit, a Unicode letter, µ, or °, or a
 dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
-`1,000`. The token must appear in the cited `line_range` when one is set,
+`1,000`. A thin space (U+2009), narrow no-break space (U+202F), or
+no-break space (U+00A0) in an unsigned digit run is typography. An
+ordinary ASCII space is not: `1 100` certifies 1 and certifies 100 and
+does not certify 1100. The first group is one to three digits and each
+group after it is exactly three, so `1 650` and `1 650` are 1650. A
+separated run joins only as a whole. A short group is not deleted, and
+a well-formed piece of that same run is not joined on its own, so
+`12 34 567` is not 34567 and `1 650 1` is not 1650. The
+run starts at the beginning of the text or after whitespace or
+punctuation, and a letter does not precede it, so `SiO2 100` is formula
+`SiO2` and the number 100, not `SiO2100`. The run is not an exponent, a
+sign, or a decimal fraction, so `1e0 001`, `12 34`, `1.5 000`, and
+`1 550e3` are not one number. A formula or species label does not apply
+this fold. A comma is not this separator, so a cell `1,000` is not 1000.
+The same typographic grouped spelling in a numeric cell is that number.
+An ASCII space in a cell does not join, so a cell `1 550` is not 1550.
+The token must
+appear in the cited `line_range` when one is set,
 otherwise in the opened text. A CSV or TSV source is not searched that way:
 the complete table is parsed first, honouring quoted multi-line cells, and
 the locator then selects records that lie entirely inside the cited lines.
@@ -164,7 +205,130 @@ A cell certifies a stored value only when the whole trimmed, unquoted cell
 is a spelling of that number or equals the stored string. A substring does
 not certify: a cell `1/2` is not `1`, and a cell `1,000` is not `1`. A
 `line_range` that cuts through a quoted cell is source-blind and is not
-re-parsed from the sliced lines. A page or table number alone is not an open.
+re-parsed from the sliced lines. A MinerU markdown table is one
+`<table>...</table>` line, so a `line_range` cannot isolate a row. On a
+text artifact, `table_row` and `table_column` are the 1-based grid
+position of one cell, header rows included. `table_row_number` and
+`table_column_number` are the same indexes. Both axes are required. The
+validator parses that complete table, expanding `rowspan` and `colspan`,
+and the stored number or ordinary string must be that whole trimmed cell.
+A cell that contains a superscript certifies only when the cell is a
+complete power and nothing else: exactly one optional leading sign and
+an unsigned base, an optional × or x or ·, then 10 and the superscript
+exponent, or the unsigned base raised to that exponent. `10<sup>3</sup>`
+certifies `1e3`.
+`1.5×10<sup>3</sup>` certifies 1500 / `1.5e3`. A leading minus applies
+to the whole power. The HTML cell and the caret spelling use that one
+parser, so `-10<sup>2</sup>` and `-10^2` are -100 and `100` does not
+certify. A second sign is not that grammar: `--10<sup>2</sup>`,
+`+-10<sup>2</sup>`, and `-−10<sup>2</sup>` are `superscript_in_cell`.
+`-1.5×10<sup>3</sup>` is -1500. `10<sup>3</sup>2` and any
+other leading or trailing content are `superscript_in_cell`. A missing
+base, including `<sup>2</sup>`, is `superscript_in_cell` and does not
+raise. `0<sup>2</sup>` certifies `0.0` and does not certify `-0.0`.
+`-0<sup>2</sup>` is that power negated with `copy_negate`, so it certifies
+`-0.0` and does not certify `0.0`. The power, including a times-ten
+product, is computed in one decimal context that traps an inexact,
+rounded, underflow, overflow, subnormal, or invalid result. Any of those
+is `superscript_in_cell`. `12345678901234567890123456789<sup>1</sup>`
+does not certify `1.2345678901234567890123456790e28`. `10<sup>-1000</sup>`
+does not certify 0. `1.5×10<sup>3</sup>` still certifies 1500.
+The sign of zero is the same comparison a plain numeric cell uses. A stored
+integer uses the same numeric equality as a float, so `10<sup>3</sup>`
+certifies `1000` and `1000.0`, and `103` does not. A string certifies
+only as a spelling of that power (`1e3`,
+`10^3`, `1×10^3`, `-10^2`). A value printed
+in another row of the same line does not certify. A cited
+`line_range`, or the opened text when `line_range` is absent, that
+includes a line of an HTML `<table>` and has no `table_row` or
+`table_column` refuses with `html_table_requires_cell_address`. A value
+on a prose line in that span still certifies. A value present only in
+the table does not. A
+missing table, more than one table in the cited span, a span that cuts a
+table, an index that is not a positive integer, or a cell outside the
+grid is source-blind. `line_range` still chooses which complete table is
+cited.
+Formula-bearing label keys are `formula` and `species` only. The label is
+normalized before every comparison, including a label with no ASCII digit.
+Folding does not change how many whitespace-separated tokens the cited
+text has. A space always separates tokens. No wrapper joins across a
+space. Markup is removed inside each token:
+`_{n}`, a bare `_` followed by digits, Unicode subscript digits,
+`$...$`, and a `\mathrm`, `\text`, or `\rm` command. A space inside
+`$...$` is a separator, so `$H_{2} O_{2}$` certifies `H2` and `O2` and
+does not certify `H2O2`, and `$SiO_{2} 100$` certifies `SiO2` and does
+not certify `SiO2100`. A caret is a superscript. A whitespace token that
+contains `^` does not certify as a plain formula or a plain number, so
+`$O^{2-}$` does not certify `O2`, `$Fe^{2+}$` does not certify `Fe2`,
+and `$SiO^{2}$` does not certify `SiO2`. Charged or powered species
+labels are unsupported. Before any wrapper is removed, a raw whitespace
+token that carries `^`, `<sup>`, a Unicode superscript, or any charge
+sign together with an uppercase element letter is charged. The charge
+signs are ASCII plus and hyphen-minus plus the certification sign class
+`UNICODE_MINUS_SIGNS` and `UNICODE_PLUS_SIGNS` (superscript and subscript
+plus and minus included), anywhere in the token, before formula folding.
+`Cl−,`, `SO₄−`, `SO_{4}−`, and `Fe-rich` do not certify the neutral
+label. `Cl` does. `-6.98` still certifies `-6.98`. The charge guard is a
+formula or species label, so a measured leaf such as `-1Pa` or
+`1.2E-3K` still certifies. A charged token, and an HTML, CSV, or TSV
+cell that contains it, certifies no formula or species label, neither
+the neutral prefix nor a charged label, and certifies no number. The charged
+reason compares element symbols, lowercase letters included, after the
+subscript fold. `SO₄−` does not type `SiO2`, `F−` does not type `Fe`, and
+`MnO−` does not type `MgO`. For a charge sign that is not a superscript,
+an unrelated formula miss stays `cited_token_absent`. An empty `<sup></sup>`
+is still a superscript. `SiO<sup></sup>2` does not certify `SiO2`; the
+refusal is `charged_species_unsupported`. `Fe<sup>2</sup>` is
+`charged_species_unsupported` for `Fe` and `Fe2`, not `cited_token_absent`.
+A `<sup>` tag whose content is letters, a Unicode superscript, or a modifier
+letter is decided on the raw token or cell before spans are stripped.
+`<sup>SiO2</sup>`, `SiO2ⁿ`, `SiO2ᵃ`, and `Fe^{x}` certify no formula or
+species label. The refusal is `charged_species_unsupported`. A superscript
+in another token of the same cited span does not; that unrelated miss stays
+`cited_token_absent`. An addressed HTML, CSV, or TSV cell is one unit
+on that check. A space inside the cell does not split it, so `Fe -`
+is `charged_species_unsupported` for `Fe` and `SiO2 ⁿ` is
+`charged_species_unsupported` for `SiO2`. Only prose splits on
+whitespace.
+Formula
+and species labels take that guarded comparison first, on prose, an
+HTML cell, a CSV or TSV cell, and repository text, so an identical
+`Fe^{2+}` cell does not certify. The refusal is
+`charged_species_unsupported`. `Fe`, `Fe2`, and `Fe^{2+}` all refuse
+`$\mathrm{Fe}^{2+}$`, `$Fe^{2+}$`, `Fe<sup>2+</sup>`, `Fe⁺`, and `Fe²⁺`.
+A neutral `Fe` elsewhere in the same text still certifies `Fe`. A plain
+numeric cell with no element symbol stays on the power path, so
+`10<sup>3</sup>` still certifies `1e3`. A subscript digit inside a
+formula token is not a number. `SiO_{2}` and `SiO₂` do not certify 2.
+`Fe_{2}O_{3}` does not certify 2 or 3. A neighbouring measurement still
+certifies, so `SiO_{2} 100` certifies 100 and `6.98 Fe_{2}O_{3}`
+certifies 6.98. A token with no internal space is the
+`printed_formula` conversion, so
+`${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$` certifies `Al2O3`. A space is
+never removed. `SiO 2` does not certify `SiO2`. `(OH) 2` does not
+certify `(OH)2`. `Fe 6.98` certifies `Fe` and `6.98` and does not
+certify `Fe6`. `H2 O2` does not certify `H2O2` and certifies `H2` and
+`O2` separately, `Fe 2 O 3` does not certify `Fe2O3`, and `SiO2 Al2O3`
+stays two tokens and certifies each of them. `SiO2Al2O3` certifies
+neither. A preceding number stays its own token, so `6.98 Fe_{2}O_{3}`
+certifies `Fe2O3`
+and certifies 6.98. In a cell, the whole trimmed cell after that fold, and
+after removing one wrapping `$...$` pair, must equal the folded label. In
+running text the folded label must equal one whole formula run. A run is
+a maximal span of element symbols, digits, parentheses, square brackets,
+and the charge marks ·, +, and -. Whitespace or any other character
+delimits it. A `.` followed by a digit, directly after an element
+letter, a digit, or `)`, stays in the run. `_{.5}` folds to `.5`.
+`FeO.5`, `FeO_{.5}`, and `FeO_{0.5}` do not certify `FeO`. `SiO2.5`
+and `SiO_{2.5}` do not certify `SiO2`. `FeO1.5` does not certify
+`FeO`. A period that is not followed by a digit is still a boundary,
+so `FeO.` and `SiO2.` at the end of a sentence certify `FeO` and
+`SiO2`. `CO` does not certify text that contains only `CO₂`, and
+`SiO₂` does not certify `SiO₂₂`. `SO4` does not certify `Fe₂(SO₄)₃`.
+`Fe2(SO4)3` does. `CaO·SiO2` certifies only as that whole run, so `SiO2`
+does not.
+Numbers, numeric strings, and every other key keep the un-folded formula
+comparison. A page or table number alone is not an open.
 A PDF is not opened as text. Do not backfill reviewer fields from the
 extract's own value.
 
@@ -614,6 +778,12 @@ A locator is a mapping with at least one non-empty location key among:
 - `line_range` (e.g. thermo.inp line range)
 - `note` (prose locator when the above do not apply — allowed, but prefer structured keys)
 - `source_path`, `quotes_path`, `record`
+
+`table_row` and `table_column`, and the same indexes under
+`table_row_number` and `table_column_number`, select one cell of an
+opened text artifact. They are cell selectors, not location keys. The
+locator still needs `source_path`, `quotes_path`, `record`, or another
+location key above.
 
 `page` is the one-based physical page in the PDF. `pdf_page_index` is the
 zero-based PDF page index (the first PDF page is 0). `published_page` is the

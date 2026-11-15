@@ -15,6 +15,7 @@ from simulator.battery.enums import Engine
 from simulator.battery.records import Observation
 from simulator.battery.score_report_data import (
     ElementRetentionReportData,
+    EligibilityFailureCensus,
     Nasa9FitComparisonData,
 )
 
@@ -148,6 +149,7 @@ def _e15_markdown_lines(
 
 def _all_numeric_markdown_lines(
     records: Sequence[Mapping[str, object]],
+    engine_counts: Sequence[tuple[str, str, int, int, int | None]],
     *,
     regenerated: bool = True,
 ) -> list[str]:
@@ -169,18 +171,31 @@ def _all_numeric_markdown_lines(
         return lines
     lines.extend(
         [
-            "| rail | engine | n | n certified | n flagged | n dex | median dex | "
-            "IQR dex | flag classes | sources |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---|---|",
+            "| rail | engine | numeric events | unique observations | unique source_ids | "
+            "n certified | n flagged | n dex | median dex | "
+            "IQR dex | top 3 flag classes | sources |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
         ]
     )
     strata_lines: list[str] = []
+    unique_counts = {
+        (rail, engine): (observations, sources)
+        for rail, engine, _events, observations, sources in engine_counts
+    }
     for row in records:
         flags = row.get("flag_class_counts") or {}
         assert isinstance(flags, Mapping)
-        flag_s = ", ".join(f"{k}={v}" for k, v in flags.items()) if flags else "—"
+        top_flags = sorted(
+            ((key, value) for key, value in flags.items() if key != "unflagged"),
+            key=lambda item: (-int(item[1]), str(item[0])),
+        )[:3]
+        flag_s = ", ".join(f"{key}={value}" for key, value in top_flags) or "—"
         sources = row.get("sources") or []
         assert isinstance(sources, Sequence)
+        unique_observations, unique_sources = unique_counts.get(
+            (str(row["rail"]), str(row["engine"])), (0, 0)
+        )
+        unique_sources_s = "—" if unique_sources is None else str(unique_sources)
         source_s = (
             ", ".join(
                 f"{s.get('source_id')}(n={s.get('n_numeric')},"
@@ -191,7 +206,8 @@ def _all_numeric_markdown_lines(
             or "—"
         )
         lines.append(
-            f"| {row['rail']} | {row['engine']} | {row['n']} | {row['n_certified']} | "
+            f"| {row['rail']} | {row['engine']} | {row['n']} | "
+            f"{unique_observations} | {unique_sources_s} | {row['n_certified']} | "
             f"{row['n_flagged']} | {row['n_dex']} | {row.get('median_dex') or '—'} | "
             f"{row.get('iqr_dex') or '—'} | {flag_s} | {source_s} |"
         )
@@ -212,6 +228,30 @@ def _all_numeric_markdown_lines(
             *(strata_lines or ["| (none) | — | — | — | 0 | — | — |"]),
         ]
     )
+    return lines
+
+
+def _eligibility_failure_census_lines(
+    census: EligibilityFailureCensus,
+) -> list[str]:
+    lines = [
+        "## Eligibility conjunct failure census",
+        "",
+        "Numeric residual events and unique observations where each current "
+        "score_eligible conjunct is false. First failure follows the declared "
+        "conjunct order; those event counts sum to numeric events minus eligible events.",
+        "",
+        "| rail | engine | first failing conjunct | first failing events | conjunct | "
+        "failure events | unique observations |",
+        "|---|---|---|---:|---|---:|---:|",
+    ]
+    for rail, engine, conjunct, events, observations, first_events in census.rows:
+        lines.append(
+            f"| {rail} | {engine} | {conjunct if first_events else '—'} | "
+            f"{first_events} | {conjunct} | {events} | {observations} |"
+        )
+    if not census.rows:
+        lines.append("| (none) | — | — | 0 | — | 0 | 0 |")
     return lines
 
 
@@ -385,6 +425,7 @@ def render_legacy_score_report_markdown(
     rail_census: Sequence[Mapping[str, object]],
     unassigned_census: Sequence[Mapping[str, object]],
     all_numeric_records: Sequence[Mapping[str, object]],
+    eligibility_census: EligibilityFailureCensus,
     headline_rows: Sequence[Mapping[str, object]],
     e15_lines: Sequence[str],
     flagged_rows: Sequence[Mapping[str, object]],
@@ -468,8 +509,11 @@ def render_legacy_score_report_markdown(
             "",
             *_all_numeric_markdown_lines(
                 all_numeric_records,
+                eligibility_census.engine_counts,
                 regenerated=has_residuals,
             ),
+            "",
+            *_eligibility_failure_census_lines(eligibility_census),
         ]
     )
     lines.extend(
@@ -668,6 +712,7 @@ def render_payload_score_report_markdown(
     engines: Sequence[Engine],
     observations_present: bool,
     all_numeric_records: Sequence[Mapping[str, object]],
+    eligibility_census: EligibilityFailureCensus,
     measured_headline_rows: Sequence[Mapping[str, object]],
     e15_lines: Sequence[str],
     flagged_rows: Sequence[Mapping[str, object]],
@@ -704,8 +749,11 @@ def render_payload_score_report_markdown(
             f"Engines: {', '.join(e.value for e in engines)}.",
             "",
             *_all_numeric_markdown_lines(
-                all_numeric_records
+                all_numeric_records,
+                eligibility_census.engine_counts,
             ),
+            "",
+            *_eligibility_failure_census_lines(eligibility_census),
         ]
     )
     lines.extend(
