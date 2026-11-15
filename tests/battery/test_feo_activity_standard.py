@@ -205,17 +205,19 @@ def test_melt_pack_shift_matches_condensate_gibbs_rows_as_crosscheck() -> None:
         .joinpath("data", "gas", "condensate-default-v1.csv")
         .open("r", encoding="utf-8", newline="") as handle
     ):
-        current_row = next(
+        current_row = dict(next(
             row for row in csv.DictReader(handle) if "FeO(l)" in row.values()
-        )
+        ))
+    for key in ("dH298_R", "dG_A", "dG_B", "dG_C", "dG_D", "dG_E"):
+        current_row[key] = float(current_row[key])
     old_janaf_row = {
         "species_name": "FeO(l)",
-        "dH298_R": "-30.01",
-        "dG_A": "6.72",
-        "dG_B": "6.588",
-        "dG_C": "-1.248",
-        "dG_D": "0.150",
-        "dG_E": "-0.007697",
+        "dH298_R": -30.01,
+        "dG_A": 6.72,
+        "dG_B": 6.588,
+        "dG_C": -1.248,
+        "dG_D": 0.150,
+        "dG_E": -0.007697,
     }
     identity = _melt_pack_identity("default")
     for temperature_K, expected in (
@@ -320,6 +322,38 @@ def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> No
     }
 
 
+def test_redox_feo_row_matches_dg46_and_mutations_refuse() -> None:
+    row = feo_standard_module._openimcc_redox_pack_feo_row()
+    assert feo_standard_module._redox_pack_feo_row_refusal(row) is None
+
+    mutated_row = dict(row)
+    mutated_row["dG_A"] = str(Decimal(str(row["dG_A"])) + Decimal("0.1"))
+    refusal = feo_standard_module._redox_pack_feo_row_refusal(mutated_row)
+
+    assert refusal is not None
+    assert refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert refusal.detail["reason"] == "openimcc_feo_redox_standard_row_mismatch"
+
+
+def test_openimcc_redox_refuses_a_v1_melt_standard_with_dg46_redox_row() -> None:
+    identity = _melt_pack_identity("published-core")
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
+        Engine.OPENIMCC,
+        (
+            f"openimcc-redox-pack:sha256:"
+            f"{feo_standard_module._OPENIMCC_DEFAULT_REDOX_PACK_DIGEST}",
+            f"openimcc-melt-binding:sha256:{identity['binding_digest']}",
+        ),
+        melt_pack_identity=identity,
+        temperature_K=Decimal("1600"),
+    )
+
+    assert standard is None
+    assert refusal is not None
+    assert refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert refusal.detail["reason"] == "openimcc_feo_redox_melt_standard_mismatch"
+
+
 @pytest.fixture(scope="module")
 def distin_migration():
     root = Path(REPO_ROOT)
@@ -388,9 +422,9 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
     assert candidate.provenance["feo_standard_normalisation"][
         "to_standard"
     ] == "Fe-019"
-    assert float(
-        candidate.provenance["feo_standard_normalisation"]["log10_shift"]
-    ) > 0
+    normalisation = candidate.provenance["feo_standard_normalisation"]
+    assert normalisation["melt_pack_identity"] == _melt_pack_identity("default")
+    assert Decimal(normalisation["log10_shift"]) > 0
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
     assert sha256(serialized).hexdigest() == _DISTIN_1880_RESIDUAL_SHA256
 
