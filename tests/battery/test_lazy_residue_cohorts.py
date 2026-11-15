@@ -127,7 +127,6 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
             experiments,
             catalog,
             preform_dimensions_mm=preform_dimensions_mm,
-            code_revision="lazy-selection-test",
             selected_experiment_ids=frozenset({"unknown-experiment"}),
         )
     assert exc_info.value.reason == "hashimoto_experiment_selection_invalid"
