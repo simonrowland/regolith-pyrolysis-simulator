@@ -8,6 +8,7 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import Engine, Rail
+from simulator.battery.records import ApproxPressure, BandBasis
 from simulator.battery.migrate import PrintedOxygenFacts, printed_oxygen_decision
 from simulator.battery.score import (
     SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE,
@@ -165,8 +166,21 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
             assert row.point_conditions["temperature_K"].state.is_value
             assert row.point_conditions["total_pressure_Pa"].state.is_value
             assert row.identity.total_pressure_Pa is not None
-            assert row.identity.total_pressure_Pa.is_unknown
-            assert row.identity.total_pressure_Pa.reason == "in_cell_total_pressure_not_derivable"
+            # d-399: the located "KC chamber about 10^-6 mbar" print (kems-137
+            # p. 5; kems-138 p. 2) is an approximate point, so identity carries
+            # a band, not unknown (t-1756 declared these rows unknown -> banded).
+            #   10^-6 mbar x 100 Pa/mbar = 1e-4 Pa (the extract's point '0.0001').
+            #   No interval is printed, so the band is half a decade each side:
+            #   [1e-4 / sqrt(10), 1e-4 * sqrt(10)] = [3.1623e-5, 3.1623e-4] Pa.
+            #   Check: high / low = 10 (one decade), low * high = point**2.
+            assert row.identity.total_pressure_Pa.is_value
+            band = row.identity.total_pressure_Pa.value
+            assert isinstance(band, ApproxPressure)
+            assert band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+            assert band.point == Decimal("0.0001")
+            assert abs(band.low - Decimal("0.000031622776601683793319988935")) < Decimal("1e-30")
+            assert abs(band.high - Decimal("0.00031622776601683793319988935")) < Decimal("1e-29")
+            assert abs(band.high / band.low - 10) < Decimal("1e-25")
             assert row.point_conditions["composition"].state.is_unknown
             if sid == "kems-137-bischof-2023":
                 temperature = row.identity.temperature_K.value
@@ -195,13 +209,21 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                         "O’Neill and Pownceby, 1993"
                     ),
                 }
+                # The conversion records the row's run pressure: the d-399 identity
+                # point 1e-4 Pa = 1e-4 / 1e5 bar = 1E-9 bar. The O'Neill and Pownceby
+                # 1993 equation is evaluated at its 1 bar reference with no pressure
+                # correction, so the converted value is pressure-independent (the
+                # 10 bar check below asserts the same state); only the notice text
+                # records the pressure.
+                run_pressure_bar = row.identity.total_pressure_Pa.value.point / Decimal(100000)
+                assert run_pressure_bar == Decimal("1E-9")
                 decision = printed_oxygen_decision(
                     PrintedOxygenFacts(),
                     raw_item=relative_item,
                     point_conditions=None,
                     scope="row",
                     run_temperature_K=temperature,
-                    run_pressure_bar=Decimal(1),
+                    run_pressure_bar=run_pressure_bar,
                     source_id=sid,
                 )
                 assert decision is not None and decision.state.is_value

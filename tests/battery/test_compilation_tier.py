@@ -4071,10 +4071,18 @@ def test_b677_ideal_gas_enthalpy_scores_and_combined_phase_stays_refused(
     pytest.importorskip("vaporock.equil")
 
     from simulator.battery.compilation_tier import _tabulated_gas_basis_matches
+    from simulator.battery.compilation_tier import _b677_printed_ideal_gas_h298
     from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
-    from simulator.battery.migrate import compilation_column_series_from_record
+    from simulator.battery.migrate import REPO_ROOT, compilation_column_series_from_record
 
     aluminum_record = _b677_record("table-0010.json")
+    b677_root = REPO_ROOT / "data/literature/compilations/pankratz-1984-usbm-b677/records"
+    assert _b677_printed_ideal_gas_h298(
+        str(b677_root / "table-0010.json"), "Al", "Al-005"
+    ) is True
+    assert _b677_printed_ideal_gas_h298(
+        str(b677_root / "table-0095.json"), "K", "K-005"
+    ) is False
     assert aluminum_record["name_as_published"] == "Aluminum (ideal monatomic gas)"
     assert aluminum_record["formula_heading_raw"] == "Al(g)"
     assert _b677_printed_cell(aluminum_record, "298", 3) == "0"
