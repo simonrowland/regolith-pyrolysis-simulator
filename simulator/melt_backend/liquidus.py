@@ -422,7 +422,7 @@ def find_liquidus_solidus_by_fraction(
 
     liquid_threshold = 1.0 - liquid_epsilon_value
     samples: list[MeltFractionSample] = []
-    excluded_samples: list[dict[str, Any]] = []
+    leading_out_of_domain_samples: list[dict[str, Any]] = []
     raw_fraction_by_temperature: dict[float, float] = {}
     # Mode-vector notices keyed by the sample temperature. The finder
     # annotates them when that sample takes part in a threshold decision.
@@ -432,6 +432,7 @@ def find_liquidus_solidus_by_fraction(
     start_time = time.monotonic()
     deadline = start_time + budget if budget is not None else None
     last_T_C: Optional[float] = None
+    first_grid_error: LiquidusSampleError | None = None
 
     def _elapsed_s() -> float:
         return max(0.0, time.monotonic() - start_time)
@@ -446,56 +447,70 @@ def find_liquidus_solidus_by_fraction(
             'budget_s': float(budget),
         }
 
-    def _exclusion_diagnostics() -> dict[str, Any]:
-        if not excluded_samples:
-            return {}
-        notices = [
-            {
-                'kind': 'liquidus_sample_excluded',
-                'temperature_C': item['temperature_C'],
-                'status': item['status'],
-                'reason': item['reason'],
-                'authority': item['authority'],
-            }
-            for item in excluded_samples
-        ]
+    def _leading_exclusion_record(
+        temperature_C: float,
+        exc: LiquidusSampleError,
+    ) -> dict[str, Any]:
+        sample_diagnostics = dict(exc.diagnostics)
+        reason = (
+            sample_diagnostics.get('backend_status_reason')
+            or sample_diagnostics.get('backend_failure_reason_code')
+            or sample_diagnostics.get('reason')
+            or exc.status
+        )
         return {
-            'excluded_samples': [dict(item) for item in excluded_samples],
-            'notices': notices,
+            'temperature_C': float(temperature_C),
+            'status': exc.status,
+            'reason': str(reason),
+            'authority': 'out_of_domain',
+            'message': '; '.join(exc.warnings),
+            'diagnostics': sample_diagnostics,
         }
 
-    def _with_exclusion_diagnostics(
-        diagnostics: Mapping[str, Any] | None = None,
+    def _leading_exclusion_diagnostics(
+        first_supported_temperature_C: float,
+        *,
+        solidus_is_qualified: bool,
     ) -> dict[str, Any]:
-        merged = dict(diagnostics or {})
-        merged.update(_exclusion_diagnostics())
-        return merged
+        if not leading_out_of_domain_samples:
+            return {}
+        excluded = [dict(item) for item in leading_out_of_domain_samples]
+        notice = {
+            'code': 'liquidus_low_end_samples_excluded',
+            'message': (
+                'Out-of-domain samples below the supported temperature range '
+                'were excluded; solidus is the lowest crossing within that range.'
+            ),
+            'authority': 'extrapolated',
+            'reason': 'out_of_domain_samples_below_supported_range',
+            'supported_range_C': (first_supported_temperature_C, max_T),
+            'excluded_samples': excluded,
+        }
+        if solidus_is_qualified:
+            notice['solidus_qualification'] = (
+                'lowest_crossing_within_supported_range'
+            )
+        return {
+            'supported_range_C': notice['supported_range_C'],
+            'excluded_samples': excluded,
+            'notices': [dict(notice)],
+            'liquidus_sample_exclusion_notice': notice,
+            **(
+                {'solidus_qualification': notice['solidus_qualification']}
+                if solidus_is_qualified
+                else {}
+            ),
+        }
 
-    def _exclusion_warnings() -> list[str]:
-        warnings = []
-        for item in excluded_samples:
-            warning = (
+    def _leading_exclusion_warnings() -> list[str]:
+        return [
+            (
                 f"liquidus sample excluded at {item['temperature_C']:g} C: "
                 f"{item['status']} ({item['reason']}; "
                 f"authority={item['authority']})"
+                + (f"; {item['message']}" if item['message'] else '')
             )
-            if item['message']:
-                warning += f"; {item['message']}"
-            warnings.append(warning)
-        return warnings
-
-    def samples_in_same_segment(
-        temperature_C: float,
-    ) -> list[MeltFractionSample]:
-        return [
-            point
-            for point in samples
-            if not any(
-                min(point.temperature_C, temperature_C)
-                <= excluded['temperature_C']
-                <= max(point.temperature_C, temperature_C)
-                for excluded in excluded_samples
-            )
+            for item in leading_out_of_domain_samples
         ]
 
     def budget_warning() -> str:
@@ -551,7 +566,7 @@ def find_liquidus_solidus_by_fraction(
         frac = _clamp_fraction(raw)
         point = _monotone_point(
             MeltFractionSample(temperature_C, frac),
-            samples_in_same_segment(temperature_C),
+            samples,
             tolerance=monotonicity_tolerance,
             smoothing_max=monotone_smoothing_max,
         )
@@ -560,58 +575,64 @@ def find_liquidus_solidus_by_fraction(
         check_budget()
         return point
 
-    def sample_or_exclude_out_of_domain(
-        temperature_C: float,
-    ) -> MeltFractionSample | None:
-        try:
-            return sample(temperature_C)
-        except LiquidusSampleError as exc:
-            if exc.status != 'out_of_domain':
-                raise
-            sample_diagnostics = dict(exc.diagnostics)
-            reason = (
-                sample_diagnostics.get('backend_status_reason')
-                or sample_diagnostics.get('backend_failure_reason_code')
-                or sample_diagnostics.get('reason')
-                or exc.status
-            )
-            excluded_samples.append({
-                'temperature_C': float(temperature_C),
-                'status': exc.status,
-                'reason': str(reason),
-                'authority': 'out_of_domain_excluded',
-                'message': '; '.join(exc.warnings),
-                'diagnostics': sample_diagnostics,
-            })
-            return None
-
-    def sample_for_bisection(temperature_C: float) -> MeltFractionSample:
-        point = sample_or_exclude_out_of_domain(temperature_C)
-        if point is None:
-            diagnostics = _exclusion_diagnostics()
-            diagnostics['reason'] = (
-                'out_of_domain_liquidus_sample_inside_crossing_bracket'
-            )
-            raise LiquidusSampleError(
-                'out_of_domain',
-                (),
-                diagnostics,
-            )
-        return point
-
+    grid_points: list[MeltFractionSample] = []
     try:
-        grid_points = [sample_or_exclude_out_of_domain(T) for T in grid]
+        for temperature_C in grid:
+            try:
+                point = sample(temperature_C)
+            except LiquidusSampleError as exc:
+                if grid_points:
+                    raise
+                if exc.status != 'out_of_domain':
+                    if first_grid_error is not None:
+                        raise first_grid_error
+                    raise
+                if first_grid_error is None:
+                    first_grid_error = exc
+                leading_out_of_domain_samples.append(
+                    _leading_exclusion_record(temperature_C, exc)
+                )
+                continue
+            grid_points.append(point)
+
+        if not grid_points:
+            assert first_grid_error is not None
+            return LiquidusSolidusResult(
+                status=first_grid_error.status,
+                warnings=tuple([
+                    *smoothing_warnings,
+                    *first_grid_error.warnings,
+                ]),
+                samples=tuple(samples),
+                iterations=iterations,
+                diagnostics=first_grid_error.diagnostics,
+            )
+
+        if (
+            leading_out_of_domain_samples
+            and grid_points[0].frac_M > solid_threshold
+        ):
+            diagnostics = _leading_exclusion_diagnostics(
+                grid_points[0].temperature_C,
+                solidus_is_qualified=False,
+            )
+            diagnostics['reason'] = 'solidus_below_supported_range'
+            return LiquidusSolidusResult(
+                status='out_of_domain',
+                warnings=tuple([
+                    *smoothing_warnings,
+                    'solidus is below the supported temperature range',
+                    *_leading_exclusion_warnings(),
+                ]),
+                samples=tuple(samples),
+                iterations=iterations,
+                diagnostics=diagnostics,
+            )
 
         solidus_bracket = None
         liquidus_bracket = None
-        previous: MeltFractionSample | None = None
-        for current in grid_points:
-            if current is None:
-                previous = None
-                continue
-            if previous is None:
-                previous = current
-                continue
+        previous = grid_points[0]
+        for current in grid_points[1:]:
             if (
                 solidus_bracket is None
                 and previous.frac_M <= solid_threshold
@@ -650,24 +671,27 @@ def find_liquidus_solidus_by_fraction(
                 f'liquidus bracket absent: frac_M never reached {liquid_threshold:g}'
             )
         if missing:
-            diagnostics = _exclusion_diagnostics()
-            if excluded_samples:
+            diagnostics = _leading_exclusion_diagnostics(
+                grid_points[0].temperature_C,
+                solidus_is_qualified=False,
+            )
+            if leading_out_of_domain_samples:
                 missing = [
-                    'requested crossings unsupported after out-of-domain '
-                    'liquidus samples were excluded',
+                    'requested crossings unsupported within the supported '
+                    'temperature range',
                     *missing,
                 ]
-                diagnostics['reason'] = (
-                    'out_of_domain_liquidus_samples_prevented_bracketing'
-                )
+                diagnostics['reason'] = 'supported_range_crossings_absent'
             return LiquidusSolidusResult(
                 status=(
-                    'out_of_domain' if excluded_samples else 'not_converged'
+                    'out_of_domain'
+                    if leading_out_of_domain_samples
+                    else 'not_converged'
                 ),
                 warnings=tuple([
                     *smoothing_warnings,
                     *missing,
-                    *_exclusion_warnings(),
+                    *_leading_exclusion_warnings(),
                 ]),
                 samples=tuple(samples),
                 iterations=iterations,
@@ -675,7 +699,7 @@ def find_liquidus_solidus_by_fraction(
             )
 
         solidus, solidus_iterations = _bisect_solidus(
-            sample_for_bisection,
+            sample,
             solidus_bracket[0],
             solidus_bracket[1],
             threshold=solid_threshold,
@@ -685,7 +709,7 @@ def find_liquidus_solidus_by_fraction(
         )
         iterations += solidus_iterations
         liquidus, liquidus_iterations = _bisect_liquidus(
-            sample_for_bisection,
+            sample,
             liquidus_bracket[0],
             liquidus_bracket[1],
             threshold=liquid_threshold,
@@ -695,18 +719,26 @@ def find_liquidus_solidus_by_fraction(
         )
         iterations += liquidus_iterations
     except _LiquidusFinderBudgetExceeded as exc:
+        if not grid_points and first_grid_error is not None:
+            return LiquidusSolidusResult(
+                status=first_grid_error.status,
+                warnings=tuple([
+                    *smoothing_warnings,
+                    *first_grid_error.warnings,
+                ]),
+                samples=tuple(samples),
+                iterations=iterations,
+                diagnostics=first_grid_error.diagnostics,
+            )
         return LiquidusSolidusResult(
             status='not_converged',
             warnings=tuple([
                 *smoothing_warnings,
                 str(exc),
-                *_exclusion_warnings(),
             ]),
             samples=tuple(samples),
             iterations=iterations,
-            diagnostics=_with_exclusion_diagnostics(
-                _budget_diagnostics()
-            ),
+            diagnostics=_budget_diagnostics(),
         )
     except LiquidusSampleError as exc:
         return LiquidusSolidusResult(
@@ -714,11 +746,10 @@ def find_liquidus_solidus_by_fraction(
             warnings=tuple([
                 *smoothing_warnings,
                 *exc.warnings,
-                *_exclusion_warnings(),
             ]),
             samples=tuple(samples),
             iterations=iterations,
-            diagnostics=_with_exclusion_diagnostics(exc.diagnostics),
+            diagnostics=exc.diagnostics,
         )
     except (
         LiquidFractionInvalidError,
@@ -730,11 +761,10 @@ def find_liquidus_solidus_by_fraction(
             warnings=tuple([
                 *smoothing_warnings,
                 str(exc),
-                *_exclusion_warnings(),
             ]),
             samples=tuple(samples),
             iterations=iterations,
-            diagnostics=_exclusion_diagnostics(),
+            diagnostics={},
         )
     if liquidus.temperature_C < solidus.temperature_C:
         return LiquidusSolidusResult(
@@ -742,21 +772,27 @@ def find_liquidus_solidus_by_fraction(
             warnings=tuple([
                 *smoothing_warnings,
                 'liquidus below solidus after bisection',
-                *_exclusion_warnings(),
             ]),
             samples=tuple(samples),
             iterations=iterations,
-            diagnostics=_exclusion_diagnostics(),
+            diagnostics={},
         )
+    diagnostics = _leading_exclusion_diagnostics(
+        grid_points[0].temperature_C,
+        solidus_is_qualified=True,
+    )
     return LiquidusSolidusResult(
         liquidus_T_C=liquidus.temperature_C,
         solidus_T_C=solidus.temperature_C,
         liquid_fraction=1.0,
         status='ok',
-        warnings=tuple([*smoothing_warnings, *_exclusion_warnings()]),
+        warnings=tuple([
+            *smoothing_warnings,
+            *_leading_exclusion_warnings(),
+        ]),
         samples=tuple(samples),
         iterations=iterations,
-        diagnostics=_exclusion_diagnostics(),
+        diagnostics=diagnostics,
     )
 
 

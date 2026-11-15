@@ -3126,6 +3126,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         )
         if phase_signal_notice is not None:
             d207_notices.append(phase_signal_notice)
+        phase_basis_notice = controls.get("phase_basis_notice")
+        if (
+            isinstance(phase_basis_notice, Mapping)
+            and isinstance(phase_basis_notice.get("code"), str)
+            and isinstance(phase_basis_notice.get("message"), str)
+            and not any(
+                notice.get("code") == phase_basis_notice["code"]
+                for notice in d207_notices
+            )
+        ):
+            d207_notices.append(dict(phase_basis_notice))
         if high_t_activity_authority is not None:
             d207_notices.extend(
                 dict(notice)

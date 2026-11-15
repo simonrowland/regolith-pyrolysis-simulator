@@ -682,7 +682,7 @@ def test_liquidus_finder_interior_grid_gap_keeps_typed_failure():
     assert not result.diagnostics.get('excluded_samples')
 
 
-def test_liquidus_finder_discards_low_end_exclusion_if_interior_sample_fails():
+def test_liquidus_finder_keeps_interior_grid_refusal_after_low_end_exclusion():
     def sample(temperature_C: float) -> float:
         if temperature_C in {400.0, 600.0}:
             reason = (
@@ -706,15 +706,21 @@ def test_liquidus_finder_discards_low_end_exclusion_if_interior_sample_fails():
 
     assert result.status == 'out_of_domain'
     assert result.diagnostics == {
-        'backend_status_reason': 'failure_at_400_C',
+        'backend_status_reason': 'failure_at_600_C',
         'exception_class': 'LiquidusSampleError',
-        'exception_message': 'low-end sample rejected',
+        'exception_message': 'interior sample rejected',
     }
-    assert result.warnings == ('low-end sample rejected',)
+    assert result.warnings == ('interior sample rejected',)
 
 
 def test_liquidus_finder_refuses_when_out_of_domain_sample_splits_crossing():
     def sample(temperature_C: float) -> float:
+        if temperature_C == 200.0:
+            raise LiquidusSampleError(
+                'out_of_domain',
+                ('low-end sample rejected',),
+                {'backend_status_reason': 'failure_at_200_C'},
+            )
         if temperature_C == 1100.0:
             raise LiquidusSampleError(
                 'out_of_domain',
@@ -725,7 +731,7 @@ def test_liquidus_finder_refuses_when_out_of_domain_sample_splits_crossing():
 
     result = find_liquidus_solidus_by_fraction(
         sample,
-        min_T_C=800.0,
+        min_T_C=200.0,
         max_T_C=1600.0,
         scan_step_C=200.0,
         tolerance_C=1.0,
