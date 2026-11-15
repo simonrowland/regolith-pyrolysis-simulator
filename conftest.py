@@ -64,6 +64,7 @@ pytest_plugins = (
     "tests._plugins.loadgroup_order",
     "tests._plugins.known_red",
     "tests.suite_shape_guard",
+    "tests.signature_double_guard_plugin",
 )
 
 

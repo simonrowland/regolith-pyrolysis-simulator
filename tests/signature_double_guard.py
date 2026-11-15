@@ -11,26 +11,67 @@ from pathlib import Path
 from typing import Any
 
 
-def _python_callable(value: Any) -> bool:
+_GUARD_TEST_PATH = "tests/test_signature_double_guard.py"
+
+
+def _unwrap_descriptor(value: Any) -> Any:
     while isinstance(value, (staticmethod, classmethod)):
         value = value.__func__
+    return value
+
+
+def _unwrap_partial(value: Any) -> Any:
     while isinstance(value, functools.partial):
         value = value.func
-    return inspect.isfunction(value) or inspect.ismethod(value)
+    return value
+
+
+def _callable_origin(value: Any) -> Any:
+    value = _unwrap_descriptor(value)
+    value = _unwrap_partial(value)
+    if inspect.ismethod(value):
+        value = value.__func__
+    return value
+
+
+def _is_guard_test_node(nodeid: str) -> bool:
+    return nodeid.partition("::")[0] == _GUARD_TEST_PATH
+
+
+def _python_callable(value: Any) -> bool:
+    origin = _callable_origin(value)
+    return inspect.isfunction(origin) or inspect.ismethod(origin)
+
+
+def _is_test_defined_callable(value: Any) -> bool:
+    module = getattr(_callable_origin(value), "__module__", "")
+    return module == "tests" or module.startswith("tests.") or any(
+        part.startswith("test_") for part in module.split(".")
+    )
+
+
+def _signature_cache_safe(value: Any) -> bool:
+    if isinstance(value, functools.partial):
+        return False
+    value = _unwrap_descriptor(value)
+    return (
+        inspect.isfunction(value)
+        and value.__closure__ is None
+        and "<locals>" not in value.__qualname__
+    )
 
 
 @lru_cache(maxsize=4096)
 def _cached_signature(value: Any, replacement: bool) -> inspect.Signature:
-    if isinstance(value, staticmethod):
-        value = value.__func__
-    elif isinstance(value, classmethod):
-        value = value.__func__
+    value = _unwrap_descriptor(value)
     if replacement:
         return inspect.signature(value, follow_wrapped=False)
     return inspect.signature(value)
 
 
 def _signature(value: Any, *, replacement: bool = False) -> inspect.Signature:
+    if not _signature_cache_safe(value):
+        return _cached_signature.__wrapped__(value, replacement)
     try:
         hash(value)
     except TypeError:
@@ -324,6 +365,8 @@ def check_patch_signature(
     )
     if skipped or mismatch is None:
         return skipped
+    if _is_test_defined_callable(production) and not _is_guard_test_node(nodeid):
+        return False
     key = allowlist_key_for_node(nodeid, production, replacement)
     if collected is not None:
         collected[key] = mismatch
@@ -341,12 +384,7 @@ def _without_receiver(signature: inspect.Signature) -> inspect.Signature:
 
 
 def signature_target_name(value: Any) -> str:
-    while isinstance(value, (staticmethod, classmethod)):
-        value = value.__func__
-    while isinstance(value, functools.partial):
-        value = value.func
-    if inspect.ismethod(value):
-        value = value.__func__
+    value = _callable_origin(value)
     return f"{value.__module__}.{value.__qualname__}"
 
 

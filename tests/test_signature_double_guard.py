@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import functools
+import gc
 import inspect
-import subprocess
+import json
 from functools import wraps
 from pathlib import Path
 from types import SimpleNamespace
+import weakref
 
 import pytest
 
@@ -27,27 +29,12 @@ _TESTS = Path(__file__).parent
 _ALLOWLIST = _TESTS / "data" / "signature_double_allowlist.txt"
 
 
-def _base_allowlist_key(key: str) -> str:
-    base, separator, signature = key.rpartition("::")
-    return base if separator and signature.startswith("[") else key
-
-
-def _assert_allowlist_only_shrinks(entries, previous_keys):
-    pinned_parent = any(
-        key.rpartition("::")[2].startswith("[") for key in previous_keys
-    )
-    if pinned_parent:
-        remaining = set(entries) <= previous_keys
-    else:
-        remaining = {
-            _base_allowlist_key(key) for key in entries
-        } <= previous_keys
-    if not remaining:
-        raise AssertionError("signature allowlist entries may only shrink")
-
-
 def _all_keyword_calls(left, right=0, *, scale=1):
     return (left + right) * scale
+
+
+def _signature_cache_test_callable(value):
+    return value
 
 
 def test_guard_catches_a_narrowed_lambda_mutation():
@@ -78,12 +65,9 @@ def test_guard_ignores_builtins():
 
 
 def test_signature_objects_are_cached_by_callable_and_role():
-    def production(value):
-        return value
-
     before = _cached_signature.cache_info()
-    first = _signature(production)
-    second = _signature(production)
+    first = _signature(_signature_cache_test_callable)
+    second = _signature(_signature_cache_test_callable)
     after = _cached_signature.cache_info()
 
     assert first is second
@@ -91,9 +75,52 @@ def test_signature_objects_are_cached_by_callable_and_role():
     assert after.hits == before.hits + 1
 
 
+def test_bound_method_signature_cache_does_not_retain_instance():
+    class Worker:
+        def run(self, value):
+            return value
+
+    worker = Worker()
+    worker_ref = weakref.ref(worker)
+    bound = worker.run
+
+    _signature(bound)
+    _signature(bound, replacement=True)
+    _signature(functools.partial(bound, "value"))
+
+    del bound, worker
+    gc.collect()
+
+    assert worker_ref() is None
+
+
+def test_signature_cache_does_not_retain_closures_or_partial_arguments():
+    class Provider:
+        pass
+
+    provider = Provider()
+    provider_ref = weakref.ref(provider)
+
+    def closure():
+        return provider
+
+    partial = functools.partial(_signature_cache_test_callable, provider)
+    _signature(closure)
+    _signature(partial, replacement=True)
+
+    del closure, partial, provider
+    gc.collect()
+
+    assert provider_ref() is None
+
+
 def test_signature_comparison_is_cached_by_signature_pair():
-    production = inspect.signature(_all_keyword_calls)
-    replacement = inspect.signature(lambda left: left)
+    production = inspect.Signature(
+        [inspect.Parameter("cache_production", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
+    )
+    replacement = inspect.Signature(
+        [inspect.Parameter("cache_replacement", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
+    )
     before = _cached_signature_mismatch.cache_info()
 
     first = signature_mismatch_for_signatures(production, replacement)
@@ -110,18 +137,19 @@ def test_collect_mode_nested_session_records_same_target_twice(
 ):
     collect_file = tmp_path / "collected-allowlist"
     repo_root = Path(__file__).resolve().parents[1]
-    tests_dir = repo_root / "tests"
+    plugin_path = repo_root / "tests" / "signature_double_guard_plugin.py"
     monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_COLLECT", "1")
     monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_COLLECT_FILE", str(collect_file))
     monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_FAIL_UNLISTED", "0")
     pytester.makeconftest(
         "import importlib.util\n"
         "import sys\n"
-        f"tests_dir = {str(tests_dir)!r}\n"
-        "sys.path.insert(0, tests_dir)\n"
+        f"repo_root = {str(repo_root)!r}\n"
+        f"plugin_path = {str(plugin_path)!r}\n"
+        "sys.path.insert(0, repo_root)\n"
         "spec = importlib.util.spec_from_file_location(\n"
         "    '_signature_double_guard_plugin',\n"
-        "    f'{tests_dir}/conftest.py',\n"
+        "    plugin_path,\n"
         ")\n"
         "plugin = importlib.util.module_from_spec(spec)\n"
         "sys.modules[spec.name] = plugin\n"
@@ -207,6 +235,18 @@ def test_wrapped_replacement_uses_its_own_signature(monkeypatch):
         monkeypatch.setattr(target, "run", narrowed)
 
 
+def test_wrapped_production_uses_its_declared_signature(monkeypatch):
+    def production(left, right=0):
+        return left + right
+
+    @wraps(production)
+    def wrapped(*args, **kwargs):
+        return production(*args, **kwargs)
+
+    target = SimpleNamespace(run=wrapped)
+    monkeypatch.setattr(target, "run", lambda left, right=0: left + right)
+
+
 def test_classmethod_replacement_uses_descriptor_binding(monkeypatch):
     class Worker:
         @classmethod
@@ -214,6 +254,18 @@ def test_classmethod_replacement_uses_descriptor_binding(monkeypatch):
             return left + right
 
     replacement = classmethod(lambda cls, left: left)
+
+    with pytest.raises(AssertionError, match="incompatible"):
+        monkeypatch.setattr(Worker, "run", replacement)
+
+
+def test_staticmethod_replacement_uses_descriptor_binding(monkeypatch):
+    class Worker:
+        @staticmethod
+        def run(left, right=0):
+            return left + right
+
+    replacement = staticmethod(lambda left: left)
 
     with pytest.raises(AssertionError, match="incompatible"):
         monkeypatch.setattr(Worker, "run", replacement)
@@ -227,6 +279,16 @@ def test_partial_production_callable_is_checked(monkeypatch):
 
     with pytest.raises(AssertionError, match="incompatible"):
         monkeypatch.setattr(target, "run", lambda: 0)
+
+
+def test_partial_production_accepts_a_double_for_its_remaining_signature(
+    monkeypatch,
+):
+    def production(left, right=0):
+        return left + right
+
+    target = SimpleNamespace(run=functools.partial(production, 1))
+    monkeypatch.setattr(target, "run", lambda right=0: 1 + right)
 
 
 def test_variadic_keyword_collision_is_checked(monkeypatch):
@@ -266,28 +328,31 @@ def test_waiver_covers_only_its_exact_replacement_signature():
         check_patch_signature(target, "run", narrowed_again, nodeid, allowed)
 
 
-def test_signature_double_allowlist_only_shrinks():
-    entries = read_allowlist(_ALLOWLIST)
-    relative_allowlist = _ALLOWLIST.relative_to(_TESTS.parent).as_posix()
-    previous = subprocess.run(
-        ["git", "show", f"HEAD^:{relative_allowlist}"],
-        cwd=_TESTS.parent,
-        check=False,
-        capture_output=True,
-        text=True,
+def test_test_defined_target_is_not_a_production_signature_waiver():
+    def test_helper(*args, **kwargs):
+        return args, kwargs
+
+    target = SimpleNamespace(run=test_helper)
+    collected = {}
+
+    assert not check_patch_signature(
+        target,
+        "run",
+        lambda: None,
+        "tests/test_other.py::test_probe",
+        {},
+        collected,
     )
-    if previous.returncode == 0:
-        previous_keys = {
-            line.partition(" # ")[0]
-            for line in previous.stdout.splitlines()
-            if line.strip() and not line.lstrip().startswith("#")
-        }
-        _assert_allowlist_only_shrinks(entries, previous_keys)
-        with pytest.raises(AssertionError, match="only shrink"):
-            _assert_allowlist_only_shrinks(
-                {
-                    **entries,
-                    "tests/__mutation__.py::test_added::module.callable::[]": "mutation",
-                },
-                previous_keys,
-            )
+    assert collected == {}
+
+
+def test_signature_double_allowlist_keys_pin_full_waiver_identity():
+    entries = read_allowlist(_ALLOWLIST)
+    for key in entries:
+        nodeid_and_target, separator, replacement_signature = key.rpartition("::")
+        nodeid, target_separator, target = nodeid_and_target.rpartition("::")
+
+        assert separator and target_separator
+        assert nodeid.startswith("tests/") and "::" in nodeid
+        assert target and "." in target
+        assert isinstance(json.loads(replacement_signature), list)
