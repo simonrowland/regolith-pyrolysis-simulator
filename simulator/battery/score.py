@@ -18129,7 +18129,7 @@ def _is_compilation_thermo_reference(
         and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
     ) or is_compilation_source(observation.source_id, origin)
     return bool(
-        quantity in FORMATION_QUANTITIES | PURE_STANDARD_THERMO
+        quantity in FORMATION_QUANTITIES | PURE_STANDARD_THERMO | FUSION_QUANTITIES
         and compilation
         and not is_internal_consistency(origin)
         and not is_sf04_workbook(observation)
