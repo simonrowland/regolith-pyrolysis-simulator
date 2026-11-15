@@ -10485,6 +10485,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
         raw_liquid_fraction = getattr(result, 'liquid_fraction', None)
+        # Keep the physical no-liquid gate on the backend result above; this
+        # fallback supplies phase evidence only to vapour-channel selection.
+        vapour_phase_liquid_fraction = raw_liquid_fraction
+        phase_basis_source = 'equilibrium_result.liquid_fraction'
+        if vapour_phase_liquid_fraction is None:
+            phase_signal = getattr(
+                self, '_vapor_pressure_freeze_gate_phase_fraction', None,
+            )
+            if callable(phase_signal):
+                (
+                    vapour_phase_liquid_fraction,
+                    phase_basis_source,
+                ) = phase_signal()
+            else:
+                phase_basis_source = 'missing'
         regime_diagnostic: dict[str, Any] = {}
         # H1 permits None only for vapor-only results with no phase
         # assemblage.  That is not proof of a no-liquid rump, so the
@@ -10595,7 +10610,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'vacuum_floor_bar': vacuum_floor,
                 'body': getattr(self.melt, 'body', ''),
                 'process_phase': process_phase,
-                'liquid_fraction': raw_liquid_fraction,
+                'liquid_fraction': vapour_phase_liquid_fraction,
+                'phase_basis_source': phase_basis_source,
                 'ambient_pressure_bar': (
                     ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
                 ),

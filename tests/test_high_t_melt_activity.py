@@ -260,13 +260,13 @@ def _physics_numeric_payload(result) -> tuple[dict, dict]:
 def _physics_metadata_payload(
     result,
     *,
-    exclude_b813_temperature_notices: bool = False,
+    exclude_nonbaseline_notice_fields: bool = False,
 ) -> tuple[dict, dict, tuple[str, ...]]:
     diagnostic = result.diagnostic
     provenance = copy.deepcopy(
         diagnostic["vapor_pressure_numerator_provenance"]
     )
-    if exclude_b813_temperature_notices:
+    if exclude_nonbaseline_notice_fields:
         # The merged green base already attaches temperature notices with
         # their existing authority, reason, status and acquisition fields.
         # b-813 adds certified_band; project that key out while preserving
@@ -278,10 +278,33 @@ def _physics_metadata_payload(
             if not {"temperature_K", "valid_range_K"} <= notice.keys():
                 continue
             notice.pop("certified_band", None)
+    warnings = tuple(result.warnings)
+    if exclude_nonbaseline_notice_fields:
+        # d-207 adds phase-basis notices to the diagnostic warning stream.
+        # They do not alter the baseline physics/provenance digest asserted by
+        # this legacy bit-identity pin.
+        d207_notice_codes = {
+            vapor_pressure_module.OPENIMCC_VAPOUR_PHASE_SIGNAL_MISSING_NOTICE[
+                "code"
+            ],
+            vapor_pressure_module.OPENIMCC_VAPOUR_PHASE_SIGNAL_INVALID_NOTICE[
+                "code"
+            ],
+            vapor_pressure_module.OPENIMCC_LIQUID_SIO_BELOW_1950K_NOTICE[
+                "code"
+            ],
+        }
+        warnings = tuple(
+            warning for warning in warnings
+            if not any(
+                warning.startswith(f"{code}:")
+                for code in d207_notice_codes
+            )
+        )
     return (
         dict(diagnostic["vapor_pressures_source"]),
         provenance,
-        tuple(result.warnings),
+        warnings,
     )
 
 
@@ -534,7 +557,7 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     numeric_payload = _physics_numeric_payload(result)
     metadata_payload = _physics_metadata_payload(
         result,
-        exclude_b813_temperature_notices=True,
+        exclude_nonbaseline_notice_fields=True,
     )
     # Numeric-only hash read from the 9c327c2 Studio-3 failure trace.
     assert hashlib.sha256(
@@ -553,7 +576,7 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     numeric_payload = _physics_numeric_payload(result)
     metadata_payload = _physics_metadata_payload(
         result,
-        exclude_b813_temperature_notices=True,
+        exclude_nonbaseline_notice_fields=True,
     )
     # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
     assert hashlib.sha256(
@@ -703,15 +726,31 @@ def test_liquid_vapour_selection_carries_published_sio_band_notice() -> None:
 
 
 def test_liquid_sio_band_notice_marks_1700_k_lower_measurement_limit() -> None:
-    result = _provider().dispatch(
-        _request(BASE_MELT_MOL, 1600.0, liquid_fraction=1.0)
+    diagnostic = {"notices": []}
+    vapor_pressure_module._append_openimcc_liquid_sio_band_notice(
+        diagnostic,
+        temperature_K=1600.0,
+        phase_basis="liquid",
+        uses_openimcc_operands=True,
     )
-    notices = result.diagnostic["high_t_melt_activity"]["notices"]
     notice = next(
-        n for n in notices
+        n for n in diagnostic["notices"]
         if n["code"] == "openimcc_liquid_sio_below_1950K_band"
     )
     assert "band was measured only from 1700 K" in notice["message"]
+
+
+@pytest.mark.parametrize(
+    ("liquid_fraction", "expected_basis"),
+    ((1.0 - 5.0e-13, "liquid"), (0.999999, "solid_bearing")),
+    ids=("canonical-liquid-tolerance", "partial-melt"),
+)
+def test_vapour_phase_basis_uses_canonical_melt_regime(
+    liquid_fraction, expected_basis,
+) -> None:
+    assert vapor_pressure_module._openimcc_vapour_phase_basis(
+        liquid_fraction
+    ) == expected_basis
 
 
 def test_missing_liquid_fraction_keeps_1950_k_switch_and_emits_notice() -> None:
@@ -1047,6 +1086,43 @@ def test_refused_activity_holds_only_local_certified_gamma(
     )
     assert again_silica["method"] == "extrapolated_first_order_ln_gamma"
     assert again_silica["consecutive_refusal_count"] == 2
+
+
+def test_refusal_continuation_below_1950_k_carries_liquid_sio_band_notice(
+    monkeypatch,
+) -> None:
+    provider = _provider()
+
+    def liquid_history_request(hour, previous=None):
+        request = _history_request(
+            BASE_MELT_MOL, 1800.0, hour, previous,
+        )
+        return replace(request, control_inputs={
+            **request.control_inputs,
+            "liquid_fraction": 1.0,
+        })
+
+    certified = provider.dispatch(liquid_history_request(60))
+    assert certified.diagnostic["high_t_melt_activity"][
+        "certified_effective_gamma_by_parent"
+    ]
+
+    def nonconverge(**_kwargs):
+        raise ImccNonconvergenceError("liquid continuation refusal", {})
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    result = provider.dispatch(liquid_history_request(
+        61,
+        certified.diagnostic["high_t_melt_activity"],
+    ))
+    authority = result.diagnostic["high_t_melt_activity"]
+
+    assert authority["provider"] == "constant_gamma"
+    assert authority["held_effective_gamma_by_parent"]
+    assert any(
+        notice["code"] == "openimcc_liquid_sio_below_1950K_band"
+        for notice in authority["notices"]
+    )
 
 
 def _certify_lunar_calls_60_61(provider):
