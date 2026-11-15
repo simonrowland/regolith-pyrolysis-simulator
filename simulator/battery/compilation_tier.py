@@ -4474,6 +4474,7 @@ def _nasa9_fit_comparisons_with_bound_lineage(
         load_sidecar,
         sidecar_element_reference_curves,
     )
+    from simulator.battery.generators.janaf import _formation_basis_at_temperature
     from simulator.battery.score import (
         _compile_residual_with_lineage,
         _observation_matches_run_filters,
@@ -4674,6 +4675,50 @@ def _nasa9_fit_comparisons_with_bound_lineage(
             )
             if not grid:
                 continue
+            formation_frames: dict[
+                Decimal, tuple[object, Observation]
+            ] = {}
+            if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+                product = source_observation.identity.species
+                if product is None:
+                    continue
+                for temperature in grid:
+                    basis = _formation_basis_at_temperature(
+                        formula, product, temperature
+                    )
+                    frame_points = [
+                        (source_temperature, source_point)
+                        for (
+                            source_formula,
+                            source_phase,
+                            source_quantity,
+                            source_temperature,
+                        ), source_point in table_points.items()
+                        if source_formula == formula
+                        and source_phase == phase
+                        and source_quantity == quantity.value
+                        and source_point.identity.reaction == basis.reaction
+                        and source_point.identity.formation_elements
+                        == basis.formation_elements
+                    ]
+                    if not frame_points:
+                        formation_frames.clear()
+                        break
+                    _source_temperature, source_point = min(
+                        frame_points,
+                        key=lambda item: (
+                            abs(item[0] - temperature),
+                            item[0],
+                        ),
+                    )
+                    frame_observation = (
+                        source_point.parent
+                        if isinstance(source_point, _CompilationSeriesCell)
+                        else source_point
+                    )
+                    formation_frames[temperature] = (basis, frame_observation)
+                if len(formation_frames) != len(grid):
+                    continue
             fit_series_id = f"nasa9-fit::{record_id}::{quantity.value}"
             grid_values: list[tuple[Decimal, Decimal]] = []
             for temperature in grid:
@@ -4719,12 +4764,24 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                     continue
                 if temperature.value is None or point.value.point is None:
                     continue
+                frame_observation = source_observation
+                identity = point.identity
+                if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+                    basis, frame_observation = formation_frames[
+                        as_decimal(temperature.value)
+                    ]
+                    identity = replace(
+                        frame_observation.identity,
+                        temperature_K=State.of(as_decimal(temperature.value)),
+                        reaction=basis.reaction,
+                        formation_elements=basis.formation_elements,
+                    )
                 fit_reference = replace(
-                    source_observation,
+                    frame_observation,
                     observation_id=point.observation_id,
-                    identity=point.identity,
+                    identity=identity,
                     value=point.value,
-                    notices=point.notices,
+                    notices=frame_observation.notices + (fit_notice,),
                 )
                 for engine in engines:
                     attempt = predict_thermo_attempt(
@@ -4740,8 +4797,8 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                         engine,
                         context=context,
                         prediction=prediction,
-                        comparison_ids={source_observation.observation_id},
-                        lineage_observation_id=source_observation.observation_id,
+                        comparison_ids={frame_observation.observation_id},
+                        lineage_observation_id=frame_observation.observation_id,
                         _validation_indexes=_validation_indexes,
                     )
                     comparisons.append(

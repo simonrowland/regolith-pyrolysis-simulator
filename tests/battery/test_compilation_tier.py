@@ -667,6 +667,165 @@ def test_nasa9_fit_grid_uses_declared_endpoints_and_density_cap() -> None:
     )
 
 
+def test_nasa9_formation_fit_grid_rebinds_janaf_frame_at_each_temperature(
+    monkeypatch,
+) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.score as score
+    from simulator.battery.compilation_tier import (
+        ThermoAttempt,
+        _nasa9_fit_comparisons,
+        _nasa9_fit_temperature_grid,
+    )
+    from simulator.battery.enums import QUANTITY_UNITS
+    from simulator.battery.generators.compilation_thermo_fits import load_sidecar
+    from simulator.battery.generators.janaf import (
+        _formation_basis_at_temperature,
+        generate_table,
+    )
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    fit_records = load_sidecar()
+    record = next(
+        row
+        for row in fit_records
+        if row.get("record_id") == "nist-janaf-4th:Al-004:l:1000:3000"
+        and row.get("status") == "accepted"
+    )
+    formation_records = [
+        fit_record
+        for fit_record in fit_records
+        if fit_record.get("status") == "accepted"
+        and fit_record.get("formation_capable")
+        and isinstance(fit_record.get("printed_formation_cells"), list)
+    ]
+    table_ids = sorted(
+        {
+            str(reference["table_id"])
+            for fit_record in formation_records
+            for reference in fit_record["printed_formation_cells"]
+            if isinstance(reference, dict) and reference.get("table_id")
+        }
+    )
+    source_observations = tuple(
+        observation
+        for table_id in table_ids
+        for observation in generate_table(
+            load_table_document(TABLES_DIR / f"{table_id}.yaml"),
+            source_path=str(TABLES_DIR / f"{table_id}.yaml"),
+        ).observations
+    )
+    source_observations = tuple(
+        observation
+        for observation in source_observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        in {Quantity.DELTA_FH, Quantity.DELTA_FG}
+    )
+    experiments = {
+        experiment_id: replace(
+            F.tabulation_experiment(), experiment_id=experiment_id
+        )
+        for experiment_id in {obs.experiment_id for obs in source_observations}
+    }
+    context = _context(
+        *source_observations,
+        experiments=experiments,
+    )
+    source_by_id = {obs.observation_id: obs for obs in source_observations}
+
+    lineage_by_reference = {}
+    compile_with_lineage = score._compile_residual_with_lineage
+
+    def capture_lineage(reference, *args, **kwargs):
+        result = compile_with_lineage(reference, *args, **kwargs)
+        if reference.observation_id.startswith("nasa9-fit::"):
+            lineage_by_reference[reference.observation_id] = kwargs[
+                "lineage_observation_id"
+            ]
+        return result
+
+    monkeypatch.setattr(score, "_compile_residual_with_lineage", capture_lineage)
+
+    def echo_fit(_engine, observation, **_kwargs):
+        quantity = observation.identity.quantity.value
+        return ThermoAttempt(
+            value=observation.value.point,
+            unit=QUANTITY_UNITS[quantity],
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="formation-frame-test",
+            coefficient_sources=(),
+        )
+
+    monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", echo_fit)
+    comparisons = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.NASA_CEA_9,),
+        invoke_pure_phase=False,
+        fit_records=fit_records,
+    )
+    formation_comparisons = [
+        item
+        for item in comparisons
+        if item.quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}
+    ]
+    al_delta_fh = [
+        item
+        for item in formation_comparisons
+        if item.quantity is Quantity.DELTA_FH
+        and item.record["record_id"] == record["record_id"]
+    ]
+    expected_grid = _nasa9_fit_temperature_grid(
+        Decimal(str(record["validity"]["T_min_K"])),
+        Decimal(str(record["validity"]["T_max_K"])),
+    )
+    assert [item.temperature_K for item in al_delta_fh] == list(expected_grid)
+
+    product = next(
+        observation.identity.species
+        for observation in source_observations
+        if (
+            observation.locator is not None
+            and observation.locator.record == "Al-004"
+            and observation.identity.quantity.value is Quantity.DELTA_FH
+            and observation.identity.species is not None
+            and observation.identity.species.phase.is_value
+            and observation.identity.species.phase.value is Phase.L
+        )
+    )
+    al_bases = [
+        _formation_basis_at_temperature(str(record["formula"]), product, temperature)
+        for temperature in expected_grid
+    ]
+    assert al_bases[0].reaction != al_bases[-1].reaction
+
+    for item in formation_comparisons:
+        basis = _formation_basis_at_temperature(
+            str(item.record["formula"]),
+            item.reference.identity.species,
+            item.temperature_K,
+        )
+        assert item.reference.identity.reaction == basis.reaction
+        assert item.reference.identity.formation_elements == basis.formation_elements
+        assert item.reference.observation_id.rsplit("#", 1)[0] == (
+            f"nasa9-fit::{item.record['record_id']}::{item.quantity.value}"
+        )
+        assert item.reference.locator is not None
+        assert basis.locator_note in item.reference.locator.note
+        lineage_id = lineage_by_reference[item.reference.observation_id]
+        lineage_source = source_by_id[lineage_id]
+        assert lineage_source.identity.reaction == basis.reaction
+        assert lineage_source.identity.formation_elements == basis.formation_elements
+        assert lineage_source.locator is not None
+        assert basis.locator_note in lineage_source.locator.note
+    assert lineage_by_reference[al_delta_fh[0].reference.observation_id] != (
+        lineage_by_reference[al_delta_fh[-1].reference.observation_id]
+    )
+
+
 def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
     tmp_path, monkeypatch
 ) -> None:
