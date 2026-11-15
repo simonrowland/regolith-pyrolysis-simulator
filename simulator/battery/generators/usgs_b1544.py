@@ -28,11 +28,15 @@ from simulator.battery.enums import (
 )
 from simulator.battery.generators._usgs_common import (
     LETTER_TAIL_RE,
+    _account_token,
     _decimal_grain,
+    _neighbour_sign_hits as _shared_neighbour_sign_hits,
     _neighbours_of,
     _opposite_to_both_neighbours,
     _published_decimal,
+    _run_generator_main,
     _value_grain,
+    load_record,
 )
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
@@ -1253,26 +1257,7 @@ def _neighbour_sign_hits(
 ) -> list[dict[str, Any]]:
     if series is None:
         series = _signed_series(record)
-    hits: list[dict[str, Any]] = []
-    for (column, basis), points in series.items():
-        ordered = sorted(points, key=lambda item: item[0])
-        for row_index, token, value in ordered:
-            left, right = _neighbours_of(token, series)
-            if not _opposite_to_both_neighbours(value, left, right):
-                continue
-            hits.append(
-                {
-                    "record_id": token.record_id,
-                    "column": column,
-                    "formation_basis": basis,
-                    "row_index": row_index,
-                    "as_published": token.as_published,
-                    "extracted": str(value),
-                    "left_neighbour": str(left),
-                    "right_neighbour": str(right),
-                }
-            )
-    return hits
+    return _shared_neighbour_sign_hits((), series)
 
 
 def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
@@ -1437,11 +1422,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     by_column_basis: dict[str, Counter[str]] = defaultdict(Counter)
 
     def account(token: RawToken, bucket: str) -> None:
-        by_column[token.column][bucket] += 1
-        by_column[token.column]["raw"] += 1
-        key = f"{token.column}:{token.formation_basis or 'shared'}"
-        by_column_basis[key][bucket] += 1
-        by_column_basis[key]["raw"] += 1
+        _account_token(token, bucket, by_column, by_column_basis)
 
     def refuse(token: RawToken, reason: str) -> None:
         nonlocal refused
@@ -1696,13 +1677,6 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     return RecordGeneration(tuple(observations), report)
 
 
-def load_record(path: Path) -> Mapping[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, Mapping):
-        raise ValueError(f"{path}: record is not a mapping")
-    return payload
-
-
 def documents_from_records(directory: Path) -> Iterable[Mapping[str, Any]]:
     paths = sorted(directory.glob("*.json"))
     if not paths:
@@ -1803,9 +1777,12 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    args = _parse_args(argv)
-    write_staging(documents_from_records(args.records), args.out)
-    return 0
+    return _run_generator_main(
+        argv,
+        parse_args=_parse_args,
+        documents_from_records=documents_from_records,
+        write_staging=write_staging,
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover
