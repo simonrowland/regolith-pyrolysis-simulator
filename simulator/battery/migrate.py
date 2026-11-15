@@ -8895,7 +8895,7 @@ def _bind_same_run_initial_composition(
     obs: Mapping[str, Any],
     context: Mapping[str, Any],
 ) -> Composition | None:
-    """KC91 Table 3: the initial analysed melt is the final row's run composition."""
+    """KC91 Table 3 fallback when the experiment has no run composition owner."""
 
     if not label_marks_final(_row_phase_label(obs)):
         return None
@@ -8905,6 +8905,15 @@ def _bind_same_run_initial_composition(
     if isinstance(locator, Mapping) and locator.get("table") not in (None, ""):
         table = str(locator.get("table"))
     if not experiment or not table:
+        return None
+    experiment_rows = context.get("experiment_source_rows")
+    run = experiment_rows.get(experiment) if isinstance(experiment_rows, Mapping) else None
+    sample = run.get("sample") if isinstance(run, Mapping) else None
+    if isinstance(sample, Mapping) and sample.get("initial_composition") is not None:
+        # The experiment sample is the owner when it declares a start, including
+        # a typed refusal for a printed N.A. component. Do not bypass it with
+        # the row-derived fallback or stamp the initial phase analysis as a
+        # circular input.
         return None
     melts = context.get("same_run_initial_melts")
     if not isinstance(melts, Mapping):
