@@ -500,6 +500,7 @@ class ElementMassFractionRedox:
 class _ElementWtOxideProjection:
     components: tuple[tuple[str, Decimal], ...]
     oxygen_closure_residual_wt_percent: Decimal | None
+    projected_component_mass_g_per_100g: tuple[tuple[str, Decimal], ...]
 
 
 def canonical_element_symbol(name: str) -> str:
@@ -695,14 +696,19 @@ def _element_wt_percent_stoichiometric_oxide_projection(
     Thus Si4+ -> SiO2, Fe3+ -> Fe2O3, Mg2+ -> MgO and Na+ -> Na2O.
     Formula-unit moles are ``n_E / (2/g)``; oxygen demand is ``n_E*z/2``.
     Retained components such as Cl, CO2 and H2O remain their own formula
-    units. The residual is measured O wt% minus oxygen in these oxides and
-    retained compounds. Measured O never enters the component moles or their
-    normalization, and Cl contributes no oxygen correction.
+    units. The oxide mass factor is ``M(E_(2/g)O_(z/g)) / ((2/g) * M(E))``;
+    for Fe2+ it is ``71.844 / 55.845`` g FeO per g Fe. The residual is measured
+    O wt% minus oxygen in these oxides and retained compounds. It is a check
+    only: measured O never enters the component moles or their normalization,
+    and Cl contributes no oxygen correction.
 
     Unit check: wt% is g per 100 g, so ``w_E/M_E`` and oxygen demand are
     mol per 100 g; multiplying the residual oxygen moles by ``M_O`` returns
-    wt% on that same 100 g basis. Sanity: 28.085 g Si is 1 mol Si, so SiO2
-    requires 2 mol O = 31.998 g; measured O of 31.998 g gives zero residual.
+    wt% on that same 100 g basis. Sanity: 42.5 g Fe at the typed Fe2+
+    assumption is 42.5/55.845 mol Fe and therefore the same moles of FeO,
+    about 54.68 g FeO per 100 g assay. Independently, 28.085 g Si is 1 mol Si,
+    so SiO2 requires 2 mol O = 31.998 g; measured O of 31.998 g gives zero
+    residual.
     """
 
     retained = tuple(str(name).strip() for name in retained_components)
@@ -765,13 +771,20 @@ def _element_wt_percent_stoichiometric_oxide_projection(
         for name, amount in component_moles.items()
         if amount > 0
     )
+    projected_component_mass = tuple(
+        (name, amount * _formula_molar_mass(name))
+        for name, amount in component_moles.items()
+        if amount > 0
+    )
     residual = None
     if measured_oxygen is not None:
         oxygen_weight = _atomic_weight("O")
         residual = measured_oxygen - (
             oxygen_demand_mol + retained_oxygen_mol
         ) * oxygen_weight
-    return _ElementWtOxideProjection(mole_fractions, residual)
+    return _ElementWtOxideProjection(
+        mole_fractions, residual, projected_component_mass
+    )
 
 
 def _is_circular_observable(observable: object | None) -> bool:
