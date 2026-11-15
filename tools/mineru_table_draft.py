@@ -170,10 +170,12 @@ _COMMA_DECIMAL = re.compile(
 )
 _AMBIGUOUS_COMMA = re.compile(r"(?<![\d.,])\d{2,},\d{3}(?!\d)")
 _FOOTNOTE_MARK = re.compile(r"([*†‡§¶|]+)$")
+# The one superscript alphabet. Certification imports this string.
+UNICODE_SUPERSCRIPTS = "⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹"
 _NUMERIC_SUPERSCRIPT = re.compile(
-    r"[+\-−–—]?\d+|[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+"
+    r"[+\-−–—]?\d+|[" + UNICODE_SUPERSCRIPTS + r"]+"
 )
-_UNICODE_SUPERSCRIPT_SUFFIX = re.compile(r"[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+$")
+_UNICODE_SUPERSCRIPT_SUFFIX = re.compile("[" + UNICODE_SUPERSCRIPTS + r"]+$")
 _NEGATIVE_HEADER = re.compile(
     r"\b(?:negative|minus)\b|below\s+zero|less\s+than\s+zero|[<≤]\s*0",
     re.IGNORECASE,
@@ -202,10 +204,15 @@ def default_corpus_root() -> Path:
 class _RawCell:
     text_parts: list[str] = field(default_factory=list)
     superscript_parts: list[str] = field(default_factory=list)
+    superscript_spans: list[tuple[int, int]] = field(default_factory=list)
     rowspan: int = 1
     colspan: int = 1
     is_header: bool = False
     superscript_depth: int = 0
+    # Set on the start tag. An empty ``<sup></sup>`` has no text span.
+    has_superscript: bool = False
+    # Tags included. Certification reads this before it strips spans.
+    raw_parts: list[str] = field(default_factory=list)
 
     @property
     def text(self) -> str:
@@ -226,6 +233,13 @@ class Cell:
     merged: bool = False
     is_header: bool = False
     superscript_text: str = ""
+    # Character spans of ``<sup>`` text inside ``text``. Certification uses
+    # these so a power is not the concatenated digits. An empty tag has
+    # no span; ``has_superscript`` records that the tag was present.
+    superscript_spans: tuple[tuple[int, int], ...] = ()
+    has_superscript: bool = False
+    # Cell source with ``<sup>`` tags still in place. ``text`` has them stripped.
+    raw_text: str = ""
     value_text: str = ""
     mark: str = ""
     numeric_value: float | None = None
@@ -247,18 +261,24 @@ class _TableParser(HTMLParser):
                 self.row = []
             attributes = dict(attrs)
             self.cell = _RawCell(
-                rowspan=_span(attributes.get("rowspan")),
-                colspan=_span(attributes.get("colspan")),
+                rowspan=_span(attributes.get("rowspan"), "rowspan"),
+                colspan=_span(attributes.get("colspan"), "colspan"),
                 is_header=tag == "th",
             )
         elif tag == "sup" and self.cell is not None:
+            # Presence, not text. An empty <sup></sup> never reaches handle_data.
+            self.cell.has_superscript = True
             self.cell.superscript_depth += 1
+            raw = self.get_starttag_text()
+            if raw:
+                self.cell.raw_parts.append(raw)
         elif tag == "br" and self.cell is not None:
             self.cell.text_parts.append("\n")
 
     def handle_endtag(self, tag: str) -> None:
         if tag == "sup" and self.cell is not None:
             self.cell.superscript_depth = max(0, self.cell.superscript_depth - 1)
+            self.cell.raw_parts.append("</sup>")
         elif tag in {"td", "th"} and self.row is not None and self.cell is not None:
             self.row.append(self.cell)
             self.cell = None
@@ -268,16 +288,31 @@ class _TableParser(HTMLParser):
 
     def handle_data(self, data: str) -> None:
         if self.cell is not None:
+            start = len(self.cell.text)
             self.cell.text_parts.append(data)
+            self.cell.raw_parts.append(data)
             if self.cell.superscript_depth:
                 self.cell.superscript_parts.append(data)
+                self.cell.superscript_spans.append((start, start + len(data)))
 
 
-def _span(value: str | None) -> int:
-    try:
-        return max(1, int(value or "1"))
-    except ValueError:
+class TableGeometryError(Exception):
+    """A rowspan or colspan that is not a positive integer."""
+
+
+def _span(value: str | None, name: str = "span") -> int:
+    """Positive span, or 1 when the attribute is absent.
+
+    ``0`` and a non-integer are not spans. Both callers see that refusal.
+    """
+    if value is None or str(value).strip() == "":
         return 1
+    text = str(value).strip()
+    if not re.fullmatch(r"[0-9]+", text) or int(text) < 1:
+        raise TableGeometryError(
+            f"html_table_span_invalid: {name} is not a positive integer"
+        )
+    return int(text)
 
 
 def _is_number(text: str) -> bool:
@@ -402,6 +437,9 @@ def parse_table_html(table_body: str) -> list[list[Cell]]:
                         merged=raw_cell.rowspan > 1 or raw_cell.colspan > 1,
                         is_header=raw_cell.is_header,
                         superscript_text=raw_cell.superscript_text,
+                        superscript_spans=tuple(raw_cell.superscript_spans),
+                        has_superscript=raw_cell.has_superscript,
+                        raw_text="".join(raw_cell.raw_parts),
                     )
             row_count = max(row_count, row_index + raw_cell.rowspan)
             column_index += raw_cell.colspan
@@ -1784,18 +1822,72 @@ def _blank_or_dash(text: str) -> bool:
     return token == "" or token in _DASH_TEXT
 
 
+# One LaTeX-formula command list. ``printed_formula`` is the only unwrap.
+_PRINTED_FORMULA_COMMAND_RE = re.compile(r"\\(?:mathrm|text|rm)\b")
+# A detector only. ``printed_formula`` strips the subscript characters.
+# ``_{.5}`` and ``_.5`` are the same markup as ``_{2}`` and fold to ``.5``.
+_PRINTED_FORMULA_SUBSCRIPT_RE = re.compile(r"_\{?(?:\d|\.\d)")
+
+
 def printed_formula(text: str) -> str:
     """Unwrap a printed species cell to its formula letters and digits.
 
     ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` becomes ``Al2O3``. This strips
     math wrappers only; it does not interpret chemistry or drop ``circ``.
+    Spaces in ``text`` are removed. A citation that must keep a space between
+    tokens uses ``printed_formula_tokens`` instead.
     """
 
     token = text.strip()
     if len(token) >= 2 and token[0] == "$" and token[-1] == "$":
         token = token[1:-1].strip()
-    token = re.sub(r"\\(?:mathrm|text|rm)\b", "", token)
+    token = _PRINTED_FORMULA_COMMAND_RE.sub("", token)
     return re.sub(r"[{}_^\\\s]", "", token)
+
+
+def _printed_formula_token(text: str) -> str:
+    """Unwrap one whitespace token by calling ``printed_formula``.
+
+    ``text`` has no whitespace. ``$`` is math markup, including a delimiter
+    left on one side when a ``$...$`` span was split. A token with no formula
+    markup is returned unchanged, so an ordinary underscore stays. A caret
+    is a superscript, not a subscript count, so a token that contains ``^``
+    is not unwrapped. ``printed_formula`` still strips ``^`` on a whole
+    species cell.
+    """
+    if "^" in text:
+        return text
+    if (
+        "$" not in text
+        and _PRINTED_FORMULA_SUBSCRIPT_RE.search(text) is None
+        and _PRINTED_FORMULA_COMMAND_RE.search(text) is None
+    ):
+        return text
+    return printed_formula(text.replace("$", ""))
+
+
+def printed_formula_tokens(text: str) -> str:
+    """Fold formula markup inside each whitespace token.
+
+    Split on whitespace first. A space inside ``$...$`` is a separator, so
+    ``$H_{2} O_{2}$`` stays two tokens. ``printed_formula`` runs on each
+    token and never across a space. The separator is kept. ``printed_formula``
+    itself still strips every space when the emitter passes one species cell.
+    """
+    parts: list[str] = []
+    cursor = 0
+    for match in re.finditer(r"\s+", text):
+        if match.start() > cursor:
+            token = _printed_formula_token(text[cursor : match.start()])
+            if token:
+                parts.append(token)
+        parts.append(match.group(0))
+        cursor = match.end()
+    if cursor < len(text):
+        token = _printed_formula_token(text[cursor:])
+        if token:
+            parts.append(token)
+    return "".join(parts)
 
 
 def _stacked_values(text: str) -> bool:

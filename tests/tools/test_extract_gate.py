@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import copy
 import json
 import shutil
@@ -1351,6 +1352,76 @@ def test_cli_audits_extract_by_source_id(tmp_path: Path, monkeypatch, capsys):
     assert "EXTRACT" in output and "fixture-source.yaml" in output
 
 
+def _repo_module_file(root: Path, module: str) -> Path | None:
+    """File for a repo module, or None when ``module`` is not in ``root``."""
+    parts = module.split(".")
+    if not parts or not all(part.isidentifier() for part in parts):
+        return None
+    candidate = root.joinpath(*parts)
+    module_path = candidate.with_suffix(".py")
+    if module_path.is_file():
+        return module_path
+    init_path = candidate / "__init__.py"
+    if init_path.is_file():
+        return init_path
+    return None
+
+
+def _package_name(root: Path, path: Path) -> str:
+    parts = list(path.relative_to(root).with_suffix("").parts)
+    parts.pop()
+    return ".".join(parts)
+
+
+def _imported_module_names(root: Path, path: Path) -> set[str]:
+    """Modules named by import statements, including a relative import."""
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    package = _package_name(root, path)
+    modules: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                modules.add(alias.name)
+            continue
+        if not isinstance(node, ast.ImportFrom):
+            continue
+        if node.level:
+            parts = package.split(".") if package else []
+            drop = node.level - 1
+            if drop > len(parts):
+                continue
+            base_parts = parts[: len(parts) - drop]
+            if node.module:
+                base_parts.extend(node.module.split("."))
+            base = ".".join(base_parts)
+        else:
+            base = node.module or ""
+        if base:
+            modules.add(base)
+            for alias in node.names:
+                if alias.name != "*":
+                    modules.add(f"{base}.{alias.name}")
+    return modules
+
+
+def _repo_import_closure(root: Path, entry: Path) -> set[Path]:
+    """Transitive repo files imported by ``entry``, including parent packages."""
+    pending = [entry.resolve()]
+    seen: set[Path] = set()
+    while pending:
+        path = pending.pop()
+        if path in seen:
+            continue
+        seen.add(path)
+        for module in _imported_module_names(root, path):
+            parts = module.split(".")
+            for end in range(1, len(parts) + 1):
+                resolved = _repo_module_file(root, ".".join(parts[:end]))
+                if resolved is not None and resolved not in seen:
+                    pending.append(resolved)
+    return seen
+
+
 def test_cli_uses_distinct_foreign_tree_and_restores_runner_modules(
     tmp_path: Path, capsys
 ):
@@ -1387,6 +1458,29 @@ def test_cli_uses_distinct_foreign_tree_and_restores_runner_modules(
         ).replace('        "alpha",\n', "", 1),
         encoding="utf-8",
     )
+    # Production loads a full checkout: tools/extract_gate.py::_tree_modules
+    # checks three entry files, then imports them. It does not copy modules.
+    # This fixture roots simulator/ and tools/, so a module under either
+    # package cannot fall through to the runner. Copy the derived closure
+    # under those packages. The asserts pin the modules the validator gained.
+    closure = _repo_import_closure(
+        REPO_ROOT, REPO_ROOT / "tools/validate_literature_extracts.py"
+    )
+    assert (REPO_ROOT / "tools/mineru_table_draft.py") in closure
+    assert (REPO_ROOT / "simulator/chemistry/formula_text.py") in closure
+    for source in closure:
+        relative = source.relative_to(REPO_ROOT)
+        if relative.parts[0] not in {"simulator", "tools"}:
+            continue
+        if relative.as_posix() == "tools/validate_literature_extracts.py":
+            continue
+        destination = tree / relative
+        if destination.is_file():
+            continue
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+    assert (tree / "tools/mineru_table_draft.py").is_file()
+    assert (tree / "simulator/chemistry/formula_text.py").is_file()
     subprocess.run(["git", "init", str(tree)], check=True, capture_output=True)
     subprocess.run(
         [
@@ -1440,6 +1534,7 @@ def test_cli_uses_distinct_foreign_tree_and_restores_runner_modules(
 
     output = capsys.readouterr().out
     assert status == 1
+    assert "HARD tree-import:" not in output
     assert "HARD schema/fidelity:" in output
     assert "type must be one of" in output
     assert "MIGRATION observations by ValueKind:" in output

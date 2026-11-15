@@ -27941,7 +27941,6 @@ class Migrator:
             oxygen_decision,
             from_fallback=oxygen_decision_fallback,
         )
-        oxygen_applied = False
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
@@ -27955,7 +27954,6 @@ class Migrator:
         ):
             oxygen_applied = True
             ident_kwargs["fO2_Pa"] = oxygen_state
-            oxygen_applied = True
         identity_for_profile = (
             Identity(
                 quantity=State.of(q_token),
