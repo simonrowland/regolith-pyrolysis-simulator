@@ -13,6 +13,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.validity import underdetermined_apparatus
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -508,3 +509,80 @@ def test_s7_s9_row_composition_and_locators_migrate_without_source_docx() -> Non
             affected += 1
 
     assert affected == 317
+
+
+def test_parent_pdf_absence_keeps_apparatus_unknown_and_calibration_flagged() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    experiment_record = extract["experiments"][0]
+    apparatus = experiment_record["apparatus"]
+
+    def assert_unknown(located: dict[str, object]) -> None:
+        assert located["state"] == {"tag": "unknown", "reason": "parent_pdf_absent"}
+        assert located["locator"]["section"] == "experimental section"
+        assert "parent article pdf is absent" in located["locator"]["note"].casefold()
+
+    assert_unknown(apparatus["cell_material_and_liner"])
+    for geometry_field in (
+        "orifice_diameter_m",
+        "orifice_channel_length_m",
+        "clausing_factor",
+    ):
+        assert_unknown(apparatus["geometry"][geometry_field])
+    assert_unknown(apparatus["ionization"]["method"])
+    assert_unknown(apparatus["ionization"]["cross_sections_and_source"])
+    assert_unknown(apparatus["ionization"]["ion_current_to_pressure_conversion"])
+    assert_unknown(apparatus["temperature_measurement"]["sensor"])
+    candidate_note = next(
+        note for note in extract["notes"] if "Candidate calibration source only" in note
+    )
+    assert "unverified_citation_pending_parent_pdf" in candidate_note
+    assert "Lopatin SI, Shugurov SM" in candidate_note
+    assert "10.1002/rcm.9298" in candidate_note
+    assert "p. 4, section 2.4" in candidate_note
+    assert "Eq. (10)" in candidate_note and "Eq. (16)" in candidate_note
+
+    mutated = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    mutated_apparatus = mutated["experiments"][0]["apparatus"]
+    mutated_apparatus["cell_material_and_liner"]["state"] = {
+        "tag": "value",
+        "value": "tungsten",
+    }
+    with pytest.raises(AssertionError):
+        assert_unknown(mutated_apparatus["cell_material_and_liner"])
+
+    migrator = migrate_one_extract(ROOT, EXTRACT)
+    migrator.finalize()
+    result = migrator.result
+    rows = [row for row in result.observations.values() if row.source_id == SID]
+    vapor_rows = [
+        row for row in rows if row.identity.quantity.value is Quantity.P_PARTIAL
+    ]
+    assert len(vapor_rows) == 778
+    assert len({row.experiment_id for row in vapor_rows}) == 1
+    experiment = result.experiments[vapor_rows[0].experiment_id]
+    assert experiment.apparatus is not None
+    assert experiment.apparatus.cell_material_and_liner is not None
+    assert experiment.apparatus.cell_material_and_liner.state.is_unknown
+    assert experiment.apparatus.geometry is not None
+    assert experiment.apparatus.geometry.orifice_diameter_m is not None
+    assert experiment.apparatus.geometry.orifice_diameter_m.state.reason == (
+        "parent_pdf_absent"
+    )
+    assert experiment.apparatus.temperature_measurement is not None
+    assert experiment.apparatus.temperature_measurement["sensor"].state.reason == (
+        "parent_pdf_absent"
+    )
+
+    flagged = 0
+    for row in vapor_rows:
+        gate = underdetermined_apparatus(
+            experiment,
+            Quantity.P_PARTIAL,
+            observation=row,
+        )
+        calibration_check = next(
+            check for check in gate.checks if check.name == "kems_calibration"
+        )
+        assert calibration_check.detail["flag"] == "calibration_not_grounded"
+        flagged += 1
+    assert flagged == 778
