@@ -14694,10 +14694,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             memo = {id(self): context, id(self.atom_ledger): ledger}
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
+            sulfsat_gate = getattr(self, '_sulfsat_gate', None)
+            if sulfsat_gate is not None:
+                # Gate-curve memo admission compares this provider identity;
+                # forecast equilibrium skips the SulfSat computation hook.
+                memo[id(sulfsat_gate)] = sulfsat_gate
             if live_store is not None:
                 memo[id(live_store)] = forecast_store
             forecast_state = dict(self.__dict__)
-            forecast_state['_sulfsat_gate'] = None
             # The forecast gets independent provider registrations. Deep-copying
             # the live registry would traverse engine subprocess/warm pools;
             # sharing it would let forecast dispatch mutate live providers.
