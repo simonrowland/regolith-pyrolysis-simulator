@@ -970,8 +970,8 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             1950.0,
             "openimcc_vapour_phase_signal_missing",
             "builtin_authoritative",
-            "magemin_mode_vector_mass_deficit",
-            id="stolyarova-magemin-mode-vector-refusal",
+            "silicate_window",
+            id="stolyarova-magemin-silicate-window-refusal",
         ),
         pytest.param(
             "shornikov-2026-wollastonite-kems",
