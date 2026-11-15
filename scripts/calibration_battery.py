@@ -197,7 +197,7 @@ def inventory_targets(obs):
 
 def extract_rows():
     from simulator.diagnostic_helpers import extract_reproduction as e
-    from simulator.battery.source_declarations import SOURCE_DECLARATIONS
+    from simulator.battery.source_declarations import calibration_kinds_for_source
     observations = e.load_adopted_observations()
     vp = e.load_vapor_pressure_data()
     rows, seen = [], {}
@@ -221,10 +221,11 @@ def extract_rows():
         kind = "derived measurement" if obs.obs_type == "activity_coefficient" else "direct experiment"
         if obs.obs_type in {"gibbs_table", "transition_point"}:
             kind = "literature correlation"
-        source_rules = SOURCE_DECLARATIONS.get(obs.source_id or "", {})
-        calibration_kind = source_rules.get("calibration_kind")
+        calibration_kind, calibration_kind_override = calibration_kinds_for_source(
+            obs.source_id
+        )
         if calibration_kind is not None:
-            kind = str(calibration_kind.value)
+            kind = calibration_kind
         method = str(e._evidence_marker(obs.values, "method_class") or "")
         quantity = str(obs.values.get("quantity", ""))
         if obs.values.get("alpha_form") or obs.values.get("fit") or method in {"review_compilation", "secondary_compilation"}:
@@ -233,9 +234,8 @@ def extract_rows():
             kind = "literature correlation"
         if method.startswith("model_derived"):
             kind = "derived measurement"
-        calibration_kind_override = source_rules.get("calibration_kind_override")
         if calibration_kind_override is not None:
-            kind = str(calibration_kind_override.value)
+            kind = calibration_kind_override
         if "qualitative" in method or quantity.startswith("qualitative_"):
             kind = "qualitative"
         if e._evidence_marker(obs.values, "evidence_class") == "thermodynamic_model_parameter" or quantity in {"SOLGASMIX_alkali_speciation", "equilibrium_molecular_oxygen_yield"}:

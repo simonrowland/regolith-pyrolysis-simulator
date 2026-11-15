@@ -140,3 +140,16 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
         ),
     },
 }
+
+
+def calibration_kinds_for_source(
+    source_id: str | None,
+) -> tuple[str | None, str | None]:
+    """Return the declared calibration kind and its later derived-kind override."""
+    rules = SOURCE_DECLARATIONS.get(source_id or "", {})
+    kind = rules.get("calibration_kind")
+    override = rules.get("calibration_kind_override")
+    return (
+        None if kind is None else str(kind.value),
+        None if override is None else str(override.value),
+    )
