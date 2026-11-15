@@ -632,7 +632,7 @@ def _campaign_branch(
                 if isinstance(invariant_table, Mapping)
                 else sampler.invariant_table
             )
-            _, rating_C, onset = _tier_a_rating_state(
+            _, rating_C, onset, _rating_cap_refusal = _tier_a_rating_state(
                 liner_composition_wt_pct,
                 composition,
                 tier_a_table,
@@ -2353,17 +2353,28 @@ def _tier_a_rating_state(
     *,
     margin_C: float,
     service_temperature_C: float,
-) -> tuple[float, float, bool]:
+) -> tuple[float, float, bool, dict[str, str] | None]:
     """Resolve Tier A first liquid, pure cap, and shared service onset decision."""
 
     first_liquid_C = first_liquid_tier_a(
         invariant_table,
         interface_composition_wt_pct,
     )
-    pure_literature_temperature_C = first_liquid_tier_a(
-        invariant_table,
-        liner_composition_wt_pct,
-    )
+    rating_cap_refusal = None
+    try:
+        pure_literature_temperature_C = first_liquid_tier_a(
+            invariant_table,
+            liner_composition_wt_pct,
+        )
+    except LinerCorrosionRefusal as exc:
+        # The contaminated first-liquid point still rates onset without a pure
+        # literature cap. Keep the cap's typed refusal separate: dissolution
+        # uses the cited service-temperature liquid and does not need T_lit.
+        pure_literature_temperature_C = None
+        rating_cap_refusal = {
+            "reason": "tier_a_pure_liner_rating_cap_unavailable",
+            "detail": f"{exc.reason}: {exc.detail}",
+        }
     rating_C, _rating_cap_C = _rated_temperature_with_margin(
         first_liquid_C,
         pure_literature_temperature_C,
@@ -2375,6 +2386,7 @@ def _tier_a_rating_state(
         first_liquid_C,
         rating_C,
         _rating_is_onset_at_service(rating_C, service_temperature_C),
+        rating_cap_refusal,
     )
 
 
@@ -2497,7 +2509,12 @@ def _interface_state_at_depth(
     if criterion_tier == "A":
         if not isinstance(invariant_table, Mapping) or not invariant_table:
             raise LinerCorrosionRefusal("liner_invariant_table_missing")
-        first_melt_C, rating_temperature_C, onset = _tier_a_rating_state(
+        (
+            first_melt_C,
+            rating_temperature_C,
+            onset,
+            rating_cap_refusal,
+        ) = _tier_a_rating_state(
             liner_composition_wt_pct,
             mixed["composition_wt_pct"],
             invariant_table,
@@ -2508,6 +2525,7 @@ def _interface_state_at_depth(
             "mixed": mixed,
             "first_melt_T_C": first_melt_C,
             "rating_temperature_C": rating_temperature_C,
+            "rating_cap_refusal": rating_cap_refusal,
             "liquid_fraction": None,
             "onset": onset,
         }
@@ -2814,6 +2832,9 @@ def build_liner_state_segment(
     )
     mixed = interface_state["mixed"]
     refusals: list[dict[str, str]] = []
+    rating_cap_refusal = interface_state.get("rating_cap_refusal")
+    if isinstance(rating_cap_refusal, Mapping):
+        refusals.append(dict(rating_cap_refusal))
     flags = list(mixed["flags"])
     flags.extend((TEMPERATURE_MARGIN_FLAG, HORIZON_FLAG))
     raw_enamel = interface_chemistry.get("enamel")
@@ -3033,6 +3054,9 @@ def build_liner_state_segment(
                     "rating_temperature_C": sensitivity_state[
                         "rating_temperature_C"
                     ],
+                    "rating_cap_refusal": sensitivity_state.get(
+                        "rating_cap_refusal"
+                    ),
                     "melt_activity": sensitivity_state.get("melt_activity"),
                     "campaigns_to_runaway": (
                         sensitivity_recurrence["campaigns_to_runaway"]

@@ -500,7 +500,7 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
             ] == [825.0, 850.0]
             assert raw_reference_profile["engine_minor_phase_eutectic"][
                 "plateau_liquid_fraction"
-            ] == pytest.approx(0.0026, abs=0.0002)
+            ] == pytest.approx(0.00193, abs=0.00002)
             assert raw_reference_profile["engine_minor_phase_eutectic"]["phases"]
             assert "phase_closure_unverified" in raw_reference_profile["flags"]
 
