@@ -192,6 +192,12 @@ def _store_difference_details(
                         f"{path}::{observation_id}: {json.dumps(row, sort_keys=True)}"
                     )
             continue
+        if path.endswith(".md"):
+            details.append(
+                f"{path}: bytes differ ({len(stored_bytes)} stored, "
+                f"{len(regenerated_bytes)} regenerated)"
+            )
+            continue
         stored_rows = _observation_rows(stored_bytes)
         regenerated_rows = _observation_rows(regenerated_bytes)
         changed_rows = [
