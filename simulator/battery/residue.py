@@ -2756,11 +2756,29 @@ def predict_mass_loss_fraction(
                 name for name, term in term_by_species.items()
                 if parent in term.parent_moles_per_product
             ]
-            cap["applied_bound_kg"] = math.fsum(
+            applied_bound_kg = math.fsum(
                 mapping.get(name, 0.0) * parent_mass_share_by_channel[name][parent]
                 for mapping in (bounds_by_channel, preheat_bounds_by_channel)
                 for name in species
             )
+            parent_scale = parent_channel_scales[parent]
+            parent_controls_every_species = all(
+                channel_scales[name] == parent_scale[
+                    "capped" if name in capped_channels else "finite"
+                ]
+                for name in species
+                if bounds_by_channel.get(name, 0.0) > 0.0
+                or preheat_bounds_by_channel.get(name, 0.0) > 0.0
+            )
+            if (
+                cap["uncapped_bound_kg"] >= cap["ceiling_kg"]
+                and parent_controls_every_species
+            ):
+                # This parent cap determines every contribution, so its
+                # applied total is exactly the ceiling. Avoid a false shortfall
+                # from re-summing individually scaled floating-point bounds.
+                applied_bound_kg = cap["ceiling_kg"]
+            cap["applied_bound_kg"] = applied_bound_kg
         unsourced_bound_kg = math.fsum(bounds_by_channel.values())
         preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
         point_loss_kg = documented_loss_kg
