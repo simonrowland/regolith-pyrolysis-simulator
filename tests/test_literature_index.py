@@ -13,6 +13,8 @@ import re
 import yaml
 import pytest
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
+from simulator.reference_data.janaf import load_manifest as load_janaf_manifest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BUILDER = REPO_ROOT / "data" / "literature" / "build_index.py"
@@ -424,10 +426,51 @@ def test_repo_source_status_counts_match_rows() -> None:
 def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
     counts = index["counts"]
+    extract_census = load_named_manifest(
+        REPO_ROOT / "tests" / "manifests" / "literature_extract_source_ids.jsonl"
+    )
+    excluded_extract = "bencze-yazhenskikh-2016-table-s1-k.yaml"
+    assert excluded_extract in extract_census
+    # The supplementary table uses literature_extract_table.v1, so build_index
+    # excludes it from the literature_extract.v1 index census.
+    expected_extracts = {
+        path: source_id
+        for path, source_id in extract_census.items()
+        if path != excluded_extract
+    }
+    indexed_extracts = {
+        Path(extract["path"]).name: source["source_id"]
+        for source in index["sources"]
+        for extract in source["extracts"]
+    }
+    assert_named_rows(
+        indexed_extracts, expected_extracts, label="literature index extracts"
+    )
     # Pin the generated index for the approved combined-offer merge stack.
+    # The named comparison runs first so an added or dropped extract is
+    # reported by filename before this aggregate pin can fail on a bare count.
     assert counts["sources"] == 850
-    assert counts["extracts"] == 848
-    assert counts["extracts_without_pdf"] == 848
+    # PDF status of every source with extracts, compared by source id against
+    # a checked-in manifest so a changed status is named, and the
+    # extracts_without_pdf count is pinned to that independent expectation
+    # rather than to a recount of the same index (green pinned it as 848).
+    indexed_pdf_status = {
+        source["source_id"]: source["pdf_status"]
+        for source in index["sources"]
+        if source["extracts"]
+    }
+    expected_pdf_status = load_named_manifest(
+        REPO_ROOT / "tests" / "manifests" / "literature_source_pdf_status.jsonl"
+    )
+    assert_named_rows(
+        indexed_pdf_status,
+        expected_pdf_status,
+        label="literature index source PDF status",
+    )
+    assert counts["extracts"] == len(indexed_extracts)
+    assert counts["extracts_without_pdf"] == sum(
+        status == "ABSENT" for status in expected_pdf_status.values()
+    )
     assert counts["alias_groups_needing_resolution"] == 94
 
     status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
@@ -931,9 +974,20 @@ def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
     rows = {row["source_id"]: row for row in index["sources"]}
     row = rows["nist-janaf-4th"]
     tables = row["corpus"]["tables"]
+    corpus_root = Path(index["scan"]["corpus_root"])
+    txt_dir = corpus_root / "raw" / "janaf-nist-txt"
+    expected_table_ids = {
+        entry["table_id"] for entry in load_janaf_manifest()["entries"]
+    }
+    actual_table_ids = {path.stem for path in txt_dir.glob("*.txt")}
+    assert_named_rows(
+        {table_id: None for table_id in actual_table_ids},
+        {table_id: None for table_id in expected_table_ids},
+        label="NIST-JANAF raw table file paths",
+    )
+
     assert tables["path"] == "raw/janaf-nist-txt"
     assert tables["exists"] is True
-    assert tables["file_count"] == 1655
     assert row["pdf_status"] == "ABSENT"
     assert row["pdf_path"] is None
     assert row["extracts"] == []
@@ -942,9 +996,8 @@ def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
     legacy = rows["janaf-4th"]
     assert legacy["corpus"]["tables"]["path"] != "raw/janaf-nist-txt"
     assert "nist-janaf-4th" not in legacy["aliases"]
-
-    corpus_root = Path(index["scan"]["corpus_root"])
-    txt = corpus_root / "raw" / "janaf-nist-txt" / "K-001.txt"
+    assert tables["file_count"] == len(expected_table_ids)
+    txt = txt_dir / "K-001.txt"
     header = (REPO_ROOT / "data/literature/compilations/janaf/tables/K-001.yaml").read_text(
         encoding="utf-8", errors="replace"
     )[:2000]
