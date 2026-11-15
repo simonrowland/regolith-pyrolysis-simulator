@@ -14,8 +14,10 @@ from simulator.battery.enums import (
     RefusalReason,
 )
 from simulator.battery.records import Composition, QuotedFrom, State
+from simulator.battery import migrate as M
 from simulator.battery import validate as V
 from simulator.battery.validate import validate_corpus
+from simulator.battery.records import Sample
 from tests.battery import factories as F
 from tests.battery import test_quoted_from as Q
 
@@ -124,6 +126,21 @@ def test_quoted_from_resolution_guard_is_load_bearing(monkeypatch) -> None:
     monkeypatch.setattr(V, "validate_experiment", namespace["validate_experiment"])
     with pytest.raises(AssertionError):
         Q.test_quoted_from_requires_a_resolving_target()
+
+
+def test_lab_parameter_merge_preserves_sample_inheritance_flag() -> None:
+    quoted = Q._quoted_experiment(
+        QuotedFrom(QuotedTargetKind.EXPERIMENT, "primary-experiment")
+    )
+
+    merged = M._merge_experiment_lab_params(
+        quoted,
+        Sample(),
+        None,
+        quoted.pressure_environment,
+    )
+
+    assert merged.sample.initial_composition_inherited_from is True
 
 
 def test_quoted_from_contract_is_documented() -> None:
