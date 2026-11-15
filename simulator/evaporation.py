@@ -768,11 +768,12 @@ class EvaporationMixin:
         The evaporation multiplier may use floor or held curves. Vapour
         binding accepts live, admitted curves, rejects fallback physics and
         actual curve repairs, and admits a composition-projected MAGEMin curve
-        only with its typed extrapolation notice. Its source-label notice is
-        provenance, not a curve repair. This lookup is lazy: a cache miss
-        invokes the same gate-curve resolver that freeze-gate consumers use,
-        and subsequent reads reuse its memo.
+        only with its typed extrapolation notice and projection-only source
+        refusal. Its source-label notice is provenance, not a curve repair.
+        This lookup is lazy: a cache miss invokes the same gate-curve resolver
+        that freeze-gate consumers use, and subsequent reads reuse its memo.
         """
+        from engines.domain_reason import OutOfDomainReason
 
         register = getattr(
             self, '_register_freeze_gate_liquid_fraction_providers', None,
@@ -860,6 +861,21 @@ class EvaporationMixin:
             and isinstance(projected_notice.get('dropped_components'), list)
             and bool(projected_notice.get('dropped_components'))
         )
+        provider_refusal = curve.get('gate_provider_refusal')
+        refusal_reasons = (
+            provider_refusal.get('reasons')
+            if isinstance(provider_refusal, Mapping)
+            else None
+        )
+        projection_reason = OutOfDomainReason.COMPOSITION_PROJECTED.value
+        valid_projection_refusal = (
+            isinstance(provider_refusal, Mapping)
+            and provider_refusal.get('status') == 'out_of_domain'
+            and isinstance(refusal_reasons, (list, tuple))
+            and bool(refusal_reasons)
+            and all(isinstance(reason, str) for reason in refusal_reasons)
+            and set(refusal_reasons) <= {projection_reason}
+        )
         projected_magemin_fallback_slot = (
             getattr(self, '_liquid_fraction_provider', None) == 'magemin'
             and fallback_provider_id == 'magemin-shadow'
@@ -867,6 +883,7 @@ class EvaporationMixin:
             and source == f'{fallback_slot_source}:composition_projected'
             and provider_outcome == 'stable_refusal'
             and valid_projection_notice
+            and valid_projection_refusal
         )
         if (
             source != 'gate_liquid_fraction'
@@ -887,7 +904,10 @@ class EvaporationMixin:
         ):
             return None, 'freeze_gate_authority_missing_or_invalid', None, None
         if (
-            curve.get('gate_provider_refusal')
+            (
+                curve.get('gate_provider_refusal')
+                and not projected_magemin_fallback_slot
+            )
             or (
                 curve.get('composition_projected_notice')
                 and not projected_magemin_fallback_slot
@@ -2153,6 +2173,9 @@ class EvaporationMixin:
         from simulator.melt_backend.magemin import (
             composition_projected_liquidus_notice,
         )
+        from simulator.reduced_real_determinism import (
+            gate_curve_provider_diagnostic_reasons,
+        )
 
         if not _diagnostic_names_composition_projected(diagnostic):
             return None
@@ -2207,6 +2230,13 @@ class EvaporationMixin:
             )
         curve = dict(curve)
         curve['composition_projected_notice'] = notice
+        curve['gate_provider_refusal'] = {
+            'provider': self._liquid_fraction_provider,
+            'status': diagnostic.get('backend_status'),
+            'reasons': list(
+                gate_curve_provider_diagnostic_reasons(diagnostic)
+            ),
+        }
         return curve
 
     def _record_freeze_gate_curve_source_repair(
@@ -3090,12 +3120,10 @@ class EvaporationMixin:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
-            gate_curve_provider_diagnostic_reasons,
             gate_curve_provider_timeout_reason,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
         )
-        from engines.domain_reason import OutOfDomainReason
 
         fO2_log, redox_state = normalize_redox_state(
             fO2_log,
@@ -3222,24 +3250,11 @@ class EvaporationMixin:
             raise EvaporationFluxRefusal('liquid_fraction_provider_failed', failure)
         if status_outcome is GateCurveProviderOutcome.STABLE_REFUSAL:
             self._freeze_gate_held_curve_record = None
-            refusal_reasons = gate_curve_provider_diagnostic_reasons(
-                diagnostic
-            )
-            projection_reason = OutOfDomainReason.COMPOSITION_PROJECTED.value
-            projection_refusal = (
-                str(status).strip().lower() == 'out_of_domain'
-                and bool(refusal_reasons)
-                and set(refusal_reasons) <= {projection_reason}
-            )
-            projected = (
-                self._composition_projected_freeze_gate_curve(
-                    diagnostic,
-                    source=source,
-                    reasons=reasons,
-                    repair_notices=repair_notices,
-                )
-                if projection_refusal
-                else None
+            projected = self._composition_projected_freeze_gate_curve(
+                diagnostic,
+                source=source,
+                reasons=reasons,
+                repair_notices=repair_notices,
             )
             if projected is not None:
                 return self._remember_freeze_gate_provider_curve(projected)
