@@ -2716,18 +2716,22 @@ def _oracle_ceiling_kg_hr(
     else:
         catalog = getattr(snapshot, "vapour_catalog", None)
         molar_mass = None
-        if catalog is not None and hasattr(catalog, "legacy_view"):
+        legacy = getattr(catalog, "_legacy_projection", None)
+        if not isinstance(legacy, Mapping) and catalog is not None and hasattr(
+            catalog,
+            "legacy_view",
+        ):
             try:
                 legacy = catalog.legacy_view()
             except (ValueError, AttributeError, TypeError):
                 legacy = None
-            oxides = legacy.get("oxide_vapors") if isinstance(legacy, Mapping) else None
-            row = oxides.get(species) if isinstance(oxides, Mapping) else None
-            grams = row.get("molar_mass_g_mol") if isinstance(row, Mapping) else None
-            if not isinstance(grams, bool) and isinstance(grams, int | float):
-                molar_mass = float(grams) / 1000.0
-                if not math.isfinite(molar_mass) or molar_mass <= 0.0:
-                    molar_mass = None
+        oxides = legacy.get("oxide_vapors") if isinstance(legacy, Mapping) else None
+        row = oxides.get(species) if isinstance(oxides, Mapping) else None
+        grams = row.get("molar_mass_g_mol") if isinstance(row, Mapping) else None
+        if not isinstance(grams, bool) and isinstance(grams, int | float):
+            molar_mass = float(grams) / 1000.0
+            if not math.isfinite(molar_mass) or molar_mass <= 0.0:
+                molar_mass = None
     if molar_mass is None:
         return None
     alpha = 1.0
