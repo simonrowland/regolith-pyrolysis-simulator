@@ -2580,7 +2580,9 @@ def test_barin_1995_aluminate_tables_are_pinned_and_migrate_conditions(
             pending.extend(item)
     assert not any(
         str(locator.get("source_path", "")).startswith("docs/references/")
-        and str(locator.get("source_path", "")).endswith(".md")
+        and not str(locator.get("source_path", "")).startswith(
+            "docs/references/pdfs/"
+        )
         for locator in locators
     )
     expected_tables = {
