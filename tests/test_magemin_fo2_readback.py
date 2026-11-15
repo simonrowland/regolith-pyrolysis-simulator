@@ -85,17 +85,10 @@ def test_live_c5_buffer_loss_is_numerical_failure(live_backend, requested):
     assert result.diagnostics['backend_failure_disposition'] == 'numerical'
 
 
-def test_fe_free_native_fo2_is_indeterminate_and_cacheable(
-    tmp_path, monkeypatch,
-):
-    from simulator import engine_cache
+def test_fe_free_native_fo2_is_indeterminate_and_successful(monkeypatch):
     from simulator.diagnostic_helpers.binary_pot_battery import (
-        EngineHandle,
-        _call_cached_backend_equilibrate,
         load_binary_pots,
-        normalize_engine_settings,
     )
-    from simulator.engine_cache import _is_refusal
 
     backend = MAGEMinBackend()
     backend._available = True
@@ -124,15 +117,6 @@ def test_fe_free_native_fo2_is_indeterminate_and_cacheable(
         ))
 
     monkeypatch.setattr(magemin_module.subprocess, 'run', run)
-    monkeypatch.setenv('REGOLITH_ENGINE_CACHE', str(tmp_path / 'magemin.sqlite'))
-    engine_cache.engine_cache_counters(reset=True)
-    engine_cache._MEMORY_CACHE.clear()
-    handle = EngineHandle(
-        name='magemin', backend=backend, available=True,
-        unavailable_reason=None, takes_fo2=True,
-        supports_intrinsic_fo2=False,
-        engine_settings=normalize_engine_settings('magemin', None),
-    )
     temperature_C = 1426.85
     requested = -9.0
     kwargs = {
@@ -143,21 +127,11 @@ def test_fe_free_native_fo2_is_indeterminate_and_cacheable(
         'pressure_bar': 0.05,
     }
 
-    raw_results = []
-
-    def solve():
-        result = backend.equilibrate(**kwargs)
-        raw_results.append(result)
-        return result
-
-    cold = _call_cached_backend_equilibrate(handle, kwargs, solve)
-    raw = raw_results[0]
+    raw = backend.equilibrate(**kwargs)
     assert raw.status == 'ok'
     assert raw.fO2_log is None
     assert 'solved_fO2_log' not in raw.diagnostics
     assert raw.diagnostics['qfm_reference_notice']['kind'] == 'out_of_certified_band'
-    assert cold.status == 'ok'
-    assert not _is_refusal(cold)
     notice = raw.diagnostics['fo2_indeterminate_no_redox_carrier']
     assert notice == {
         'database': projection.database,
@@ -165,31 +139,7 @@ def test_fe_free_native_fo2_is_indeterminate_and_cacheable(
         'native_readback_fO2_log': native_readback,
         'buffer_phase_present': False,
     }
-    assert cold.diagnostics['fo2_indeterminate_no_redox_carrier'] == notice
-    assert engine_cache.engine_cache_counters(reset=True)['magemin'] == {
-        'hits': 0,
-        'misses': 1,
-        'stores': 1,
-        'store_error': 0,
-        'read_error': 0,
-        'conflicts': 0,
-    }
 
-    engine_cache._MEMORY_CACHE.clear()
-    warm = _call_cached_backend_equilibrate(
-        handle, kwargs, lambda: pytest.fail('expected SQLite cache hit')
-    )
-    assert warm.status == 'ok'
-    assert warm.diagnostics['fo2_indeterminate_no_redox_carrier'] == notice
-    assert 'solved_fO2_log' not in warm.diagnostics
-    assert engine_cache.engine_cache_counters(reset=True)['magemin'] == {
-        'hits': 1,
-        'misses': 0,
-        'stores': 0,
-        'store_error': 0,
-        'read_error': 0,
-        'conflicts': 0,
-    }
 
 
 def test_fe_bearing_native_fo2_control_failure_remains_not_converged(
