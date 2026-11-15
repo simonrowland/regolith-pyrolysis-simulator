@@ -245,6 +245,7 @@ from simulator.battery.records import (
     as_decimal,
     identity_pressure_from_converted_point,
     identity_pressure_state,
+    notice_from_plain as _notice_from_plain,
     nominal_pressure_pa,
     phase_token,
 )
@@ -3516,30 +3517,6 @@ def _admission_from_plain(payload: object, *, value: Value) -> Admission:
         reason=reason,
         superseded_by=payload.get("superseded_by"),
         decided_by=decided,
-    )
-
-
-def _notice_from_plain(payload: object) -> Notice:
-    assert isinstance(payload, Mapping)
-    affected = tuple(Quantity(str(q)) for q in (payload.get("affected_quantities") or ()))
-    dropped = payload.get("dropped")
-    return Notice(
-        kind=NoticeKind(str(payload["kind"])),
-        affected_quantities=affected,
-        reason=str(payload.get("reason") or ""),
-        origin=str(payload.get("origin") or ""),
-        original=None if payload.get("original") is None else as_decimal(payload["original"]),
-        source=payload.get("source"),
-        destination=payload.get("destination"),
-        band=payload.get("band"),
-        dropped=None if dropped is None else tuple(str(x) for x in dropped),
-        dropped_mass_fraction=None
-        if payload.get("dropped_mass_fraction") is None
-        else as_decimal(payload["dropped_mass_fraction"]),
-        authority=None
-        if payload.get("authority") is None
-        else Authority(str(payload["authority"])),
-        certification=payload.get("certification"),
     )
 
 
@@ -23738,6 +23715,7 @@ class Migrator:
         self._work_index_row: dict[str, Mapping[str, Any] | None] = {}
         self._obs_source: dict[str, str] = {}
         self._obs_row_index: dict[str, int] = {}
+        self._extract_notices: dict[str, object] = {}
         self._author_derivations: dict[str, Derivation] = {}
         # Parents actually replaced by emitted children. Retarget uses this
         # exact map, never a prefix search.
@@ -24569,6 +24547,19 @@ class Migrator:
         *,
         source_row_index: int | None = None,
     ) -> None:
+        notice_id = observation.observation_id
+        if "::point:" in notice_id:
+            notice_id = notice_id.split("::point:", 1)[0]
+        if notice_id.endswith("::mass_loss_fraction"):
+            notice_id = notice_id.removesuffix("::mass_loss_fraction")
+        extract_notices = tuple(
+            _notice_from_plain(notice)
+            for notice in (self._extract_notices.get(notice_id) or ())
+        )
+        if extract_notices:
+            observation = replace(
+                observation, notices=extract_notices + observation.notices
+            )
         identity = observation.identity
         basis_state = (
             identity.valence_basis
@@ -25321,6 +25312,11 @@ class Migrator:
             else None
         )
         rows = list(iter_extract_observations(doc))
+        self._extract_notices = {
+            f"{source_id}::{row['observation_id']}": row.get("notices")
+            for _, row in rows
+            if row.get("observation_id") and row.get("notices")
+        }
         fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
         raw_experiments = doc.get("experiments") or ()
@@ -25706,9 +25702,6 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
-        extract_notices = tuple(
-            _notice_from_plain(notice) for notice in (obs.get("notices") or ())
-        )
         context = source_context or {}
         closure_components_by_observation = context.get(
             "same_row_composition_closure_components"
@@ -28333,7 +28326,6 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
-                        *extract_notices,
                         *point_notices,
                         *ambient_pressure_notices,
                     ),
@@ -28464,7 +28456,6 @@ class Migrator:
                         phase_provenance=phase_provenance,
                         identity_provenance=identity_provenance,
                         notices=(
-                            *extract_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28603,7 +28594,6 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
-                        *extract_notices,
                         *(
                             ()
                             if total_iron_notice is None
@@ -28803,7 +28793,6 @@ class Migrator:
                         source_derivation=source_derivation,
                         phase_provenance=sample_source_provenance,
                         notices=(
-                            *extract_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28865,7 +28854,7 @@ class Migrator:
             elif obs.get("uncertainty"):
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
-        observation_notices: list[Notice] = list(extract_notices)
+        observation_notices: list[Notice] = []
         if ambient_pressure_notice is not None:
             observation_notices.append(ambient_pressure_notice)
         if obs.get("standard_pressure") == "not_printed":
