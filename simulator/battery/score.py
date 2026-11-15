@@ -18273,7 +18273,7 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
         ev = obs.evidence.class_
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
             continue
-        if _has_duplicate_observation_link(obs, context.experiments):
+        if _has_duplicate_observation_link(obs, getattr(context, "experiments", None)):
             continue
         origin = getattr(context, "origins", {}).get(obs.observation_id)
         if is_internal_consistency(origin):
