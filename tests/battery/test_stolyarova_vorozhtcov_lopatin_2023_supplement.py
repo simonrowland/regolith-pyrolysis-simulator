@@ -513,14 +513,26 @@ def test_s7_s9_row_composition_and_locators_migrate_without_source_docx() -> Non
 
 def test_parent_pdf_absence_keeps_apparatus_unknown_and_calibration_flagged() -> None:
     extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    source_path = extract["source"]["corpus_asset"]
+    assert source_path == f"raw/{SID}/{SID}.docx"
     experiment_record = extract["experiments"][0]
     apparatus = experiment_record["apparatus"]
 
+    def assert_absence_locator(locator: dict[str, object]) -> None:
+        assert locator["source_path"] == source_path
+        assert locator["figure"] == "S12"
+        assert "section" not in locator
+        note = locator["note"].casefold()
+        assert "figure s12's caption refers to table 1 in the main text" in note
+        assert "the apparatus is described in the parent article" in note
+        assert "10.1002/rcm.9459" in note
+        assert "which is not in the corpus" in note
+
     def assert_unknown(located: dict[str, object]) -> None:
         assert located["state"] == {"tag": "unknown", "reason": "parent_pdf_absent"}
-        assert located["locator"]["section"] == "experimental section"
-        assert "parent article pdf is absent" in located["locator"]["note"].casefold()
+        assert_absence_locator(located["locator"])
 
+    assert_absence_locator(experiment_record["locator"])
     assert_unknown(apparatus["cell_material_and_liner"])
     for geometry_field in (
         "orifice_diameter_m",
