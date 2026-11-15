@@ -1115,23 +1115,63 @@ def test_tier_b_neighbour_disagreement_uses_tier_a_or_refuses():
     assert fallback_activity["criterion_signal_at_service_temperature"] == 1.0
 
 
+# Oracle arithmetic: without a pure field, rating = T_contaminated - margin;
+# with one, rating = min(T_contaminated - margin, T_pure - margin). The three
+# service literals straddle that independently tabulated rating, with onset at
+# equality. For the pure-absent Tier B cases, its pinned 2000 C bulk reference
+# supplies only the cap. In particular, 1400/1600/25 C rates at 1375 C, so
+# service 1450 C is already onset.
 @pytest.mark.parametrize(
-    ("pure_first_liquid_C", "contaminated_first_liquid_C"),
+    (
+        "pure_first_liquid_C",
+        "contaminated_first_liquid_C",
+        "margin_C",
+        "service_temperature_C",
+        "expected_rating_C",
+        "expected_cap_C",
+        "expected_cap_source",
+        "expected_onset",
+        "expected_tier_b_cap_C",
+    ),
     [
-        (None, 1500.0),
-        (1400.0, 1600.0),
-        (1500.0, 1500.0),
-        (1600.0, 1400.0),
+        (None, 1500.0, 0.0, 1499.0, 1500.0, None, None, False, 2000.0),
+        (None, 1500.0, 0.0, 1500.0, 1500.0, None, None, True, 2000.0),
+        (None, 1500.0, 0.0, 1501.0, 1500.0, None, None, True, 2000.0),
+        (None, 1500.0, 25.0, 1474.0, 1475.0, None, None, False, 1975.0),
+        (None, 1500.0, 25.0, 1475.0, 1475.0, None, None, True, 1975.0),
+        (None, 1500.0, 25.0, 1476.0, 1475.0, None, None, True, 1975.0),
+        (1400.0, 1600.0, 0.0, 1399.0, 1400.0, 1400.0, "pure_liner_first_liquid", False, 1400.0),
+        (1400.0, 1600.0, 0.0, 1400.0, 1400.0, 1400.0, "pure_liner_first_liquid", True, 1400.0),
+        (1400.0, 1600.0, 0.0, 1401.0, 1400.0, 1400.0, "pure_liner_first_liquid", True, 1400.0),
+        (1400.0, 1600.0, 25.0, 1374.0, 1375.0, 1375.0, "pure_liner_first_liquid", False, 1375.0),
+        (1400.0, 1600.0, 25.0, 1375.0, 1375.0, 1375.0, "pure_liner_first_liquid", True, 1375.0),
+        (1400.0, 1600.0, 25.0, 1376.0, 1375.0, 1375.0, "pure_liner_first_liquid", True, 1375.0),
+        (1400.0, 1600.0, 25.0, 1450.0, 1375.0, 1375.0, "pure_liner_first_liquid", True, 1375.0),
+        (1500.0, 1500.0, 0.0, 1499.0, 1500.0, 1500.0, "pure_liner_first_liquid", False, 1500.0),
+        (1500.0, 1500.0, 0.0, 1500.0, 1500.0, 1500.0, "pure_liner_first_liquid", True, 1500.0),
+        (1500.0, 1500.0, 0.0, 1501.0, 1500.0, 1500.0, "pure_liner_first_liquid", True, 1500.0),
+        (1500.0, 1500.0, 25.0, 1474.0, 1475.0, 1475.0, "pure_liner_first_liquid", False, 1475.0),
+        (1500.0, 1500.0, 25.0, 1475.0, 1475.0, 1475.0, "pure_liner_first_liquid", True, 1475.0),
+        (1500.0, 1500.0, 25.0, 1476.0, 1475.0, 1475.0, "pure_liner_first_liquid", True, 1475.0),
+        (1600.0, 1400.0, 0.0, 1399.0, 1400.0, 1600.0, "pure_liner_first_liquid", False, 1600.0),
+        (1600.0, 1400.0, 0.0, 1400.0, 1400.0, 1600.0, "pure_liner_first_liquid", True, 1600.0),
+        (1600.0, 1400.0, 0.0, 1401.0, 1400.0, 1600.0, "pure_liner_first_liquid", True, 1600.0),
+        (1600.0, 1400.0, 25.0, 1374.0, 1375.0, 1575.0, "pure_liner_first_liquid", False, 1575.0),
+        (1600.0, 1400.0, 25.0, 1375.0, 1375.0, 1575.0, "pure_liner_first_liquid", True, 1575.0),
+        (1600.0, 1400.0, 25.0, 1376.0, 1375.0, 1575.0, "pure_liner_first_liquid", True, 1575.0),
     ],
 )
-@pytest.mark.parametrize("margin_C", [0.0, 25.0])
-@pytest.mark.parametrize("service_offset_C", [-1.0, 0.0, 1.0])
 def test_rating_resolution_is_shared_by_tier_paths_and_recurrence(
     monkeypatch,
     pure_first_liquid_C,
     contaminated_first_liquid_C,
     margin_C,
-    service_offset_C,
+    service_temperature_C,
+    expected_rating_C,
+    expected_cap_C,
+    expected_cap_source,
+    expected_onset,
+    expected_tier_b_cap_C,
 ):
     from simulator import liner_corrosion
 
@@ -1144,24 +1184,6 @@ def test_rating_resolution_is_shared_by_tier_paths_and_recurrence(
         area_m2=1.0,
         reacted_layer_depth_m=1.0,
     )["composition_wt_pct"]
-    resolution = liner_corrosion._resolve_rating_and_onset(
-        pure_first_liquid_C,
-        contaminated_first_liquid_C,
-        margin_C,
-        0.0,
-    )
-    assert resolution.rating_temperature_C is not None
-    service_temperature_C = resolution.rating_temperature_C + service_offset_C
-    review_case = (
-        pure_first_liquid_C == 1400.0
-        and contaminated_first_liquid_C == 1600.0
-        and margin_C == 25.0
-        and service_offset_C == 1.0
-    )
-    if review_case:
-        service_temperature_C = 1450.0
-        assert resolution.rating_temperature_C == 1375.0
-
     all_oxides = set(liner) | set(mixed)
 
     def invariant_row(composition, temperature_C):
@@ -1187,37 +1209,26 @@ def test_rating_resolution_is_shared_by_tier_paths_and_recurrence(
         margin_C=margin_C,
         service_temperature_C=service_temperature_C,
     )
-    expected_direct = liner_corrosion._resolve_rating_and_onset(
-        pure_first_liquid_C,
-        contaminated_first_liquid_C,
-        margin_C,
-        service_temperature_C,
-    )
-    assert direct == expected_direct
+    assert direct.rating_temperature_C == expected_rating_C
+    assert direct.cap_temperature_C == expected_cap_C
+    assert direct.cap_source == expected_cap_source
+    assert direct.onset_at_service_temperature is expected_onset
 
-    fallback = liner_corrosion._tier_a_fallback_melt_activity(
+    fallback_activity = liner_corrosion._tier_a_fallback_melt_activity(
         mixed,
+        liner_composition_wt_pct=liner,
         deposits=deposits,
         invariant_table=table,
-        pure_reference={
-            "flags": [],
-            "tier_a_first_liquid_T_C": pure_first_liquid_C,
-        },
+        pure_reference={"flags": []},
         literature_melting_temperature_C=None,
         margin_C=margin_C,
         service_temperature_C=service_temperature_C,
         sensitivity={"status": "test"},
     )
-    assert fallback["rating_temperature_C"] == expected_direct.rating_temperature_C
-    assert fallback["rating_cap_temperature_C"] == expected_direct.cap_temperature_C
-    assert fallback["rating_cap_source"] == expected_direct.cap_source
-    assert (
-        fallback["onset_at_service_temperature"]
-        == expected_direct.onset_at_service_temperature
-    )
-    if review_case:
-        assert fallback["rating_temperature_C"] == 1375.0
-        assert fallback["onset_at_service_temperature"] is True
+    assert fallback_activity["rating_temperature_C"] == expected_rating_C
+    assert fallback_activity["rating_cap_temperature_C"] == expected_cap_C
+    assert fallback_activity["rating_cap_source"] == expected_cap_source
+    assert fallback_activity["onset_at_service_temperature"] is expected_onset
 
     bulk_low_C = 2000.0
     tier_b_pure_C = (
@@ -1281,19 +1292,12 @@ def test_rating_resolution_is_shared_by_tier_paths_and_recurrence(
         pure_reference=pure_reference,
         service_temperature_C=service_temperature_C,
     )
-    tier_b_resolution = liner_corrosion._resolve_rating_and_onset(
-        tier_b_pure_C,
-        contaminated_first_liquid_C,
-        margin_C,
-        service_temperature_C,
-    )
-    assert tier_b_activity["rating_temperature_C"] == tier_b_resolution.rating_temperature_C
-    assert tier_b_activity["rating_cap_temperature_C"] == tier_b_resolution.cap_temperature_C
-    assert tier_b_activity["rating_cap_source"] == tier_b_resolution.cap_source
-    assert (
-        tier_b_activity["onset_at_service_temperature"]
-        == tier_b_resolution.onset_at_service_temperature
-    )
+    # If pure T is absent from the fixture, the Tier B reference falls back to
+    # its independently supplied 2000 C bulk lower bracket.
+    assert tier_b_activity["rating_temperature_C"] == expected_rating_C
+    assert tier_b_activity["rating_cap_temperature_C"] == expected_tier_b_cap_C
+    assert tier_b_activity["rating_cap_source"] == "pure_liner_first_liquid"
+    assert tier_b_activity["onset_at_service_temperature"] is expected_onset
 
     tier_a_recurrence = corrosion_campaign_recurrence(
         liner,
@@ -1309,14 +1313,10 @@ def test_rating_resolution_is_shared_by_tier_paths_and_recurrence(
         horizon=0,
         sampler=TierAInvariantSampler(table),
     )
-    expected_a_campaigns = (
-        [0, 0]
-        if expected_direct.onset_at_service_temperature
-        else ["> 0", "> 0"]
-    )
+    expected_a_campaigns = [0, 0] if expected_onset else ["> 0", "> 0"]
     assert tier_a_recurrence["campaigns_to_runaway"] == expected_a_campaigns
     assert tier_a_recurrence["coupled_campaigns_to_runaway"] == (
-        0 if expected_direct.onset_at_service_temperature else "> 0"
+        0 if expected_onset else "> 0"
     )
 
     monkeypatch.setattr(
@@ -1338,15 +1338,198 @@ def test_rating_resolution_is_shared_by_tier_paths_and_recurrence(
         horizon=0,
         sampler=tier_b_sampler,
     )
-    expected_b_campaigns = (
-        [0, 0]
-        if tier_b_resolution.onset_at_service_temperature
-        else ["> 0", "> 0"]
-    )
+    expected_b_campaigns = [0, 0] if expected_onset else ["> 0", "> 0"]
     assert tier_b_recurrence["campaigns_to_runaway"] == expected_b_campaigns
     assert tier_b_recurrence["coupled_campaigns_to_runaway"] == (
-        0 if tier_b_resolution.onset_at_service_temperature else "> 0"
+        0 if expected_onset else "> 0"
     )
+
+
+def test_continuity_fallback_reads_pure_cap_from_table_on_stable_tier_b_reference(
+    monkeypatch,
+):
+    liner = {"Na2O": 5.0, "SiO2": 95.0}
+    deposits = {"Na": 0.1}
+    mixed = contaminated_interface_composition(
+        liner,
+        deposits,
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+    )["composition_wt_pct"]
+    table = {
+        "invariants": [
+            {
+                "composition_bounds_wt_pct": {"Na2O": [0.0, 9.9]},
+                "first_liquid_temperature_C": 1400.0,
+            },
+            {
+                "composition_bounds_wt_pct": {"Na2O": [9.9, 100.0]},
+                "first_liquid_temperature_C": 1600.0,
+            },
+        ]
+    }
+
+    class StableTierBSampler:
+        def __call__(self, _composition, temperature_C, _pressure_bar):
+            if temperature_C < 1550.0:
+                return 0.0
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+    sampler = StableTierBSampler()
+    pure_reference = liner_corrosion._tier_b_reference_profile(
+        sampler,
+        liner,
+        pressure_bar=1.0,
+        literature_melting_temperature_C=1553.0,
+    )
+    assert pure_reference["composition_continuity"]["status"] == "passed"
+    assert "tier_a_first_liquid_T_C" not in pure_reference
+    brackets = iter(([1500.0, 1525.0], [1400.0, 1425.0], [1450.0, 1475.0]))
+
+    def disagreeing_contaminated_profile(
+        _sampler,
+        _composition,
+        *,
+        temperatures,
+        service_temperature_C,
+        **_kwargs,
+    ):
+        bracket = next(brackets)
+        liquid = {temperature_C: 0.01 for temperature_C in temperatures}
+        liquid[bracket[1]] = 0.01
+        return {
+            "scan_temperature_C": list(temperatures),
+            "liquid_fraction_by_temperature_C": liquid,
+            "excess_liquid_fraction_by_temperature_C": dict(liquid),
+            "contaminated_melt_bracket_C": list(bracket),
+            "service_liquid_fraction": 0.01,
+        }
+
+    monkeypatch.setattr(
+        liner_corrosion,
+        "_tier_b_contaminated_profile",
+        disagreeing_contaminated_profile,
+    )
+    activity = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        mixed,
+        deposits,
+        sampler=sampler,
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=1553.0,
+        pure_reference=pure_reference,
+        service_temperature_C=1450.0,
+        invariant_table=table,
+    )
+
+    # The real Tier B activity route detects disagreeing contaminated
+    # neighbours, then takes 1400 C (pure table row) and 1600 C (mixed row).
+    # Rating = min(1600 - 25, 1400 - 25) = 1375 C.
+    assert activity["tier_a_fallback"] is True
+    assert activity["rating_temperature_C"] == 1375.0
+    assert activity["rating_cap_temperature_C"] == 1375.0
+    assert activity["rating_cap_source"] == "pure_liner_first_liquid"
+    assert activity["onset_at_service_temperature"] is True
+
+
+def test_no_resolved_excess_melt_keeps_pure_rating_for_segment_and_recurrence(
+    monkeypatch,
+):
+    liner = {"CaO": 20.16, "Al2O3": 36.65, "SiO2": 43.19}
+    table = _anorthite_tier_a_table()
+    deposit = {"Na": 0.01}
+
+    class IdenticalPureAndContaminatedProfiles(liner_corrosion.CurveLiquidFractionSampler):
+        def __call__(self, _composition, temperature_C, _pressure_bar):
+            if temperature_C < 1550.0:
+                return 0.0
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+        def curve(
+            self,
+            liner_composition_wt_pct,
+            deposit_kg_by_species,
+            *,
+            temperature_C,
+            pressure_bar,
+        ):
+            return TabulatedLiquidFractionCurve(
+                liner_composition_wt_pct=liner_composition_wt_pct,
+                deposit_composition_wt_pct=liner_corrosion.deposit_oxide_composition(
+                    deposit_kg_by_species
+                ),
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                points=((0.0, 0.0), (0.001, 0.0), (0.01, 1.0), (1.0, 1.0)),
+            )
+
+    sampler = IdenticalPureAndContaminatedProfiles()
+    pure_reference = liner_corrosion._tier_b_reference_profile_for_liner(
+        sampler,
+        liner,
+        pressure_bar=1.0,
+        invariant_table=table,
+    )
+    assert pure_reference["literature_melting_temperature_C"] == 1553.0
+    assert pure_reference["bulk_melt_bracket_C"] == [1550.0, 1575.0]
+    monkeypatch.setattr(
+        liner_corrosion,
+        "_tier_b_reference_profile_for_liner",
+        lambda *_args, **_kwargs: pure_reference,
+    )
+
+    for service_temperature_C, expected_onset, expected_campaigns in (
+        (1527.9, False, ["> 0", "> 0"]),
+        (1528.0, True, [0, 0]),
+    ):
+        recurrence = corrosion_campaign_recurrence(
+            liner,
+            deposit,
+            {},
+            {},
+            density_kg_m3=1000.0,
+            area_m2=1.0,
+            reacted_layer_depth_m=0.001,
+            temperature_C=service_temperature_C,
+            pressure_bar=1.0,
+            margin_C=25.0,
+            horizon=0,
+            sampler=sampler,
+        )
+        segment = build_liner_state_segment(
+            {
+                "composition": liner,
+                "citation": "Morey 1964, Table 26 row 6",
+                "criterion_tier": "B",
+                "invariant_table": table,
+                "density_kg_m3": 1000.0,
+                "reacted_layer_depth_m": 0.001,
+                "margin_C": 25.0,
+                "horizon_campaigns": 0,
+                "porosity_fraction": 0.0,
+            },
+            deposit,
+            area_m2=1.0,
+            service_temperature_C=service_temperature_C,
+            pressure_bar=1.0,
+            sampler=sampler,
+            deposit_inert_kg_by_species={"Na": 0.0},
+            deposit_reactive_kg_by_species={"Na": 0.0},
+        )
+
+        # No excess onset means T_lit - margin = 1553 - 25 = 1528 C.
+        assert segment["rating_temperature_C"] == 1528.0
+        assert segment["melt_activity"]["rating_temperature_C"] == 1528.0
+        assert "deposit_melt_below_resolution" in segment["flags"]
+        assert segment["onset"] is expected_onset
+        assert segment["campaigns_to_runaway"] == expected_campaigns
+        assert recurrence["campaigns_to_runaway"] == expected_campaigns
 
 
 def test_tier_b_reference_refuses_a_scan_that_stops_at_minor_phase_melting():
@@ -2357,6 +2540,7 @@ def test_tier_a_margin_triggers_anorthite_onset_at_1550_c():
 
     fallback_activity = liner_corrosion._tier_a_fallback_melt_activity(
         anorthite,
+        liner_composition_wt_pct=anorthite,
         deposits={},
         invariant_table=table,
         pure_reference={"flags": [], "literature_melting_temperature_C": 1553.0},

@@ -166,10 +166,18 @@ def _resolve_rating_and_onset(
             "a below-scan onset cannot also have a finite contaminated first-liquid point",
         )
     cap = pure_first_liquid - margin if pure_first_liquid is not None else None
+    # If the contaminated excess-melt scan resolves no onset, contamination
+    # has not lowered the pure-liner onset. Retain the pure rating T_lit-margin
+    # (d-419); the separately flagged below-scan case remains an unresolved
+    # lower boundary and must not be assigned this finite rating.
     rating = (
-        contaminated_first_liquid - margin
-        if contaminated_first_liquid is not None
-        else None
+        None
+        if onset_below_scan_range
+        else (
+            contaminated_first_liquid - margin
+            if contaminated_first_liquid is not None
+            else cap
+        )
     )
     if rating is not None and cap is not None:
         rating = min(rating, cap)
@@ -1325,6 +1333,7 @@ def _average_contaminated_neighbours(
 def _tier_a_fallback_melt_activity(
     interface: Mapping[str, float],
     *,
+    liner_composition_wt_pct: Mapping[str, Any],
     deposits: Mapping[str, float],
     invariant_table: Mapping[str, Any] | None,
     pure_reference: Mapping[str, Any],
@@ -1361,9 +1370,18 @@ def _tier_a_fallback_melt_activity(
         else None
     )
     literature_source = "cited_literature" if literature_temperature is not None else None
-    pure_first_liquid_C = pure_reference.get("tier_a_first_liquid_T_C")
-    if pure_first_liquid_C is None:
-        pure_first_liquid_C = literature_temperature
+    try:
+        pure_first_liquid_C = first_liquid_tier_a(
+            invariant_table,
+            liner_composition_wt_pct,
+        )
+    except LinerCorrosionRefusal:
+        # A table may cover the contaminated point but not the pure-liner
+        # point. Preserve the pure Tier B result, or its T_lit reference, as
+        # the cap source instead of treating the missing table row as a value.
+        pure_first_liquid_C = pure_reference.get("tier_a_first_liquid_T_C")
+        if pure_first_liquid_C is None:
+            pure_first_liquid_C = literature_temperature
     resolution = _resolve_rating_and_onset(
         pure_first_liquid_C,
         contaminated_temperature,
@@ -1466,6 +1484,7 @@ def _tier_b_melt_activity_rating(
         )
         return _tier_a_fallback_melt_activity(
             interface,
+            liner_composition_wt_pct=liner,
             deposits=deposits,
             invariant_table=invariant_table,
             pure_reference=pure_reference,
@@ -1534,6 +1553,7 @@ def _tier_b_melt_activity_rating(
             sensitivity = contaminated_sensitivity or contaminated_continuity
             return _tier_a_fallback_melt_activity(
                 interface,
+                liner_composition_wt_pct=liner,
                 deposits=deposits,
                 invariant_table=invariant_table,
                 pure_reference=pure_reference,
