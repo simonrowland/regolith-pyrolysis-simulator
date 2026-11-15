@@ -61,6 +61,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     QUANTITY_UNITS,
+    QuotedTargetKind,
     Quantity,
     RefusalReason,
     ResidualStatus,
@@ -972,6 +973,7 @@ def validate_experiment(
     path: str = "experiment",
     benches: Mapping[str, Bench] | None = None,
     context_rows: Mapping[str, Any] | None = None,
+    observations: Mapping[str, Observation] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     if experiment.kind is ExperimentKind.LITERATURE:
@@ -1006,6 +1008,66 @@ def validate_experiment(
                     f"{path}.simulated_experiment_id",
                     RefusalReason.REFERENTIAL_INTEGRITY,
                     f"simulated_experiment_id {experiment.simulated_experiment_id!r} does not resolve",
+                )
+            )
+    if experiment.quoted_from is not None:
+        target = experiment.quoted_from
+        if target.target_kind is QuotedTargetKind.EXPERIMENT:
+            resolves = target.target_id in experiments
+        else:
+            resolves = observations is not None and target.target_id in observations
+        if not resolves:
+            issues.append(
+                _issue(
+                    f"{path}.quoted_from",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"quoted_from {target.target_kind.value} {target.target_id!r} does not resolve",
+                )
+            )
+        if (
+            target.target_kind is QuotedTargetKind.EXPERIMENT
+            and target.target_id == experiment.experiment_id
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.quoted_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "quoted_from cannot point to the quoting experiment itself",
+                )
+            )
+    if experiment.method_inherited_from:
+        if experiment.quoted_from is None:
+            issues.append(
+                _issue(
+                    f"{path}.method_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited method requires quoted_from",
+                )
+            )
+        if not experiment.method.is_value:
+            issues.append(
+                _issue(
+                    f"{path}.method_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited method flag requires a method value",
+                )
+            )
+    if experiment.sample.initial_composition_inherited_from:
+        composition = experiment.sample.initial_composition
+        if experiment.quoted_from is None:
+            issues.append(
+                _issue(
+                    f"{path}.sample.initial_composition_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited run composition requires quoted_from",
+                )
+            )
+        if composition is None or not composition.state.is_value:
+            issues.append(
+                _issue(
+                    f"{path}.sample.initial_composition_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited run composition flag requires an initial composition value",
                 )
             )
     if benches is not None and experiment.bench_id is not None:
@@ -2725,6 +2787,7 @@ def validate_corpus(
                 f"experiment[{experiment.experiment_id}]",
                 bench_map,
                 context_map,
+                observations=obs_map,
             )
         )
     source_owners = _source_owners(work_map)

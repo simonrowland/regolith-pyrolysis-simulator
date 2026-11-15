@@ -52,6 +52,7 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     Quantity,
+    QuotedTargetKind,
     QuenchDirection,
     QuenchState,
     RawInputStatus,
@@ -1442,11 +1443,16 @@ class Sample:
     characterization: Located[str] | None = None
     surface_area_m2: Located[Value] | None = None
     pretreatment: Located[str] | None = None
+    initial_composition_inherited_from: bool | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "mass_kg", _located_value(self.mass_kg))
         object.__setattr__(self, "volume_m3", _located_value(self.volume_m3))
         object.__setattr__(self, "surface_area_m2", _located_value(self.surface_area_m2))
+        if self.initial_composition_inherited_from is not None and not isinstance(
+            self.initial_composition_inherited_from, bool
+        ):
+            raise TypeError("Sample.initial_composition_inherited_from must be bool or absent")
 
 
 @dataclass(frozen=True)
@@ -1695,6 +1701,24 @@ class AmbientPressureEvidence:
 
 
 @dataclass(frozen=True)
+class QuotedFrom:
+    """Citation link to a primary record, separate from derivation ancestry."""
+
+    target_kind: QuotedTargetKind
+    target_id: str
+
+    def __post_init__(self) -> None:
+        try:
+            target_kind = QuotedTargetKind(self.target_kind)
+        except (TypeError, ValueError) as exc:
+            choices = ", ".join(kind.value for kind in QuotedTargetKind)
+            raise ValueError(f"QuotedFrom.target_kind must be one of: {choices}") from exc
+        object.__setattr__(self, "target_kind", target_kind)
+        if not isinstance(self.target_id, str) or not self.target_id.strip():
+            raise ValueError("QuotedFrom.target_id is required")
+
+
+@dataclass(frozen=True)
 class Experiment:
     experiment_id: str
     kind: ExperimentKind
@@ -1716,12 +1740,20 @@ class Experiment:
     equipment_context_id: str | None = None
     thermal_schedule: ThermalSchedule | None = None
     fe_metal_saturated: Located[bool] | None = None
+    method_inherited_from: bool | None = None
+    quoted_from: QuotedFrom | None = None
 
     def __post_init__(self) -> None:
         if not self.experiment_id:
             raise ValueError("Experiment.experiment_id is required")
         if not self.conditions:
             raise ValueError("Experiment.conditions is required")
+        if self.method_inherited_from is not None and not isinstance(
+            self.method_inherited_from, bool
+        ):
+            raise TypeError("Experiment.method_inherited_from must be bool or absent")
+        if self.quoted_from is not None and not isinstance(self.quoted_from, QuotedFrom):
+            raise TypeError("Experiment.quoted_from must be a QuotedFrom record or absent")
 
 
 @dataclass(frozen=True)

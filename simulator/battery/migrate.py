@@ -150,6 +150,7 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     Quantity,
+    QuotedTargetKind,
     RawInputStatus,
     Rail,
     ReferenceStateConvention,
@@ -220,6 +221,7 @@ from simulator.battery.records import (
     Notice,
     Observation,
     PressureEnvironment,
+    QuotedFrom,
     Reaction,
     ReactionTerm,
     Sample,
@@ -3739,6 +3741,11 @@ def _sample_from_plain(
         container=None if container is None else _located_from_plain(container, str),
         printed_composition=printed_located,
         initial_composition=initial_located,
+        initial_composition_inherited_from=(
+            None
+            if payload.get("initial_composition_inherited_from") is None
+            else _boolean_from_plain(payload["initial_composition_inherited_from"])
+        ),
         composition_class=None
         if composition_class is None
         else _located_from_plain(composition_class, str),
@@ -4108,6 +4115,22 @@ def experiment_from_plain(payload: object) -> Experiment:
     return _experiment_from_plain(payload, registry_issues=None)
 
 
+def _quoted_from_from_plain(payload: object) -> QuotedFrom | None:
+    if payload is None:
+        return None
+    if not isinstance(payload, Mapping):
+        raise ValueError("quoted_from must be an object with target_kind and target_id")
+    if "target_kind" not in payload or "target_id" not in payload:
+        raise ValueError("quoted_from requires target_kind and target_id")
+    try:
+        return QuotedFrom(
+            target_kind=QuotedTargetKind(str(payload["target_kind"])),
+            target_id=payload["target_id"],
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"invalid quoted_from: {exc}") from exc
+
+
 def _experiment_from_plain(
     payload: object, *, registry_issues: list[ValidationIssue] | None
 ) -> Experiment:
@@ -4158,6 +4181,12 @@ def _experiment_from_plain(
         experiment_id=str(payload["experiment_id"]),
         kind=ExperimentKind(str(payload.get("kind") or "literature")),
         method=_state_from_plain(payload["method"], lambda v: MethodToken(str(v))),
+        method_inherited_from=(
+            None
+            if payload.get("method_inherited_from") is None
+            else _boolean_from_plain(payload["method_inherited_from"])
+        ),
+        quoted_from=_quoted_from_from_plain(payload.get("quoted_from")),
         sample=_sample_from_plain(
             payload.get("sample"),
             experiment_id=str(payload["experiment_id"]),

@@ -101,6 +101,10 @@ def test_every_workbook_component_migrates_as_its_printed_point_or_refusal(migra
         row_counts[sheet] += 1
 
         observation = result.observations[f"{SOURCE_ID}::{raw['observation_id']}"]
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.quoted_from is None
+        assert experiment.method_inherited_from is None
+        assert experiment.sample.initial_composition_inherited_from is None
         assert observation.identity.quantity.value.value == "equilibrium_phase_composition"
         assert observation.identity.species.formula == values["formula"]
         assert observation.identity.species.phase.value.value == "l"

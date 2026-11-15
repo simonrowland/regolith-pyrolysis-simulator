@@ -577,6 +577,11 @@ class ExperimentKind(StrEnum):
     SYNTHETIC = "synthetic"
 
 
+class QuotedTargetKind(StrEnum):
+    OBSERVATION = "observation"
+    EXPERIMENT = "experiment"
+
+
 class AmbientPressureEvidenceClass(StrEnum):
     GAS_FLOW = "gas_flow"
     GAS_MIXING = "gas_mixing"
