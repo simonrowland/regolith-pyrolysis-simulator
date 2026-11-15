@@ -32,6 +32,7 @@ from simulator.melt_backend.liquidus import (
 )
 from simulator.engine_pool import EngineWorkerTimeout
 from simulator.melt_regime import (
+    MELT_REGIME_EPSILON,
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
     liquid_fraction_invalidity,
@@ -761,12 +762,15 @@ def _load_evaporation_alpha_envelope_by_species(
 class EvaporationMixin:
     def _vapor_pressure_freeze_gate_phase_fraction(
         self,
-    ) -> tuple[float | None, str]:
+    ) -> tuple[float | None, str, str | None]:
         """Read an admitted, unrepaired gate curve for vapour phase selection.
 
         The evaporation multiplier may use floor or held curves. Vapour
         binding needs a phase signal, so only a live, admitted gate curve with
-        its original source and no curve repairs is eligible here.
+        no fallback physics or curve repairs is eligible here. The default
+        MAGEMin kernel fallback slot is real physics when its solve succeeds.
+        This lookup is lazy: a cache miss invokes the same gate-curve resolver
+        that freeze-gate consumers use, and subsequent reads reuse its memo.
         """
 
         register = getattr(
@@ -775,50 +779,126 @@ class EvaporationMixin:
         try:
             if callable(register):
                 register()
+        except EvaporationFluxRefusal:
+            return None, 'freeze_gate_authority_refused', None
         except (ProviderUnavailableError, ImportError):
-            return None, 'freeze_gate_authority_refused'
+            return None, 'freeze_gate_authority_refused', None
         resolve = getattr(self, '_melt_redox_liquidus_gate_record', None)
         admitted = getattr(self, '_melt_redox_gate_record_is_admitted', None)
         if not callable(resolve) or not callable(admitted):
-            return None, 'missing'
+            return None, 'missing', None
         try:
             record = resolve()
+        except EvaporationFluxRefusal:
+            return None, 'freeze_gate_authority_refused', None
         except ProviderUnavailableError:
-            return None, 'freeze_gate_authority_refused'
-        repair_notices = (
-            record.get('repair_notices')
-            if isinstance(record, Mapping)
-            else None
-        )
+            return None, 'freeze_gate_authority_refused', None
+        if not isinstance(record, Mapping):
+            return None, 'freeze_gate_authority_missing_or_invalid', None
+        try:
+            is_admitted = admitted(record)
+        except EvaporationFluxRefusal:
+            return None, 'freeze_gate_authority_refused', None
+        except ProviderUnavailableError:
+            return None, 'freeze_gate_authority_refused', None
+        repair_notices = record.get('repair_notices')
         if not (
-            isinstance(record, Mapping)
-            and record.get('disposition') in {'live', 'memo-hit'}
-            and admitted(record)
+            record.get('disposition') in {'live', 'memo-hit'}
+            and is_admitted
             and isinstance(repair_notices, list)
             and not repair_notices
         ):
-            return None, 'freeze_gate_authority_missing_or_invalid'
+            return None, 'freeze_gate_authority_missing_or_invalid', None
         curve = record.get('curve')
         if not isinstance(curve, Mapping):
-            return None, 'freeze_gate_authority_missing_or_invalid'
+            return None, 'freeze_gate_authority_missing_or_invalid', None
         source = str(curve.get('source') or '')
+        provider_outcome = record.get('provider_outcome')
+        provider_outcome = getattr(
+            provider_outcome, 'value', provider_outcome,
+        )
+        registry = getattr(self, '_chem_registry', None)
+        fallback_for = getattr(registry, 'fallback_for', None)
+        fallback_provider = (
+            fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+            if callable(fallback_for)
+            else None
+        )
+        fallback_profile = (
+            fallback_provider.capability_profile()
+            if fallback_provider is not None
+            else None
+        )
+        fallback_provider_id = getattr(
+            fallback_profile, 'provider_id', None,
+        )
+        fallback_slot_source = (
+            f'gate_liquid_fraction:fallback:{fallback_provider_id}'
+            if fallback_provider_id
+            else None
+        )
+        successful_magemin_fallback_slot = (
+            getattr(self, '_liquid_fraction_provider', None) == 'magemin'
+            and fallback_provider_id == 'magemin-shadow'
+            and source == fallback_slot_source
+            and provider_outcome == 'produced'
+        )
         if (
             source != 'gate_liquid_fraction'
-            or curve.get('gate_provider_refusal')
+            and not successful_magemin_fallback_slot
+        ):
+            return None, 'freeze_gate_authority_fallback_or_projected', None
+        if (
+            curve.get('gate_provider_refusal')
             or curve.get('composition_projected_notice')
             or curve.get('composition_derived')
         ):
-            return None, 'freeze_gate_authority_fallback_or_projected'
+            return None, 'freeze_gate_authority_fallback_or_projected', None
+        path = curve.get('path')
         try:
-            fraction = self._interpolate_freeze_gate_curve(
-                curve,
-                float(self.melt.temperature_C),
+            knots = tuple(
+                (float(temperature_C), float(fraction))
+                for temperature_C, fraction in path
             )
+            temperature_C = float(self.melt.temperature_C)
         except (KeyError, TypeError, ValueError):
-            return None, 'freeze_gate_authority_missing_or_invalid'
-        if liquid_fraction_invalidity(fraction) is not None:
-            return None, 'freeze_gate_authority_missing_or_invalid'
-        return float(fraction), 'freeze_gate_authority:gate_liquid_fraction'
+            return None, 'freeze_gate_authority_missing_or_invalid', None
+        if (
+            not knots
+            or not math.isfinite(temperature_C)
+            or any(
+                not math.isfinite(sample_T)
+                or liquid_fraction_invalidity(sample_fraction) is not None
+                for sample_T, sample_fraction in knots
+            )
+            or any(
+                right[0] <= left[0]
+                for left, right in zip(knots, knots[1:])
+            )
+        ):
+            return None, 'freeze_gate_authority_missing_or_invalid', None
+
+        phase_basis_continuation = None
+        if temperature_C < knots[0][0]:
+            fraction = knots[0][1]
+            if fraction >= 1.0 - MELT_REGIME_EPSILON:
+                return None, 'freeze_gate_authority_missing_or_invalid', None
+            phase_basis_continuation = 'below_sampled_range_solid_bearing'
+        elif temperature_C > knots[-1][0]:
+            fraction = knots[-1][1]
+            if fraction < 1.0 - MELT_REGIME_EPSILON:
+                return None, 'freeze_gate_authority_missing_or_invalid', None
+            phase_basis_continuation = 'above_sampled_liquidus'
+        else:
+            fraction = EvaporationMixin._interpolate_freeze_gate_path_sample(
+                knots,
+                temperature_C,
+            )
+            if fraction is None:
+                return None, 'freeze_gate_authority_missing_or_invalid', None
+
+        phase_source = f'freeze_gate_authority:{source}'
+        return float(fraction), phase_source, phase_basis_continuation
 
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -3424,6 +3504,36 @@ class EvaporationMixin:
         }
 
     @staticmethod
+    def _interpolate_freeze_gate_path_sample(
+        path: tuple,
+        temperature_C: float,
+    ) -> float | None:
+        """Interpolate one in-range sample, without extrapolating the path."""
+
+        points = iter(path)
+        try:
+            first_T, first_fraction = next(points)
+        except StopIteration:
+            raise IndexError('freeze-gate curve path is empty')
+        previous_T = float(first_T)
+        previous_fraction = float(first_fraction)
+        for next_T, next_fraction in points:
+            next_T = float(next_T)
+            next_fraction = float(next_fraction)
+            if previous_T <= temperature_C <= next_T:
+                span = max(next_T - previous_T, _FREEZE_GATE_EPSILON)
+                weight = (temperature_C - previous_T) / span
+                return max(
+                    0.0,
+                    min(
+                        1.0,
+                        previous_fraction
+                        + (next_fraction - previous_fraction) * weight,
+                    ),
+                )
+        return None
+
+    @staticmethod
     def _interpolate_freeze_gate_curve(
         curve: Mapping[str, Any],
         temperature_C: float,
@@ -3442,23 +3552,12 @@ class EvaporationMixin:
         if temperature_C >= liquidus_T_C:
             return 1.0
         path = tuple(curve.get('path') or ())
-        previous_T, previous_fraction = path[0]
-        for next_T, next_fraction in path[1:]:
-            previous_T = float(previous_T)
-            next_T = float(next_T)
-            if previous_T <= temperature_C <= next_T:
-                span = max(next_T - previous_T, _FREEZE_GATE_EPSILON)
-                weight = (temperature_C - previous_T) / span
-                return max(
-                    0.0,
-                    min(
-                        1.0,
-                        float(previous_fraction)
-                        + (float(next_fraction) - float(previous_fraction))
-                        * weight,
-                    ),
-                )
-            previous_T, previous_fraction = next_T, next_fraction
+        sampled_fraction = EvaporationMixin._interpolate_freeze_gate_path_sample(
+            path,
+            temperature_C,
+        )
+        if sampled_fraction is not None:
+            return sampled_fraction
         span = max(liquidus_T_C - solidus_T_C, _FREEZE_GATE_EPSILON)
         return max(0.0, min(1.0, (temperature_C - solidus_T_C) / span))
 
