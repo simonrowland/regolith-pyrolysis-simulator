@@ -501,7 +501,10 @@ def _inventory_mass_kg(inventory_mol: Mapping[str, float]) -> float:
 
 
 def _initial_oxide_inventory_mol(
-    wt_pct: Mapping[str, Any], sample_mass_kg: float
+    wt_pct: Mapping[str, Any],
+    sample_mass_kg: float,
+    *,
+    normalize_to_sample_mass: bool = True,
 ) -> dict[str, float]:
     total_wt_pct = math.fsum(float(amount) for amount in wt_pct.values())
     if (
@@ -513,12 +516,13 @@ def _initial_oxide_inventory_mol(
         )
     ):
         raise ResidueInventoryRefusal("initial_composition_invalid")
-    # Printed oxide wt% can round to a total other than 100. Each oxide mass is
-    # m0*w_i/Σw, so Σm_i=m0 exactly. Dividing kg by kg mol^-1 gives mol. R3-10's
-    # 99.99 wt% total therefore gives its measured 28.4 mg exactly; using /100
-    # would give 28.39716 mg.
+    # For normalized cohorts, printed oxide wt% can round away from 100. Each
+    # oxide mass is m0*w_i/Σw, so Σm_i=m0 exactly. Dividing kg by kg mol^-1 gives
+    # mol. R3-10's 99.99 wt% total therefore gives 28.4 mg; using /100 gives
+    # 28.39716 mg.
+    percentage_basis = total_wt_pct if normalize_to_sample_mass else 100.0
     return {
-        str(oxide): sample_mass_kg * (float(amount) / total_wt_pct)
+        str(oxide): sample_mass_kg * (float(amount) / percentage_basis)
         / _formula_terms(str(oxide))[1]
         for oxide, amount in wt_pct.items()
     }
@@ -3053,7 +3057,13 @@ def _langmuir_run_setup(
             experiment_id,
         )
     initial_inventory_mol = _initial_oxide_inventory_mol(
-        run_wt_pct, sample_mass_kg
+        run_wt_pct,
+        sample_mass_kg,
+        # The Hashimoto numeric digest pins its legacy /100 inventory basis.
+        # Langmuir cohorts normalize printed rounding to the measured mass.
+        normalize_to_sample_mass=(
+            cohort_spec.geometry_source != "hashimoto_metadata_dimensions"
+        ),
     )
     gas_channels, channel_omissions = _openimcc_gas_channels_and_omission_notices(
         tuple(initial_inventory_mol), gas_pack
