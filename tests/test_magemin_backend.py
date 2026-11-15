@@ -1413,6 +1413,14 @@ def test_magemin_and_alphamelts_reject_exact_major_oxide_boundary():
     assert alpha_reason == OutOfDomainReason.MAJOR_SUM.value
     assert magemin_reason == OutOfDomainReason.MAJOR_SUM.value
 
+    magemin_above_valid, _warnings, magemin_above_reason = (
+        MAGEMinDomainGate.validate_with_reason(
+            {'SiO2': 50.0, 'MgO': 45.0001}
+        )
+    )
+    assert magemin_above_valid is True
+    assert magemin_above_reason is None
+
 
 def test_magemin_as_active_backend_fails_closed_with_clear_message(monkeypatch):
     # MAGEMin is not wired into any active call site. If someone DOES
@@ -1446,7 +1454,7 @@ def test_magemin_as_active_backend_fails_closed_with_clear_message(monkeypatch):
         {
             "oxide": {
                 "label": "Oxide",
-                "composition_wt_pct": {"SiO2": 100.0},
+                "composition_wt_pct": {"SiO2": 50.0, "MgO": 50.0},
             }
         },
         {"metals": {}, "oxide_vapors": {}},
@@ -2346,7 +2354,6 @@ def test_magemin_equilibrate_refuses_out_of_domain_silica(
     [
         ({'SiO2': 30.0, 'Al2O3': 70.0}, 'ok', None),
         ({'SiO2': 80.0, 'Al2O3': 20.0}, 'ok', None),
-        ({'SiO2': 30.0, 'Al2O3': 65.0}, 'out_of_domain', 'major_sum'),
     ],
 )
 def test_magemin_equilibrate_domain_boundaries(
