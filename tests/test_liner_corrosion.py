@@ -324,6 +324,52 @@ def test_magemin_phi_curve_is_cached_and_interpolated():
     assert len(backend.calls) > first_call_count
 
 
+def test_recurrence_profiles_reuse_cached_phi_curves_for_same_deposit_mix():
+    backend = _FakeMageminBackend()
+    sampler = MageminLinerSampler(backend)
+    liner = {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0}
+    temperatures = (500.0, 525.0, 550.0)
+    pure_reference = {
+        "scan_temperature_C": list(temperatures),
+        "liquid_fraction_by_temperature_C": dict.fromkeys(temperatures, 0.0),
+        "bulk_melt_bracket_C": [550.0, 575.0],
+        "literature_melting_temperature_C": 1553.0,
+        "composition_continuity": {"status": "passed"},
+        "flags": [],
+    }
+
+    def profile(deposit_kg):
+        return liner_corrosion._campaign_branch(
+            liner,
+            {"Na": deposit_kg},
+            {},
+            density_kg_m3=1000.0,
+            area_m2=1.0,
+            reacted_layer_depth_m=1.0,
+            temperature_C=525.0,
+            pressure_bar=1.0e-6,
+            margin_C=25.0,
+            horizon=0,
+            sampler=sampler,
+            pure_reference=pure_reference,
+        )
+
+    profile(0.01)
+    first_campaign_calls = len(backend.calls)
+    profile(0.02)
+    second_campaign_calls = len(backend.calls) - first_campaign_calls
+
+    # One 31-point phi(f) table per scan temperature handles the nominal
+    # mixture. The two off-line continuity probes still need direct solves;
+    # a second campaign with the same Na mix adds only those point samples.
+    max_uncached_neighbour_calls = 2 * (len(temperatures) + 1)
+    assert first_campaign_calls <= (
+        len(temperatures) * (liner_corrosion.MAGEMIN_PHI_CURVE_INTERVALS + 1)
+        + max_uncached_neighbour_calls
+    )
+    assert second_campaign_calls <= max_uncached_neighbour_calls
+
+
 def test_magemin_phi_curve_brackets_valid_request_near_silica_domain_edge():
     backend = _FakeMageminBackend()
     sampler = MageminLinerSampler(backend)
@@ -1658,7 +1704,34 @@ def test_tier_b_rating_uses_excess_melt_and_the_lower_temperature_bracket():
     assert "deposit_melt_below_resolution" not in rated["flags"]
 
 
-def test_tier_b_onset_at_first_scan_point_is_an_unresolved_lower_boundary():
+# Independent d-419 rating arithmetic for T_lit=1553 C, pure bulk lower=1550 C,
+# and margin=25 C: no excess gives 1553-25=1528 C; a resolved [500,525]
+# bracket gives 1553+(500-1550)-25=478 C; downward [450,475] gives
+# 1553+(450-1550)-25=428 C.
+@pytest.mark.parametrize(
+    (
+        "excess_start_C",
+        "expected_bracket_C",
+        "expected_rating_C",
+        "expected_onset_at_450_C",
+    ),
+    (
+        (None, None, 1528.0, False),
+        (525.0, [500.0, 525.0], 478.0, False),
+        (460.0, [450.0, 475.0], 428.0, True),
+    ),
+    ids=(
+        "no-excess-below-scan",
+        "resolved-onset-above-scan-floor",
+        "extend-scan-down",
+    ),
+)
+def test_tier_b_service_below_scan_uses_the_three_onset_cases(
+    excess_start_C,
+    expected_bracket_C,
+    expected_rating_C,
+    expected_onset_at_450_C,
+):
     class BoundarySampler:
         def __call__(self, composition, temperature_C, _pressure_bar):
             if temperature_C < 1550.0:
@@ -1667,8 +1740,12 @@ def test_tier_b_onset_at_first_scan_point_is_an_unresolved_lower_boundary():
                 pure = 0.044
             else:
                 pure = 1.0
-            if composition.get("Na2O", 0.0) > 0.0 and temperature_C == 500.0:
-                return pure + 0.01
+            if (
+                excess_start_C is not None
+                and composition.get("Na2O", 0.0) > 0.0
+                and temperature_C >= excess_start_C
+            ):
+                return min(1.0, pure + 0.01)
             return pure
 
     sampler = BoundarySampler()
@@ -1688,33 +1765,23 @@ def test_tier_b_onset_at_first_scan_point_is_an_unresolved_lower_boundary():
         margin_C=25.0,
         literature_melting_temperature_C=1553.0,
         pure_reference=reference,
-        service_temperature_C=750.0,
-    )
-
-    assert activity["contaminated_melt_bracket_C"] == [None, 500.0]
-    assert activity["rating_temperature_C"] is None
-    assert "onset_below_scan_range" in activity["flags"]
-    assert liner_corrosion._tier_b_onset_at_service_temperature(activity, 750.0)
-
-    below_scan_activity = liner_corrosion._tier_b_melt_activity_rating(
-        liner,
-        {"SiO2": 49.0, "Al2O3": 30.0, "CaO": 20.0, "Na2O": 1.0},
-        {"Na": 1.0},
-        sampler=sampler,
-        pressure_bar=1.0,
-        margin_C=25.0,
-        literature_melting_temperature_C=1553.0,
-        pure_reference=reference,
         service_temperature_C=450.0,
     )
-    # The sampled onset is unresolved below 500 C, but the actual 450 C
-    # service sample has no excess melt. The pure cap is 1553 - 25 = 1528 C,
-    # so d-419 rates NO-ONSET at this service point.
-    assert below_scan_activity["rating_temperature_C"] == 1528.0
-    assert below_scan_activity["onset_at_service_temperature"] is False
+
+    assert activity["contaminated_melt_bracket_C"] == expected_bracket_C
+    assert activity["rating_temperature_C"] == expected_rating_C
+    assert activity["onset_at_service_temperature"] is expected_onset_at_450_C
     assert liner_corrosion._tier_b_onset_at_service_temperature(
-        below_scan_activity, 450.0
-    ) is False
+        activity, 450.0
+    ) is expected_onset_at_450_C
+    if excess_start_C == 460.0:
+        # d-419 lower-bracket arithmetic: 1553 + (450 - 1550) - 25 = 428 C;
+        # the 450 C service point is at/above that conservative rating.
+        assert "onset_below_scan_range" not in activity["flags"]
+    elif expected_bracket_C is None:
+        # No excess anywhere in the original scan and none at service gives
+        # the independent pure cap, 1553 - 25 = 1528 C.
+        assert "deposit_melt_below_resolution" in activity["flags"]
 
 
 def test_tier_b_scans_the_pure_bulk_lower_boundary_for_contaminated_onset():

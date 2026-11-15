@@ -1268,18 +1268,34 @@ def _tier_b_contaminated_profile(
     sampler: LiquidFractionSampler,
     composition_wt_pct: Mapping[str, Any],
     *,
+    liner_composition_wt_pct: Mapping[str, Any],
+    deposit_kg_by_species: Mapping[str, Any],
+    use_cached_curve: bool,
     temperatures: Sequence[float],
     pure_liquid_by_temperature_C: Mapping[float, float],
     pressure_bar: float,
     service_temperature_C: float | None,
 ) -> dict[str, Any]:
     composition = validate_oxide_composition(composition_wt_pct)
+    liner = validate_oxide_composition(liner_composition_wt_pct)
+    deposits = _checked_deposit(deposit_kg_by_species)
     contaminated: dict[float, float] = {}
     excess: dict[float, float] = {}
-    for temperature in temperatures:
-        fraction = _checked_liquid_fraction(
-            sampler(composition, temperature, pressure_bar)
+
+    def sample_contaminated(temperature: float) -> float:
+        return _checked_liquid_fraction(
+            _sample_liquid_fraction(
+                sampler,
+                composition,
+                deposits if use_cached_curve else {},
+                liner,
+                temperature,
+                pressure_bar,
+            )
         )
+
+    for temperature in temperatures:
+        fraction = sample_contaminated(temperature)
         contaminated[temperature] = fraction
         excess[temperature] = fraction - float(pure_liquid_by_temperature_C[temperature])
     onset_bracket: list[float | None] | None = None
@@ -1287,13 +1303,50 @@ def _tier_b_contaminated_profile(
         if excess[temperature] > LIQUIDUS_SOLID_EPSILON:
             onset_bracket = [temperatures[index - 1] if index else None, temperature]
             break
+
+    # d-419 lower-bracket rule: an excess already present at the first scan
+    # temperature may put onset below the service temperature. Continue in the
+    # same scan step until the no-excess point brackets it, stopping at
+    # absolute zero. If the sampler refuses or the floor is reached first,
+    # retain [None, T_positive] so the rating path stays conservatively
+    # unresolved; never replace this case with the pure-liner cap.
+    if onset_bracket is not None and onset_bracket[0] is None:
+        upper_temperature = float(onset_bracket[1])
+        floor_C = -CELSIUS_TO_KELVIN_OFFSET
+        while upper_temperature > floor_C:
+            lower_temperature = max(
+                floor_C,
+                upper_temperature - TIER_B_MELT_SCAN_STEP_C,
+            )
+            try:
+                lower_fraction = sample_contaminated(lower_temperature)
+                lower_baseline = pure_liquid_by_temperature_C.get(lower_temperature)
+                if lower_baseline is None:
+                    lower_baseline = _checked_liquid_fraction(
+                        _sample_liquid_fraction(
+                            sampler,
+                            liner,
+                            {},
+                            liner,
+                            lower_temperature,
+                            pressure_bar,
+                        )
+                    )
+            except LinerCorrosionRefusal:
+                break
+            contaminated[lower_temperature] = lower_fraction
+            excess[lower_temperature] = lower_fraction - float(lower_baseline)
+            if excess[lower_temperature] <= LIQUIDUS_SOLID_EPSILON:
+                onset_bracket = [lower_temperature, upper_temperature]
+                break
+            onset_bracket = [None, lower_temperature]
+            upper_temperature = lower_temperature
+
     service_fraction = None
     if service_temperature_C is not None:
-        service_fraction = _checked_liquid_fraction(
-            sampler(composition, service_temperature_C, pressure_bar)
-        )
+        service_fraction = sample_contaminated(service_temperature_C)
     return {
-        "scan_temperature_C": list(temperatures),
+        "scan_temperature_C": sorted(contaminated),
         "liquid_fraction_by_temperature_C": contaminated,
         "excess_liquid_fraction_by_temperature_C": excess,
         "contaminated_melt_bracket_C": onset_bracket,
@@ -1525,17 +1578,38 @@ def _tier_b_melt_activity_rating(
         first_neighbour, second_neighbour, delta = _tier_b_composition_neighbours(
             interface
         )
-        interface_profiles = [
-            _tier_b_contaminated_profile(
-                sampler,
-                composition,
-                temperatures=scan_temperatures,
-                pure_liquid_by_temperature_C=pure_liquid,
-                pressure_bar=pressure,
-                service_temperature_C=service_temperature_C,
+        nominal_uses_curve = False
+        if deposits and isinstance(sampler, CurveLiquidFractionSampler):
+            try:
+                _infer_deposit_fraction(
+                    liner,
+                    deposit_oxide_composition(deposits),
+                    interface,
+                )
+            except LinerCorrosionRefusal:
+                # Private callers may supply a diagnostic composition that is
+                # not the liner/deposit mix line; preserve their direct-sample
+                # behavior instead of asking phi(f) to extrapolate it.
+                pass
+            else:
+                nominal_uses_curve = True
+        interface_profiles = []
+        for index, composition in enumerate(
+            (interface, first_neighbour, second_neighbour)
+        ):
+            interface_profiles.append(
+                _tier_b_contaminated_profile(
+                    sampler,
+                    composition,
+                    liner_composition_wt_pct=liner,
+                    deposit_kg_by_species=deposits,
+                    use_cached_curve=(index == 0 and nominal_uses_curve),
+                    temperatures=scan_temperatures,
+                    pure_liquid_by_temperature_C=pure_liquid,
+                    pressure_bar=pressure,
+                    service_temperature_C=service_temperature_C,
+                )
             )
-            for composition in (interface, first_neighbour, second_neighbour)
-        ]
         nominal_profile, first_profile, second_profile = interface_profiles
         selected_contaminated, contaminated_continuity, contaminated_sensitivity = (
             _composition_continuity_selection(
@@ -1593,25 +1667,12 @@ def _tier_b_melt_activity_rating(
             context="pure-liner service baseline",
         )
         service_excess = float(service_fraction) - baseline_service
-    service_onset_below_scan_range = onset_below_scan_range
-    if (
-        service_onset_below_scan_range
-        and service_temperature_C is not None
-        and _finite_real(service_temperature_C, "service_temperature_C")
-        < TIER_B_MELT_SCAN_MIN_C
-        and service_excess <= LIQUIDUS_SOLID_EPSILON
-    ):
-        # The profile's first sampled excess may be at 500 C, but the service
-        # point is sampled directly too. Under d-419, no excess melt at a
-        # below-grid service point is NO-ONSET there; keep the unresolved scan
-        # flag while using the pure cap for the service rating.
-        service_onset_below_scan_range = False
     resolution = _resolve_rating_and_onset(
         literature_temperature,
         contaminated_first_liquid_C,
         margin,
         service_temperature_C,
-        onset_below_scan_range=service_onset_below_scan_range,
+        onset_below_scan_range=onset_below_scan_range,
     )
     result = {
         "pure_bulk_melt_bracket_C": list(pure_reference["bulk_melt_bracket_C"]),
