@@ -1383,6 +1383,13 @@ class Work:
             and self.membership_completeness is not MembershipCompleteness.UNKNOWN
         ):
             raise ValueError("Work.source_ids is required")
+        if (
+            self.membership_completeness is MembershipCompleteness.COMPLETE
+            and not self.has_complete_membership_evidence
+        ):
+            raise ValueError(
+                "complete Work membership requires a registered table_csv evidence asset"
+            )
         uncertainties = dict(self.source_method_uncertainties or {})
         if not set(uncertainties).issubset(self.source_ids):
             raise ValueError("source method uncertainty must name a source_id on the Work")
@@ -1397,6 +1404,15 @@ class Work:
         return (
             not self.source_ids
             or self.membership_completeness is not MembershipCompleteness.UNKNOWN
+        )
+
+    @property
+    def has_complete_membership_evidence(self) -> bool:
+        """A complete membership list must cite a registered source table."""
+
+        return any(
+            asset.role is AssetRole.TABLE_CSV and asset.path.strip() != "unknown"
+            for asset in self.source_files.files
         )
 
 

@@ -61,7 +61,6 @@ from simulator.battery.enums import (
     FUSION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
     MEASURED_EVIDENCE,
-    MembershipCompleteness,
     MELT_ACTIVITY_QUANTITIES,
     MetricOperation,
     MethodToken,
@@ -268,6 +267,7 @@ from simulator.battery.source_lineage import (
 )
 from simulator.battery.validate import (
     Ancestry,
+    _calibration_membership_relation,
     _ValidationIndexes,
     ValidationIssue,
     _BOUND_WORK_INPUTS,
@@ -5254,46 +5254,6 @@ def _candidate_lineage_for_sources(
     cached = indexes.candidate_lineages.get(source_key)
     if cached is not None:
         return cached
-    calibration_works = tuple(
-        work
-        for src in expanded
-        if (work := indexes.work_by_alias.get(src)) is not None
-        and work.is_calibration_membership
-    )
-    if calibration_works:
-        # A partial list can prove a member overlap below, but cannot establish
-        # complete candidate ancestry for sources absent from that subset.
-        if any(
-            work.membership_completeness is not MembershipCompleteness.COMPLETE
-            for work in calibration_works
-        ):
-            result = (False, None)
-            indexes.candidate_lineages[source_key] = result
-            return result
-        calibration_ids = {work.work_id for work in calibration_works}
-        ordinary_sources = tuple(
-            src
-            for src in expanded
-            if (work := indexes.work_by_alias.get(src)) is None
-            or not work.is_calibration_membership
-        )
-        if ordinary_sources:
-            ordinary_lineage = _resolve_coefficient_sources(
-                ordinary_sources,
-                observations,
-                works,
-                experiments,
-                _indexes=indexes,
-            )
-            if not ordinary_lineage.complete:
-                result = (False, None)
-                indexes.candidate_lineages[source_key] = result
-                return result
-            assert ordinary_lineage.ids is not None
-            calibration_ids.update(ordinary_lineage.ids)
-        result = (True, Ancestry.of(calibration_ids))
-        indexes.candidate_lineages[source_key] = result
-        return result
     candidate_lineage = _resolve_coefficient_sources(
         expanded, observations, works, experiments, _indexes=indexes
     )
@@ -5359,7 +5319,9 @@ def _resolve_source_relation_with_indexes(
     if indexes is None or not indexes.matches(works, observations, experiments):
         indexes = _build_validation_indexes(works, observations, experiments)
     membership_relation = _calibration_membership_relation(
-        reference, coefficient_sources, indexes
+        reference,
+        expand_coefficient_sources(coefficient_lineage_sources(coefficient_sources)),
+        indexes,
     )
     if membership_relation is SourceRelation.TRAINING:
         return membership_relation
@@ -5384,36 +5346,6 @@ def _resolve_source_relation_with_indexes(
         _indexes=indexes,
     )
     return _source_relation_from_lineages(reference_lineage, candidate_lineage)
-
-
-def _calibration_membership_relation(
-    reference: Observation,
-    coefficient_sources: Sequence[str],
-    indexes: _ValidationIndexes,
-) -> SourceRelation | None:
-    """Use only registered calibration membership to decide training overlap."""
-
-    expanded_sources = expand_coefficient_sources(
-        coefficient_lineage_sources(coefficient_sources)
-    )
-    calibration_works = tuple(
-        work
-        for src in expanded_sources
-        if (work := indexes.work_by_alias.get(src)) is not None
-        and work.is_calibration_membership
-    )
-    if not calibration_works:
-        return None
-    if any(reference.source_id in work.source_ids for work in calibration_works):
-        return SourceRelation.TRAINING
-    if len(calibration_works) != len(expanded_sources):
-        return None
-    if all(
-        work.membership_completeness is MembershipCompleteness.COMPLETE
-        for work in calibration_works
-    ):
-        return SourceRelation.INDEPENDENT
-    return SourceRelation.UNKNOWN
 
 
 def _source_relation_from_lineages(
@@ -5470,7 +5402,9 @@ class _ScoringLineageResolver:
     ) -> tuple[bool, SourceRelation]:
         complete, candidate_lineage = self._candidate_lineage(sources)
         membership_relation = _calibration_membership_relation(
-            reference, sources, self.indexes
+            reference,
+            expand_coefficient_sources(coefficient_lineage_sources(sources)),
+            self.indexes,
         )
         if membership_relation is SourceRelation.TRAINING:
             return True, SourceRelation.TRAINING

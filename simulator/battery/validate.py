@@ -885,6 +885,17 @@ def validate_work(work: Work, path: str = "work") -> list[ValidationIssue]:
                 "complete or partial calibration membership requires source_ids",
             )
         )
+    elif (
+        work.membership_completeness is MembershipCompleteness.COMPLETE
+        and not work.has_complete_membership_evidence
+    ):
+        issues.append(
+            _issue(
+                f"{path}.source_files",
+                RefusalReason.CONDITIONAL_FIELD,
+                "complete calibration membership requires a registered table_csv evidence asset",
+            )
+        )
     for source_id, uncertainty in (work.source_method_uncertainties or {}).items():
         field = f"{path}.source_method_uncertainties.{source_id}"
         if not isinstance(uncertainty, SourceMethodUncertainty):
@@ -2128,6 +2139,37 @@ def _inputs_registered_under_work(
     )
 
 
+def _calibration_membership_relation(
+    reference: Observation,
+    coefficient_sources: Sequence[str],
+    indexes: _ValidationIndexes,
+) -> SourceRelation | None:
+    """Resolve training overlap from registered calibration membership sets."""
+
+    calibration_works = tuple(
+        work
+        for source in coefficient_sources
+        if (work := indexes.work_by_alias.get(source)) is not None
+        and work.is_calibration_membership
+    )
+    if not calibration_works:
+        return None
+    if any(
+        reference.source_id is not None and reference.source_id in work.source_ids
+        for work in calibration_works
+    ):
+        return SourceRelation.TRAINING
+    if any(
+        work.membership_completeness is not MembershipCompleteness.COMPLETE
+        or not work.has_complete_membership_evidence
+        for work in calibration_works
+    ):
+        return SourceRelation.UNKNOWN
+    if len(calibration_works) == len(coefficient_sources):
+        return SourceRelation.INDEPENDENT
+    return None
+
+
 def _observation_lineage(
     observation_id: str,
     observations: Mapping[str, Observation],
@@ -2276,14 +2318,25 @@ def _resolve_coefficient_sources(
                 result = Ancestry.incomplete(AncestryFailure.UNKNOWN_ALIAS)
                 indexes.coefficient_source_lineages[source_key] = result
                 return result
-            nested = _inputs_registered_under_work(
-                work,
-                observations,
-                experiments,
-                indexes.table_ids,
-                indexes.asset_ids,
-                _indexes=indexes,
-            )
+            if work.is_calibration_membership:
+                nested = (
+                    Ancestry.of(work.source_ids)
+                    if work.membership_completeness
+                    is MembershipCompleteness.COMPLETE
+                    and work.has_complete_membership_evidence
+                    else Ancestry.incomplete(
+                        AncestryFailure.UNRESOLVABLE_INPUT
+                    )
+                )
+            else:
+                nested = _inputs_registered_under_work(
+                    work,
+                    observations,
+                    experiments,
+                    indexes.table_ids,
+                    indexes.asset_ids,
+                    _indexes=indexes,
+                )
         if not nested.complete:
             indexes.coefficient_source_lineages[source_key] = nested
             return nested
@@ -2543,6 +2596,27 @@ def _validate_residual_with_indexes(
                             )
                         )
                     else:
+                        membership_relation = _calibration_membership_relation(
+                            reference,
+                            coefficient_lineage_sources(engine.coefficient_sources),
+                            indexes,
+                        )
+                        if membership_relation is SourceRelation.TRAINING:
+                            issues.append(
+                                _issue(
+                                    f"{path}.source_relation",
+                                    RefusalReason.CONDITIONAL_FIELD,
+                                    "independent score_eligible conflicts with listed calibration membership",
+                                )
+                            )
+                        elif membership_relation is SourceRelation.UNKNOWN:
+                            issues.append(
+                                _issue(
+                                    f"{path}.source_relation",
+                                    RefusalReason.LINEAGE_UNKNOWN,
+                                    "calibration membership is incomplete or lacks table evidence",
+                                )
+                            )
                         ref_ids = _observation_lineage(
                             reference.observation_id,
                             observations,

@@ -1,0 +1,19 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: engine-calibration-openimcc-redox-1.5.0-ti-candidate
+  citation: "OpenIMCC redox pack 1.5.0-ti-candidate (pin 66ec4a3); JANAF Fe-019 row provenance; other pack row membership is not complete"
+  source_ids:
+  - janaf-4th
+  membership_completeness: partial
+  source_files:
+    corpus_repo: openimcc
+    corpus_commit:
+      tag: value
+      value: 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84
+    files:
+    - asset_id: openimcc-redox-pack:1.5.0-ti-candidate
+      role: compilation_record
+      path: openimcc/data/packs/openimcc-redox-ti-candidate.json
+      sha256:
+        tag: value
+        value: 31d7bf5532a92983a3bbb593bf65e3cd9d398d64699a0c0e87fb05071d0f17dc

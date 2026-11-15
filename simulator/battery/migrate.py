@@ -33186,6 +33186,34 @@ class Migrator:
                 index_row=row,
             )
 
+    def migrate_calibration_works(self) -> None:
+        """Load declared calibration Works as migration inputs, not stale output."""
+
+        declarations_dir = self.literature / "calibration-works"
+        if not declarations_dir.is_dir():
+            return
+        for path in sorted(declarations_dir.glob("*.yaml")):
+            doc = load_yaml(path)
+            if (
+                not isinstance(doc, Mapping)
+                or doc.get("schema_version") != _WORK_SCHEMA_VERSION
+                or not isinstance(doc.get("work"), Mapping)
+            ):
+                raise ValueError(
+                    f"calibration Work declaration {path} must contain a {_WORK_SCHEMA_VERSION} Work"
+                )
+            work = work_from_plain(doc["work"])
+            if not work.is_calibration_membership:
+                raise ValueError(
+                    f"calibration Work declaration {work.work_id!r} has no membership state"
+                )
+            existing = self.result.works.get(work.work_id)
+            if existing is not None and existing != work:
+                raise ValueError(
+                    f"calibration Work declaration conflicts with migrated Work {work.work_id!r}"
+                )
+            self.result.works[work.work_id] = work
+
     def _apply_supersedes(self) -> None:
         observations = self.result.observations
         chosen_edges: dict[str, str] = {}
@@ -33638,6 +33666,7 @@ class Migrator:
         self.migrate_extracts()
         self.migrate_named_sources()
         self.migrate_compilations()
+        self.migrate_calibration_works()
         _prune_carried_doi_aliases_to_live_works(
             self.result, self._carried_aliases
         )
@@ -33648,6 +33677,7 @@ class Migrator:
 
 # Flat queue files repeated the same reason once per observation. Grouping
 # keeps that reason once. Locator key order is fixed so two writes match.
+_WORK_SCHEMA_VERSION = "battery_work.v2.1"
 QUEUE_SCHEMA_VERSION = "battery_migration_queue.v2"
 _QUEUE_LOCATOR_KEY_ORDER = (
     "page",
@@ -33858,7 +33888,7 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     for work_id, work in sorted(result.works.items()):
         exp_ids = result.experiments_by_work.get(work_id, [])
         payload = {
-            "schema_version": "battery_work.v2.1",
+            "schema_version": _WORK_SCHEMA_VERSION,
             "work": to_plain(work),
             "experiments": [
                 to_plain(experiments_by_id[eid])

@@ -12060,8 +12060,22 @@ def test_openimcc_candidate_alias_resolves_to_its_calibration_work() -> None:
     )
 
 
+def _registered_calibration_works():
+    from simulator.battery.migrate import work_from_plain
+
+    declaration_dir = score_mod.REPO_ROOT / "data" / "literature" / "calibration-works"
+    works = {}
+    for path in sorted(declaration_dir.glob("*.yaml")):
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        assert isinstance(doc, Mapping) and isinstance(doc.get("work"), Mapping)
+        work = work_from_plain(doc["work"])
+        works[work.work_id] = work
+    return works
+
+
 def test_calibration_membership_decides_only_cited_engine_source_overlap() -> None:
-    from simulator.battery.enums import MembershipCompleteness
+    from simulator.battery.enums import AssetRole, MembershipCompleteness
+    from simulator.battery.records import SourceFile
     from simulator.battery.score import (
         COEFFICIENT_SOURCE_STORE_IDS,
         ENGINE_COEFFICIENT_SOURCES,
@@ -12069,22 +12083,17 @@ def test_calibration_membership_decides_only_cited_engine_source_overlap() -> No
         lineage_complete_for,
     )
     from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
+    from simulator.state_types import State
 
-    melts_work = replace(
-        F.work("engine-calibration-melts-family"),
-        source_ids=("berman-1988-internally-consistent-mineral-thermodynamic-data",),
-        membership_completeness=MembershipCompleteness.PARTIAL,
-    )
-    magemin_work = replace(
-        F.work("engine-calibration-magemin-ig-40ed109d"),
-        source_ids=(),
-        membership_completeness=MembershipCompleteness.UNKNOWN,
-    )
-    openimcc_work = replace(
-        F.work("engine-calibration-openimcc-1.0.2"),
-        source_ids=("no27-fegley-cameron-1987-epsl",),
-        membership_completeness=MembershipCompleteness.PARTIAL,
-    )
+    declared_works = _registered_calibration_works()
+    for work in declared_works.values():
+        if work.membership_completeness is MembershipCompleteness.PARTIAL:
+            with pytest.raises(ValueError, match="table_csv"):
+                replace(work, membership_completeness=MembershipCompleteness.COMPLETE)
+
+    melts_work = declared_works["engine-calibration-melts-family"]
+    magemin_work = declared_works["engine-calibration-magemin-ig-40ed109d"]
+    openimcc_work = declared_works["engine-calibration-openimcc-1.0.2"]
     works = {
         work.work_id: work for work in (melts_work, magemin_work, openimcc_work)
     }
@@ -12152,8 +12161,19 @@ def test_calibration_membership_decides_only_cited_engine_source_overlap() -> No
         "unlisted-openimcc-source", openimcc_sources
     ) is SourceRelation.UNKNOWN
 
+    table = SourceFile(
+        asset_id="tables:melts-calibration-membership",
+        role=AssetRole.TABLE_CSV,
+        path="tables/melts-calibration-membership.csv",
+        sha256=State.of("membership-table-digest"),
+    )
     complete_melts_work = replace(
-        melts_work, membership_completeness=MembershipCompleteness.COMPLETE
+        melts_work,
+        source_files=replace(
+            melts_work.source_files,
+            files=(*melts_work.source_files.files, table),
+        ),
+        membership_completeness=MembershipCompleteness.COMPLETE,
     )
     complete_works = {**works, complete_melts_work.work_id: complete_melts_work}
     reference = F.observation(
@@ -12173,6 +12193,190 @@ def test_calibration_membership_decides_only_cited_engine_source_overlap() -> No
         experiments={source_experiment.experiment_id: source_experiment},
     )
     assert complete_relation is SourceRelation.INDEPENDENT
+
+
+def _complete_calibration_residual_case():
+    from simulator.battery.enums import AssetRole, MembershipCompleteness
+    from simulator.battery.records import SourceFile
+    from simulator.state_types import State
+
+    melts_work = _registered_calibration_works()["engine-calibration-melts-family"]
+    table = SourceFile(
+        asset_id="tables:complete-melts-calibration-membership",
+        role=AssetRole.TABLE_CSV,
+        path="tables/complete-melts-calibration-membership.csv",
+        sha256=State.of("membership-table-digest"),
+    )
+    complete_work = replace(
+        melts_work,
+        source_files=replace(
+            melts_work.source_files,
+            files=(*melts_work.source_files.files, table),
+        ),
+        membership_completeness=MembershipCompleteness.COMPLETE,
+    )
+    reference_work = F.work("complete-calibration-reference-work")
+    reference_experiment = F.tabulation_experiment(
+        experiment_id="complete-calibration-reference-exp",
+        work_id=reference_work.work_id,
+    )
+    reference = F.observation(
+        "complete-calibration-nonmember-reference",
+        reference_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="unlisted-melts-source",
+    )
+    works = {reference_work.work_id: reference_work, complete_work.work_id: complete_work}
+    experiments = {reference_experiment.experiment_id: reference_experiment}
+    candidate_sources = (complete_work.work_id,)
+    candidate = F.observation(
+        "complete-calibration-engine-candidate",
+        reference.experiment_id,
+        reference.identity,
+        Decimal("1"),
+        evidence=EvidenceClass.ENGINE_PREDICTION,
+        source_id=reference.source_id,
+        engine=EngineTrace(
+            name=Engine.ALPHAMELTS,
+            channel="alphamelts",
+            run_id="alphamelts:complete-membership-test",
+            coefficient_sources=candidate_sources,
+            lineage_complete=True,
+        ),
+        authority=Authority.CERTIFIED,
+    )
+    residual = F.residual(
+        "complete-calibration-nonmember-residual",
+        reference.observation_id,
+        candidate=candidate.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+        source_relation=SourceRelation.INDEPENDENT,
+        experiment_id=reference.experiment_id,
+        quantity=Quantity.DELTA_FG,
+    )
+    observations = {
+        reference.observation_id: reference,
+        candidate.observation_id: candidate,
+    }
+    return (
+        melts_work,
+        complete_work,
+        reference,
+        candidate_sources,
+        works,
+        experiments,
+        observations,
+        residual,
+    )
+
+
+def test_complete_calibration_ancestry_matches_score_and_residual_validation() -> None:
+    from simulator.battery.enums import MembershipCompleteness
+    from simulator.battery.score import (
+        _ScoringLineageResolver,
+        _candidate_lineage_for_sources,
+        lineage_complete_for,
+    )
+    from simulator.battery.validate import _resolve_coefficient_sources
+
+    (
+        melts_work,
+        complete_work,
+        reference,
+        candidate_sources,
+        works,
+        experiments,
+        observations,
+        residual,
+    ) = _complete_calibration_residual_case()
+    assert lineage_complete_for(
+        candidate_sources,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    ) is True
+    assert resolve_source_relation(
+        reference,
+        candidate_sources,
+        True,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    ) is SourceRelation.INDEPENDENT
+    context = ScoreContext(
+        works=works,
+        experiments=experiments,
+        observations=observations,
+        hostname="test",
+    )
+    assert _ScoringLineageResolver(context).for_reference(
+        reference, candidate_sources
+    ) == (True, SourceRelation.INDEPENDENT)
+    scored_complete, scored_lineage = _candidate_lineage_for_sources(
+        candidate_sources,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    )
+    validated_lineage = _resolve_coefficient_sources(
+        candidate_sources, observations, works, experiments
+    )
+    assert scored_complete is True
+    assert scored_lineage == validated_lineage
+    assert scored_lineage is not None and scored_lineage.ids == frozenset(
+        complete_work.source_ids
+    )
+    assert validate_residual(
+        residual, observations, experiments, works
+    ) == []
+
+    partial_work = replace(
+        complete_work, membership_completeness=MembershipCompleteness.PARTIAL
+    )
+    partial_works = {**works, partial_work.work_id: partial_work}
+    assert lineage_complete_for(
+        candidate_sources,
+        works=partial_works,
+        observations=observations,
+        experiments=experiments,
+    ) is False
+
+    unknown_work = replace(
+        melts_work, membership_completeness=MembershipCompleteness.UNKNOWN
+    )
+    unknown_works = {**works, unknown_work.work_id: unknown_work}
+    unknown_context = ScoreContext(
+        works=unknown_works,
+        experiments=experiments,
+        observations=observations,
+        hostname="test",
+    )
+    assert lineage_complete_for(
+        candidate_sources,
+        works=unknown_works,
+        observations=observations,
+        experiments=experiments,
+    ) is False
+    assert _ScoringLineageResolver(unknown_context).for_reference(
+        reference, candidate_sources
+    ) == (False, SourceRelation.UNKNOWN)
+
+
+def test_complete_calibration_residual_validates_with_shared_ancestry() -> None:
+    (
+        _,
+        _,
+        _,
+        _,
+        works,
+        experiments,
+        observations,
+        residual,
+    ) = _complete_calibration_residual_case()
+    assert validate_residual(residual, observations, experiments, works) == []
 
 
 @pytest.mark.parametrize(

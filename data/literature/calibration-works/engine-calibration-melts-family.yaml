@@ -1,0 +1,20 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: engine-calibration-melts-family
+  citation: "MELTS-family calibration database: Ghiorso et al. (2002), pMELTS, doi:10.1029/2001GC000217; partial member Berman (1988), Journal of Petrology 29(2), 445-522"
+  source_ids:
+  - berman-1988-internally-consistent-mineral-thermodynamic-data
+  membership_completeness: partial
+  source_files:
+    corpus_repo: external-publication
+    corpus_commit:
+      tag: unknown
+      reason: DOI-addressed publication, not a corpus commit
+    files:
+    - asset_id: calibration-paper:10.1029/2001GC000217
+      role: compilation_record
+      path: https://doi.org/10.1029/2001GC000217
+      sha256:
+        tag: unknown
+        reason: external DOI source; no local byte digest recorded
+  doi: 10.1029/2001GC000217

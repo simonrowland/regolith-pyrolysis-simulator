@@ -397,6 +397,41 @@ def test_work_membership_completeness_is_typed_and_round_trips() -> None:
     payload["membership_completeness"] = "guessed"
     with pytest.raises(ValueError, match="MembershipCompleteness"):
         work_from_plain(payload)
+
+
+def test_calibration_work_declarations_survive_fresh_migration_and_reload(
+    tmp_path: Path,
+) -> None:
+    expected_work_ids = {
+        "engine-calibration-magemin-ig-40ed109d",
+        "engine-calibration-melts-family",
+        "engine-calibration-openimcc-1.0.2",
+        "engine-calibration-openimcc-1.0.2-ext-sp-2",
+        "engine-calibration-openimcc-1.0.3-d066-v1",
+        "engine-calibration-openimcc-1.0.3-d066-ext-v1",
+        "engine-calibration-openimcc-1.0.3-d066-v1-kcaalsi2o7",
+        "engine-calibration-openimcc-redox-1.4.0",
+        "engine-calibration-openimcc-redox-1.4.0-cr-candidate",
+        "engine-calibration-openimcc-redox-1.5.0-ti-candidate",
+        "engine-calibration-openimcc-redox-1.6.0-cr-ti-candidate",
+    }
+    root = _write_min_tree(tmp_path / "fresh-migration")
+    source_dir = REPO_ROOT / "data" / "literature" / "calibration-works"
+    target_dir = root / "data" / "literature" / "calibration-works"
+    target_dir.mkdir(parents=True)
+    declaration_paths = sorted(source_dir.glob("*.yaml"))
+    assert len(declaration_paths) == len(expected_work_ids)
+    for path in declaration_paths:
+        (target_dir / path.name).write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+
+    generated = migrate(root, write=True)
+    reloaded, _, _ = load_migrated_store(root)
+
+    assert expected_work_ids <= generated.works.keys()
+    assert expected_work_ids <= reloaded.keys()
+    assert {work_id: generated.works[work_id] for work_id in expected_work_ids} == {
+        work_id: reloaded[work_id] for work_id in expected_work_ids
+    }
 from simulator.battery.records import (
     Bench,
     BenchIdentity,
