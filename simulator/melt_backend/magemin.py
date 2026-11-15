@@ -2548,7 +2548,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 legacy = 'unavailable'
                 try:
                     with (
-                        _magemin_subprocess_slot(5),
+                        _magemin_subprocess_slot(60),
                         tempfile.TemporaryDirectory() as tmpdir,
                     ):
                         result = subprocess.run(

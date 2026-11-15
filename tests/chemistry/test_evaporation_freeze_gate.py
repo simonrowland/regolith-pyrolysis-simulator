@@ -4149,6 +4149,11 @@ def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
     )
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'a' * 64},
         },
@@ -5541,7 +5546,6 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
         curve,
         include_selected_bindings=False,
     )
-
     receiver_evidence = gate_curve_memo_evidence(
         receiver,
         curve,
@@ -5563,6 +5567,163 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     assert producer_evidence.producer_evidence == (
         receiver_evidence.producer_evidence
     )
+
+
+def test_cold_magemin_version_failures_do_not_store_or_reuse_gate_memos(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from contextlib import contextmanager
+    import subprocess
+
+    from engines.magemin import MAGEMinShadowProvider
+    from simulator import engine_binding_admission as admission
+    from simulator import engine_local_config
+    import simulator.melt_backend.magemin as magemin_module
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    monkeypatch.setattr(magemin_module, '_MAGEMIN_ENGINE_VERSION_CACHE', {})
+    monkeypatch.setattr(engine_local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(
+        engine_local_config, 'warn_legacy_once', lambda *_args: None
+    )
+    monkeypatch.setattr(
+        admission, 'authorize_binding', lambda *_args, **_kwargs: {}
+    )
+    monkeypatch.setattr(
+        admission, 'selected_binding_identities', lambda *_args, **_kwargs: ()
+    )
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert isinstance(provider, MAGEMinShadowProvider)
+    backend = MAGEMinBackend()
+    binary = tmp_path / 'MAGEMin'
+    binary.write_bytes(b'fixture MAGEMin binary identity')
+    backend._binary_path = binary
+    backend.is_available = lambda: True
+    provider._backend = backend
+    provider._backend_initialised = True
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'status': 'ok',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+    dispatch_calls = []
+
+    def dispatch_curve(_reasons, **_kwargs):
+        dispatch_calls.append(True)
+        return dict(curve)
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve_from_gate_dispatch', dispatch_curve)
+
+    def unavailable_slot(_timeout_s):
+        raise magemin_module._MAGEMinEngineLifecycleError(
+            'MAGEMinSubprocessSlotTimeout', 'fixture slot failure'
+        )
+
+    monkeypatch.setattr(magemin_module, '_magemin_subprocess_slot', unavailable_slot)
+    monkeypatch.setattr(
+        magemin_module.subprocess,
+        'run',
+        lambda *_args, **_kwargs: pytest.fail('slot failure must skip probe'),
+    )
+    first = sim._freeze_gate_curve_record()
+    first_evidence = admission.gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+
+    assert first['disposition'] == 'live'
+    assert first_evidence.eligible is False
+    assert first_evidence.producer_evidence == 'evidence-unavailable'
+    assert first_evidence.provenance['runtime_version'] == {
+        'tag': 'unknown',
+        'value': None,
+        'reason': 'version getter failed: ValueError',
+    }
+    assert not admission.gate_curve_memo_eligibility(sim, curve)
+    assert any(
+        notice['reason'] == 'MAGEMin runtime version unknown'
+        for notice in sim._engine_binding_admission_notices
+    )
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+
+    @contextmanager
+    def acquired_slot(_timeout_s):
+        yield
+
+    def timed_out_probe(args, **_kwargs):
+        raise subprocess.TimeoutExpired(args, timeout=5)
+
+    monkeypatch.setattr(magemin_module, '_magemin_subprocess_slot', acquired_slot)
+    monkeypatch.setattr(magemin_module.subprocess, 'run', timed_out_probe)
+    second = sim._freeze_gate_curve_record()
+    second_evidence = admission.gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+
+    assert second['disposition'] == 'live'
+    assert second_evidence.eligible is False
+    assert second_evidence.producer_evidence == 'evidence-unavailable'
+    assert second_evidence.provenance['runtime_version'] == (
+        first_evidence.provenance['runtime_version']
+    )
+    assert len(dispatch_calls) == 2
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+
+    def successful_probe(args, **_kwargs):
+        return subprocess.CompletedProcess(
+            args,
+            0,
+            stdout='MAGEMin 1.9.6\n',
+            stderr='',
+        )
+
+    monkeypatch.setattr(magemin_module.subprocess, 'run', successful_probe)
+    third = sim._freeze_gate_curve_record()
+    normal_evidence = admission.gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+    assert admission.gate_curve_memo_eligibility(sim, curve)
+    fourth = sim._freeze_gate_curve_record()
+
+    assert normal_evidence.eligible is True
+    assert normal_evidence.provenance['runtime_version'] == {
+        'tag': 'value',
+        'value': 'MAGEMin 1.9.6',
+        'reason': None,
+    }
+    assert third['disposition'] == 'live'
+    assert third['origin']['producer_evidence'] == (
+        normal_evidence.producer_evidence
+    )
+    assert fourth['disposition'] == 'memo-hit'
+    assert len(dispatch_calls) == 3
+    assert isinstance(sim._freeze_gate_liquid_fraction_cache, dict)
+    assert len(shared_cache) == 1
 
 
 def _installed_magemin_runtime_binaries():

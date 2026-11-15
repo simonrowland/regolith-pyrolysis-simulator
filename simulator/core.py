@@ -5187,7 +5187,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self,
             value['curve'],
             value.get('origin'),
-            fresh_evidence=False,
+            fresh_evidence=True,
             **redox_state_kwargs,
         )
 
@@ -5344,7 +5344,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self,
                 curve,
                 cache.get('origin'),
-                fresh_evidence=False,
+                fresh_evidence=True,
                 **redox_state_kwargs,
             )
         )
@@ -5394,7 +5394,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     self,
                     memoized_record['curve'],
                     memoized_record.get('origin'),
-                    fresh_evidence=False,
+                    fresh_evidence=True,
                     **redox_state_kwargs,
                 )
             ):
@@ -5519,6 +5519,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 disposition=normalized_record.get('disposition', 'live'),
             )
         )
+        if cache_eligible and isinstance(normalized_record.get('origin'), Mapping):
+            cache_eligible = gate_curve_memo_origin_matches(
+                self,
+                normalized_curve,
+                normalized_record.get('origin'),
+                fresh_evidence=True,
+                **redox_state_kwargs,
+            )
         validated_curve = (
             validated_cache.get('curve')
             if isinstance(validated_cache, dict)
@@ -5533,7 +5541,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self,
                 normalized_curve,
                 validated_cache.get('origin'),
-                fresh_evidence=False,
+                fresh_evidence=True,
                 **redox_state_kwargs,
             )
             and isinstance(validated_cache.get('repair_notices'), list)
@@ -5551,15 +5559,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 'key': key,
             }
-        if (
-            isinstance(memo, dict)
-            and gate_curve_memo_is_cacheable(
-                self,
-                normalized_curve,
-                normalized_record.get('provider_outcome'),
-                disposition=normalized_record.get('disposition', 'live'),
-            )
-        ):
+        if isinstance(memo, dict) and cache_eligible:
             memo[key] = gate_curve_memo_record(
                 normalized_curve,
                 normalized_record.get('origin'),

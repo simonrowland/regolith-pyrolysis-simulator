@@ -139,7 +139,8 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
     assert first.get_engine_version() == 'MAGEMin 1.9.6'
     assert second.get_engine_version() == 'MAGEMin 1.9.6'
     assert len(run_calls) == 1
-    assert slot_calls == [5]
+    assert slot_calls == [60]
+    assert run_calls[0][1]['timeout'] == 5
 
     @contextmanager
     def timed_out_slot(_timeout_s):
@@ -204,7 +205,7 @@ def test_version_probe_slot_failure_and_timeout_share_typed_unknown(
     assert slot_failure_state == timeout_state == {
         'tag': 'unknown',
         'value': None,
-        'reason': 'empty version',
+        'reason': 'version getter failed: ValueError',
     }
 
 

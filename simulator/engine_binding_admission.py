@@ -510,13 +510,42 @@ def _gate_curve_evidence(
     )
 
 
+def _magemin_runtime_version_is_unknown(
+    identity: BindingIdentity,
+    provenance: Mapping[str, Any],
+) -> bool:
+    if identity.engine_id != "magemin":
+        return False
+    runtime_version = provenance.get("runtime_version")
+    return not (
+        isinstance(runtime_version, Mapping)
+        and runtime_version.get("tag") == "value"
+        and isinstance(runtime_version.get("value"), str)
+        and bool(runtime_version["value"].strip())
+    )
+
+
 def _gate_curve_producer_evidence(
     identity: BindingIdentity,
     provenance: Mapping[str, Any],
 ) -> str:
-    if _selected_producer_digest(identity, provenance) is None:
+    if (
+        _magemin_runtime_version_is_unknown(identity, provenance)
+        or _selected_producer_digest(identity, provenance) is None
+    ):
         return "evidence-unavailable"
     return admission_fingerprint(identity, provenance)
+
+
+def _gate_curve_evidence_has_known_magemin_version(
+    evidence: GateCurveEvidence,
+) -> bool:
+    if evidence.identity is None or evidence.identity.engine_id != "magemin":
+        return True
+    return not _magemin_runtime_version_is_unknown(
+        evidence.identity,
+        evidence.provenance or {},
+    )
 
 
 def _unresolved_gate_curve_evidence(
@@ -1063,12 +1092,12 @@ def gate_curve_memo_eligibility(sim: Any, curve: Mapping[str, Any]) -> bool:
 
     if not _is_cacheable_gate_curve(curve):
         return False
-    gate_curve_memo_evidence(
+    evidence = gate_curve_memo_evidence(
         sim,
         curve,
         include_selected_bindings=True,
     )
-    return True
+    return _gate_curve_evidence_has_known_magemin_version(evidence)
 
 
 def authorize_cached_real_replay(
@@ -1745,6 +1774,14 @@ def _live_cache_eligibility(
     memo_provider_role: str | None = None,
 ) -> bool:
     try:
+        if _magemin_runtime_version_is_unknown(
+            identity,
+            current_provenance,
+        ):
+            raise EngineBindingAdmissionError(
+                identity,
+                "MAGEMin runtime version unknown",
+            )
         authorize_binding(
             identity,
             current_provenance,

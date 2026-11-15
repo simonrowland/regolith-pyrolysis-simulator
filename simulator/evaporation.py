@@ -3706,6 +3706,7 @@ class EvaporationMixin:
                     self._freeze_gate_provider_outcome,
                 )
                 from simulator.engine_binding_admission import (
+                    _gate_curve_evidence_has_known_magemin_version,
                     gate_curve_memo_evidence,
                     write_gate_curve_memo_record,
                 )
@@ -3714,6 +3715,10 @@ class EvaporationMixin:
                     self,
                     curve,
                     include_selected_bindings=cache_eligible,
+                )
+                cache_eligible = (
+                    cache_eligible
+                    and _gate_curve_evidence_has_known_magemin_version(evidence)
                 )
                 record = write_gate_curve_memo_record(
                     self,
