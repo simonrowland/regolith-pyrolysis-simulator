@@ -901,6 +901,59 @@ def test_unrouted_summary_uses_filtered_population_for_all_report_paths(
         assert "| nasa_cea_9 | cp | cr |" not in report
 
 
+def test_unrouted_summary_keeps_selected_zero_residual_across_report_paths(
+    tmp_path: Path,
+) -> None:
+    import simulator.battery.score as score_module
+
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "selected-mgo-cr-cp-no-residual",
+        experiment.experiment_id,
+        _pure_phase_identity(),
+        Decimal("55"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    context = _context(observation)
+    engines = (Engine.INTERNAL_ANALYTICAL,)
+
+    residuals, _candidates, _strata = score_module._score_store_with_decisions(
+        context, engines=engines
+    )
+    assert not residuals
+    assert residuals.selected == {observation.observation_id}
+    direct_report = score_module.render_score_report(
+        residuals, context=context, engines=engines
+    )
+
+    residuals_path = tmp_path / "residuals.jsonl"
+    residual_count, metadata = score_module._score_store_to_jsonl(
+        context, residuals_path, engines=engines
+    )
+    partial_path = residuals_path.with_name(residuals_path.name + ".partial")
+    assert residual_count == 0
+    assert metadata.selected_reference_ids == {observation.observation_id}
+    streamed_report = score_module._render_score_report_from_payloads_legacy(
+        score_module._ResidualJsonlRows(partial_path, metadata=metadata),
+        context=context,
+        engines=engines,
+        _aggregate=metadata.aggregate,
+    )
+    payload_rows = score_module._ResidualJsonlRows(partial_path, metadata=metadata)
+    payload_report = score_module.render_score_report_from_payloads(
+        payload_rows,
+        engines=engines,
+        hostname=context.hostname,
+        observations=context.observations,
+        origins=context.origins,
+    )
+
+    census_row = "| internal-analytical | cp | cr | 1 |"
+    for report in (direct_report, streamed_report, payload_report):
+        assert census_row in report
+
+
 def _assert_compilation_routing_retains_numeric_residuals() -> None:
     from simulator.battery.score import flagged_strata, score_store
 

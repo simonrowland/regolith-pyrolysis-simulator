@@ -18799,6 +18799,7 @@ def _score_store_to_jsonl(
             aggregate=stream.report_aggregate,
             static_refusals=stream.static_refusals,
             selected_reference_count=len(stream.selected_reference_ids),
+            selected_reference_ids=frozenset(stream.selected_reference_ids),
         )
     finally:
         stream.close()
@@ -19169,6 +19170,7 @@ class _ResidualReportMetadata:
     aggregate: _ScorePayloadAccumulator | None = None
     static_refusals: Sequence[Mapping[str, object]] = ()
     selected_reference_count: int = 0
+    selected_reference_ids: frozenset[str] | None = None
 
 
 class _ResidualJsonlRows:
@@ -19189,6 +19191,11 @@ class _ResidualJsonlRows:
         )
         self._typed_tier_band_values = (
             {} if metadata is None else metadata.tier_band_values
+        )
+        self.selected_reference_ids = (
+            None
+            if metadata is None
+            else getattr(metadata, "selected_reference_ids", None)
         )
 
     def __iter__(self) -> Iterable[dict[str, object]]:

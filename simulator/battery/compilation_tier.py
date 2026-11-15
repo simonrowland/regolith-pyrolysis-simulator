@@ -4323,12 +4323,13 @@ def _compilation_tier_report_lines_from_payloads(
 ) -> list[str]:
     from simulator.battery.score import _flagged_payload_strata
 
-    selected_observation_ids: set[str] = set()
+    selected_reference_ids = getattr(rows, "selected_reference_ids", None)
+    selected_observation_ids = set(selected_reference_ids or ())
 
     def selected_rows() -> Iterable[Mapping[str, object]]:
         for row in rows:
             reference = str(row.get("reference") or "")
-            if reference:
+            if reference and selected_reference_ids is None:
                 selected_observation_ids.add(reference)
             if not _flagged_payload_strata(row):
                 yield row
