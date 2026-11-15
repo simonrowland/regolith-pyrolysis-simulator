@@ -108,11 +108,7 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
-GATE_CURVE_NOTICE_KEYS = (
-    'composition_projected_notice',
-    'gate_provider_refusal',
-    'liquidus_sample_exclusion_notice',
-)
+GATE_CURVE_NOTICE_KEYS = ('composition_projected_notice', 'gate_provider_refusal')
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001

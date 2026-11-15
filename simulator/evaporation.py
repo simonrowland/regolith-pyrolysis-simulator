@@ -760,43 +760,6 @@ def _load_evaporation_alpha_envelope_by_species(
 
 
 class EvaporationMixin:
-    @staticmethod
-    def _attach_liquidus_sample_exclusion_notice(
-        curve: dict[str, Any] | None,
-        diagnostic: Mapping[str, Any],
-    ) -> dict[str, Any] | None:
-        if curve is None:
-            return None
-        containers = [diagnostic]
-        for key in (
-            'backend_diagnostics',
-            'projected_liquidus_diagnostics',
-        ):
-            nested = diagnostic.get(key)
-            if isinstance(nested, Mapping):
-                containers.append(nested)
-                backend_diagnostics = nested.get('backend_diagnostics')
-                if isinstance(backend_diagnostics, Mapping):
-                    containers.append(backend_diagnostics)
-        notice = next(
-            (
-                container.get('liquidus_sample_exclusion_notice')
-                for container in containers
-                if isinstance(
-                    container.get('liquidus_sample_exclusion_notice'),
-                    Mapping,
-                )
-            ),
-            None,
-        )
-        if not isinstance(notice, Mapping):
-            return curve
-        curve = dict(curve)
-        curve['liquidus_sample_exclusion_notice'] = copy.deepcopy(
-            dict(notice)
-        )
-        return curve
-
     def _vapor_pressure_freeze_gate_phase_fraction(
         self,
     ) -> tuple[
@@ -1117,32 +1080,11 @@ class EvaporationMixin:
                 )
 
         phase_source = f'freeze_gate_authority:{source}'
-        phase_basis_notice = (
-            dict(projected_notice)
-            if projected_magemin_fallback_slot
-            and isinstance(projected_notice, Mapping)
-            else None
-        )
-        sample_exclusion_notice = curve.get(
-            'liquidus_sample_exclusion_notice'
-        )
-        if isinstance(sample_exclusion_notice, Mapping):
-            if phase_basis_notice is None:
-                phase_basis_notice = dict(sample_exclusion_notice)
-            else:
-                phase_basis_notice.update({
-                    key: sample_exclusion_notice[key]
-                    for key in ('code', 'message', 'authority')
-                    if key in sample_exclusion_notice
-                })
-                phase_basis_notice[
-                    'liquidus_sample_exclusion_notice'
-                ] = dict(sample_exclusion_notice)
         return (
             float(fraction),
             phase_source,
             phase_basis_continuation,
-            phase_basis_notice,
+            dict(projected_notice) if projected_magemin_fallback_slot else None,
             None,
         )
 
@@ -3437,10 +3379,6 @@ class EvaporationMixin:
                 repair_notices=repair_notices,
             )
             if projected is not None:
-                projected = self._attach_liquidus_sample_exclusion_notice(
-                    projected,
-                    diagnostic,
-                )
                 return self._remember_freeze_gate_provider_curve(projected)
             if _diagnostic_names_composition_projected(diagnostic):
                 if not any(
@@ -3488,10 +3426,6 @@ class EvaporationMixin:
                 repair_notices=repair_notices,
                 reasons=reasons,
             )
-            curve = self._attach_liquidus_sample_exclusion_notice(
-                curve,
-                diagnostic,
-            )
             if curve is not None:
                 record_gate_curve_provider_outcome(
                     self,
@@ -3506,10 +3440,6 @@ class EvaporationMixin:
             liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
             source=source,
             reasons=reasons,
-        )
-        curve = self._attach_liquidus_sample_exclusion_notice(
-            curve,
-            diagnostic,
         )
         if curve is not None:
             record_gate_curve_provider_outcome(
@@ -3622,10 +3552,6 @@ class EvaporationMixin:
                 else 'liquidus_solidus:kernel'
             ),
             reasons=reasons,
-        )
-        curve = self._attach_liquidus_sample_exclusion_notice(
-            curve,
-            diagnostic,
         )
         if curve is not None and composition_derived:
             curve = dict(curve)
