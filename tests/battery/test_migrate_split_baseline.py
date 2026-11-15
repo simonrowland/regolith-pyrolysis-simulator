@@ -1,22 +1,28 @@
-"""Golden M0 migration pins; complementary to test_migrate.py's 137-row digest.
+"""Migration pins: representative source rows and byte-exact whole-store output.
 
-These pins cover a few representative source shapes before the migrate.py
-codec, composition, and identity moves. Each run migrates one extract row or
-one compilation table through the existing migration entry points. They call
+The representative pins exercise individual source shapes through
 ``migrate(..., write=False)`` without ``observation_from_plain`` or
-``load_migrated_store``, select one child per input, and the compilation helper
-stops before ``Migrator.finalize``. This is not whole-store coverage or a
-complete proof for M1-M3.
+``load_migrated_store``. The whole-store pin runs the complete migration and
+compares the writer's complete output map against the checked-in derived store.
 """
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 
-from simulator.battery.migrate import Migrator, REPO_ROOT, migrate, to_plain
+from simulator.battery.migrate import (
+    Migrator,
+    REPO_ROOT,
+    _store_output_file_bytes,
+    _store_regeneration_differences,
+    migrate,
+    to_plain,
+    write_outputs,
+)
 
 
 _EXTRACT_ROWS = (
@@ -123,6 +129,7 @@ def _pinned_output(result, observation_id: str) -> dict[str, object]:
         key: _state_output(value, key)
         for key, value in to_plain(observation.identity).items()
     }
+
     point_conditions = (
         {
             key: {
@@ -146,6 +153,62 @@ def _pinned_output(result, observation_id: str) -> dict[str, object]:
             "why": [entry.why for entry in queued] if queued else ["no queue entry"],
         },
     }
+
+
+def _observation_rows(output: bytes) -> dict[str, dict[str, object]]:
+    document = yaml.safe_load(output)
+    if not isinstance(document, dict) or not isinstance(document.get("observations"), list):
+        return {}
+    return {
+        str(row["observation_id"]): {
+            "identity": row.get("identity"),
+            "value": row.get("value"),
+            "point_conditions": row.get("point_conditions"),
+            "locator": row.get("locator"),
+        }
+        for row in document["observations"]
+        if isinstance(row, dict) and row.get("observation_id") is not None
+    }
+
+
+def _store_difference_details(
+    stored: dict[str, bytes], regenerated: dict[str, bytes], paths: list[str]
+) -> str:
+    details = []
+    for path in paths:
+        stored_bytes = stored.get(path)
+        regenerated_bytes = regenerated.get(path)
+        if stored_bytes is None or regenerated_bytes is None:
+            present_bytes = stored_bytes if stored_bytes is not None else regenerated_bytes
+            details.append(
+                f"{path}: {'missing from store' if stored_bytes is None else 'unexpected in store'}"
+            )
+            if present_bytes is not None:
+                for observation_id, row in sorted(_observation_rows(present_bytes).items()):
+                    details.append(
+                        f"{path}::{observation_id}: {json.dumps(row, sort_keys=True)}"
+                    )
+            continue
+        stored_rows = _observation_rows(stored_bytes)
+        regenerated_rows = _observation_rows(regenerated_bytes)
+        changed_rows = [
+            observation_id
+            for observation_id in sorted(stored_rows.keys() | regenerated_rows.keys())
+            if stored_rows.get(observation_id) != regenerated_rows.get(observation_id)
+        ]
+        if changed_rows:
+            for observation_id in changed_rows:
+                details.append(
+                    f"{path}::{observation_id}\n"
+                    f"  stored: {json.dumps(stored_rows.get(observation_id), sort_keys=True)}\n"
+                    f"  regenerated: {json.dumps(regenerated_rows.get(observation_id), sort_keys=True)}"
+                )
+        else:
+            details.append(
+                f"{path}: bytes differ ({len(stored_bytes)} stored, "
+                f"{len(regenerated_bytes)} regenerated); no observation-row difference"
+            )
+    return "\n".join(details)
 
 
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
@@ -2269,3 +2332,41 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
 }
     ''')
     assert actual == expected, json.dumps(actual, sort_keys=True, separators=(",", ":"), default=str)
+
+
+def test_complete_store_regeneration_matches_checked_in_bytes() -> None:
+    result = migrate(REPO_ROOT, write=False)
+    stored = _store_output_file_bytes(REPO_ROOT)
+    regenerated: dict[str, bytes] = {}
+
+    def capture_writer_output(result, root: Path) -> None:
+        write_outputs(result, root)
+        regenerated.update(_store_output_file_bytes(root))
+
+    with patch(
+        "simulator.battery.migrate.write_outputs",
+        side_effect=capture_writer_output,
+    ):
+        helper_differences = _store_regeneration_differences(REPO_ROOT, result)
+
+    byte_differences = sorted(
+        path
+        for path in stored.keys() | regenerated.keys()
+        if stored.get(path) != regenerated.get(path)
+    )
+    assert helper_differences == byte_differences
+    assert byte_differences == [], _store_difference_details(
+        stored, regenerated, byte_differences
+    )
+
+    report = regenerated["data/battery/migration-report.md"].decode("utf-8")
+    headline = {
+        "rows in": sum(count.rows_in for count in result.source_counts.values()),
+        "records out (observations)": len(result.observations),
+        "works": len(result.works),
+        "experiments": len(result.experiments),
+        "queue size": len(result.queue),
+        "hard issues": len(result.validation.hard_issues),
+    }
+    for label, count in headline.items():
+        assert f"{label}: {count}" in report
