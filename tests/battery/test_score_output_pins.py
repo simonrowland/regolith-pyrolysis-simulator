@@ -83,7 +83,6 @@ def _without_certified_counts(text: str) -> str:
                 labels[label]
                 for label in (
                     "n certified",
-                    "numeric events",
                     "unique observations",
                     "unique source_ids",
                     "flag classes",

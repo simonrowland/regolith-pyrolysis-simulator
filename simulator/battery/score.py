@@ -23030,6 +23030,7 @@ def _render_score_report_from_payloads_legacy(
         rows,
         conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
         observations=context.observations,
+        engine_for_row=_engine_from_payload,
     )
     pending = 0
     admitted = 0
@@ -24644,6 +24645,7 @@ def render_score_report_from_payloads(
         rows,
         conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
         observations=observations,
+        engine_for_row=_engine_from_payload,
     )
     unflagged_rows = _FilteredPayloadRows(
         rows, lambda row: not _flagged_payload_strata(row)

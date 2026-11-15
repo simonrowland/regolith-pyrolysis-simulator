@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from decimal import Decimal
-from typing import Iterable, Mapping, NamedTuple
+from typing import Callable, Iterable, Mapping, NamedTuple
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.identity import Identity, quantity_token
@@ -132,6 +132,7 @@ def eligibility_failure_census(
     *,
     conjunct_names: Iterable[str],
     observations: Mapping[str, Observation] | None = None,
+    engine_for_row: Callable[[Mapping[str, object]], str],
 ) -> EligibilityFailureCensus:
     """Count failure events, observations, and first failure per report cell."""
 
@@ -147,15 +148,14 @@ def eligibility_failure_census(
         if not isinstance(row.get("numeric"), Mapping) or not row.get("rail"):
             continue
         rail = str(row["rail"])
-        request = row.get("candidate_request")
-        key = row.get("key")
-        engine = (
-            str(request.get("engine"))
-            if isinstance(request, Mapping) and request.get("engine")
-            else str(key).rsplit("::", 1)[-1]
-        )
+        engine = engine_for_row(row)
         reference = str(row.get("reference") or "")
-        observation = None if observations is None else observations.get(reference)
+        if observations is None:
+            observation = None
+        else:
+            from simulator.battery.compilation_tier import reference_observation
+
+            observation = reference_observation(observations, reference)
         observation_id = (
             observation.observation_id if observation is not None else reference
         )
