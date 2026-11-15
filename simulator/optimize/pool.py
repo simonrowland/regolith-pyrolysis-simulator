@@ -62,8 +62,8 @@ from simulator.optimize.worker_runtime import (
 from simulator.engine_pool import (
     EngineWorkerPool,
     EngineWorkerTimeout,
-    INHERIT_PROCESS_GROUP_ENV,
     WarmEngineWorker,
+    _inherit_process_group_for_worker_children,
 )
 from simulator.supervised_process_pool import (
     DEFAULT_PROCESS_TASK_TIMEOUT_SECONDS,
@@ -439,7 +439,7 @@ def _evaluate_tasks_in_pool(
 def _bootstrap_optimizer_engine_worker(
     warm_runtime_spec: _WarmRuntimeSpec,
 ) -> tuple[None, str]:
-    os.environ[INHERIT_PROCESS_GROUP_ENV] = '1'
+    _inherit_process_group_for_worker_children()
     _initialize_worker(warm_runtime_spec)
     return None, warm_runtime_spec.backend_name
 
