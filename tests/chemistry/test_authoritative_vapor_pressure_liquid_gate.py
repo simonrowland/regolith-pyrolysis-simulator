@@ -378,6 +378,50 @@ def test_internal_analytical_refresh_treats_freeze_gate_fallback_as_missing() ->
 
 
 @pytest.mark.parametrize(
+    ('temperature_C', 'expected_fraction'),
+    (
+        (1100.0, 0.0),
+        (1200.0, 0.0),
+        (1250.0, 0.1),
+        (1300.0, 0.2),
+        (1350.0, 0.6),
+        (1400.0, 1.0),
+        (1450.0, 1.0),
+    ),
+    ids=(
+        'below-solidus',
+        'solidus-knot',
+        'first-segment',
+        'middle-knot',
+        'second-segment',
+        'liquidus-knot',
+        'above-liquidus',
+    ),
+)
+def test_freeze_gate_curve_interpolation_matches_parent_golden(
+    temperature_C,
+    expected_fraction,
+) -> None:
+    # Parent 602581452 arithmetic: the 1250 C segment is 0 + .2 * .5 = .1;
+    # the 1350 C segment is .2 + (1.0 - .2) * .5 = .6. Exact knots and the
+    # legacy solidus/liquidus boundary branches return their sampled endpoints.
+    curve = {
+        'solidus_T_C': 1200.0,
+        'liquidus_T_C': 1400.0,
+        'path': (
+            (1200.0, 0.0),
+            (1300.0, 0.2),
+            (1400.0, 1.0),
+        ),
+    }
+
+    assert EvaporationMixin._interpolate_freeze_gate_curve(
+        curve,
+        temperature_C,
+    ) == expected_fraction
+
+
+@pytest.mark.parametrize(
     (
         'temperature_C',
         'path',
