@@ -86,6 +86,133 @@ def test_langmuir_flux_matches_hk_formula():
     ) == pytest.approx(expected_molar / alpha, rel=1e-12)
 
 
+def test_r04_inline_hk_call_sites_pre_move_hex_table():
+    """Record the four independent HK expressions before consolidating them."""
+    from simulator.battery.oxygen_balance import (
+        _VacuumOxygenChannel,
+        _solve_vacuum_oxygen_balance,
+    )
+    from simulator.chemistry.oxygen_interface import (
+        InterfaceOxygenChannel,
+        solve_interface_oxygen,
+    )
+    from simulator.condensation import _hkl_impingement_flux_mol_m2_s
+    from simulator.physical_constants import PA_PER_BAR
+
+    temperatures = (1000.0, 1800.0, 2500.0)
+    molar_masses = (0.002, 0.055845, 0.250)
+    alpha = 0.37
+    output = {}
+    for temperature in temperatures:
+        for molar_mass in molar_masses:
+            label = (temperature, molar_mass)
+            channels = (
+                _VacuumOxygenChannel(
+                    "A", molar_mass, 0.0, 1.0, -0.5, alpha,
+                    "R-04 pre-move pin",
+                ),
+                _VacuumOxygenChannel(
+                    "O2", 0.031998, 2.0, 0.0, 1.0, 1.0,
+                    "R-04 pre-move pin",
+                ),
+            )
+
+            def vacuum_pressure_model(logp):
+                po2_bar = 10.0**logp
+                return {
+                    "A": 1.0e-3 / math.sqrt(po2_bar),
+                    "O2": 1.0e5 * po2_bar,
+                }
+
+            vacuum = _solve_vacuum_oxygen_balance(
+                vacuum_pressure_model,
+                channels,
+                temperature_K=temperature,
+            )
+            output[("battery", *label)] = vacuum.channel_fluxes_mol_m2_s[
+                "A"
+            ].hex()
+
+            interface_channel = InterfaceOxygenChannel(
+                "A", molar_mass, 0.0, 1.0, -0.5, alpha,
+            )
+
+            def interface_pressure_model(logp):
+                return {
+                    "A": PA_PER_BAR * 1.0e-6 / math.sqrt(10.0**logp)
+                }
+
+            interface = solve_interface_oxygen(
+                interface_pressure_model,
+                (interface_channel,),
+                reservoir_log10_fO2_bar=-12.0,
+                melt_capacity_mol_per_ln_fO2=0.0,
+                exchange_time_s=1.0,
+                overhead_pO2_bar=0.0,
+                area_m2=1.0,
+                temperature_K=temperature,
+                oxygen_alpha=0.8,
+            )
+            output[("interface_product", *label)] = (
+                interface.product_fluxes_mol_m2_s["A"].hex()
+            )
+            output[("interface_oxygen", *label)] = (
+                interface.gas_source_mol_s.hex()
+            )
+
+            condensation = _hkl_impingement_flux_mol_m2_s(
+                "PIN",
+                1200.0,
+                temperature,
+                vapor_pressure_data={
+                    "metals": {
+                        "PIN": {"molar_mass_g_mol": molar_mass * 1000.0}
+                    }
+                },
+            )
+            output[("condensation", *label)] = condensation.hex()
+
+    expected = (
+        "0x1.30574244fdae0p-6",
+        "0x1.7c6d12d63d280p-2",
+        "0x1.7c6d12d63d281p-3",
+        "0x1.d59724a995919p+6",
+        "0x1.9144d5660bfafp-8",
+        "0x1.f5960abf8eedep-4",
+        "0x1.f5960abf8eed2p-5",
+        "0x1.637821a6caecep+4",
+        "0x1.e6f203a19915ap-9",
+        "0x1.30574244fdb9ap-4",
+        "0x1.30574244fdb9cp-5",
+        "0x1.5002f44c2f171p+3",
+        "0x1.c5af3f52c6959p-7",
+        "0x1.1b8d8793bc285p-2",
+        "0x1.1b8d8793bc286p-3",
+        "0x1.5e0313cf5bb7fp+6",
+        "0x1.2b1691fec3a03p-8",
+        "0x1.75dc367e747f7p-4",
+        "0x1.75dc367e747edp-5",
+        "0x1.08f37e489d570p+4",
+        "0x1.6af2990f07a68p-9",
+        "0x1.c5af3f52c6a6ep-5",
+        "0x1.c5af3f52c6a72p-6",
+        "0x1.f4e57c709f8a4p+2",
+        "0x1.80f6d037f83edp-7",
+        "0x1.e1348445f660dp-3",
+        "0x1.e1348445f660fp-4",
+        "0x1.28febb7be2293p+6",
+        "0x1.fb91c74fbbe9ap-9",
+        "0x1.3d3b1c91d56a7p-4",
+        "0x1.3d3b1c91d56a1p-5",
+        "0x1.c1a312b6f745ap+3",
+        "0x1.33f8a6932f04bp-9",
+        "0x1.80f6d037f84d7p-5",
+        "0x1.80f6d037f84dap-6",
+        "0x1.a90653b61f8ebp+2",
+    )
+    assert tuple(output.values()) == expected
+
+
 def test_knudsen_effusion_is_alpha_one_langmuir():
     molar_mass = species_molar_mass_kg_mol("Na")
     T_K = 1700.0
