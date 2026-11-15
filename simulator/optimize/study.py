@@ -5291,6 +5291,14 @@ def _record_objective_scores(
     record: StudyRecord,
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[float | None, ...]:
+    """Rank on physical scores, with the furnace penalty when it exists.
+
+    ``cost_adjusted_objective_scores`` owns the ungrounded-threshold
+    case: a null liner threshold leaves the physical scores in place
+    and invents no campaign count. Any other missing furnace price is
+    unscoreable.
+    """
+
     try:
         return cost_adjusted_objective_scores(
             record.objectives,
