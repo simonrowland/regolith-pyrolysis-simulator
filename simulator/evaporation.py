@@ -804,12 +804,21 @@ class EvaporationMixin:
         def unavailable(code: str, **detail: Any) -> tuple[
             None, str, None, None, Mapping[str, Any]
         ]:
+            phase_detail = {"code": code, **detail}
+            gate_diagnostic = getattr(
+                self, "_last_melt_redox_liquidus_gate_diagnostic", None
+            )
+            diagnostic = (
+                copy.deepcopy(dict(gate_diagnostic))
+                if isinstance(gate_diagnostic, Mapping) and gate_diagnostic
+                else copy.deepcopy(phase_detail)
+            )
             return (
                 None,
                 "freeze_gate_authority_missing_or_invalid",
                 None,
                 None,
-                {"code": code, **detail},
+                {**phase_detail, "diagnostic": diagnostic},
             )
 
         register = getattr(
