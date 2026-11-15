@@ -43,6 +43,7 @@ KNOWN_INTERNAL_ENV = {
     "MAGEMIN_PROBE_SCAN_ID": "Labels output from a targeted MAGEMin hang probe.",
     "MPLCONFIGDIR": "Selects a matplotlib cache for an internal profiling script.",
     "REGOLITH_DEBUG_FEEDSTOCKS": "Exposes debug-only feedstocks in the development UI.",
+    "REGOLITH_ENGINE_CACHE_BOX": "Labels cache rows with a source box for internal engine-cache diagnostics.",
     "REGOLITH_ENGINE_POOL_DEBUG": "Prints internal engine-worker lifecycle diagnostics.",
     "REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP": "Internal worker lifecycle handoff flag.",
     "REGOLITH_OPTIMIZER_CHILD_PID_LOG": "Internal child-process tracking log path.",

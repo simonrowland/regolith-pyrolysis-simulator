@@ -1,0 +1,61 @@
+{
+  "backend_result": [
+    "non_authoritative",
+    null,
+    false,
+    {},
+    {},
+    [],
+    {},
+    {},
+    {
+      "Mg": 0.0017881445937485009,
+      "Mg2": 6.183324146301334e-15,
+      "MgO_gas": 5.886971012551051e-07,
+      "O": 0.00014128445743049454,
+      "O2": 9.999999999999796e-05,
+      "Si": 7.080181360048051e-12,
+      "Si2": 3.2508325256213193e-24,
+      "Si3": 8.530127376286943e-35,
+      "SiO": 0.00940940540022837,
+      "SiO2_gas": 2.9934617509969917e-05
+    },
+    {},
+    {},
+    {
+      "notice_codes": [],
+      "notice_values": [],
+      "warning_codes": [
+        90
+      ],
+      "warning_values": [
+        {
+          "position": 0,
+          "text": "This adapter calls System.eval_gas_abundances without the optional P argument, so upstream evaluates liquid chemical potentials at its default P (installed source: P=1e-10 bar) rather than the requested pressure_bar. The vapor result is non-authoritative for pressure-sensitive transport."
+        }
+      ]
+    }
+  ],
+  "engine": "vaporock",
+  "provenance": {
+    "captured_at_utc": "2026-11-13T13:38:33.258498+00:00",
+    "engine_identity": {
+      "backend_class": "VapoRockBackend",
+      "backend_module": "simulator.melt_backend.vaporock",
+      "configured_identity": {
+        "digest": "sha256:0159678a8eefb51dfe3f12bb646dc38507a07230",
+        "name": "vaporock",
+        "version": "1.0.0"
+      }
+    },
+    "engine_version": "1.0.0",
+    "engine_version_source": "engine identity configuration",
+    "git_sha": "4966c28a8c72e6ad55cd4621c5148b4dfe21fb4e",
+    "host": "Mac-Studio-256-3.local"
+  },
+  "request": {
+    "po2_mode": "engine_default",
+    "pot_id": "mgo_sio2_40_60",
+    "temperature_K": 1700.0
+  }
+}

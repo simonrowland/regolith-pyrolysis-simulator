@@ -1447,6 +1447,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity: Dict[str, Any] = {}
         self._high_t_melt_activity_fallback_steps: list[Dict[str, Any]] = []
+        self._high_t_melt_activity_table_fallback_ticks: Dict[int, set[str]] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_target_inventory_diagnostic: Dict[str, Any] = {}
         self._target_inventory_by_hour: list[Dict[str, Any]] = []
@@ -1823,6 +1824,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_imcc_activity_shadow = {}
         self._last_high_t_melt_activity = {}
         self._high_t_melt_activity_fallback_steps = []
+        self._high_t_melt_activity_table_fallback_ticks = {}
         self._last_target_inventory_diagnostic = {}
         self._target_inventory_by_hour = []
         self._target_inventory_depletion_hour = None
@@ -9798,28 +9800,67 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         authority: Any,
         vapor_pressure_provenance: Any,
     ) -> None:
-        if not isinstance(authority, Mapping) or not authority.get('fallback'):
+        if not isinstance(authority, Mapping):
             return
         if not isinstance(vapor_pressure_provenance, Mapping):
             return
+        fallback_rows = [
+            item
+            for item in vapor_pressure_provenance.values()
+            if isinstance(item, Mapping)
+            and item.get('melt_activity_fallback')
+            and item.get('melt_activity_parent_oxide')
+        ]
+        table_rows = [
+            row for row in fallback_rows
+            if str(row.get('melt_activity_flag') or '').endswith('_table_fallback')
+        ]
+        if table_rows:
+            ticks = getattr(self, '_high_t_melt_activity_table_fallback_ticks', {})
+            ticks.setdefault(int(self.melt.hour) + 1, set()).update(
+                str(row['melt_activity_parent_oxide']) for row in table_rows
+            )
+            self._high_t_melt_activity_table_fallback_ticks = ticks
+            fallback_rows = [row for row in fallback_rows if row not in table_rows]
         parent_oxides = sorted(
             {
                 str(item.get('melt_activity_parent_oxide'))
-                for item in vapor_pressure_provenance.values()
-                if isinstance(item, Mapping)
-                and item.get('melt_activity_fallback')
-                and item.get('melt_activity_parent_oxide')
+                for item in fallback_rows
             }
         )
         if not parent_oxides:
             return
+        reason = dict(authority.get('fallback_reason') or {})
+        if not reason:
+            for item in fallback_rows:
+                refusal = item.get('openimcc_refusal')
+                if not isinstance(refusal, Mapping):
+                    continue
+                reason = {
+                    'code': refusal.get('code'),
+                    'detail': refusal.get('detail') or refusal.get('reason'),
+                }
+                break
+        fallback_flags = {
+            str(item.get('melt_activity_flag'))
+            for item in fallback_rows
+            if item.get('melt_activity_flag')
+        }
+        activity_fallback_notices = [
+            dict(notice)
+            for notice in authority.get('notices', ())
+            if isinstance(notice, Mapping)
+            and notice.get('parent') in parent_oxides
+            and notice.get('code') in fallback_flags
+        ]
         campaign = getattr(self.melt, 'campaign', None)
         campaign_name = str(getattr(campaign, 'name', campaign) or '')
         step = {
             'hour': int(self.melt.hour) + 1,
             'campaign': campaign_name,
             'parent_oxides': parent_oxides,
-            'reason': dict(authority.get('fallback_reason') or {}),
+            'reason': reason,
+            'activity_fallback_notices': activity_fallback_notices,
             'held_effective_gamma_notices': list(
                 authority.get('held_effective_gamma_by_parent', {}).values()
             ) + (
@@ -9834,7 +9875,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         steps.append(step)
 
     def high_t_melt_activity_run_notice(self) -> Dict[str, Any] | None:
-        """Aggregate OpenIMCC refusal predictions for the run artifact."""
+        """Aggregate flagged high-T melt-activity substitutions for the run artifact."""
 
         steps = getattr(self, '_high_t_melt_activity_fallback_steps', ())
         if not isinstance(steps, (list, tuple)) or not steps:
@@ -9875,6 +9916,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         reason_codes = sorted({str(item['reason']) for item in notices})
         for step in valid_steps:
+            notices.extend(step.get('activity_fallback_notices', ()))
             notices.extend(step.get('held_effective_gamma_notices', ()))
         notice: Dict[str, Any] = {
             'kind': 'high_t_melt_activity_fallback',
@@ -9896,6 +9938,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif campaigns:
             notice['campaigns'] = campaigns
         return notice
+
+    def high_t_melt_activity_table_fallback_run_notice(self) -> Dict[str, Any] | None:
+        ticks = self._high_t_melt_activity_table_fallback_ticks
+        parent_oxides = sorted({parent for parents in ticks.values() for parent in parents})
+        if not parent_oxides:
+            return None
+        return {
+            'kind': 'high_t_melt_activity_table_fallback',
+            'affected_tick_count': len(ticks),
+            'affected_parent_oxides': parent_oxides,
+        }
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         ledger_melt = self.atom_ledger.project_account_kg('process.cleaned_melt')

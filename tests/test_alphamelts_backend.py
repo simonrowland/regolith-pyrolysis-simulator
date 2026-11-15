@@ -336,7 +336,9 @@ def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> Non
     ],
 )
 @pytest.mark.parametrize(
-    'mode', ['python_api', None], ids=['requested-api', 'discovered-api']
+    'mode',
+    ['python_api', None, 'auto'],
+    ids=['requested-api', 'discovered-api', 'explicit-auto'],
 )
 @pytest.mark.parametrize('warm_worker', [False, True], ids=['cold', 'warm'])
 def test_python_api_initialization_refuses_raw_model_before_worker_creation(
