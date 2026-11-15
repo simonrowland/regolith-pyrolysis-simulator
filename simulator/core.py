@@ -10393,6 +10393,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         vapour_phase_liquid_fraction = raw_liquid_fraction
         phase_basis_source = 'equilibrium_result.liquid_fraction'
         phase_basis_continuation = None
+        phase_basis_notice = None
         if vapour_phase_liquid_fraction is None:
             phase_signal = getattr(
                 self, '_vapor_pressure_freeze_gate_phase_fraction', None,
@@ -10402,6 +10403,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     vapour_phase_liquid_fraction,
                     phase_basis_source,
                     phase_basis_continuation,
+                    phase_basis_notice,
                 ) = phase_signal()
             else:
                 phase_basis_source = 'missing'
@@ -10513,6 +10515,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'liquid_fraction': vapour_phase_liquid_fraction,
                 'phase_basis_source': phase_basis_source,
                 'phase_basis_continuation': phase_basis_continuation,
+                **({'phase_basis_notice': dict(phase_basis_notice)}
+                   if phase_basis_notice is not None else {}),
                 'ambient_pressure_bar': (
                     ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
                 ),
