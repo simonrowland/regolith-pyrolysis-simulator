@@ -31,6 +31,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from tests._plugins.time_isolation import patch_module_time
 
 import simulator.engine_pool as engine_pool
 from simulator.engine_pool import (
@@ -1239,7 +1240,9 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
         raise BlockingIOError
 
     monkeypatch.setattr(magemin_module.fcntl, 'flock', contended_flock)
-    monkeypatch.setattr(magemin_module.time, 'sleep', lambda _seconds: None)
+    patch_module_time(
+        monkeypatch, magemin_module, sleep=lambda _seconds: None
+    )
 
     result = backend.equilibrate(
         1500.0,
@@ -2517,7 +2520,9 @@ def test_magemin_liquidus_finder_honors_aggregate_budget_config(monkeypatch):
 
     fake_module = types.SimpleNamespace(minimize=minimize)
     _make_available_magemin(monkeypatch, fake_module)
-    monkeypatch.setattr(liquidus_module.time, "monotonic", lambda: clock["t"])
+    patch_module_time(
+        monkeypatch, liquidus_module, monotonic=lambda: clock["t"]
+    )
 
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
@@ -2674,7 +2679,9 @@ def test_magemin_liquidus_subprocess_path_preserves_sample_timeout_diagnostics(
     monkeypatch.setattr(
         "simulator.melt_backend.magemin.subprocess.run", fake_run
     )
-    monkeypatch.setattr(liquidus_module.time, "monotonic", lambda: clock["t"])
+    patch_module_time(
+        monkeypatch, liquidus_module, monotonic=lambda: clock["t"]
+    )
 
     backend = MAGEMinBackend()
     backend._available = True
