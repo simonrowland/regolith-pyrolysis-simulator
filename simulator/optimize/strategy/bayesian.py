@@ -13,10 +13,13 @@ from simulator.optimize.doe import _condition_pressure_pair_values
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveDefinition,
+    ObjectiveProfileError,
+    ask_time_objective_definitions,
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
     objective_definitions,
     objective_scores,
+    scoring_profile_for_executed_spec,
 )
 from simulator.optimize.recipe import (
     KeyPath,
@@ -48,6 +51,8 @@ _CONSTRAINT_NAMES_ATTR = "regolith_constraint_names"
 _CANDIDATE_ID_ATTR = "regolith_candidate_id"
 _INFEASIBLE_ATTR = "regolith_infeasible"
 _UNSCOREABLE_OBJECTIVES_ATTR = "regolith_unscoreable_objectives"
+_EXECUTED_OBJECTIVE_METRICS_ATTR = "regolith_executed_objective_metrics"
+_EXECUTED_OBJECTIVE_VALUES_ATTR = "regolith_executed_objective_values"
 _BAD_MAXIMIZE_VALUE = -1.0e30
 _BAD_MINIMIZE_VALUE = 1.0e30
 _NONFINITE_INFEASIBLE_CONSTRAINT_VIOLATION = 1.0e30
@@ -91,7 +96,9 @@ class OptunaTPEStrategy:
         self._seed = seed
         self._n_startup_trials = startup_trials
         self.objective_profile = MappingProxyType(dict(active_profile))
-        self._objective_definitions = objective_definitions(self.objective_profile)
+        self._objective_definitions = ask_time_objective_definitions(
+            self.objective_profile
+        )
         self._directions = tuple(
             definition.sense for definition in self._objective_definitions
         )
@@ -318,7 +325,11 @@ class OptunaTPEStrategy:
         _tell_optuna_strategy(self, results)
 
     def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...] | None:
-        return _objective_values_for_definitions(scored, self._objective_definitions)
+        return objective_values_for_executed_spec(
+            self.objective_profile,
+            self._objective_definitions,
+            scored,
+        )
 
 
 def _optuna_params_from_seed(
@@ -476,6 +487,73 @@ def _objective_mapping(scored: "ScoredResult") -> Mapping[str, float | None]:
     return canonical_objective_mapping(mapping)
 
 
+def executed_definitions_for_scored(
+    profile: Mapping[str, Any],
+    frozen: Sequence[ObjectiveDefinition],
+    scored: "ScoredResult",
+) -> Sequence[ObjectiveDefinition] | None:
+    """Definitions of the spec this result executed.
+
+    A missing spec is still the ask-time list. An execution whose declared
+    weight was all withheld returns None: that trial is unscoreable, not a
+    zero vector.
+    """
+
+    spec = getattr(scored, "eval_spec", None)
+    if spec is None:
+        return frozen
+    try:
+        return objective_definitions(scoring_profile_for_executed_spec(profile, spec))
+    except ObjectiveProfileError:
+        return None
+
+
+def objective_values_for_executed_spec(
+    profile: Mapping[str, Any],
+    frozen: Sequence[ObjectiveDefinition],
+    scored: "ScoredResult",
+) -> tuple[float, ...] | None:
+    definitions = executed_definitions_for_scored(profile, frozen, scored)
+    if definitions is None:
+        return None
+    return _objective_values_for_definitions(scored, definitions)
+
+
+def _tell_optuna_trial(
+    study: Any,
+    trial: Any,
+    *,
+    values: tuple[float, ...] | None,
+    executed_definitions: Sequence[ObjectiveDefinition] | None,
+    frozen_definitions: Sequence[ObjectiveDefinition],
+) -> None:
+    """Tell one trial from the executed metric space.
+
+    Equal spaces tell the executed values. A superset tells the frozen
+    coordinates and stores the full executed vector. A subset is pruned:
+    a withheld objective is not filled with zero, and the trial is not
+    failed. An unscoreable result still fails.
+    """
+
+    if values is None or executed_definitions is None:
+        trial.set_user_attr(_UNSCOREABLE_OBJECTIVES_ATTR, True)
+        study.tell(trial, state=_failed_trial_state())
+        return
+    frozen_metrics = tuple(definition.metric for definition in frozen_definitions)
+    executed_metrics = tuple(definition.metric for definition in executed_definitions)
+    if executed_metrics == frozen_metrics:
+        study.tell(trial, values=values)
+        return
+    trial.set_user_attr(_EXECUTED_OBJECTIVE_METRICS_ATTR, list(executed_metrics))
+    trial.set_user_attr(_EXECUTED_OBJECTIVE_VALUES_ATTR, list(values))
+    if set(frozen_metrics) <= set(executed_metrics):
+        by_metric = dict(zip(executed_metrics, values, strict=True))
+        aligned = tuple(by_metric[metric] for metric in frozen_metrics)
+        study.tell(trial, values=aligned)
+        return
+    study.tell(trial, state=_pruned_trial_state())
+
+
 def _objective_values_for_definitions(
     scored: "ScoredResult",
     definitions: Sequence[ObjectiveDefinition],
@@ -612,6 +690,10 @@ def _failed_trial_state() -> Any:
     return _require_optuna().trial.TrialState.FAIL
 
 
+def _pruned_trial_state() -> Any:
+    return _require_optuna().trial.TrialState.PRUNED
+
+
 def _tell_optuna_strategy(
     strategy: Any,
     results: Sequence[tuple[Candidate, "ScoredResult"]],
@@ -676,11 +758,17 @@ def _tell_optuna_strategy(
             _INFEASIBLE_ATTR,
             not bool(getattr(scored, "feasible", False)),
         )
-        if values is None:
-            trial.set_user_attr(_UNSCOREABLE_OBJECTIVES_ATTR, True)
-            strategy._study.tell(trial, state=_failed_trial_state())
-        else:
-            strategy._study.tell(trial, values=values)
+        _tell_optuna_trial(
+            strategy._study,
+            trial,
+            values=values,
+            executed_definitions=executed_definitions_for_scored(
+                strategy.objective_profile,
+                strategy._objective_definitions,
+                scored,
+            ),
+            frozen_definitions=strategy._objective_definitions,
+        )
         strategy._result_by_id[candidate.id] = scored
         strategy._results.append((candidate, scored))
         strategy._tell_count += 1

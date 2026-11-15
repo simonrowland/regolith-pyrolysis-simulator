@@ -96,14 +96,20 @@ from simulator.fidelity_vocabulary import (
 )
 from simulator.optimize.objective import (
     ObjectiveComputationError,
+    ObjectiveProfileError,
     ObjectiveVector,
-    _campaigns_elapsed,
+    _merged_run_for_fidelity,
+    admit_executed_objective_weight,
     composition_target_eval_metadata,
     composition_target_infeasible_reason,
     composition_target_specs,
     composition_targets_require_coating,
     composition_targets_require_stage0_exit,
     composition_targets_require_terminal_rump,
+    profile_with_resolved_execution,
+    resolved_execution_identity,
+    scoring_profile_for_executed_spec,
+    unclaimed_product_withheld_objective_note,
     compute_objectives,
     product_summary,
 )
@@ -158,7 +164,7 @@ from simulator.pumping_cost import (
 )
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
-from simulator.run_executor import RunExecutor
+from simulator.run_executor import RunExecutor, campaign_stop_record
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError
@@ -1101,6 +1107,20 @@ def evaluate(
             cache_key_value=key,
         )
 
+    # INVARIANT: a stored C6 refusal is never a numeric score. This is the
+    # only pricing return. It stands after environment-failure aborts and
+    # after failed-status results, and before every score-producing return
+    # (earned out-of-domain rump, infeasible retained vector, feasible vector).
+    stored_c6_refusal = _stored_c6_campaign_refusal_result(
+        candidate_id,
+        spec,
+        key,
+        run_execution,
+        profile,
+    )
+    if stored_c6_refusal is not None:
+        return stored_c6_refusal
+
     backend_status = _latest_backend_status(run_execution)
     if _has_out_of_domain_backend_signal(
         run_execution,
@@ -1200,23 +1220,25 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     if not feasibility.feasible:
-        objectives = None
+        # ``profile`` stays the authored profile for the run reference.
+        # The vector and its withhold notice come from ``objective_profile``,
+        # which is stamped with EvalSpec.campaign. They travel as one score
+        # so a fidelity overlay cannot make the notice name a different campaign.
+        campaign_score = None
         try:
             pumping_diagnostic = _pumping_diagnostic_for_gate(
                 run_execution,
                 feedstock_id=spec.feedstock_id,
             )
-            computed_objectives = _compute_objective_vector(
+            campaign_score = _compute_objective_vector(
                 run_execution,
                 objective_profile,
                 pumping_diagnostic,
                 spec,
             )
-            if all(value.value is not None for value in computed_objectives.values):
-                objectives = computed_objectives
         except (OverflowError, ObjectiveComputationError):
             # Keep the failed gate result; an unavailable vector remains unscored.
-            pass
+            campaign_score = None
         return _infeasible_result(
             candidate_id,
             spec,
@@ -1224,7 +1246,7 @@ def evaluate(
             feasibility,
             run_execution,
             profile,
-            objectives=objectives,
+            campaign_score=campaign_score,
         )
     pumping_diagnostic = _pumping_diagnostic_for_gate(
         run_execution,
@@ -1240,7 +1262,12 @@ def evaluate(
             profile,
             pumping_margin,
         )
-    target_reason = composition_target_infeasible_reason(profile)
+    # Gates use the resolved execution triple. ``objective_profile`` is
+    # stamped with EvalSpec campaign, track, and c5_enabled, and
+    # ``composition_target_specs`` drops objectives that triple does not
+    # claim. An unclaimed terminal-rump row must not
+    # replace the retained score with rump_terminal_completion_unknown.
+    target_reason = composition_target_infeasible_reason(objective_profile)
     if target_reason:
         return _target_infeasible_result(
             candidate_id,
@@ -1252,7 +1279,7 @@ def evaluate(
             detail=target_reason,
             notes=(target_reason,),
         )
-    if composition_targets_require_terminal_rump(profile):
+    if composition_targets_require_terminal_rump(objective_profile):
         if _trace_has_unearned_rump_terminal(run_execution):
             return _target_infeasible_result(
                 candidate_id,
@@ -1278,12 +1305,13 @@ def evaluate(
             )
 
     try:
-        objectives = _compute_objective_vector(
+        campaign_score = _compute_objective_vector(
             run_execution,
             objective_profile,
             pumping_diagnostic,
             spec,
         )
+        objectives = campaign_score.objectives
         trace_payload = _composition_target_trace_payload(
             objective_profile,
             objectives,
@@ -1336,6 +1364,7 @@ def evaluate(
             cost_parameters=spec.cost_parameters,
             coating_margin=feasibility.margins.get("coating"),
         ),
+        notes=_notes_for_executed_campaign_score((), campaign_score),
     )
 
 
@@ -1821,11 +1850,15 @@ def _trace_with_optimizer_coating_report(
             "wall_deposit_by_segment_species_kg trace is missing or malformed"
         )
     try:
-        campaigns_elapsed = _campaigns_elapsed(run_execution)
-    except (ObjectiveComputationError, TypeError, ValueError) as exc:
+        campaigns_elapsed = float(getattr(run_execution, "campaigns_elapsed", 1.0))
+    except (TypeError, ValueError) as exc:
+        raise CoatingFeasibilityReportError(
+            "campaigns_elapsed must be numeric"
+        ) from exc
+    if not math.isfinite(campaigns_elapsed) or campaigns_elapsed <= 0.0:
         raise CoatingFeasibilityReportError(
             "campaigns_elapsed must be finite and positive"
-        ) from exc
+        )
     normalized_deposit: dict[tuple[str, str], float] = {}
     by_species: dict[str, float] = {}
     null_deposit_species: list[str] = []
@@ -2911,12 +2944,24 @@ def _build_eval_inputs_for_candidate(
     cost_parameters: Mapping[str, Any] | None = None,
     conditional_context: ConditionalExecutionContext | None = None,
 ) -> tuple[PhysicsConstraintSet | None, EvalSpec, Any]:
-    """Build the resolved spec and run config that ``evaluate`` uses."""
-    active_constraints = _composition_target_constraints(
+    """Build the resolved spec and run config that ``evaluate`` uses.
+
+    This is the only place that builds ``active_constraints``. The triple
+    is ``resolved_execution_identity``: the request and the profile key
+    fold through ``canonical_backend_name`` before this read. The voltage
+    cap can still flip ``c5_enabled`` inside ``_build_eval_inputs``. The
+    constraints returned here are rebuilt from that finished spec so the
+    gates match the run. The thermal ceiling sees the pre-cap constraints;
+    it does not depend on c5.
+    """
+    identity = resolved_execution_identity(profile, fidelity)
+    preliminary = _composition_target_constraints(
         profile,
         constraints,
         recipe_patch=patch,
-        campaign=str(_run_options(profile, fidelity)["campaign"]),
+        campaign=str(identity["campaign"]),
+        track=str(identity["track"]),
+        c5_enabled=bool(identity["c5_enabled"]),
     )
     spec, run_config = _build_eval_inputs(
         patch,
@@ -2924,9 +2969,39 @@ def _build_eval_inputs_for_candidate(
         fidelity,
         profile,
         schema,
-        constraints=active_constraints,
+        constraints=preliminary,
         cost_parameters=cost_parameters,
         conditional_context=conditional_context,
+    )
+    # The voltage cap can flip c5 after the preliminary gates. Rebuild only
+    # then, and replace the constraints digest so the cache key matches the
+    # gates the run used. An unchanged triple keeps the digested object.
+    post_identity = (
+        str(spec.campaign),
+        str(spec.track),
+        bool(spec.c5_enabled),
+    )
+    pre_identity = (
+        str(identity["campaign"]),
+        str(identity["track"]),
+        bool(identity["c5_enabled"]),
+    )
+    if post_identity == pre_identity:
+        return preliminary, spec, run_config
+    active_constraints = _composition_target_constraints(
+        profile,
+        constraints,
+        recipe_patch=patch,
+        campaign=str(spec.campaign),
+        track=str(spec.track),
+        c5_enabled=bool(spec.c5_enabled),
+    )
+    spec = replace(
+        spec,
+        data_digests={
+            **dict(spec.data_digests),
+            "physics_constraints": physics_constraints_digest(active_constraints),
+        },
     )
     return active_constraints, spec, run_config
 
@@ -3018,6 +3093,97 @@ def _build_prefix_eval_inputs(
     )
 
 
+def _c0_pyrolysis_continues_through_later_steps(
+    run_options: Mapping[str, Any],
+    *,
+    stop_at_stage0_exit: bool,
+) -> bool:
+    """True when this evaluation drives the C0 AUTO_APPLY sequence.
+
+    A thermal window or lab schedule may rewrite the first step's hour
+    count. That bakeout is not the whole evaluation: later steps still
+    run under campaigns.py. Stage-0 exit stops at the PATH_AB decision.
+    Any other campaign stays on its own route. EvalSpec.hours is not a
+    key dimension. The VERSION bump is the cache lever.
+    """
+
+    if stop_at_stage0_exit:
+        return False
+    if str(run_options.get("track") or "pyrolysis") != "pyrolysis":
+        return False
+    from simulator.campaigns import CampaignManager
+    from simulator.state import CampaignPhase
+
+    phases = CampaignManager.campaign_phases_for_id(
+        str(run_options.get("campaign") or "")
+    )
+    return phases == (CampaignPhase.C0,)
+
+
+def _c6_campaign_refusal_reason(run_execution: Any) -> str:
+    """Reason for a campaign-scoped C6 refusal, or "" when there is none.
+
+    INVARIANT: a stored C6 refusal (status refused) is priced unavailable
+    for every reason the campaign controller or the thermite step records.
+    RunExecutor leaves batch status ok and keeps the diagnostic. This is
+    the pricing chokepoint. It does not whitelist a reason string. A
+    missing reason is still unavailable (``c6_campaign_refused``).
+
+    Behaviour-changing scoring edits require a VERSION bump
+    (simulator/optimize/evalspec.py). Do not bump data/corpus_version.yaml.
+    """
+
+    blobs: list[Any] = []
+    diagnostic = getattr(run_execution, "refusal_diagnostic", None)
+    if isinstance(diagnostic, MappingABC):
+        blobs.append(diagnostic)
+    simulator = getattr(run_execution, "simulator", None)
+    live = getattr(simulator, "_last_c6_refusal_diagnostic", None)
+    if isinstance(live, MappingABC):
+        blobs.append(live)
+    for blob in blobs:
+        if str(blob.get("status") or "") != "refused":
+            continue
+        campaign = str(blob.get("campaign") or "")
+        family = str(blob.get("reaction_family") or "")
+        if campaign != "C6" and family != "c6_mg_thermite":
+            continue
+        return _reason_from_mapping(blob) or "c6_campaign_refused"
+    return ""
+
+
+def _stored_c6_campaign_refusal_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+) -> ScoredResult | None:
+    """The single C6 pricing return, or None when the run stored no refusal.
+
+    ``evaluate`` calls this once, before any return that can attach a
+    numeric objective vector. An earned out-of-domain rump is still a
+    score, so it does not pass this gate. Environment-failure disposition
+    aborts earlier and is not relabeled. Behaviour-changing scoring edits
+    require a VERSION bump (simulator/optimize/evalspec.py). Do not bump
+    data/corpus_version.yaml.
+    """
+
+    reason = _c6_campaign_refusal_reason(run_execution)
+    if not reason:
+        return None
+    return _physics_refused_result(
+        candidate_id,
+        spec,
+        key,
+        reason=reason,
+        error_message=f"priced_unavailable:{reason}",
+        run_execution=run_execution,
+        profile=profile,
+        diagnostic=getattr(run_execution, "refusal_diagnostic", None),
+    )
+
+
 def _build_eval_inputs_impl(
     patch: RecipePatch,
     feedstock_id: str,
@@ -3042,8 +3208,9 @@ def _build_eval_inputs_impl(
         source="<profile>",
         schema=schema,
     )
+    base_run_options = _run_options(profile, fidelity)
     run_options = _thermal_scheduled_run_options(
-        _run_options(profile, fidelity),
+        base_run_options,
         profile=profile,
         recipe_patch=patch,
         constraints=constraints,
@@ -3070,8 +3237,6 @@ def _build_eval_inputs_impl(
     feedstock = bundle.feedstocks[feedstock_id]
     profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
     profile_digest = _profile_digest(profile)
-    target_metadata = composition_target_eval_metadata(profile)
-    stop_at_stage0_exit = composition_targets_require_stage0_exit(profile)
     run_options = _run_options_with_conditional_pins(
         run_options, conditional_context
     )
@@ -3087,6 +3252,26 @@ def _build_eval_inputs_impl(
         patch,
     )
     _validate_c5_eval_options(run_options, bundle.setpoints)
+    # The digest stays the authored profile. Gate metadata uses the triple
+    # after the voltage cap, the same triple stored on the EvalSpec. An
+    # unclaimed composition objective does not stop the run at stage 0 and
+    # does not enter the target digest.
+    gate_profile = profile_with_resolved_execution(
+        profile,
+        {
+            "campaign": str(run_options["campaign"]),
+            "track": str(run_options["track"] or "pyrolysis"),
+            "c5_enabled": bool(run_options["c5_enabled"]),
+        },
+    )
+    # Structural checks ran before the voltage cap and conditional pins.
+    # Remaining weight uses this triple, the one the EvalSpec will store.
+    try:
+        admit_executed_objective_weight(gate_profile)
+    except ObjectiveProfileError as exc:
+        raise ProfileValidationError(str(exc)) from exc
+    target_metadata = composition_target_eval_metadata(gate_profile)
+    stop_at_stage0_exit = composition_targets_require_stage0_exit(gate_profile)
     setpoints_patch = schema.to_setpoints_patch(patch)
     (
         stage0_redox_oxidant_kg,
@@ -3153,6 +3338,10 @@ def _build_eval_inputs_impl(
         allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
+        until_campaign_complete=_c0_pyrolysis_continues_through_later_steps(
+            run_options,
+            stop_at_stage0_exit=stop_at_stage0_exit,
+        ),
     )._session_config()
     if stop_at_stage0_exit:
         run_config = replace(run_config, stop_at_stage0_exit=True)
@@ -3572,14 +3761,8 @@ def _c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:
 
 
 def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]:
-    fidelity_options = profile.get("fidelities", {})
-    selected = {}
-    if isinstance(fidelity_options, Mapping):
-        raw_selected = fidelity_options.get(fidelity, {})
-        if isinstance(raw_selected, Mapping):
-            selected = dict(raw_selected)
-    merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
-    merged.update(selected)
+    merged = _merged_run_for_fidelity(profile, fidelity)
+    identity = resolved_execution_identity(profile, fidelity)
     # Fold the legacy `stub` alias onto canonical `internal-analytical` at this
     # run-config acceptance boundary so downstream consumers see one token.
     backend_name = canonical_backend_name(
@@ -3605,13 +3788,13 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
     lab_overlay_scope = _lab_overlay_scope_options(merged)
     mass_kg = _positive_eval_mass_kg(merged.get("mass_kg", 1000.0))
     return MappingProxyType({
-        "campaign": merged.get("campaign", "C0"),
+        "campaign": str(identity["campaign"]),
         "hours": int(merged.get("hours", 24)),
         "mass_kg": mass_kg,
         "additives_kg": dict(merged.get("additives_kg", {}) or {}),
-        "track": merged.get("track", "pyrolysis"),
+        "track": str(identity["track"]),
         "backend_name": backend_name,
-        "c5_enabled": bool(merged.get("c5_enabled", False)),
+        "c5_enabled": bool(identity["c5_enabled"]),
         "mre_max_voltage_V": float(merged.get("mre_max_voltage_V", 0.0) or 0.0),
         "mre_target_species": str(merged.get("mre_target_species", "") or ""),
         "reduced_real_cache": reduced_real_cache,
@@ -3739,20 +3922,12 @@ def _positive_eval_mass_kg(raw: Any) -> float:
 
 
 def _validate_eval_mass_basis(profile: Mapping[str, Any], fidelity: str) -> None:
-    raw_mass: Any = None
-    found = False
-    run_options = profile.get("run")
-    if isinstance(run_options, MappingABC) and "mass_kg" in run_options:
-        raw_mass = run_options["mass_kg"]
-        found = True
-    fidelity_options = profile.get("fidelities")
-    if isinstance(fidelity_options, MappingABC):
-        selected = fidelity_options.get(fidelity)
-        if isinstance(selected, MappingABC) and "mass_kg" in selected:
-            raw_mass = selected["mass_kg"]
-            found = True
-    if found:
-        _positive_eval_mass_kg(raw_mass)
+    # The mass the run executes. Alias spellings share `_merged_run_for_fidelity`
+    # with the campaign lookup, so a `stub` request cannot validate the authored
+    # mass while the overlay runs a different one.
+    merged = _merged_run_for_fidelity(profile, fidelity)
+    if "mass_kg" in merged:
+        _positive_eval_mass_kg(merged["mass_kg"])
 
 
 def _thermal_scheduled_run_options(
@@ -4272,8 +4447,24 @@ def _objective_profile_for_spec(
     profile: Mapping[str, Any],
     spec: EvalSpec,
 ) -> Mapping[str, Any]:
+    # Score against the EvalSpec triple. Fidelity options, conditional pins,
+    # and the voltage cap all land on the spec before this copy. Hours and
+    # the thermal window below do not change product claims. The digested
+    # profile is the caller's object; this copy is scoring-only.
+    profile = scoring_profile_for_executed_spec(profile, spec)
     run = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
     changed = False
+    # profile_with_resolved_execution returns the authored object when the
+    # default track (pyrolysis) and default c5 (false) already match the spec.
+    # Claim readers use those defaults, but this scoring copy stores the keys
+    # the spec recorded. The authored profile is not mutated.
+    resolved_track = str(spec.track or "pyrolysis")
+    if run.get("track") != resolved_track:
+        run["track"] = resolved_track
+        changed = True
+    if run.get("c5_enabled") is not spec.c5_enabled:
+        run["c5_enabled"] = spec.c5_enabled
+        changed = True
     try:
         configured_hours = int(run.get("hours"))
     except (TypeError, ValueError):
@@ -4419,7 +4610,33 @@ def _composition_target_constraints(
     *,
     recipe_patch: RecipePatch | None = None,
     campaign: str | None = None,
+    track: str | None = None,
+    c5_enabled: bool | None = None,
 ) -> PhysicsConstraintSet | None:
+    # The triple is the resolved execution, including a fidelity overlay
+    # and a later c5 rewrite. Stamp all three before coating and extraction
+    # read the scoring rows. Passing one field without the others would
+    # keep the authored track or c5, which is the defect. An unclaimed
+    # composition objective then imposes neither gate.
+    provided = (
+        campaign is not None,
+        track is not None,
+        c5_enabled is not None,
+    )
+    if any(provided) and not all(provided):
+        raise EvaluationInputError(
+            "composition target constraints require campaign, track, and "
+            "c5_enabled together"
+        )
+    if all(provided):
+        profile = profile_with_resolved_execution(
+            profile,
+            {
+                "campaign": campaign,
+                "track": track,
+                "c5_enabled": c5_enabled,
+            },
+        )
     active = constraints or physics_constraints_from_profile(profile)
     active = _with_recipe_local_furnace_ceiling(
         profile,
@@ -4560,6 +4777,49 @@ def _with_composition_target_extraction_thresholds(
     )
 
 
+@dataclass(frozen=True)
+class _ExecutedCampaignScore:
+    """Objective vector and the withhold notice of one scoring profile.
+
+    INVARIANT: the notice is ``unclaimed_product_withheld_objective_note`` of
+    the same profile passed to ``compute_objectives``. That profile carries
+    the evaluated triple (campaign, track, c5_enabled), not the authored
+    run. Every path that publishes a vector publishes this pair. A fidelity
+    overlay or a voltage-cap rewrite cannot attach a notice for a different
+    triple.
+    """
+
+    objectives: ObjectiveVector
+    withhold_note: str | None
+
+
+def _score_executed_campaign(
+    run_execution: Any,
+    scoring_profile: Mapping[str, Any],
+    spec: EvalSpec,
+) -> _ExecutedCampaignScore:
+    objectives = compute_objectives(
+        scoring_profile,
+        run_execution,
+        cost_parameters=spec.cost_parameters,
+    )
+    return _ExecutedCampaignScore(
+        objectives=_objectives_with_thermal_window_metadata(objectives, spec),
+        withhold_note=unclaimed_product_withheld_objective_note(scoring_profile),
+    )
+
+
+def _notes_for_executed_campaign_score(
+    notes: tuple[str, ...] | Sequence[str],
+    score: _ExecutedCampaignScore,
+) -> tuple[str, ...]:
+    existing = tuple(str(item) for item in notes)
+    note = score.withhold_note
+    if note is None or note in existing:
+        return existing
+    return existing + (note,)
+
+
 def _infeasible_result(
     candidate_id: str | None,
     spec: EvalSpec,
@@ -4570,13 +4830,21 @@ def _infeasible_result(
     *,
     notes: tuple[str, ...] = (),
     trace_payload: Mapping[str, Any] | None = None,
-    objectives: ObjectiveVector | None = None,
+    campaign_score: _ExecutedCampaignScore | None = None,
 ) -> ScoredResult:
     trace_payload = _trace_payload_with_interpolation_feasibility(
         trace_payload,
         run_execution,
         feasibility.margins,
     )
+    objectives = None
+    # A retained vector keeps the notice produced with it. ``profile`` is the
+    # run-reference profile and is not a second campaign for this notice.
+    if campaign_score is not None and all(
+        value.value is not None for value in campaign_score.objectives.values
+    ):
+        objectives = campaign_score.objectives
+        notes = _notes_for_executed_campaign_score(notes, campaign_score)
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -4596,16 +4864,15 @@ def _compute_objective_vector(
     objective_profile: Mapping[str, Any],
     pumping_diagnostic: Mapping[str, Any],
     spec: EvalSpec,
-) -> ObjectiveVector:
-    objectives = compute_objectives(
-        objective_profile,
+) -> _ExecutedCampaignScore:
+    return _score_executed_campaign(
         _CertifiedPumpingDiagnosticRunExecution(
             run_execution,
             pumping_diagnostic,
         ),
-        cost_parameters=spec.cost_parameters,
+        objective_profile,
+        spec,
     )
-    return _objectives_with_thermal_window_metadata(objectives, spec)
 
 
 def _target_infeasible_result(
@@ -5174,10 +5441,12 @@ def _out_of_domain_result(
             assessment.trace_payload,
         )
         try:
-            objectives = compute_objectives(
-                profile,
+            # ``profile`` here is the scoring profile the caller stamped with
+            # EvalSpec.campaign. The vector and the notice share it.
+            campaign_score = _score_executed_campaign(
                 scoring_execution,
-                cost_parameters=spec.cost_parameters,
+                profile,
+                spec,
             )
         except OverflowError as exc:
             raise EngineBugAbort(
@@ -5195,7 +5464,7 @@ def _out_of_domain_result(
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
-        objectives = _objectives_with_thermal_window_metadata(objectives, spec)
+        objectives = campaign_score.objectives
         trace_payload = _composition_target_trace_payload(
             profile,
             objectives,
@@ -5229,9 +5498,11 @@ def _out_of_domain_result(
                 cost_parameters=spec.cost_parameters,
                 coating_margin=feasibility.margins.get("coating"),
             ),
-            notes=assessment.notes,
+            notes=_notes_for_executed_campaign_score(assessment.notes, campaign_score),
         )
 
+    # ``profile`` here is the scoring profile the caller stamped with
+    # EvalSpec.campaign. The rump gate follows that campaign's claims.
     if composition_targets_require_terminal_rump(profile):
         return _target_infeasible_result(
             candidate_id,
@@ -6317,6 +6588,31 @@ def _live_run_reference_trace(
     return _TraceOverlay(trace, MappingProxyType(dict(payload)))
 
 
+def _campaign_stops_for_trace(run_execution: Any) -> tuple[dict[str, Any], ...]:
+    """Completed-step stop records stored on the ranking trace.
+
+    Prefer the records the executor accumulated. A carrier that did not
+    copy them still yields the same records from the session step list.
+    A summary with no stop token is omitted. It is not stored as
+    ``endpoint_met``.
+    """
+
+    stored = getattr(run_execution, "campaign_stops", None)
+    if not stored:
+        session = getattr(run_execution, "session", None)
+        stored = []
+        for result in getattr(session, "_step_results", ()) or ():
+            record = campaign_stop_record(getattr(result, "campaign_summary", None))
+            if record is not None:
+                stored.append(record)
+    records: list[dict[str, Any]] = []
+    for item in stored:
+        record = campaign_stop_record(item)
+        if record is not None:
+            records.append(record)
+    return tuple(records)
+
+
 def _cache_trace_payload(
     run_execution: Any,
     trace_payload: Mapping[str, Any] | None,
@@ -6358,6 +6654,13 @@ def _cache_trace_payload(
         payload["refusal_reason"] = refusal_reason
     if isinstance(refusal_diagnostic, Mapping) and refusal_diagnostic:
         payload["refusal_diagnostic"] = _compact_jsonable(dict(refusal_diagnostic))
+
+    # Per-step stop reasons are part of the ranking trace. A time cap that
+    # carries a residual into the next campaign stays visible as time_cap
+    # plus the cap name. Missing reasons are not rewritten to endpoint_met.
+    campaign_stops = _campaign_stops_for_trace(run_execution)
+    if campaign_stops:
+        payload["campaign_stops"] = campaign_stops
 
     simulator = getattr(run_execution, "simulator", None)
     notice_reader = getattr(simulator, "engine_commissioning_run_notice", None)
