@@ -7,14 +7,16 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tests.helpers.corpus_paths import regolith_corpus_root
+from simulator.battery.enums import AmountBasis, Engine
+from simulator.battery.records import Composition, Located
+from simulator.battery.score import fusion_comparison_reference
+from simulator.battery.generators.bench import activity_request_for_engine
+
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/saito-2021-fexo-cao-silica-activity.yaml"
 SID = "saito-2021-fexo-cao-silica-activity"
-CORPUS = regolith_corpus_root()
 
 
-@pytest.mark.skipif(not (CORPUS / "raw" / SID / f"{SID}.pdf").is_file(), reason="corpus source is absent")
 def test_nonstoichiometric_fexo_context_and_deferred_figures(tmp_path: Path) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     species = document["species"]["Fe(1-x)O"]
@@ -58,6 +60,8 @@ def test_nonstoichiometric_fexo_context_and_deferred_figures(tmp_path: Path) -> 
     assert migrated.validation is not None
     assert migrated.validation.hard_issues == ()
     migrated_by_id = {o.observation_id: o for o in observations}
+    migrated_experiments = migrated.experiments
+    liquid_compositions = 0
     for source_observation in species["observations"]:
         observation_id = source_observation["observation_id"]
         observation = migrated_by_id[f"{SID}::{observation_id}"]
@@ -72,6 +76,43 @@ def test_nonstoichiometric_fexo_context_and_deferred_figures(tmp_path: Path) -> 
         assert observation.point_conditions["fO2_log"].state.value == Decimal(
             source_observation["values"]["log_fO2"]["value"]
         )
+        if observation.identity.reference_state.value.endmember.phase.value.value != "l":
+            assert "composition_wt_pct" not in source_observation["values"]
+            continue
+
+        printed_composition = source_observation["values"]["composition_wt_pct"]
+        liquid_compositions += 1
+        assert set(printed_composition) == {"FeO", "FeO1.5", "CaO", "SiO2"}
+        located_composition = observation.point_conditions["composition"]
+        assert isinstance(located_composition, Located)
+        assert located_composition.locator is not None
+        assert located_composition.state.is_value
+        composition = located_composition.state.value
+        assert isinstance(composition, Composition)
+        assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+        # The migrated composition canonicalizes the source FeO1.5 component.
+        assert "Fe2O3" in dict(composition.components)
+
+        converted = fusion_comparison_reference(
+            observation, engine=Engine.OPENIMCC
+        )
+        experiment = migrated_experiments[observation.experiment_id]
+        request = activity_request_for_engine(
+            experiment, converted, Engine.OPENIMCC.value
+        )
+        assert request is not None and request.payload is not None, (
+            observation_id,
+            None if request is None else request.readiness.gaps,
+        )
+        assert request.readiness.status.value == "ready"
+        engine_composition = request.payload["composition_mol"]
+        expected_engine_components = {"FeO", "SiO2"}
+        if Decimal(str(printed_composition["FeO1.5"])) > 0:
+            expected_engine_components.add("FeO1.5")
+        if Decimal(str(printed_composition["CaO"])) > 0:
+            expected_engine_components.add("CaO")
+        assert expected_engine_components <= set(engine_composition)
+    assert liquid_compositions == 42
 
     by_table_record = {
         (row.locator.record, row.identity.reference_state.value.endmember.phase.value.value): row

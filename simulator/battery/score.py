@@ -6647,7 +6647,11 @@ def _total_iron_basis_band(
         )
     components = dict(composition.components)
     feo = components.get("FeO", Decimal(0))
-    fe2o3 = components.get("Fe2O3", Decimal(0))
+    if "Fe2O3" not in components:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_ferric_analysis_missing"}
+        )
+    fe2o3 = components["Fe2O3"]
     total_iron = feo + 2 * fe2o3
     if (
         not feo.is_finite()
