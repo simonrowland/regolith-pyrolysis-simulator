@@ -3565,6 +3565,11 @@ def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
     }
     sim._freeze_gate_shared_curve_cache = {key: cached_record}
     sim._freeze_gate_liquid_fraction_curve_memo = {key: cached_record}
+    sim._freeze_gate_held_curve_record = {
+        'hour': int(sim.melt.hour),
+        'provider': 'magemin',
+        'record': cached_record,
+    }
 
     class ReplaySpy:
         replay_enabled = True
