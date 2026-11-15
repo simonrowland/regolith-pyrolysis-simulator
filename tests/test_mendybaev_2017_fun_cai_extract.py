@@ -10,6 +10,7 @@ import yaml
 
 from simulator.battery.enums import Quantity
 from simulator.battery.migrate import Migrator
+from tools import locator_page_audit
 from tools.locator_page_audit import collect_locator_records
 
 
@@ -25,6 +26,20 @@ FUNC_STARTING_COMPOSITION = {
 }
 SOURCE_PAGE_PINS = {
     12: "Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments",
+}
+EXPECTED_SKIP_PATHS = {
+    "benches.0.identity.ref.locator",
+    "benches.0.geometry.locator",
+    "experiments.0.locator",
+    *(
+        f"experiments.{index}.{field}.locator"
+        for index in range(1, 10)
+        for field in (
+            "apparatus.geometry.cell_or_crucible_material",
+            "pressure_environment.sweep_gas",
+        )
+    ),
+    *(f"experiments.{index}.thermal_schedule.total_duration_s.locator" for index in range(1, 10)),
 }
 
 
@@ -61,10 +76,9 @@ def _assert_source_page_index_pins(document: dict) -> None:
     with LOCATOR_AUDIT.open(encoding="utf-8", newline="") as stream:
         receipt = list(csv.DictReader(stream))
     assert receipt
-    assert all(
-        row["result"] in {"PASS", "SKIP_NO_PHRASE_OR_PIN"}
-        for row in receipt
-    )
+    skips = {row["path"] for row in receipt if row["result"] == "SKIP_NO_PHRASE_OR_PIN"}
+    assert skips == EXPECTED_SKIP_PATHS
+    assert all(row["result"] == "PASS" for row in receipt if row["path"] not in skips)
     expected_pairs = [
         (row["path"], int(row["pdf_page_index"]), row["phrase"])
         for row in receipt
@@ -102,6 +116,24 @@ def test_source_page_index_pins_and_plus_one_mutation() -> None:
         pass
     else:
         raise AssertionError("moving the Ca quotation to index 13 must fail its page/phrase pair")
+
+    mutated_form = deepcopy(document)
+    mutated_form["experiments"][1]["sample"]["form"]["locator"]["pdf_page_index"] = 13
+    try:
+        _assert_source_page_index_pins(mutated_form)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("moving a known-value form locator from index 8 to 13 must fail")
+
+
+def test_locator_page_audit_uses_configured_corpus_root(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+    assert locator_page_audit.source_pdf_path() == (
+        tmp_path
+        / "raw/mendybaev-2017-fun-cai-lab-evaporation/"
+        "mendybaev-2017-fun-cai-lab-evaporation.pdf"
+    )
 
 
 def test_table_1_first_last_and_largest_two_sigma_cells_match_page() -> None:

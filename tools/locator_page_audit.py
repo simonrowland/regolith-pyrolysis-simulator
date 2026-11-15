@@ -11,13 +11,13 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from simulator.corpus_paths import regolith_corpus_root
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/mendybaev-2017-fun-cai-lab-evaporation.yaml"
-PDF = Path(
-    "/Users/simonrowland/Repos/regolith-corpus/raw/"
-    "mendybaev-2017-fun-cai-lab-evaporation/"
+PDF_RELATIVE_PATH = Path(
+    "raw/mendybaev-2017-fun-cai-lab-evaporation/"
     "mendybaev-2017-fun-cai-lab-evaporation.pdf"
 )
 PDF_SHA256 = "a2e99863bc07401d0d87607430ef78fbb61c7a6840405dc58467255a9cf0185b"
@@ -77,15 +77,37 @@ def _phrase_for_locator(
             return value
         return row
 
-    for context in reversed(contexts):
-        value = _scalar_text(context.get("value"))
-        if value:
-            return value
+    if any(
+        isinstance(context.get("state"), dict)
+        and context["state"].get("tag") in {"unknown", "not_applicable"}
+        for context in reversed(contexts)
+    ):
+        return ""
 
     for key in ("paragraph", "quote", "quotation", "phrase", "quoted_text"):
         phrase = _scalar_text(locator.get(key))
         if phrase:
             return phrase
+
+    note = _scalar_text(locator.get("note"))
+    if note and "unit conversion only" in note:
+        printed_token = re.search(
+            r"\b\d+(?:\.\d+)?\s*(?:\^?[-−]?\d+)?\s*(?:bar|bars|Pa)\b",
+            note,
+            re.IGNORECASE,
+        )
+        if printed_token:
+            return printed_token.group()
+
+    for context in reversed(contexts):
+        value = _scalar_text(context.get("value"))
+        if value:
+            return value
+        state = context.get("state")
+        if isinstance(state, dict) and state.get("tag") == "value":
+            value = _scalar_text(state.get("value"))
+            if value:
+                return value
 
     for context in reversed(contexts):
         for key in ("quote", "quotation", "phrase", "quoted_text", "as_printed"):
@@ -128,7 +150,11 @@ def collect_locator_records(document: dict[str, Any]) -> list[dict[str, Any]]:
 
 def _normalize(text: str) -> str:
     without_gutters = re.sub(r"(?m)^\s*\d{3,4}\s+", "", text)
-    return " ".join(without_gutters.split())
+    return " ".join(without_gutters.casefold().replace("^", "").split())
+
+
+def source_pdf_path() -> Path:
+    return regolith_corpus_root() / PDF_RELATIVE_PATH
 
 
 def _page_text(page: int) -> str:
@@ -140,7 +166,7 @@ def _page_text(page: int) -> str:
             str(page),
             "-l",
             str(page),
-            str(PDF),
+            str(source_pdf_path()),
             "-",
         ],
         check=True,
@@ -150,7 +176,8 @@ def _page_text(page: int) -> str:
 
 
 def audit() -> int:
-    actual_sha = hashlib.sha256(PDF.read_bytes()).hexdigest()
+    pdf_path = source_pdf_path()
+    actual_sha = hashlib.sha256(pdf_path.read_bytes()).hexdigest()
     if actual_sha != PDF_SHA256:
         raise SystemExit(f"unexpected corpus PDF sha256: {actual_sha}")
 
@@ -165,6 +192,7 @@ def audit() -> int:
         writer = csv.DictWriter(
             stream,
             fieldnames=("path", "pdf_page_index", "physical_page", "phrase", "result"),
+            lineterminator="\n",
         )
         writer.writeheader()
         for record in records:
