@@ -2813,7 +2813,9 @@ class EvaporationMixin:
         # production key itself byte-identical for in-domain inputs.
         magemin_domain_reason = None
         if self._liquid_fraction_provider == 'magemin':
-            from engines.magemin.domain import MAGEMinDomainGate
+            from engines.magemin.domain import (
+                _validate_magemin_projection_with_reason,
+            )
             from simulator.melt_backend.base import (
                 project_melt_to_oxide_projection,
             )
@@ -2825,8 +2827,13 @@ class EvaporationMixin:
                 oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
                 species_formula_registry=formula_registry,
             )
-            valid, _warnings, reason = MAGEMinDomainGate.validate_with_reason(
-                magemin_projection.oxide_wt_pct
+            valid, _warnings, reason = (
+                _validate_magemin_projection_with_reason(
+                    magemin_projection.oxide_wt_pct,
+                    dropped_mass_kg_by_species=(
+                        magemin_projection.dropped_mass_kg_by_species
+                    ),
+                )
             )
             if not valid:
                 magemin_domain_reason = reason

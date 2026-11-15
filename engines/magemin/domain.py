@@ -230,6 +230,30 @@ class MAGEMinDomainGate:
         return _FORBIDDEN_SPECIES
 
 
+def _validate_magemin_projection_with_reason(
+    composition_wt_pct: Mapping[str, float],
+    *,
+    dropped_mass_kg_by_species: Mapping[str, float] | None = None,
+) -> Tuple[bool, List[str], str | None]:
+    """Validate an oxide projection, including species dropped by its resolver."""
+    dropped = sorted(
+        str(species)
+        for species, mass_kg in (dropped_mass_kg_by_species or {}).items()
+        if is_finite(mass_kg) and float(mass_kg) > 0.0
+    )
+    if dropped:
+        return (
+            False,
+            [
+                'MAGEMinDomainGate: non-oxide species present '
+                '(must route through Stage 0 first): '
+                f'{dropped}'
+            ],
+            OutOfDomainReason.FORBIDDEN_SPECIES.value,
+        )
+    return MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
+
+
 def _canonical_domain_species(name: object) -> str:
     key = str(name).strip()
     if key in _MELTS_OXIDE_SET:
