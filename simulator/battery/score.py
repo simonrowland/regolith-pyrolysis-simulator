@@ -219,7 +219,10 @@ from simulator.battery.score_report import (
     render_payload_score_report_markdown,
     store_stamp_has_known_revision,
 )
-from simulator.battery.score_report_data import element_retention_report_data
+from simulator.battery.score_report_data import (
+    eligibility_failure_census,
+    element_retention_report_data,
+)
 from simulator.battery.score_metrics import (
     QUANTITY_METRIC,
     _phase_component_reference_wt_percent,
@@ -23050,6 +23053,12 @@ def _render_score_report_from_payloads_legacy(
     if not report_engine_names:
         report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
     report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
+    eligibility_census = eligibility_failure_census(
+        rows,
+        conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
+        observations=context.observations,
+        engine_for_row=_engine_from_payload,
+    )
     pending = 0
     admitted = 0
     for observation in comparison_candidates(context):
@@ -23068,6 +23077,7 @@ def _render_score_report_from_payloads_legacy(
         all_numeric_records=aggregate.all_numeric.records(
             engine.value for engine in engines
         ),
+        eligibility_census=eligibility_census,
         headline_rows=aggregate.headline_records(engines=report_engines),
         e15_lines=_e15_report_lines(aggregate.e15_points, context.observations),
         flagged_rows=aggregate.flagged_records(),
@@ -24658,6 +24668,12 @@ def render_score_report_from_payloads(
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
 ) -> str:
+    eligibility_census = eligibility_failure_census(
+        rows,
+        conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
+        observations=observations,
+        engine_for_row=_engine_from_payload,
+    )
     unflagged_rows = _FilteredPayloadRows(
         rows, lambda row: not _flagged_payload_strata(row)
     )
@@ -24750,6 +24766,7 @@ def render_score_report_from_payloads(
         engines=engines,
         observations_present=observations is not None,
         all_numeric_records=all_numeric_records,
+        eligibility_census=eligibility_census,
         measured_headline_rows=measured_headline_rows,
         e15_lines=e15_lines,
         flagged_rows=flagged_rows,
