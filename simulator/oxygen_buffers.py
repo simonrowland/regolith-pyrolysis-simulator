@@ -179,12 +179,17 @@ def _oneill_iw_log10_fO2_bar_value(
         if decimal_evaluation
         else math.log(temperature_K)
     )
+    temperature_squared = (
+        temperature_K * temperature_K
+        if decimal_evaluation
+        else temperature_K**2
+    )
     if temperature_K < number(1042):
         mu_o2 = (
             number("-605812")
             + number("1366.718") * temperature_K
             - number("182.7955") * temperature_K * log_temperature
-            + number("0.10359") * temperature_K * temperature_K
+            + number("0.10359") * temperature_squared
         )
     elif temperature_K < number(1184):
         mu_o2 = (
