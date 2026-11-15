@@ -8722,12 +8722,16 @@ def _predict_distin_closed_feo_activity(
         identity,
         fO2_Pa=State.of(log10_fo2_to_pa(Decimal(str(fo2_log)))),
     )
-    # The pinned openimcc/data/packs/openimcc-redox-v1.json:294-318 row names
-    # JANAF Fe-019 and embeds its FeO(l) coefficients; its redox-pack digest
-    # therefore guards the standard used by this closed-redox result.
+    # MELT owns the activity standard; the FeO standard owner validates that
+    # this redox pack's FeO(l) row is compatible with the returned MELT digest.
     coefficient_sources = [
         f"openimcc-redox-pack:sha256:{result.redox_pack_digest}"
     ]
+    if result.melt_pack_binding_digest:
+        coefficient_sources.append(
+            "openimcc-melt-binding:sha256:"
+            f"{result.melt_pack_binding_digest}"
+        )
     return EnginePrediction(
         engine=engine,
         channel=channel,
