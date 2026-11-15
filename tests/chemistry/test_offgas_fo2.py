@@ -502,6 +502,69 @@ def test_direct_gas_couple_numeric_outputs_are_pinned_before_extension(polys):
     assert h2.log10_fO2 == pytest.approx(-4.956493206418616, abs=1e-12)
 
 
+def test_wgs_solver_keeps_a_pinned_direct_couple_value_at_equilibrium(polys):
+    temperature_K = 1682.15
+    h2_moles = 10.0
+    h2o_moles = 2000.0
+    # Choose CO2/CO so the input Q equals the production CEA WGS K. The shift
+    # extent is zero and the result must retain the direct H2/H2O golden value.
+    gas = {
+        "H2": h2_moles,
+        "H2O": h2o_moles,
+        "CO": 1.0,
+        "CO2": (h2o_moles / h2_moles)
+        * 10.0 ** water_gas_shift_log10_K(polys, temperature_K),
+    }
+    result = imposed_fo2(gas, temperature_K, polys)
+
+    # Mutation: invert K_CO/K_H2 to K_H2/K_CO; this numeric pin fails.
+    assert result.extent_mol == pytest.approx(0.0, abs=1e-10)
+    assert result.log10_fO2 == pytest.approx(-4.956493206418616, abs=1e-12)
+
+
+def test_imposed_fo2_returns_the_ceajanaf_wgs_source_spread(polys):
+    from decimal import Decimal
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
+    )
+
+    temperature_K = 1682.15
+    gas = {"CO2": 0.22, "CO": 1.4, "H2O": 0.35, "H2": 2.0}
+    janaf_gibbs = {
+        formula: float(
+            _janaf_gas_formation_gibbs_J_per_mol(
+                formula, Decimal(str(temperature_K))
+            )
+        )
+        for formula in ("CO2", "CO", "H2O", "H2", "O2")
+    }
+
+    cea = imposed_fo2(gas, temperature_K, polys)
+    result = imposed_fo2(
+        gas,
+        temperature_K,
+        polys,
+        janaf_formation_gibbs_J_per_mol=janaf_gibbs,
+        janaf_gas_constant_J_per_mol_K=float(JANAF_R_J_PER_MOL_K),
+    )
+
+    # Mutation: remove or halve the full source-spread band; these assertions fail.
+    assert result.log10_fO2 == pytest.approx(cea.log10_fO2, abs=1e-12)
+    assert result.uncertainty_band_dex is not None
+    assert result.uncertainty_band_dex == pytest.approx(0.0004895351, abs=2e-9)
+    assert result.as_dict()["uncertainty_band_dex"] == result.uncertainty_band_dex
+
+
+def test_non_wgs_result_omits_the_optional_source_band(polys):
+    result = imposed_fo2({"H2O": 2000.0, "H2": 10.0}, 1682.15, polys)
+
+    # Mutation: serialize a fabricated zero band when no WGS comparison ran.
+    assert result.uncertainty_band_dex is None
+    assert "uncertainty_band_dex" not in result.as_dict()
+
+
 def test_direct_couple_owner_combines_mix_precision_and_janaf_cea_spread(polys):
     from simulator.chemistry.offgas_fo2 import _direct_gas_couple_fo2
 
