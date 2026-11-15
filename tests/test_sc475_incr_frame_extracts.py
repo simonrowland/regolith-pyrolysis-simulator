@@ -7,6 +7,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as migrate_module
+from simulator.battery import schema_gap as schema_gap_module
 from simulator.battery.migrate import Migrator
 from simulator.battery.validate import validate_corpus
 
@@ -2713,7 +2714,7 @@ def _assert_stack_shornikov_rows(document, hit_rows):
 
 
 def test_increment_and_frame_repairs_migrate_unavailable():
-    assert migrate_module._SC475_SCHEMA_GAP_SOURCE_IDS == SC475_SOURCE_IDS
+    assert schema_gap_module.SC475_SCHEMA_GAP_SOURCE_IDS == SC475_SOURCE_IDS
     reason_mismatches = []
     checked_sources = set()
     for source_id, expected in HIT_ROWS.items():
@@ -2844,7 +2845,18 @@ def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows()
                 ), observation_id
 
 
-def _assert_schema_gap_refusals(migrator, source_id, expected_reasons, *, report):
+def _source_observation_count(source_row):
+    values = source_row["values"]
+    for key in ("points", "series"):
+        points = values.get(key)
+        if isinstance(points, list):
+            return len(points)
+    return 1
+
+
+def _assert_schema_gap_refusals(
+    migrator, source_id, source_rows, expected_reasons, *, report
+):
     validator_observation_ids = []
     for observation_id, expected_reason in expected_reasons.items():
         migrated = [
@@ -2853,7 +2865,8 @@ def _assert_schema_gap_refusals(migrator, source_id, expected_reasons, *, report
             if key == f"{source_id}::{observation_id}"
             or key.startswith(f"{source_id}::{observation_id}::")
         ]
-        assert migrated, observation_id
+        expected_count = _source_observation_count(source_rows[observation_id])
+        assert len(migrated) == expected_count, observation_id
         actual_reasons = [row.value.unavailable_reason for row in migrated]
         admissions = [row.admission.status.value for row in migrated]
         validator_observation_ids.extend(row.observation_id for row in migrated)
@@ -2899,7 +2912,7 @@ def _migrate_shornikov_rows(source_id, hit_rows, *, report):
     migrator._migrate_extract(path)
     migrator.finalize()
     _assert_schema_gap_refusals(
-        migrator, source_id, expected_reasons, report=report
+        migrator, source_id, _records(document), expected_reasons, report=report
     )
 
 
@@ -2970,6 +2983,7 @@ def _migrate_zaitsev_rows(*, report):
     _assert_schema_gap_refusals(
         migrator,
         source_id,
+        rows,
         {
             observation_id: rows[observation_id]["values"]["schema_gap"]
             for observation_id in ZAITSEV_HIT_ROWS

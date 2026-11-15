@@ -77,6 +77,7 @@ import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import SOURCE_DECLARATIONS
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
@@ -12010,52 +12011,11 @@ def _pressure_series_quantity(
     return None
 
 
-def _declared_schema_gap(payload: Mapping[str, Any] | None) -> str | None:
-    if not isinstance(payload, Mapping):
-        return None
-    reason = payload.get("schema_gap")
-    return reason.strip() if isinstance(reason, str) and reason.strip() else None
-
-
-# `schema_gap` also records unrelated curation gaps across the corpus. Scope
-# this refusal to the SC-475 extracts and observations declared in the extract's
-# top-level schema_gaps list; use the row wording, which can carry detail absent
-# from that list's accepted reason text.
-_SC475_SCHEMA_GAP_SOURCE_IDS = frozenset(
-    {
-        "shornikov-2008-mgo-aluminosilicate-melts",
-        "shornikov-2011-cao-mgo-alumina-melts",
-        "shornikov-2014-sodium-germanate-melts",
-        "shornikov-2017-spinel-thermodynamics",
-        "shornikova-2019-perovskite-thermodynamics",
-        "zaitsev-2006-magnesium-silicate-thermodynamics",
-        "beyer-1980-potassium-metasilicate-disilicate-ri8410",
-        "bennington-brown-1982-synthetic-acmite-ri8621",
-        "bennington-brown-beyer-1984-aegirine-ri8912",
-    }
-)
-
-
-def _sc475_declared_schema_gap(
-    source_id: str,
-    observation_id: str,
-    payload: Mapping[str, Any] | None,
-    declarations: Mapping[str, str] | None,
-) -> str | None:
-    if source_id not in _SC475_SCHEMA_GAP_SOURCE_IDS or declarations is None:
-        return None
-    declared = declarations.get(observation_id)
-    if not isinstance(declared, str) or not declared.strip():
-        return None
-    return _declared_schema_gap(payload)
-
-
 def map_quantity(
     obs_type: str | None,
     values: Mapping[str, Any] | list[Any] | None,
     units: str | None = None,
     row: Mapping[str, Any] | None = None,
-    schema_gap: str | None = None,
 ) -> tuple[State[Quantity], str | None]:
     if isinstance(values, list):
         values = (
@@ -12150,9 +12110,7 @@ def map_quantity(
     if quantity_absent and obs_type in TYPE_QUANTITY:
         inferred = TYPE_QUANTITY[obs_type]
         if not _quantity_corroborated(inferred, values, units, row):
-            reason = schema_gap or (
-                "row type is a curation label, not a statement of the observable"
-            )
+            reason = "row type is a curation label, not a statement of the observable"
             contradiction = _quantity_contradiction(
                 inferred, obs_type, values, units, row
             )
@@ -12164,14 +12122,11 @@ def map_quantity(
             return State.unknown(contradiction), contradiction
         return State.of(inferred), None
     if isinstance(raw, str) and raw:
-        if schema_gap is not None:
-            return State.unknown(schema_gap), schema_gap
         return (
             State.unknown(f"unsupported quantity {raw!r}"),
             f"unsupported quantity {raw!r}",
         )
-    reason = schema_gap or "source does not state a closed quantity"
-    return State.unknown(reason), schema_gap or "missing quantity"
+    return State.unknown("source does not state a closed quantity"), "missing quantity"
 
 
 _COMPILATION_CELL_QUANTITY: dict[str, Quantity] = {
@@ -17822,18 +17777,8 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
-    declared_schema_gap = _declared_schema_gap(payload)
-    if (
-        q_token is None
-        and isinstance(declared, State)
-        and declared.reason == declared_schema_gap
-        and declared_schema_gap is not None
-    ):
-        return _unavailable_selection(
-            declared_schema_gap,
-            condition_ranges=condition_ranges,
-            unused_ancillary=unused,
-        )
+    if (gap_selection := sg.gap_selection(_unavailable_selection, declared, payload, condition_ranges, unused)) is not None:
+        return gap_selection
     if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
         oxide_fields, invalid_fields = _residue_component_field_sets(payload)
         for field in ("residue_ppm", *oxide_fields):
@@ -25371,13 +25316,6 @@ class Migrator:
             doc, work=work, source_id=source_id, experiment_refs=experiment_refs
         )
         extraction = doc.get("extraction") if isinstance(doc.get("extraction"), Mapping) else {}
-        declared_schema_gaps = {
-            str(gap["observation_id"]): str(gap["reason"])
-            for gap in (doc.get("schema_gaps") or ())
-            if isinstance(gap, Mapping)
-            and isinstance(gap.get("observation_id"), str)
-            and isinstance(gap.get("reason"), str)
-        }
         extract_provenance = (
             dict(doc["provenance"])
             if isinstance(doc.get("provenance"), Mapping)
@@ -25445,6 +25383,7 @@ class Migrator:
                 if _row_is_phase_analysis(row):
                     phase_analysis_parent_ids.add(f"{source_id}::{record_id}")
         source_context = dict(pressure_identity_context or {})
+        source_context = sg.attach_extract_declarations(source_context, doc)
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["printed_atmospheres_for_set"] = (
             printed_atmospheres_for_set
@@ -25525,7 +25464,6 @@ class Migrator:
                     source_context=source_context,
                     provenance=extract_provenance,
                     fusion_transition_rows=fusion_transition_rows,
-                    declared_schema_gaps=declared_schema_gaps,
                 )
             except _InvalidDecimalValue as exc:
                 self._record_invalid_decimal_source(
@@ -25749,7 +25687,6 @@ class Migrator:
         fusion_transition_rows: Mapping[
             tuple[str, str, str], tuple[Mapping[str, Any], ...]
         ] | None = None,
-        declared_schema_gaps: Mapping[str, str] | None = None,
     ) -> None:
         measured = self.result.measured
         raw_obs_id = str(obs.get("observation_id") or "")
@@ -25772,9 +25709,6 @@ class Migrator:
         else:
             values = {}
         context = source_context or {}
-        declared_schema_gap = _sc475_declared_schema_gap(
-            source_id, raw_obs_id, values, declared_schema_gaps
-        )
         closure_components_by_observation = context.get(
             "same_row_composition_closure_components"
         )
@@ -25822,13 +25756,7 @@ class Migrator:
             else None
         )
         obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
-        quantity, q_reason = map_quantity(
-            obs_type,
-            values,
-            units=obs.get("units"),
-            row=obs,
-            schema_gap=declared_schema_gap,
-        )
+        quantity, q_reason, declared_schema_gap = sg.map_quantity(map_quantity, source_id, raw_obs_id, values, context, obs)
         q_token = quantity.value if quantity.is_value else None
         identity_profile_uses_composition = _composition_axis_is_required(
             q_token,
@@ -26772,20 +26700,7 @@ class Migrator:
                 else f"source admission_status={raw_source_admission}"
             )
             admission = Admission(status=AdmissionStatus.PENDING, reason=reason)
-        if (
-            q_token is None
-            and declared_schema_gap is not None
-            and value.kind is ValueKind.UNAVAILABLE
-            and admission.status is AdmissionStatus.ADMITTED
-        ):
-            # A schema-gap row has no representable quantity, so it must not remain admitted.
-            admission = admission_for(
-                "typed_refusal",
-                superseded_by=None,
-                extraction=extraction,
-                locator=locator,
-                refusal_reason=declared_schema_gap,
-            )
+        admission = sg.admission(admission, q_token, declared_schema_gap, value.kind.value, admission.status.value, admission_for, extraction, locator)
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (
@@ -28691,8 +28606,7 @@ class Migrator:
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
-                    parent_values=values,
-                    schema_gap_reason=declared_schema_gap,
+                    parent_values=sg.point_context(values, declared_schema_gap),
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
@@ -28891,12 +28805,7 @@ class Migrator:
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
-                        parent_values=(
-                            _values_without_row_lists(values)
-                            if non_yield_points
-                            else values
-                        ),
-                        schema_gap_reason=declared_schema_gap,
+                        parent_values=sg.point_context(values, declared_schema_gap, _values_without_row_lists if non_yield_points else None),
                         composition_datum_declared=declares_composition_datum,
                         provenance=observation_provenance,
                         parent_point_conditions=(
@@ -29475,7 +29384,6 @@ class Migrator:
         equipment: object = None,
         parent_reason: str | None = None,
         parent_values: object = None,
-        schema_gap_reason: str | None = None,
         composition_datum_declared: bool = False,
         provenance: Mapping[str, Any] | None = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
@@ -29868,27 +29776,7 @@ class Migrator:
                     **raw_item,
                     "gas_species": parent_values["gas_species"],
                 }
-            if (
-                q_token is None
-                and isinstance(parent_values, Mapping)
-                and schema_gap_reason is not None
-                and _declared_schema_gap(parent_values) == schema_gap_reason
-                and "schema_gap" not in selection_payload
-            ):
-                selection_payload = {
-                    **selection_payload,
-                    "schema_gap": schema_gap_reason,
-                }
-            selection_quantity: Quantity | State[Quantity] | None = q_token
-            if (
-                q_token is None
-                and schema_gap_reason is not None
-                and _declared_schema_gap(selection_payload) == schema_gap_reason
-            ):
-                selection_quantity = State.unknown(schema_gap_reason)
-            value_sel = select_declared_source(
-                selection_quantity, units, selection_payload
-            )
+            value_sel = sg.point_value(select_declared_source, q_token, units, parent_values, selection_payload)
             provenance = _printed_scalar_provenance(
                 provenance, raw_item, value_sel
             )
