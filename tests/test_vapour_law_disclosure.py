@@ -3856,33 +3856,25 @@ def test_detached_session_verb_registers_on_the_session(verb: str) -> None:
     assert session.simulator.law_disclosures == session.law_disclosures
 
 
-def test_c0_forecast_context_shares_the_parent_registry(monkeypatch) -> None:
+def test_c0_forecast_context_shares_the_parent_registry() -> None:
     """The detached forecast writes the parent's registry, not a copy.
 
     Deleting the share in ``_build_c0_forecast_context`` leaves the parent
     snapshot empty after the context evaluates Fe.
     """
 
-    from simulator.chemistry.kernel.registry import ProviderRegistry
-    from simulator.core import MeltState, PyrolysisSimulator
     from simulator.vapour_rail.run_disclosure import RunDisclosure
+    from tests.chemistry.conftest import _build_sim, _load_yaml
 
-    monkeypatch.setattr(
-        "simulator.core.snapshot_atom_ledger",
-        lambda ledger: ledger,
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("setpoints.yaml"),
     )
-    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     registry = RunDisclosure()
     sim._law_disclosure_registry = registry
     sim.law_disclosures = ()
-    sim.melt = MeltState()
-    sim.backend = None
-    sim._c0_forecast_backend_factory = None
-    sim._pt0_determinism_store = None
-    sim.atom_ledger = _in_domain_freeze_gate_ledger()
-    sim._chem_registry = ProviderRegistry()
-    sim._chem_kernel = None
-    sim._build_chemistry_kernel = lambda: None
 
     context, status = sim._build_c0_forecast_context()
     assert status == ""
