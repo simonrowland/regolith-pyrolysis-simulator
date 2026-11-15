@@ -7,16 +7,19 @@ import logging
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
-from simulator.optimize.objective import ObjectiveDefinition, objective_definitions
+from simulator.optimize.objective import (
+    ObjectiveDefinition,
+    ask_time_objective_definitions,
+)
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.strategy.bayesian import (
-    _couple_suggested_pressure_defaults,
     _constraints_for_trial,
-    _objective_values_for_definitions,
+    _couple_suggested_pressure_defaults,
     _optuna_params_from_seed,
     _suggest_value,
     _sync_conditioned_trial_params,
     _tell_optuna_strategy,
+    objective_values_for_executed_spec,
 )
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
@@ -58,7 +61,9 @@ class OptunaNSGA2Strategy:
         self.schema = schema or RecipeSchema()
         self._seed = seed
         self.objective_profile = MappingProxyType(dict(active_profile))
-        self._objective_definitions = objective_definitions(self.objective_profile)
+        self._objective_definitions = ask_time_objective_definitions(
+            self.objective_profile
+        )
         self._directions = tuple(
             definition.sense for definition in self._objective_definitions
         )
@@ -197,7 +202,11 @@ class OptunaNSGA2Strategy:
         _tell_optuna_strategy(self, results)
 
     def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...] | None:
-        return _objective_values_for_definitions(scored, self._objective_definitions)
+        return objective_values_for_executed_spec(
+            self.objective_profile,
+            self._objective_definitions,
+            scored,
+        )
 
 
 def _require_optuna() -> Any:
