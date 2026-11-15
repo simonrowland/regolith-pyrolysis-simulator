@@ -4106,6 +4106,7 @@ def test_coverage_found_absent(tmp_extracts: Path):
     assert by_id["SiO"]["fixture-source"] == "absent"
 
 
+@pytest.mark.nightly
 def test_coverage_pending_stubs_not_found():
     """Null-hypothesis (KM-M2 STILL-OPEN): all 13 pending-* stubs report found.
 

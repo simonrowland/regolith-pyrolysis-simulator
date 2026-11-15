@@ -14,7 +14,7 @@ pytest_plugins = ("pytester",)
 def test_load_sensitive_tests_are_marked_nightly() -> None:
     from tests import suite_shape_guard
 
-    assert suite_shape_guard._nightly_marker_violations() == []
+    assert suite_shape_guard._tier_marker_violations() == []
 
 
 def _make_guard_suite(pytester, *, source: str, roster: tuple[tuple[str, str], ...]):
