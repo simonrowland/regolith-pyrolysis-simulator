@@ -98,6 +98,7 @@ from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveProfileError,
     ObjectiveVector,
+    _campaigns_elapsed,
     _merged_run_for_fidelity,
     admit_executed_objective_weight,
     composition_target_eval_metadata,
@@ -1850,15 +1851,11 @@ def _trace_with_optimizer_coating_report(
             "wall_deposit_by_segment_species_kg trace is missing or malformed"
         )
     try:
-        campaigns_elapsed = float(getattr(run_execution, "campaigns_elapsed", 1.0))
-    except (TypeError, ValueError) as exc:
-        raise CoatingFeasibilityReportError(
-            "campaigns_elapsed must be numeric"
-        ) from exc
-    if not math.isfinite(campaigns_elapsed) or campaigns_elapsed <= 0.0:
+        campaigns_elapsed = _campaigns_elapsed(run_execution)
+    except (ObjectiveComputationError, TypeError, ValueError) as exc:
         raise CoatingFeasibilityReportError(
             "campaigns_elapsed must be finite and positive"
-        )
+        ) from exc
     normalized_deposit: dict[tuple[str, str], float] = {}
     by_species: dict[str, float] = {}
     null_deposit_species: list[str] = []

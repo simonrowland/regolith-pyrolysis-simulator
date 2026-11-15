@@ -2158,6 +2158,23 @@ def test_product_booking_and_coating_gate_share_run_total_zero_classification() 
     ("terminal_summary", "tap_hour_summary", "production_gate", "evaluate_report"),
 )
 @pytest.mark.parametrize(
+    ("elapsed_source", "direct_attribute"),
+    (
+        ("direct", "value"),
+        ("run_metadata", "absent"),
+        ("run_metadata", "none"),
+        ("result_document", "absent"),
+        ("result_document", "none"),
+    ),
+    ids=(
+        "direct",
+        "metadata-without-direct",
+        "metadata-with-none-direct",
+        "document-without-direct",
+        "document-with-none-direct",
+    ),
+)
+@pytest.mark.parametrize(
     (
         "window_name",
         "campaigns_elapsed",
@@ -2181,6 +2198,8 @@ def test_product_booking_and_coating_gate_share_run_total_zero_classification() 
 def test_publication_paths_use_their_own_wall_supply_window(
     monkeypatch: pytest.MonkeyPatch,
     publication_path: str,
+    elapsed_source: str,
+    direct_attribute: str,
     window_name: str,
     campaigns_elapsed: float,
     rates_kg_hr: tuple[float, ...],
@@ -2196,7 +2215,9 @@ def test_publication_paths_use_their_own_wall_supply_window(
     summary divides 1.25 kg by all elapsed campaigns, while the hour-1 tap
     summary divides 1 kg by half the elapsed campaigns. In the final window,
     the terminal integral is (1 + 10) / 2 = 5.5, while the hour-1 tap integral
-    is 1 / 1 = 1 kg/campaign.
+    is 1 / 1 = 1 kg/campaign. Direct values, run metadata, and result-document
+    metadata all exercise the production elapsed-campaign resolver, including
+    absent and None direct attributes.
     """
 
     flux_snapshots = tuple(
@@ -2216,7 +2237,23 @@ def test_publication_paths_use_their_own_wall_supply_window(
         "refused": (("SiO", "hot_wall"),),
         "charge": 1000.0,
     })
-    execution.campaigns_elapsed = campaigns_elapsed
+
+    def publish_campaign_count(target: Any) -> None:
+        if elapsed_source == "run_metadata":
+            target.run_metadata = {"campaigns_elapsed": campaigns_elapsed}
+        elif elapsed_source == "result_document":
+            target.run_metadata = None
+            target.result_document = {
+                "run_metadata": {"campaigns_elapsed": campaigns_elapsed}
+            }
+        if direct_attribute == "value":
+            target.campaigns_elapsed = campaigns_elapsed
+        elif direct_attribute == "none":
+            target.campaigns_elapsed = None
+        elif hasattr(target, "campaigns_elapsed"):
+            delattr(target, "campaigns_elapsed")
+
+    publish_campaign_count(execution)
     expected = (
         tap_expected_kg_per_campaign
         if publication_path == "tap_hour_summary"
@@ -2246,7 +2283,7 @@ def test_publication_paths_use_their_own_wall_supply_window(
             flux.carrier_authority_by_species["SiO"]["parent_oxide"] = "SiO2"
             snapshot.evap_flux = flux
         tap_execution = _tap_run(tap_snapshots, configured_hours=len(tap_snapshots))
-        tap_execution.campaigns_elapsed = campaigns_elapsed
+        publish_campaign_count(tap_execution)
         tap_execution.trace.wall_deposit_by_segment_species_kg = {}
         tap_execution.trace.wall_zone_by_segment = {"hot_wall": "Hot"}
         tap_execution.trace.wall_deposit_sticking_authority = {
