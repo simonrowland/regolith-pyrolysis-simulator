@@ -1,7 +1,9 @@
 import math
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 from simulator.condensation import (
     CondensationModel,
@@ -18,7 +20,9 @@ from simulator.condensation_routing import (
     NA_COLLECTOR_STAGE_KEY,
     PRODUCT_DESTINATIONS,
     STAGE_KEY_BY_NUMBER,
+    STAGE_TARGET_SPECIES,
     accepted_species_for_stage_number,
+    active_collector_stage_number,
     product_stage_number,
     stage_index_for_visit_identity,
     stage_list_index_for_destination,
@@ -396,6 +400,55 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
     assert 'valid_range_K [864, 2499] at 523.15 K' in warnings
     assert '24%' in warnings
     assert 'valid_range_K [679.4, 1033] at 313.15 K' in warnings
+
+
+def test_cro_and_cro3_share_the_stage_2_chromium_collector():
+    """CrO and CrO3 condense as chromia on the Stage 2 cartridge.
+
+    Dropping CrO from DESIGNATED_STAGE empties its pipe-wall candidate
+    list, and this test fails. Al, Ti, MgO, CaO and the dimers stay
+    undesignated.
+    """
+
+    stage = "stage_2_cr_oxide_harvest"
+    assert DESIGNATED_STAGE["CrO"] == stage
+    assert DESIGNATED_STAGE["CrO3"] == stage
+    assert DESIGNATED_STAGE["CrO2"] == stage
+    targets = STAGE_TARGET_SPECIES[2]
+    cro2 = targets.index("CrO2")
+    assert targets[cro2 - 1: cro2 + 2] == ("CrO", "CrO2", "CrO3")
+    assert target_species_for_stage_number(2) == list(targets)
+    assert "CrO" in accepted_species_for_stage_number(2)
+    assert "CrO3" in accepted_species_for_stage_number(2)
+    for species in ("Al2", "AlO", "TiO", "MgO_gas", "CaO_gas", "Si2"):
+        assert species not in DESIGNATED_STAGE
+
+    setpoints = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data" / "setpoints.yaml").read_text()
+    )
+    train = setpoints["condensation_train"]
+    listed = [
+        stage_row["target_species"]
+        for stage_row in train["stages"]
+        if stage_row.get("key") == stage
+    ]
+    listed.append(train["metals_train"][stage]["target_species"])
+    assert listed == [["Cr", "CrO", "CrO2", "CrO3"], ["Cr", "CrO", "CrO2", "CrO3"]]
+    assert train["stages"][0]["terminal_account"] == (
+        "terminal.chromium_condensed_oxide_stored"
+    )
+    assert train["metals_train"][stage]["terminal_account"] == (
+        "terminal.chromium_condensed_oxide_stored"
+    )
+
+    model = CondensationModel(
+        CondensationTrain.create_default(), wall_temperature_C=1100.0,
+    )
+    stage_numbers = [item.stage_number for item in model.train.active_stages]
+    assert active_collector_stage_number("CrO", stage_numbers) == 2
+    assert model._mixed_temperature_wall_candidate_segments("CrO")
+    assert model._mixed_temperature_wall_candidate_segments("CrO3")
+    assert model._mixed_temperature_wall_candidate_segments("Al2") == []
 
 
 def test_k_moves_to_its_trap_and_other_stage_4_destinations_stay():

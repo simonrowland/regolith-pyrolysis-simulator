@@ -146,6 +146,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # description.
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+        from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.CONDENSATION_ROUTE
@@ -268,10 +269,25 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                         control_audit=control_audit,
                         diagnostic={'credited_condensed_kg': 0.0,
                                     'reason_skipped': 'coupled reactive parcel below numerical floor'})
-        condensed_product_mol = self._condensed_product_mol(
-            species, baffle_condensed_kg, sp_data, registry,
-            resolve_species_formula,
-        )
+        booking = controls.get("wall_reaction_booking")
+        if isinstance(booking, Mapping):
+            # The route already assigned the captured extent to the winning
+            # reaction. These mols replace the static product map for this
+            # parcel. The yaml map is left in place for parcels that do not
+            # carry a booking.
+            condensed_product_mol = {
+                str(product): float(mol)
+                for product, mol in dict(
+                    booking.get("baffle_products_mol") or {}
+                ).items()
+                if float(mol) > 0.0
+            }
+        else:
+            booking = None
+            condensed_product_mol = self._condensed_product_mol(
+                species, baffle_condensed_kg, sp_data, registry,
+                resolve_species_formula,
+            )
         if reactive_mol > 0.0:
             ordinary_mol = max(0.0, condensed_product_mol.get(species, 0.0) - reactive_mol)
             if ordinary_mol > 0.0:
@@ -295,12 +311,23 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         if alkali_refusal is not None:
             return alkali_refusal
 
-        wall_plan = self._wall_reaction_plan(
-            species,
-            wall_deposit_mol_by_account,
-            request.account_view.accounts,
-            controls,
-        )
+        if isinstance(booking, Mapping):
+            wall_plan = self._booked_wall_plan(booking)
+        else:
+            try:
+                wall_plan = self._wall_reaction_plan(
+                    species,
+                    wall_deposit_mol_by_account,
+                    request.account_view.accounts,
+                    controls,
+                )
+            except WallSaturationLawRefusal as exc:
+                return self._route_refusal(
+                    exc.reason,
+                    control_audit,
+                    species=species,
+                    detail=exc.detail,
+                )
 
         # MaterialLot applies its floor independently to every account/species
         # component on both sides.  Roll back only wall parcels whose coupled
@@ -327,7 +354,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             )
         )
 
-        credits = self._credits_by_product_account(condensed_product_mol, sp_data)
+        credits = self._credits_by_product_account(
+            condensed_product_mol,
+            self._booking_account_data(sp_data, condensed_product_mol)
+            if isinstance(booking, Mapping) else sp_data,
+        )
         # Prior retained vapor retries only through stable baffle chemistry;
         # newly arriving vapor keeps this tick's physical wall split. Merging
         # identical product/account components lets prior+current cross the
@@ -489,6 +520,19 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             }
         if reactive_mol > 0.0:
             debits['process.overhead_gas']['O2'] = oxygen_mol
+        if isinstance(booking, Mapping):
+            wall_survived = self._booked_wall_products_survived(booking, wall_plan)
+            o2_debit = float(booking.get("baffle_oxygen_debit_mol") or 0.0)
+            o2_credit = float(booking.get("baffle_oxygen_credit_mol") or 0.0)
+            if wall_survived:
+                o2_debit += float(booking.get("wall_oxygen_debit_mol") or 0.0)
+                o2_credit += float(booking.get("wall_oxygen_credit_mol") or 0.0)
+            if o2_debit > 0.0:
+                overhead = debits['process.overhead_gas']
+                overhead['O2'] = overhead.get('O2', 0.0) + o2_debit
+            if o2_credit > 0.0:
+                overhead_credit = credits.setdefault('process.overhead_gas', {})
+                overhead_credit['O2'] = overhead_credit.get('O2', 0.0) + o2_credit
         for account, species_mol in wall_plan[
             "substrate_debit_mol_by_account"
         ].items():
@@ -763,6 +807,127 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             },
         )
 
+    def _booking_account_data(
+        self,
+        sp_data: Mapping[str, Any],
+        products_mol: Mapping[str, float],
+    ) -> dict[str, Any]:
+        """Product accounts for a wall-reaction booking.
+
+        Cr2O3 uses the chromia terminal this provider already declares.
+        Anything else keeps the species map, or the condensation train.
+        """
+
+        data = dict(sp_data)
+        accounts = dict(data.get("condensation_product_accounts") or {})
+        if "Cr2O3" in products_mol and "Cr2O3" not in accounts:
+            accounts["Cr2O3"] = self.CHROMIUM_CONDENSED_ACCOUNT
+        if accounts:
+            data["condensation_product_accounts"] = accounts
+        return data
+
+    @staticmethod
+    def _booked_wall_products_survived(
+        booking: Mapping[str, Any],
+        wall_plan: Mapping[str, Any],
+    ) -> bool:
+        """False when materialization replaced the booked wall solids.
+
+        The O2 debit belongs to those solids. A rolled-back vapour credit
+        has no oxygen movement.
+        """
+
+        booked = {
+            str(account): {
+                str(product): float(mol)
+                for product, mol in dict(species_mol).items()
+            }
+            for account, species_mol in dict(
+                booking.get("wall_products_mol_by_account") or {}
+            ).items()
+        }
+        surviving = {
+            str(account): {
+                str(product): float(mol)
+                for product, mol in dict(species_mol).items()
+            }
+            for account, species_mol in dict(
+                wall_plan.get("product_mol_by_account") or {}
+            ).items()
+        }
+        if set(booked) != set(surviving):
+            return False
+        for account, products in booked.items():
+            other = surviving[account]
+            if set(products) != set(other):
+                return False
+            for product, mol in products.items():
+                if abs(mol - other[product]) > 1.0e-12:
+                    return False
+        return True
+
+    def _booked_wall_plan(self, booking: Mapping[str, Any]) -> dict[str, Any]:
+        """Wall-account products from the same winning reactions as the baffle.
+
+        The SiO disproportionation matrix is not a fallback. An empty
+        product map means this parcel put no vapour on a wall.
+        """
+
+        products_by_account = {
+            str(account): {
+                str(product): float(mol)
+                for product, mol in dict(species_mol).items()
+                if float(mol) > 0.0
+            }
+            for account, species_mol in dict(
+                booking.get("wall_products_mol_by_account") or {}
+            ).items()
+        }
+        products_by_account = {
+            account: products
+            for account, products in products_by_account.items()
+            if products
+        }
+        diagnostic_legs_by_account: dict[str, list[dict[str, Any]]] = {}
+        for leg_index, raw_leg in enumerate(booking.get("reaction_legs") or ()):
+            if not isinstance(raw_leg, Mapping):
+                continue
+            account = str(raw_leg.get("account") or "")
+            if (
+                str(raw_leg.get("surface") or "") != "wall"
+                or account not in products_by_account
+            ):
+                continue
+            diagnostic_legs_by_account.setdefault(account, []).append({
+                "booking_leg_index": leg_index,
+                "reaction_id": raw_leg.get("reaction_id"),
+                "surface": raw_leg.get("surface"),
+                "stage_key": raw_leg.get("stage_key"),
+                "account": raw_leg.get("account"),
+                "vapour_mol": raw_leg.get("vapour_mol"),
+                "notices": tuple(raw_leg.get("notices") or ()),
+            })
+        diagnostics_by_account = {}
+        for account in products_by_account:
+            reaction_legs = tuple(diagnostic_legs_by_account.get(account, ()))
+            notices = tuple(dict.fromkeys(
+                notice
+                for leg in reaction_legs
+                for notice in leg["notices"]
+            ))
+            diagnostics_by_account[account] = {
+                "mechanism": "wall_saturation_winner",
+                "status": "wall_reaction_booking",
+                "notices": notices,
+                "reaction_legs": reaction_legs,
+            }
+        return {
+            "product_mol_by_account": products_by_account,
+            "substrate_debit_mol_by_account": {},
+            "diagnostics_by_account": diagnostics_by_account,
+            "alkali_state_by_account": {},
+        }
+
     def _wall_reaction_plan(
         self,
         species: str,
@@ -776,6 +941,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         alkali_state_by_account = self._copy_alkali_state(
             controls.get("wall_alkali_binding_diagnostic_state_by_account")
         )
+        raw_species_row = controls.get("sp_data")
+        species_row = raw_species_row if isinstance(raw_species_row, Mapping) else {}
+        from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
+        from simulator.vapour_rail.wall_saturation import (
+            resolve_wall_saturation,
+            wall_reactions_declaration,
+        )
+
+        declared_wall_reactions = wall_reactions_declaration(species_row)
 
         for account, arrival_mol in wall_deposit_mol_by_account.items():
             if arrival_mol <= 0.0:
@@ -788,13 +962,31 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 "source": str(WALL_REACTIVITY_MATRIX_PATH),
             }
 
-            if species == "SiO":
-                reaction = self._matrix_reaction("SiO_disproportionation")
-                for product, ratio in dict(reaction["product_credits"]).items():
+            if declared_wall_reactions is not None or species == "SiO":
+                if declared_wall_reactions is None:
+                    raise WallSaturationLawRefusal(
+                        "wall_reactions_absent",
+                        f"{species} has no wall_reactions declaration",
+                    )
+                wall_temperature_K = self._wall_temperature_K(controls, account)
+                if wall_temperature_K is None:
+                    raise WallSaturationLawRefusal(
+                        "wall_temperature_required",
+                        f"{species} wall reaction at {account} has no temperature",
+                    )
+                reaction = resolve_wall_saturation(
+                    species_row,
+                    species_id=species,
+                    T_K=wall_temperature_K,
+                    pO2_Pa=None,
+                )
+                for product, ratio in reaction.products_mol_per_mol_vapour:
                     products[str(product)] = arrival_mol * float(ratio)
                 diagnostic.update({
-                    "mechanism": reaction.get("mechanism"),
-                    "status": reaction.get("status"),
+                    "mechanism": reaction.reaction_id,
+                    "status": "DECLARED_WALL_REACTION",
+                    "source": "sp_data.wall_reactions",
+                    "notices": tuple(reaction.notices),
                 })
             elif species == "Mg":
                 reaction = self._matrix_reaction("Mg_silica_reduction")

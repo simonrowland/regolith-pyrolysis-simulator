@@ -1100,7 +1100,7 @@ condensation_train:
       key: "stage_2_cr_oxide_harvest"
       label: "Cr Oxide Harvester"
       temp_range_C: [1100, 1300]
-      target_species: ["Cr", "CrO2"]
+      target_species: ["Cr", "CrO", "CrO2", "CrO3"]
       product: "Cr2O3"
       terminal_account: "terminal.chromium_condensed_oxide_stored"
       note: "Dedicated physical Cr product stream; CrO2(g) disproportionates to Cr2O3(s) + O2(g)."
@@ -1164,7 +1164,7 @@ condensation_train:
       material: "MZO-lined removable chromia cartridge"
       max_service_T_C: 1450
       product: "Cr2O3-rich chromium oxide concentrate"
-      target_species: ["Cr", "CrO2"]
+      target_species: ["Cr", "CrO", "CrO2", "CrO3"]
       terminal_account: "terminal.chromium_condensed_oxide_stored"
       compatibility: "Cr2O3-stable hot oxide harvest before SiO baffles"
 

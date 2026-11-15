@@ -199,14 +199,24 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
         stage.collected_kg.get("Cr2O3", 0.0) for stage in sim.train.stages
     )
     assert stage_cr2o3 == pytest.approx(terminal_chromia["Cr2O3"])
-    # CrO2 reacts into chromia. Elemental Cr stays below saturation on
-    # the designated stage. b1113 may condense that vapour on a colder
-    # stage; that stage does not target Cr, so the mass is impurity.
-    assert stage_2.get("Cr", 0.0) == 0.0
-    for stage in sim.train.stages:
-        if stage.collected_kg.get("Cr", 0.0) <= 0.0:
-            continue
-        assert "Cr" not in stage.target_species
+    # CrO2 reacts into chromia. d-402's solid-standard-state wall equilibrium
+    # also carries elemental Cr onto colder collectors: 1.03396984e-5 kg on
+    # Stage 1 as an impurity, 1.30930814e-7 kg on Stage 2, and 5.82146862e-5 kg
+    # on Stage 4. The colder Stage-4 surface captures more Cr-bearing vapour.
+    captured_cr_by_stage = {
+        stage.stage_number: stage.collected_kg["Cr"]
+        for stage in sim.train.stages
+        if stage.collected_kg.get("Cr", 0.0) > 0.0
+    }
+    assert captured_cr_by_stage == pytest.approx(
+        {
+            1: 1.0339698354445707e-5,
+            2: 1.3093081434769078e-7,
+            4: 5.821468620201194e-5,
+        },
+        rel=1e-9,
+        abs=0.0,
+    )
     cr_outcomes = sim.condensation_model.last_condensation_refusals_by_species["Cr"]["stage_outcomes"]
     assert any(item["stage_number"] == 2 and item["reason"] == "no_supersaturation"
                and item["eta"] == 0.0 for item in cr_outcomes)

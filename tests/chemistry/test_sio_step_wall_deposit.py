@@ -350,10 +350,13 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # Reverting only _route to its pre-21f065338 version recovers the old
         # 8.428322859789999e-06 kg pin; preserving flow gives the measured value below.
         # With c679673f5/85fedcb8e band-integrated capture across collector
-        # and saturation thresholds, the unavailable-MAGEMin run measures
-        # 5.12945178146e-06 kg at 1050 C.
+        # and saturation thresholds, the unavailable-MAGEMin run measured
+        # 5.12945178146e-06 kg at 1050 C under the Psat = 0 backstop.
+        # b-1188 removes the Psat = 0 backstop. Re-running this unavailable-
+        # MAGEMin report deposits 0 kg of wall Si+SiO2 at 1050 C. The trace
+        # was not a supersaturated wall-law capture.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            5.12945178146e-06, rel=1e-9
+            0.0, abs=1e-24
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
@@ -367,23 +370,38 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
 
 def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     wall_T_K = 1700.0 + 273.15
-    p_local_pa = 1.0
     alpha_s = 0.04
 
-    # SiO now carries the melt standard-reaction term, which must not be
-    # consumed as a pure-vapor wall saturation pressure. The authorized
-    # disproportionation-product backstop supplies the P_sat ~= 0 limit.
-    with pytest.raises(WallSaturationPressureRefusal):
-        _antoine_psat_pa("SiO", wall_T_K)
+    # Unknown O2 uses the conservative disproportionation pressure.
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+    resolved = resolve_wall_saturation(
+        condensation_module._species_vapor_data("SiO"), species_id="SiO", T_K=wall_T_K,
+    )
+    assert resolved.reaction_id == "disproportionation"
+    assert resolved.notices == ("wall_pO2_unknown_pO2_free_route_used",)
     sio_psat_pa, refused = condensation_module._try_antoine_psat_pa(
         "SiO", wall_T_K
     )
-    assert sio_psat_pa is None
-    assert refused is True
+    assert sio_psat_pa == pytest.approx(resolved.pressure_Pa)
+    assert refused is False
 
+    po2_pa = 1.0e-4
+    psat = _antoine_psat_pa("SiO", wall_T_K, wall_pO2_Pa=po2_pa)
+    assert psat is not None and psat > 0.0
+    # One pascal is below this wall law. Supersaturation is a multiple of Psat.
+    p_local_pa = psat * 4.0
+    undersaturated = _hkl_surface_deposition_flux_mol_m2_s(
+        "SiO",
+        P_local_pa=psat * 0.5,
+        T_surface_K=wall_T_K,
+        alpha_s=alpha_s,
+        wall_pO2_Pa=po2_pa,
+    )
+    assert undersaturated == 0.0
+    driving = p_local_pa - psat
     expected_hkl = alpha_s * _hkl_impingement_flux_mol_m2_s(
         "SiO",
-        p_local_pa,
+        driving,
         wall_T_K,
     )
     hkl_flux = _hkl_surface_deposition_flux_mol_m2_s(
@@ -391,6 +409,7 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
         P_local_pa=p_local_pa,
         T_surface_K=wall_T_K,
         alpha_s=alpha_s,
+        wall_pO2_Pa=po2_pa,
     )
     series_flux = _series_resistance_deposition_flux_mol_m2_s(
         "SiO",
@@ -398,11 +417,15 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
         T_surface_K=wall_T_K,
         alpha_s=alpha_s,
         regime_factor=1.0,
+        wall_pO2_Pa=po2_pa,
     )
 
     assert hkl_flux == pytest.approx(expected_hkl)
     assert series_flux == pytest.approx(expected_hkl)
     assert hkl_flux > 0.0
+    assert hkl_flux < alpha_s * _hkl_impingement_flux_mol_m2_s(
+        "SiO", p_local_pa, wall_T_K,
+    )
 
 
 @pytest.mark.parametrize(
@@ -714,10 +737,11 @@ def test_wall_route_uses_segment_local_partial_pressure_after_capture() -> None:
     assert sodium_by_segment
     assert max(sodium_by_segment) <= 1000.0
     # Na remains unsaturated here; removing Fe raises its Dalton fraction.
-    assert sodium_by_segment[0] == pytest.approx(100.0)
-    assert max(sodium_by_segment) > 100.0
+    inlet_na = model.wall_species_partial_pressures_pa["Na"]
+    assert sodium_by_segment[0] == pytest.approx(inlet_na)
+    assert max(sodium_by_segment) > inlet_na
     iron_by_segment = [partials["Fe"] for partials in model.wall_species_partial_pressures_pa_by_segment.values()]
-    assert min(iron_by_segment) < 100.0
+    assert min(iron_by_segment) < model.wall_species_partial_pressures_pa["Fe"]
     for segment_name, species_records in (
         model.last_wall_deposition_rate_shadow_candidate.items()
     ):
@@ -797,7 +821,7 @@ def test_wall_route_depletes_partial_pressure_after_upstream_wall_capture(
             f"wall_{wall_index}"
         ]["Cr"] == pytest.approx(
             _dalton_partial_pa(
-                inlet_partial_mbar=partial_pressure_mbar,
+                inlet_partial_mbar=model.wall_species_partial_pressures_pa["Cr"] / 100.0,
                 total_mbar=10.0,
                 rate_kg_hr=rate_kg_hr,
                 remaining_kg_hr=remaining_kg_hr,
@@ -882,12 +906,7 @@ def test_stage_scoped_no_reactive_backstop_skips_reactivity_metadata(monkeypatch
         condensation_module.STICKING_DATA["reactivity_class_by_species"],
         "SiO",
     )
-    with pytest.raises(WallSaturationPressureRefusal) as exc_info:
-        _hkl_surface_deposition_flux_mol_m2_s(
-            "SiO",
-            P_local_pa=1.0,
-            T_surface_K=1700.0 + 273.15,
-            alpha_s=1.0,
-            reactive_product_backstop=False,
-        )
-    assert exc_info.value.reason == "source_certified_range_refused"
+    assert _hkl_surface_deposition_flux_mol_m2_s(
+        "SiO", P_local_pa=1.0, T_surface_K=1700.0 + 273.15,
+        alpha_s=1.0, reactive_product_backstop=False,
+    ) == 0.0

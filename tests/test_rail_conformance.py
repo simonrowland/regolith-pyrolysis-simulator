@@ -2239,9 +2239,10 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     # Premise: all seven carriers draw from one Al2O3 reservoir. Al atoms per
     # carrier are 1,2,2,2,2,1,1; O2 released per carrier is
     # 3/4,3/2,1,1/2,0,1/4,-1/4. Algebra: sum each applied carrier mole times
-    # its coefficient exactly once. Unit check: kg/(kg/mol)=mol. Sanity:
-    # AlO2 consumes O2 while every other oxidized carrier releases no more
-    # oxygen than its shared Al2O3 parent contains.
+    # its coefficient exactly once. Unit check: each kg/hr rate is applied for
+    # this one-hour route, so kg/(kg/mol)=mol. Sanity: AlO2 consumes O2 while
+    # every other oxidized carrier releases no more oxygen than its shared
+    # Al2O3 parent contains.
     carrier_mol = {
         species_id: rate_kg_hr
         / resolve_species_formula(
@@ -2275,6 +2276,18 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
         carrier_mol[species_id] * o2_per_carrier[species_id]
         for species_id in carrier_mol
     )
+    # Reverse the source reaction for the AlO2 that d-402 captures as a solid:
+    # AlO2(g) -> 1/2 Al2O3(s) + 1/4 O2(g). The production route supplies the
+    # captured mass; multiplying its moles by -the source O2 coefficient gives
+    # the returned O2. Units are (kg / kg mol-1) * mol O2 / mol AlO2 = mol O2;
+    # zero AlO2 capture reduces this to the source-only carrier sum above.
+    al_o2_capture = sim.condensation_model.last_condensation_authority_by_species[
+        "AlO2"
+    ]["condensed_mass_kg_hr"]
+    al_o2_capture_mol = al_o2_capture / resolve_species_formula(
+        "AlO2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    returned_wall_o2_mol = -al_o2_capture_mol * o2_per_carrier["AlO2"]
 
     after_al = sim.atom_ledger.atom_moles_by_account("process.cleaned_melt")["Al"]
     after_o2 = sum(
@@ -2282,7 +2295,9 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
         for account in ("process.overhead_gas", "reservoir.fo2_buffer")
     )
     assert before_al - after_al == pytest.approx(expected_al_debit_mol, rel=1.0e-11)
-    assert after_o2 - before_o2 == pytest.approx(expected_o2_release_mol, rel=1.0e-11)
+    assert after_o2 - before_o2 == pytest.approx(
+        expected_o2_release_mol + returned_wall_o2_mol, rel=1.0e-11
+    )
     transition_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }

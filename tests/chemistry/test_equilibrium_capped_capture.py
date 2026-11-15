@@ -167,31 +167,24 @@ def test_sio_above_reactive_product_cutoff_is_physical_pass_through():
     assert outcomes[-1]["reason"] == "above_reactive_product_condensation_temperature"
 
 
-def test_reactive_sio_backstop_keeps_raw_saturated_strip_active():
+def test_sio_undersaturated_strip_does_not_deposit():
+    """A local pressure below the wall-law Psat captures nothing.
+
+    The retired reactive backstop kept this strip active by substituting
+    Psat = 0. Restoring that substitution fails ``flux == 0`` and ``eta == 0``.
+    """
+
     model = _configured_model()
     stage = model.train.stages[3]
     stage.temp_range_C = (1200.0, 1200.0)
-    model.vapor_pressure_data = {
-        "oxide_vapors": {
-            "SiO": {
-                "pure_component_antoine": {
-                    "A": 2.0,
-                    "B": 0.0,
-                    "C": 0.0,
-                    "valid_range_K": [1000.0, 1600.0],
-                },
-            },
-        },
-    }
     wall_temperature_K = 1200.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    po2_pa = 1.0e-4
     raw_psat, refused = condensation._try_antoine_psat_pa(
-        "SiO", wall_temperature_K,
-        vapor_pressure_data=model.vapor_pressure_data,
+        "SiO", wall_temperature_K, wall_pO2_Pa=po2_pa,
     )
     assert not refused
-    assert raw_psat is not None
+    assert raw_psat is not None and raw_psat > 0.0
     inlet_pressure_pa = raw_psat / 2.0
-    assert raw_psat >= inlet_pressure_pa
 
     diagnostic = {}
     flux = condensation._series_resistance_deposition_flux_mol_m2_s(
@@ -200,41 +193,42 @@ def test_reactive_sio_backstop_keeps_raw_saturated_strip_active():
         T_gas_K=model.gas_temperature_C + condensation.CELSIUS_TO_KELVIN_OFFSET,
         overhead_pressure_pa=model.overhead_pressure_mbar * 100.0,
         carrier_gas=model.carrier_gas,
-        vapor_pressure_data=model.vapor_pressure_data,
         reactive_product_backstop=True,
+        wall_pO2_Pa=po2_pa,
         diagnostic_out=diagnostic,
     )
-    assert flux > 0.0
-    assert diagnostic["wall_saturation_pressure_pa"] == 0.0
+    assert flux == 0.0
+    assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(raw_psat)
 
+    outcomes = []
     eta = model._condensation_efficiency(
         stage=stage, species="SiO", T_cond_C=1200.0, residence_s=4.0,
         available_kg=1.0, alpha_s_value=0.5,
         inlet_partial_pressure_pa=inlet_pressure_pa,
+        wall_pO2_Pa=po2_pa,
+        efficiency_outcomes=outcomes,
     )
-    assert eta > 0.0
+    assert eta == 0.0
+    assert outcomes[-1]["reason"] == "no_supersaturation"
 
 
-def test_sio_missing_saturation_without_reactive_backstop_refuses(monkeypatch):
+def test_sio_missing_po2_uses_flagged_conservative_capture():
+    """d-402 uses an available pO2-free wall reaction as a conservative bound."""
+
     model = _configured_model()
     stage = model.train.stages[3]
     stage.temp_range_C = (1000.0, 1000.0)
-    monkeypatch.setattr(
-        condensation, "_reactive_product_backstop_authorized", lambda _species: False,
-    )
-    monkeypatch.setattr(
-        condensation, "_try_antoine_psat_pa", lambda *_args, **_kwargs: (None, False),
-    )
 
-    with pytest.raises(
-        condensation.WallSaturationPressureRefusal,
-        match="saturation_pressure_unavailable",
-    ):
-        model._condensation_efficiency(
-            stage=stage, species="SiO", T_cond_C=1050.0, residence_s=4.0,
-            available_kg=1.0, alpha_s_value=0.5,
-            inlet_partial_pressure_pa=100.0,
-        )
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage, species="SiO", T_cond_C=1050.0, residence_s=4.0,
+        available_kg=1.0, alpha_s_value=0.5,
+        inlet_partial_pressure_pa=100.0, efficiency_outcomes=outcomes,
+    )
+    assert eta > 0.0
+    flag = next(item for item in outcomes if item["status"] == "status_bearing")
+    assert flag["authority_level"] == "status_bearing"
+    assert flag["reason"] == "wall_pO2_unknown_pO2_free_route_used"
 
 
 def test_band_capture_integrates_33_centers_with_inclusive_reactive_cutoff(monkeypatch):
@@ -401,8 +395,14 @@ def test_route_keeps_capture_at_its_stage_and_depletes_inlet_pressure(monkeypatc
     monkeypatch.setattr(model, "_condensation_efficiency", capture_half)
     result = model.route(EvaporationFlux(species_kg_hr={"Fe": 1.0}), MeltState(temperature_C=1700.0))
     assert result.condensed_by_stage_species == {"stage_1_fe_condenser": {"Fe": 0.5}}
-    assert result.remaining_by_species["Fe"] == pytest.approx(0.5)
-    assert seen == [(1, 1.0, 100.0)]
+    assert result.remaining_by_species["Fe"] == 0.5
+    # d-402 forms the partial pressure from explicit molar flows via Dalton's
+    # law; converting the closed single-species fraction back to pressure
+    # rounds 100 Pa down by one float64 step (1.42e-14 Pa).
+    assert seen[0][:2] == (1, 1.0)
+    assert seen[0][2] == pytest.approx(
+        100.0, rel=0.0, abs=4 * math.ulp(100.0),
+    )
 
 
 def test_hot_sio_passes_to_its_reactive_product_stage():

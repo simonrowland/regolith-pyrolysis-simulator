@@ -13,6 +13,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import CampaignPhase
+from tests.native_fe_test_support import NATIVE_FE_ROUTE_ACCOUNTS
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -146,16 +147,16 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
         "Ni": 0.20543205156374078,
     })
     assert "Fe" not in before_tap
+    before_route_fe_mol = {
+        account: sim.atom_ledger.mol_by_account(account).get("Fe", 0.0)
+        for account in NATIVE_FE_ROUTE_ACCOUNTS
+    }
 
     sim._apply_native_fe_saturation_split()
 
     after_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
     tap_mol = sim.atom_ledger.mol_by_account("terminal.drain_tap_material")
     overhead_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")
-    train_mol = sim.atom_ledger.mol_by_account("process.condensation_train")
-    wall01_mol = sim.atom_ledger.mol_by_account(
-        "process.wall_deposit_segment_stage_0_to_stage_1"
-    )
     fo2_buffer_mol = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer")
     tap = sim.atom_ledger.kg_by_account("terminal.drain_tap_material")
     overhead = sim.atom_ledger.kg_by_account("process.overhead_gas")
@@ -165,10 +166,12 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
         "FeO", sim.species_formula_registry).molar_mass_kg_per_mol()
     o2_mm = resolve_species_formula(
         "O2", sim.species_formula_registry).molar_mass_kg_per_mol()
-    routed_vapor_mol = (
-        overhead_mol.get("Fe", 0.0)
-        + train_mol.get("Fe", 0.0)
-        + wall01_mol.get("Fe", 0.0)
+    # d-402's wall equilibrium routes some Fe into the Stage-4 cartridge
+    # residue; count that sink with overhead, train, offgas, and pipe deposits.
+    routed_vapor_mol = sum(
+        sim.atom_ledger.mol_by_account(account).get("Fe", 0.0)
+        - before_route_fe_mol[account]
+        for account in NATIVE_FE_ROUTE_ACCOUNTS
     )
     split_fe_mol = tap_mol["Fe"] + routed_vapor_mol
 

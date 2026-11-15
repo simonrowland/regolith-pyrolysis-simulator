@@ -210,6 +210,7 @@ def wall_deposit_candidate_for_surface_kg(
         reactive_product_backstop_enabled,
         _required_record_alpha_s,
         _series_resistance_deposition_flux_mol_m2_s,
+        _species_declares_wall_reactions,
         _species_vapor_data,
         _transport_parameter_notice,
         _wall_alpha_record,
@@ -366,6 +367,21 @@ def wall_deposit_candidate_for_surface_kg(
         applied_regime_factor = _deposition_finite_scalar(
             "regime_factor", applied_regime_factor
         )
+        # Missing wall pO2 uses a pO2-free route, flagged
+        # wall_pO2_unknown_pO2_free_route_used. This is the conservative bound
+        # because adding O2 can only lower P_sat. Refuse wall_pO2_required only
+        # when every admissible reaction needs pO2.
+        wall_pO2_Pa = None
+        if isinstance(pressure_source, Mapping) and "O2" in pressure_source:
+            wall_pO2_Pa = _deposition_finite_scalar(
+                "wall_pO2_Pa", pressure_source["O2"],
+            )
+            if wall_pO2_Pa < 0.0:
+                raise DepositionInputRefusal(
+                    "wall_pO2_Pa",
+                    wall_pO2_Pa,
+                    "must be non-negative",
+                )
         try:
             flux = _series_resistance_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_wall_K, alpha_s,
@@ -377,6 +393,7 @@ def wall_deposit_candidate_for_surface_kg(
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
                 vapor_pressure_data=vapor_pressure_data,
+                wall_pO2_Pa=wall_pO2_Pa,
                 # Same gate as the stage integrator. The helper's default is
                 # True; passing the gate result keeps a hot wall reversible.
                 reactive_product_backstop=reactive_product_backstop_enabled(
@@ -404,6 +421,9 @@ def wall_deposit_candidate_for_surface_kg(
         source_only_wall_channel = (
             source_data.get("fit_target") == "standard_reaction_term"
             and "pure_component_antoine" not in source_data
+            and not _species_declares_wall_reactions(
+                species, vapor_pressure_data,
+            )
         )
         if source_only_wall_channel:
             from engines.builtin.vapor_pressure import _coefficient_mapping
@@ -443,7 +463,10 @@ def wall_deposit_candidate_for_surface_kg(
             "wall_temperature_K": T_wall_K,
         }
     pressure_notice = rate_diagnostic.get("wall_saturation_pressure_notice")
-    if pressure_notice is not None:
+    if (
+        isinstance(pressure_notice, Mapping)
+        and pressure_notice.get("authority_level") == "extrapolated"
+    ):
         _record_wall_pressure_notice(model, "wall_saturation_pressure_extrapolations_by_species",
             species, str(getattr(segment, "name", "default_pipe")), pressure_notice)
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa

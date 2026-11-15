@@ -95,7 +95,7 @@ STAGE_NUMBER_BY_KEY.update({
 
 STAGE_TARGET_SPECIES: dict[int, tuple[str, ...]] = {
     1: ('Fe',),
-    2: ('Cr', 'CrO2', 'Mn'),
+    2: ('Cr', 'CrO', 'CrO2', 'CrO3', 'Mn'),
     3: ('SiO',),
     4: ('Na', 'Mg'),
 }
@@ -109,7 +109,9 @@ STAGE_TARGET_SPECIES_BY_KEY: dict[str, tuple[str, ...]] = {
 DESIGNATED_STAGE: dict[str, str] = {
     'Fe': 'stage_1_fe_condenser',
     'Cr': 'stage_2_cr_oxide_harvest',
+    'CrO': 'stage_2_cr_oxide_harvest',
     'CrO2': 'stage_2_cr_oxide_harvest',
+    'CrO3': 'stage_2_cr_oxide_harvest',
     'Cr2O3': 'stage_2_cr_oxide_harvest',
     'Mn': 'stage_2_cr_oxide_harvest',
     'SiO': 'stage_3_sio_zone',

@@ -757,13 +757,6 @@ def _load_wall_reactivity_matrix(
         raise ValueError(f'{path}: missing reactions table')
     _validate_wall_reaction(
         path,
-        'SiO_disproportionation',
-        reactions.get('SiO_disproportionation'),
-        species='SiO',
-        status='GROUNDED_STOICHIOMETRY',
-    )
-    _validate_wall_reaction(
-        path,
         'Mg_silica_reduction',
         reactions.get('Mg_silica_reduction'),
         species='Mg',
@@ -2473,6 +2466,10 @@ class CondensationRouteResult:
         default_factory=dict)
     stage3_reactive_alkali_by_species: Dict[str, Dict[str, Any]] = field(
         default_factory=dict)
+    # Winning wall-reaction products for this parcel. Absent means the
+    # static condensation map, or the vapour species itself, still applies.
+    wall_reaction_booking_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict)
     # Stage-4 sub_order 1 only. One record per species that reached the
     # alkali freeze-out cartridge: f_eq, NTU, vapour eta, aerosol eta.
     cartridge_capture_by_species: Dict[str, Dict[str, Any]] = field(
@@ -2486,6 +2483,22 @@ class CondensationRouteResult:
 
     def silica_capture_kg(self, stage_number: int | None = None) -> float:
         """SiO2 product from the existing 2SiO -> Si + SiO2 split."""
+        booking = self.wall_reaction_booking_by_species.get('SiO')
+        if booking:
+            # The booked SiO2 mol is the winner's product, not the static
+            # 0.5 factor. MOLAR_MASS is g/mol, so mol * g/mol / 1000 is kg.
+            if stage_number is None:
+                sio2_mol = float(
+                    booking.get('baffle_products_mol', {}).get('SiO2', 0.0)
+                )
+            else:
+                stage_key = STAGE_KEY_BY_NUMBER.get(int(stage_number))
+                sio2_mol = float(
+                    (booking.get('baffle_products_mol_by_stage') or {})
+                    .get(stage_key, {})
+                    .get('SiO2', 0.0)
+                )
+            return sio2_mol * MOLAR_MASS['SiO2'] / 1000.0
         if stage_number is None:
             sio_condensed_kg = self.condensed_for_species('SiO')
         else:
@@ -3782,6 +3795,25 @@ class CondensationModel:
         # VR-11 / B3: stage-local efficiency zeros mint typed pass-through
         # outcomes (no longer silent return 0.0 without a consumer channel).
         efficiency_outcomes_by_species: dict[str, list[dict[str, Any]]] = {}
+        stage3_through = (
+            self.train.collection_route.get('stage3_route') == 'through'
+        )
+        source_rates = {
+            sp: rate for sp, rate in evap_flux.species_kg_hr.items()
+            if carrier_authority_status_by_species.get(sp) not in non_debiting_carrier_statuses
+            and sp not in cleanup_offgas_authorization
+        }
+        # This snapshot is supplied by PyrolysisSimulator.condensation_model
+        # from committed process.overhead_gas mol. A projected evaporation
+        # coproduct is not a reactant: its writer may refuse materialization.
+        wall_pO2_known = (
+            'O2' in self.retained_vapor_mol
+            or 'O2' in self.species_partial_pressures_mbar
+        )
+        oxygen_mol = _finite_nonnegative_value(
+            self.retained_vapor_mol.get('O2', 0.0), label='committed overhead O2 mol',
+        )
+        inlet_molar_flows: dict[str, float] = {}
         self.wall_species_partial_pressures_pa = (
             _flowing_species_partial_pressures_pa(
                 evap_flux.species_kg_hr,
@@ -3791,6 +3823,64 @@ class CondensationModel:
             if self._species_partial_pressures_configured
             else {}
         )
+        if self.wall_species_partial_pressures_pa:
+            inlet_partials = self.wall_species_partial_pressures_pa
+            total_pa = self.overhead_pressure_mbar * 100.0
+            if "O2" not in inlet_partials:
+                carrier_mol_s, _ = _inlet_carrier_molar_flow_mol_s(
+                    evap_flux.species_kg_hr, inlet_partials, total_pa,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                )
+                # The existing parcel interval is one hour. Committed O2
+                # mol / 3600 s and vapour kg/hr / M / 3600 are mol/s.
+                # Normalize with the explicit transport carrier once.
+                mixture_mol_s = {
+                    sp: _species_molar_flow_mol_s(
+                        sp, rate, vapor_pressure_data=self.vapor_pressure_data,
+                    ) for sp, rate in source_rates.items()
+                }
+                if wall_pO2_known:
+                    mixture_mol_s["O2"] = oxygen_mol / 3600.0
+                else:
+                    # Evaporation may project O2 before its ledger write. Do
+                    # not turn that uncommitted value or an absent key into
+                    # a known zero wall pO2.
+                    mixture_mol_s.pop("O2", None)
+                carrier = self.carrier_gas
+                # Oxygen cover is already in the committed O2 snapshot.
+                # An inert carrier is an explicit transport flow, including 0.
+                mixture_mol_s.setdefault(carrier, 0.0)
+                if carrier != "O2":
+                    mixture_mol_s[carrier] += carrier_mol_s
+                inlet_molar_flows = mixture_mol_s
+                self.wall_species_partial_pressures_pa = _molar_flow_partials_pa(
+                    mixture_mol_s, total_pa,
+                )
+                mixture_input_path = "committed_oxygen_with_transport_carrier"
+            else:
+                # An explicitly supplied full mixture is already on the
+                # shared pressure basis. Name its implicit carrier remainder.
+                partials = dict(inlet_partials)
+                remainder = total_pa - math.fsum(partials.values())
+                if abs(remainder) <= _partial_pressure_roundoff_pa(partials, total_pa):
+                    remainder = 0.0
+                remainder = max(0.0, remainder)
+                partials[self.carrier_gas] = partials.get(self.carrier_gas, 0.0) + remainder
+                self.wall_species_partial_pressures_pa = partials
+                # The supplied full mixture is an equivalent unit-flow basis;
+                # keep its explicit carrier component through depletion.
+                inlet_molar_flows = dict(partials)
+                mixture_input_path = "supplied_full_mixture"
+            if wall_pO2_known:
+                # The Dalton helper omits zero-flow species. Keep an explicit
+                # zero O2 entry distinct from absent O2, which means the wall
+                # pO2 is unknown and must use the flagged pO2-free route.
+                self.wall_species_partial_pressures_pa.setdefault('O2', 0.0)
+            if self.operating_history:
+                self.operating_history[-1]["mixture_input_path"] = mixture_input_path
+                self.operating_history[-1]["inlet_species_partial_pressures_pa"] = dict(
+                    self.wall_species_partial_pressures_pa
+                )
         knudsen_diagnostic = self._enforce_knudsen_regime()
         # Hot-wall judgements run after the train walk below. Segment
         # pressures do not exist yet; judging here would broadcast the
@@ -3798,53 +3888,15 @@ class CondensationModel:
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
         reactive_alkali: dict[str, dict[str, Any]] = {}
-        from simulator.evaporation import (
-            _evaporation_stoich, _project_evaporation_overhead_source_mol_hr,
+        wall_reaction_bookings: dict[str, dict[str, Any]] = {}
+        stream_po2_pa = self.wall_species_partial_pressures_pa.get("O2")
+        if stream_po2_pa is None and self.wall_species_partial_pressures_pa:
+            # The populated map is a complete mixture; omitted O2 is a known
+            # zero partial, while an unavailable mixture remains a refusal.
+            stream_po2_pa = 0.0
+        stream_po2_bar = (
+            None if stream_po2_pa is None else stream_po2_pa / PA_PER_BAR
         )
-
-        stream_source = {}
-        stage3_through = (
-            self.train.collection_route.get('stage3_route') == 'through'
-        )
-        if stage3_through:
-            source_rates = {
-                sp: rate for sp, rate in evap_flux.species_kg_hr.items()
-                if carrier_authority_status_by_species.get(sp) not in non_debiting_carrier_statuses
-                and sp not in cleanup_offgas_authorization
-            }
-            source_stoich = {}
-            for sp in source_rates:
-                data = _species_vapor_data(sp, vapor_pressure_data=self.vapor_pressure_data)
-                if data.get('parent_oxide'):
-                    source_stoich[sp] = _evaporation_stoich(
-                        sp, data, self.species_formula_registry)
-            stream_source = _project_evaporation_overhead_source_mol_hr(
-                source_rates, source_stoich, self.species_formula_registry)
-        retained_oxygen_mol = (_finite_nonnegative_value(
-            self.retained_vapor_mol.get('O2', 0.0), label='headspace O2 mol')
-            if stage3_through else 0.0)
-        # Premise: each one-hour parcel carries its evaporation coproducts.
-        # The shared source owner projects sum(rate[kg/h]*O2_per_product[kg/kg]
-        # /M_O2[kg/mol])*1 h, excluding oxygen sent to the melt buffer.
-        # Thus n_available = n_retained + n_stream, including signed O2 sinks.
-        # For SiO2 -> SiO + 1/2 O2 this reduces to 0.5*rate_SiO/M_SiO + retained
-        # [mol]. Zero source recovers the retained-only budget; no terminal
-        # store or melt-buffer oxygen is available to this reaction.
-        oxygen_mol = max(0.0, retained_oxygen_mol + stream_source.get('O2', 0.0))
-        stream_po2_bar = None
-        vapor_mol = sum(mol for sp, mol in stream_source.items() if sp != 'O2')
-        if stream_source.get('O2', 0.0) > 0.0 and vapor_mol > 0.0:
-            # The reported vapor partials already include carrier dilution.
-            # For an ideal co-flowing parcel p_O2,source / sum(p_vapor) =
-            # n_O2,source / sum(n_vapor). The one-hour amounts share a time
-            # basis, so mol/mol is dimensionless; Pa/1e5 converts to bar.
-            # Add the ledger carried-in O2 partial pressure. Zero fresh
-            # source recovers the retained-headspace pressure exactly.
-            vapor_pressure_pa = sum(
-                self.wall_species_partial_pressures_pa.get(sp, 0.0)
-                for sp in stream_source if sp != 'O2')
-            stream_po2_bar = (
-                stream_source['O2'] / vapor_mol * vapor_pressure_pa / PA_PER_BAR)
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             if (
                 carrier_authority_status_by_species.get(species)
@@ -3934,8 +3986,21 @@ class CondensationModel:
                     self.wall_species_partial_pressures_pa,
                     self.overhead_pressure_mbar * 100.0,
                     inlet_rates, {segment.name: flowing_rates},
+                    inlet_molar_flows=inlet_molar_flows,
                 )[segment.name]
+                if wall_pO2_known:
+                    partials.setdefault('O2', 0.0)
                 self.wall_species_partial_pressures_pa_by_segment[segment.name] = partials
+                if self.operating_history:
+                    closure = _partial_pressure_closure_diagnostic(partials, overhead_pressure_pa)
+                    self.operating_history[-1].setdefault(
+                        "segment_partial_pressure_closure", {},
+                    )[segment.name] = closure
+                    if closure["reason"] == "no_advective_parcel":
+                        history = self.operating_history[-1]
+                        history["no_advective_parcel_count"] = (
+                            history.get("no_advective_parcel_count", 0) + 1
+                        )
                 arriving_species_kg_hr_by_segment[segment.name] = {
                     str(species): float(flowing_rates.get(species, 0.0))
                     for species in inlet_rates
@@ -3960,7 +4025,21 @@ class CondensationModel:
                         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                     )
                     deposit = candidates.get(segment.name, 0.0)
-                    if deposit > 0.0:
+                    if isinstance(deposit, (int, float)) and deposit > 0.0:
+                        deposit, oxygen_mol = _keep_declared_wall_deposit(
+                            species,
+                            float(deposit),
+                            surface="wall",
+                            T_K=float(segment.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+                            p_local_pa=partials.get(species),
+                            pO2_Pa=partials["O2"] if "O2" in partials else None,
+                            oxygen_mol=oxygen_mol,
+                            vapor_pressure_data=self.vapor_pressure_data,
+                            registry=self.species_formula_registry,
+                            bookings=wall_reaction_bookings,
+                            account=segment.wall_deposit_account,
+                        )
+                    if isinstance(deposit, (int, float)) and deposit > 0.0:
                         wall_hkl_by_species.setdefault(species, {})[segment.name] = deposit
                         wall_removed[species] = deposit
                 for species, deposit in wall_removed.items():
@@ -3971,7 +4050,10 @@ class CondensationModel:
                 self.wall_species_partial_pressures_pa,
                 self.overhead_pressure_mbar * 100.0,
                 inlet_rates, {stage_key: flowing_rates},
+                inlet_molar_flows=inlet_molar_flows,
             )[stage_key]
+            if wall_pO2_known:
+                partials.setdefault('O2', 0.0)
             stage_inlet_K = bulk_gas_K
             stage_area_m2 = self._stage_area_m2_for_stage(stage)
             stage_molar_flow_mol_s = carrier_mol_s + _tracked_molar_flow_mol_s(
@@ -4019,9 +4101,17 @@ class CondensationModel:
                 'T_bulk_mean_K': stage_mean_K,
                 'ntu': stage_ntu,
                 'n_total_mol_s': stage_molar_flow_mol_s,
+                'species_partial_pressures_pa': dict(partials),
+                'partial_pressure_closure': _partial_pressure_closure_diagnostic(
+                    partials, overhead_pressure_pa,
+                ),
             }
             if heat_transfer_notice is not None:
                 bulk_record['heat_transfer_notice'] = heat_transfer_notice
+            if (self.operating_history
+                    and bulk_record['partial_pressure_closure']['reason'] == 'no_advective_parcel'):
+                history = self.operating_history[-1]
+                history["no_advective_parcel_count"] = history.get("no_advective_parcel_count", 0) + 1
             self.last_stage_bulk_gas.append(bulk_record)
             self.stage_bulk_gas_history.append(bulk_record)
             bulk_gas_K = stage_outlet_K
@@ -4048,7 +4138,7 @@ class CondensationModel:
                     )
                     reaction.update(
                         available_oxygen_mol=oxygen_mol,
-                        stream_oxygen_mol=stream_source.get('O2', 0.0),
+                        stream_oxygen_mol=0.0,
                     )
                     reactive_alkali[species] = reaction
                     if not reaction['favoured']:
@@ -4077,6 +4167,7 @@ class CondensationModel:
                             antoine_extrapolations=antoine_extrapolations,
                             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                             efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
+                            wall_pO2_Pa=partials.get("O2"),
                         )
                     else:
                         eta = self._condensation_efficiency(
@@ -4091,6 +4182,7 @@ class CondensationModel:
                             antoine_extrapolations=antoine_extrapolations,
                             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                             efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
+                            wall_pO2_Pa=partials.get("O2"),
                             reactive_alkali_silica=reaction is not None,
                             flowing_pressure_pa=(
                                 partials.get(species) if reaction is not None else None
@@ -4152,6 +4244,24 @@ class CondensationModel:
                 if capture_refused:
                     continue
                 deposit = supply * eta
+                if deposit > 1e-15 and reaction is None:
+                    deposit, oxygen_mol = _keep_declared_wall_deposit(
+                        species,
+                        float(deposit),
+                        surface="baffle",
+                        T_K=_stage_midpoint_temperature_K(stage),
+                        p_local_pa=partials.get(species),
+                        pO2_Pa=partials.get("O2"),
+                        oxygen_mol=oxygen_mol,
+                        vapor_pressure_data=self.vapor_pressure_data,
+                        registry=self.species_formula_registry,
+                        bookings=wall_reaction_bookings,
+                        stage_key=stage_key_for_stage(
+                            stage,
+                            falsey_sub_order_is_zero=True,
+                            include_collector_fallback=True,
+                        ),
+                    )
                 if deposit > 1e-15:
                     if reaction is not None:
                         molar_mass = resolve_species_formula(
@@ -4604,9 +4714,28 @@ class CondensationModel:
             sticking_notice['vapour_carrier_lineage_by_deposited_species'] = (
                 wall_carrier_lineage_by_deposited_species
             )
-            extrapolations = self.last_sticking_alpha_provenance_notice.get(
+            raw_extrapolations = self.last_sticking_alpha_provenance_notice.get(
                 'wall_saturation_pressure_extrapolations_by_species', {}
             )
+            # The shared telemetry map also carries status-bearing pO2-free
+            # bounds so stage integration can consume them. Keep that distinct
+            # from the public extrapolation collection.
+            extrapolations: dict[str, Any] = {}
+            if isinstance(raw_extrapolations, Mapping):
+                for species, value in raw_extrapolations.items():
+                    if not isinstance(value, Mapping):
+                        continue
+                    if value.get('authority_level') == 'extrapolated':
+                        extrapolations[str(species)] = copy.deepcopy(dict(value))
+                        continue
+                    by_surface = {
+                        str(surface): copy.deepcopy(dict(record))
+                        for surface, record in value.items()
+                        if isinstance(record, Mapping)
+                        and record.get('authority_level') == 'extrapolated'
+                    }
+                    if by_surface:
+                        extrapolations[str(species)] = by_surface
             if extrapolations:
                 sticking_notice['wall_saturation_pressure_extrapolations_by_species'] = copy.deepcopy(extrapolations)
             transport_notices = self.last_sticking_alpha_provenance_notice.get(
@@ -4700,10 +4829,7 @@ class CondensationModel:
                     (item for item in outcomes if item.get('status') == 'refused'),
                     None,
                 )
-                domain_outcome = next(
-                    (item for item in outcomes if item.get('status') == 'extrapolated'),
-                    None,
-                )
+                domain_outcome = _least_authoritative_wall_domain(outcomes)
                 # Keep the local refusal in stage_outcomes without erasing
                 # extrapolation evidence from the stages that did run.
                 if domain_outcome is not None:
@@ -4716,11 +4842,37 @@ class CondensationModel:
                                 else VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
                             ),
                             'authoritative_for_condensation': False,
-                            'authority_level': 'extrapolated',
-                            'reason': domain_outcome['reason'],
-                            'valid_range_K': domain_outcome['valid_range_K'],
+                            'authority_level': domain_outcome.get(
+                                'authority_level',
+                                'extrapolated'
+                                if domain_outcome.get('status') == 'extrapolated'
+                                else 'status_bearing',
+                            ),
+                            'reason': (
+                                domain_outcome.get(
+                                    'wall_saturation_pressure_reason'
+                                )
+                                or domain_outcome['reason']
+                            ),
                             'stage_outcomes': list(outcomes),
                         })
+                        if domain_outcome.get('valid_range_K') is not None:
+                            authority['valid_range_K'] = domain_outcome['valid_range_K']
+                        notices_by_stage = [
+                            {
+                                'stage_number': item.get('stage_number'),
+                                'notice': copy.deepcopy(dict(notice)),
+                            }
+                            for item in outcomes
+                            for notice in item.get(
+                                'wall_saturation_pressure_notices', (),
+                            )
+                            if isinstance(notice, Mapping)
+                        ]
+                        if notices_by_stage:
+                            authority['wall_saturation_pressure_notices'] = (
+                                notices_by_stage
+                            )
                 if species in condensation_refusals_by_species:
                     existing = condensation_refusals_by_species[species]
                     if isinstance(existing, dict):
@@ -4737,6 +4889,32 @@ class CondensationModel:
                     'output_status': 'refused' if refused_outcome else 'status_bearing',
                     'stage_outcomes': list(outcomes),
                 }
+
+            # A wall can evaluate the pO2-free bound before any stage accepts
+            # capture (for example, a downstream area refusal). Preserve that
+            # resolver authority on the route result instead of losing it with
+            # the wall-pressure telemetry map.
+            for key, notice in antoine_extrapolations.items():
+                if (
+                    not isinstance(notice, Mapping)
+                    or notice.get('reason') != 'wall_pO2_unknown_pO2_free_route_used'
+                ):
+                    continue
+                species = str(key).split('#', 1)[0]
+                authority = condensation_authority_by_species.get(species)
+                if authority is None or authority.get('authority_level') == 'extrapolated':
+                    continue
+                authority.update({
+                    'status': (
+                        VAPOUR_CARRIER_AUTHORITY_MISSING
+                        if authority.get('status') == VAPOUR_CARRIER_AUTHORITY_MISSING
+                        else VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
+                    ),
+                    'authoritative_for_condensation': False,
+                    'authority_level': 'status_bearing',
+                    'reason': 'wall_pO2_unknown_pO2_free_route_used',
+                    'wall_saturation_pressure_notice': copy.deepcopy(dict(notice)),
+                })
 
             for species, authority in condensation_authority_by_species.items():
                 input_mass = max(
@@ -4827,6 +5005,9 @@ class CondensationModel:
                 condensation_authority_by_species
             )
             if self.operating_history:
+                self.operating_history[-1]['wall_reaction_booking_by_species'] = (
+                    copy.deepcopy(wall_reaction_bookings)
+                )
                 self.operating_history[-1][
                     'wall_deposition_rate_shadow_candidate'
                 ] = copy.deepcopy(
@@ -4839,6 +5020,7 @@ class CondensationModel:
 
         return CondensationRouteResult(
             stage3_reactive_alkali_by_species=reactive_alkali,
+            wall_reaction_booking_by_species=copy.deepcopy(wall_reaction_bookings),
             remaining_by_species=copy.deepcopy(remaining_by_species),
             retained_in_source_by_species=copy.deepcopy(
                 retained_in_source_by_species
@@ -5215,20 +5397,24 @@ class CondensationModel:
             raise DepositionInputRefusal('stage3_product_activity', product_mol,
                                          'silicate product composition required')
         a_oxide = activity.thermodynamic_parent_activity()
+        if stream_po2_bar is None:
+            raise DepositionInputRefusal(
+                'stage3_stream_pO2_bar', None,
+                'Dalton O2 partial pressure is unavailable',
+            )
         try:
             pressure_pa = _finite_nonnegative_value(
                 flowing_pressure_pa,
                 label=f'{species} partial pressure',
             )
-            # pO2_mbar is the incoming sweep command; zero commanded O2
-            # does not remove the co-evolved oxygen in the actual headspace.
             po2_bar = _finite_nonnegative_value(
-                melt.oxygen_reservoir.headspace_ledger_pO2_bar,
-                label='stage3 headspace pO2_bar')
+                stream_po2_bar,
+                label='stream Dalton pO2_bar',
+            )
         except ValueError as exc:
             raise DepositionInputRefusal('stage3_reaction_gas', species, str(exc)) from exc
-        if stream_po2_bar is not None:
-            po2_bar += stream_po2_bar
+        # This stream Dalton partial already includes committed overhead O2;
+        # the headspace ledger represents the same inventory and is not added.
         # Ellingham basis: 4 M(g) + O2 -> 2 M2O, standard pressure 1 bar.
         # ln(Q/K) = 2 ln(a_M2O) - 4 ln(p_M/bar) - ln(pO2/bar)
         #             + dG°/(R T). All log arguments are dimensionless;
@@ -5249,8 +5435,7 @@ class CondensationModel:
                          else po2_bar > 0.0 and pressure_pa > 0.0 and a_oxide == 0.0),
             'log_Q_over_K': log_q_over_k, 'temperature_K': temperature_K,
             'alkali_pressure_pa': pressure_pa, 'pO2_bar': po2_bar,
-            'pO2_source': ('retained_plus_evaporation_stream' if stream_po2_bar is not None
-                           else 'oxygen_reservoir.headspace_ledger_pO2_bar'),
+            'pO2_source': 'stream_dalton_o2_partial',
             **({'reference_state_notice': {
                 'status': 'authority_extrapolated',
                 'message': 'reference-state mismatch: pure-liquid KO0.5 activity vs crystalline K2O dG; no K2O fusion data; authority extrapolated',
@@ -5285,6 +5470,7 @@ class CondensationModel:
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
         antoine_extrapolation_warnings: list[str] | None,
         efficiency_outcomes: list[dict[str, Any]] | None,
+        wall_pO2_Pa: float | None = None,
     ) -> tuple[float, dict[str, Any]]:
         """Vapour e-NTU on the freeze-out cartridge, plus an aerosol flag.
 
@@ -5353,6 +5539,7 @@ class CondensationModel:
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             diagnostic_out=saturation_diagnostic,
+            wall_pO2_Pa=wall_pO2_Pa,
         )
         if saturation_diagnostic.get('wall_saturation_pressure_refused'):
             raise WallSaturationPressureRefusal(
@@ -5440,8 +5627,32 @@ class CondensationModel:
         reactive_alkali_silica: bool = False,
         flowing_pressure_pa: float | None = None,
         bulk_gas_inlet_K: float | None = None,
+        wall_pO2_Pa: float | None = None,
     ) -> float:
         """Equilibrium-capped kinetic capture integrated over the stage band."""
+
+        band_notices: list[dict[str, Any]] = []
+
+        def _band_wall_authority_fields() -> dict[str, Any]:
+            least_authoritative = _least_authoritative_wall_domain(
+                band_notices,
+            )
+            if least_authoritative is None:
+                return {}
+            return {
+                'authority_level': least_authoritative['authority_level'],
+                'wall_saturation_pressure_reason': str(
+                    least_authoritative.get('reason')
+                    or 'wall_saturation_pressure_non_authoritative'
+                ),
+                'valid_range_K': copy.deepcopy(
+                    least_authoritative.get('valid_range_K')
+                ),
+                'wall_saturation_pressure_notices': copy.deepcopy(
+                    band_notices
+                ),
+            }
+
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
                 efficiency_outcomes.append({
@@ -5452,6 +5663,7 @@ class CondensationModel:
                     'stage_number': int(stage.stage_number),
                     'T_cond_C': float(T_cond_C),
                     'eta': 0.0,
+                    **_band_wall_authority_fields(),
                     **detail,
                 })
             return 0.0
@@ -5509,8 +5721,7 @@ class CondensationModel:
         if area == 0.0:
             return _mint_zero('no_configured_capture_area')
 
-        midpoint_T_K = _stage_midpoint_temperature_K(stage)
-        lo_C, hi_C = _stage_temp_band_C(stage)
+        lo_C, hi_C = _ordered_stage_band_C(stage)
         width_C = hi_C - lo_C
         sample_count = 1 if width_C == 0.0 else HKL_BAND_SAMPLES
         reactive_backstop_authorized = _reactive_product_backstop_authorized(species)
@@ -5586,6 +5797,7 @@ class CondensationModel:
                 antoine_extrapolations=notices,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=diagnostic,
+                wall_pO2_Pa=wall_pO2_Pa,
             )
             try:
                 flux = _series_resistance_deposition_flux_mol_m2_s(
@@ -5612,6 +5824,9 @@ class CondensationModel:
                         'saturation_pressure_unavailable',
                     ),
                 )
+            wall_notice = diagnostic.get('wall_saturation_pressure_notice')
+            if isinstance(wall_notice, Mapping):
+                band_notices.append(copy.deepcopy(dict(wall_notice)))
             if not math.isfinite(flux) or flux < 0.0:
                 raise ValueError(
                     f'condensation efficiency for {species} in stage '
@@ -5621,11 +5836,21 @@ class CondensationModel:
                 0.0 if reactive_alkali_silica
                 else diagnostic.get('wall_saturation_pressure_pa')
             )
-            if saturation_pressure is None or not math.isfinite(float(saturation_pressure)):
+            if saturation_pressure is None or not isinstance(saturation_pressure, (int, float)):
                 raise WallSaturationPressureRefusal(
                     species, sample_T_K, 'saturation_pressure_unavailable',
                 )
-            sample_driving_pressure = max(0.0, p_in - float(saturation_pressure))
+            saturation_pressure = float(saturation_pressure)
+            # +∞ is the oxidative pO2 → 0 limit: no supersaturation, not a
+            # missing pressure. NaN is still a refusal.
+            if math.isnan(saturation_pressure):
+                raise WallSaturationPressureRefusal(
+                    species, sample_T_K, 'saturation_pressure_unavailable',
+                )
+            if math.isinf(saturation_pressure):
+                sample_driving_pressure = 0.0
+            else:
+                sample_driving_pressure = max(0.0, p_in - saturation_pressure)
             band_flux_sum += flux
             if sample_driving_pressure > 0.0:
                 positive_driving_samples += 1
@@ -5725,16 +5950,19 @@ class CondensationModel:
             if segment is not None:
                 _, _, pressure_pa = segment
         eta = (p_in - pressure_pa) / p_in
-        notice = notices.get(f'{species}#wall:{midpoint_T_K}')
-        if isinstance(notice, Mapping) and efficiency_outcomes is not None:
+        notice = _least_authoritative_wall_domain(band_notices)
+        if notice is not None and efficiency_outcomes is not None:
+            authority_level = str(notice['authority_level'])
+            outcome_status = authority_level
             efficiency_outcomes.append({
-                **notice, 'status': 'extrapolated', 'authority_level': 'extrapolated',
-                'reason': 'antoine_psat_unavailable_at_T' if notice.get('status') == 'refused'
-                          else notice.get('reason', 'outside_source_temperature_band'),
-                'original_reason': notice.get('reason'),
+                **notice,
+                'status': outcome_status,
+                'authority_level': authority_level,
+                'reason': notice.get('reason') or 'outside_source_temperature_band',
                 'output_status': 'status_bearing', 'species': species,
                 'stage_number': int(stage.stage_number), 'T_cond_C': T_cond_C,
                 'flowing_pressure_pa': p_in, 'eta': eta,
+                **_band_wall_authority_fields(),
             })
         return eta
 
@@ -6365,7 +6593,7 @@ def antoine_dew_temperature_diagnostic(
     try:
         p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
         p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
-    except (KeyError, ValueError) as exc:
+    except (KeyError, ValueError, WallSaturationPressureRefusal) as exc:
         return {
             "status": "refused_outside_certified_surface",
             "temperature_K": None,
@@ -6425,6 +6653,31 @@ def _stage_material_config(
 def _stage_temp_band_C(stage: CondensationStage) -> tuple[float, float]:
     lo_C, hi_C = stage.temp_range_C
     return float(lo_C), float(hi_C)
+
+
+def _least_authoritative_wall_domain(
+    outcomes: Sequence[Mapping[str, Any]],
+) -> Mapping[str, Any] | None:
+    """Select the weakest wall-thermochemistry domain used by a result."""
+
+    severity = {
+        'authoritative': 0,
+        'status_bearing': 1,
+        'extrapolated': 2,
+    }
+    candidates = [
+        outcome for outcome in outcomes
+        if str(
+            outcome.get('authority_level') or outcome.get('status') or ''
+        ) in severity
+    ]
+    return max(
+        candidates,
+        key=lambda outcome: severity[str(
+            outcome.get('authority_level') or outcome.get('status') or ''
+        )],
+        default=None,
+    )
 
 
 def _ordered_stage_band_C(stage: CondensationStage) -> tuple[float, float]:
@@ -7540,7 +7793,8 @@ def _inlet_carrier_molar_flow_mol_s(
 
     if not inlet_partials_pa:
         return 0.0, None
-    species_names = tuple(str(species) for species in inlet_partials_pa)
+    species_names = tuple(str(species) for species in inlet_partials_pa
+                          if species in inlet_species_kg_hr)
     if total_pressure_pa <= 0.0:
         return 0.0, species_names
     vapour_mol_s = _tracked_molar_flow_mol_s(
@@ -7549,12 +7803,15 @@ def _inlet_carrier_molar_flow_mol_s(
         vapor_pressure_data=vapor_pressure_data,
     )
     partial_sum_pa = math.fsum(
-        float(pressure) for pressure in inlet_partials_pa.values()
+        float(inlet_partials_pa[species]) for species in species_names
     )
     if (
         vapour_mol_s <= 0.0
         or partial_sum_pa <= 0.0
-        or partial_sum_pa >= total_pressure_pa
+        or total_pressure_pa - partial_sum_pa <= _partial_pressure_roundoff_pa(
+            {species: inlet_partials_pa[species] for species in species_names},
+            total_pressure_pa,
+        )
     ):
         return 0.0, species_names
     return (
@@ -8229,6 +8486,344 @@ def _pure_sodium_saturation_pa(
     return saturation.pressure_pa
 
 
+def _declared_wall_saturation_pressure_pa(
+    species: str,
+    T_K: float,
+    data: Mapping[str, Any],
+    *,
+    wall_pO2_Pa: float | None,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
+    diagnostic_out: MutableMapping[str, Any] | None = None,
+) -> float | None:
+    """Wall-law Psat for a species that declares ``wall_reactions``.
+
+    Returns None when the row has no block, so the caller keeps the legacy
+    pure-component curve. A declared block that cannot be evaluated raises
+    ``WallSaturationPressureRefusal`` with the law's reason. It does not
+    fall through to a source-exponent refusal or to Psat = 0.
+
+    The Gibbs algebra stays in ``wall_saturation_pressure_pa``. This
+    function only chooses the species row, the temperature, and the parcel
+    pO2, then translates the law's refusal onto the deposition boundary.
+    """
+
+    from simulator.vapour_rail.nasa_cea import NasaCeaError, WallSaturationLawRefusal
+    from simulator.vapour_rail.wall_saturation import (
+        resolve_wall_saturation,
+        wall_reactions_declaration,
+    )
+
+    try:
+        declaration = wall_reactions_declaration(data)
+    except WallSaturationLawRefusal as exc:
+        temperature = float(T_K) if isinstance(T_K, (int, float)) else float("nan")
+        raise WallSaturationPressureRefusal(species, temperature, exc.reason) from exc
+    if declaration is None:
+        return None
+    temperature = _deposition_finite_scalar("T_wall_K", T_K)
+    if temperature <= 0.0:
+        raise DepositionInputRefusal(
+            "T_wall_K",
+            temperature,
+            "must be above absolute zero",
+        )
+    try:
+        resolved = resolve_wall_saturation(
+            data,
+            species_id=species,
+            T_K=temperature,
+            pO2_Pa=wall_pO2_Pa,
+        )
+    except WallSaturationLawRefusal as exc:
+        raise WallSaturationPressureRefusal(
+            species, temperature, exc.reason,
+        ) from exc
+    except NasaCeaError as exc:
+        raise WallSaturationPressureRefusal(
+            species, temperature, "wall_saturation_law_refused",
+        ) from exc
+    extrapolated = [
+        participant for participant in resolved.participants
+        if participant.authority_level == "extrapolated"
+    ]
+    used_pfree_route = "wall_pO2_unknown_pO2_free_route_used" in resolved.notices
+    if extrapolated or used_pfree_route:
+        if extrapolated:
+            first = extrapolated[0]
+            valid_range = first.valid_range_K
+            record = {
+                "temperature_K": temperature,
+                "valid_range_K": valid_range,
+                "status": "extrapolated",
+                "authority_level": "extrapolated",
+                "reason": "wall_condensation_thermo_extrapolated",
+                "reaction_id": resolved.reaction_id,
+                "notices": list(resolved.notices),
+                "thermo_sources": [
+                    {
+                        "role": participant.role,
+                        "species": participant.species,
+                        "record_id": participant.record_id,
+                        "valid_range_K": participant.valid_range_K,
+                    }
+                    for participant in extrapolated
+                ],
+            }
+            warning = (
+                f"{species} wall saturation extrapolated beyond "
+                f"valid_range_K {valid_range} at {temperature:g} K"
+            )
+        else:
+            record = {
+                "temperature_K": temperature,
+                "status": "status_bearing",
+                "authority_level": "status_bearing",
+                "reason": "wall_pO2_unknown_pO2_free_route_used",
+                "reaction_id": resolved.reaction_id,
+                "notices": list(resolved.notices),
+            }
+            warning = (
+                f"{species} wall saturation uses the flagged pO2-free "
+                "route because wall pO2 is unknown"
+            )
+        _store_saturation_extrapolation(
+            species,
+            record,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            warning=warning,
+        )
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_notice"] = dict(record)
+    return float(resolved.pressure_Pa)
+
+
+def _species_declares_wall_reactions(
+    species: str,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> bool:
+    """True when the species row has a wall-reaction block.
+
+    An ill-typed block is still declared: the law refuses it, and the
+    deposition backstop must not replace that refusal with Psat = 0.
+    """
+
+    from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
+    from simulator.vapour_rail.wall_saturation import wall_reactions_declaration
+
+    data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
+    try:
+        return wall_reactions_declaration(data) is not None
+    except WallSaturationLawRefusal:
+        return True
+
+
+def _empty_wall_reaction_booking() -> dict[str, Any]:
+    return {
+        "baffle_products_mol": {},
+        "baffle_products_mol_by_stage": {},
+        "baffle_oxygen_debit_mol": 0.0,
+        "baffle_oxygen_credit_mol": 0.0,
+        "wall_products_mol_by_account": {},
+        "wall_oxygen_debit_mol": 0.0,
+        "wall_oxygen_credit_mol": 0.0,
+    }
+
+
+def _assign_declared_wall_capture(
+    species: str,
+    captured_mol: float,
+    *,
+    T_K: float,
+    p_local_pa: float | None,
+    pO2_Pa: float | None,
+    oxygen_mol: float,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> tuple[list[dict[str, Any]], float, float] | None:
+    """Assign a transported capture to the saturation ladder.
+
+    Returns None when the species has no wall-reaction block. Otherwise
+    ``(legs, oxygen_mol_remaining, unbooked_mol)``.
+
+    Premise. The transport integral already used the lowest saturation
+    pressure. This assigns that captured extent to the same reactions.
+    It does not recompute K.
+
+    Transport uses the minimum P_sat, often the near-zero oxidative route at
+    trace pO2; this split spends only committed O2 and sends an exhausted
+    remainder through a supersaturated pO2-free route. The coupling moves
+    f_eq by about 0.6% at the Stage-3 design peak; forecast O2 must not be fed
+    back to erase it (d-402: committed O2 only).
+
+    Oxygen is the committed parcel inventory, never a forecast coproduct.
+    For n_v mol captured and a = ν_O2/ν_v mol O2 per mol vapour,
+    n_oxidised = min(n_v, n_O2/a); n_free = n_v - n_oxidised.
+    Units: mol/(mol/mol) = mol. n_O2 = 0 leaves only the free route;
+    n_O2 >= a*n_v permits full oxidation. The residual uses the free
+    route only if supersaturated; otherwise it remains vapour.
+
+    Algebra. Walk the reactions in ascending Psat. A reaction takes
+    vapour only while ``Psat < p_local``. An oxidative leg takes
+    ``min(remaining, n_O2 / (ν_O2/ν_v))`` and debits that times
+    ``ν_O2/ν_v``. When the budget is short, the take is rounded down
+    by one ULP so the debit cannot exceed ``n_O2``. A leg with
+    ``ν_O2 <= 0`` takes the rest; a credit adds ``|ν_O2/ν_v|`` mol O2
+    per mol vapour to the ledger proposal (not the available budget).
+    The next reaction is reached
+    only when it is itself supersaturated. Anything left is unbooked
+    vapour, not a deposit.
+
+    Units. Extents and the oxygen budget are moles. Pressures are
+    pascals. Stoichiometry ratios are mol per mol of vapour.
+    """
+
+    from simulator.vapour_rail.nasa_cea import NasaCeaError, WallSaturationLawRefusal
+    from simulator.vapour_rail.wall_saturation import (
+        ranked_wall_saturations,
+        wall_reactions_declaration,
+    )
+
+    data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
+    try:
+        declaration = wall_reactions_declaration(data)
+    except WallSaturationLawRefusal as exc:
+        raise WallSaturationPressureRefusal(species, float(T_K), exc.reason) from exc
+    if declaration is None:
+        return None
+    if captured_mol <= 0.0:
+        return [], oxygen_mol, 0.0
+    if p_local_pa is None or not math.isfinite(p_local_pa) or p_local_pa < 0.0:
+        raise WallSaturationPressureRefusal(
+            species, float(T_K), "saturation_pressure_unavailable",
+        )
+    try:
+        ladder = ranked_wall_saturations(
+            data, species_id=species, T_K=float(T_K), pO2_Pa=pO2_Pa,
+        )
+    except WallSaturationLawRefusal as exc:
+        raise WallSaturationPressureRefusal(species, float(T_K), exc.reason) from exc
+    except NasaCeaError as exc:
+        raise WallSaturationPressureRefusal(
+            species, float(T_K), "wall_saturation_law_refused",
+        ) from exc
+    remaining = captured_mol
+    legs: list[dict[str, Any]] = []
+    for reaction in ladder:
+        if remaining <= 0.0:
+            break
+        if not reaction.pressure_Pa < p_local_pa:
+            break
+        o2_per = float(reaction.o2_mol_per_mol_vapour)
+        if o2_per > 0.0:
+            if oxygen_mol <= 0.0:
+                continue
+            capacity = oxygen_mol / o2_per
+            if capacity < remaining:
+                capacity = math.nextafter(capacity, 0.0)
+            take = min(remaining, max(0.0, capacity))
+            if take <= 0.0:
+                continue
+            debit = take * o2_per
+            oxygen_mol -= debit
+            credit = 0.0
+        else:
+            take = remaining
+            debit = 0.0
+            credit = take * (-o2_per) if o2_per < 0.0 else 0.0
+            # This credit is part of a proposal, not committed inventory.
+            # Book it, but do not lend it to a later carrier's capture.
+        products = {
+            str(product): take * float(ratio)
+            for product, ratio in reaction.products_mol_per_mol_vapour
+            if take * float(ratio) > 0.0
+        }
+        legs.append({
+            "reaction_id": reaction.reaction_id,
+            "notices": reaction.notices,
+            "products_mol": products,
+            "oxygen_debit_mol": debit,
+            "oxygen_credit_mol": credit,
+            "vapour_mol": take,
+        })
+        remaining -= take
+    return legs, oxygen_mol, remaining
+
+
+def _keep_declared_wall_deposit(
+    species: str,
+    deposit_kg: float,
+    *,
+    surface: str,
+    T_K: float,
+    p_local_pa: float | None,
+    pO2_Pa: float | None,
+    oxygen_mol: float,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    registry: Mapping[str, Any],
+    bookings: dict[str, dict[str, Any]],
+    stage_key: str | None = None,
+    account: str | None = None,
+) -> tuple[float, float]:
+    """Keep only the capture the oxygen budget can book.
+
+    A species with no wall block is unchanged. A declared reaction that
+    cannot take the extent returns that mass to the flowing vapour.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+
+    if not _species_declares_wall_reactions(species, vapor_pressure_data):
+        return deposit_kg, oxygen_mol
+    molar_mass = resolve_species_formula(
+        species, registry,
+    ).molar_mass_kg_per_mol()
+    if molar_mass <= 0.0:
+        raise WallSaturationPressureRefusal(
+            species, float(T_K), "saturation_pressure_unavailable",
+        )
+    captured_mol = deposit_kg / molar_mass
+    assigned = _assign_declared_wall_capture(
+        species,
+        captured_mol,
+        T_K=T_K,
+        p_local_pa=p_local_pa,
+        pO2_Pa=pO2_Pa,
+        oxygen_mol=oxygen_mol,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    if assigned is None:
+        return deposit_kg, oxygen_mol
+    legs, oxygen_mol, unbooked_mol = assigned
+    if legs:
+        booking = bookings.setdefault(species, _empty_wall_reaction_booking())
+        for leg in legs:
+            booking.setdefault("reaction_legs", []).append({
+                **leg, "surface": surface, "stage_key": stage_key, "account": account,
+            })
+            products = leg["products_mol"]
+            if surface == "wall":
+                account_products = booking["wall_products_mol_by_account"].setdefault(
+                    str(account), {},
+                )
+                for product, mol in products.items():
+                    account_products[product] = account_products.get(product, 0.0) + mol
+                booking["wall_oxygen_debit_mol"] += leg["oxygen_debit_mol"]
+                booking["wall_oxygen_credit_mol"] += leg["oxygen_credit_mol"]
+            else:
+                baffle = booking["baffle_products_mol"]
+                by_stage = booking["baffle_products_mol_by_stage"].setdefault(
+                    str(stage_key), {},
+                )
+                for product, mol in products.items():
+                    baffle[product] = baffle.get(product, 0.0) + mol
+                    by_stage[product] = by_stage.get(product, 0.0) + mol
+                booking["baffle_oxygen_debit_mol"] += leg["oxygen_debit_mol"]
+                booking["baffle_oxygen_credit_mol"] += leg["oxygen_credit_mol"]
+    kept_mol = max(0.0, captured_mol - unbooked_mol)
+    return kept_mol * molar_mass, oxygen_mol
+
+
 def _antoine_psat_pa(
     species: str,
     T_K: float,
@@ -8237,6 +8832,8 @@ def _antoine_psat_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     enforce_hot_train_applicability: bool = True,
+    wall_pO2_Pa: float | None = None,
+    diagnostic_out: MutableMapping[str, Any] | None = None,
 ) -> float | None:
     if enforce_hot_train_applicability:
         _assert_condensation_applicable(
@@ -8256,6 +8853,20 @@ def _antoine_psat_pa(
     )
     if sodium_pressure is not None:
         return sodium_pressure
+    # One call covers both former refusal sites: the source-exponent gate
+    # (no legacy Antoine) and the empty wall fit (SiO's legacy block skipped
+    # that gate). A species with a wall-reaction block never reaches either.
+    wall_pressure = _declared_wall_saturation_pressure_pa(
+        species,
+        T_K,
+        data,
+        wall_pO2_Pa=wall_pO2_Pa,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        diagnostic_out=diagnostic_out,
+    )
+    if wall_pressure is not None:
+        return wall_pressure
     has_legacy_antoine = any(
         isinstance(block, Mapping)
         for block_name in _ANTOINE_COEFFICIENT_BLOCKS
@@ -8439,6 +9050,7 @@ def _try_antoine_psat_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     enforce_hot_train_applicability: bool = True,
+    wall_pO2_Pa: float | None = None,
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
@@ -8466,6 +9078,7 @@ def _try_antoine_psat_pa(
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             enforce_hot_train_applicability=enforce_hot_train_applicability,
+            wall_pO2_Pa=wall_pO2_Pa,
         )
     except (CatalogCompileError, VaporPressureRangeError, NasaCeaDomainError, ShomateDomainError,
             WallSaturationPressureRefusal) as exc:
@@ -8532,6 +9145,13 @@ def _record_wall_surface_antoine_telemetry(
         and antoine_extrapolation_warnings is None
     ):
         return
+    if _species_declares_wall_reactions(
+        species, vapor_pressure_data=vapor_pressure_data,
+    ):
+        # This telemetry probe has no segment composition. The actual wall
+        # candidate records a reaction-law result with its local pO2; probing
+        # here would turn missing probe input into a false pO2-free notice.
+        return
     _try_antoine_psat_pa(
         species,
         wall_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
@@ -8539,6 +9159,11 @@ def _record_wall_surface_antoine_telemetry(
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
+
+
+def _partial_pressure_roundoff_pa(partials: Mapping[str, float], total_pa: float) -> float:
+    """Float64 summation bound, in Pa; not a physical carrier allowance."""
+    return max(math.ulp(total_pa), math.ulp(sum(partials.values()))) * max(1, len(partials))
 
 
 def _flowing_species_partial_pressures_pa(
@@ -8603,13 +9228,9 @@ def _flowing_species_partial_pressures_pa(
             molar_flow_by_species[str(species)] = (
                 rate_kg_hr / (molar_mass_g_mol / 1000.0)
             )
-        total_molar_flow = sum(molar_flow_by_species.values())
-        if total_molar_flow <= 0.0:
+        if not molar_flow_by_species:
             return {}
-        partial_pressures_pa = {
-            species: molar_flow / total_molar_flow * pressure_pa
-            for species, molar_flow in molar_flow_by_species.items()
-        }
+        return _molar_flow_partials_pa(molar_flow_by_species, pressure_pa)
 
     for species, partial_pressure_pa in partial_pressures_pa.items():
         if not math.isfinite(partial_pressure_pa) or partial_pressure_pa < 0.0:
@@ -8625,10 +9246,7 @@ def _flowing_species_partial_pressures_pa(
             )
     partial_pressure_sum_pa = sum(partial_pressures_pa.values())
     if partial_pressure_sum_pa > pressure_pa:
-        roundoff_pa = max(
-            math.ulp(pressure_pa),
-            math.ulp(partial_pressure_sum_pa),
-        ) * max(1, len(partial_pressures_pa))
+        roundoff_pa = _partial_pressure_roundoff_pa(partial_pressures_pa, pressure_pa)
         if (
             pressure_pa > 0.0
             and partial_pressure_sum_pa - pressure_pa <= roundoff_pa
@@ -8673,11 +9291,49 @@ def _flowing_species_partial_pressures_pa(
     return partial_pressures_pa
 
 
+def _partial_pressure_closure_diagnostic(
+    partials: Mapping[str, float], total_pa: float,
+) -> dict[str, Any]:
+    if not any(value > 0.0 for value in partials.values()):
+        return {"status": "not_applicable", "reason": "no_advective_parcel",
+                "relative_error": None}
+    return {"status": "evaluated", "reason": None,
+            "relative_error": abs(math.fsum(partials.values()) - total_pa) / total_pa
+            if total_pa > 0.0 else 0.0}
+
+
+def _molar_flow_partials_pa(
+    molar_flows: Mapping[str, float], total_pressure_pa: float,
+    *, background_molar_flow: float = 0.0,
+) -> dict[str, float]:
+    """Dalton mixture, with all flows in one common mol/time basis.
+
+    p_i = P_total * n_dot_i / sum_j(n_dot_j). mol/time cancels, leaving Pa.
+    Including carrier and oxygen makes sum(p_i) = P_total; removing a vapour
+    renormalizes the remaining gas without adding an independent O2 pressure.
+    """
+    flows = {
+        str(species): _finite_nonnegative_value(value, label=f"{species} molar flow")
+        for species, value in molar_flows.items()
+    }
+    total = math.fsum(flows.values()) + background_molar_flow
+    if total <= 0.0:
+        return {species: 0.0 for species in flows}
+    partials = {species: total_pressure_pa * (value / total)
+                for species, value in flows.items()}
+    return _flowing_species_partial_pressures_pa(
+        {}, total_pressure_pa,
+        reported_partial_pressures_mbar={sp: p / 100.0 for sp, p in partials.items()},
+    )
+
+
 def _segment_species_partial_pressures_pa(
     inlet_partial_pressures_pa: Mapping[str, float],
     total_pressure_pa: float,
     inlet_species_kg_hr: Mapping[str, float],
     species_kg_hr_by_segment: Mapping[str, Mapping[str, float]],
+    *,
+    inlet_molar_flows: Mapping[str, float] | None = None,
 ) -> dict[str, dict[str, float]]:
     # Premise: carrier molar flow persists while upstream capture reduces each
     # vapor flow. On a unit inlet-total-molar-flow basis, y_c=1-sum_i(y_i,0)
@@ -8703,25 +9359,25 @@ def _segment_species_partial_pressures_pa(
             for segment in species_kg_hr_by_segment
         }
 
-    inlet_mole_fraction = {
-        species: partial_pressure_pa / pressure_pa
-        for species, partial_pressure_pa in inlet_partials.items()
-    }
-    inlet_partial_pressure_sum_pa = sum(inlet_partials.values())
-    # Premise: _flowing_species_partial_pressures_pa already proves
-    # sum(p_i) <= P_total (or refuses a physical overfill). Derive the carrier
-    # on that same pressure basis: y_c=(P_total-sum(p_i))/P_total. Unit check:
-    # Pa/Pa is dimensionless. This avoids independently summing p_i/P_total,
-    # which can round to >1 even when the pressure sum is exactly P_total.
-    carrier_mole_fraction = (
-        pressure_pa - inlet_partial_pressure_sum_pa
-    ) / pressure_pa
+    if inlet_molar_flows is None:
+        # Compatibility for explicitly supplied partial maps: a common
+        # pressure unit is a molar-flow basis. Only a resolved, non-roundoff
+        # pressure remainder represents an implicit carrier.
+        inlet_molar_flows = dict(inlet_partials)
+        residual_pa = pressure_pa - math.fsum(inlet_partials.values())
+        carrier_basis = (
+            residual_pa
+            if residual_pa > _partial_pressure_roundoff_pa(inlet_partials, pressure_pa)
+            else 0.0
+        )
+    else:
+        carrier_basis = 0.0  # Production includes carrier as an explicit flow.
 
     by_segment: dict[str, dict[str, float]] = {}
     for raw_segment, segment_rates in species_kg_hr_by_segment.items():
         segment = str(raw_segment)
         local_molar_basis: dict[str, float] = {}
-        for species, inlet_fraction in inlet_mole_fraction.items():
+        for species, inlet_flow in inlet_molar_flows.items():
             inlet_rate = float(inlet_species_kg_hr.get(species, 0.0))
             local_rate = float(segment_rates.get(species, 0.0))
             if (
@@ -8734,7 +9390,12 @@ def _segment_species_partial_pressures_pa(
                     f'wall flowing mass rate for {species} must be finite '
                     'and non-negative'
                 )
-            if inlet_rate <= 0.0:
+            if species not in inlet_species_kg_hr:
+                # This is a supplied background gas, not a tracked condensable
+                # mass rate. It persists with the carrier; reaction
+                # booking separately enforces the finite O2 inventory.
+                depletion_fraction = 1.0
+            elif inlet_rate <= 0.0:
                 if local_rate > 0.0:
                     raise ValueError(
                         f'wall segment {segment} has {species} flow without '
@@ -8749,28 +9410,12 @@ def _segment_species_partial_pressures_pa(
                     )
                 depletion_fraction = local_rate / inlet_rate
             local_molar_basis[species] = (
-                inlet_fraction * depletion_fraction
+                inlet_flow * depletion_fraction
             )
 
-        local_total_basis = (
-            carrier_mole_fraction + sum(local_molar_basis.values())
-        )
-        if local_total_basis <= 0.0:
-            by_segment[segment] = {
-                species: 0.0 for species in inlet_partials
-            }
-            continue
-        local_partials = {
-            species: local_basis / local_total_basis * pressure_pa
-            for species, local_basis in local_molar_basis.items()
-        }
-        by_segment[segment] = _flowing_species_partial_pressures_pa(
-            {},
-            pressure_pa,
-            reported_partial_pressures_mbar={
-                species: partial_pressure_pa / 100.0
-                for species, partial_pressure_pa in local_partials.items()
-            },
+        by_segment[segment] = _molar_flow_partials_pa(
+            local_molar_basis, pressure_pa,
+            background_molar_flow=carrier_basis,
         )
     return by_segment
 
@@ -9017,6 +9662,82 @@ def _wall_antoine_temperature_relation(
     return None
 
 
+def _declared_wall_driving_pressure_pa(
+    species: str,
+    local_pressure_pa: float,
+    T_surface_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
+    antoine_extrapolation_warnings: list[str] | None,
+    diagnostic_out: MutableMapping[str, Any] | None,
+    wall_pO2_Pa: float | None,
+) -> float:
+    """Driving pressure from the wall law, never from a Psat = 0 backstop.
+
+    Premise. A declared wall reaction has a saturation pressure. The force
+    on the wall is the supersaturation of that pressure.
+
+    Algebra. ``driving = max(0, p_local − Psat)``. Units are pascals.
+    ``Psat ≥ p_local`` gives 0, the same limit as
+    ``equilibrium_capture_fraction``. ``Psat → +∞`` (oxidative reaction at
+    pO2 = 0) is that limit, not a missing pressure.
+
+    A law refusal is re-raised. It is not replaced by ``p_local``.
+    """
+
+    # Transport uses the minimum P_sat (trace pO2 can select the near-zero
+    # oxidative route); booking later spends committed O2 and may send the
+    # exhausted remainder through a supersaturated pO2-free route. This moves
+    # f_eq by about 0.6% at the Stage-3 design peak; forecast O2 must not be
+    # fed back to remove the coupling (d-402: committed O2 only).
+    try:
+        P_sat_pa = _antoine_psat_pa(
+            species,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            wall_pO2_Pa=wall_pO2_Pa,
+            diagnostic_out=diagnostic_out,
+        )
+    except WallSaturationPressureRefusal as exc:
+        record = {
+            "temperature_K": T_surface_K,
+            "status": "refused",
+            "reason": exc.reason,
+            "authority_level": "unavailable",
+            "valid_range_K": getattr(exc, "valid_range_K", None),
+            "band_scope": getattr(exc, "band_scope", "wall_saturation_pressure"),
+            "refusal_type": type(exc).__name__,
+        }
+        if antoine_extrapolations is not None:
+            antoine_extrapolations[f"{species}#wall:{T_surface_K}"] = record
+        if (
+            antoine_extrapolation_warnings is not None
+            and str(exc) not in antoine_extrapolation_warnings
+        ):
+            antoine_extrapolation_warnings.append(str(exc))
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = None
+            diagnostic_out["wall_saturation_pressure_refused"] = True
+            diagnostic_out["wall_saturation_pressure_refusal_reason"] = exc.reason
+            diagnostic_out["wall_saturation_pressure_notice"] = dict(record)
+        raise
+    if diagnostic_out is not None:
+        diagnostic_out["wall_saturation_pressure_pa"] = P_sat_pa
+        diagnostic_out["wall_saturation_pressure_refused"] = False
+    if P_sat_pa is None or not math.isfinite(P_sat_pa):
+        if P_sat_pa is not None and math.isinf(P_sat_pa) and P_sat_pa > 0.0:
+            return 0.0
+        raise WallSaturationPressureRefusal(
+            species,
+            T_surface_K,
+            "saturation_pressure_unavailable",
+        )
+    return max(0.0, local_pressure_pa - P_sat_pa)
+
+
 def _wall_deposition_driving_pressure_pa(
     species: str,
     P_local_pa: float,
@@ -9028,6 +9749,7 @@ def _wall_deposition_driving_pressure_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
+    wall_pO2_Pa: float | None = None,
 ) -> float:
     try:
         local_pressure_pa = float(P_local_pa)
@@ -9074,12 +9796,28 @@ def _wall_deposition_driving_pressure_pa(
             "MissingReactivityClassRefusal"
         )
         return 0.0
+    if _species_declares_wall_reactions(species, vapor_pressure_data):
+        # The three Psat = 0 branches below are not a fallback for a
+        # declared wall reaction. Driving force is max(0, p_local − Psat).
+        # Psat ≥ p_local, including +∞ when an oxidative reaction is given
+        # pO2 = 0, deposits nothing. A law refusal stays a refusal.
+        return _declared_wall_driving_pressure_pa(
+            species,
+            local_pressure_pa,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            diagnostic_out=diagnostic_out,
+            wall_pO2_Pa=wall_pO2_Pa,
+        )
     P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
         species,
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        wall_pO2_Pa=wall_pO2_Pa,
     )
     if stable_condensation_product_backstop:
         if not _stable_condensation_product_backstop_authorized(species):
@@ -9097,10 +9835,10 @@ def _wall_deposition_driving_pressure_pa(
     reactivity_class = declared_reactivity_class
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         if reactivity_class == 'reactive':
-            # SiO has a melt standard-reaction pressure, not a stable pure-SiO
-            # wall P_sat. Its authorized wall product is disproportionated
-            # Si/SiO2 with the existing first-order P_sat ~= 0 backstop, so the
-            # full local SiO pressure remains the deposition driving pressure.
+            # A declared wall reaction returned above and never reaches this
+            # branch. What remains is a reactive species with no wall block
+            # and no saturation pressure. Its driving force is the full
+            # local pressure.
             if diagnostic_out is not None:
                 diagnostic_out["wall_saturation_pressure_pa"] = 0.0
                 diagnostic_out["wall_saturation_pressure_refused"] = False
@@ -9163,9 +9901,10 @@ def _wall_deposition_driving_pressure_pa(
     if reactivity_class == 'reactive':
         if P_sat_pa < local_pressure_pa:
             return max(0.0, local_pressure_pa - P_sat_pa)
-        # Reactive deposits are less-volatile wall products, not the vapor
-        # species. Today SiO uses the disproportionation-product limit
-        # P_sat ~= 0; this explicit hook can grow a real product P_sat later.
+        # Same uncovered reactive species as above, now with a finite
+        # saturation pressure at or above the local pressure. Driving force
+        # stays the full local pressure. A declared wall reaction does not
+        # reach this branch.
         effective_product_psat_pa = 0.0
         if diagnostic_out is not None:
             diagnostic_out["wall_saturation_pressure_pa"] = effective_product_psat_pa
@@ -9187,6 +9926,7 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     reactive_product_backstop: bool = True,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    wall_pO2_Pa: float | None = None,
 ) -> float:
     # b-304: same category-1 gate as the series-resistance helper below.
     # Pre-fix this helper had NO input gate: alpha_s multiplies the flux
@@ -9210,6 +9950,7 @@ def _hkl_surface_deposition_flux_mol_m2_s(
         reactive_product_backstop=reactive_product_backstop,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        wall_pO2_Pa=wall_pO2_Pa,
     )
     if driving_pressure_pa <= 0.0:
         return 0.0
@@ -9260,6 +10001,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     diagnostic_out: MutableMapping[str, Any] | None = None,
     equilibrium_pressure_pa: float | None = None,
     diffusivity_temperature_K: float | None = None,
+    wall_pO2_Pa: float | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -9307,8 +10049,9 @@ def _series_resistance_deposition_flux_mol_m2_s(
     ``_stirring_enhanced_sherwood`` for the Frössling rationale.
 
     Returns 0 only for category-3 real limits: no driving force
-    (physisorber ``P_local <= P_sat`` at ``T_surface``; reactive species
-    use the product-P_sat floor) or ``alpha_s == 0.0`` exactly (a
+    (``P_local <= P_sat`` at ``T_surface``; a declared wall reaction uses
+    that law, and undersaturation is zero force) or ``alpha_s == 0.0``
+    exactly (a
     perfectly non-sticking surface — see the gate comment below).
     Category-1 degenerate inputs — non-positive pipe diameter or
     absolute temperatures, sticking coefficient outside [0, 1], any
@@ -9391,6 +10134,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=diagnostic_out,
+                wall_pO2_Pa=wall_pO2_Pa,
             )
         except WallSaturationPressureRefusal as exc:
             if diagnostic_out is not None:
@@ -10112,9 +10856,9 @@ def cold_spot_diagnostic(
     is not a supersaturation finding. A computed P_sat outside the
     certified fit keeps that best estimate and publishes the
     extrapolation on the judgement. The coating gate reads those
-    judgements. Reactive SiO deposition still uses its P_sat ~= 0
-    backstop on the deposition path; that backstop does not pass the
-    hot-wall check.
+    judgements. Declared reactive wall reactions use the same wall
+    saturation law on deposition and diagnostic paths; a refused law
+    is never replaced by P_sat = 0.
     """
 
     # The historical uniform floor is not a violation threshold.
@@ -10329,12 +11073,22 @@ def cold_spot_diagnostic(
                     )
                     call_notes: dict[str, dict[str, Any]] = {}
                     call_warnings: list[str] = []
+                    wall_pO2_pa = None
+                    if (
+                        segment_partials is not None
+                        and 'O2' in segment_partials
+                    ):
+                        wall_pO2_pa = _finite_nonnegative_value(
+                            segment_partials['O2'],
+                            label='O2 partial pressure',
+                        )
                     P_sat_pa, saturation_refused = _try_antoine_psat_pa(
                         species_name,
                         wall_T_K,
                         vapor_pressure_data=vapor_pressure_data,
                         antoine_extrapolations=call_notes,
                         antoine_extrapolation_warnings=call_warnings,
+                        wall_pO2_Pa=wall_pO2_pa,
                     )
                     if context_notes is not None:
                         for note_key, note_record in call_notes.items():

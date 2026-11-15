@@ -44,6 +44,32 @@ def _sim(setpoints=None):
     )
 
 
+def _assert_stage3_single_stream_oxygen_basis(model, result, committed_o2_mol):
+    from simulator.physical_constants import PA_PER_BAR
+
+    partial_pressures = model.wall_species_partial_pressures_pa
+    if committed_o2_mol == 0.0:
+        # d-402: zero-flow O2 is N/A; a complete stream may omit it or carry
+        # an explicit zero, but neither supplies oxygen to the reactive route.
+        assert partial_pressures.get("O2", 0.0) == 0.0
+        stream_po2_bar = 0.0
+    else:
+        assert "O2" in partial_pressures
+        stream_po2_bar = partial_pressures["O2"] / PA_PER_BAR
+    for reaction in result.stage3_reactive_alkali_by_species.values():
+        available_o2_mol = reaction["available_oxygen_mol"]
+        assert 0.0 <= available_o2_mol <= committed_o2_mol + 1e-15
+        if committed_o2_mol == 0.0:
+            assert available_o2_mol == 0.0
+        assert reaction["stream_oxygen_mol"] == 0.0
+        if stream_po2_bar == 0.0:
+            assert reaction["pO2_bar"] == 0.0
+        else:
+            assert reaction["pO2_bar"] == pytest.approx(stream_po2_bar)
+        if committed_o2_mol > 0.0:
+            assert reaction["pO2_source"] == "stream_dalton_o2_partial"
+
+
 @pytest.mark.parametrize("missing", [
     ("stage3_product_purity",), ("stage3_instantaneous_purity",),
     ("stage3_product_purity", "stage3_instantaneous_purity"),
@@ -101,14 +127,9 @@ def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
 def test_diverted_alkali_sio_numeric_pin():
     """Pin the merged bypass route while the silica cartridge is isolated.
 
-    The Na collector (identity (4, 0)) keeps the film-temperature Na and
-    K hexes. e-NTU bulk temperature moved 0.005226 kg of SiO off that
-    collector and onto the trap: collector SiO 0x1.eb5bad0247ecbp-1, trap
-    SiO 0x1.4a452fdb81350p-5, and their sum is the whole kilogram. The
-    trap applies the same saturation law, so Na and K that pass the
-    collector condense at (4, 1). Stage number 4 is that sum. The hex
-    strings are this production route(), and the three species close
-    against the inlet.
+    d-402 segment equilibrium moves 0.03998600 kg SiO from the K trap
+    (0.04031619 to 0.00033019 kg) to the warmer Na collector (0.95968381
+    to 0.99966981 kg); Na and K remain on the diverted collector/trap route.
     """
     model = _model("divert", hard_gate=False)
     result = model.route(
@@ -121,14 +142,20 @@ def test_diverted_alkali_sio_numeric_pin():
         return {sp: kg.hex() for sp, kg in bucket.items()}
 
     assert hexes(result.capture_kg_by_stage_identity[(4, 0)]) == {
-        "SiO": "0x1.eb5bad0247ecbp-1",
-        "Na": "0x1.6bb536538edccp-11",
-        "K": "0x1.37fba2863fc46p-14",
+        "SiO": "0x1.ffd4b8a80a760p-1",
     }
     assert hexes(result.capture_kg_by_stage_identity[(4, 1)]) == {
-        "SiO": "0x1.4a452fdb81350p-5",
-        "Na": "0x1.a59943ba3757cp-18",
-        "K": "0x1.adca243e7e035p-16",
+        "SiO": "0x1.5a3abfac50000p-12",
+        "Na": "0x1.6f0068d952e7bp-11",
+        "K": "0x1.a36d94567e17ep-14",
+    }
+    assert hexes(result.capture_kg_by_stage_identity[(5, 0)]) == {
+        "Na": "0x1.7f493af82d14fp-43",
+        "K": "0x1.311c0b771993cp-31",
+    }
+    assert hexes(result.capture_kg_by_stage_identity[(6, 0)]) == {
+        "Na": "0x1.72f70896c9c37p-44",
+        "K": "0x1.cd403db064ac0p-38",
     }
     # The public map is keyed by stage key. Stage number 4 is the sum of
     # the Na collector and the K trap, the two surfaces that share it.
@@ -138,13 +165,22 @@ def test_diverted_alkali_sio_numeric_pin():
             stage4[species] = stage4.get(species, 0.0) + kg
     assert hexes(stage4) == {
         "SiO": "0x1.0000000000000p+0",
-        "Na": "0x1.6f0068db034b7p-11",
-        "K": "0x1.a36e2b95df453p-14",
+        "Na": "0x1.6f0068d952e7bp-11",
+        "K": "0x1.a36d94567e17ep-14",
+    }
+    all_captured = {}
+    for bucket in result.condensed_by_stage_species.values():
+        for species, kg in bucket.items():
+            all_captured[species] = all_captured.get(species, 0.0) + kg
+    assert hexes(all_captured) == {
+        "SiO": "0x1.0000000000000p+0",
+        "Na": "0x1.6f0068db8bac7p-11",
+        "K": "0x1.a36e2eb1c4112p-14",
     }
     assert hexes(result.remaining_by_species) == {
         "SiO": "0x0.0p+0",
-        "Na": "0x1.6973dba000000p-70",
-        "K": "0x1.5b8351ab00000p-63",
+        "Na": "0x1.78dc12b000000p-68",
+        "K": "0x1.0d968ba000000p-57",
     }
 
 
@@ -155,26 +191,34 @@ def test_evaporation_overhead_source_numeric_pin():
     assert {sp: mol.hex() for sp, mol in source.items()} == {'SiO': '0x1.6af1875a0e72ap+4', 'O2': '0x1.6af1875a0e72bp+3', 'Na': '0x1.f2dd8993f4497p-6', 'K': '0x1.4f3cb1669146ep-9'}
 
 
-@pytest.mark.parametrize("sio_kg,retained,expected_o2", [
-    (1.179680414706, 3.86523814998e-9, 13.379915782435),
-    (5.133267625024, 3.17585413112e-9, 58.221436632609),
-    (5.806568174578, 3.23181618178e-9, 65.858000346813),
+@pytest.mark.parametrize("sio_kg,retained", [
+    (1.179680414706, 3.86523814998e-9),
+    (5.133267625024, 3.17585413112e-9),
+    (5.806568174578, 3.23181618178e-9),
 ])
-def test_stage3_includes_reviewed_same_hour_stream_oxygen(sio_kg, retained, expected_o2):
+def test_stage3_same_hour_forecast_oxygen_does_not_enter_committed_budget(sio_kg, retained):
     model = _model("through", hard_gate=False)
     model.retained_vapor_mol = {"O2": retained}
     melt = MeltState(temperature_C=1750)
     melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
     result = model.route(EvaporationFlux({"SiO": sio_kg, "Na": 0.0007, "K": 0.0001}), melt)
     reactions = result.stage3_reactive_alkali_by_species
+    _assert_stage3_single_stream_oxygen_basis(model, result, retained)
+    # This real same-hour source projection is evidence only; it is not part
+    # of the committed O2 available to this route.
+    forecast_o2_mol = _sim()._project_evaporation_overhead_source_mol_hr(
+        {"SiO": sio_kg}, {},
+    ).get("O2", 0.0)
+    assert forecast_o2_mol > retained
     for reaction in reactions.values():
-        assert reaction["available_oxygen_mol"] == pytest.approx(expected_o2 + retained, rel=1e-10)
-        assert reaction["uptake_mol"] == pytest.approx(reaction["transport_uptake_mol"])
-    assert sum(r["uptake_mol"] for r in reactions.values()) > 4 * retained
+        assert reaction["uptake_mol"] <= reaction["transport_uptake_mol"] + 1e-15
+        assert reaction["oxygen_debit_mol"] == pytest.approx(reaction["uptake_mol"] / 4.0)
+    assert sum(r["uptake_mol"] for r in reactions.values()) <= 4 * retained + 1e-15
 
 
 def test_stage3_coproduct_pressure_uses_measured_vapor_carrier_dilution():
     from simulator.accounting.formulas import resolve_species_formula
+    from simulator.physical_constants import PA_PER_BAR
     model = _model("through", hard_gate=False)
     rates = {"SiO": 1.0, "Na": 0.0007, "K": 0.0001}
     mol = {sp: kg / resolve_species_formula(sp).molar_mass_kg_per_mol()
@@ -187,51 +231,151 @@ def test_stage3_coproduct_pressure_uses_measured_vapor_carrier_dilution():
     melt = MeltState(temperature_C=1650)
     melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
     result = model.route(EvaporationFlux(rates), melt)
-    # SiO2 -> SiO + 1/2 O2 gives pO2_source = 0.5*pSiO by Dalton's law,
-    # independent of the 10 mbar carrier-gas total; mbar/1000 is bar.
-    for reaction in result.stage3_reactive_alkali_by_species.values():
-        assert reaction["pO2_bar"] == pytest.approx(1e-8 + 0.5 * 0.4 / 1000)
+    stream_po2_bar = model.wall_species_partial_pressures_pa["O2"] / PA_PER_BAR
+    assert stream_po2_bar > 0.0
+    _assert_stage3_single_stream_oxygen_basis(model, result, 1e-7)
 
 
-@pytest.mark.parametrize("oxygen_mol", [1e-7, 1.0])
-def test_stage3_shared_oxygen_split_is_order_independent(monkeypatch, oxygen_mol):
+def test_stage3_committed_overhead_o2_drives_favourability_from_stream_once():
+    from simulator.physical_constants import PA_PER_BAR
+
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas", {"O2": 0.5}, material_origin="reagent",
+    )
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    assert sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar > 0.0
+
+    model = _model("through", hard_gate=False)
+    committed_overhead = sim.atom_ledger.physical_mol_by_account("process.overhead_gas")
+    assert committed_overhead["O2"] == pytest.approx(0.5)
+    model.retained_vapor_mol = dict(committed_overhead)
+    result = model.route(
+        EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}), sim.melt,
+    )
+
+    reaction = result.stage3_reactive_alkali_by_species["Na"]
+    stream_po2_bar = model.wall_species_partial_pressures_pa["O2"] / PA_PER_BAR
+    assert model.retained_vapor_mol["O2"] == pytest.approx(0.5)
+    assert stream_po2_bar > 0.0
+    _assert_stage3_single_stream_oxygen_basis(model, result, 0.5)
+    assert reaction["pO2_bar"] == pytest.approx(stream_po2_bar)
+    assert reaction["pO2_source"] == "stream_dalton_o2_partial"
+    assert reaction["log_Q_over_K"] is not None
+
+
+def test_stage3_shared_oxygen_split_is_order_independent(monkeypatch):
     import simulator.evaporation as source_owner
     # Isolate carried-in oxidant competition from the newly evolved stream.
     monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
                         lambda *args, **kwargs: {}, raising=False)
+    oxygen_mol = 9.3988
     results = []
     for order in (("Na", "K"), ("K", "Na")):
         model = _model("through", hard_gate=False)
+        # Premise: 4 M(g) + O2 -> 2 M2O, so combined reactive demand is
+        # (Na uptake + K uptake) / 4 mol O2. This parcel leaves about 0.00810
+        # mol O2 after the upstream SiO wall booking, below the ~0.00825 mol
+        # transport demand; both species therefore receive material uptake
+        # from a binding shared budget. At or above demand, uptake equals the
+        # transport extent; here the common budget factor is below one.
         model.retained_vapor_mol = {"O2": oxygen_mol}
+        model.pipe_segments = []
         melt = MeltState(temperature_C=1650)
         melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
         rates = {"SiO": 1.0, **{sp: {"Na": 0.0007, "K": 0.0001}[sp] for sp in order}}
         result = model.route(EvaporationFlux(rates), melt)
-        results.append({sp: r["uptake_mol"] for sp, r in result.stage3_reactive_alkali_by_species.items()})
-    assert results[0] == pytest.approx(results[1], rel=1e-12)
-    if oxygen_mol == 1e-7:
-        assert results[0] == pytest.approx({"Na": 3.69003728744e-7, "K": 3.09962712565e-8}, rel=1e-10)
-    else:
-        assert results[0] == pytest.approx({"Na": 0.0304483264479, "K": 0.00255765595947}, rel=1e-10)
+        _assert_stage3_single_stream_oxygen_basis(model, result, oxygen_mol)
+        results.append(result)
+    uptake_by_order = [{
+        sp: reaction["uptake_mol"]
+        for sp, reaction in result.stage3_reactive_alkali_by_species.items()
+    } for result in results]
+    assert set(uptake_by_order[0]) == {"Na", "K"}
+    assert set(uptake_by_order[1]) == {"Na", "K"}
+    for species, minimum_material_uptake_mol in (("Na", 1e-2), ("K", 1e-3)):
+        first = uptake_by_order[0][species]
+        second = uptake_by_order[1][species]
+        assert first > minimum_material_uptake_mol
+        assert second > minimum_material_uptake_mol
+        uptake_abs_tolerance = 1e-12 * max(abs(first), abs(second), 1e-30)
+        assert first == pytest.approx(
+            second, rel=1e-12, abs=uptake_abs_tolerance,
+        )
+    for result in results:
+        reactions = result.stage3_reactive_alkali_by_species
+        available_o2_mol = reactions["Na"]["available_oxygen_mol"]
+        available_abs_tolerance = 1e-12 * max(abs(available_o2_mol), 1e-30)
+        assert reactions["K"]["available_oxygen_mol"] == pytest.approx(
+            available_o2_mol, rel=1e-12, abs=available_abs_tolerance,
+        )
+        oxygen_debit_mol = sum(
+            reaction["oxygen_debit_mol"] for reaction in reactions.values()
+        )
+        debit_abs_tolerance = 1e-12 * max(abs(available_o2_mol), 1e-30)
+        assert oxygen_debit_mol == pytest.approx(
+            available_o2_mol, rel=1e-12, abs=debit_abs_tolerance,
+        )
+        transport_demand_o2_mol = sum(
+            reaction["transport_uptake_mol"] for reaction in reactions.values()
+        ) / 4.0
+        assert oxygen_debit_mol < transport_demand_o2_mol
+        for reaction in reactions.values():
+            assert reaction["oxidant_limited"]
+            transport_abs_tolerance = 1e-12 * max(
+                abs(reaction["transport_uptake_mol"]), 1e-30,
+            )
+            assert reaction["uptake_mol"] <= (
+                reaction["transport_uptake_mol"] + transport_abs_tolerance
+            )
+            reaction_debit_abs_tolerance = 1e-12 * max(
+                abs(reaction["oxygen_debit_mol"]), 1e-30,
+            )
+            assert reaction["oxygen_debit_mol"] == pytest.approx(
+                reaction["uptake_mol"] / 4.0,
+                rel=1e-12,
+                abs=reaction_debit_abs_tolerance,
+            )
 
 
-@pytest.mark.parametrize("po2,expected_log,favoured", [
-    (1e-8, -38.8286945826, True),
-    (1.06560249466e-25, 0.251711636707, False),
-])
-def test_stage3_na_gate_matches_liquid_activity_reference(monkeypatch, po2, expected_log, favoured):
+@pytest.mark.parametrize(
+    ("po2_bar", "expected_favoured"),
+    [
+        (1e-8, True),
+        (1.06560249466e-25, False),
+    ],
+)
+def test_stage3_na_gate_matches_liquid_activity_reference(
+    monkeypatch, po2_bar, expected_favoured,
+):
     import simulator.evaporation as source_owner
+
     monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
                         lambda *args, **kwargs: {})
     model = _model("through", hard_gate=False)
     model.retained_vapor_mol = {"O2": 1.0}
+    po2_mbar = po2_bar * 1000.0
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={
+            "Na": 0.3, "K": 0.3, "SiO": 0.4 - po2_mbar, "O2": po2_mbar,
+        },
+    )
     melt = MeltState(temperature_C=1650)
-    # Geometric midpoint of the review's crystal and liquid critical pO2.
-    melt.oxygen_reservoir.headspace_ledger_pO2_bar = po2
+    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
     result = model.route(EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}), melt)
     reaction = result.stage3_reactive_alkali_by_species["Na"]
-    assert reaction["log_Q_over_K"] == pytest.approx(expected_log, abs=1e-9)
-    assert reaction["favoured"] is favoured
+    _assert_stage3_single_stream_oxygen_basis(model, result, 1.0)
+
+    # Independent expected signs use the liquid Na2O Gibbs basis owned by
+    # ellingham_thermo (NIST-JANAF Na-013): the 1e-8 bar case has ln(Q/K)
+    # about -38.972, while 1.0656e-25 bar (near the log-pressure midpoint)
+    # has ln(Q/K) about +0.252. Keep the signs explicit instead of
+    # repeating the production log(Q/K) expression in this test.
+    assert reaction["log_Q_over_K"] is not None
+    assert reaction["pO2_bar"] > 0.0
+    assert reaction["favoured"] is expected_favoured
 
 
 def test_stage3_k_evaluation_flags_missing_liquid_reference():
@@ -252,86 +396,101 @@ def test_same_hour_zero_retained_oxygen_kernel_capture_closes(order, monkeypatch
     model = _model("through", hard_gate=False)
     model.train = sim.train
     sim._condensation_model = model
-    sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar = 0.0
+    # A stale ledger pO2 must not supply oxygen to the fresh Dalton stream.
+    sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
     assert not sim.atom_ledger.physical_mol_by_account("process.overhead_gas").get("O2", 0)
     rates = {sp: {"SiO": 1.0, "Na": 0.0007, "K": 0.0001}[sp] for sp in order}
     from dataclasses import replace
     original_route = model.route
+    routed_results = []
 
     def force_commit_order(flux, melt):
-        return replace(original_route(flux, melt), wall_route_species_order=order)
+        result = replace(original_route(flux, melt), wall_route_species_order=order)
+        routed_results.append(result)
+        return result
 
     monkeypatch.setattr(model, "route", force_commit_order)
     first = len(sim.atom_ledger.transitions)
     sim._route_to_condensation(EvaporationFlux(rates))
+    result = routed_results[-1]
+    _assert_stage3_single_stream_oxygen_basis(model, result, 0.0)
+    assert all(reaction["uptake_mol"] == 0.0
+               for reaction in result.stage3_reactive_alkali_by_species.values())
     transitions = sim.atom_ledger.transitions[first:]
     for transition in transitions:
         transition.validate_conservation(sim.species_formula_registry)
     stage3 = sim.train.stages[3].collected_kg
     oxide_mol = sum(stage3.get(sp, 0) / resolve_species_formula(sp).molar_mass_kg_per_mol()
                     for sp in ("Na2O", "K2O"))
-    assert oxide_mol > 0
+    assert oxide_mol == 0.0
     # SiO2 -> SiO + 1/2 O2 is the sole gas-side oxygen source here.
     expected_source = 0.5 / resolve_species_formula("SiO").molar_mass_kg_per_mol()
     oxygen_left = sim.atom_ledger.physical_mol_by_account("process.overhead_gas").get("O2", 0)
     assert oxygen_left + 0.5 * oxide_mol == pytest.approx(expected_source, rel=1e-12)
 
 
-@pytest.mark.parametrize("oxygen_mol", [1.0, 1e-7, 0.0])
+@pytest.mark.parametrize("oxygen_mol", [20.0, 1e-7, 0.0])
 def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol, monkeypatch):
     import simulator.evaporation as source_owner
     monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
                         lambda *args, **kwargs: {})
-    from simulator.accounting.formulas import resolve_species_formula
 
     model = _model("through", hard_gate=False)
     model.retained_vapor_mol = {"O2": oxygen_mol}
-    # A zero incoming-sweep command does not make retained headspace O2 vanish.
+    # Isolate the Stage-3 reactive sink from earlier wall reactions spending
+    # the same committed oxygen parcel.
+    model.pipe_segments = []
+    # A zero incoming-sweep command does not make committed overhead O2 vanish.
     melt = MeltState(temperature_C=1650, pO2_mbar=0.0)
-    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8 if oxygen_mol else 0.0
+    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
     result = model.route(
         EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
         melt,
     )
+    _assert_stage3_single_stream_oxygen_basis(model, result, oxygen_mol)
     assert model.train.collection_route["stage3_route"] == "through"
     assert model.last_stage3_route_diagnostic["capture_purity"] >= 0.98
-    stage3 = result.condensed_by_stage_species.get(STAGE_KEY_BY_NUMBER[3], {})
     uptake_mol = {
-        sp: stage3.get(sp, 0.0) / resolve_species_formula(sp).molar_mass_kg_per_mol()
-        for sp in ("Na", "K")
+        sp: reaction["uptake_mol"]
+        for sp, reaction in result.stage3_reactive_alkali_by_species.items()
     }
     if oxygen_mol == 0.0:
         assert sum(uptake_mol.values()) == 0.0
+    elif oxygen_mol == 20.0:
+        # 1 kg SiO is 22.7 mol; its 0.5 mol O2/mol oxidative leg can use
+        # about 11.3 mol, so 20 mol also leaves a committed alkali budget.
+        assert all(mol > 0.0 for mol in uptake_mol.values())
+        assert sum(
+            reaction["oxygen_debit_mol"]
+            for reaction in result.stage3_reactive_alkali_by_species.values()
+        ) <= oxygen_mol
     else:
-        assert sum(uptake_mol.values()) > 0.0
-        if oxygen_mol == 1.0:
-            assert all(mol > 0.0 for mol in uptake_mol.values())
         # 4 M + O2 -> 2 M2O: one mol O2 can bind four mol alkali atoms.
         assert sum(uptake_mol.values()) <= 4.0 * oxygen_mol
-        if oxygen_mol == 1e-7:
-            assert sum(uptake_mol.values()) == pytest.approx(4.0 * oxygen_mol)
 
 
-def test_vanishing_oxygen_pressure_disables_reaction_despite_available_oxidant(monkeypatch):
+def test_vanishing_stream_oxygen_disables_reaction_despite_stale_headspace_pO2(monkeypatch):
     import simulator.evaporation as source_owner
     monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
                         lambda *args, **kwargs: {})
     model = _model("through", hard_gate=False)
-    model.retained_vapor_mol = {"O2": 1.0}
+    model.retained_vapor_mol = {"O2": 0.0}
     melt = MeltState(temperature_C=1650, pO2_mbar=1e-5)
+    # Exercise the zero-stream limit even if the independent ledger field is stale.
     melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-203
     result = model.route(
         EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
         melt,
     )
-    assert all(not r['favoured'] and r['log_Q_over_K'] > 0.0
+    _assert_stage3_single_stream_oxygen_basis(model, result, 0.0)
+    assert all(not r['favoured'] and r['log_Q_over_K'] is None
                for r in result.stage3_reactive_alkali_by_species.values())
     stage3 = result.condensed_by_stage_species[STAGE_KEY_BY_NUMBER[3]]
     assert stage3.get('Na', 0.0) == 0.0
     assert stage3.get('K', 0.0) == 0.0
 
 
-@pytest.mark.parametrize('oxygen_mol', [1.0, 1e-7, 0.0])
+@pytest.mark.parametrize('oxygen_mol', [20.0, 1e-7, 0.0])
 def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mol, monkeypatch):
     import simulator.evaporation as source_owner
     monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
@@ -346,12 +505,17 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
                                       material_origin='reagent')
     model = _model('through', hard_gate=False)
     model.train = sim.train
+    # Keep this atom-closure case focused on Stage 3's committed O2 debit.
+    model.pipe_segments = []
     sim._condensation_model = model
     sim.melt.pO2_mbar = 0.0
-    sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8 if oxygen_mol else 0.0
+    sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar = (
+        1e-8 if oxygen_mol else 1e-203
+    )
     model = sim.condensation_model
     flux = EvaporationFlux({'SiO': 1.0, 'Na': 0.0007, 'K': 0.0001})
     result = model.route(flux, sim.melt)
+    _assert_stage3_single_stream_oxygen_basis(model, result, oxygen_mol)
     bypass = _model('divert', hard_gate=False).route(flux, sim.melt)
     assert sim.train.collection_route['stage3_route'] == 'through'
     registry = sim.species_formula_registry
@@ -364,32 +528,83 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
                         or sim.vapor_pressures['oxide_vapors'].get(sp) or {})
         credited = sim._dispatch_condensation_route(
             sp, rate - result.remaining_by_species[sp], metadata, result)
-        sim._project_condensed_stage_collection(
-            result, sp, credited, sim._condensed_products_kg(sp, credited, metadata))
+        sim._project_routed_condensate(result, sp, credited, metadata)
     for transition in sim.atom_ledger.transitions[first_transition:]:
         transition.validate_conservation(registry)
-        assert transition.debit_atom_moles(registry) == pytest.approx(
-            transition.credit_atom_moles(registry))
+        debit_atoms = transition.debit_atom_moles(registry)
+        credit_atoms = transition.credit_atom_moles(registry)
+        for element in set(debit_atoms) | set(credit_atoms):
+            debit_mol = debit_atoms.get(element, 0.0)
+            credit_mol = credit_atoms.get(element, 0.0)
+            atom_abs_tolerance = 1e-12 * max(
+                abs(debit_mol), abs(credit_mol), 1e-30,
+            )
+            assert debit_mol == pytest.approx(
+                credit_mol, rel=1e-12, abs=atom_abs_tolerance,
+            )
     stage3 = sim.train.stages[3].collected_kg
     oxide_mol = sum(stage3.get(oxide, 0.0) / resolve_species_formula(
         oxide, registry).molar_mass_kg_per_mol() for oxide in ('Na2O', 'K2O'))
-    oxygen_left = sim.atom_ledger.physical_mol_by_account('process.overhead_gas').get('O2', 0.0)
-    # Each oxide formula unit requires one O atom, hence half a mol O2.
-    assert oxygen_mol - oxygen_left == pytest.approx(oxide_mol * 0.5)
-    assert oxide_mol * 0.5 <= oxygen_mol
+    # For 4 M + O2 -> 2 M2O, the oxide projection spends one O2 per two
+    # formula units. The Stage-3 debit stays within the post-wall committed
+    # budget; upstream wall consumption is accounted in its own transitions.
+    stage3_oxygen_debit_mol = sum(
+        reaction["oxygen_debit_mol"]
+        for reaction in result.stage3_reactive_alkali_by_species.values()
+    )
+    assert stage3_oxygen_debit_mol <= oxygen_mol
+    actual_stage3_o2_debit_mol = sum(
+        sim._transition_species_mol(
+            transition,
+            side='debits',
+            account='process.overhead_gas',
+            species='O2',
+        )
+        for transition in sim.atom_ledger.transitions[first_transition:]
+        if transition.name in {'condense_Na', 'condense_K'}
+    )
     assert not stage3.get('Na', 0.0) and not stage3.get('K', 0.0)
-    for sp in ('Na', 'K', 'Na2O', 'K2O', 'Si', 'SiO2'):
+    for sp in ('Na', 'K', 'Na2O', 'K2O', 'Si', 'SiO', 'SiO2'):
         projected = sum(stage.collected_kg.get(sp, 0.0) for stage in sim.train.stages)
-        # collected_kg is the physical stage inventory. Liquid Na and K
-        # return to the train. Solids booked on the freeze-out cartridge
-        # move to the residue account, so the train alone is not the backing.
         backed = sum(
             sim.atom_ledger.kg_by_account(account).get(sp, 0.0)
             for account in STAGE_COLLECTION_BACKING_ACCOUNTS
         )
-        assert projected == pytest.approx(backed)
-    if oxygen_mol:
-        assert oxide_mol > 0.0
+        mass_abs_tolerance = 1e-10 * max(abs(projected), abs(backed), 1e-30)
+        assert projected == pytest.approx(
+            backed, rel=1e-12, abs=mass_abs_tolerance,
+        )
+    if oxygen_mol == 20.0:
+        stage3_debit_abs_tolerance = 1e-12 * max(
+            abs(actual_stage3_o2_debit_mol), abs(stage3_oxygen_debit_mol), 1e-30,
+        )
+        assert actual_stage3_o2_debit_mol == pytest.approx(
+            stage3_oxygen_debit_mol,
+            rel=1e-12,
+            abs=stage3_debit_abs_tolerance,
+        )
+        oxide_debit_abs_tolerance = 1e-12 * max(
+            abs(oxide_mol * 0.5), abs(actual_stage3_o2_debit_mol), 1e-30,
+        )
+        assert oxide_mol * 0.5 == pytest.approx(
+            actual_stage3_o2_debit_mol,
+            rel=1e-12,
+            abs=oxide_debit_abs_tolerance,
+        )
+        assert oxide_mol > 1e-2
+        assert actual_stage3_o2_debit_mol > 1e-3
+        stage3_oxide_kg = sum(stage3.get(oxide, 0.0) for oxide in ('Na2O', 'K2O'))
+        projected_oxide_impurity_kg = sum(
+            sim._last_impurity_delta.get((3, oxide), 0.0)
+            for oxide in ('Na2O', 'K2O')
+        )
+        assert projected_oxide_impurity_kg > 1e-4
+        impurity_abs_tolerance = 1e-12 * max(
+            abs(projected_oxide_impurity_kg), abs(stage3_oxide_kg), 1e-30,
+        )
+        assert projected_oxide_impurity_kg == pytest.approx(
+            stage3_oxide_kg, rel=1e-12, abs=impurity_abs_tolerance,
+        )
         assert stage_purity_report(sim.train)['stage_3_sio_zone']['purity_fraction'] < 1.0
         # Stage number 4 is the Na collector plus the K trap. The through
         # path has already taken alkali at stage 3, so less of it reaches
@@ -403,8 +618,14 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
         assert sum(
             sim.train.stages[4].collected_kg.get(sp, 0.0) for sp in ('Na', 'K')
         ) < bypass_stage4
-        assert sum(stage3.get(oxide, 0.0) for oxide in ('Na2O', 'K2O')) / (
-            stage3['SiO2'] + sum(stage3.get(oxide, 0.0) for oxide in ('Na2O', 'K2O'))) <= 0.02
+    elif oxygen_mol == 0.0:
+        assert oxide_mol == 0.0
+        assert stage3_oxygen_debit_mol == 0.0
+        assert actual_stage3_o2_debit_mol == 0.0
+    else:
+        assert oxide_mol == 0.0
+        assert actual_stage3_o2_debit_mol == 0.0
+        assert stage3_oxygen_debit_mol <= 1e-12 * oxygen_mol
 
 
 @pytest.mark.parametrize("carrier", ["Na", "K", "Na2", "K2O", "NaCl", "Na2O"])

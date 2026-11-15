@@ -2898,6 +2898,44 @@ families:
       species:
         TiO:
           formula: TiO
+          wall_reactions:
+            phase_note: "The wall product is TiO2. Condensed TiO, including NG-1950, is not the product."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: TiO
+                nasa: NG-1201
+                janaf: O-022
+              oxygen_stoichiometry: 0.5
+              products:
+              - species: TiO2
+                formula: TiO2
+                stoichiometry: 1
+                nasa: [NG-1953, NG-1954]
+                janaf: [O-043, O-044]
+            - id: disproportionation
+              vapour_stoichiometry: 2
+              vapour:
+                formula: TiO
+                nasa: NG-1201
+                janaf: O-022
+              oxygen_stoichiometry: 0
+              products:
+              - species: Ti
+                formula: Ti
+                stoichiometry: 1
+                nasa: [NG-1936, NG-1937, NG-1938]
+                janaf: [Ti-002, Ti-003, Ti-004]
+              - species: TiO2
+                formula: TiO2
+                stoichiometry: 1
+                nasa: [NG-1953, NG-1954]
+                janaf: [O-043, O-044]
           molar_mass_g_mol: 63.866
           parent_oxide: TiO2
           fit_target: standard_reaction_term
@@ -3064,6 +3102,26 @@ families:
       species:
         TiO2_gas:
           formula: TiO2
+          wall_reactions:
+            phase_note: "Congruent TiO2. Solid NG-1953 covers through 2185 K; liquid NG-1954 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: congruent
+              vapour_stoichiometry: 1
+              vapour:
+                formula: TiO2
+                nasa: NG-1205
+                janaf: O-046
+              oxygen_stoichiometry: 0
+              products:
+              - species: TiO2
+                formula: TiO2
+                stoichiometry: 1
+                nasa: [NG-1953, NG-1954]
+                janaf: [O-043, O-044]
           molar_mass_g_mol: 79.865
           parent_oxide: TiO2
           fit_target: standard_reaction_term
@@ -3233,6 +3291,26 @@ families:
       species:
         CaO_gas:
           formula: CaO
+          wall_reactions:
+            phase_note: "Congruent CaO. Solid NG-1383 covers through 3172 K; liquid NG-1384 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: congruent
+              vapour_stoichiometry: 1
+              vapour:
+                formula: CaO
+                nasa: NG-0476
+                janaf: Ca-030
+              oxygen_stoichiometry: 0
+              products:
+              - species: CaO
+                formula: CaO
+                stoichiometry: 1
+                nasa: [NG-1383, NG-1384]
+                janaf: [Ca-027, Ca-028]
           molar_mass_g_mol: 56.077
           parent_oxide: CaO
           fit_target: standard_reaction_term
@@ -3415,6 +3493,44 @@ families:
       species:
         AlO:
           formula: AlO
+          wall_reactions:
+            phase_note: "Al2O3(a) NG-1286 covers through 2327 K and liquid NG-1287 above it. Al metal is solid NG-1272 through 933.61 K and liquid NG-1273 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: AlO
+                nasa: NG-0040
+                janaf: Al-074
+              oxygen_stoichiometry: 0.25
+              products:
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 0.5
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
+            - id: disproportionation
+              vapour_stoichiometry: 3
+              vapour:
+                formula: AlO
+                nasa: NG-0040
+                janaf: Al-074
+              oxygen_stoichiometry: 0
+              products:
+              - species: Al
+                formula: Al
+                stoichiometry: 1
+                nasa: [NG-1272, NG-1273]
+                janaf: [Al-002, Al-003]
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 1
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
           molar_mass_g_mol: 42.9805385
           parent_oxide: Al2O3
           fit_target: standard_reaction_term
@@ -3565,6 +3681,44 @@ families:
       species:
         Al2O:
           formula: Al2O
+          wall_reactions:
+            phase_note: "Al2O3(a) NG-1286 covers through 2327 K and liquid NG-1287 above it. Al metal is solid NG-1272 through 933.61 K and liquid NG-1273 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Al2O
+                nasa: NG-0067
+                janaf: Al-092
+              oxygen_stoichiometry: 1
+              products:
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 1
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
+            - id: disproportionation
+              vapour_stoichiometry: 3
+              vapour:
+                formula: Al2O
+                nasa: NG-0067
+                janaf: Al-092
+              oxygen_stoichiometry: 0
+              products:
+              - species: Al
+                formula: Al
+                stoichiometry: 4
+                nasa: [NG-1272, NG-1273]
+                janaf: [Al-002, Al-003]
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 1
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
           molar_mass_g_mol: 69.962077
           parent_oxide: Al2O3
           fit_target: standard_reaction_term
@@ -3716,6 +3870,39 @@ families:
       species:
         Al2:
           formula: Al2
+          wall_reactions:
+            phase_note: "Al2O3(a) NG-1286 covers through 2327 K and liquid NG-1287 above it. Al metal is solid NG-1272 through 933.61 K and liquid NG-1273 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: association
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Al2
+                nasa: NG-0061
+                janaf: Al-080
+              oxygen_stoichiometry: 0
+              products:
+              - species: Al
+                formula: Al
+                stoichiometry: 2
+                nasa: [NG-1272, NG-1273]
+                janaf: [Al-002, Al-003]
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Al2
+                nasa: NG-0061
+                janaf: Al-080
+              oxygen_stoichiometry: 1.5
+              products:
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 1
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
           molar_mass_g_mol: 53.963077
           parent_oxide: Al2O3
           fit_target: standard_reaction_term
@@ -3864,6 +4051,44 @@ families:
       species:
         Al2O2:
           formula: Al2O2
+          wall_reactions:
+            phase_note: "Al2O3(a) NG-1286 covers through 2327 K and liquid NG-1287 above it. Al metal is solid NG-1272 through 933.61 K and liquid NG-1273 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Al2O2
+                nasa: NG-0069
+                janaf: Al-094
+              oxygen_stoichiometry: 0.5
+              products:
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 1
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
+            - id: disproportionation
+              vapour_stoichiometry: 3
+              vapour:
+                formula: Al2O2
+                nasa: NG-0069
+                janaf: Al-094
+              oxygen_stoichiometry: 0
+              products:
+              - species: Al
+                formula: Al
+                stoichiometry: 2
+                nasa: [NG-1272, NG-1273]
+                janaf: [Al-002, Al-003]
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 2
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
           molar_mass_g_mol: 85.961077
           parent_oxide: Al2O3
           fit_target: standard_reaction_term
@@ -4016,6 +4241,25 @@ families:
       species:
         Al2O3_gas:
           formula: Al2O3
+          wall_reactions:
+            phase_note: "Al2O3(a) NG-1286 covers through 2327 K and liquid NG-1287 above it. Al metal is solid NG-1272 through 933.61 K and liquid NG-1273 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: congruent
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Al2O3
+                nasa: NG-0071
+              oxygen_stoichiometry: 0
+              products:
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 1
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
           molar_mass_g_mol: 101.960077
           parent_oxide: Al2O3
           fit_target: standard_reaction_term
@@ -4165,6 +4409,26 @@ families:
       species:
         AlO2:
           formula: AlO2
+          wall_reactions:
+            phase_note: "Al2O3(a) NG-1286 covers through 2327 K and liquid NG-1287 above it. Al metal is solid NG-1272 through 933.61 K and liquid NG-1273 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: reductive
+              vapour_stoichiometry: 1
+              vapour:
+                formula: AlO2
+                nasa: NG-0053
+                janaf: Al-077
+              oxygen_stoichiometry: -0.25
+              products:
+              - species: Al2O3
+                formula: Al2O3
+                stoichiometry: 0.5
+                nasa: [NG-1286, NG-1287]
+                janaf: [Al-096, Al-100]
           molar_mass_g_mol: 58.9795385
           parent_oxide: Al2O3
           fit_target: standard_reaction_term
@@ -4317,6 +4581,39 @@ families:
       species:
         Ca2:
           formula: Ca2
+          wall_reactions:
+            phase_note: "Association to Ca metal, or oxidation to CaO. Ca(a) NG-1366 skips its collapsed 300-298.15 K interval."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: association
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Ca2
+                nasa: NG-0482
+                janaf: Ca-033
+              oxygen_stoichiometry: 0
+              products:
+              - species: Ca
+                formula: Ca
+                stoichiometry: 2
+                nasa: [NG-1366, NG-1367, NG-1368]
+                janaf: [Ca-002, Ca-004]
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Ca2
+                nasa: NG-0482
+                janaf: Ca-033
+              oxygen_stoichiometry: 1
+              products:
+              - species: CaO
+                formula: CaO
+                stoichiometry: 2
+                nasa: [NG-1383, NG-1384]
+                janaf: [Ca-027, Ca-028]
           molar_mass_g_mol: 80.156
           parent_oxide: CaO
           fit_target: standard_reaction_term
@@ -4503,6 +4800,44 @@ families:
       species:
         CrO:
           formula: CrO
+          wall_reactions:
+            phase_note: "Solid Cr2O3 is the wall standard through 2705 K. JANAF Cr-015 liquid is the melt standard, not this wall."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: CrO
+                nasa: NG-0503
+                janaf: Cr-010
+              oxygen_stoichiometry: 0.25
+              products:
+              - species: Cr2O3
+                formula: Cr2O3
+                stoichiometry: 0.5
+                nasa: [NG-1403, NG-1404, NG-1405, NG-1406, NG-1407]
+                janaf: [Cr-014]
+            - id: disproportionation
+              vapour_stoichiometry: 3
+              vapour:
+                formula: CrO
+                nasa: NG-0503
+                janaf: Cr-010
+              oxygen_stoichiometry: 0
+              products:
+              - species: Cr
+                formula: Cr
+                stoichiometry: 1
+                nasa: [NG-1398, NG-1399, NG-1400]
+                janaf: [Cr-002, Cr-003]
+              - species: Cr2O3
+                formula: Cr2O3
+                stoichiometry: 1
+                nasa: [NG-1403, NG-1404, NG-1405, NG-1406, NG-1407]
+                janaf: [Cr-014]
           molar_mass_g_mol: 67.9951
           parent_oxide: Cr2O3
           fit_target: standard_reaction_term
@@ -4653,6 +4988,44 @@ families:
       species:
         SiO:
           formula: SiO
+          wall_reactions:
+            phase_note: "Crystalline cristobalite Psat is an optimistic capture ceiling. Amorphous fused silica lies above that G and the increment is unmeasured."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: disproportionation
+              vapour_stoichiometry: 2
+              vapour:
+                formula: SiO
+                nasa: NG-1135
+                janaf: O-012
+              oxygen_stoichiometry: 0
+              products:
+              - species: Si
+                formula: Si
+                stoichiometry: 1
+                nasa: [NG-1858, NG-1859]
+                janaf: [Si-002, Si-003]
+              - species: SiO2
+                formula: SiO2
+                stoichiometry: 1
+                nasa: [NG-1862, NG-1863, NG-1864, NG-1865]
+                janaf: [O-035, O-037, O-038]
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: SiO
+                nasa: NG-1135
+                janaf: O-012
+              oxygen_stoichiometry: 0.5
+              products:
+              - species: SiO2
+                formula: SiO2
+                stoichiometry: 1
+                nasa: [NG-1862, NG-1863, NG-1864, NG-1865]
+                janaf: [O-035, O-037, O-038]
           molar_mass_g_mol: 44.084
           parent_oxide: SiO2
           authority_class: uncertified
@@ -4841,6 +5214,44 @@ families:
       species:
         CrO2:
           formula: CrO2
+          wall_reactions:
+            phase_note: "Solid Cr2O3 is the wall standard through 2705 K. JANAF Cr-015 liquid is the melt standard, not this wall."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: reductive
+              vapour_stoichiometry: 1
+              vapour:
+                formula: CrO2
+                nasa: NG-0504
+                janaf: Cr-011
+              oxygen_stoichiometry: -0.25
+              products:
+              - species: Cr2O3
+                formula: Cr2O3
+                stoichiometry: 0.5
+                nasa: [NG-1403, NG-1404, NG-1405, NG-1406, NG-1407]
+                janaf: [Cr-014]
+            - id: reductive_metal
+              vapour_stoichiometry: 3
+              vapour:
+                formula: CrO2
+                nasa: NG-0504
+                janaf: Cr-011
+              oxygen_stoichiometry: -1.5
+              products:
+              - species: Cr
+                formula: Cr
+                stoichiometry: 1
+                nasa: [NG-1398, NG-1399, NG-1400]
+                janaf: [Cr-002, Cr-003]
+              - species: Cr2O3
+                formula: Cr2O3
+                stoichiometry: 1
+                nasa: [NG-1403, NG-1404, NG-1405, NG-1406, NG-1407]
+                janaf: [Cr-014]
           molar_mass_g_mol: 83.9941
           parent_oxide: Cr2O3
           fit_target: standard_reaction_term
@@ -9072,6 +9483,26 @@ families:
       species:
         CrO3:
           formula: CrO3
+          wall_reactions:
+            phase_note: "Solid Cr2O3 is the wall standard through 2705 K. JANAF Cr-015 liquid is the melt standard, not this wall."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: reductive
+              vapour_stoichiometry: 1
+              vapour:
+                formula: CrO3
+                nasa: NG-0505
+                janaf: Cr-012
+              oxygen_stoichiometry: -0.75
+              products:
+              - species: Cr2O3
+                formula: Cr2O3
+                stoichiometry: 0.5
+                nasa: [NG-1403, NG-1404, NG-1405, NG-1406, NG-1407]
+                janaf: [Cr-014]
           molar_mass_g_mol: 99.9931
           parent_oxide: Cr2O3
           fit_target: standard_reaction_term
@@ -12833,6 +13264,39 @@ families:
       species:
         K2:
           formula: K2
+          wall_reactions:
+            phase_note: "Association to K metal, or oxidation to K2O."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: association
+              vapour_stoichiometry: 1
+              vapour:
+                formula: K2
+                nasa: NG-0752
+                janaf: K-011
+              oxygen_stoichiometry: 0
+              products:
+              - species: K
+                formula: K
+                stoichiometry: 2
+                nasa: [NG-1558, NG-1559]
+                janaf: [K-002, K-003]
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: K2
+                nasa: NG-0752
+                janaf: K-011
+              oxygen_stoichiometry: 0.5
+              products:
+              - species: K2O
+                formula: K2O
+                stoichiometry: 1
+                nasa: [NG-1596, NG-1597, NG-1598, NG-1599]
+                janaf: [K-012]
           molar_mass_g_mol: 78.1966
           parent_oxide: K2O
           fit_target: standard_reaction_term
@@ -12978,6 +13442,25 @@ families:
       species:
         K2O_gas:
           formula: K2O
+          wall_reactions:
+            phase_note: "K2O solids NG-1596, NG-1597 and NG-1598 end at 1013 K. Above that the wall is liquid NG-1599. A 250 C alkali wall is solid NG-1596."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: congruent
+              vapour_stoichiometry: 1
+              vapour:
+                formula: K2O
+                nasa: NG-0760
+              oxygen_stoichiometry: 0
+              products:
+              - species: K2O
+                formula: K2O
+                stoichiometry: 1
+                nasa: [NG-1596, NG-1597, NG-1598, NG-1599]
+                janaf: [K-012]
           molar_mass_g_mol: 94.1956
           parent_oxide: K2O
           fit_target: standard_reaction_term
@@ -13127,6 +13610,39 @@ families:
       species:
         Mg2:
           formula: Mg2
+          wall_reactions:
+            phase_note: "Association to Mg metal, or oxidation to MgO."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: association
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Mg2
+                nasa: NG-0820
+                janaf: Mg-027
+              oxygen_stoichiometry: 0
+              products:
+              - species: Mg
+                formula: Mg
+                stoichiometry: 2
+                nasa: [NG-1654, NG-1655]
+                janaf: [Mg-002, Mg-003]
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Mg2
+                nasa: NG-0820
+                janaf: Mg-027
+              oxygen_stoichiometry: 1
+              products:
+              - species: MgO
+                formula: MgO
+                stoichiometry: 2
+                nasa: [NG-1670, NG-1671]
+                janaf: [Mg-008, Mg-009]
           molar_mass_g_mol: 48.61
           parent_oxide: MgO
           fit_target: standard_reaction_term
@@ -13296,6 +13812,26 @@ families:
       species:
         MgO_gas:
           formula: MgO
+          wall_reactions:
+            phase_note: "Congruent MgO. Solid NG-1670 covers through 3100 K; liquid NG-1671 above it."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: congruent
+              vapour_stoichiometry: 1
+              vapour:
+                formula: MgO
+                nasa: NG-0815
+                janaf: Mg-011
+              oxygen_stoichiometry: 0
+              products:
+              - species: MgO
+                formula: MgO
+                stoichiometry: 1
+                nasa: [NG-1670, NG-1671]
+                janaf: [Mg-008, Mg-009]
           molar_mass_g_mol: 40.304
           parent_oxide: MgO
           fit_target: standard_reaction_term
@@ -13469,6 +14005,39 @@ families:
       species:
         Na2:
           formula: Na2
+          wall_reactions:
+            phase_note: "Association to Na metal, or oxidation to Na2O."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: association
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Na2
+                nasa: NG-0900
+                janaf: Na-011
+              oxygen_stoichiometry: 0
+              products:
+              - species: Na
+                formula: Na
+                stoichiometry: 2
+                nasa: [NG-1706, NG-1707]
+                janaf: [Na-002, Na-003]
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Na2
+                nasa: NG-0900
+                janaf: Na-011
+              oxygen_stoichiometry: 0.5
+              products:
+              - species: Na2O
+                formula: Na2O
+                stoichiometry: 1
+                nasa: [NG-1741, NG-1742, NG-1743, NG-1744]
+                janaf: [Na-012, Na-013]
           molar_mass_g_mol: 45.97953856
           parent_oxide: Na2O
           fit_target: standard_reaction_term
@@ -13673,6 +14242,25 @@ families:
       species:
         Na2O_gas:
           formula: Na2O
+          wall_reactions:
+            phase_note: "Na2O solids NG-1741, NG-1742 and NG-1743 cover through 1405 K. Liquid NG-1744 covers above that."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: congruent
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Na2O
+                nasa: NG-0905
+              oxygen_stoichiometry: 0
+              products:
+              - species: Na2O
+                formula: Na2O
+                stoichiometry: 1
+                nasa: [NG-1741, NG-1742, NG-1743, NG-1744]
+                janaf: [Na-012, Na-013]
           molar_mass_g_mol: 61.97853856
           parent_oxide: Na2O
           fit_target: standard_reaction_term
@@ -13883,6 +14471,39 @@ families:
       species:
         Si2:
           formula: Si2
+          wall_reactions:
+            phase_note: "Crystalline cristobalite Psat is an optimistic capture ceiling. Amorphous fused silica lies above that G and the increment is unmeasured."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: association
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Si2
+                nasa: NG-1139
+                janaf: Si-008
+              oxygen_stoichiometry: 0
+              products:
+              - species: Si
+                formula: Si
+                stoichiometry: 2
+                nasa: [NG-1858, NG-1859]
+                janaf: [Si-002, Si-003]
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Si2
+                nasa: NG-1139
+                janaf: Si-008
+              oxygen_stoichiometry: 2
+              products:
+              - species: SiO2
+                formula: SiO2
+                stoichiometry: 2
+                nasa: [NG-1862, NG-1863, NG-1864, NG-1865]
+                janaf: [O-035, O-037, O-038]
           molar_mass_g_mol: 56.17
           parent_oxide: SiO2
           fit_target: standard_reaction_term
@@ -14033,6 +14654,39 @@ families:
       species:
         Si3:
           formula: Si3
+          wall_reactions:
+            phase_note: "Crystalline cristobalite Psat is an optimistic capture ceiling. Amorphous fused silica lies above that G and the increment is unmeasured."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: association
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Si3
+                nasa: NG-1143
+                janaf: Si-009
+              oxygen_stoichiometry: 0
+              products:
+              - species: Si
+                formula: Si
+                stoichiometry: 3
+                nasa: [NG-1858, NG-1859]
+                janaf: [Si-002, Si-003]
+            - id: oxidative
+              vapour_stoichiometry: 1
+              vapour:
+                formula: Si3
+                nasa: NG-1143
+                janaf: Si-009
+              oxygen_stoichiometry: 3
+              products:
+              - species: SiO2
+                formula: SiO2
+                stoichiometry: 3
+                nasa: [NG-1862, NG-1863, NG-1864, NG-1865]
+                janaf: [O-035, O-037, O-038]
           molar_mass_g_mol: 84.255
           parent_oxide: SiO2
           fit_target: standard_reaction_term
@@ -14184,6 +14838,26 @@ families:
       species:
         SiO2_gas:
           formula: SiO2
+          wall_reactions:
+            phase_note: "Crystalline cristobalite Psat is an optimistic capture ceiling. Amorphous fused silica lies above that G and the increment is unmeasured."
+            thermo: nasa
+            oxygen:
+              nasa: NG-0937
+              janaf: O-029
+            reactions:
+            - id: congruent
+              vapour_stoichiometry: 1
+              vapour:
+                formula: SiO2
+                nasa: NG-1136
+                janaf: O-040
+              oxygen_stoichiometry: 0
+              products:
+              - species: SiO2
+                formula: SiO2
+                stoichiometry: 1
+                nasa: [NG-1862, NG-1863, NG-1864, NG-1865]
+                janaf: [O-035, O-037, O-038]
           molar_mass_g_mol: 60.083
           parent_oxide: SiO2
           fit_target: standard_reaction_term
@@ -14439,6 +15113,21 @@ families:
       species:
         FeO_association_gas:
           formula: FeO
+          wall_reactions:
+            phase_note: "Congruent FeO(g) = FeO(cr) on JANAF Fe-021 and Fe-018. Liquid Fe-019 is not cited. NASA gas NG-0578 has no condensed FeO polynomial."
+            thermo: janaf
+            reactions:
+            - id: congruent
+              vapour_stoichiometry: 1
+              vapour:
+                formula: FeO
+                janaf: Fe-021
+              oxygen_stoichiometry: 0
+              products:
+              - species: FeO
+                formula: FeO
+                stoichiometry: 1
+                janaf: [Fe-018]
           molar_mass_g_mol: 71.8440
           parent_oxide: FeO
           fit_target: standard_reaction_term
@@ -14579,6 +15268,9 @@ families:
       species:
         NiO_gas:
           formula: NiO
+          wall_reactions:
+            missing: wall_condensation_thermo_missing
+            note: "NASA gas NG-0926 only. No condensed NiO in the NASA index and no NiO JANAF table."
           molar_mass_g_mol: 74.6924
           parent_oxide: NiO
           fit_target: standard_reaction_term
@@ -14736,6 +15428,9 @@ families:
       species:
         MnO_gas:
           formula: MnO
+          wall_reactions:
+            missing: wall_condensation_thermo_missing
+            note: "No MnO formula in the NASA index and none in the JANAF extract."
           molar_mass_g_mol: 70.937044
           parent_oxide: MnO
           fit_target: standard_reaction_term
@@ -14904,6 +15599,9 @@ families:
       species:
         CoO_gas:
           formula: CoO
+          wall_reactions:
+            missing: wall_condensation_thermo_missing
+            note: "JANAF Co-013 is the CoO crystal. No CoO gas row and no NASA CoO record."
           molar_mass_g_mol: 74.932194
           parent_oxide: CoO
           fit_target: standard_reaction_term

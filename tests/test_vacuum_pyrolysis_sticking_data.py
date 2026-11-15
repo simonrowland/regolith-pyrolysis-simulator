@@ -15,6 +15,7 @@ from simulator.state import (
     MeltState,
     PipeSegment,
 )
+from tests.condensation_test_support import assert_synthetic_sio_route_authority
 
 
 DATA_PATH = Path("data/literature/vacuum_pyrolysis_sticking.yaml")
@@ -28,23 +29,6 @@ def _published_fe_condensation_alpha(temperature_K: float) -> float:
     """Tachibana ln(alpha_c) = 0.61 - 1127/T, as stored A*exp(-B/T)."""
     spec = _load_sticking_data()["species"]["Fe"]["condensation"]["value"]
     return float(spec["A"]) * math.exp(-float(spec["B"]) / float(temperature_K))
-
-
-def _assert_synthetic_sio_route_authority(route) -> None:
-    authority = route.condensation_authority_by_species["SiO"]
-    stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
-        "stage_outcomes", []
-    )
-    # Source pressure remains authoritative; colder collectors extrapolate
-    # the synthetic curve's 1323-1324 K support and cannot inherit that claim.
-    assert authority["status"] == "status_bearing"
-    assert authority["authoritative_for_condensation"] is False
-    assert authority["carrier_authority"]["pressure"] == {
-        "kind": "value",
-        "pa": 100.0,
-        "valid_range_K": [1323.0, 1324.0],
-    }
-    assert any(outcome["reason"] == "antoine_psat_unavailable_at_T" for outcome in stage_outcomes)
 
 
 def _configure_knudsen_policy(model: CondensationModel) -> CondensationModel:
@@ -283,7 +267,7 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(
         MeltState(),
     )
 
-    _assert_synthetic_sio_route_authority(route)
+    assert_synthetic_sio_route_authority(route)
     assert route.condensed_for_species("SiO") > 0.0
     assert captured_below_floor_alphas
     assert captured_below_floor_alphas == pytest.approx(
