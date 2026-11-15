@@ -2171,6 +2171,18 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels(
     assert "pump_outlet_by_species_kg" in payload["final"]
 
 
+def test_flux_ledger_pins_keep_required_runner_scenarios():
+    scenario_names = {scenario["name"] for scenario in SCENARIOS}
+    required_scenarios = {
+        "lunar_mare_low_ti_C0_24h",
+        "mars_basalt_C2A_12h",
+        "ci_carbonaceous_chondrite_C2B_12h",
+    }
+
+    assert required_scenarios <= scenario_names
+    assert scenario_names == set(SCENARIO_FLUX_LEDGER_PINS)
+
+
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
 def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     """A live run must reproduce the committed golden fixture exactly."""
