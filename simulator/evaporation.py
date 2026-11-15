@@ -480,6 +480,7 @@ class FreezeGateCurveCacheKey(NamedTuple):
     water_mol_fraction: float
     formula_registry_digest: str
     inert_species: tuple[str, ...]
+    magemin_domain_reason: str | None
     redox_state_identity: tuple[tuple[str, Any], ...] | None
 
 
@@ -2282,12 +2283,15 @@ class EvaporationMixin:
             return gate_curve_memo_record(curve, None, (), 'live')
 
         held = self._freeze_gate_held_curve_record
+        held_record = None
         if (
             held is not None
             and held['hour'] == int(self.melt.hour)
             and held['provider'] == self._liquid_fraction_provider
         ):
-            return copy.deepcopy(held['record'])
+            held_record = held['record']
+            if self._liquid_fraction_provider != 'magemin':
+                return copy.deepcopy(held_record)
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
@@ -2306,13 +2310,22 @@ class EvaporationMixin:
             fO2_log=redox_key_fO2_log,
             **redox_state_kwargs,
         )
+        if (
+            key.magemin_domain_reason is None
+            and held_record is not None
+        ):
+            return copy.deepcopy(held_record)
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
         from simulator.engine_binding_admission import (
             gate_curve_memo_origin_matches,
         )
 
-        if store is not None and getattr(store, 'replay_enabled', False):
+        if (
+            store is not None
+            and getattr(store, 'replay_enabled', False)
+            and key.magemin_domain_reason is None
+        ):
             curve = store.replay_gate_curve(
                 self,
                 fO2_log=fO2_log,
@@ -2332,7 +2345,8 @@ class EvaporationMixin:
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         if (
-            cache
+            key.magemin_domain_reason is None
+            and cache
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
             and gate_curve_memo_is_cacheable(
@@ -2385,7 +2399,10 @@ class EvaporationMixin:
             '_freeze_gate_shared_curve_cache',
             None,
         )
-        if isinstance(shared_curve_cache, dict):
+        if (
+            key.magemin_domain_reason is None
+            and isinstance(shared_curve_cache, dict)
+        ):
             process_cached = shared_curve_cache.get(key)
             if isinstance(process_cached, Mapping):
                 shared_value = process_cached.get('curve')
@@ -2777,6 +2794,27 @@ class EvaporationMixin:
             provider_formula_identity.append(
                 (species_key, normalized_elements)
             )
+        # Quantized fractions can alias compositions on opposite sides of
+        # the MAGEMin domain boundary; retain the gate result in that key.
+        magemin_domain_reason = None
+        if self._liquid_fraction_provider == 'magemin':
+            from engines.magemin.domain import MAGEMinDomainGate
+            from simulator.melt_backend.base import (
+                project_melt_to_oxide_projection,
+            )
+            from simulator.melt_backend.magemin import MAGEMinBackend
+
+            magemin_projection = project_melt_to_oxide_projection(
+                composition_kg=None,
+                composition_mol=provider_mol,
+                oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
+                species_formula_registry=formula_registry,
+            )
+            valid, _warnings, reason = MAGEMinDomainGate.validate_with_reason(
+                magemin_projection.oxide_wt_pct
+            )
+            if not valid:
+                magemin_domain_reason = reason
         return FreezeGateCurveCacheKey(
             # v7 moves explicitly inert species out of the submitted curve
             # composition while keeping their membership as a separate input.
@@ -2790,6 +2828,7 @@ class EvaporationMixin:
             ),
             inert_species=inert_species,
             redox_state_identity=redox_identity_key,
+            magemin_domain_reason=magemin_domain_reason,
         )
 
     def _silicate_provider_melt_inputs(

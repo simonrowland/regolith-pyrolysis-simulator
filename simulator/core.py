@@ -5303,7 +5303,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         cache_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         record = None
         cache_hit = bool(
-            isinstance(cache, dict)
+            key.magemin_domain_reason is None
+            and isinstance(cache, dict)
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
             and isinstance(curve, Mapping)
@@ -5339,7 +5340,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             None,
         )
         core_memo_hit = False
-        if curve is None and isinstance(memo, dict):
+        if (
+            curve is None
+            and key.magemin_domain_reason is None
+            and isinstance(memo, dict)
+        ):
             memoized_record = memo.get(key)
             if (
                 isinstance(memoized_record, Mapping)

@@ -114,6 +114,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from engines.magemin.domain import MAGEMinDomainGate
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.oxygen_buffers import oneill_qfm_log10_fO2_bar
 from simulator.melt_backend.base import (
@@ -1731,18 +1732,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         On library error returns an empty result with a warning rather
         than raising.
         """
-        # The subprocess bridge has no Python module (the binary is the
-        # bridge); the other bridges do.  Either way the backend must be
-        # available with a resolved bridge.
-        if not self._available or self._bridge is None:
-            return EquilibriumResult(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                status='unavailable',
-                warnings=['MAGEMin backend not initialized'],
-            )
-
         prior_warnings: List[str] = []
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, Tuple[str, ...]] = {}
@@ -1836,6 +1825,36 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'equilibrium result',
                 ],
                 diagnostics=projection_diagnostics,
+            )
+
+        domain_valid, domain_warnings, domain_reason = (
+            MAGEMinDomainGate.validate_with_reason(comp_wt)
+        )
+        if not domain_valid:
+            diagnostics = dict(projection_diagnostics)
+            diagnostics.update({
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': domain_reason,
+            })
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='out_of_domain',
+                warnings=[*prior_warnings, *domain_warnings],
+                diagnostics=diagnostics,
+            )
+
+        # Domain refusal precedes availability so every bulk that reaches
+        # this entry receives the same typed answer, even when the binary is
+        # absent. In-domain requests retain the existing unavailable result.
+        if not self._available or self._bridge is None:
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='unavailable',
+                warnings=['MAGEMin backend not initialized'],
             )
 
         try:
@@ -2151,12 +2170,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     ) -> LiquidusSolidusResult:
         """Find solidus/liquidus by repeated MAGEMin single-point frac_M."""
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
-        if not self._available or self._bridge is None:
-            return LiquidusSolidusResult(
-                status='unavailable',
-                warnings=('MAGEMin backend not initialized',),
-            )
-
         sample_warnings: list[str] = []
         renormalised_notices: list[dict] = []
 
