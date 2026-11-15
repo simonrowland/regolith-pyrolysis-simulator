@@ -323,6 +323,29 @@ def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
     gate_sim = _sim(
         'magemin', vapor_pressure_data, feedstocks_data, setpoints_data,
     )
+    from simulator.accounting.formulas import resolve_species_formula
+
+    composition_wt_pct = {
+        'SiO2': 50.0,
+        'Al2O3': 15.0,
+        'MgO': 12.0,
+        'FeO': 10.0,
+        'CaO': 10.0,
+        'Na2O': 3.0,
+    }
+    composition_mol = {
+        species: amount
+        / resolve_species_formula(
+            species, gate_sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    gate_sim.atom_ledger.load_external_mol(
+        'process.cleaned_melt',
+        composition_mol,
+        source='b-1225 direct gate missing-binary refusal pin',
+        material_origin='feedstock',
+    )
     with pytest.raises(EvaporationFluxRefusal) as gate_error:
         gate_sim._melt_redox_liquidus_gate_curve()
     assert (
@@ -330,6 +353,16 @@ def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
         == 'liquid_fraction_provider_failed'
     )
     assert gate_error.value.diagnostic['provider'] == 'magemin'
+    projected = gate_error.value.diagnostic['provider_diagnostic'][
+        'backend_diagnostics'
+    ]
+    assert projected['projected_liquidus_status'] == 'unavailable'
+    assert projected['projected_liquidus_diagnostics'][
+        'backend_status_reason'
+    ] == 'missing_binary'
+    assert projected['projected_liquidus_diagnostics'][
+        'backend_failure_disposition'
+    ] == 'environment'
     assert gate_sim._last_melt_redox_liquidus_gate_diagnostic == {}
 
 
