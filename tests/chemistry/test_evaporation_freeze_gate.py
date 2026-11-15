@@ -3520,12 +3520,23 @@ def test_keyed_freeze_gate_memo_hits_without_local_slot_and_keeps_redox_key(
     assert len(calls) == 2
 
 
+@pytest.mark.parametrize(("composition_wt_pct", "expected_reason"), [
+    ({"Al2O3": 100.0}, "magemin_domain_sio2_below_min"),
+    (
+        {"SiO2": 20.0, "MgO": 20.0, "NaCl": 60.0},
+        "forbidden_species",
+    ),
+])
 def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    composition_wt_pct,
+    expected_reason,
 ):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
@@ -3533,14 +3544,17 @@ def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
         enabled=True,
         liquid_fraction_provider='magemin',
     )
-    alumina_mol = 100.0 / resolve_species_formula(
-        'Al2O3',
-        sim.species_formula_registry,
-    ).molar_mass_kg_per_mol()
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
     ledger = AtomLedger(registry=sim.atom_ledger.registry)
     ledger.load_external_mol(
         _CLEANED_MELT_ACCOUNT,
-        {'Al2O3': alumina_mol},
+        composition_mol,
         source='b-1225 cache refusal pin',
         material_origin='feedstock',
     )
@@ -3551,7 +3565,14 @@ def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
             fO2_log=float(sim._current_melt_redox_fO2_log()),
         ),
     )
-    assert domain_reason == 'magemin_domain_sio2_below_min'
+    assert domain_reason == expected_reason
+    live = MAGEMinBackend().equilibrate(
+        1200.0,
+        composition_kg=composition_wt_pct,
+        species_formula_registry=sim.species_formula_registry,
+    )
+    assert live.status == 'out_of_domain'
+    assert live.diagnostics['backend_status_reason'] == domain_reason
     cached_record = gate_curve_memo_record(
         {
             'source': 'gate_liquid_fraction:test-cache',
@@ -3610,6 +3631,98 @@ def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
     monkeypatch.setattr(sim, '_freeze_gate_curve_record', fail_live_record)
     with pytest.raises(RuntimeError, match='live gate record reached'):
         sim._melt_redox_liquidus_gate_record()
+
+
+@pytest.mark.parametrize(("composition_wt_pct", "projected_retry"), [
+    ({"SiO2": 50.0, "MgO": 50.0}, False),
+    ({"SiO2": 20.0, "MgO": 80.0}, False),
+    (
+        {
+            "SiO2": 50.0,
+            "MgO": 29.0,
+            "FeO": 10.0,
+            "P2O5": 10.0,
+            "MnO": 1.0,
+        },
+        True,
+    ),
+    ({"SiO2": 20.0, "MgO": 20.0, "NaCl": 60.0}, False),
+    (
+        {
+            "SiO2": 49.0,
+            "MgO": 20.0,
+            "Al2O3": 20.0,
+            "CaO": 8.5,
+            "H2O": 2.5,
+        },
+        False,
+    ),
+])
+def test_magemin_cache_classifier_matches_live_gate_decision(
+    composition_wt_pct,
+    projected_retry,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.melt_backend.base import project_melt_to_oxide_projection
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        composition_mol,
+        source='b-1225 cache/live gate parity pin',
+        material_origin='feedstock',
+    )
+    sim.atom_ledger = ledger
+    _key, cache_reason = sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    backend = MAGEMinBackend()
+    equilibrium_kwargs = {
+        'composition_kg': composition_wt_pct,
+        'species_formula_registry': sim.species_formula_registry,
+    }
+    if projected_retry:
+        source_projection = project_melt_to_oxide_projection(
+            composition_kg=composition_wt_pct,
+            composition_mol=None,
+            oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=sim.species_formula_registry,
+        )
+        submitted_projection = backend._build_db_bulk_projection(
+            source_projection.oxide_wt_pct
+        )
+        equilibrium_kwargs['projected_oxide_wt_pct'] = (
+            submitted_projection.composition_wt_pct
+        )
+    live_result = backend.equilibrate(1200.0, **equilibrium_kwargs)
+    live_reason = (live_result.diagnostics or {}).get(
+        'backend_status_reason'
+    )
+
+    assert cache_reason == live_reason
+    if cache_reason is None:
+        assert live_result.status == 'unavailable'
+    else:
+        assert live_result.status == 'out_of_domain'
 
 
 def test_absolute_redox_states_keep_freeze_gate_cache_reuse(

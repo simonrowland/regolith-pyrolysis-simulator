@@ -1263,7 +1263,10 @@ def test_magemin_freeze_gate_memo_key_preserves_domain_boundary_identity() -> No
         )
 
     inside, inside_reason = key_for(30.0)
-    outside, outside_reason = key_for(29.99999)
+    # PT-0 capture uses six significant figures before the live provider and
+    # gate see this input. 29.9999 remains below the inclusive 30.0 boundary
+    # at that precision while sharing the quantized cache composition key.
+    outside, outside_reason = key_for(29.9999)
 
     assert inside.composition_mol_fractions == outside.composition_mol_fractions
     assert inside_reason is None

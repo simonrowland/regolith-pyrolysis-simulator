@@ -2527,6 +2527,82 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
     _assert_magemin_cli_absolute_targets(calls, -9.0)
 
 
+def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
+    monkeypatch,
+):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    source = {
+        'SiO2': 50.0,
+        'MgO': 29.0,
+        'FeO': 10.0,
+        'P2O5': 10.0,
+        'MnO': 1.0,
+    }
+
+    # After the ig database drops P2O5 and MnO, the supported source totals
+    # 89 wt%. The domain oxide basis normalizes that remainder: SiO2 is
+    # 50/89*100 = 56.179775... wt%, and the major-oxide total is 89/89*100
+    # = 100 wt%. The solver still receives the existing unnormalized
+    # FeOt+O projection of the supported 50/29/10 wt% bulk.
+    retained_total = 50.0 + 29.0 + 10.0
+    assert 50.0 / retained_total * 100.0 == pytest.approx(56.1797752809)
+    assert retained_total / retained_total * 100.0 == pytest.approx(100.0)
+
+    result = backend.find_liquidus_solidus(
+        composition_kg=source,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['projected_liquidus_status'] == 'ok'
+    expected_projection = backend._build_db_bulk_projection({
+        'SiO2': 50.0,
+        'MgO': 29.0,
+        'FeO': 10.0,
+    })
+    expected_bulk = '--Bulk=' + ','.join(
+        f'{value:.8g}' for value in expected_projection.vector
+    )
+    submitted_bulks = {
+        next(arg for arg in args if arg.startswith('--Bulk='))
+        for args in calls
+    }
+    assert submitted_bulks == {expected_bulk}
+
+
+def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(monkeypatch):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    projected = backend._build_db_bulk_projection({
+        'SiO2': 50.0,
+        'MgO': 30.0,
+        'FeO': 20.0,
+    })
+
+    result = backend.find_liquidus_solidus(
+        projected_oxide_wt_pct=projected.composition_wt_pct,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'ok'
+    expected_bulk = '--Bulk=' + ','.join(
+        f'{value:.8g}' for value in projected.vector
+    )
+    assert {
+        next(arg for arg in args if arg.startswith('--Bulk='))
+        for args in calls
+    } == {expected_bulk}
+
+
 def test_magemin_liquidus_evaluates_redox_state_at_each_sample_temperature(
     monkeypatch,
 ):
