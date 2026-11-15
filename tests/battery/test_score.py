@@ -7202,7 +7202,8 @@ def test_studio_dispatch_uses_caller_host(
 
     monkeypatch.setenv("REGOLITH_STUDIO_HOST", "example-studio.invalid")
     monkeypatch.setattr(battery_score.socket, "gethostname", lambda: "laptop")
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    # Record the original absence before the CLI overwrites this setting.
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", "")
     engine_cache_path = tmp_path / "engine-cache.sqlite"
 
     def record_host(
