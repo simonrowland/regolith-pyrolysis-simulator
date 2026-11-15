@@ -1967,3 +1967,31 @@ def test_measured_zero_alias_conflicts_with_a_positive_alias() -> None:
         "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.0}},
     }
     assert not _coating_wall_deposit_selection(zero_vs_zero)[1]
+
+
+@pytest.mark.parametrize("has_positive_deposit", [False, True])
+@pytest.mark.parametrize("carrier_status", ["refused", "status_bearing", "authoritative"])
+def test_wall_figure_preserves_upstream_carrier_refusal(
+    has_positive_deposit, carrier_status,
+):
+    from simulator.wall_deposit_availability import wall_deposit_figure_availability
+
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Fe": 0.1}} if has_positive_deposit else {},
+        {
+            **_alpha_notice("Fe", cited=True),
+            "vapour_carrier_authority_by_species": _carrier_authority(
+                "Fe", status=carrier_status,
+            ),
+        },
+    )
+    figure = wall_deposit_figure_availability(
+        has_positive_deposit=has_positive_deposit, authority=authority,
+    )
+    if carrier_status == "refused":
+        assert figure.status == "refused"
+        assert figure.refusal["authority"] == authority
+        assert figure.refusal["authority"]["refused_carrier_species"] == ["Fe"]
+    else:
+        assert figure.status == ("available" if has_positive_deposit else "measured_empty")
+        assert figure.refusal is None

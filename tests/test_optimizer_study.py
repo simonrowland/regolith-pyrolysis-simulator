@@ -7680,29 +7680,29 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    # The merged knob vocabulary moves seed 0's wall coordinates. Under
-    # d-402 both CrO2 and CrO3 refuse because every declared wall route needs
-    # pO2 and the parcel has no committed pO2. The missing wall quantity
-    # takes precedence over the null resinter threshold.
+    # Seed 0 starts at 40 C. Cr oxide source activity refuses before any
+    # vapour supply is materialized; this is not a wall-pO2 refusal or a
+    # proven negligible supply. The empty ledger cannot price that unknown.
     assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
     summary = provenance[0]["product_summary"]
     assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
     authority = summary["wall_deposit_refusal"]["authority"]
-    assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
-    assert authority["wall_saturation_pressure_refused_species"] == ["CrO2", "CrO3"]
-    refusals = authority["wall_saturation_pressure_refusals_by_species"]
-    assert set(refusals) == {"CrO2", "CrO3"}
-    assert all(
-        record["reason"] == "wall_pO2_required"
-        for by_segment in refusals.values()
-        for record in by_segment.values()
-    )
+    assert authority["code"] == "wall_deposit_vapour_carrier_non_authoritative"
+    assert "wall_deposit_saturation_pressure_refused" not in authority["codes"]
+    assert not authority.get("wall_saturation_pressure_refusals_by_species")
+    for species in ("CrO2", "CrO3"):
+        assert species in authority["refused_carrier_species"]
+        carrier = authority["vapour_carrier_authority_by_species"][species]
+        assert carrier["refusal_code"] == "missing_evidence"
+        assert carrier["source_reaction_activity"]["value"] is None
+        assert carrier["is_flux_active"] is False
     assert summary["wall_deposit_total_kg"] is None
+    assert summary["wall_deposit_kg_by_segment_species"] == {}
     assert summary["resinter_threshold_kg"] is None
     assert summary["has_positive_qualified_fouling"] is None
-    assert summary.get("furnace_amortization_status") is None
+    assert summary["furnace_amortization_status"] == "available"
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

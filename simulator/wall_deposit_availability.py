@@ -40,12 +40,18 @@ def wall_deposit_figure_availability(
     pressure_refused = cumulative_pressure_refused or _has_pressure_refusal(
         explicit_authority
     )
-    if explicit_refusal or pressure_refused:
+    # Source refusal withholds the vapour debit: an empty deposit ledger
+    # is not a measured physical zero. No supply bound can be derived from
+    # that missing source quantity (kg/h unknown -> deposit kg unknown).
+    # Preserve its existing authority instead of pricing the withheld mass
+    # as zero. Status-bearing numeric sources still retain their prediction.
+    carrier_refused = bool(authority_payload.get("refused_carrier_species"))
+    if explicit_refusal or pressure_refused or carrier_refused:
         # An authority payload with pressure refusals may already aggregate
         # earlier campaigns; the explicit refusal can describe only the latest.
         refusal_authority = (
             authority_payload
-            if cumulative_pressure_refused
+            if cumulative_pressure_refused or carrier_refused
             else explicit_authority or authority_payload
         )
         if not refusal_authority:
