@@ -406,6 +406,27 @@ def test_tier_b_reference_refuses_a_scan_that_stops_at_minor_phase_melting():
     assert "f_liq=0.0026" in refused.value.detail
 
 
+def test_tier_b_reference_extends_until_bulk_melt_reaches_liquid_threshold():
+    class ExtendedBulkProfile:
+        def __call__(self, _composition, temperature_C, _pressure_bar):
+            if temperature_C <= 1000.0:
+                return 0.0
+            if temperature_C < 1650.0:
+                return 0.0026
+            if temperature_C < 1675.0:
+                return 0.01
+            return 1.0
+
+    reference = liner_corrosion._tier_b_reference_profile(
+        ExtendedBulkProfile(),
+        {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+        pressure_bar=1.0,
+    )
+
+    assert reference["scan_temperature_C"][-1] == 1675.0
+    assert reference["bulk_melt_bracket_C"] == [1650.0, 1675.0]
+
+
 def test_liquidus_search_defaults_pin_the_existing_2200_c_ceiling():
     from inspect import signature
 

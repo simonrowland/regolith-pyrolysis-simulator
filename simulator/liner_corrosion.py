@@ -19,6 +19,7 @@ import yaml
 
 from simulator.accounting.formulas import parse_formula, resolve_species_formula
 from simulator.melt_backend.liquidus import (
+    DEFAULT_LIQUIDUS_FINDER_MAX_T_C,
     LIQUIDUS_LIQUID_EPSILON,
     LIQUIDUS_SOLID_EPSILON,
 )
@@ -576,16 +577,20 @@ def _tier_b_reference_profile(
     pressure_bar: float,
     literature_melting_temperature_C: float | None = None,
 ) -> dict[str, Any]:
-    """Sample the fixed d-419 grid and identify pure bulk and minor melting.
+    """Sample the d-419 grid and identify pure bulk and minor melting.
 
-    The scan advances in 25 C increments from 500 C through 1600 C.  The
-    pure reference is the largest adjacent liquid-fraction jump, which keeps
-    the 1000-1025 C minor-phase eutectic from defining the bulk melt point.
+    The initial scan advances in 25 C increments from 500 C through 1600 C.
+    If it has not reached the liquid finder's declared fully-liquid threshold,
+    it extends in the same increments through that finder's 2200 C ceiling.
+    Only a profile that reaches this threshold can use its largest adjacent
+    liquid-fraction jump as the bulk melt point; this keeps the 1000-1025 C
+    minor-phase eutectic from defining the bulk reference when the bulk melt
+    transition lies above the initial scan.
     """
 
     liner = validate_oxide_composition(liner_composition_wt_pct)
     pressure = _positive(pressure_bar, "pressure_bar")
-    temperatures = tuple(
+    temperatures = list(
         TIER_B_MELT_SCAN_MIN_C + index * TIER_B_MELT_SCAN_STEP_C
         for index in range(
             int((TIER_B_MELT_SCAN_MAX_C - TIER_B_MELT_SCAN_MIN_C)
@@ -594,7 +599,8 @@ def _tier_b_reference_profile(
     )
     liquid_by_temperature: dict[float, float] = {}
     diagnostics_by_temperature: dict[float, Mapping[str, Any]] = {}
-    for temperature in temperatures:
+
+    def sample_temperature(temperature: float) -> None:
         liquid_by_temperature[temperature] = _checked_liquid_fraction(
             _sample_liquid_fraction(
                 sampler,
@@ -610,6 +616,31 @@ def _tier_b_reference_profile(
             detail = diagnostic_reader(liner, temperature, pressure)
             if isinstance(detail, Mapping):
                 diagnostics_by_temperature[temperature] = detail
+
+    for temperature in temperatures:
+        sample_temperature(temperature)
+
+    fully_liquid_threshold = 1.0 - LIQUIDUS_LIQUID_EPSILON
+    while (
+        liquid_by_temperature[temperatures[-1]] < fully_liquid_threshold
+        and temperatures[-1] < DEFAULT_LIQUIDUS_FINDER_MAX_T_C
+    ):
+        next_temperature = min(
+            temperatures[-1] + TIER_B_MELT_SCAN_STEP_C,
+            DEFAULT_LIQUIDUS_FINDER_MAX_T_C,
+        )
+        temperatures.append(next_temperature)
+        sample_temperature(next_temperature)
+    if liquid_by_temperature[temperatures[-1]] < fully_liquid_threshold:
+        raise LinerCorrosionRefusal(
+            "liner_reference_unresolved",
+            (
+                f"pure-liner scan {temperatures[0]:g}-{temperatures[-1]:g} C "
+                f"reached f_liq={liquid_by_temperature[temperatures[-1]]:g}; "
+                f"fully-liquid threshold={fully_liquid_threshold:g}"
+            ),
+        )
+    temperatures = tuple(temperatures)
 
     jumps = tuple(
         liquid_by_temperature[high] - liquid_by_temperature[low]
