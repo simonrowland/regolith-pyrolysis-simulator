@@ -5293,7 +5293,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
-        key = self._freeze_gate_cache_key(
+        key, magemin_domain_reason = self._freeze_gate_cache_key_and_domain(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
             **redox_state_kwargs,
@@ -5303,7 +5303,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         cache_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         record = None
         cache_hit = bool(
-            key.magemin_domain_reason is None
+            magemin_domain_reason is None
             and isinstance(cache, dict)
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
@@ -5342,7 +5342,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         core_memo_hit = False
         if (
             curve is None
-            and key.magemin_domain_reason is None
+            and magemin_domain_reason is None
             and isinstance(memo, dict)
         ):
             memoized_record = memo.get(key)

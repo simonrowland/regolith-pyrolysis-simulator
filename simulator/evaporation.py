@@ -480,7 +480,6 @@ class FreezeGateCurveCacheKey(NamedTuple):
     water_mol_fraction: float
     formula_registry_digest: str
     inert_species: tuple[str, ...]
-    magemin_domain_reason: str | None
     redox_state_identity: tuple[tuple[str, Any], ...] | None
 
 
@@ -2305,13 +2304,13 @@ class EvaporationMixin:
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
-        key = self._freeze_gate_cache_key(
+        key, magemin_domain_reason = self._freeze_gate_cache_key_and_domain(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
             **redox_state_kwargs,
         )
         if (
-            key.magemin_domain_reason is None
+            magemin_domain_reason is None
             and held_record is not None
         ):
             return copy.deepcopy(held_record)
@@ -2324,7 +2323,7 @@ class EvaporationMixin:
         if (
             store is not None
             and getattr(store, 'replay_enabled', False)
-            and key.magemin_domain_reason is None
+            and magemin_domain_reason is None
         ):
             curve = store.replay_gate_curve(
                 self,
@@ -2345,7 +2344,7 @@ class EvaporationMixin:
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         if (
-            key.magemin_domain_reason is None
+            magemin_domain_reason is None
             and cache
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
@@ -2400,7 +2399,7 @@ class EvaporationMixin:
             None,
         )
         if (
-            key.magemin_domain_reason is None
+            magemin_domain_reason is None
             and isinstance(shared_curve_cache, dict)
         ):
             process_cached = shared_curve_cache.get(key)
@@ -2696,6 +2695,22 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
         provider_melt_inputs: _SilicateProviderMeltInputs | None = None,
     ) -> FreezeGateCurveCacheKey:
+        key, _magemin_domain_reason = self._freeze_gate_cache_key_and_domain(
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            redox_state=redox_state,
+            provider_melt_inputs=provider_melt_inputs,
+        )
+        return key
+
+    def _freeze_gate_cache_key_and_domain(
+        self,
+        *,
+        pressure_bar: float,
+        fO2_log: float,
+        redox_state: RedoxState | None = None,
+        provider_melt_inputs: _SilicateProviderMeltInputs | None = None,
+    ) -> tuple[FreezeGateCurveCacheKey, str | None]:
         from simulator.reduced_real_determinism import _digest
         from simulator.chemistry.kernel import ChemistryIntent
 
@@ -2794,8 +2809,8 @@ class EvaporationMixin:
             provider_formula_identity.append(
                 (species_key, normalized_elements)
             )
-        # Quantized fractions can alias compositions on opposite sides of
-        # the MAGEMin domain boundary; retain the gate result in that key.
+        # Cache callers bypass reads for a domain refusal. Keep the
+        # production key itself byte-identical for in-domain inputs.
         magemin_domain_reason = None
         if self._liquid_fraction_provider == 'magemin':
             from engines.magemin.domain import MAGEMinDomainGate
@@ -2815,7 +2830,7 @@ class EvaporationMixin:
             )
             if not valid:
                 magemin_domain_reason = reason
-        return FreezeGateCurveCacheKey(
+        key = FreezeGateCurveCacheKey(
             # v7 moves explicitly inert species out of the submitted curve
             # composition while keeping their membership as a separate input.
             schema='oxide_mol_fraction_p_fO2_v7',
@@ -2828,8 +2843,8 @@ class EvaporationMixin:
             ),
             inert_species=inert_species,
             redox_state_identity=redox_identity_key,
-            magemin_domain_reason=magemin_domain_reason,
         )
+        return key, magemin_domain_reason
 
     def _silicate_provider_melt_inputs(
         self,

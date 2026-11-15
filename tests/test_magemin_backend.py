@@ -1099,7 +1099,7 @@ def test_magemin_worker_exit_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1122,7 +1122,7 @@ def test_magemin_pool_unavailable_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1146,7 +1146,7 @@ def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1169,7 +1169,7 @@ def test_magemin_in_process_budget_exhaustion_returns_typed_status():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
         call_timeout_s=0.0,
@@ -1211,7 +1211,7 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1251,7 +1251,7 @@ def test_magemin_subprocess_slot_permission_error_returns_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1481,7 +1481,7 @@ def test_magemin_equilibrate_never_emits_ledger_transition(monkeypatch):
 
     result = backend.equilibrate(
         1600.0,
-        composition_mol={"SiO2": 1.0},
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
         fO2_log=-8.0,
         pressure_bar=1e-6,
     )
@@ -1670,7 +1670,7 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         pressure_bar=1.0,
         fO2_log=-8.0,
     )
@@ -2112,7 +2112,7 @@ def test_magemin_liquidus_flags_flat_renormalised_bracket(monkeypatch):
     monkeypatch.setattr(backend, 'equilibrate', fake_equilibrate)
 
     result = backend.find_liquidus_solidus(
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
         min_T_C=1000.0,
@@ -2692,7 +2692,7 @@ def test_magemin_liquidus_finder_invalid_budget_is_refused(budget):
     backend._config = {'liquidus_finder_budget_s': budget}
 
     result = backend.find_liquidus_solidus(
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         min_T_C=800.0,
         max_T_C=1000.0,
         scan_step_C=100.0,
@@ -3382,7 +3382,7 @@ def test_magemin_fake_bridge_library_error_returns_warning(monkeypatch):
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={"SiO2": 1.0},
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -3410,7 +3410,7 @@ def test_magemin_equilibrate_propagates_local_call_helper_errors(monkeypatch):
     with pytest.raises(KeyError, match='local MAGEMin wrapper defect'):
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3434,7 +3434,7 @@ def test_magemin_remote_handler_error_propagates_with_remote_traceback(
     with pytest.raises(remote_type) as raised:
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3457,7 +3457,7 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
     with pytest.raises(EngineWorkerRemoteError) as raised:
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3543,7 +3543,7 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
     backend._magemin_module = types.SimpleNamespace(minimize=fake_minimize)
     params = {
         'temperature_C': 1500.0,
-        'composition_mol': {'SiO2': 1.0},
+        'composition_mol': {'SiO2': 1.0, 'MgO': 1.0},
         'pressure_bar': 1.0,
         'fO2_log': -8.0,
     }
@@ -3587,7 +3587,7 @@ def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         pressure_bar=1.0,
         fO2_log=-8.0,
     )
@@ -3621,7 +3621,7 @@ def test_magemin_equilibrate_parser_local_defect_propagates(
     with pytest.raises(local_error, match='local MAGEMin parser defect'):
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             pressure_bar=1.0,
             fO2_log=-8.0,
         )
@@ -3667,7 +3667,7 @@ def test_magemin_remote_engine_call_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -3694,7 +3694,7 @@ def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )

@@ -3545,8 +3545,13 @@ def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
         material_origin='feedstock',
     )
     sim.atom_ledger = ledger
-    key = _freeze_gate_key_for_current_state(sim)
-    assert key.magemin_domain_reason == 'magemin_domain_sio2_below_min'
+    key, domain_reason = sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=float(sim._current_melt_redox_fO2_log()),
+        ),
+    )
+    assert domain_reason == 'magemin_domain_sio2_below_min'
     cached_record = gate_curve_memo_record(
         {
             'source': 'gate_liquid_fraction:test-cache',

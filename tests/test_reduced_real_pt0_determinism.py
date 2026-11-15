@@ -1218,7 +1218,7 @@ def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> No
     assert "total_submitted_amount_kg" not in key
 
 
-def test_magemin_freeze_gate_memo_key_separates_domain_boundary() -> None:
+def test_magemin_freeze_gate_memo_key_preserves_domain_boundary_identity() -> None:
     from simulator.accounting.formulas import resolve_species_formula
     from simulator.accounting.ledger import AtomLedger
 
@@ -1257,18 +1257,18 @@ def test_magemin_freeze_gate_memo_key_separates_domain_boundary() -> None:
             material_origin="feedstock",
         )
         sim.atom_ledger = ledger
-        return sim._freeze_gate_cache_key(
+        return sim._freeze_gate_cache_key_and_domain(
             pressure_bar=1.0,
             fO2_log=-9.0,
         )
 
-    inside = key_for(30.0)
-    outside = key_for(29.99999)
+    inside, inside_reason = key_for(30.0)
+    outside, outside_reason = key_for(29.99999)
 
     assert inside.composition_mol_fractions == outside.composition_mol_fractions
-    assert inside.magemin_domain_reason is None
-    assert outside.magemin_domain_reason == "magemin_domain_sio2_below_min"
-    assert inside != outside
+    assert inside_reason is None
+    assert outside_reason == "magemin_domain_sio2_below_min"
+    assert inside == outside
 
 
 def test_amount_is_present_only_for_extensive_alphamelts_composite() -> None:

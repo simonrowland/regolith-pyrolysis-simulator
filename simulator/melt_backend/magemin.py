@@ -1732,6 +1732,33 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         On library error returns an empty result with a warning rather
         than raising.
         """
+        requested_temperature_C = temperature_C
+        requested_pressure_bar = pressure_bar
+        requested_fO2_log = fO2_log
+        try:
+            temperature_C, pressure_bar, fO2_log, call_timeout_s = (
+                _admit_magemin_call_scalars(
+                    temperature_C,
+                    pressure_bar,
+                    fO2_log,
+                    call_timeout_s,
+                )
+            )
+        except _MAGEMinDeclaredInputError as exc:
+            message = f'MAGEMin equilibrate failed: {exc}'
+            return EquilibriumResult(
+                temperature_C=requested_temperature_C,
+                pressure_bar=requested_pressure_bar,
+                fO2_log=requested_fO2_log,
+                status='refused',
+                warnings=[message],
+                diagnostics={
+                    'backend_failure_exception': exc.exception_type,
+                    'backend_failure_message': exc.engine_message,
+                    'reason': 'invalid_input',
+                },
+            )
+
         prior_warnings: List[str] = []
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, Tuple[str, ...]] = {}
@@ -1827,36 +1854,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics=projection_diagnostics,
             )
 
-        domain_valid, domain_warnings, domain_reason = (
-            MAGEMinDomainGate.validate_with_reason(comp_wt)
-        )
-        if not domain_valid:
-            diagnostics = dict(projection_diagnostics)
-            diagnostics.update({
-                'backend_status': 'out_of_domain',
-                'backend_status_reason': domain_reason,
-            })
-            return EquilibriumResult(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                status='out_of_domain',
-                warnings=[*prior_warnings, *domain_warnings],
-                diagnostics=diagnostics,
-            )
-
-        # Domain refusal precedes availability so every bulk that reaches
-        # this entry receives the same typed answer, even when the binary is
-        # absent. In-domain requests retain the existing unavailable result.
-        if not self._available or self._bridge is None:
-            return EquilibriumResult(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                status='unavailable',
-                warnings=['MAGEMin backend not initialized'],
-            )
-
         try:
             bulk_projection = self._build_db_bulk_projection(comp_wt)
         except MeltCompositionError as exc:
@@ -1903,6 +1900,48 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'components have no documented ig endmember: {dropped}',
                 ],
                 diagnostics=diagnostics,
+            )
+
+        # The ig-order projection can refuse unsupported components before
+        # the domain gate. The liquidus finder's projected retry is a
+        # different bulk whose supplied wt% values can sum below 100; gate
+        # its normalized oxide composition while preserving those original
+        # values for the existing MAGEMin call.
+        domain_comp_wt = comp_wt
+        if projected_oxide_wt_pct is not None:
+            domain_comp_wt = project_melt_to_oxide_projection(
+                composition_kg=comp_wt,
+                composition_mol=None,
+                oxide_basis=self._MAGEMIN_INPUT_BASIS,
+                species_formula_registry=species_formula_registry,
+            ).oxide_wt_pct
+        domain_valid, domain_warnings, domain_reason = (
+            MAGEMinDomainGate.validate_with_reason(domain_comp_wt)
+        )
+        if not domain_valid:
+            diagnostics = dict(result_diagnostics)
+            diagnostics.update({
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': domain_reason,
+            })
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='out_of_domain',
+                warnings=[*prior_warnings, *domain_warnings],
+                diagnostics=diagnostics,
+            )
+
+        # Apply the gate before availability so out-of-domain bulks receive
+        # the same typed answer whether or not the binary is installed.
+        if not self._available or self._bridge is None:
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='unavailable',
+                warnings=['MAGEMin backend not initialized'],
             )
 
         try:
@@ -2962,14 +3001,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         """
         module = self._magemin_module
         call_started = time.monotonic()
-        temperature_C, pressure_bar, fO2_log, call_timeout_s = (
-            _admit_magemin_call_scalars(
-                temperature_C,
-                pressure_bar,
-                fO2_log,
-                call_timeout_s,
-            )
-        )
         temperature_K = temperature_C + 273.15
         pressure_GPa = self._pressure_bar_to_GPa(pressure_bar)
         pressure_kbar = self._GPa_to_kbar(pressure_GPa)

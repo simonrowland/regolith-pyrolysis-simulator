@@ -97,6 +97,25 @@ def test_domain_gate_accepts_basalt():
     assert warnings == []
 
 
+def test_domain_gate_accepts_auxiliary_water_but_counts_it_against_oxides():
+    trace_water = {'SiO2': 50.0, 'MgO': 49.53, 'H2O': 0.47}
+    valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(
+        trace_water
+    )
+    assert valid is True
+    assert warnings == []
+    assert reason is None
+
+    at_major_boundary = {'SiO2': 50.0, 'MgO': 45.0, 'H2O': 5.0}
+    valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(
+        at_major_boundary
+    )
+    assert valid is False
+    assert reason == 'major_sum'
+    assert any('major-oxide total = 95.00 wt%' in warning for warning in warnings)
+    assert not any('unrecognised species' in warning for warning in warnings)
+
+
 @pytest.mark.parametrize('alias', ['FeO_total', 'feot', 'feototal', 'feo_tot'])
 def test_domain_gate_accepts_feo_total_aliases_like_alphamelts(alias):
     composition = _basalt_wt_pct()
@@ -392,8 +411,13 @@ def test_liquidus_finder_forwards_normalized_redox_state():
     )
 
 
-def test_freeze_gate_dispatch_preserves_domain_refusal_when_engine_unavailable(
-    monkeypatch,
+@pytest.mark.parametrize(
+    'intent',
+    (ChemistryIntent.GATE_LIQUID_FRACTION, ChemistryIntent.SILICATE_EQUILIBRIUM),
+    ids=('freeze-gate-liquid-fraction', 'equilibrium'),
+)
+def test_provider_dispatch_preserves_domain_refusal_when_engine_unavailable(
+    monkeypatch, intent,
 ):
     backend = MAGEMinBackend()
     backend._available = False
@@ -406,7 +430,7 @@ def test_freeze_gate_dispatch_preserves_domain_refusal_when_engine_unavailable(
     )
     provider = MAGEMinShadowProvider(backend=backend)
     request = IntentRequest(
-        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        intent=intent,
         account_view=ProviderAccountView(
             accounts={'process.cleaned_melt': {'Al2O3': 1.0}},
             species_formula_registry={},

@@ -96,9 +96,11 @@ class MAGEMinDomainGate:
         ----------
         composition_wt_pct:
             Mapping from species name to wt%. Expected to be the cleaned
-            silicate-oxide composition from ``MeltState``. Non-oxide
-            species in this mapping are treated as a domain violation
-            (Stage 0 cleanup must run first).
+            silicate-oxide composition from ``MeltState``. H2O is also
+            accepted as MAGEMin's auxiliary bulk component; its mass still
+            counts against the major-oxide threshold. Other non-oxide
+            species are treated as a domain violation (Stage 0 cleanup must
+            run first).
 
         Returns
         -------
@@ -114,7 +116,7 @@ class MAGEMinDomainGate:
         3. SiO2 ∈ [30, 80] wt%.
         4. Sum of major oxides > 95 wt% (i.e. trace species must not
            dominate).
-        5. All species in the input map are in the 14-oxide MELTS basis.
+        5. All species except auxiliary H2O are in the 14-oxide MELTS basis.
         """
         valid, warnings, _reason = MAGEMinDomainGate.validate_with_reason(
             composition_wt_pct
@@ -140,6 +142,11 @@ class MAGEMinDomainGate:
             if not is_finite(value):
                 continue
             normalized_name = _canonical_domain_species(species)
+            # H2O is a positional bulk component in MAGEMin's ig database.
+            # Keep its effect in the oxide wt% total (the input is already
+            # normalized), but do not treat it as an unknown melt species.
+            if normalized_name == 'H2O':
+                continue
             normalized[normalized_name] = (
                 normalized.get(normalized_name, 0.0) + float(value)
             )
