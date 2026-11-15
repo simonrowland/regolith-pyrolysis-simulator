@@ -23715,7 +23715,6 @@ class Migrator:
         self._work_index_row: dict[str, Mapping[str, Any] | None] = {}
         self._obs_source: dict[str, str] = {}
         self._obs_row_index: dict[str, int] = {}
-        self._extract_notices: dict[str, object] = {}
         self._author_derivations: dict[str, Derivation] = {}
         # Parents actually replaced by emitted children. Retarget uses this
         # exact map, never a prefix search.
@@ -24547,19 +24546,6 @@ class Migrator:
         *,
         source_row_index: int | None = None,
     ) -> None:
-        notice_id = re.split(
-            r"::(?:T=|field:|point:|mass_loss_fraction|points:|rows:)",
-            observation.observation_id,
-            maxsplit=1,
-        )[0]
-        extract_notices = tuple(
-            _notice_from_plain(notice)
-            for notice in (self._extract_notices.get(notice_id) or ())
-        )
-        if extract_notices:
-            observation = replace(
-                observation, notices=extract_notices + observation.notices
-            )
         identity = observation.identity
         basis_state = (
             identity.valence_basis
@@ -25312,11 +25298,6 @@ class Migrator:
             else None
         )
         rows = list(iter_extract_observations(doc))
-        self._extract_notices = {
-            f"{source_id}::{row['observation_id']}": row.get("notices")
-            for _, row in rows
-            if row.get("observation_id") and row.get("notices")
-        }
         fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
         raw_experiments = doc.get("experiments") or ()
@@ -25690,6 +25671,9 @@ class Migrator:
                 f"{source_id}: extract observation without observation_id reached "
                 "_migrate_extract_observation"
             )
+        source_notices = tuple(
+            _notice_from_plain(notice) for notice in (obs.get("notices") or ())
+        )
         obs_id = f"{source_id}::{raw_obs_id}"
         raw_values = obs.get("values")
         if isinstance(raw_values, list):
@@ -28326,6 +28310,7 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
+                        *source_notices,
                         *point_notices,
                         *ambient_pressure_notices,
                     ),
@@ -28456,6 +28441,7 @@ class Migrator:
                         phase_provenance=phase_provenance,
                         identity_provenance=identity_provenance,
                         notices=(
+                            *source_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28594,6 +28580,7 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
+                        *source_notices,
                         *(
                             ()
                             if total_iron_notice is None
@@ -28793,6 +28780,7 @@ class Migrator:
                         source_derivation=source_derivation,
                         phase_provenance=sample_source_provenance,
                         notices=(
+                            *source_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28828,6 +28816,7 @@ class Migrator:
                     work=work,
                     source_key=source_key,
                     source_id=source_id,
+                    notices=source_notices,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -28854,7 +28843,7 @@ class Migrator:
             elif obs.get("uncertainty"):
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
-        observation_notices: list[Notice] = []
+        observation_notices: list[Notice] = list(source_notices)
         if ambient_pressure_notice is not None:
             observation_notices.append(ambient_pressure_notice)
         if obs.get("standard_pressure") == "not_printed":
@@ -29094,6 +29083,7 @@ class Migrator:
         work: Work,
         source_key: str,
         source_id: str,
+        notices: tuple[Notice, ...],
     ) -> None:
         """Add Johnston's ratio alongside its unchanged printed cell children."""
 
@@ -29340,7 +29330,7 @@ class Migrator:
             uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
             evidence=evidence,
             admission=admission,
-            notices=(),
+            notices=notices,
             source_id=source_id,
             locator=reference.locator,
             read_from=reference.read_from,

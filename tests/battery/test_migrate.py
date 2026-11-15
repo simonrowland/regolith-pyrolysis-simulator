@@ -2456,6 +2456,81 @@ def test_production_migration_preserves_model_derived_fallback_notices(
     assert result.validation.hard_issues == ()
 
 
+def _model_derived_extract_with_notice(observation_id: str) -> dict:
+    extract = _raw_inputs_extract("model_derived", include_method=True)
+    row = extract["species"]["Na"]["observations"][0]
+    row["observation_id"] = observation_id
+    row["values"]["derivation"].pop("method")
+    row["notices"] = [
+        {
+            "kind": "engine_model_caveat",
+            "affected_quantities": ["p_sat"],
+            "reason": "method_unknown: no method located in source",
+            "origin": "literature_extract",
+        }
+    ]
+    return extract
+
+
+def test_extract_notice_survives_scalar_id_with_temperature_suffix(
+    tmp_path: Path,
+) -> None:
+    extract = _model_derived_extract_with_notice("na_psat::T=1200:h=abc")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(T_K=1200.0, pressure_atm=1.0)
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(iter(result.observations.values()))
+    assert observation.observation_id == (
+        "fixture-source::na_psat::T=1200:h=abc"
+    )
+    assert observation.notices[0].reason == (
+        "method_unknown: no method located in source"
+    )
+
+
+def test_extract_notice_survives_author_ordinal_rekeying_to_temperature(
+    tmp_path: Path,
+) -> None:
+    extract = _model_derived_extract_with_notice("na_psat::point:0")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(T_K=1200.0, pressure_atm=1.0)
+    sibling = deepcopy(row)
+    sibling["observation_id"] = "na_psat::point:1"
+    sibling["values"].update(T_K=1300.0, pressure_atm=2.0)
+    extract["species"]["Na"]["observations"].append(sibling)
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observations = list(result.observations.values())
+    assert len(observations) == 2
+    assert all(
+        "::point:" not in observation.observation_id for observation in observations
+    )
+    assert all("::T=" in observation.observation_id for observation in observations)
+    assert all(
+        observation.notices[0].reason
+        == "method_unknown: no method located in source"
+        for observation in observations
+    )
+
+
+def test_duplicate_extract_ids_with_different_notices_raise(tmp_path: Path) -> None:
+    extract = _model_derived_extract_with_notice("na_psat")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(T_K=1200.0, pressure_atm=1.0)
+    sibling = deepcopy(row)
+    sibling["notices"][0]["reason"] = "different caveat"
+    extract["species"]["Na"]["observations"].append(sibling)
+
+    with pytest.raises(DuplicateObservationIdError):
+        migrate(_write_min_tree(tmp_path, extract), write=False)
+
+
 def test_documented_model_derived_notice_decodes_canonical_quantity() -> None:
     payload = {
         "kind": "engine_model_caveat",
