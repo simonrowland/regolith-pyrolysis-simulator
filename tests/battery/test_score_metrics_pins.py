@@ -49,8 +49,8 @@ from simulator.battery.score import (
 
 # Quantity token → operation. Read off QUANTITY_METRIC. A quantity absent
 # from that table is None: fugacity, log10_K_reaction,
-# activity_coefficient_temperature_fit, mass_loss_areal_density,
-# valence_ratio, delta_fH. valence_ratio is chosen by identity, not here.
+# activity_coefficient_temperature_fit, mass_loss_areal_density, valence_ratio.
+# valence_ratio is chosen by identity, not here.
 EXPECTED_QUANTITY_METRIC: dict[str, str | None] = {
     "p_sat": "dex",
     "p_partial": "dex",
@@ -71,7 +71,7 @@ EXPECTED_QUANTITY_METRIC: dict[str, str | None] = {
     "fe3_fe2_ratio": "dex",
     "valence_ratio": None,
     "ion_intensity_ratio": "dex",
-    "delta_fH": None,
+    "delta_fH": "absolute",
     "delta_fG": "absolute",
     "H_minus_H298": "absolute",
     "heat_of_fusion": "absolute",

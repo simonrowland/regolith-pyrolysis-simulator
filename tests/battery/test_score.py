@@ -1543,6 +1543,47 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
 
 
+def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:
+    quantity = Quantity.DELTA_FH
+    identity = Identity(
+        quantity=quantity,
+        species=Species("H2O", Phase.G),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": "0.25",
+            "units": QUANTITY_UNITS[quantity],
+            "confidence_level": "one_sigma",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "delta-fh-printed-width",
+            "delta-fh-printed-width-experiment",
+            identity,
+            Decimal("-241.826"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="delta-fh-printed-width-source",
+        ),
+        uncertainty=uncertainty,
+    )
+
+    printed = score_mod._printed_uncertainty_band(
+        quantity,
+        uncertainty,
+        Decimal("-241.826"),
+        source_observation=observation,
+    )
+
+    assert printed.refusal is None
+    assert printed.band is not None
+    assert printed.band.unit == QUANTITY_UNITS[quantity]
+    assert printed.band.value == (
+        Decimal("0.25") * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    )
+
+
 @pytest.mark.parametrize(
     ("subtype", "source_unit", "scale_unit", "quantity", "reference", "width"),
     (

@@ -32,11 +32,13 @@ from simulator.battery.enums import (
     EvidenceClass,
     ExecutionState,
     IdentityEqualKind,
+    MetricOperation,
     NoticeKind,
     PerBasis,
     Phase,
     Polymorph,
     Quantity,
+    QUANTITY_UNITS,
     RefusalReason,
     ResidualStatus,
     SourceRelation,
@@ -803,7 +805,11 @@ def test_compilation_routing_reduces_refusals_without_changing_routed_residuals(
 
 
 def test_nasa9_delta_fh_residual_uses_glenn_fit_and_janaf_cell() -> None:
-    from simulator.battery.compilation_tier import _iter_compilation_series_cells
+    from simulator.battery.identity import Reaction, ReactionTerm
+    from simulator.battery.compilation_tier import (
+        _iter_compilation_series_cells,
+        predict_thermo_attempt,
+    )
     from simulator.battery.generators.janaf import generate_table
     from simulator.reference_data.janaf import TABLES_DIR, load_table_document
     from simulator.battery.score import compile_residual
@@ -824,10 +830,26 @@ def test_nasa9_delta_fh_residual_uses_glenn_fit_and_janaf_cell() -> None:
         and point.identity.temperature_K.is_value
         and point.identity.temperature_K.value == Decimal("298.15")
     )
+    water_g = cell.identity.species
+    hydrogen_g = Species("H2", Phase.G)
+    oxygen_g = Species("O2", Phase.G)
+    formation_identity = replace(
+        cell.identity,
+        reaction=State.of(
+            Reaction(
+                (
+                    ReactionTerm(water_g, Fraction(1)),
+                    ReactionTerm(hydrogen_g, Fraction(-1)),
+                    ReactionTerm(oxygen_g, Fraction(-1, 2)),
+                )
+            )
+        ),
+        formation_elements=State.of((('H', hydrogen_g), ('O', oxygen_g))),
+    )
     observation = replace(
         cell.parent,
         observation_id=cell.observation_id,
-        identity=cell.identity,
+        identity=formation_identity,
         value=Value.point_of(cell.value.point),
     )
     experiment = replace(
@@ -837,6 +859,8 @@ def test_nasa9_delta_fh_residual_uses_glenn_fit_and_janaf_cell() -> None:
         observation,
         experiments={experiment.experiment_id: experiment},
     )
+    prediction = predict_thermo_attempt(Engine.NASA_CEA_9, observation)
+    assert prediction.value == Decimal("-241.82462223370027")
     residual, _candidate = compile_residual(
         observation,
         Engine.NASA_CEA_9,
@@ -844,6 +868,12 @@ def test_nasa9_delta_fh_residual_uses_glenn_fit_and_janaf_cell() -> None:
         comparison_ids=set(),
     )
     assert residual.numeric is not None, residual.refusal
+    # NASA-9 evaluates NG-0677 at 298.15 K to -241.82462223370027 kJ/mol;
+    # JANAF H-064 prints -241.826 kJ/mol. Thus the signed energy residual is
+    # -241.82462223370027 - (-241.826) = 0.00137776629973 kJ/mol.
+    assert residual.numeric.operation is MetricOperation.ABSOLUTE
+    assert residual.numeric.value == Decimal("0.00137776629973")
+    assert residual.numeric.unit == QUANTITY_UNITS[Quantity.DELTA_FH]
 
 
 def test_nasa9_fit_writer_serializes_typed_refusal_fields(tmp_path, monkeypatch) -> None:
