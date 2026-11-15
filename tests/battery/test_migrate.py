@@ -16087,6 +16087,21 @@ def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
         ),
         value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
     )
+    not_applicable_identity = replace(
+        known_identity,
+        quantity=State.not_applicable("not a quantity on this row"),
+    )
+    not_applicable_absence = replace(
+        F.observation(
+            "not-applicable-absence",
+            experiment.experiment_id,
+            not_applicable_identity,
+            Decimal("5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
+    )
     sources = {
         "context-row": "data/literature/extracts/fixture-source.yaml",
         "reference-row": (
@@ -16097,6 +16112,7 @@ def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
             "species_rail_differential_ledger.yaml"
         ),
         "known-absence": "data/literature/extracts/fixture-source.yaml",
+        "not-applicable-absence": "data/literature/extracts/fixture-source.yaml",
     }
     reference_manifest = (
         root / "data/literature/compilations/fixture-reference/manifest.yaml"
@@ -16115,7 +16131,13 @@ def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
     migrator = Migrator(root, aliases={}, index={})
     migrator.result.works[work.work_id] = work
     migrator.result.experiments[experiment.experiment_id] = experiment
-    for observation in (context_row, reference_row, ledger_row, known_absence):
+    for observation in (
+        context_row,
+        reference_row,
+        ledger_row,
+        known_absence,
+        not_applicable_absence,
+    ):
         migrator.result.observations[observation.observation_id] = observation
         source = sources[observation.observation_id]
         migrator._obs_source[observation.observation_id] = source
@@ -16131,7 +16153,8 @@ def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
     migrator.finalize()
 
     assert [entry.observation_id for entry in migrator.result.queue] == [
-        "known-absence"
+        "known-absence",
+        "not-applicable-absence",
     ]
     assert migrator.result.queue_work_counts is not None
     assert sum(

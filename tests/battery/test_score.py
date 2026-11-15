@@ -10275,6 +10275,21 @@ def test_comparison_candidates_rehome_context_and_reference_rows() -> None:
         ),
         value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
     )
+    not_applicable_identity = replace(
+        F.psat_identity("Si"),
+        quantity=State.not_applicable("not a quantity on this row"),
+    )
+    not_applicable_absence = replace(
+        F.observation(
+            "not-applicable-quantity-absence",
+            experiment.experiment_id,
+            not_applicable_identity,
+            Decimal("6"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="measured-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
+    )
     unmarked_reference = F.observation(
         "unmarked-reference",
         experiment.experiment_id,
@@ -10297,6 +10312,7 @@ def test_comparison_candidates_rehome_context_and_reference_rows() -> None:
             reference,
             ledger,
             known_absence,
+            not_applicable_absence,
             unmarked_reference,
         ),
         origins={
@@ -10314,6 +10330,7 @@ def test_comparison_candidates_rehome_context_and_reference_rows() -> None:
 
     assert {observation.observation_id for observation in candidates} == {
         "known-quantity-absence",
+        "not-applicable-quantity-absence",
         "unmarked-reference",
     }
 

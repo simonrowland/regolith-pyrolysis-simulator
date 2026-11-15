@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from simulator.battery.enums import ValueKind
-from simulator.battery.identity import Identity, quantity_token
-from simulator.battery.records import Observation
+from simulator.battery.identity import Identity
+from simulator.battery.records import Observation, State
 
 
 INTERNAL_CONSISTENCY_STEMS: frozenset[str] = frozenset(
@@ -54,7 +54,8 @@ def is_non_observation(observation: Observation, origin: str | None = None) -> b
     identity = observation.identity
     if (
         isinstance(identity, Identity)
-        and quantity_token(identity) is None
+        and isinstance(identity.quantity, State)
+        and identity.quantity.is_unknown
         and observation.value.kind is ValueKind.UNAVAILABLE
     ):
         return True
