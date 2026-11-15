@@ -75,6 +75,15 @@ from typing import (
 
 import yaml
 
+from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader import (
+    SOURCE_ID as _B1544_SOURCE_ID,
+)
+from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
+    SOURCE_ID as _B1452_SOURCE_ID,
+)
+from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
+    SOURCE_ID as _B1259_SOURCE_ID,
+)
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.source_declarations import (
@@ -23315,11 +23324,6 @@ def _is_nist_janaf_table(path: Path, doc: Mapping[str, Any]) -> bool:
     return index + 1 < len(parts) and parts[index + 1] == "janaf"
 
 
-_B1544_SOURCE_ID = "hemingway-haas-robinson-1982-usgs-b1544"
-_B1452_SOURCE_ID = "robie-hemingway-fisher-1978-usgs-b1452"
-_B1259_SOURCE_ID = "robie-waldbaum-1968-usgs-b1259"
-
-
 def _is_usgs_b1544_record(path: Path, doc: Mapping[str, Any]) -> bool:
     if not doc.get("record_id"):
         return False
@@ -33903,9 +33907,9 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
                 dest = observations_v2 / "compilations-janaf" / f"janaf-{element}.yaml"
                 key = f"compilation:janaf:{element}"
             elif family in {
-                "hemingway-haas-robinson-1982-usgs-b1544",
-                "robie-hemingway-fisher-1978-usgs-b1452",
-                "robie-waldbaum-1968-usgs-b1259",
+                _B1544_SOURCE_ID,
+                _B1452_SOURCE_ID,
+                _B1259_SOURCE_ID,
             }:
                 dest = (
                     observations_v2

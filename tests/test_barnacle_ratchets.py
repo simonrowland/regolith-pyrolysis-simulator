@@ -35,16 +35,22 @@ def _source_id_expression(node: ast.AST) -> bool:
     )
 
 
+def _source_id_binding_name(name: str) -> bool:
+    return name in {"SOURCE_ID", "SOURCE_IDS"} or name.endswith(
+        ("_SOURCE_ID", "_SOURCE_IDS")
+    )
+
+
 def _declared_source_id_value(
-    node: ast.AST, imported_source_ids: set[str]
+    node: ast.AST, source_id_names: set[str]
 ) -> bool:
     if isinstance(node, ast.Constant):
         return isinstance(node.value, str)
     if isinstance(node, ast.Name):
-        return node.id.endswith("_SOURCE_ID") or node.id in imported_source_ids
+        return node.id in source_id_names
     if isinstance(node, (ast.Set, ast.Tuple, ast.List)):
         return bool(node.elts) and all(
-            _declared_source_id_value(item, imported_source_ids)
+            _declared_source_id_value(item, source_id_names)
             for item in node.elts
         )
     return False
@@ -52,13 +58,37 @@ def _declared_source_id_value(
 
 def _source_id_comparison_sites_in_source(source: str, path: str) -> list[str]:
     tree = ast.parse(source, filename=path)
-    imported_source_ids = {
+    source_id_names = {
         alias.asname or alias.name
         for node in ast.walk(tree)
         if isinstance(node, ast.ImportFrom)
         for alias in node.names
-        if alias.name == "SOURCE_ID"
+        if _source_id_binding_name(alias.name)
     }
+    assignments = [
+        (target, node.value)
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.Assign, ast.AnnAssign))
+        and node.value is not None
+        for target in (
+            node.targets if isinstance(node, ast.Assign) else [node.target]
+        )
+        if isinstance(target, ast.Name)
+        and _source_id_binding_name(target.id)
+    ]
+    # Resolve simple aliases and string/set constants so the guard catches
+    # source-id comparisons even when a local name hides the token.
+    while True:
+        new_names = {
+            target.id
+            for target, value in assignments
+            if target.id not in source_id_names
+            and _declared_source_id_value(value, source_id_names)
+        }
+        if not new_names:
+            break
+        source_id_names.update(new_names)
+
     sites = []
     for node in ast.walk(tree):
         if not isinstance(node, ast.Compare):
@@ -68,9 +98,9 @@ def _source_id_comparison_sites_in_source(source: str, path: str) -> list[str]:
             isinstance(operator, (ast.Eq, ast.NotEq, ast.In, ast.NotIn))
             and (
                 _source_id_expression(left)
-                and _declared_source_id_value(right, imported_source_ids)
+                and _declared_source_id_value(right, source_id_names)
                 or _source_id_expression(right)
-                and _declared_source_id_value(left, imported_source_ids)
+                and _declared_source_id_value(left, source_id_names)
             )
             for left, right, operator in zip(
                 operands, operands[1:], node.ops
@@ -291,19 +321,43 @@ def matches(source_id, observation):
     assert len(sites) == 7, "all source-id comparison forms must enter the ratchet"
 
 
+def _imported_names_by_module(tree: ast.AST) -> dict[tuple[str, str], str | None]:
+    return {
+        (alias.asname or alias.name, alias.name): node.module
+        for node in tree.body
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+
+def _source_id_from_owner(module: str) -> str:
+    owner_path = REPO_ROOT / Path(*module.split("."))
+    tree = ast.parse(owner_path.with_suffix(".py").read_text(encoding="utf-8"))
+    value = next(
+        node.value
+        for node in tree.body
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == "SOURCE_ID"
+            for target in node.targets
+        )
+    )
+    assert isinstance(value, ast.Constant) and isinstance(value.value, str)
+    return value.value
+
+
 def test_compilation_source_ids_reuse_reference_data_owners() -> None:
     declaration_path = REPO_ROOT / "simulator/battery/source_declarations.py"
     declaration_tree = ast.parse(declaration_path.read_text(encoding="utf-8"))
     owners = {
-        "B1259_SOURCE_ID": "simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader",
-        "B1452_SOURCE_ID": "simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader",
+        "B1259_SOURCE_ID": (
+            "simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader"
+        ),
+        "B1452_SOURCE_ID": (
+            "simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader"
+        ),
     }
-    declaration_imports = {
-        (alias.asname or alias.name, alias.name): node.module
-        for node in declaration_tree.body
-        if isinstance(node, ast.ImportFrom)
-        for alias in node.names
-    }
+    declaration_imports = _imported_names_by_module(declaration_tree)
     assert all(
         declaration_imports.get((name, "SOURCE_ID")) == module
         for name, module in owners.items()
@@ -312,11 +366,9 @@ def test_compilation_source_ids_reuse_reference_data_owners() -> None:
     declarations = next(
         node.value
         for node in declaration_tree.body
-        if isinstance(node, ast.Assign)
-        and any(
-            isinstance(target, ast.Name) and target.id == "SOURCE_DECLARATIONS"
-            for target in node.targets
-        )
+        if isinstance(node, ast.AnnAssign)
+        and isinstance(node.target, ast.Name)
+        and node.target.id == "SOURCE_DECLARATIONS"
     )
     assert isinstance(declarations, ast.Dict)
     declaration_keys = {
@@ -326,30 +378,28 @@ def test_compilation_source_ids_reuse_reference_data_owners() -> None:
 
     migration_path = REPO_ROOT / "simulator/battery/migrate.py"
     migration_tree = ast.parse(migration_path.read_text(encoding="utf-8"))
-    migration_imports = {
-        (alias.asname or alias.name, alias.name): node.module
-        for node in migration_tree.body
-        if isinstance(node, ast.ImportFrom)
-        for alias in node.names
-    }
-    migration_names = {
-        "B1259_SOURCE_ID": "_B1259_SOURCE_ID",
-        "B1452_SOURCE_ID": "_B1452_SOURCE_ID",
+    migration_imports = _imported_names_by_module(migration_tree)
+    migration_owners = {
+        "_B1544_SOURCE_ID": (
+            "simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader"
+        ),
+        "_B1259_SOURCE_ID": owners["B1259_SOURCE_ID"],
+        "_B1452_SOURCE_ID": owners["B1452_SOURCE_ID"],
     }
     assert all(
-        migration_imports.get((local_name, "SOURCE_ID")) == owners[owner_name]
-        for owner_name, local_name in migration_names.items()
+        migration_imports.get((local_name, "SOURCE_ID")) == module
+        for local_name, module in migration_owners.items()
     )
-    assert not any(
-        isinstance(node, (ast.Assign, ast.AnnAssign))
-        and any(
-            isinstance(target, ast.Name)
-            and target.id in migration_names.values()
-            for target in (
-                node.targets if isinstance(node, ast.Assign) else [node.target]
-            )
+    owner_values = {
+        _source_id_from_owner(module) for module in migration_owners.values()
+    }
+    assert all(
+        owner_values.isdisjoint(
+            node.value
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Constant) and isinstance(node.value, str)
         )
-        for node in migration_tree.body
+        for tree in (declaration_tree, migration_tree)
     )
 
 

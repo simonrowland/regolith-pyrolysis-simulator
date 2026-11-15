@@ -3,6 +3,12 @@
 from dataclasses import dataclass
 
 from simulator.battery.enums import Phase
+from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
+    SOURCE_ID as B1452_SOURCE_ID,
+)
+from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
+    SOURCE_ID as B1259_SOURCE_ID,
+)
 
 
 @dataclass(frozen=True)
@@ -119,7 +125,7 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
     "janaf-4th": {
         "compilation_family": SourceRule("janaf", "JANAF compilation"),
     },
-    "robie-waldbaum-1968-usgs-b1259": {
+    B1259_SOURCE_ID: {
         "element_reference_phase_protocol": SourceRule(
             "b1259", "USGS Bulletin 1259 element-reference phase records"
         ),
@@ -127,7 +133,7 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
             "b1259", "USGS Bulletin 1259 reference enthalpy zero records"
         ),
     },
-    "robie-hemingway-fisher-1978-usgs-b1452": {
+    B1452_SOURCE_ID: {
         "reference_enthalpy_zero_protocol": SourceRule(
             "b1452", "USGS Bulletin 1452 reference enthalpy zero records"
         ),
