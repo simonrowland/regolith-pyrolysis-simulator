@@ -668,8 +668,16 @@ def test_inventory_cap_reserves_finite_shared_parent_channel(
     assert cap["applied_bound_kg"] == pytest.approx(ceiling, rel=1e-14, abs=0.0)
 
 
+@pytest.mark.parametrize(
+    ("al_sio_bound_kg", "sio2_bound_kg", "other_parent_zeroes_mixed_gas"),
+    [
+        pytest.param(0.02, 0.0005, False, id="other-parent-tighter"),
+        pytest.param(0.2, 0.01, True, id="other-parent-zeroes-mixed-gas"),
+    ],
+)
 def test_inventory_cap_records_actual_mixed_parent_debit_when_other_parent_is_tighter(
     prescribed_pressure_engine, fig3_source, r11_inputs, monkeypatch,
+    al_sio_bound_kg, sio2_bound_kg, other_parent_zeroes_mixed_gas,
 ):
     import simulator.battery.residue as residue
     from simulator.accounting.formulas import parse_formula
@@ -728,18 +736,11 @@ def test_inventory_cap_records_actual_mixed_parent_debit_when_other_parent_is_ti
         bounds, corners = original_bounds(*args, **kwargs)
         # The same controlled mass envelope is supplied for each geometry
         # callback; the production cap then allocates it against each parent.
-        # There are four point callbacks and two preheat callbacks, giving
-        # 0.12 kg AlSiO and 0.003 kg finite SiO2 overall. The inventory is
-        # 1 mol Al2O3 (~0.102 kg) and 0.1 mol SiO2 (~0.006 kg). AlSiO consumes
-        # 0.5 mol Al2O3 + 1 mol SiO2 per product mole; its normalized parent
-        # mass shares are about 0.459 and 0.541. Thus alumina demand is
-        # 0.12*0.459 ~= 0.055 kg < 0.102 kg (scale 1), while silica demand is
-        # 0.12*0.541 + 0.003 ~= 0.068 kg > 0.006 kg. Finite silica alone is
-        # below its ceiling, so the divergent scale is
-        # (0.006 - 0.003)/(0.12*0.541) ~= 0.046; AlSiO uses the tighter
-        # min(1, 0.046), keeping both parent scales positive and unequal.
-        bounds["AlSiO"] = 0.02
-        bounds["SiO2"] = 0.0005
+        # The second case makes finite silica demand exceed its ceiling, so
+        # silica assigns the mixed gas a zero scale despite positive alumina
+        # demand. The alumina record must then report the actual zero debit.
+        bounds["AlSiO"] = al_sio_bound_kg
+        bounds["SiO2"] = sio2_bound_kg
         return bounds, corners
 
     monkeypatch.setattr(residue, "_mass_loss_corner_bounds", supply_controlled_bounds)
@@ -756,11 +757,18 @@ def test_inventory_cap_records_actual_mixed_parent_debit_when_other_parent_is_ti
     alumina = caps["Al2O3"]
     silica = caps["SiO2"]
     assert bound["inventory_capped_channels"] == ["AlSiO"]
-    assert alumina["uncapped_bound_kg"] < alumina["ceiling_kg"]
+    if other_parent_zeroes_mixed_gas:
+        assert alumina["uncapped_bound_kg"] > alumina["ceiling_kg"]
+    else:
+        assert alumina["uncapped_bound_kg"] < alumina["ceiling_kg"]
     assert silica["uncapped_bound_kg"] > silica["ceiling_kg"]
-    assert 0.0 < by_channel["AlSiO"]
+    if other_parent_zeroes_mixed_gas:
+        assert by_channel.get("AlSiO", 0.0) == 0.0
+        assert alumina["applied_bound_kg"] == 0.0
+    else:
+        assert 0.0 < by_channel["AlSiO"]
+        assert alumina["applied_bound_kg"] < alumina["uncapped_bound_kg"]
     assert 0.0 < by_channel["SiO2"]
-    assert alumina["applied_bound_kg"] < alumina["uncapped_bound_kg"]
     assert silica["applied_bound_kg"] == pytest.approx(
         silica["ceiling_kg"], rel=1e-14, abs=0.0,
     )
