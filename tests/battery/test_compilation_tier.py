@@ -6760,7 +6760,7 @@ def test_score_store_pairs_tables_from_one_index(monkeypatch) -> None:
 
 
 def test_score_progress_total_is_series_cells(monkeypatch, capsys) -> None:
-    import simulator.battery.score as score_module
+    import simulator.battery.score_run as score_run_module
 
     from simulator.battery.records import Execution
     from simulator.battery.score import score_store
@@ -6776,7 +6776,7 @@ def test_score_progress_total_is_series_cells(monkeypatch, capsys) -> None:
         return current_time
 
     patch_module_time(
-        monkeypatch, score_module, monotonic=advance_monotonic
+        monkeypatch, score_run_module, monotonic=advance_monotonic
     )
     identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
     series = F.observation(
