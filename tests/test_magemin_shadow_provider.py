@@ -444,9 +444,12 @@ def test_provider_dispatch_preserves_domain_refusal_when_engine_unavailable(
 
     assert result.status == 'out_of_domain'
     assert result.diagnostic['backend_status_reason'] == (
-        'magemin_domain_sio2_below_min'
+        'silicate_window'
     )
-    assert any('SiO2 = 0.00 wt%' in warning for warning in result.warnings)
+    assert any(
+        'SiO2 = 0.00 wt% below MELTS calibration range' in warning
+        for warning in result.warnings
+    )
     assert engine_calls == []
 
 

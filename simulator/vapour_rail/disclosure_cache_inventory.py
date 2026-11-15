@@ -137,6 +137,33 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
                 add(f"class:{rel}:{node.name}", rel, node.lineno, "class", node.name)
             elif isinstance(node, (ast.Assign, ast.AnnAssign)):
                 targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                if rel == "simulator/engine_cache.py":
+                    for target in targets:
+                        if not isinstance(target, ast.Name):
+                            continue
+                        if (
+                            target.id == "_MEMORY_CACHE"
+                            and _decorator_name(node.value) == "OrderedDict"
+                        ):
+                            add(
+                                f"store:{rel}:_MEMORY_CACHE",
+                                rel,
+                                node.lineno,
+                                "store",
+                                "_MEMORY_CACHE",
+                            )
+                        elif (
+                            target.id == "_TABLE"
+                            and isinstance(node.value, ast.Constant)
+                            and node.value.value == "engine_outputs"
+                        ):
+                            add(
+                                f"store:{rel}:_TABLE",
+                                rel,
+                                node.lineno,
+                                "store",
+                                "_TABLE",
+                            )
                 if not _is_store_value(node.value):
                     continue
                 for target in targets:
@@ -1142,6 +1169,22 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Caches backend binary, source, or distribution identity by engine_id. It reads runtime metadata and never evaluates a vapour law or stores a thermodynamic value.',
     },
+    'store:simulator/engine_cache.py:_MEMORY_CACHE': {
+        "path": 'simulator/engine_cache.py',
+        "line": 98,
+        "kind": 'store',
+        "name": '_MEMORY_CACHE',
+        "carries_disclosure": False,
+        "how": 'Bounded OrderedDict front cache for engine_outputs responses keyed by engine request. It stores intermediate backend responses; internal-analytical residue pressure uses the wrapper that bypasses this cache, and this store does not evaluate vapour laws or hold disclosure rows.',
+    },
+    'store:simulator/engine_cache.py:_TABLE': {
+        "path": 'simulator/engine_cache.py',
+        "line": 81,
+        "kind": 'store',
+        "name": '_TABLE',
+        "carries_disclosure": False,
+        "how": 'SQLite engine_outputs backing table for cached engine responses keyed by engine request. It stores intermediate backend responses; internal-analytical residue pressure bypasses this cache, and rows contain no vapour-law disclosures.',
+    },
     'lru:simulator/reference_data/janaf.py:_compiled_table_by_id': {
         "path": 'simulator/reference_data/janaf.py',
         "line": 1238,
@@ -1219,6 +1262,33 @@ def _extra_cache_line(
     A line that matches none of these stays unclassified.
     """
 
+    if path == "simulator/engine_cache.py" and any(
+        token in stripped
+        for token in (
+            "_CACHE_BYPASSED",
+            "_ENGINE_CACHE_SETTINGS_PROJECTIONS",
+            "_cache_environment_setting",
+        )
+    ):
+        return (
+            "inert",
+            "Cache bypass context, settings projections, and environment readers configure cache behavior but do not store results. The OrderedDict and SQLite engine-response stores are inventoried separately.",
+            None,
+        )
+    if path == "simulator/melt_backend/base.py" and any(
+        token in stripped
+        for token in (
+            "_EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS",
+            "ENGINE_CACHE_NOTICE_CODE_TABLE",
+            "_ENGINE_NOTICE_BY_CODE",
+            "_ENGINE_NOTICE_BY_NUMBER",
+        )
+    ):
+        return (
+            "inert",
+            "Engine-cache diagnostic field and notice-code metadata; it describes serialized diagnostics but stores no cache value.",
+            None,
+        )
     if path == "simulator/evaporation.py" and stripped.startswith(
         "shared_curve_cache = getattr("
     ):

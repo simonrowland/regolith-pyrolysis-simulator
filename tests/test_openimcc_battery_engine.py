@@ -1464,11 +1464,19 @@ def test_vapor_engine_keeps_mixed_noncrash_start_refusals_in_family() -> None:
     )
 
 
-def test_vapor_engine_labels_all_silicate_window_start_refusals() -> None:
+def test_vapor_engine_labels_magemin_silicate_window_start_refusals() -> None:
+    from engines.magemin.domain import MAGEMinDomainGate
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _OxygenBalanceRefusal,
         _solve_vapor_engine_cell_oxygen_balance,
     )
+
+    valid, warnings, engine_reason = MAGEMinDomainGate.validate_with_reason(
+        {"SiO2": 20.0, "MgO": 80.0}
+    )
+    assert not valid
+    assert engine_reason == "silicate_window"
+    assert any("SiO2 = 20.00 wt% below" in warning for warning in warnings)
 
     trials: list[float] = []
 
@@ -1477,7 +1485,7 @@ def test_vapor_engine_labels_all_silicate_window_start_refusals() -> None:
         return SimpleNamespace(
             status="refusal",
             refusal_reason="gate_refused_in_adapter",
-            engine_reason="silicate_window",
+            engine_reason=engine_reason,
             gas_partial_pressures_Pa={},
             invalid_gas_partial_pressure_components=(),
         )

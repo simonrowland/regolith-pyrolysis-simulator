@@ -3037,6 +3037,9 @@ def _memo_host(calls: list[str]):
     from simulator.evaporation import EvaporationMixin
 
     host = object.__new__(EvaporationMixin)
+    host.atom_ledger = _in_domain_freeze_gate_ledger()
+    host.inventory = SimpleNamespace(inert_melt_components_kg={})
+    host.species_formula_registry = {}
     host._liquid_fraction_provider = "declared"
     host._freeze_gate_held_curve_record = None
     host._pt0_store = None
@@ -3060,6 +3063,25 @@ def _memo_host(calls: list[str]):
 
     host._freeze_gate_curve_from_gate_dispatch = dispatch
     return host
+
+
+def _in_domain_freeze_gate_ledger():
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.evaporation import _FREEZE_GATE_ACCOUNT
+
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        _FREEZE_GATE_ACCOUNT,
+        {
+            "SiO2": 0.5,
+            "MgO": 0.1,
+            "FeO": 0.2,
+            "CaO": 0.15,
+            "Al2O3": 0.05,
+        },
+        material_origin="feedstock",
+    )
+    return ledger
 
 
 def _memo_record(*, disclosures):
@@ -3240,6 +3262,9 @@ def _core_gate_host(calls: list[str], recomputed_disclosures):
     from simulator.core import PyrolysisSimulator
 
     host = object.__new__(PyrolysisSimulator)
+    host.atom_ledger = _in_domain_freeze_gate_ledger()
+    host.inventory = SimpleNamespace(inert_melt_components_kg={})
+    host.species_formula_registry = {}
     host._liquid_fraction_provider = "declared"
     host.melt = SimpleNamespace(
         hour=1,

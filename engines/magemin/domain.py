@@ -188,16 +188,16 @@ class MAGEMinDomainGate:
         # Check 3: SiO2 in [30, 80] wt%.
         sio2 = normalized.get('SiO2', 0.0)
         if sio2 < _SIO2_MIN_WT_PCT:
-            reason = reason or OutOfDomainReason.MAGEMIN_DOMAIN_SIO2_BELOW_MIN
+            reason = reason or OutOfDomainReason.SILICATE_WINDOW
             warnings.append(
-                f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% outside MELTS '
+                f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% below MELTS '
                 f'calibration range [{_SIO2_MIN_WT_PCT}, '
                 f'{_SIO2_MAX_WT_PCT}] wt%.'
             )
         elif sio2 > _SIO2_MAX_WT_PCT:
-            reason = reason or OutOfDomainReason.MAGEMIN_DOMAIN_SIO2_ABOVE_MAX
+            reason = reason or OutOfDomainReason.SILICATE_WINDOW
             warnings.append(
-                f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% outside MELTS '
+                f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% above MELTS '
                 f'calibration range [{_SIO2_MIN_WT_PCT}, '
                 f'{_SIO2_MAX_WT_PCT}] wt%.'
             )

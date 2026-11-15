@@ -3524,7 +3524,7 @@ def test_keyed_freeze_gate_memo_hits_without_local_slot_and_keeps_redox_key(
 
 
 @pytest.mark.parametrize(("composition_wt_pct", "expected_reason"), [
-    ({"Al2O3": 100.0}, "magemin_domain_sio2_below_min"),
+    ({"Al2O3": 100.0}, "silicate_window"),
     (
         {"SiO2": 20.0, "MgO": 20.0, "NaCl": 60.0},
         "forbidden_species",
