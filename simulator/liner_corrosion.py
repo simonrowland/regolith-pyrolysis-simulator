@@ -655,6 +655,7 @@ def _tier_b_reference_profile_single(
     *,
     pressure_bar: float,
     literature_melting_temperature_C: float | None = None,
+    allow_flat_endmember_profile: bool = False,
 ) -> dict[str, Any]:
     """Sample the d-419 grid and identify pure bulk and minor melting.
 
@@ -700,55 +701,73 @@ def _tier_b_reference_profile_single(
         sample_temperature(temperature)
 
     fully_liquid_threshold = 1.0 - LIQUIDUS_LIQUID_EPSILON
-    while (
-        liquid_by_temperature[temperatures[-1]] < fully_liquid_threshold
-        and temperatures[-1] < DEFAULT_LIQUIDUS_FINDER_MAX_T_C
-    ):
-        next_temperature = min(
-            temperatures[-1] + TIER_B_MELT_SCAN_STEP_C,
-            DEFAULT_LIQUIDUS_FINDER_MAX_T_C,
+    scanned_liquid = tuple(liquid_by_temperature.values())
+    constant_endmember_profile = (
+        allow_flat_endmember_profile
+        and bool(scanned_liquid)
+        and all(value == scanned_liquid[0] for value in scanned_liquid)
+        and (
+            all(value <= LIQUIDUS_SOLID_EPSILON for value in scanned_liquid)
+            or all(value >= fully_liquid_threshold for value in scanned_liquid)
         )
-        temperatures.append(next_temperature)
-        sample_temperature(next_temperature)
-    if liquid_by_temperature[temperatures[-1]] < fully_liquid_threshold:
-        raise LinerCorrosionRefusal(
-            "liner_reference_unresolved",
-            (
-                f"pure-liner scan {temperatures[0]:g}-{temperatures[-1]:g} C "
-                f"reached f_liq={liquid_by_temperature[temperatures[-1]]:g}; "
-                f"fully-liquid threshold={fully_liquid_threshold:g}"
-            ),
-        )
+    )
+    if not constant_endmember_profile:
+        while (
+            liquid_by_temperature[temperatures[-1]] < fully_liquid_threshold
+            and temperatures[-1] < DEFAULT_LIQUIDUS_FINDER_MAX_T_C
+        ):
+            next_temperature = min(
+                temperatures[-1] + TIER_B_MELT_SCAN_STEP_C,
+                DEFAULT_LIQUIDUS_FINDER_MAX_T_C,
+            )
+            temperatures.append(next_temperature)
+            sample_temperature(next_temperature)
+        if liquid_by_temperature[temperatures[-1]] < fully_liquid_threshold:
+            raise LinerCorrosionRefusal(
+                "liner_reference_unresolved",
+                (
+                    f"pure-liner scan {temperatures[0]:g}-{temperatures[-1]:g} C "
+                    f"reached f_liq={liquid_by_temperature[temperatures[-1]]:g}; "
+                    f"fully-liquid threshold={fully_liquid_threshold:g}"
+                ),
+            )
     temperatures = tuple(temperatures)
 
     jumps = tuple(
         liquid_by_temperature[high] - liquid_by_temperature[low]
         for low, high in zip(temperatures, temperatures[1:])
     )
-    if not jumps or max(jumps) <= 0.0:
-        raise LinerCorrosionRefusal("liner_bulk_melt_transition_missing")
-    bulk_index = max(range(len(jumps)), key=jumps.__getitem__)
-    bulk_bracket = [temperatures[bulk_index], temperatures[bulk_index + 1]]
+    if constant_endmember_profile:
+        bulk_index = None
+        bulk_bracket = None
+        bulk_jump = None
+    else:
+        if not jumps or max(jumps) <= 0.0:
+            raise LinerCorrosionRefusal("liner_bulk_melt_transition_missing")
+        bulk_index = max(range(len(jumps)), key=jumps.__getitem__)
+        bulk_bracket = [temperatures[bulk_index], temperatures[bulk_index + 1]]
+        bulk_jump = jumps[bulk_index]
     # d-419 describes a minor-phase plateau. MAGEMin has shorter positive
     # steps below that plateau, so rank sub-bulk steps by the number of
     # consecutive samples staying within the same liquid-fraction epsilon.
     # The longest sustained step is the eutectic plateau; shorter events stay
     # visible in the full profile rather than defining the corrosion baseline.
     minor_candidates: list[tuple[int, int]] = []
-    for index, jump in enumerate(jumps[:bulk_index]):
-        if jump <= LIQUIDUS_SOLID_EPSILON:
-            continue
-        upper_index = index + 1
-        plateau_fraction = liquid_by_temperature[temperatures[upper_index]]
-        plateau_end_index = upper_index
-        for next_index in range(upper_index + 1, bulk_index + 1):
-            next_fraction = liquid_by_temperature[temperatures[next_index]]
-            if abs(next_fraction - plateau_fraction) > LIQUIDUS_SOLID_EPSILON:
-                break
-            plateau_end_index = next_index
-        span = plateau_end_index - upper_index
-        if span > 0:
-            minor_candidates.append((index, span))
+    if bulk_index is not None:
+        for index, jump in enumerate(jumps[:bulk_index]):
+            if jump <= LIQUIDUS_SOLID_EPSILON:
+                continue
+            upper_index = index + 1
+            plateau_fraction = liquid_by_temperature[temperatures[upper_index]]
+            plateau_end_index = upper_index
+            for next_index in range(upper_index + 1, bulk_index + 1):
+                next_fraction = liquid_by_temperature[temperatures[next_index]]
+                if abs(next_fraction - plateau_fraction) > LIQUIDUS_SOLID_EPSILON:
+                    break
+                plateau_end_index = next_index
+            span = plateau_end_index - upper_index
+            if span > 0:
+                minor_candidates.append((index, span))
     minor_index = (
         max(minor_candidates, key=lambda candidate: candidate[1])[0]
         if minor_candidates
@@ -791,7 +810,7 @@ def _tier_b_reference_profile_single(
         "liquid_fraction_by_temperature_C": liquid_by_temperature,
         "first_liquid_bracket_C": first_liquid_bracket,
         "bulk_melt_bracket_C": bulk_bracket,
-        "bulk_melt_liquid_fraction_jump": jumps[bulk_index],
+        "bulk_melt_liquid_fraction_jump": bulk_jump,
         "engine_minor_phase_eutectic": minor_phase,
         "flags": flags,
     }
@@ -991,7 +1010,8 @@ def _average_neighbour_profiles(
         if temperature in right_temperatures
         and temperature <= min(left_temperatures[-1], right_temperatures[-1])
     )
-    if not set(left["bulk_melt_bracket_C"]).issubset(common_temperatures):
+    bulk_bracket = left.get("bulk_melt_bracket_C")
+    if bulk_bracket is not None and not set(bulk_bracket).issubset(common_temperatures):
         return None
     result = dict(left)
     averaged = {
@@ -1003,8 +1023,11 @@ def _average_neighbour_profiles(
     }
     result["scan_temperature_C"] = list(common_temperatures)
     result["liquid_fraction_by_temperature_C"] = averaged
-    low, high = result["bulk_melt_bracket_C"]
-    result["bulk_melt_liquid_fraction_jump"] = averaged[high] - averaged[low]
+    if bulk_bracket is None:
+        result["bulk_melt_liquid_fraction_jump"] = None
+    else:
+        low, high = bulk_bracket
+        result["bulk_melt_liquid_fraction_jump"] = averaged[high] - averaged[low]
     result["flags"] = list(
         dict.fromkeys([*left.get("flags", ()), *right.get("flags", ())])
     )
@@ -1018,6 +1041,7 @@ def _tier_b_reference_profile(
     pressure_bar: float,
     literature_melting_temperature_C: float | None = None,
     invariant_table: Mapping[str, Any] | None = None,
+    allow_flat_endmember_profile: bool = False,
 ) -> dict[str, Any]:
     """Apply d-419's composition-continuity decision table to a pure profile.
 
@@ -1046,6 +1070,7 @@ def _tier_b_reference_profile(
                     composition,
                     pressure_bar=pressure_bar,
                     literature_melting_temperature_C=literature_melting_temperature_C,
+                    allow_flat_endmember_profile=allow_flat_endmember_profile,
                 )
             )
             refusals.append(None)
@@ -1062,6 +1087,36 @@ def _tier_b_reference_profile(
     if all(profile is None for profile in profiles):
         first_refusal = next(refusal for refusal in refusals if refusal is not None)
         raise first_refusal
+    if all(
+        profile is not None and profile.get("bulk_melt_bracket_C") is None
+        for profile in profiles
+    ):
+        flat_profiles = [profile for profile in profiles if profile is not None]
+        assert nominal_profile is not None
+        nominal_liquid = nominal_profile["liquid_fraction_by_temperature_C"]
+        if any(
+            not math.isclose(
+                float(nominal_liquid[temperature]),
+                float(profile["liquid_fraction_by_temperature_C"][temperature]),
+                rel_tol=0.0,
+                abs_tol=LIQUIDUS_SOLID_EPSILON,
+            )
+            for profile in flat_profiles[1:]
+            for temperature in nominal_profile["scan_temperature_C"]
+        ):
+            raise LinerCorrosionRefusal(
+                "tier_b_composition_continuity_unresolved",
+                "constant fully-solid/fully-liquid saturation profiles disagree",
+            )
+        selected = dict(nominal_profile)
+        selected["composition_continuity"] = {
+            "status": "passed",
+            "flat_profile_liquid_fraction": next(iter(nominal_liquid.values())),
+        }
+        engine_version = getattr(sampler, "engine_version", None)
+        if engine_version is not None:
+            selected["engine_version"] = str(engine_version)
+        return selected
     selected, continuity, sensitivity = _composition_continuity_selection(
         nominal_profile,
         first_profile,
@@ -2522,7 +2577,7 @@ def _tier_b_saturated_deposit_fraction(
     pressure_bar: float | None,
     pure_reference_profile: Mapping[str, Any],
     invariant_table: Mapping[str, Any] | None,
-) -> float:
+) -> tuple[float, list[dict[str, Any]]]:
     if not isinstance(sampler, CurveLiquidFractionSampler):
         raise LinerCorrosionRefusal("tier_b_phi_curve_sampler_missing")
     if pressure_bar is None:
@@ -2538,7 +2593,8 @@ def _tier_b_saturated_deposit_fraction(
     if len(points) < 2:
         raise LinerCorrosionRefusal("tier_b_saturated_liquid_fraction_not_reached")
     corrected_points: list[tuple[float, float]] = []
-    for raw_fraction, _raw_liquid_fraction in points:
+    continuity_evidence: list[dict[str, Any]] = []
+    for raw_fraction, raw_liquid_fraction in points:
         fraction = _finite_real(raw_fraction, "deposit_fraction")
         if (
             fraction < 0.0
@@ -2558,15 +2614,41 @@ def _tier_b_saturated_deposit_fraction(
                     composition,
                     pressure_bar=pressure_bar,
                     invariant_table=invariant_table,
+                    allow_flat_endmember_profile=True,
                 )
-            corrected_fraction = _tier_b_sample_at_temperature_with_reference(
-                sampler,
-                composition,
-                temperature_C,
-                pressure_bar,
-                reference_profile,
-                context=f"saturation curve at deposit fraction {fraction:g}",
-            )
+            continuity = reference_profile.get("composition_continuity")
+            status = continuity.get("status") if isinstance(continuity, Mapping) else None
+            if status == "passed":
+                # The cached curve is the nominal sampler's phi(f) table. Use
+                # it after the profile confirms no composition discontinuity.
+                corrected_fraction = _checked_liquid_fraction(raw_liquid_fraction)
+            elif status == "sensitive":
+                corrected_fraction = _tier_b_sample_at_temperature_with_reference(
+                    sampler,
+                    composition,
+                    temperature_C,
+                    pressure_bar,
+                    reference_profile,
+                    context=f"saturation curve at deposit fraction {fraction:g}",
+                )
+                sensitivity = reference_profile.get("engine_composition_sensitive")
+                if not isinstance(sensitivity, Mapping):
+                    raise LinerCorrosionRefusal(
+                        "tier_b_saturation_continuity_unresolved",
+                        f"deposit fraction {fraction:g}: sensitivity evidence missing",
+                    )
+                continuity_evidence.append(
+                    {
+                        "deposit_fraction": fraction,
+                        "engine_composition_sensitive": dict(sensitivity),
+                        "flags": [ENGINE_COMPOSITION_SENSITIVE_FLAG],
+                    }
+                )
+            else:
+                raise LinerCorrosionRefusal(
+                    "tier_b_saturation_continuity_unresolved",
+                    f"deposit fraction {fraction:g}: unresolved continuity status {status!r}",
+                )
         except LinerCorrosionRefusal as exc:
             raise LinerCorrosionRefusal(
                 "tier_b_saturation_continuity_unresolved",
@@ -2579,10 +2661,10 @@ def _tier_b_saturated_deposit_fraction(
                     "tier_b_saturated_liquid_deposit_fraction_invalid"
                 )
             if len(corrected_points) == 1:
-                return fraction
+                return fraction, continuity_evidence
             low_fraction, low_signal = corrected_points[-2]
             if low_signal >= target:
-                return low_fraction
+                return low_fraction, continuity_evidence
             low = low_fraction
             high = fraction
             for _ in range(52):
@@ -2594,7 +2676,7 @@ def _tier_b_saturated_deposit_fraction(
                     high = midpoint
                 else:
                     low = midpoint
-            return high
+            return high, continuity_evidence
     raise LinerCorrosionRefusal("tier_b_saturated_liquid_fraction_not_reached")
 
 
@@ -2756,6 +2838,7 @@ def build_liner_state_segment(
         flags.append(ENGINE_COMPOSITION_SENSITIVE_FLAG)
 
     dissolution_ratio: float | None = None
+    dissolution_curve_continuity: list[dict[str, Any]] = []
     if x_star is None and deposits:
         try:
             # The margin gates current onset only. Saturation x* is a service-
@@ -2773,7 +2856,7 @@ def build_liner_state_segment(
                     service_C,
                 )
             elif tier == "B":
-                x_star = _tier_b_saturated_deposit_fraction(
+                x_star, dissolution_curve_continuity = _tier_b_saturated_deposit_fraction(
                     sampler,
                     liner,
                     deposits,
@@ -2805,6 +2888,8 @@ def build_liner_state_segment(
             refusals.append(exc.as_dict())
         if dissolution_ratio is not None:
             flags.append(DISSOLUTION_KINETICS_FLAG)
+        if dissolution_curve_continuity:
+            flags.append(ENGINE_COMPOSITION_SENSITIVE_FLAG)
     if onset:
         flags.append(CORROSION_NO_RATE_FLAG)
 
@@ -2943,6 +3028,7 @@ def build_liner_state_segment(
         "onset": onset,
         "species_aggressiveness": species_aggressiveness,
         "liner_consumed_kg_per_kg_deposit": dissolution_ratio,
+        "dissolution_curve_continuity": dissolution_curve_continuity or None,
         "cumulative_deposit_oxide_equivalent_kg_by_oxide": (
             deposit_oxide_equivalent_mass_by_oxide(deposits)
         ),

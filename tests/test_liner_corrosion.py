@@ -415,12 +415,15 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                 0.0, abs=1e-12
             )
 
-            # The sampler routes the request through projected oxide wt% and
-            # measured 0.0018900189 at exact anorthite / 1000 C on studio-3;
-            # keep that pin on the adapter call rather than equating its value
-            # with the direct composition_kg result above (0.00217).
-            assert sampler(formula_derived_anorthite, 1000.0, 1.0) == pytest.approx(
-                0.0018900189, abs=2e-5
+            # The sampler submits this formula-owner oxide wt% at 1 bar with
+            # MAGEMIN_FO2_LOG. Comparing c13a9b011 with its parent shows no
+            # change to the adapter call, request arguments, or test input.
+            # The current Studio gate measured 0.0021999780 on this route;
+            # earlier gates measured 0.0018900189. Keep the latest route pin
+            # separate from the composition_kg result above.
+            adapter_fraction = sampler(formula_derived_anorthite, 1000.0, 1.0)
+            assert adapter_fraction == pytest.approx(0.0021999780, abs=2e-5), (
+                f"adapter route {sampler.engine_version}: {adapter_fraction:g}"
             )
 
             # In the adapter profile, the exact nominal first crosses at 1000
@@ -683,7 +686,7 @@ def test_tier_b_saturation_uses_continuity_corrected_curve_for_x_star():
     assert middle_reference["engine_composition_sensitive"][
         "neighbour_brackets_C"
     ] == [[1400.0, 1425.0], [1400.0, 1425.0]]
-    x_star = liner_corrosion._tier_b_saturated_deposit_fraction(
+    x_star, continuity_evidence = liner_corrosion._tier_b_saturated_deposit_fraction(
         sampler,
         liner,
         {"Na": 1.0},
@@ -696,6 +699,39 @@ def test_tier_b_saturation_uses_continuity_corrected_curve_for_x_star():
     # x*=0.5+(0.999-0.0)*(0.9995-0.5)/(0.9995-0.0)~=0.9992501.
     # Using the unchecked raw point (0.5, 1.0) would put x* near 0.4995.
     assert x_star == pytest.approx(0.99925)
+    assert len(continuity_evidence) == 1
+    assert continuity_evidence[0]["deposit_fraction"] == 0.5
+    assert continuity_evidence[0]["flags"] == [
+        liner_corrosion.ENGINE_COMPOSITION_SENSITIVE_FLAG
+    ]
+    assert continuity_evidence[0]["engine_composition_sensitive"][
+        "neighbour_brackets_C"
+    ] == [[1400.0, 1425.0], [1400.0, 1425.0]]
+
+    segment = liner_corrosion.build_liner_state_segment(
+        {
+            "composition": liner,
+            "criterion_tier": "B",
+            "density_kg_m3": 1000.0,
+            "reacted_layer_depth_m": 0.001,
+            "margin_C": 0.0,
+            "horizon_campaigns": 0,
+            "porosity_fraction": 0.0,
+        },
+        {"Na": 1.0},
+        area_m2=1.0,
+        service_temperature_C=1400.0,
+        pressure_bar=1.0,
+        sampler=sampler,
+        deposit_inert_kg_by_species={"Na": 0.0},
+        deposit_reactive_kg_by_species={"Na": 0.0},
+    )
+    segment_continuity = segment["dissolution_curve_continuity"]
+    assert segment_continuity[0]["deposit_fraction"] == 0.5
+    assert segment_continuity[0]["engine_composition_sensitive"][
+        "nominal_bracket_C"
+    ] == [1375.0, 1400.0]
+    assert liner_corrosion.ENGINE_COMPOSITION_SENSITIVE_FLAG in segment["flags"]
 
     first_neighbour, second_neighbour, _ = (
         liner_corrosion._tier_b_composition_neighbours(unstable_nominal)
@@ -742,6 +778,55 @@ def test_tier_b_saturation_uses_continuity_corrected_curve_for_x_star():
             invariant_table=None,
         )
     assert refused.value.reason == "tier_b_saturation_continuity_unresolved"
+
+
+def test_tier_b_saturation_accepts_agreeing_all_liquid_profile():
+    liner = {"CaO": 20.0, "Al2O3": 30.0, "SiO2": 50.0}
+    deposit = {"Na2O": 100.0}
+
+    class AllLiquidSaturationSampler(liner_corrosion.CurveLiquidFractionSampler):
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            if composition.get("Na2O", 0.0) >= 0.1:
+                return 1.0
+            if temperature_C < 1550.0:
+                return 0.0
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+        def curve(
+            self,
+            liner_composition_wt_pct,
+            deposit_kg_by_species,
+            *,
+            temperature_C,
+            pressure_bar,
+        ):
+            return TabulatedLiquidFractionCurve(
+                liner_composition_wt_pct=liner_composition_wt_pct,
+                deposit_composition_wt_pct=deposit,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                points=((0.0, 0.0), (0.001, 0.0), (0.01, 1.0), (1.0, 1.0)),
+            )
+
+    sampler = AllLiquidSaturationSampler()
+    pure_reference = liner_corrosion._tier_b_reference_profile(
+        sampler, liner, pressure_bar=1.0
+    )
+    x_star, evidence = liner_corrosion._tier_b_saturated_deposit_fraction(
+        sampler,
+        liner,
+        {"Na": 1.0},
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        pure_reference_profile=pure_reference,
+        invariant_table=None,
+    )
+    # The matching all-liquid nominal and neighbour profiles need no bulk
+    # jump to establish continuity; the original phi(f) table remains usable.
+    assert x_star == pytest.approx(0.009991)
+    assert evidence == []
 
 
 def test_tier_b_contaminated_profile_checks_composition_continuity():
