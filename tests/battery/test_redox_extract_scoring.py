@@ -169,9 +169,9 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert len(residuals) == 1
     assert residuals[0].numeric is not None
     assert residuals[0].numeric.operation is MetricOperation.DEX
-    assert residuals[0].status is ResidualStatus.NO_BAND
-    assert residuals[0].refusal is not None
-    assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residuals[0].status is ResidualStatus.MISMATCH
+    assert residuals[0].numeric.decision_band is not None
+    assert residuals[0].refusal is None
 
 
 def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
@@ -491,7 +491,7 @@ def test_sossi_internal_analytical_numeric_count_matches_green():
     )
 
 
-def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical():
+def test_internal_analytical_sossi_aithala_redox_outputs_match_current_pin():
     context, _observations = _sossi_aithala_redox_context()
     residuals, _ = score_store(
         context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
@@ -505,19 +505,19 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
 
     # Combined-base pin. The payload still includes t-1279's six joined-Aithala
     # FeOT notices. Quench4 adds quench_state not_stated and the glass-to-melt
-    # identity compare, so the identity_equal conjunct passes. Printed
-    # uncertainty with an unmapped unit is printed_uncertainty_unit_unmapped
-    # and carries the source unit text.
+    # identity compare, so the identity_equal conjunct passes. Sossi's SD per
+    # Fig. 2 widths use one sigma; Aithala's unstated confidence stays
+    # printed_unstated.
     # b-979 / d-053: source_relation on all 18 residuals moves from
     # independent to unknown. Kress attribution stays UNKNOWN unless both
     # walks are complete.
     # d-342 retarget. At b1cb2dec4 the payload hashed to
     # 1ab48f4d30da838c5ae5a6445b3a773bee1c04738637e2693f7b2e17263d46b2
     # and the twelve Sossi rows were refused input_phase_assemblage_unstated.
-    # Those twelve now score. The six Aithala rows are byte-identical.
-    # The previous pin was already stale at that base.
+    # The newly resolved Sossi one-sigma and Aithala printed_unstated bands
+    # change the residual payload and are captured in the current pin.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "5035aea8b78ad081fda458e8565b4f1bb49fd2e9381af7fedc68d111ae93dd23"
+        "b1ac9045e7d20a1ddef162d8b3c4911449d615210430a702316bfd9d80fd7c02"
     )
 
 
@@ -1362,8 +1362,8 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
             "openimcc",
         }:
             assert residual.numeric is not None
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+            assert residual.numeric.decision_band is not None
+            assert residual.refusal is None
         elif engine in {"alphamelts", "thermoengine"}:
             # Composition is printed, so these engines attempt a ferric split.
             # The unsupported-engine refusal is the one from before that path.

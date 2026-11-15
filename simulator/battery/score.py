@@ -5915,7 +5915,22 @@ def _mapping_uncertainty_value(
         else:
             return value, None
     for key, value in mapping.items():
-        if str(key).casefold() in {"value", "amount", "error_value", "uncertainty_value"}:
+        field = str(key).casefold()
+        if field in {
+            "value",
+            "amount",
+            "error_value",
+            "uncertainty_value",
+            "absolute",
+            "absolute_activity",
+            "log10_a_sio2",
+            "verbatim",
+        }:
+            if field == "verbatim" and (
+                not isinstance(value, str)
+                or re.search(rf"(?:±|\+/-)\s*{_UNCERTAINTY_NUMBER}", value) is None
+            ):
+                continue
             if isinstance(value, (tuple, list)) and len(value) == 2:
                 return value, "range"
             try:
@@ -5927,7 +5942,7 @@ def _mapping_uncertainty_value(
                         unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
                         return scalar, unit
             else:
-                return value, None
+                return value, "dex" if field == "log10_a_sio2" else None
     for key, value in mapping.items():
         name = str(key).casefold()
         if name in {"range", "bounds", "interval", "limits"} and isinstance(value, (tuple, list)) and len(value) == 2:
@@ -6180,6 +6195,12 @@ def _uncertainty_unit(
                 unit,
                 flags=re.IGNORECASE,
             ).strip()
+            if re.match(
+                r"^\(?\s*(?:as printed\b|for all\b|confidence\b|statistic\b|SD\s+per\b|standard deviation\b)",
+                unit,
+                re.IGNORECASE,
+            ):
+                continue
             if unit and re.search(r"[A-Za-z°µμ%]", unit):
                 return unit
     if observation is not None:
@@ -6271,6 +6292,12 @@ def _convert_uncertainty_width(
             return width, declared_scale
         if unit in {"%", "percent", "percentage"}:
             return None, expected
+    activity_unit = unit.removesuffix(",asprinted")
+    if quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT} and activity_unit in {
+        "dimensionlessactivity",
+        "absolutedimensionlessactivity",
+    }:
+        return width, expected
     if unit in {expected.casefold(), "1", "fraction", "relative"}:
         return width, "fraction" if unit in {"fraction", "relative"} else expected
     if unit in {"%", "percent", "percentage"}:
@@ -6327,21 +6354,37 @@ def _metric_uncertainty_width(
     return None
 
 
+def _printed_uncertainty_confidence_level(
+    quantity: Quantity,
+    uncertainty: Uncertainty,
+    raw_text: str,
+) -> str:
+    confidence_level = (
+        uncertainty.verbatim.get("confidence_level", "not_stated")
+        if isinstance(uncertainty.verbatim, Mapping)
+        else "not_stated"
+    )
+    if confidence_level != "not_stated":
+        return confidence_level
+    if quantity is Quantity.ACTIVITY and _is_log10_activity_standard_deviation(raw_text):
+        return "one_sigma"
+    if re.search(r"\bSD\s+per\b", raw_text, re.IGNORECASE):
+        return "one_sigma"
+    return confidence_level
+
+
 def _confidence_level_notice(
     quantity: Quantity,
     uncertainty: Uncertainty,
     source_observation: Observation | None,
     source_value: Decimal | tuple[Decimal, Decimal] | None,
 ) -> Notice | None:
-    confidence_level = (
-        uncertainty.verbatim.get("confidence_level", "not_stated")
-        if isinstance(uncertainty.verbatim, Mapping)
-        else "not_stated"
+    confidence_level = _printed_uncertainty_confidence_level(
+        quantity,
+        uncertainty,
+        _uncertainty_original(uncertainty),
     )
-    if confidence_level != "not_stated" or (
-        quantity is Quantity.ACTIVITY
-        and _is_log10_activity_standard_deviation(_uncertainty_original(uncertainty))
-    ):
+    if confidence_level != "not_stated":
         return None
     source_fields = (
         [
@@ -6510,18 +6553,14 @@ def _printed_uncertainty_band(
             )
         )
     raw_text = _uncertainty_original(uncertainty)
-    confidence_level = (
-        uncertainty.verbatim.get("confidence_level", "not_stated")
-        if isinstance(uncertainty.verbatim, Mapping)
-        else "not_stated"
+    confidence_level = _printed_uncertainty_confidence_level(
+        quantity, uncertainty, raw_text
     )
     log10_activity_sigma = (
         band_basis == "row_printed"
         and quantity is Quantity.ACTIVITY
         and _is_log10_activity_standard_deviation(raw_text)
     )
-    if log10_activity_sigma:
-        confidence_level = "one_sigma"
     exact_fields: list[str] = []
     if source_observation is not None:
         derivation = source_observation.derivation
