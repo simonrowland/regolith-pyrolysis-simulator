@@ -2747,6 +2747,22 @@ def predict_mass_loss_fraction(
                 for parent in term.parent_moles_per_product
             )
         }
+        # Capture this while bounds are raw: another parent's tighter scale
+        # can zero a contributor after this parent's scale was selected.
+        parent_controls_every_species = {
+            parent: all(
+                channel_scales[name] == parent_channel_scales[parent][
+                    "capped" if name in capped_channels else "finite"
+                ]
+                for name, term in term_by_species.items()
+                if parent in term.parent_moles_per_product
+                and (
+                    bounds_by_channel.get(name, 0.0) > 0.0
+                    or preheat_bounds_by_channel.get(name, 0.0) > 0.0
+                )
+            )
+            for parent in inventory_bounds_by_parent
+        }
         for mapping in (bounds_by_channel, preheat_bounds_by_channel):
             for species, scale in channel_scales.items():
                 if species in mapping:
@@ -2761,18 +2777,9 @@ def predict_mass_loss_fraction(
                 for mapping in (bounds_by_channel, preheat_bounds_by_channel)
                 for name in species
             )
-            parent_scale = parent_channel_scales[parent]
-            parent_controls_every_species = all(
-                channel_scales[name] == parent_scale[
-                    "capped" if name in capped_channels else "finite"
-                ]
-                for name in species
-                if bounds_by_channel.get(name, 0.0) > 0.0
-                or preheat_bounds_by_channel.get(name, 0.0) > 0.0
-            )
             if (
                 cap["uncapped_bound_kg"] >= cap["ceiling_kg"]
-                and parent_controls_every_species
+                and parent_controls_every_species[parent]
             ):
                 # This parent cap determines every contribution, so its
                 # applied total is exactly the ceiling. Avoid a false shortfall
