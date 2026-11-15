@@ -1273,6 +1273,7 @@ def _tier_b_contaminated_profile(
     use_cached_curve: bool,
     temperatures: Sequence[float],
     pure_liquid_by_temperature_C: Mapping[float, float],
+    pure_reference: Mapping[str, Any],
     pressure_bar: float,
     service_temperature_C: float | None,
 ) -> dict[str, Any]:
@@ -1322,15 +1323,13 @@ def _tier_b_contaminated_profile(
                 lower_fraction = sample_contaminated(lower_temperature)
                 lower_baseline = pure_liquid_by_temperature_C.get(lower_temperature)
                 if lower_baseline is None:
-                    lower_baseline = _checked_liquid_fraction(
-                        _sample_liquid_fraction(
-                            sampler,
-                            liner,
-                            {},
-                            liner,
-                            lower_temperature,
-                            pressure_bar,
-                        )
+                    lower_baseline = _tier_b_sample_at_temperature_with_reference(
+                        sampler,
+                        liner,
+                        lower_temperature,
+                        pressure_bar,
+                        pure_reference,
+                        context="pure-liner downward scan baseline",
                     )
             except LinerCorrosionRefusal:
                 break
@@ -1606,6 +1605,7 @@ def _tier_b_melt_activity_rating(
                     use_cached_curve=(index == 0 and nominal_uses_curve),
                     temperatures=scan_temperatures,
                     pure_liquid_by_temperature_C=pure_liquid,
+                    pure_reference=pure_reference,
                     pressure_bar=pressure,
                     service_temperature_C=service_temperature_C,
                 )

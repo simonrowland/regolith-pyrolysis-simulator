@@ -1056,7 +1056,11 @@ def test_tier_b_contaminated_profile_checks_composition_continuity():
 
     assert activity["contaminated_melt_bracket_C"] == [1000.0, 1025.0]
     assert "engine_composition_sensitive" in activity["flags"]
-    assert activity["engine_composition_sensitive"]["nominal_bracket_C"] == [None, 500.0]
+    # The nominal 0.01 at 500 C is bracketed by its zero value at 475 C.
+    assert activity["engine_composition_sensitive"]["nominal_bracket_C"] == [
+        475.0,
+        500.0,
+    ]
     assert activity["engine_composition_sensitive"]["neighbour_bracket_C"] == [
         1000.0,
         1025.0,
@@ -1782,6 +1786,68 @@ def test_tier_b_service_below_scan_uses_the_three_onset_cases(
         # No excess anywhere in the original scan and none at service gives
         # the independent pure cap, 1553 - 25 = 1528 C.
         assert "deposit_melt_below_resolution" in activity["flags"]
+
+
+def test_tier_b_downward_scan_uses_the_selected_neighbour_pure_baseline():
+    liner = {"CaO": 20.0, "Al2O3": 30.0, "SiO2": 50.0}
+
+    class ContinuityBaselineSampler:
+        def __init__(self):
+            self.nominal_pure_samples_at_475_C = 0
+
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            if composition.get("Na2O", 0.0) > 0.0:
+                if temperature_C < 475.0:
+                    return 0.0
+                if temperature_C < 1550.0:
+                    return 0.01
+                if temperature_C < 1575.0:
+                    return 0.054
+                return 1.0
+            if _matches_oxide_composition(composition, liner):
+                if temperature_C == 475.0:
+                    self.nominal_pure_samples_at_475_C += 1
+                    return 0.02
+                if temperature_C == 500.0:
+                    return 0.02
+            if temperature_C < 1025.0:
+                return 0.0
+            if temperature_C < 1550.0:
+                return 0.0026
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+    sampler = ContinuityBaselineSampler()
+    pure_reference = liner_corrosion._tier_b_reference_profile(
+        sampler,
+        liner,
+        pressure_bar=1.0,
+        literature_melting_temperature_C=1553.0,
+    )
+    assert pure_reference["composition_continuity"]["status"] == "sensitive"
+    assert pure_reference["liquid_fraction_by_temperature_C"][500.0] == 0.0
+
+    activity = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        {"CaO": 19.8, "Al2O3": 29.7, "SiO2": 49.5, "Na2O": 1.0},
+        {"Na": 1.0},
+        sampler=sampler,
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=1553.0,
+        pure_reference=pure_reference,
+        service_temperature_C=450.0,
+    )
+
+    # The pure nominal has an artificial 0.02 fraction at 475 C, but the
+    # selected d-421 neighbors both have zero there. Their zero baseline makes
+    # the 0.01 contaminated fraction positive at 475, resolving [450,475]:
+    # 1553 + (450 - 1550) - 25 = 428 C, so service at 450 C is onset.
+    assert activity["contaminated_melt_bracket_C"] == [450.0, 475.0]
+    assert activity["rating_temperature_C"] == 428.0
+    assert activity["onset_at_service_temperature"] is True
+    assert sampler.nominal_pure_samples_at_475_C == 0
 
 
 def test_tier_b_scans_the_pure_bulk_lower_boundary_for_contaminated_onset():
