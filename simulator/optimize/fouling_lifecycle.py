@@ -129,9 +129,6 @@ class FoulingLifecycleHarness:
                 if isinstance(run_metadata, Mapping)
                 else None
             )
-            liner_states_by_campaign.append(
-                liner_state if isinstance(liner_state, Mapping) else None
-            )
             mass_balance_error_pct = _mass_balance_error_pct(artifact)
             if (
                 mass_balance_error_pct is not None
@@ -170,6 +167,53 @@ class FoulingLifecycleHarness:
                 snapshot,
                 export_includes_carried=self._export_includes_carried,
                 campaign_index=campaign_index,
+            )
+            if (
+                isinstance(liner_state, Mapping)
+                and artifact.simulator is not None
+                and carried is not None
+            ):
+                material_id = (
+                    run_metadata.get("furnace_material_id")
+                    if isinstance(run_metadata, Mapping)
+                    else None
+                )
+                if material_id:
+                    from simulator.liner_corrosion import build_liner_state_for_run
+
+                    try:
+                        accumulated_state = build_liner_state_for_run(
+                            str(material_id),
+                            artifact.simulator,
+                            artifact.trace,
+                            initial_deposit_kg_by_segment_species=(
+                                carried.deposit_plain() if carried is not None else {}
+                            ),
+                        )
+                    except Exception as exc:  # noqa: BLE001 - diagnostic cannot gate lifecycle
+                        reason = str(
+                            getattr(exc, "reason", "liner_accumulated_state_rebuild_failed")
+                        )
+                        segments = liner_state.get("segments")
+                        names = (
+                            tuple(str(name) for name in segments)
+                            if isinstance(segments, Mapping)
+                            else ("_run",)
+                        )
+                        accumulated_state = {
+                            "schema": "liner-state-v1",
+                            "segments": {
+                                name: {
+                                    "status": "refused",
+                                    "refusal": {"reason": reason, "detail": str(exc)},
+                                }
+                                for name in names
+                            },
+                        }
+                    if accumulated_state is not None:
+                        liner_state = accumulated_state
+            liner_states_by_campaign.append(
+                liner_state if isinstance(liner_state, Mapping) else None
             )
             total = _campaigns_total_from_artifact(
                 artifact,

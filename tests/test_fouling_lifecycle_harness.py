@@ -8,7 +8,9 @@ import math
 
 import pytest
 
+from simulator.accounting.formulas import parse_formula
 from simulator.coating_lifespan import CampaignsToResinterTotal, FoulingProjectionError
+from simulator.liner_corrosion import build_liner_state_segment
 from simulator.optimize.fouling_lifecycle import (
     FoulingLifecycleHarness,
     FoulingRunArtifact,
@@ -40,6 +42,44 @@ def _artifact(
         c4b_binding_substrate_state=c4b_state,
         campaigns_to_resinter_total=campaigns_total,
         result_document=result_document,
+    )
+
+
+def _liner_state_for_accumulated_deposit(current, initial):
+    liner = {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0}
+    chemistry = {
+        "composition": liner,
+        "criterion_tier": "B",
+        "density_kg_m3": 1.0,
+        "reacted_layer_depth_m": 1.0,
+        "margin_C": 0.0,
+        "horizon_campaigns": 5,
+        "porosity_fraction": 0.0,
+    }
+
+    def sampler(composition, temperature_C, _pressure_bar):
+        pure = (
+            0.0
+            if temperature_C < 1550.0
+            else 0.05
+            if temperature_C < 1575.0
+            else 1.0
+        )
+        return max(pure, 1.0 if composition.get("Na2O", 0.0) >= 50.0 else 0.0)
+
+    accumulated = dict(initial)
+    for species, mass_kg in current.items():
+        accumulated[species] = accumulated.get(species, 0.0) + mass_kg
+    return build_liner_state_segment(
+        chemistry,
+        accumulated,
+        area_m2=1.0,
+        service_temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+        sampler=sampler,
+        deposit_inert_kg_by_species=current,
+        deposit_reactive_kg_by_species=current,
+        initial_deposit_kg_by_species=initial,
     )
 
 
@@ -81,83 +121,130 @@ def _authoritative_carrier_record(species: str) -> dict[str, object]:
     }
 
 
-def test_project_lifecycle_consumes_runner_liner_recurrence_when_selected():
-    document = {
-        "run_metadata": {
-            "liner_state": {
-                "schema": "liner-state-v1",
-                "segments": {
-                    "hot_wall": {"campaigns_to_runaway": [2, 4]},
-                    "cool_wall": {"campaigns_to_runaway": [3, 5]},
-                },
-            }
-        }
-    }
+def test_accumulated_na_deposit_fires_on_second_campaign_at_one_kg_oxide():
+    initial = {}
+    states = []
+
+    def run_campaign(na_mass_kg):
+        nonlocal initial
+        current = {"Na": na_mass_kg}
+        segment_state = _liner_state_for_accumulated_deposit(current, initial)
+        states.append(segment_state)
+        prior = dict(initial)
+        initial = {"Na": prior.get("Na", 0.0) + na_mass_kg}
+        return _artifact(
+            {("hot_wall", "Na"): na_mass_kg},
+            result_document={
+                "run_metadata": {
+                    "liner_state": {
+                        "schema": "liner-state-v1",
+                        "segments": {"hot_wall": segment_state},
+                    }
+                }
+            },
+        )
+
     result = FoulingLifecycleHarness(
-        lambda _input: _artifact({}, result_document=document),
+        run_campaign,
         segment_area_m2={},
-    ).run(("first", "second", "third"))
+    ).run((0.6, 0.4))
 
     interface = result.lifecycle_projection.to_dict()["interface_first_melt"]
     assert interface["fired"] is True
     assert interface["segment"] == "hot_wall"
     assert interface["campaign_index"] == 2
+    # 0.6 kg Na produces 0.808775 kg Na2O, below the 1 kg threshold;
+    # adding 0.4 kg Na produces 1.347959 kg cumulative Na2O, above it.
+    na2o_per_na = parse_formula("Na2O").molar_mass_g_per_mol() / (
+        2.0 * parse_formula("Na").molar_mass_g_per_mol()
+    )
+    assert states[0]["onset"] is False
+    assert states[1]["onset"] is True
+    assert states[1]["cumulative_deposit_oxide_equivalent_kg_by_oxide"][
+        "Na2O"
+    ] == pytest.approx(na2o_per_na)
 
 
 def test_liner_onset_counts_from_first_campaign_with_metadata():
-    document = {
-        "run_metadata": {
-            "liner_state": {
-                "schema": "liner-state-v1",
-                "segments": {"hot_wall": {"campaigns_to_runaway": [2, 4]}},
-            }
-        }
-    }
+    initial = {}
+
+    def run_campaign(has_liner):
+        nonlocal initial
+        if not has_liner:
+            return _artifact({}, result_document={"run_metadata": {}})
+        current = {"Na": 0.6 if not initial else 0.4}
+        segment_state = _liner_state_for_accumulated_deposit(current, initial)
+        initial = {"Na": initial.get("Na", 0.0) + current["Na"]}
+        return _artifact(
+            {("hot_wall", "Na"): current["Na"]},
+            result_document={
+                "run_metadata": {
+                    "liner_state": {
+                        "schema": "liner-state-v1",
+                        "segments": {"hot_wall": segment_state},
+                    }
+                }
+            },
+        )
 
     result = FoulingLifecycleHarness(
-        lambda has_liner: _artifact(
-            {}, result_document=document if has_liner else {"run_metadata": {}}
-        ),
+        run_campaign,
         segment_area_m2={},
     ).run((False, False, True, True))
 
     interface = result.lifecycle_projection.to_dict()["interface_first_melt"]
     assert interface["fired"] is True
     assert interface["campaign_index"] == 4
-    assert interface["value"] == 2.0
 
 
-def test_later_campaign_liner_state_can_move_the_forecast_onset_earlier():
-    def run_campaign(forecast_and_deposit):
-        onset_campaign, na_deposit_kg = forecast_and_deposit
-        document = {
-            "run_metadata": {
-                "liner_state": {
-                    "schema": "liner-state-v1",
-                    "segments": {
-                        "hot_wall": {
-                            "campaigns_to_runaway": [
-                                onset_campaign,
-                                onset_campaign,
-                            ],
-                            "deposit_kg_by_species": {"Na": na_deposit_kg},
-                        }
-                    },
-                }
-            }
+def test_accumulated_changing_deposit_mix_keeps_oxide_species_separate():
+    initial = {}
+    states = []
+
+    def run_campaign(deposit):
+        nonlocal initial
+        species, mass_kg = deposit
+        current = {species: mass_kg}
+        segment_state = _liner_state_for_accumulated_deposit(current, initial)
+        states.append(segment_state)
+        initial = {
+            species_name: initial.get(species_name, 0.0)
+            + current.get(species_name, 0.0)
+            for species_name in set(initial) | set(current)
         }
-        return _artifact({}, result_document=document)
+        return _artifact(
+            {("hot_wall", species): mass_kg},
+            result_document={
+                "run_metadata": {
+                    "liner_state": {
+                        "schema": "liner-state-v1",
+                        "segments": {"hot_wall": segment_state},
+                    }
+                }
+            },
+        )
 
     result = FoulingLifecycleHarness(
         run_campaign,
         segment_area_m2={},
-    ).run(((4, 0.1), (4, 0.1), (2, 0.5), (2, 0.5)))
+    ).run((("Na", 0.6), ("K", 0.4)))
 
     interface = result.lifecycle_projection.to_dict()["interface_first_melt"]
-    assert interface["fired"] is True
-    assert interface["campaign_index"] == 3
-    assert interface["value"] == 3.0
-    assert interface["limit"] == 2.0
+    assert interface["fired"] is False
+    na2o_per_na = parse_formula("Na2O").molar_mass_g_per_mol() / (
+        2.0 * parse_formula("Na").molar_mass_g_per_mol()
+    )
+    k2o_per_k = parse_formula("K2O").molar_mass_g_per_mol() / (
+        2.0 * parse_formula("K").molar_mass_g_per_mol()
+    )
+    # Although the cumulative oxide total exceeds 1 kg, the Na2O fraction
+    # falls below the fixture's 50 wt% onset after K2O joins the interface.
+    cumulative_oxides = states[-1][
+        "cumulative_deposit_oxide_equivalent_kg_by_oxide"
+    ]
+    assert cumulative_oxides["K2O"] == pytest.approx(0.4 * k2o_per_k)
+    assert cumulative_oxides["Na2O"] == pytest.approx(0.6 * na2o_per_na)
+    assert states[-1]["onset"] is False
 
 
 def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:

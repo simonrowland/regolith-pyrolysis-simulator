@@ -220,6 +220,19 @@ def _oxide_equivalent_kg_by_species(
     return result
 
 
+def deposit_oxide_equivalent_mass_by_oxide(
+    deposit_kg_by_species: Mapping[str, Any],
+) -> dict[str, float]:
+    """Return cumulative deposit mass by assumed oxide, in kg."""
+
+    masses_by_species = _oxide_equivalent_kg_by_species(deposit_kg_by_species)
+    result: dict[str, float] = {}
+    for species, mass_kg in masses_by_species.items():
+        oxide = DEPOSIT_OXIDE_BY_SPECIES[species]
+        result[oxide] = result.get(oxide, 0.0) + mass_kg
+    return dict(sorted(result.items()))
+
+
 def deposit_oxide_composition(
     deposit_kg_by_species: Mapping[str, Any],
 ) -> dict[str, float]:
@@ -1611,15 +1624,26 @@ def build_liner_state_segment(
     sampler: LiquidFractionSampler | None,
     deposit_inert_kg_by_species: Mapping[str, Any] | None = None,
     deposit_reactive_kg_by_species: Mapping[str, Any] | None = None,
+    initial_deposit_kg_by_species: Mapping[str, Any] | None = None,
     x_star: float | None = None,
 ) -> dict[str, Any]:
-    """Build one terminal segment record, preserving unavailable fields as refusals."""
+    """Build one terminal segment record from cumulative interface deposits.
+
+    ``deposit_kg_by_species`` is the cumulative measured deposit vector at the
+    end of this campaign. ``initial_deposit_kg_by_species`` is its prior state;
+    inert and reactive branch maps remain per-campaign increments for forecasts.
+    """
 
     raw_composition = interface_chemistry.get("composition")
     if not isinstance(raw_composition, Mapping) or not raw_composition:
         raise LinerCorrosionRefusal("liner_composition_missing")
     liner = validate_oxide_composition(raw_composition)
     deposits = _checked_deposit(deposit_kg_by_species)
+    if initial_deposit_kg_by_species is not None and not isinstance(
+        initial_deposit_kg_by_species, Mapping
+    ):
+        raise LinerCorrosionRefusal("initial_liner_deposit_state_invalid")
+    initial_deposits = _checked_deposit(initial_deposit_kg_by_species or {})
     h = interface_chemistry.get("reacted_layer_depth_m")
     if h is None:
         raise LinerCorrosionRefusal("reacted_layer_depth_missing")
@@ -1767,7 +1791,7 @@ def build_liner_state_segment(
             # per kg of measured deposit species; convert bases through the
             # same species-to-oxide owner used by interface mixing.
             oxide_equivalent_kg = math.fsum(
-                _oxide_equivalent_kg_by_species(deposits).values()
+                deposit_oxide_equivalent_mass_by_oxide(deposits).values()
             )
             raw_deposit_kg = math.fsum(deposits.values())
             if raw_deposit_kg <= 0.0:
@@ -1793,7 +1817,7 @@ def build_liner_state_segment(
         try:
             recurrence = _run_corrosion_recurrence(
                 liner,
-                {},
+                initial_deposits,
                 deposit_inert_kg_by_species,
                 deposit_reactive_kg_by_species,
                 density_kg_m3=density,
@@ -1835,7 +1859,7 @@ def build_liner_state_segment(
                 sensitivity_recurrence = (
                     _run_corrosion_recurrence(
                         liner,
-                        {},
+                        initial_deposits,
                         deposit_inert_kg_by_species,
                         deposit_reactive_kg_by_species,
                         density_kg_m3=density,
@@ -1919,6 +1943,9 @@ def build_liner_state_segment(
         "onset": onset,
         "species_aggressiveness": species_aggressiveness,
         "liner_consumed_kg_per_kg_deposit": dissolution_ratio,
+        "cumulative_deposit_oxide_equivalent_kg_by_oxide": (
+            deposit_oxide_equivalent_mass_by_oxide(deposits)
+        ),
         "sticking_state": recurrence["sticking_state"] if recurrence else None,
         "campaigns_to_runaway": (
             recurrence["campaigns_to_runaway"] if recurrence else None
@@ -2150,6 +2177,10 @@ def build_liner_state_for_run(
     material_id: str,
     simulator: Any,
     trace: Any,
+    *,
+    initial_deposit_kg_by_segment_species: Mapping[
+        str, Mapping[str, Any]
+    ] | None = None,
 ) -> dict[str, Any] | None:
     """Build terminal liner metadata in the physics owner module."""
 
@@ -2172,8 +2203,19 @@ def build_liner_state_for_run(
     model = getattr(simulator, "condensation_model", None)
     pipe_segments = tuple(getattr(model, "pipe_segments", ()) or ())
     inert_by_segment = _trace_deposits_by_segment(trace)
+    initial_by_segment = (
+        {}
+        if initial_deposit_kg_by_segment_species is None
+        else initial_deposit_kg_by_segment_species
+    )
+    if not isinstance(initial_by_segment, Mapping):
+        raise LinerCorrosionRefusal("initial_liner_deposit_state_invalid")
+    if any(not isinstance(name, str) for name in initial_by_segment):
+        raise LinerCorrosionRefusal("initial_liner_deposit_state_invalid")
     segment_names = sorted(
-        {str(segment.name) for segment in pipe_segments} | set(inert_by_segment)
+        {str(segment.name) for segment in pipe_segments}
+        | set(inert_by_segment)
+        | {str(name) for name in initial_by_segment}
     ) or ["_run"]
     temperatures = wall_temperature_by_segment_C(simulator)
     try:
@@ -2229,6 +2271,22 @@ def build_liner_state_for_run(
                 continue
             inert = inert_by_segment.get(name, {})
             try:
+                raw_initial = initial_by_segment.get(name, {})
+                if not isinstance(raw_initial, Mapping):
+                    raise LinerCorrosionRefusal(
+                        "initial_liner_deposit_state_invalid", name
+                    )
+                initial = _checked_deposit(raw_initial)
+                cumulative = dict(initial)
+                for species, mass_kg in _checked_deposit(inert).items():
+                    cumulative[species] = cumulative.get(species, 0.0) + mass_kg
+            except LinerCorrosionRefusal as exc:
+                records[name] = {
+                    "status": "refused",
+                    "refusal": exc.as_dict(),
+                }
+                continue
+            try:
                 reactive = _reactive_deposit_upper_bound_for_segment(
                     model, segment, inert, snapshots
                 )
@@ -2240,13 +2298,14 @@ def build_liner_state_for_run(
             try:
                 state = build_liner_state_segment(
                     chemistry,
-                    inert,
+                    cumulative,
                     area_m2=float(segment.surface_area_m2),
                     service_temperature_C=service_temperature,
                     pressure_bar=pressure_bar,
                     sampler=sampler,
                     deposit_inert_kg_by_species=inert,
                     deposit_reactive_kg_by_species=reactive,
+                    initial_deposit_kg_by_species=initial,
                 )
             except LinerCorrosionRefusal as exc:
                 records[name] = {

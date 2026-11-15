@@ -1090,6 +1090,23 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
     assert segment_state["liner_consumed_kg_per_kg_deposit"] == pytest.approx(
         99.09008107296567 * na_to_na2o
     )
+    accumulated_state = liner_corrosion.build_liner_state_for_run(
+        "fixture-liner",
+        simulator,
+        trace,
+        initial_deposit_kg_by_segment_species={"liner-wall": {"Na": 0.1}},
+    )
+    accumulated_segment = accumulated_state["segments"]["liner-wall"]
+    # Prior Na is already over the fixture onset. Starting the recurrence from
+    # that carried state must report campaign zero, not a new-liner forecast.
+    assert accumulated_segment["campaigns_to_runaway"] == [0, 0]
+    assert accumulated_segment["onset"] is True
+    assert accumulated_segment["deposit_kg_by_species"]["Na"] == pytest.approx(
+        0.1001
+    )
+    assert accumulated_segment[
+        "cumulative_deposit_oxide_equivalent_kg_by_oxide"
+    ]["Na2O"] == pytest.approx(0.1001 * na_to_na2o)
     assert 1500.0 in FixtureSampler.curve_temperatures
     assert "engine_phase_closure_unverified" in segment_state["flags"]
 

@@ -539,54 +539,14 @@ def _first_liner_state_refusal(raw_state: Mapping[str, Any]) -> dict[str, Any] |
 def _interface_first_melt_from_liner_states(
     liner_states_by_campaign: Sequence[Mapping[str, Any] | None],
 ) -> Limiter:
-    """Evaluate each campaign's own liner forecast on its relative timeline."""
-
-    forecasts: list[
-        tuple[list[tuple[str, int]], dict[str, Any] | None] | None
-    ] = []
-    for liner_state in liner_states_by_campaign:
-        if not isinstance(liner_state, Mapping):
-            forecasts.append(None)
-            continue
-        segments = liner_state.get("segments")
-        if not isinstance(segments, Mapping):
-            refusal = {
-                "reason": "liner_state_segments_missing",
-                "detail": "liner-state-v1 has no segment records",
-            }
-            forecasts.append(([], refusal))
-            continue
-        selected: list[tuple[str, int]] = []
-        for raw_name, raw_state in segments.items():
-            if not isinstance(raw_state, Mapping):
-                continue
-            interval = raw_state.get("campaigns_to_runaway")
-            if (
-                isinstance(interval, Sequence)
-                and not isinstance(interval, (str, bytes))
-                and len(interval) == 2
-                and isinstance(interval[0], int)
-                and not isinstance(interval[0], bool)
-            ):
-                selected.append((str(raw_name), interval[0]))
-        selected.sort(key=lambda item: (item[1], item[0]))
-        refusal = None
-        if not selected:
-            for raw_state in segments.values():
-                if not isinstance(raw_state, Mapping):
-                    continue
-                refusal = _first_liner_state_refusal(raw_state)
-                if refusal is not None:
-                    break
-            if refusal is None:
-                refusal = {
-                    "reason": "liner_campaign_interval_unavailable",
-                    "detail": "liner state has no finite reactive campaign bound",
-                }
-        forecasts.append((selected, refusal))
+    """Fire on the first d-419 onset in each campaign's carried liner state."""
 
     first_state_index = next(
-        (index for index, forecast in enumerate(forecasts) if forecast is not None),
+        (
+            index
+            for index, liner_state in enumerate(liner_states_by_campaign)
+            if isinstance(liner_state, Mapping)
+        ),
         None,
     )
 
@@ -612,7 +572,9 @@ def _interface_first_melt_from_liner_states(
                 fired=False,
                 campaign_index=campaign_index,
             )
-        if position >= len(forecasts) or forecasts[position] is None:
+        if position >= len(liner_states_by_campaign) or not isinstance(
+            liner_states_by_campaign[position], Mapping
+        ):
             return LimiterEvaluation(
                 name=INTERFACE_FIRST_MELT_LIMITER,
                 fired=False,
@@ -622,22 +584,129 @@ def _interface_first_melt_from_liner_states(
                     "detail": f"campaign {campaign_index} has no liner-state-v1 metadata",
                 },
             )
-        selected, refusal = forecasts[position]
-        if not selected:
+        liner_state = liner_states_by_campaign[position]
+        segments = liner_state.get("segments")
+        if not isinstance(segments, Mapping):
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal={
+                    "reason": "liner_state_segments_missing",
+                    "detail": "liner-state-v1 has no segment records",
+                },
+            )
+        from simulator.liner_corrosion import deposit_oxide_equivalent_mass_by_oxide
+
+        cumulative_by_segment = _snapshot.deposit_plain()
+        fired_segments: list[str] = []
+        refusals: list[dict[str, Any]] = []
+        evaluated = 0
+        for raw_name, raw_state in segments.items():
+            segment = str(raw_name)
+            if not isinstance(raw_state, Mapping):
+                continue
+            if raw_state.get("status") == "refused":
+                refusals.append(
+                    _first_liner_state_refusal(raw_state)
+                    or {"reason": "liner_state_refused", "detail": segment}
+                )
+                continue
+            try:
+                expected_oxide_mass = deposit_oxide_equivalent_mass_by_oxide(
+                    cumulative_by_segment.get(segment, {})
+                )
+            except Exception as exc:  # noqa: BLE001 - diagnostic cannot gate lifecycle
+                refusals.append(
+                    {
+                        "reason": str(
+                            getattr(exc, "reason", "liner_cumulative_deposit_invalid")
+                        ),
+                        "detail": str(exc),
+                    }
+                )
+                continue
+            recorded_oxide_mass = raw_state.get(
+                "cumulative_deposit_oxide_equivalent_kg_by_oxide"
+            )
+            if not isinstance(recorded_oxide_mass, Mapping):
+                refusals.append(
+                    {
+                        "reason": "liner_cumulative_oxide_deposit_missing",
+                        "detail": f"{segment} has no cumulative oxide-equivalent vector",
+                    }
+                )
+                continue
+            if any(not isinstance(oxide, str) for oxide in recorded_oxide_mass):
+                refusals.append(
+                    {
+                        "reason": "liner_cumulative_oxide_deposit_invalid",
+                        "detail": f"{segment} oxide vector keys must be strings",
+                    }
+                )
+                continue
+            all_oxides = set(expected_oxide_mass) | set(recorded_oxide_mass)
+            mismatch = False
+            for oxide in all_oxides:
+                raw_value = recorded_oxide_mass.get(oxide, 0.0)
+                if not is_declared_real_scalar(raw_value):
+                    mismatch = True
+                    break
+                try:
+                    value = float(raw_value)
+                except (TypeError, ValueError):
+                    mismatch = True
+                    break
+                if not math.isfinite(value) or not math.isclose(
+                    value,
+                    expected_oxide_mass.get(oxide, 0.0),
+                    rel_tol=1.0e-9,
+                    abs_tol=1.0e-12,
+                ):
+                    mismatch = True
+                    break
+            if mismatch:
+                refusals.append(
+                    {
+                        "reason": "liner_cumulative_oxide_deposit_mismatch",
+                        "detail": f"{segment} vector does not match cumulative wall deposit",
+                    }
+                )
+                continue
+            onset = raw_state.get("onset")
+            if not isinstance(onset, bool):
+                refusals.append(
+                    {
+                        "reason": "liner_accumulated_onset_missing",
+                        "detail": f"{segment} has no d-419 onset evaluation",
+                    }
+                )
+                continue
+            evaluated += 1
+            if onset:
+                fired_segments.append(segment)
+        if fired_segments:
+            segment = sorted(fired_segments)[0]
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=True,
+                segment=segment,
+                campaign_index=campaign_index,
+            )
+        if not evaluated:
+            refusal = refusals[0] if refusals else {
+                "reason": "liner_accumulated_onset_missing",
+                "detail": "no segment has a verified cumulative d-419 onset result",
+            }
             return LimiterEvaluation(
                 name=INTERFACE_FIRST_MELT_LIMITER,
                 fired=False,
                 campaign_index=campaign_index,
                 refusal=refusal,
             )
-        segment, onset_campaign = selected[0]
-        relative_campaign_index = campaign_index - first_state_index
         return LimiterEvaluation(
             name=INTERFACE_FIRST_MELT_LIMITER,
-            fired=relative_campaign_index >= onset_campaign,
-            segment=segment,
-            value=float(relative_campaign_index),
-            limit=float(onset_campaign),
+            fired=False,
             campaign_index=campaign_index,
         )
 
