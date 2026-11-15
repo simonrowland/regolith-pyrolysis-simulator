@@ -328,6 +328,7 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                 sampler,
                 anorthite,
                 pressure_bar=1.0,
+                literature_melting_temperature_C=1553.0,
             )
         except LinerCorrosionRefusal as exc:
             if exc.reason == "engine_unavailable":
@@ -336,6 +337,8 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
         assert profile["liquid_fraction_by_temperature_C"][800.0] == 0.0
         assert profile["liquid_fraction_by_temperature_C"][1000.0] == 0.0
         assert profile["bulk_melt_bracket_C"] == [1550.0, 1575.0]
+        assert profile["bulk_melt_residual_vs_literature_C"] == [-3.0, 22.0]
+        assert profile["bulk_melt_residual_ticket"] == "b-1231"
         assert profile["engine_minor_phase_eutectic"]["temperature_bracket_C"] == [
             1000.0,
             1025.0,
@@ -356,6 +359,10 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
             pure_reference=profile,
         )
         assert pure_rating["rating_temperature_C"] == 1528.0
+        assert pure_rating["bulk_melt_residual_vs_literature_C"] == [-3.0, 22.0]
+        assert pure_rating["engine_minor_phase_eutectic"] == profile[
+            "engine_minor_phase_eutectic"
+        ]
         assert "deposit_melt_below_resolution" in pure_rating["flags"]
     finally:
         sampler.close()
@@ -493,8 +500,15 @@ def test_post_onset_dissolution_ratio_closed_form():
     assert post_onset_dissolution_ratio(0.5) == 1.0
 
 
-def _phi_from_na2o(composition, _temperature_C, _pressure_bar):
-    return min(1.0, max(0.0, (composition.get("Na2O", 0.0) - 5.0) / 20.0))
+def _phi_from_na2o(composition, temperature_C, _pressure_bar):
+    if temperature_C < 1550.0:
+        pure = 0.0
+    elif temperature_C < 1575.0:
+        pure = 0.05
+    else:
+        pure = 1.0
+    deposit = min(1.0, max(0.0, (composition.get("Na2O", 0.0) - 5.0) / 20.0))
+    return max(pure, deposit)
 
 
 def _recurrence(*, initial_na=0.0, h=1.0, inert_na=0.2, reactive_na=0.5):
@@ -577,13 +591,16 @@ def test_reactive_branch_refusal_keeps_the_inert_campaign_bound():
 
 
 def test_reactive_sampling_refusal_keeps_completed_inert_bound():
-    def sampler(composition, _temperature_C, _pressure_bar):
+    def sampler(composition, temperature_C, _pressure_bar):
         na2o_wt_pct = composition.get("Na2O", 0.0)
         if na2o_wt_pct > 30.0:
             raise LinerCorrosionRefusal(
                 "liner_first_melt_engine_out_of_domain", "reactive blend leaves domain"
             )
-        return 1.0 if na2o_wt_pct >= 15.0 else 0.0
+        pure = 0.0 if temperature_C < 1550.0 else (
+            0.05 if temperature_C < 1575.0 else 1.0
+        )
+        return max(pure, 1.0 if na2o_wt_pct >= 15.0 else 0.0)
 
     result = corrosion_campaign_recurrence(
         {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
@@ -608,8 +625,11 @@ def test_reactive_sampling_refusal_keeps_completed_inert_bound():
 
 
 def test_campaign_interval_orders_onset_counts_not_deposit_rates():
-    def sodium_liquid_signal(composition, _temperature_C, _pressure_bar):
-        return 1.0 if composition.get("Na2O", 0.0) >= 15.0 else 0.0
+    def sodium_liquid_signal(composition, temperature_C, _pressure_bar):
+        pure = 0.0 if temperature_C < 1550.0 else (
+            0.05 if temperature_C < 1575.0 else 1.0
+        )
+        return max(pure, 1.0 if composition.get("Na2O", 0.0) >= 15.0 else 0.0)
 
     result = corrosion_campaign_recurrence(
         {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
@@ -641,8 +661,11 @@ def test_campaign_interval_orders_onset_counts_not_deposit_rates():
 
 
 def test_multispecies_campaign_interval_matches_each_branch_projection():
-    def sodium_liquid_signal(composition, _temperature_C, _pressure_bar):
-        return 1.0 if composition.get("Na2O", 0.0) >= 15.0 else 0.0
+    def sodium_liquid_signal(composition, temperature_C, _pressure_bar):
+        pure = 0.0 if temperature_C < 1550.0 else (
+            0.05 if temperature_C < 1575.0 else 1.0
+        )
+        return max(pure, 1.0 if composition.get("Na2O", 0.0) >= 15.0 else 0.0)
 
     pairs = (
         ({"Na": 0.2}, {"Na": 0.2, "Fe": 2.0}),
@@ -816,8 +839,15 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
         flags = ["engine_phase_closure_unverified"]
         curve_temperatures = []
 
-        def __call__(self, composition, _temperature_C, _pressure_bar):
-            return 1.0 if composition.get("Na2O", 0.0) >= 0.1 else 0.0
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            if temperature_C < 1550.0:
+                pure = 0.0
+            elif temperature_C < 1575.0:
+                pure = 0.044
+            else:
+                pure = 1.0
+            deposit = 1.0 if composition.get("Na2O", 0.0) >= 0.1 else 0.0
+            return max(pure, deposit)
 
         def curve(
             self,
@@ -828,8 +858,19 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
             pressure_bar,
         ):
             self.curve_temperatures.append(temperature_C)
+            if temperature_C < 1550.0:
+                pure = 0.0
+            elif temperature_C < 1575.0:
+                pure = 0.044
+            else:
+                pure = 1.0
             points = (
-                ((0.0, 0.0), (0.001, 0.0), (0.01, 1.0), (1.0, 1.0))
+                (
+                    (0.0, pure),
+                    (0.001, pure),
+                    (0.01, 1.0),
+                    (1.0, 1.0),
+                )
                 if self.saturates
                 else ((0.0, 0.0), (0.001, 0.0), (0.5, 0.5))
             )

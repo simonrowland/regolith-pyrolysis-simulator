@@ -58,6 +58,13 @@ MAGEMIN_FO2_LOG = -9.0  # Fixed request setting; included in the request cache k
 MAGEMIN_CACHE_DECIMAL_PLACES = 6
 MAGEMIN_PHI_CURVE_INTERVALS = 30
 ELEMENT_CLOSURE_REL_TOLERANCE = 1.0e-3
+TIER_B_MELT_SCAN_MIN_C = 500.0
+TIER_B_MELT_SCAN_MAX_C = 1600.0
+TIER_B_MELT_SCAN_STEP_C = 25.0
+ENGINE_MINOR_PHASE_EUTECTIC_FLAG = "engine_minor_phase_eutectic"
+PHASE_CLOSURE_UNVERIFIED_FLAG = "phase_closure_unverified"
+DEPOSIT_MELT_BELOW_RESOLUTION_FLAG = "deposit_melt_below_resolution"
+ENGINE_BULK_MELT_REFERENCE_FALLBACK_FLAG = "engine_first_liquid_residual"
 
 
 class LinerCorrosionRefusal(ValueError):
@@ -462,7 +469,8 @@ def _campaign_branch(
     horizon: int,
     sampler: LiquidFractionSampler,
     feedback_deposit_kg_by_species: Mapping[str, float] | None = None,
-) -> tuple[int | str, dict[str, float], float]:
+    pure_reference: Mapping[str, Any] | None = None,
+) -> tuple[int | str, dict[str, float], float, dict[str, Any] | None]:
     deposits = _checked_deposit(initial_deposit_kg_by_species)
     service_sample_C = _finite_real(temperature_C, "temperature_C") - _finite_real(
         margin_C, "margin_C"
@@ -470,6 +478,7 @@ def _campaign_branch(
     pressure = (
         None if pressure_bar is None else _positive(pressure_bar, "pressure_bar")
     )
+    last_activity: dict[str, Any] | None = None
     for completed in range(horizon + 1):
         composition = contaminated_interface_composition(
             liner_composition_wt_pct,
@@ -478,18 +487,38 @@ def _campaign_branch(
             area_m2=area_m2,
             reacted_layer_depth_m=reacted_layer_depth_m,
         )["composition_wt_pct"]
-        criterion_signal = _checked_liquid_fraction(
-            _sample_liquid_fraction(
-                sampler,
+        if isinstance(sampler, TierAInvariantSampler):
+            criterion_signal = _checked_liquid_fraction(
+                _sample_liquid_fraction(
+                    sampler,
+                    composition,
+                    deposits,
+                    liner_composition_wt_pct,
+                    service_sample_C,
+                    pressure,
+                )
+            )
+            onset = criterion_signal > LIQUIDUS_SOLID_EPSILON
+        else:
+            if pure_reference is None:
+                raise LinerCorrosionRefusal("liner_bulk_melt_reference_missing")
+            last_activity = _tier_b_melt_activity_rating(
+                liner_composition_wt_pct,
                 composition,
                 deposits,
-                liner_composition_wt_pct,
-                service_sample_C,
-                pressure,
+                sampler=sampler,
+                pressure_bar=pressure,
+                margin_C=margin_C,
+                service_temperature_C=temperature_C,
+                literature_melting_temperature_C=None,
+                pure_reference=pure_reference,
             )
-        )
-        if criterion_signal > LIQUIDUS_SOLID_EPSILON:
-            return completed, deposits, criterion_signal
+            criterion_signal = float(
+                last_activity["excess_liquid_fraction_at_service_temperature"]
+            )
+            onset = temperature_C >= last_activity["rating_temperature_C"]
+        if onset:
+            return completed, deposits, criterion_signal, last_activity
         if completed == horizon:
             break
 
@@ -502,7 +531,262 @@ def _campaign_branch(
             increment = branch_deposit_kg_by_species
         for species, kg in increment.items():
             deposits[species] = deposits.get(species, 0.0) + kg
-    return f"> {horizon}", deposits, criterion_signal
+    return f"> {horizon}", deposits, criterion_signal, last_activity
+
+
+def _tier_b_reference_profile(
+    sampler: LiquidFractionSampler,
+    liner_composition_wt_pct: Mapping[str, Any],
+    *,
+    pressure_bar: float,
+    literature_melting_temperature_C: float | None = None,
+) -> dict[str, Any]:
+    """Sample the fixed d-419 grid and identify pure bulk and minor melting.
+
+    The scan advances in 25 C increments from 500 C through 1600 C.  The
+    pure reference is the largest adjacent liquid-fraction jump, which keeps
+    the 1000-1025 C minor-phase eutectic from defining the bulk melt point.
+    """
+
+    liner = validate_oxide_composition(liner_composition_wt_pct)
+    pressure = _positive(pressure_bar, "pressure_bar")
+    temperatures = tuple(
+        TIER_B_MELT_SCAN_MIN_C + index * TIER_B_MELT_SCAN_STEP_C
+        for index in range(
+            int((TIER_B_MELT_SCAN_MAX_C - TIER_B_MELT_SCAN_MIN_C)
+                / TIER_B_MELT_SCAN_STEP_C) + 1
+        )
+    )
+    liquid_by_temperature: dict[float, float] = {}
+    diagnostics_by_temperature: dict[float, Mapping[str, Any]] = {}
+    for temperature in temperatures:
+        liquid_by_temperature[temperature] = _checked_liquid_fraction(
+            _sample_liquid_fraction(
+                sampler,
+                liner,
+                {},
+                liner,
+                temperature,
+                pressure,
+            )
+        )
+        diagnostic_reader = getattr(sampler, "sample_diagnostics", None)
+        if callable(diagnostic_reader):
+            detail = diagnostic_reader(liner, temperature, pressure)
+            if isinstance(detail, Mapping):
+                diagnostics_by_temperature[temperature] = detail
+
+    jumps = tuple(
+        liquid_by_temperature[high] - liquid_by_temperature[low]
+        for low, high in zip(temperatures, temperatures[1:])
+    )
+    if not jumps or max(jumps) <= 0.0:
+        raise LinerCorrosionRefusal("liner_bulk_melt_transition_missing")
+    bulk_index = max(range(len(jumps)), key=jumps.__getitem__)
+    bulk_bracket = [temperatures[bulk_index], temperatures[bulk_index + 1]]
+    # d-419 describes a minor-phase plateau. MAGEMin has shorter positive
+    # steps below that plateau, so rank sub-bulk steps by the number of
+    # consecutive samples staying within the same liquid-fraction epsilon.
+    # The longest sustained step is the eutectic plateau; shorter events stay
+    # visible in the full profile rather than defining the corrosion baseline.
+    minor_candidates: list[tuple[int, int]] = []
+    for index, jump in enumerate(jumps[:bulk_index]):
+        if jump <= LIQUIDUS_SOLID_EPSILON:
+            continue
+        upper_index = index + 1
+        plateau_fraction = liquid_by_temperature[temperatures[upper_index]]
+        plateau_end_index = upper_index
+        for next_index in range(upper_index + 1, bulk_index + 1):
+            next_fraction = liquid_by_temperature[temperatures[next_index]]
+            if abs(next_fraction - plateau_fraction) > LIQUIDUS_SOLID_EPSILON:
+                break
+            plateau_end_index = next_index
+        span = plateau_end_index - upper_index
+        if span > 0:
+            minor_candidates.append((index, span))
+    minor_index = (
+        max(minor_candidates, key=lambda candidate: candidate[1])[0]
+        if minor_candidates
+        else None
+    )
+    minor_phase: dict[str, Any] | None = None
+    flags: list[str] = []
+    if minor_index is not None:
+        upper_temperature = temperatures[minor_index + 1]
+        detail = diagnostics_by_temperature.get(upper_temperature, {})
+        phases = detail.get("phases")
+        minor_phase = {
+            "temperature_bracket_C": [
+                temperatures[minor_index],
+                upper_temperature,
+            ],
+            "plateau_liquid_fraction": liquid_by_temperature[upper_temperature],
+            "phases": list(phases) if isinstance(phases, Sequence) else [],
+        }
+        flags.append(ENGINE_MINOR_PHASE_EUTECTIC_FLAG)
+    sampler_flags = set(getattr(sampler, "flags", ()) or ())
+    if (
+        ELEMENT_CLOSURE_UNVERIFIED_FLAG in sampler_flags
+        or any(
+            detail.get("element_closure_verified") is False
+            for detail in diagnostics_by_temperature.values()
+        )
+    ):
+        flags.append(PHASE_CLOSURE_UNVERIFIED_FLAG)
+    result: dict[str, Any] = {
+        "scan_temperature_C": list(temperatures),
+        "liquid_fraction_by_temperature_C": liquid_by_temperature,
+        "bulk_melt_bracket_C": bulk_bracket,
+        "bulk_melt_liquid_fraction_jump": jumps[bulk_index],
+        "engine_minor_phase_eutectic": minor_phase,
+        "flags": flags,
+    }
+    if literature_melting_temperature_C is not None:
+        literature_temperature = _finite_real(
+            literature_melting_temperature_C,
+            "literature_melting_temperature_C",
+        )
+        result["literature_melting_temperature_C"] = literature_temperature
+        result["bulk_melt_residual_vs_literature_C"] = [
+            bulk_bracket[0] - literature_temperature,
+            bulk_bracket[1] - literature_temperature,
+        ]
+        result["bulk_melt_residual_ticket"] = "b-1231"
+    return result
+
+
+def _tier_b_melt_activity_rating(
+    liner_composition_wt_pct: Mapping[str, Any],
+    interface_composition_wt_pct: Mapping[str, Any],
+    deposit_kg_by_species: Mapping[str, Any],
+    *,
+    sampler: LiquidFractionSampler,
+    pressure_bar: float,
+    margin_C: float,
+    literature_melting_temperature_C: float | None,
+    pure_reference: Mapping[str, Any],
+    service_temperature_C: float | None = None,
+) -> dict[str, Any]:
+    """Apply d-419's excess-melt shift and conservative lower scan bracket.
+
+    Premise: a pure-liner engine profile can contain a minor-phase eutectic
+    unrelated to deposit corrosion.  At each common scan temperature, subtract
+    that pure baseline from the contaminated liquid fraction and detect the
+    first excess above the accounting owner's 1e-3 solid threshold.  The
+    reported onset is the preceding (lower-temperature) 25 C grid point.
+    Rating algebra is T_lit + (T_contaminated,lo - T_bulk,pure,lo) - margin;
+    both bracket endpoints are Celsius, so the shift and rating are Celsius.
+    With no deposit, excess is zero and the rating is T_lit - margin.  The cap
+    at that pure rating prevents a deposit from improving the rating.
+    """
+
+    liner = validate_oxide_composition(liner_composition_wt_pct)
+    interface = validate_oxide_composition(interface_composition_wt_pct)
+    deposits = _checked_deposit(deposit_kg_by_species)
+    pressure = _positive(pressure_bar, "pressure_bar")
+    margin = _finite_real(margin_C, "margin_C")
+    if margin < 0.0:
+        raise LinerCorrosionRefusal("temperature_margin_invalid")
+    temperatures = tuple(float(value) for value in pure_reference["scan_temperature_C"])
+    pure_liquid = pure_reference["liquid_fraction_by_temperature_C"]
+    bulk_low = float(pure_reference["bulk_melt_bracket_C"][0])
+    reference_flags = list(pure_reference.get("flags", ()))
+    if literature_melting_temperature_C is None:
+        # d-415's fallback remains in force when no cited pure-phase T_lit is
+        # available: use the engine's pure bulk lower bracket as T_lit.
+        literature_temperature = bulk_low
+        literature_source = "engine_bulk_melt_lower_bracket"
+        reference_flags.append(ENGINE_BULK_MELT_REFERENCE_FALLBACK_FLAG)
+    else:
+        literature_temperature = _finite_real(
+            literature_melting_temperature_C,
+            "literature_melting_temperature_C",
+        )
+        literature_source = "cited_literature"
+    cap = literature_temperature - margin
+    onset_bracket: list[float] | None = None
+    excess_at_upper: float | None = None
+    service_excess = 0.0
+    if deposits:
+        for index in range(1, len(temperatures)):
+            lower_temperature = temperatures[index - 1]
+            upper_temperature = temperatures[index]
+            if upper_temperature >= bulk_low:
+                break
+            contaminated_liquid = _checked_liquid_fraction(
+                _sample_liquid_fraction(
+                    sampler,
+                    interface,
+                    deposits,
+                    liner,
+                    upper_temperature,
+                    pressure,
+                )
+            )
+            excess = contaminated_liquid - float(pure_liquid[upper_temperature])
+            if excess > LIQUIDUS_SOLID_EPSILON:
+                onset_bracket = [lower_temperature, upper_temperature]
+                excess_at_upper = excess
+                break
+    if onset_bracket is None:
+        rating = cap
+        flags = [*reference_flags, DEPOSIT_MELT_BELOW_RESOLUTION_FLAG]
+    else:
+        # Use the lower endpoint of both engine brackets. The engine contributes
+        # only a temperature shift; the pure literature temperature supplies
+        # the rated reference. The upper cap keeps contamination from improving
+        # that rating even when the engine predicts a negative shift.
+        rating = min(
+            literature_temperature
+            + (onset_bracket[0] - bulk_low)
+            - margin,
+            cap,
+        )
+        flags = list(reference_flags)
+    service_excess = 0.0
+    if service_temperature_C is not None and deposits:
+        service_temperature = _finite_real(
+            service_temperature_C,
+            "service_temperature_C",
+        )
+        contaminated_service = _checked_liquid_fraction(
+            _sample_liquid_fraction(
+                sampler,
+                interface,
+                deposits,
+                liner,
+                service_temperature,
+                pressure,
+            )
+        )
+        baseline_service = _checked_liquid_fraction(
+            _sample_liquid_fraction(
+                sampler,
+                liner,
+                {},
+                liner,
+                service_temperature,
+                pressure,
+            )
+        )
+        service_excess = contaminated_service - baseline_service
+    return {
+        "pure_bulk_melt_bracket_C": list(pure_reference["bulk_melt_bracket_C"]),
+        "bulk_melt_residual_vs_literature_C": pure_reference.get(
+            "bulk_melt_residual_vs_literature_C"
+        ),
+        "engine_minor_phase_eutectic": pure_reference.get(
+            "engine_minor_phase_eutectic"
+        ),
+        "contaminated_melt_bracket_C": onset_bracket,
+        "excess_liquid_fraction_at_upper_bracket": excess_at_upper,
+        "excess_liquid_fraction_at_service_temperature": service_excess,
+        "literature_melting_temperature_C": literature_temperature,
+        "literature_reference_source": literature_source,
+        "rating_temperature_C": rating,
+        "rating_cap_temperature_C": cap,
+        "flags": list(dict.fromkeys(flags)),
+    }
 
 
 def corrosion_campaign_recurrence(
@@ -550,9 +834,19 @@ def corrosion_campaign_recurrence(
     if margin < 0.0:
         raise LinerCorrosionRefusal("temperature_margin_invalid")
 
+    pure_reference: dict[str, Any] | None = None
+    if not isinstance(sampler, TierAInvariantSampler):
+        if pressure_bar is None:
+            raise LinerCorrosionRefusal("liner_service_pressure_missing")
+        pure_reference = _tier_b_reference_profile(
+            sampler,
+            liner,
+            pressure_bar=pressure_bar,
+        )
+
     # Compute both stipulated deposition branches independently: composition
     # changes can make the larger deposit branch reach first liquid later.
-    hi, hi_deposit, hi_signal = _campaign_branch(
+    hi, hi_deposit, hi_signal, hi_activity = _campaign_branch(
         liner,
         initial_deposit_kg_by_species,
         branches["inert"],
@@ -564,17 +858,20 @@ def corrosion_campaign_recurrence(
         margin_C=margin,
         horizon=horizon,
         sampler=sampler,
+        pure_reference=pure_reference,
     )
     lo: int | str | None = None
     lo_deposit: dict[str, float] | None = None
     lo_signal: float | None = None
+    lo_activity: dict[str, Any] | None = None
     coupled: int | str | None = None
     coupled_deposit: dict[str, float] | None = None
     coupled_signal: float | None = None
+    coupled_activity: dict[str, Any] | None = None
     if reactive is not None:
         reactive_deposit = branches["reactive_upper_bound"]["deposit_kg_by_species"]
         try:
-            lo, lo_deposit, lo_signal = _campaign_branch(
+            lo, lo_deposit, lo_signal, lo_activity = _campaign_branch(
                 liner,
                 initial_deposit_kg_by_species,
                 reactive_deposit,
@@ -586,11 +883,12 @@ def corrosion_campaign_recurrence(
                 margin_C=margin,
                 horizon=horizon,
                 sampler=sampler,
+                pure_reference=pure_reference,
             )
         except LinerCorrosionRefusal as exc:
             reactive_refusal = exc.as_dict()
         else:
-            coupled, coupled_deposit, coupled_signal = _campaign_branch(
+            coupled, coupled_deposit, coupled_signal, coupled_activity = _campaign_branch(
                 liner,
                 initial_deposit_kg_by_species,
                 branches["inert"],
@@ -603,6 +901,7 @@ def corrosion_campaign_recurrence(
                 horizon=horizon,
                 sampler=sampler,
                 feedback_deposit_kg_by_species=reactive_deposit,
+                pure_reference=pure_reference,
             )
     flags = [
         DEPOSIT_OXIDATION_STATE_FLAG,
@@ -612,6 +911,8 @@ def corrosion_campaign_recurrence(
         DISSOLUTION_KINETICS_FLAG,
         CORROSION_NO_RATE_FLAG,
     ]
+    if pure_reference is not None:
+        flags.extend(pure_reference.get("flags", ()))
     if reactive_refusal is not None:
         flags.append("reactive_deposit_branch_refused")
     onset_by_branch: dict[str, int | str | None] = {
@@ -658,6 +959,12 @@ def corrosion_campaign_recurrence(
             "reactive_upper_bound": lo_signal,
             "inert": hi_signal,
             "coupled": coupled_signal,
+        },
+        "melt_activity": {
+            "pure_reference": pure_reference,
+            "reactive_upper_bound": lo_activity,
+            "inert": hi_activity,
+            "coupled": coupled_activity,
         },
         "reactive_branch_refusal": reactive_refusal,
         "sticking_state": branches,
@@ -953,11 +1260,32 @@ def _interface_state_at_depth(
             pressure_bar,
         )
     )
+    pure_reference = _tier_b_reference_profile(
+        sampler,
+        liner_composition_wt_pct,
+        pressure_bar=pressure_bar,
+    )
+    melt_activity = _tier_b_melt_activity_rating(
+        liner_composition_wt_pct,
+        mixed["composition_wt_pct"],
+        deposit_kg_by_species,
+        sampler=sampler,
+        pressure_bar=pressure_bar,
+        margin_C=margin_C,
+        literature_melting_temperature_C=None,
+        pure_reference=pure_reference,
+        service_temperature_C=service_temperature_C,
+    )
     return {
         "mixed": mixed,
-        "first_melt_T_C": None,
+        "first_melt_T_C": (
+            melt_activity["contaminated_melt_bracket_C"][0]
+            if melt_activity["contaminated_melt_bracket_C"]
+            else None
+        ),
         "liquid_fraction": liquid_fraction,
-        "onset": liquid_fraction > LIQUIDUS_SOLID_EPSILON,
+        "onset": service_temperature_C >= melt_activity["rating_temperature_C"],
+        "melt_activity": melt_activity,
     }
 
 
@@ -1166,6 +1494,9 @@ def build_liner_state_segment(
     first_melt_C = interface_state["first_melt_T_C"]
     liquid_fraction = interface_state["liquid_fraction"]
     onset = bool(interface_state["onset"])
+    melt_activity = interface_state.get("melt_activity")
+    if isinstance(melt_activity, Mapping):
+        flags.extend(melt_activity.get("flags", ()))
     sample_temperature_C = service_C - margin_C
     if tier == "B":
         flags.append("tier_b_liquid_fraction_only_no_solidus_claim")
@@ -1314,6 +1645,12 @@ def build_liner_state_segment(
                     "first_melt_T_C": sensitivity_state["first_melt_T_C"],
                     "liquid_fraction": sensitivity_state["liquid_fraction"],
                     "onset": sensitivity_state["onset"],
+                    "rating_temperature_C": (
+                        sensitivity_state.get("melt_activity", {}).get(
+                            "rating_temperature_C"
+                        )
+                    ),
+                    "melt_activity": sensitivity_state.get("melt_activity"),
                     "campaigns_to_runaway": (
                         sensitivity_recurrence["campaigns_to_runaway"]
                         if sensitivity_recurrence
@@ -1352,6 +1689,12 @@ def build_liner_state_segment(
         "porosity_fraction": raw_porosity,
         "deposit_kg_by_species": deposits,
         "first_melt_T_C": first_melt_C,
+        "rating_temperature_C": (
+            melt_activity.get("rating_temperature_C")
+            if isinstance(melt_activity, Mapping)
+            else first_melt_C
+        ),
+        "melt_activity": melt_activity,
         "service_T_C": service_C,
         "service_pressure_bar": pressure,
         "enamel": dict(enamel),
@@ -2080,6 +2423,7 @@ class MageminLinerSampler:
         self._backend = backend
         self._initialized = False
         self._point_cache: dict[tuple[Any, ...], float] = {}
+        self._sample_diagnostics: dict[tuple[Any, ...], dict[str, Any]] = {}
         self._curve_cache: dict[tuple[Any, ...], TabulatedLiquidFractionCurve] = {}
         self.flags: list[str] = []
         self.authority_level = "verified"
@@ -2142,8 +2486,36 @@ class MageminLinerSampler:
         if fraction is None:
             raise LinerCorrosionRefusal("engine_liquid_fraction_missing")
         liquid_fraction = _checked_liquid_fraction(fraction)
+        phases = getattr(result, "phases_present", ()) or ()
+        self._sample_diagnostics[key] = {
+            "phases": [str(phase) for phase in phases],
+            "element_closure_verified": closure_verified,
+            "phase_compositions_available": bool(
+                getattr(result, "phase_compositions", None)
+                or getattr(result, "liquid_composition_wt_pct", None)
+            ),
+        }
         self._point_cache[key] = liquid_fraction
         return liquid_fraction
+
+    def sample_diagnostics(
+        self,
+        composition_wt_pct: Mapping[str, Any],
+        temperature_C: float,
+        pressure_bar: float,
+    ) -> dict[str, Any]:
+        """Return metadata for the matching cached single-point solve."""
+
+        composition = validate_oxide_composition(composition_wt_pct)
+        key = magemin_request_cache_key(
+            engine=MAGEMIN_ENGINE_ID,
+            version=MAGEMIN_REQUEST_CACHE_VERSION,
+            composition_wt_pct=composition,
+            temperature_C=_finite_real(temperature_C, "temperature_C"),
+            pressure_bar=_positive(pressure_bar, "pressure_bar"),
+            fO2_log=MAGEMIN_FO2_LOG,
+        )
+        return dict(self._sample_diagnostics.get(key, {}))
 
     def curve(
         self,
