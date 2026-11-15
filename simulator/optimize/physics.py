@@ -938,25 +938,42 @@ def _explicit_molar_mass_kg_per_mol(
     return mass
 
 
+def _catalog_legacy_projection(catalog: Any | None) -> Mapping[str, Any] | None:
+    """Read the run projection, retaining legacy-only catalog adapters."""
+
+    if catalog is None:
+        return None
+    legacy = getattr(catalog, "_legacy_projection", None)
+    if isinstance(legacy, MappingABC):
+        return legacy
+    # A few supported non-VapourRailCatalog adapters expose only this read
+    # seam. Production run catalogs take the projection path above.
+    legacy_view = getattr(catalog, "legacy_view", None)
+    if not callable(legacy_view):
+        return None
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    try:
+        legacy = legacy_view()
+    except CatalogCompileError:
+        return None
+    return legacy if isinstance(legacy, MappingABC) else None
+
+
 def _catalog_molar_mass_kg_per_mol(
     catalog: Any | None,
     species: str,
 ) -> float | None:
-    """Publisher molar mass on this run's catalog.
+    """Publisher molar mass on this run's compiled catalog.
 
-    A missing operand is not a guessed formula mass. The legacy view is
-    the publisher's lookup, including its ``MOLAR_MASS`` fallback. There
-    is no second catalog.
+    The production resolver preserves the publisher's molar-mass lookup,
+    including its ``MOLAR_MASS`` fallback. There is no second catalog.
     """
 
     from simulator.evaporation import production_vapor_molar_mass_g_per_mol
-    from simulator.vapour_rail.catalog import CatalogCompileError
 
-    if catalog is None or not hasattr(catalog, "legacy_view"):
-        return None
-    try:
-        legacy = catalog.legacy_view()
-    except CatalogCompileError:
+    legacy = _catalog_legacy_projection(catalog)
+    if legacy is None:
         return None
     grams = production_vapor_molar_mass_g_per_mol(legacy, species)
     if isinstance(grams, bool) or not isinstance(grams, int | float):
@@ -1301,21 +1318,8 @@ def _legacy_vapour_row(
 ) -> Mapping[str, Any] | None:
     """Publisher species row, metals first, as the molar-mass lookup does."""
 
-    if catalog is None or not hasattr(catalog, "legacy_view"):
-        return None
-    # VapourRailCatalog already owns the compiled compatibility projection.
-    # Read its row directly: legacy_view() deep-copies the entire projection,
-    # which is unnecessary for this read-only supply lookup. Keep the legacy
-    # accessor fallback for catalog-shaped test doubles and older callers.
-    legacy = getattr(catalog, "_legacy_projection", None)
-    if not isinstance(legacy, MappingABC):
-        from simulator.vapour_rail.catalog import CatalogCompileError
-
-        try:
-            legacy = catalog.legacy_view()
-        except CatalogCompileError:
-            return None
-    if not isinstance(legacy, MappingABC):
+    legacy = _catalog_legacy_projection(catalog)
+    if legacy is None:
         return None
     for group in ("metals", "oxide_vapors"):
         rows = legacy.get(group) or {}
