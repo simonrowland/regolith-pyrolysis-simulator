@@ -353,6 +353,16 @@ def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
         == 'liquid_fraction_provider_failed'
     )
     assert gate_error.value.diagnostic['provider'] == 'magemin'
+    projected = gate_error.value.diagnostic['provider_diagnostic'][
+        'backend_diagnostics'
+    ]
+    assert projected['projected_liquidus_status'] == 'unavailable'
+    assert projected['projected_liquidus_diagnostics'][
+        'backend_status_reason'
+    ] == 'missing_binary'
+    assert projected['projected_liquidus_diagnostics'][
+        'backend_failure_disposition'
+    ] == 'environment'
     assert gate_sim._last_melt_redox_liquidus_gate_diagnostic == {}
 
 
