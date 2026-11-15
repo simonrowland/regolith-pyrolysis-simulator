@@ -51,8 +51,9 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # sha 3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0
 # dex -0.013180332034779389
 # The offer frame is a_D * f from the Darken & Gurry factor.
+# The numeric pin is green; the digest captures the current JANAF and d-333 notices.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "6894aec2a81a2b215add00ee4576865fc0bcc87eb144ba3eb6574f426b97d971"
+    "6ca537f3aebbf954650edbfa6a1c2cac43c4daef05def1348711beccf0123a9a"
 )
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
 
@@ -271,7 +272,7 @@ def distin_migration():
     return migrator.result
 
 
-def test_distin_closed_redox_residual_line_matches_green_bytes(
+def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
     distin_migration,
 ) -> None:
     observation = next(

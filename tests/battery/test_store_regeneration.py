@@ -67,6 +67,45 @@ def test_check_store_detects_byte_drift_in_a_small_tree(
     assert "migration-report.md" in capsys.readouterr().out
 
 
+def test_reference_queue_report_is_stable_in_fresh_regeneration(
+    tmp_path: Path,
+) -> None:
+    root = _empty_root(tmp_path / "repo")
+    manifest = (
+        root
+        / "data"
+        / "literature"
+        / "compilations"
+        / "fixture-reference"
+        / "manifest.yaml"
+    )
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(
+        "schema_version: literature_compilation_manifest.v1\n"
+        "source_id: fixture-reference\n"
+        "compilation_role:\n"
+        "  scoring_eligible: false\n",
+        encoding="utf-8",
+    )
+    result = migration.MigrationResult()
+    result.add_queue(
+        "fixture-work",
+        {"page": 1},
+        ["value"],
+        "mapping required",
+        source=(
+            "data/literature/compilations/fixture-reference/records/record.yaml"
+        ),
+        observation_id="fixture-observation",
+    )
+
+    migration.write_outputs(result, root)
+
+    assert result.queue_work_counts is not None
+    assert result.queue_work_counts.reference_by_source == {"fixture-reference": 1}
+    assert migration._store_regeneration_differences(root, result) == []
+
+
 @pytest.mark.nightly
 @pytest.mark.xdist_group("serial")
 @pytest.mark.cpu_budget(2600)
