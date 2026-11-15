@@ -2851,6 +2851,10 @@ def _rankin_table_a_records(document: Mapping[str, Any]) -> list[dict[str, Any]]
                 "invalid_compound_composition",
                 f"{observation_id} has a non-text component name",
             )
+        if len(components) < 2:
+            # Table A rows 1-3 are pure-component melting references, not the
+            # multicomponent compound transitions used by the invariant table.
+            continue
         subsystem = "-".join(components)
         if transformation.startswith("Melting"):
             phases = [formula, "liquid"]
