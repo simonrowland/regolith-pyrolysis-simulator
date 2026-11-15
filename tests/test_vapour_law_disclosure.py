@@ -3879,7 +3879,7 @@ def test_c0_forecast_context_shares_the_parent_registry(monkeypatch) -> None:
     sim.backend = None
     sim._c0_forecast_backend_factory = None
     sim._pt0_determinism_store = None
-    sim.atom_ledger = object()
+    sim.atom_ledger = _in_domain_freeze_gate_ledger()
     sim._chem_registry = ProviderRegistry()
     sim._chem_kernel = None
     sim._build_chemistry_kernel = lambda: None
