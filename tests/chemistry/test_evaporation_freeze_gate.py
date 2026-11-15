@@ -11,6 +11,7 @@ import os
 from types import SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 
 from simulator import evaporation as evaporation_module
 from simulator import engine_binding_admission as admission_module
@@ -4626,7 +4627,7 @@ def test_shuttle_bakeout_cycle_counter_waits_for_successful_hour(
 
 
 def _bakeout_cycle_trace(sim, dt_hr):
-    sim._step_dt_hr = dt_hr
+    step_clock.set_dt_hr(sim, dt_hr)
     sim._shuttle_phase = ''
     bakeout_entries = []
     scheduled_increments = []

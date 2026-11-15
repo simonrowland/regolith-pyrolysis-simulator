@@ -14,6 +14,7 @@ import warnings
 from pathlib import Path
 
 import pytest
+import simulator.step_clock as step_clock
 import yaml
 import simulator.melt_backend.alphamelts as alphamelts_module
 
@@ -3946,7 +3947,7 @@ def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
 
         def equilibrate(self, **kwargs):
             vapor_calls.append(kwargs)
-            return SimpleNamespace(status='ok', vapor_pressures_Pa={'SiO': 1.0})
+            return types.SimpleNamespace(status='ok', vapor_pressures_Pa={'SiO': 1.0})
 
     backend._vaporock_available = True
     backend._vaporock_helper = VapoRockSpy()
@@ -10797,7 +10798,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
     helper = _vaporock_helper_returning({'SiO': 0.4})
     backend._vaporock_helper = helper
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
-    sim._step_dt_hr = 1.0
+    step_clock.set_dt_hr(sim, 1.0)
     sim.backend = backend
     sim.melt = types.SimpleNamespace(
         body='moon', ambient_pressure_mbar=0.0,

@@ -13,6 +13,7 @@ import sys
 from types import SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 import yaml
 
 import engines.engine_commissioning as engine_commissioning_module
@@ -2165,6 +2166,7 @@ def test_projection_over_one_percent_refuses_and_provider_solves_projected(
     assert fallback_provenance["SiO"]["projected_composition_solve"] == notice
     assert fallback_provenance["SiO"]["melt_activity_authority"] == "projected_composition_solve"
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    step_clock.initialize_committed_step_state(sim)
     sim.melt = SimpleNamespace(hour=1, campaign=CampaignPhase.C2A)
     sim._note_high_t_melt_activity_fallback(high_t, fallback_provenance)
     run_notice = sim.high_t_melt_activity_run_notice()

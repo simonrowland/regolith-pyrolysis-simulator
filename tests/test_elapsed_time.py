@@ -4,10 +4,10 @@ These are numerical integration checks, not experimental accuracy budgets.
 The operator split is first order; Richardson differences must decrease on
 halving dt. Equal segmentation uses the same internal mesh throughout.
 """
-import json
 import math
 
 import pytest
+import simulator.step_clock as step_clock
 
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError
@@ -185,7 +185,7 @@ def test_first_order_campaign_refinement():
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS[:2], ids=lambda s: s["name"])
-def test_hourly_bytes_preserve_values_with_reviewed_float_zero_sinks(scenario):
+def test_hourly_bytes_match_committed_golden(scenario):
     kwargs = {key: scenario[key] for key in (
         "feedstock_id", "campaign", "hours", "additives_kg"
     )}
@@ -199,19 +199,7 @@ def test_hourly_bytes_preserve_values_with_reviewed_float_zero_sinks(scenario):
     )
     ordinary = PyrolysisRun(**kwargs).run()
     explicit = PyrolysisRun(**kwargs, dt_hr=1.0).run()
-    historical = json.loads((FIXTURES_DIR / scenario["fixture"]).read_bytes())
-    # Controller review seq 2 permits exactly this type-only serialization
-    # correction at the thermal-budget owner. Every other byte stays pinned.
-    for row in historical["per_hour_summary"]:
-        sinks = row["energy_evaporation_breakdown_kWh"]
-        for key in (
-            "evaporation_enthalpy_sink",
-            "product_vapor_enthalpy_sink",
-            "reaction_disproportionation_enthalpy_sink",
-        ):
-            if sinks[key] == 0:
-                sinks[key] = 0.0
-    expected = json_bytes(historical)
+    expected = (FIXTURES_DIR / scenario["fixture"]).read_bytes()
     assert json_bytes(ordinary) == expected
     assert json_bytes(explicit) == expected
 
@@ -487,7 +475,7 @@ def test_c5_unreachable_rung_uses_both_substep_temperature_predicates(
 ):
     sim = _run(campaign="C5", dt_hr=0.25, hours=0.25,
                lab_schedule=_plateau_then_ramp_schedule())._start_session().simulator
-    sim._step_dt_hr = 0.25
+    step_clock.set_dt_hr(sim, 0.25)
     sim.melt.campaign_hour = 3.5
     sim.melt.temperature_C = temperature
     sim.melt.c5_enabled = True
@@ -520,7 +508,7 @@ def test_remaining_live_target_readers_forward_the_interval(monkeypatch, reader)
     from simulator.state import CampaignPhase
 
     sim = _isothermal_session(0.25).simulator
-    sim._step_dt_hr = 0.25
+    step_clock.set_dt_hr(sim, 0.25)
     sim.melt.campaign_hour = 3.5
     sim.melt.temperature_C = 1500.0
     campaign = (CampaignPhase.C3_NA if reader == "staged_na"

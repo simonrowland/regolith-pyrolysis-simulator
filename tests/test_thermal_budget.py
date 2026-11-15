@@ -26,15 +26,19 @@ BASE_THERMAL_BUDGET_ARGS = {
 }
 
 
-def test_empty_evaporation_enthalpy_sinks_are_float_zeros():
+def test_empty_evaporation_enthalpy_sinks_are_integer_zeros():
     result = evaporation_enthalpy_budget({})
 
     for key in ("latent_kWh", "dissociation_kWh", "evaporation_thermal_kWh"):
-        assert type(result[key]) is float
+        assert type(result[key]) is int
         assert result[key] == 0.0
-    for value in result["heat_flows_kWh"].values():
-        assert type(value) is float
-        assert value == 0.0
+    for key in (
+        "evaporation_enthalpy_sink",
+        "reaction_disproportionation_enthalpy_sink",
+        "product_vapor_enthalpy_sink",
+    ):
+        assert type(result["heat_flows_kWh"][key]) is int
+    assert type(result["heat_flows_kWh"]["net_unallocated"]) is float
 
 
 def test_evaporation_enthalpy_budget_adds_latent_and_dissociation_sinks():

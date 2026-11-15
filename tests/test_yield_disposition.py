@@ -2,6 +2,7 @@ import math
 from types import SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 
 from simulator.accounting import (
     AccountPolicy,
@@ -1462,7 +1463,7 @@ def _refusal_sequence_session(
         material_origin="feedstock",
     )
     sim = object.__new__(PyrolysisSimulator)
-    sim._step_dt_hr = 1.0
+    step_clock.set_dt_hr(sim, 1.0)
     # A terminal refusal reads the lazy condensation model after rollback.
     # Supply its construction inputs while leaving both models unbuilt.
     sim.setpoints = {}
@@ -1514,7 +1515,7 @@ def _refusal_sequence_session(
                 {"detail": "synthetic C6 terminal refusal"}
             )
         sim.melt.hour += 1
-        return SimpleNamespace(hour=sim.melt.hour, duration_h=sim._step_dt_hr)
+        return SimpleNamespace(hour=sim.melt.hour, duration_h=step_clock.dt_hr(sim))
 
     sim._step_one_hour = step_one_hour
     session = SimSession()

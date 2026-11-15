@@ -4,6 +4,7 @@ import copy
 from types import SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 
 from engines.builtin.foulant_disposition import _pure_component_antoine_pa
 from engines.builtin.melt_effect_adjustment import (
@@ -254,7 +255,7 @@ def test_c7_ca_partial_antoine_block_is_omitted_with_notice(monkeypatch):
 
     class FakeExtraction(ExtractionMixin):
         def __init__(self):
-            self._step_dt_hr = 1.0
+            step_clock.set_dt_hr(self, 1.0)
             source_row = load_config_bundle().setpoints["campaigns"]["C7"]
             self.setpoints = {
                 "campaigns": {

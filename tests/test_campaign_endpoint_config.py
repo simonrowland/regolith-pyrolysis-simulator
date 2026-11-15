@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 import yaml
 
 from engines.engine_commissioning import PUBLISHED_AUTHORITY_OUTSIDE
@@ -673,7 +674,7 @@ def test_c4_refusal_latches_is_complete() -> None:
     setpoints = _setpoints()
     setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 1.0
     sim = object.__new__(PyrolysisSimulator)
-    sim._step_dt_hr = 1.0
+    step_clock.set_dt_hr(sim, 1.0)
     sim.campaign_mgr = CampaignManager(setpoints)
     sim.melt = _melt(CampaignPhase.C4, 0, temperature_C=1220.0)
     sim.train = CondensationTrain()
@@ -820,7 +821,7 @@ def test_c4_refusal_plumbing_does_not_store_as_c6() -> None:
     setpoints = _setpoints()
     setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 1.0
     sim = object.__new__(PyrolysisSimulator)
-    sim._step_dt_hr = 1.0
+    step_clock.set_dt_hr(sim, 1.0)
     sim.campaign_mgr = CampaignManager(setpoints)
     sim.melt = _melt(CampaignPhase.C4, 0, temperature_C=1220.0)
     sim.train = CondensationTrain()

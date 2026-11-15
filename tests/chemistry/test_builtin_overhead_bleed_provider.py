@@ -6,6 +6,7 @@ import copy
 import math
 
 import pytest
+import simulator.step_clock as step_clock
 
 from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
 from simulator.accounting import resolve_species_formula
@@ -472,7 +473,7 @@ def test_inert_sweep_prediction_matches_committed_subhour_bleed(
         "process.overhead_gas", {"O2": molar_mass},
         source="subhour sweep projection", material_origin="feedstock",
     )
-    sim._step_dt_hr = dt_hr
+    step_clock.set_dt_hr(sim, dt_hr)
     predicted = sim._inert_sweep_transport_pO2_bar(1.0)
     result = sim._dispatch_overhead_bleed()
     assert result.status == "ok"

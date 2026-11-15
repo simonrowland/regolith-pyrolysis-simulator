@@ -20,6 +20,7 @@ import math
 from types import SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.condensation import CondensationModel
@@ -965,7 +966,7 @@ def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
     assert gas.evap_exceeds_transport is True
 
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
-    sim._step_dt_hr = 1.0
+    step_clock.set_dt_hr(sim, 1.0)
     sim.melt = melt
     sim.melt.campaign = CampaignPhase.C2A
     sim.melt.campaign_hour = 0.0

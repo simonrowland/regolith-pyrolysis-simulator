@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 
 import pytest
+import simulator.step_clock as step_clock
 
 import simulator.chemistry.phase_context as phase_context_module
 from simulator.state import CampaignPhase, EvaporationFlux
@@ -299,7 +300,7 @@ def test_subhour_oxygen_consumers_retain_abundant_reactant_rates_and_close_atoms
         assert actual.species_kg_hr[species] == pytest.approx(
             raw[species], rel=parent_exposure + oxygen_exposure + 8 * math.ulp(1.0),
         )
-    sim._step_dt_hr = dt
+    step_clock.set_dt_hr(sim, dt)
     oxygen_before = sim.atom_ledger.kg_by_account("process.overhead_gas")["O2"]
     for species, rate in actual.species_kg_hr.items():
         _, transition = sim._credit_evaporation_transition(

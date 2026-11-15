@@ -14,6 +14,7 @@ from engines.antoine import (
     _read_antoine_coefficients,
 )
 import simulator.mre_ladder as mre_ladder
+import simulator.step_clock as step_clock
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
@@ -797,7 +798,7 @@ class ExtractionMixin:
         controls = {
             'mode': 'stratify',
             'k_mix_per_hr': k_mix_per_hr,
-            'dt_hr': self._step_dt_hr,
+            'dt_hr': step_clock.dt_hr(self),
             'temperature_K': temperature_K,
             'melt_density_kg_m3': melt_density,
             'prior_pool_mol': dict(
@@ -1523,7 +1524,7 @@ class ExtractionMixin:
                 step_info = seq[idx]
                 voltage_V = step_info['voltage']
 
-                self._mre_hold_hours += 1 if self._step_dt_hr == 1.0 else self._step_dt_hr
+                self._mre_hold_hours += 1 if step_clock.dt_hr(self) == 1.0 else step_clock.dt_hr(self)
 
                 # Advance only after affirmative effective current (or
                 # explicit species-absent evidence). Continuous near-zero
@@ -1629,7 +1630,7 @@ class ExtractionMixin:
                 if allowed_oxides is not None:
                     rung_allowed_oxides &= set(allowed_oxides)
 
-                self._mre_hold_hours += 1 if self._step_dt_hr == 1.0 else self._step_dt_hr
+                self._mre_hold_hours += 1 if step_clock.dt_hr(self) == 1.0 else step_clock.dt_hr(self)
                 if self._mre_hold_hours >= step_info.get('min_hold_hours', 3):
                     c5_current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
                     target_current_low = (
@@ -1654,7 +1655,7 @@ class ExtractionMixin:
                             self.melt.campaign,
                             self.melt.campaign_hour,
                             self.melt,
-                            dt_hr=self._step_dt_hr,
+                            dt_hr=step_clock.dt_hr(self),
                         )
                     )
                     at_campaign_temperature = (
@@ -1709,7 +1710,7 @@ class ExtractionMixin:
             c5_allowed_oxides = sorted(rung_allowed_oxides)
 
         return PlantMREIntervalControl(
-            dt_h=self._step_dt_hr,
+            dt_h=step_clock.dt_hr(self),
             applied_current_A=float(current_A),
             applied_voltage_V=float(voltage_V),
             temperature_C=float(self.melt.temperature_C),
@@ -2358,7 +2359,7 @@ class ExtractionMixin:
                 CampaignPhase.C3_NA,
                 0,
                 self.melt,
-                dt_hr=self._step_dt_hr,
+                dt_hr=step_clock.dt_hr(self),
             )[0]
         )
         configured_margin = (
@@ -2604,7 +2605,7 @@ class ExtractionMixin:
                     ),
                     'true_available_mol_by_species': true_feo_mol,
                     'liquid_fraction': liquid_fraction,
-                    'dt_hr': self._step_dt_hr,
+                    'dt_hr': step_clock.dt_hr(self),
                 },
                 temperature_C_override=temperature_C,
             )
@@ -2771,7 +2772,7 @@ class ExtractionMixin:
         # tick, so the first real shuttle tick starts with campaign_hour == 1.
         # campaign_hour is the end of the last committed interval when the
         # shuttle phase is sampled. Use the saved start of that committed
-        # interval; the current _step_dt_hr belongs to the next step and may
+        # interval; the active duration belongs to the next step and may
         # differ (for example at a run stop or schedule breakpoint).
         interval_end_hour = float(self.melt.campaign_hour)
         interval_start_hour = float(
@@ -2878,7 +2879,7 @@ class ExtractionMixin:
                 'true_available_mol_by_species':
                     self._cleaned_melt_available_mol_by_species(('FeO',)),
                 'liquid_fraction': liquid_fraction,
-                'dt_hr': self._step_dt_hr,
+                'dt_hr': step_clock.dt_hr(self),
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
@@ -2908,7 +2909,7 @@ class ExtractionMixin:
             diagnostic=diagnostic,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_K,
-                'dt_hr': self._step_dt_hr,
+                'dt_hr': step_clock.dt_hr(self),
             },
         )
         # The stirred melt makes feedstock and reagent K one well-mixed pool.
@@ -3000,7 +3001,7 @@ class ExtractionMixin:
                         ('FeO', 'Cr2O3', 'TiO2'),
                     ),
                 'liquid_fraction': liquid_fraction,
-                'dt_hr': self._step_dt_hr,
+                'dt_hr': step_clock.dt_hr(self),
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
@@ -3030,7 +3031,7 @@ class ExtractionMixin:
             diagnostic=diagnostic,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_NA,
-                'dt_hr': self._step_dt_hr,
+                'dt_hr': step_clock.dt_hr(self),
             },
         )
         self._record_stage_routed_metal_credits('C3', transition)
@@ -3268,7 +3269,7 @@ class ExtractionMixin:
                     c6_cfg.get('kinetic_driven_above_crossover')
                 ),
                 'kinetic_note': str(c6_cfg.get('kinetic_note') or ''),
-                'dt_hr': self._step_dt_hr,
+                'dt_hr': step_clock.dt_hr(self),
             },
         )
         primary_diag = dict(primary_result.diagnostic or {})
@@ -3286,7 +3287,7 @@ class ExtractionMixin:
             diagnostic=primary_diag,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C6_MG,
-                'dt_hr': self._step_dt_hr,
+                'dt_hr': step_clock.dt_hr(self),
             },
         )
         # The stirred melt makes feedstock and reagent Mg one well-mixed pool.
@@ -3331,7 +3332,7 @@ class ExtractionMixin:
                     c6_cfg.get('kinetic_driven_above_crossover')
                 ),
                 'kinetic_note': str(c6_cfg.get('kinetic_note') or ''),
-                'dt_hr': self._step_dt_hr,
+                'dt_hr': step_clock.dt_hr(self),
             },
         )
         back_diag = dict(back_result.diagnostic or {})
@@ -3346,7 +3347,7 @@ class ExtractionMixin:
                 control_inputs={
                     'reaction_family': REACTION_FAMILY_C6_MG,
                     'back_reduction': True,
-                    'dt_hr': self._step_dt_hr,
+                    'dt_hr': step_clock.dt_hr(self),
                 },
             )
             self._apply_c6_back_reduction_redox_source_terms(
@@ -3402,7 +3403,7 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C6_MG,
                 'product_routing': True,
                 'mol_Al_product': mol_Al_product,
-                'dt_hr': self._step_dt_hr,
+                'dt_hr': step_clock.dt_hr(self),
             },
         )
         product_proposal = product_result.transition
@@ -3414,7 +3415,7 @@ class ExtractionMixin:
                 control_inputs={
                     'reaction_family': REACTION_FAMILY_C6_MG,
                     'product_routing': True,
-                    'dt_hr': self._step_dt_hr,
+                    'dt_hr': step_clock.dt_hr(self),
                 },
             )
             self._project_drain_tap_from_atom_ledger()
@@ -3448,7 +3449,7 @@ class ExtractionMixin:
             CampaignPhase.C7_CA_ALUMINOTHERMIC,
             getattr(self.melt, 'campaign_hour', 0),
             self.melt,
-            dt_hr=self._step_dt_hr,
+            dt_hr=step_clock.dt_hr(self),
         )
         return self._c7_float(
             cfg.get('hold_temp_C', cfg.get('default_hold_T_C')),
@@ -3903,7 +3904,7 @@ class ExtractionMixin:
         # Legacy C7 assigns hold_time_h exposure per reference-hour step.
         # Exposure scales by dt/1h (dimensionless): .25h gives one quarter
         # of that prescribed exposure, rather than repeating it four times.
-        hold_time_s = hold_time_h * 3600.0 * self._step_dt_hr
+        hold_time_s = hold_time_h * 3600.0 * step_clock.dt_hr(self)
         from simulator.transport_regime import continuum_validity_refuses
 
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
@@ -4273,6 +4274,8 @@ class ExtractionMixin:
         captured_ca_mol: float,
         diagnostics: list[dict],
     ) -> None:
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
         ca_shuttle = self._c7_nested(cfg.get('ca_shuttle'))
         if not self._c7_bool(ca_shuttle.get('enabled'), False):
             return

@@ -120,16 +120,18 @@ class EnergyTracker:
 
         # The fields above integrate a constant power over one reference hour.
         # E=P[kW]*dt[h]; 4 kW for .25 h is 1 kWh. MRE already supplies
-        # interval energy. Scale after the legacy operations to preserve dt=1.
-        record.turbine_kWh *= dt_hr
-        record.condenser_kWh *= dt_hr
-        record.evaporation_thermal_kWh *= dt_hr
-        record.latent_kWh *= dt_hr
-        record.dissociation_kWh *= dt_hr
-        record.evaporation_breakdown_kWh = {
-            key: value * dt_hr
-            for key, value in record.evaporation_breakdown_kWh.items()
-        }
+        # interval energy. Skip the no-op multiplication at dt=1 so exact
+        # integer zeros retain their historical JSON representation.
+        if dt_hr != 1.0:
+            record.turbine_kWh *= dt_hr
+            record.condenser_kWh *= dt_hr
+            record.evaporation_thermal_kWh *= dt_hr
+            record.latent_kWh *= dt_hr
+            record.dissociation_kWh *= dt_hr
+            record.evaporation_breakdown_kWh = {
+                key: value * dt_hr
+                for key, value in record.evaporation_breakdown_kWh.items()
+            }
         record.sum_scoped_energy()
 
         # Track cumulative

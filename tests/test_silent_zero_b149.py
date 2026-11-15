@@ -8,6 +8,7 @@ from __future__ import annotations
 from types import MethodType, SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 
 from simulator.condensation import _coerce_alpha_s
 from simulator.campaigns import CampaignManager, CampaignSetpointMissingRefusal
@@ -477,7 +478,6 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
         }
     }
     sim = SimpleNamespace(
-        _step_dt_hr=1.0,
         melt=SimpleNamespace(
             campaign=CampaignPhase.C7_CA_ALUMINOTHERMIC,
             campaign_hour=0,
@@ -495,6 +495,7 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
         _evaporation_bulk_partial_pressure_pa=lambda sp: 0.0,
         _silent_zero_notes=[],
     )
+    step_clock.set_dt_hr(sim, 1.0)
     # Static/instance helpers resolved on the mixin class, not the host.
     sim._c7_float = ExtractionMixin._c7_float
     sim._c7_clamp = ExtractionMixin._c7_clamp

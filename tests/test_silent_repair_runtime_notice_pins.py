@@ -5,6 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
@@ -48,7 +49,7 @@ def _sr24_simulator(monkeypatch, *, fe3_ratio: float, scas_ppm: float = 250.0):
     )
 
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
-    sim._step_dt_hr = 1.0
+    step_clock.set_dt_hr(sim, 1.0)
     sim.melt = SimpleNamespace(
         hour=0,
         temperature_C=926.85,
@@ -88,7 +89,7 @@ def test_sr21_rejected_backend_message_names_producer_without_claiming_fallback(
         backend.is_available = lambda: True
         backend.equilibrate = lambda **_kwargs: result
         sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
-        sim._step_dt_hr = 1.0
+        step_clock.set_dt_hr(sim, 1.0)
         sim.backend = backend
         sim._backend_failed = False
         sim.melt = SimpleNamespace(

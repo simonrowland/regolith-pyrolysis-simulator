@@ -20,10 +20,22 @@ from simulator.scalar_boundary import coerce_nonnegative_hours
 
 
 def initialize_committed_step_state(simulator) -> None:
-    simulator._step_dt_hr = 1.0
-    simulator._last_committed_step_dt_hr = 1.0
+    simulator._dt_hr = 1.0
+    simulator._last_committed_duration_hr = 1.0
     simulator._last_committed_campaign_interval_start_h = 0.0
     simulator._pending_shuttle_bakeout_cycle_increment = 0
+
+
+def dt_hr(simulator) -> float:
+    """Return the duration of the interval currently being simulated."""
+
+    return simulator._dt_hr
+
+
+def set_dt_hr(simulator, duration_h: float) -> None:
+    """Set the active interval duration through the clock owner."""
+
+    simulator._dt_hr = duration_h
 
 
 def reset_campaign_interval_state(simulator) -> None:
@@ -69,16 +81,16 @@ def advance_melt_clock(melt, dt_hr: float) -> float:
 def committed_snapshot_duration(simulator) -> Iterator[None]:
     """Expose the active interval duration while materializing its snapshot."""
 
-    previous_dt_hr = simulator._last_committed_step_dt_hr
-    simulator._last_committed_step_dt_hr = simulator._step_dt_hr
+    previous_dt_hr = simulator._last_committed_duration_hr
+    simulator._last_committed_duration_hr = dt_hr(simulator)
     try:
         yield
     finally:
-        simulator._last_committed_step_dt_hr = previous_dt_hr
+        simulator._last_committed_duration_hr = previous_dt_hr
 
 
 def commit_interval(simulator, campaign_start_h: float) -> None:
-    simulator._last_committed_step_dt_hr = simulator._step_dt_hr
+    simulator._last_committed_duration_hr = dt_hr(simulator)
     simulator._last_committed_campaign_interval_start_h = campaign_start_h
     pending = simulator._pending_shuttle_bakeout_cycle_increment
     if simulator.melt.campaign.name == "C3_K":
@@ -115,7 +127,7 @@ class CommittedStepProjection:
 
 
 def project_committed_step(simulator) -> CommittedStepProjection:
-    duration_h = simulator._last_committed_step_dt_hr
+    duration_h = simulator._last_committed_duration_hr
     return CommittedStepProjection(
         duration_h=duration_h,
         shuttle_cycle=projected_shuttle_cycle(simulator),

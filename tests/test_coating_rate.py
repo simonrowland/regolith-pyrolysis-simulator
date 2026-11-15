@@ -636,9 +636,8 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         # b-244: Al/Ti operator T_cond overrides removed (report-only); 14 text/audit leaves, 0 numeric; Al crossing authority -> capture_threshold_fallback.
         # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
         # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
-        # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 physical leaves changed.
-        # Elapsed-time integration retains float-typed zero energy sinks, as reviewed in tests/test_elapsed_time.py.
-        "4330d0b458d10da6a54917779b3dcf72b27dbf229512bc545597ccc385deacbd"
+        # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed.
+        "14387e1e0fe81b14d7557d4da279a8d62b9f6e5cab2d8a449931e958860db7de"
     )
 
 

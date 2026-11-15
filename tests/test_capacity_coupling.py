@@ -7,6 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import simulator.step_clock as step_clock
 import yaml
 
 import simulator.capacity_coupling as capacity_coupling
@@ -1654,7 +1655,7 @@ def test_loop3_renders_live_binding_cause(
         capacity=FiniteCapacity(oxygen_capacity),
     )
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
-    sim._step_dt_hr = 1.0
+    step_clock.set_dt_hr(sim, 1.0)
     sim.melt = SimpleNamespace(
         temperature_C=1500.0,
         campaign=CampaignPhase.C2A,
