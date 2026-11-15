@@ -76,6 +76,8 @@ from typing import (
 import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery.source_declarations import SOURCE_DECLARATIONS
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
@@ -200,6 +202,7 @@ from simulator.battery.records import (
     Annotations,
     Apparatus,
     ApparatusGeometry,
+    ApproxPressure,
     Bench,
     BenchFact,
     BenchIdentity,
@@ -237,7 +240,12 @@ from simulator.battery.records import (
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
+    approx_pressure_from_mapping,
+    approximate_derived_total_reason,
     as_decimal,
+    identity_pressure_from_converted_point,
+    identity_pressure_state,
+    nominal_pressure_pa,
     phase_token,
 )
 from simulator.battery.enums import BenchIdentityBasis, CellMaterial
@@ -892,13 +900,6 @@ def work_filename(work_id: str) -> str:
     """Filesystem-safe name. DOI slash → underscore; work_id inside YAML is exact."""
 
     return work_id.replace("/", "_") + ".yaml"
-
-
-def _dec_str(value: Decimal) -> str:
-    text = format(value, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text or "0"
 
 
 class _InvalidDecimalValue(Exception):
@@ -3117,6 +3118,19 @@ def _standard_state_from_extract_text(
     )
 
 
+def _identity_total_pressure_from_plain(value: object) -> Decimal | ApproxPressure:
+    """This axis only. A decimal stays a decimal. A band mapping reloads as a band.
+
+    Every other identity axis still uses ``as_decimal``. A mapping that is
+    not an approximate pressure refuses, so a point condition cannot land
+    on the identity as a bare point.
+    """
+
+    if isinstance(value, Mapping):
+        return approx_pressure_from_mapping(value)
+    return as_decimal(value)
+
+
 def _identity_from_plain(
     payload: object,
     *,
@@ -3180,7 +3194,7 @@ def _identity_from_plain(
         kwargs["fO2_Pa"] = _state_from_plain(payload["fO2_Pa"], as_decimal)
     if payload.get("total_pressure_Pa") is not None:
         kwargs["total_pressure_Pa"] = _state_from_plain(
-            payload["total_pressure_Pa"], as_decimal
+            payload["total_pressure_Pa"], _identity_total_pressure_from_plain
         )
     if payload.get("sweep_gas") is not None:
         kwargs["sweep_gas"] = _state_from_plain(
@@ -4560,6 +4574,14 @@ class MeasuredCounts:
 
 
 @dataclass
+class QueueWorkCounts:
+    backlog_by_source: Counter[str] = field(default_factory=Counter)
+    reference_by_source: Counter[str] = field(default_factory=Counter)
+    backlog_by_path: Counter[str] = field(default_factory=Counter)
+    reference_by_path: Counter[str] = field(default_factory=Counter)
+
+
+@dataclass
 class MigrationResult:
     works: dict[str, Work] = field(default_factory=dict)
     benches: dict[str, Bench] = field(default_factory=dict)
@@ -4580,6 +4602,7 @@ class MigrationResult:
         default_factory=lambda: defaultdict(list)
     )
     queue: list[QueueEntry] = field(default_factory=list)
+    queue_work_counts: QueueWorkCounts | None = None
     source_counts: dict[str, SourceCount] = field(default_factory=dict)
     measured: MeasuredCounts = field(default_factory=MeasuredCounts)
     aliases: dict[str, str] = field(default_factory=dict)
@@ -10517,7 +10540,7 @@ def _explicit_point_conditions(
 def _point_pressure_for_identity(
     identity: Identity | None,
     point_conditions: Mapping[str, Located[Any]] | None,
-) -> State[Decimal] | None:
+) -> State[Decimal | ApproxPressure] | None:
     if identity is None:
         return None
     if (
@@ -10531,10 +10554,12 @@ def _point_pressure_for_identity(
     state = located.state
     if not state.is_value:
         return state
-    pressure_pa = _printed_source_point_condition_pressure(located)
+    pressure_pa = _printed_source_point_condition_pressure(
+        located, include_approximate=True
+    )
     if pressure_pa is None:
         return None
-    return State.of(pressure_pa)
+    return identity_pressure_state(pressure_pa)
 
 
 def _located_explicit_point_composition(
@@ -14154,21 +14179,55 @@ def _pressure_reservoir_from_payload(
     return None
 
 
-def _pressure_numeric_with_unit(raw: object, units: object) -> tuple[Decimal, str] | None:
+def _pressure_numeric_with_unit(
+    raw: object, units: object
+) -> tuple[Decimal, str, bool] | None:
+    """One printed amount in pascals, its unit trail, and the approximate flag.
+
+    A bound or an interval is not a point, so it returns ``None``.
+    """
+
+    approximate = False
     if isinstance(raw, Mapping):
         if raw.get("tag") is not None:
             return None
+        approximate = raw.get("approximate") is True
         unit = raw.get("units") or raw.get("unit") or units
         raw = raw.get("value")
     else:
         unit = units
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        approximate = approximate or raw.approximate
+        raw = raw.point
+    elif isinstance(raw, Mapping):
+        kind = raw.get("kind")
+        if kind not in (None, "point"):
+            return None
+        if kind == "point" or "point" in raw:
+            approximate = approximate or raw.get("approximate") is True
+            raw = raw.get("point")
     amount = _as_dec_or_none(raw)
     if amount is None:
         return None
     converted, trail = convert_pressure_to_pa(amount, str(unit) if unit else None)
     if converted is None or trail is None:
         return None
-    return converted, trail
+    return converted, trail, approximate
+
+
+def _source_marked_approximate(raw: object) -> bool:
+    """True when the raw extract node carries ``approximate: true``."""
+
+    if isinstance(raw, Value):
+        return raw.approximate
+    if not isinstance(raw, Mapping):
+        return False
+    if raw.get("approximate") is True:
+        return True
+    value = raw.get("value")
+    return isinstance(value, Mapping) and value.get("approximate") is True
 
 
 def _pressure_total_from_extract(
@@ -14177,7 +14236,7 @@ def _pressure_total_from_extract(
     *,
     gas_formula: str | None,
     source_text: str,
-) -> tuple[State[Decimal] | None, str | None]:
+) -> tuple[State[Decimal | ApproxPressure] | None, str | None]:
     raw = _pressure_payload_value(obs, values, "total_pressure_Pa")
     if raw not in (None, "") and _pressure_extract_value_is_unprinted(
         obs, values, "total_pressure_Pa", raw
@@ -14193,6 +14252,19 @@ def _pressure_total_from_extract(
         and isinstance(raw, Mapping)
         and raw.get("tag") is not None
     ):
+        state_value = raw.get("value")
+        if (
+            isinstance(state_value, Mapping)
+            and state_value.get("kind") == "point"
+            and state_value.get("approximate") is True
+        ):
+            point = _as_dec_or_none(state_value.get("point"))
+            if point is None:
+                return State.unknown("source total_pressure_Pa is not decodable"), None
+            return (
+                identity_pressure_from_converted_point(point, approximate=True),
+                "identity.total_pressure_Pa=source state",
+            )
         try:
             return _state_from_plain(raw, as_decimal), "identity.total_pressure_Pa=source state"
         except (KeyError, TypeError, ValueError):
@@ -14205,8 +14277,11 @@ def _pressure_total_from_extract(
     ):
         converted = _pressure_numeric_with_unit(raw, "Pa")
         if converted is not None:
-            amount, trail = converted
-            return State.of(amount), f"identity.total_pressure_Pa=source row total; {trail}"
+            amount, trail, approximate = converted
+            return (
+                identity_pressure_from_converted_point(amount, approximate=approximate),
+                f"identity.total_pressure_Pa=source row total; {trail}",
+            )
     for name, units in _PRESSURE_TOTAL_KEYS:
         raw = _pressure_payload_value(obs, values, name)
         if raw in (None, "") or _pressure_value_is_model_calculation(
@@ -14215,8 +14290,11 @@ def _pressure_total_from_extract(
             continue
         converted = _pressure_numeric_with_unit(raw, units)
         if converted is not None:
-            amount, trail = converted
-            return State.of(amount), f"identity.total_pressure_Pa=source row {name}; {trail}"
+            amount, trail, approximate = converted
+            return (
+                identity_pressure_from_converted_point(amount, approximate=approximate),
+                f"identity.total_pressure_Pa=source row {name}; {trail}",
+            )
     for payload in (obs, values):
         for key in _PRESSURE_SUM_KEYS:
             raw = payload.get(key)
@@ -14224,6 +14302,11 @@ def _pressure_total_from_extract(
                 continue
             if _pressure_value_is_model_calculation(obs, values, key, raw):
                 continue
+            if any(_source_marked_approximate(item) for item in raw.values()):
+                return (
+                    State.unknown(approximate_derived_total_reason()),
+                    None,
+                )
             total = Decimal("0")
             trails: list[str] = []
             for item in raw.values():
@@ -14231,7 +14314,7 @@ def _pressure_total_from_extract(
                 if converted is None:
                     total = Decimal("-1")
                     break
-                amount, trail = converted
+                amount, trail, _approximate = converted
                 total += amount
                 trails.append(trail)
             if total >= 0:
@@ -14240,9 +14323,15 @@ def _pressure_total_from_extract(
                     f"significant partial pressures ({key}); " + ",".join(trails)
                 )
 
-    ratio = _printed_decimal(values.get("po2_over_pK_as_published"))
-    p_k = _printed_decimal(values.get("P_K_atm_as_published"))
+    ratio_raw = values.get("po2_over_pK_as_published")
+    p_k_raw = values.get("P_K_atm_as_published")
+    ratio = _printed_decimal(ratio_raw)
+    p_k = _printed_decimal(p_k_raw)
     congruent = bool(_PRESSURE_CONGRUENT_RE.search(source_text))
+    if congruent and (
+        _source_marked_approximate(ratio_raw) or _source_marked_approximate(p_k_raw)
+    ):
+        return State.unknown(approximate_derived_total_reason()), None
     if congruent and gas_formula is not None and ratio is not None and p_k is not None:
         p_k_pa, p_k_trail = convert_pressure_to_pa(p_k, "atm")
         if p_k_pa is not None and p_k_trail is not None and p_k_pa > 0:
@@ -14475,7 +14564,13 @@ def _partial_pressure_point_condition(
     total = identity_fields.get("total_pressure_Pa")
     if not isinstance(total, State) or not total.is_value or total.value is None:
         return None
-    return located_value(total.value, locator)
+    stored = total.value
+    if isinstance(stored, ApproxPressure):
+        # Point conditions stay printed points. The band lives on the identity.
+        stored = _value_from_plain(
+            {"kind": "point", "point": stored.point, "approximate": True}
+        )
+    return located_value(stored, locator)
 
 
 def _source_point_condition_total_pressure_pa(
@@ -14491,6 +14586,15 @@ def _source_point_condition_total_pressure_pa(
         located = _point_condition_from_plain(
             raw_pressure, key="total_pressure_Pa"
         )
+        raw_value = located.state.value if located.state.is_value else None
+        if (
+            isinstance(raw_value, Value)
+            and raw_value.kind is ValueKind.POINT
+            and raw_value.approximate
+            and raw_value.point is not None
+            and raw_value.point > 0
+        ):
+            return located
         amount = _point_condition_decimal(raw_pressure)
         if located.state.is_value and amount is not None and amount > 0:
             return replace(located, state=State.of(amount))
@@ -14499,8 +14603,16 @@ def _source_point_condition_total_pressure_pa(
 
 def _printed_source_point_condition_pressure(
     located: Located[Any] | None,
-) -> Decimal | None:
-    """Return only an exact point backed by a printed source locator."""
+    *,
+    include_approximate: bool = False,
+) -> Decimal | Value | None:
+    """Return a printed point backed by a source locator.
+
+    The default refuses an approximate point. Calibration keeps that
+    default. Identity passes ``include_approximate`` and receives the
+    ``Value`` so the band can be built. A stripped decimal would make
+    equality legal again.
+    """
 
     if (
         located is None
@@ -14511,8 +14623,12 @@ def _printed_source_point_condition_pressure(
         return None
     raw = located.state.value
     if isinstance(raw, Value):
-        if raw.kind is not ValueKind.POINT or raw.point is None or raw.approximate:
+        if raw.kind is not ValueKind.POINT or raw.point is None:
             return None
+        if raw.approximate:
+            if not include_approximate or raw.point <= 0:
+                return None
+            return raw
         raw = raw.point
     amount = _as_dec_or_none(raw)
     return amount if amount is not None and amount > 0 else None
@@ -15106,6 +15222,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
         "fraction_of_feedstock_oxygen_percent",
     ),
     Quantity.MASS_LOSS_FRACTION: _MASS_LOSS_YIELD_FIELDS,
+    Quantity.ELEMENT_RETENTION_RATIO: ("FM",),
     Quantity.YIELD_FRACTION: (
         "yield_fraction",
         "mass_yield_percent",
@@ -19949,10 +20066,10 @@ def _row_printed_atmospheres(
     return tuple(experiment_atmospheres)
 
 
-def _printed_direct_gas_couple(
+def _printed_sccm_gas_mixture(
     as_printed: str,
 ) -> tuple[dict[str, Decimal], dict[str, float]] | None:
-    """Parse a two-species SCCM couple and its last-digit relative precision."""
+    """Parse a printed SCCM gas mixture and component last-digit precision."""
 
     normalized = as_printed.replace("₂", "2").replace("₀", "0")
     pieces = normalized.split("+")
@@ -19979,20 +20096,39 @@ def _printed_direct_gas_couple(
             _last_printed_digit(fraction) / fraction
             + _last_printed_digit(flow) / flow
         )
-    if set(species_mol) not in ({"CO2", "CO"}, {"H2O", "H2"}):
+    if len(species_mol) < 2:
         return None
     return species_mol, relative_precision
+
+
+def _janaf_gas_formation_inputs(
+    formulas: Sequence[str], temperature_K: Decimal
+) -> tuple[dict[str, float], float]:
+    """Read the requested JANAF gas records through their existing owner."""
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
+    )
+
+    gibbs = {
+        formula: float(
+            _janaf_gas_formation_gibbs_J_per_mol(formula, temperature_K)
+        )
+        for formula in formulas
+    }
+    return gibbs, float(JANAF_R_J_PER_MOL_K)
 
 
 def _is_wgs_dependent_gas_mix(as_printed: str) -> bool:
     normalized = as_printed.replace("₂", "2").replace("₀", "0").upper()
     compact = re.sub(r"\s+", "", normalized)
     species = set(re.findall(r"CO2|H2O|CO|H2", compact))
+    carries_carbon = bool(species & {"CO", "CO2"})
+    carries_hydrogen = bool(species & {"H2", "H2O"})
     return (
         "WGS" in compact
-        or {"CO2", "H2"}.issubset(species)
-        or {"CO", "H2O"}.issubset(species)
-        or {"CO", "CO2", "H2", "H2O"}.issubset(species)
+        or (carries_carbon and carries_hydrogen)
     )
 
 
@@ -20051,26 +20187,130 @@ def _bare_log_frame_decision(
     tolerance = max(_last_printed_digit(log10_fO2), Decimal("0.01"))
     checked: list[tuple[str, Decimal, Decimal]] = []
     unsupported: list[str] = []
+
+    def checked_gas_mix_decision(
+        atmosphere: str,
+        expected: Decimal,
+        owner_band: Decimal,
+        band_text: str,
+        authority: Authority,
+        notices: tuple[PrintedOxygenNotice, ...] = (),
+    ) -> PrintedOxygenDecision | None:
+        checked.append((atmosphere, expected, owner_band))
+        if abs(log10_fO2 - expected) > tolerance + owner_band:
+            return None
+        reason = (
+            "bare fO2 frame matched printed atmosphere "
+            f"{atmosphere!r}; expected CEA log10(fO2/bar)="
+            f"{_display_fo2_dex(expected)}; {band_text}"
+        )
+        return PrintedOxygenDecision(
+            "log",
+            State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
+            notice_reason=reason,
+            notice_kind=NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE,
+            notice_band=band_text,
+            notice_authority=authority,
+            notices=notices,
+        )
+
     for atmosphere in candidates:
         kind = _atmosphere_kind(atmosphere)
         if kind is None:
-            parsed_couple = _printed_direct_gas_couple(atmosphere)
-            if parsed_couple is not None and temperature_K is not None:
-                species_mol, relative_precision = parsed_couple
-                formation_gibbs: dict[str, Decimal] | None = {}
-                thermo_missing_reason = ""
-                try:
-                    from simulator.battery.generators.janaf import (
-                        JANAF_R_J_PER_MOL_K,
-                        _janaf_gas_formation_gibbs_J_per_mol,
-                    )
-
-                    for formula in (*species_mol, "O2"):
-                        formation_gibbs[formula] = (
-                            _janaf_gas_formation_gibbs_J_per_mol(
-                                formula, temperature_K
+            parsed_mix = _printed_sccm_gas_mixture(atmosphere)
+            if parsed_mix is not None and temperature_K is not None:
+                species_mol, relative_precision = parsed_mix
+                if _is_wgs_dependent_gas_mix(atmosphere):
+                    formation_gibbs: dict[str, float] | None = None
+                    thermo_missing_reason = ""
+                    try:
+                        formation_gibbs, janaf_gas_constant = (
+                            _janaf_gas_formation_inputs(
+                                ("CO", "CO2", "H2", "H2O", "O2"),
+                                temperature_K,
                             )
                         )
+                    except (
+                        FileNotFoundError,
+                        OSError,
+                        KeyError,
+                        TypeError,
+                        ValueError,
+                    ) as exc:
+                        thermo_missing_reason = str(exc)
+                    if formation_gibbs is None:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
+                            "JANAF WGS data missing"
+                            + (
+                                f" ({thermo_missing_reason})"
+                                if thermo_missing_reason
+                                else ""
+                            )
+                            + ")"
+                        )
+                        continue
+                    from simulator.chemistry.offgas_fo2 import (
+                        OffgasFO2Unavailable,
+                        imposed_fo2,
+                        load_buffer_polynomials,
+                    )
+                    try:
+                        resolution = imposed_fo2(
+                            {
+                                name: float(amount)
+                                for name, amount in species_mol.items()
+                            },
+                            float(temperature_K),
+                            load_buffer_polynomials(),
+                            janaf_formation_gibbs_J_per_mol=formation_gibbs,
+                            janaf_gas_constant_J_per_mol_K=janaf_gas_constant,
+                        )
+                    except (
+                        ArithmeticError,
+                        OffgasFO2Unavailable,
+                        TypeError,
+                        ValueError,
+                    ) as exc:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: {exc})"
+                        )
+                        continue
+                    if resolution.uncertainty_band_dex is None:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
+                            "WGS source spread is unsized)"
+                        )
+                        continue
+                    expected = Decimal(str(resolution.log10_fO2))
+                    wgs_band = Decimal(str(resolution.uncertainty_band_dex))
+                    band_text = (
+                        f"tolerance={_dec_str(tolerance)} dex; "
+                        f"wgs_uncertainty_band={_dec_str(wgs_band)} dex; "
+                        f"combined_allowance={_dec_str(tolerance + wgs_band)} dex"
+                    )
+                    decision = checked_gas_mix_decision(
+                        atmosphere,
+                        expected,
+                        wgs_band,
+                        band_text,
+                        Authority.CERTIFIED,
+                    )
+                    if decision is not None:
+                        return decision
+                    continue
+
+                if set(species_mol) not in ({"CO2", "CO"}, {"H2O", "H2"}):
+                    unsupported.append(atmosphere)
+                    continue
+                formation_gibbs: dict[str, float] | None = None
+                thermo_missing_reason = ""
+                try:
+                    formation_gibbs, janaf_gas_constant = (
+                        _janaf_gas_formation_inputs(
+                            (*species_mol, "O2"), temperature_K
+                        )
+                    )
                 except (
                     FileNotFoundError,
                     OSError,
@@ -20078,7 +20318,6 @@ def _bare_log_frame_decision(
                     TypeError,
                     ValueError,
                 ) as exc:
-                    formation_gibbs = None
                     thermo_missing_reason = str(exc)
                 from simulator.chemistry.offgas_fo2 import (
                     OffgasFO2Unavailable,
@@ -20090,16 +20329,9 @@ def _bare_log_frame_decision(
                         {name: float(amount) for name, amount in species_mol.items()},
                         relative_precision,
                         float(temperature_K),
-                        formation_gibbs_J_per_mol=(
-                            {
-                                name: float(value)
-                                for name, value in formation_gibbs.items()
-                            }
-                            if formation_gibbs is not None
-                            else None
-                        ),
+                        formation_gibbs_J_per_mol=formation_gibbs,
                         gas_constant_J_per_mol_K=(
-                            float(JANAF_R_J_PER_MOL_K)
+                            janaf_gas_constant
                             if formation_gibbs is not None
                             else None
                         ),
@@ -20116,7 +20348,6 @@ def _bare_log_frame_decision(
                     continue
                 expected = Decimal(str(resolution.log10_fO2))
                 gas_band = Decimal(str(resolution.band_dex))
-                checked.append((atmosphere, expected, gas_band))
                 authority = (
                     Authority.EXTRAPOLATED
                     if resolution.authority == "extrapolated"
@@ -20132,42 +20363,37 @@ def _bare_log_frame_decision(
                     f"mix_precision={resolution.mix_precision_band_dex:.4f} dex; "
                     f"thermo_spread={spread}; combined_band={_dec_str(gas_band)} dex"
                 )
-                if abs(log10_fO2 - expected) <= tolerance + gas_band:
-                    reason = (
-                        "bare fO2 frame matched printed atmosphere "
-                        f"{atmosphere!r}; expected CEA log10(fO2/bar)="
-                        f"{_display_fo2_dex(expected)}; {band_text}"
-                    )
-                    notices = (
-                        (
-                            PrintedOxygenNotice(
-                                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                                reason=(
-                                    "gas_couple_thermo_spread_unsized: JANAF "
-                                    "species data are unavailable; using the "
-                                    "printed-flow mix band alone"
-                                    + (
-                                        f" ({thermo_missing_reason})"
-                                        if thermo_missing_reason
-                                        else ""
-                                    )
-                                ),
-                                band=band_text,
-                                authority=authority,
+                notices = (
+                    (
+                        PrintedOxygenNotice(
+                            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                            reason=(
+                                "gas_couple_thermo_spread_unsized: JANAF "
+                                "species data are unavailable; using the "
+                                "printed-flow mix band alone"
+                                + (
+                                    f" ({thermo_missing_reason})"
+                                    if thermo_missing_reason
+                                    else ""
+                                )
                             ),
-                        )
-                        if resolution.thermo_spread_dex is None
-                        else ()
+                            band=band_text,
+                            authority=authority,
+                        ),
                     )
-                    return PrintedOxygenDecision(
-                        "log",
-                        State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
-                        notice_reason=reason,
-                        notice_kind=NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE,
-                        notice_band=band_text,
-                        notice_authority=authority,
-                        notices=notices,
-                    )
+                    if resolution.thermo_spread_dex is None
+                    else ()
+                )
+                decision = checked_gas_mix_decision(
+                    atmosphere,
+                    expected,
+                    gas_band,
+                    band_text,
+                    authority,
+                    notices,
+                )
+                if decision is not None:
+                    return decision
                 continue
             if _is_wgs_dependent_gas_mix(atmosphere):
                 unsupported.append(
@@ -20504,15 +20730,7 @@ def _printed_buffer_calibration(
 
 
 def _pressure_bar_from_identity(value: object) -> Decimal | None:
-    if isinstance(value, State):
-        if not value.is_value:
-            return None
-        value = value.value
-    if isinstance(value, Value):
-        if value.kind is not ValueKind.POINT or value.point is None:
-            return None
-        value = value.point
-    pressure_pa = _as_dec_or_none(value)
+    pressure_pa = nominal_pressure_pa(value)
     if pressure_pa is None or pressure_pa <= 0:
         return None
     return pressure_pa / _BAR_PA
@@ -20989,19 +21207,36 @@ def _offset_number(raw: object) -> tuple[Decimal, str] | None:
     return number, printed
 
 
+def _mpa_identity_pressure(value: object) -> State[Decimal | ApproxPressure] | None:
+    """Valence ``pressure_MPa`` as an identity pressure.
+
+    An exact decimal keeps today's conversion. An approximate point becomes
+    the band. An exact ``Value`` still does not convert: ``convert_pressure_to_pa``
+    refuses a ``Value``, and this landing does not start filling those rows.
+    """
+
+    if isinstance(value, Value) and value.approximate:
+        if value.kind is not ValueKind.POINT or value.point is None:
+            return None
+        converted, _trail = convert_pressure_to_pa(value.point, "MPa")
+        if converted is None:
+            return None
+        return identity_pressure_from_converted_point(converted, approximate=True)
+    converted, _trail = convert_pressure_to_pa(value, "MPa")
+    if converted is None:
+        return None
+    return State.of(converted)
+
+
 def _positive_pressure_pa(state: object) -> Decimal | None:
     if isinstance(state, Located):
         state = state.state
     if not isinstance(state, State) or not state.is_value:
         return None
-    raw = state.value
-    if isinstance(raw, Value):
-        if raw.kind is not ValueKind.POINT or raw.point is None:
-            return None
-        raw = raw.point
-    if isinstance(raw, Decimal) and raw.is_finite() and raw > 0:
-        return raw
-    return None
+    raw = nominal_pressure_pa(state.value)
+    if raw is None or not raw.is_finite() or raw <= 0:
+        return None
+    return raw
 
 
 def _point_total_pressure_pa(
@@ -26454,6 +26689,10 @@ class Migrator:
             subtype = _residue_component_subtype(value_sel.field_name)
             if subtype is not None:
                 ident_kwargs["subtype"] = State.of(subtype)
+        if q_token is Quantity.ELEMENT_RETENTION_RATIO:
+            subtype = values.get("subtype")
+            if isinstance(subtype, str) and subtype.strip():
+                ident_kwargs["subtype"] = State.of(subtype.strip())
         if (
             admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
             and not _value_has_numeric_value(value)
@@ -26585,17 +26824,22 @@ class Migrator:
                         values, obs
                     )
                     printed_total = _printed_source_point_condition_pressure(
-                        source_total
+                        source_total, include_approximate=True
                     )
                     existing_total = ident_kwargs.get("total_pressure_Pa")
-                    if printed_total is not None and (
+                    printed_state = (
+                        identity_pressure_state(printed_total)
+                        if printed_total is not None
+                        else None
+                    )
+                    if printed_state is not None and (
                         existing_total is None
                         or (
                             isinstance(existing_total, State)
                             and existing_total.is_unknown
                         )
                     ):
-                        ident_kwargs["total_pressure_Pa"] = State.of(printed_total)
+                        ident_kwargs["total_pressure_Pa"] = printed_state
                     elif (
                         source_total is not None
                         and source_total.state.is_value
@@ -26737,10 +26981,13 @@ class Migrator:
             )
             if p_amt is None:
                 p_amt = _printed_source_point_condition_pressure(
-                    _source_point_condition_total_pressure_pa(values, obs)
+                    _source_point_condition_total_pressure_pa(values, obs),
+                    include_approximate=True,
                 )
             if p_amt is not None:
-                ident_kwargs["total_pressure_Pa"] = State.of(p_amt)
+                pressure_state = identity_pressure_state(p_amt)
+                if pressure_state is not None:
+                    ident_kwargs["total_pressure_Pa"] = pressure_state
             else:
                 textual = values.get("pressure_basis")
                 if textual not in (None, ""):
@@ -27650,11 +27897,10 @@ class Migrator:
                 isinstance(pressure_condition, Located)
                 and pressure_condition.state.is_value
             ):
-                pressure, _trail = convert_pressure_to_pa(
-                    pressure_condition.state.value, "MPa"
+                pressure_for_oxygen = _mpa_identity_pressure(
+                    pressure_condition.state.value
                 )
-                if pressure is not None:
-                    pressure_for_oxygen = State.of(pressure)
+                if pressure_for_oxygen is not None:
                     ident_kwargs["total_pressure_Pa"] = pressure_for_oxygen
         oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
             facts=oxygen_facts,
@@ -27676,9 +27922,11 @@ class Migrator:
             oxygen_decision,
             from_fallback=oxygen_decision_fallback,
         )
+        oxygen_applied = False
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
+        oxygen_applied = False
         if (
             q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
@@ -27686,7 +27934,9 @@ class Migrator:
                 admission, row_point_conditions
             )
         ):
+            oxygen_applied = True
             ident_kwargs["fO2_Pa"] = oxygen_state
+            oxygen_applied = True
         identity_for_profile = (
             Identity(
                 quantity=State.of(q_token),
@@ -27752,16 +28002,10 @@ class Migrator:
                 isinstance(current_pressure, State) and current_pressure.is_unknown
             )
             if printed_point_pressure and pressure_missing:
-                point_value = point_pressure.state.value
-                if isinstance(point_value, Value):
-                    if point_value.kind is ValueKind.POINT and point_value.point is not None:
-                        ident_kwargs["total_pressure_Pa"] = State.of(point_value.point)
-                        pressure_missing = False
-                else:
-                    point_amount = _as_dec_or_none(point_value)
-                    if point_amount is not None:
-                        ident_kwargs["total_pressure_Pa"] = State.of(point_amount)
-                        pressure_missing = False
+                point_state = identity_pressure_state(point_pressure.state.value)
+                if point_state is not None:
+                    ident_kwargs["total_pressure_Pa"] = point_state
+                    pressure_missing = False
             if pressure_missing and not printed_point_pressure:
                 ambient_pressure_evidence = (
                     ambient_experiment.ambient_pressure_evidence
@@ -29220,7 +29464,6 @@ class Migrator:
             q_token, ident_kwargs.get("subtype")
         )
         coord = None
-        val = None
         trail = "identity"
         extra_unc = None
         extra_unc_k: int | None = None
@@ -29558,7 +29801,6 @@ class Migrator:
                         "duplicate_of_observation_id"
                     ],
                 }
-            val = value_sel.amount
             trail = value_sel.unit_trail
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -29626,10 +29868,13 @@ class Migrator:
             and isinstance(raw_item, Mapping)
         ):
             point_pressure = _printed_source_point_condition_pressure(
-                _source_point_condition_total_pressure_pa(raw_item, {})
+                _source_point_condition_total_pressure_pa(raw_item, {}),
+                include_approximate=True,
             )
             if point_pressure is not None:
-                ident_kwargs["total_pressure_Pa"] = State.of(point_pressure)
+                pressure_state = identity_pressure_state(point_pressure)
+                if pressure_state is not None:
+                    ident_kwargs["total_pressure_Pa"] = pressure_state
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
         else:
@@ -29852,19 +30097,16 @@ class Migrator:
             subtype = _residue_component_subtype(value_sel.field_name)
             if subtype is not None:
                 ident_kwargs["subtype"] = State.of(subtype)
-        if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-            if source_id == "kems-015-hashimoto-1983":
-                # Hashimoto Table 3 (p. 116) is the recovered spherule's bulk composition;
-                # the source describes a silicate melt and says the single spherule appears
-                # after quenching (p. 113, Experimental device). Preserve the run-end liquid
-                # phase: the modeled and measured objects are the same bulk oxide inventory.
-                species = make_species(species.formula, Phase.L, charge=species.charge)
-            elif source_id == "kems-012-sossi-2019":
-                # Sossi Table 2 (OCR §4.0, lines 202-203) measures residue ppm in quenched
-                # glass; its extract locator likewise identifies LA-ICP-MS on quenched glass.
-                species = make_species(
-                    species.formula, Phase.GLASS, charge=species.charge
-                )
+        residue_phase = SOURCE_DECLARATIONS.get(source_id, {}).get(
+            "residue_component_phase"
+        )
+        if (
+            q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and residue_phase is not None
+        ):
+            species = make_species(
+                species.formula, residue_phase.value, charge=species.charge
+            )
         if printed_phase_kind == "liquid":
             species = make_species(species.formula, Phase.L, charge=species.charge)
         elif printed_phase_kind == "two_phase":
@@ -30373,15 +30615,11 @@ class Migrator:
                             _PRESSURE_IDENTITY_UNKNOWN["total_pressure_Pa"]
                         )
                     else:
-                        pressure = (
-                            State.of(pressure_value.point)
-                            if isinstance(pressure_value, Value)
-                            and pressure_value.kind is ValueKind.POINT
-                            and pressure_value.point is not None
-                            else State.unknown(
+                        pressure = identity_pressure_state(pressure_value)
+                        if pressure is None:
+                            pressure = State.unknown(
                                 "source has no located total pressure for this run"
                             )
-                        )
                     area_located = None
                     if (
                         run_experiment.apparatus is not None
@@ -30682,17 +30920,12 @@ class Migrator:
                 isinstance(total_pressure, Located)
                 and total_pressure.state.is_value
             ):
-                pressure_value = total_pressure.state.value
-                if isinstance(pressure_value, Value):
-                    pressure_value = (
-                        pressure_value.point
-                        if pressure_value.kind is ValueKind.POINT
-                        else None
-                    )
-                pressure_pa = _as_dec_or_none(pressure_value)
-                if pressure_pa is not None:
+                pressure_state = identity_pressure_state(
+                    total_pressure.state.value
+                )
+                if pressure_state is not None:
                     identity = replace(
-                        identity, total_pressure_Pa=State.of(pressure_pa)
+                        identity, total_pressure_Pa=pressure_state
                     )
         if point_composition_refusal:
             composition_reason = composition_unknown_reason(
@@ -30885,12 +31118,12 @@ class Migrator:
                 isinstance(pressure_condition, Located)
                 and pressure_condition.state.is_value
             ):
-                pressure, _trail = convert_pressure_to_pa(
-                    pressure_condition.state.value, "MPa"
+                pressure_state = _mpa_identity_pressure(
+                    pressure_condition.state.value
                 )
-                if pressure is not None:
+                if pressure_state is not None:
                     identity = replace(
-                        identity, total_pressure_Pa=State.of(pressure)
+                        identity, total_pressure_Pa=pressure_state
                     )
         refreshed_oxygen = _refresh_buffer_decision(
             oxygen_decision,
@@ -32140,7 +32373,7 @@ class Migrator:
         count = self._count(rel)
         try:
             doc = load_json(path) if path.suffix == ".json" else load_yaml(path)
-        except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
+        except (OSError, json.JSONDecodeError, yaml.YAMLError):
             count.metadata_in += 1
             return
         if not isinstance(doc, Mapping):
@@ -33391,6 +33624,9 @@ class Migrator:
             validation.issues + tuple(self.result.registry_issues),
             validation.notices,
         )
+        self.result.queue_work_counts = _queue_work_counts(
+            self.result.queue, self.root
+        )
 
     def run(self) -> MigrationResult:
         self.migrate_index_only_sources()
@@ -33592,6 +33828,8 @@ def migration_queue_document(
 
 def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     root = root or REPO_ROOT
+    if result.queue_work_counts is None:
+        result.queue_work_counts = _queue_work_counts(result.queue, root)
     works_dir = root / "data" / "literature" / "works"
     extracts_v2 = root / "data" / "literature" / "extracts-v2"
     observations_v2 = root / "data" / "literature" / "observations-v2"
@@ -33824,6 +34062,56 @@ def _store_regeneration_differences(
     )
 
 
+def _queue_work_counts(
+    queue: Iterable[QueueEntry], root: Path
+) -> QueueWorkCounts:
+    """Count intake backlog and non-scoring reference inputs by manifest source."""
+
+    backlog: Counter[str] = Counter()
+    reference_inputs: Counter[str] = Counter()
+    backlog_by_path: Counter[str] = Counter()
+    references_by_path: Counter[str] = Counter()
+    manifest_cache: dict[Path, Mapping[str, Any]] = {}
+    compilations = root / "data" / "literature" / "compilations"
+    for entry in queue:
+        source = entry.source or ""
+        source_path = root / source
+        manifest_path = next(
+            (
+                parent / "manifest.yaml"
+                for parent in source_path.parents
+                if parent.is_relative_to(compilations)
+                and (parent / "manifest.yaml").is_file()
+            ),
+            None,
+        )
+        manifest: Mapping[str, Any] = {}
+        if manifest_path is not None:
+            if manifest_path not in manifest_cache:
+                loaded = load_yaml(manifest_path)
+                manifest_cache[manifest_path] = (
+                    loaded if isinstance(loaded, Mapping) else {}
+                )
+            manifest = manifest_cache[manifest_path]
+        role = manifest.get("compilation_role")
+        role = role if isinstance(role, Mapping) else {}
+        source_name = str(manifest.get("source_id") or source or "<unknown>")
+        target = reference_inputs if role.get("scoring_eligible") is False else backlog
+        target[source_name] += 1
+        path_target = (
+            references_by_path
+            if role.get("scoring_eligible") is False
+            else backlog_by_path
+        )
+        path_target[source] += 1
+    return QueueWorkCounts(
+        backlog_by_source=backlog,
+        reference_by_source=reference_inputs,
+        backlog_by_path=backlog_by_path,
+        reference_by_path=references_by_path,
+    )
+
+
 def write_report(result: MigrationResult, path: Path) -> None:
     measured = result.measured
     hard = 0 if result.validation is None else len(result.validation.hard_issues)
@@ -33837,6 +34125,11 @@ def write_report(result: MigrationResult, path: Path) -> None:
         else "<missing_reason>"
         for observation in unavailable_work
     )
+    queue_work_counts = result.queue_work_counts
+    if queue_work_counts is None:
+        raise ValueError("migration queue work counts are not classified")
+    backlog_count = sum(queue_work_counts.backlog_by_source.values())
+    reference_count = sum(queue_work_counts.reference_by_source.values())
     lines = [
         "# Battery v2.1 migration report",
         "",
@@ -33845,6 +34138,8 @@ def write_report(result: MigrationResult, path: Path) -> None:
         f"works: {len(result.works)}",
         f"experiments: {len(result.experiments)}",
         f"queue size: {len(result.queue)}",
+        f"queue backlog: {backlog_count}",
+        f"reference inputs: {reference_count}",
         f"identical-payload dedupe aliases: {len(result.dedupe_aliases)}",
         f"metadata files: {sum(c.metadata_in for c in result.source_counts.values())}",
         f"index sources: {sum(c.index_works_in for c in result.source_counts.values())}",
@@ -33928,14 +34223,14 @@ def write_report(result: MigrationResult, path: Path) -> None:
         lines.extend(["", "| token | count |", "|---|---:|"])
         for token, n in sorted(unrecognised.items(), key=lambda kv: (-kv[1], kv[0])):
             lines.append(f"| `{token}` | {n} |")
-    lines.extend(["", "## Per source", "", "| source | rows in | observations out | queued |", "|---|---:|---:|---:|"])
-    queued_by_source: dict[str, int] = defaultdict(int)
-    for entry in result.queue:
-        queued_by_source[entry.source or ""] += 1
+    lines.extend(["", "## Per source", "", "| source | rows in | observations out | queued backlog | reference inputs |", "|---|---:|---:|---:|---:|"])
     for src, rec in sorted(result.source_counts.items()):
         lines.append(
-            f"| `{src}` | {rec.rows_in} | {rec.observations_out} | {queued_by_source.get(src, 0)} |"
+            f"| `{src}` | {rec.rows_in} | {rec.observations_out} | {queue_work_counts.backlog_by_path.get(src, 0)} | {queue_work_counts.reference_by_path.get(src, 0)} |"
         )
+    lines.extend(["", "## Reference inputs by source", "", "| source | count |", "|---|---:|"])
+    for src, count in sorted(queue_work_counts.reference_by_source.items()):
+        lines.append(f"| `{src}` | {count} |")
     if result.validation is not None and result.validation.hard_issues:
         hard_census: dict[str, int] = defaultdict(int)
         for issue in result.validation.hard_issues:

@@ -193,6 +193,13 @@ def _mre_cap_profile(**run_overrides: object) -> dict[str, object]:
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -984,6 +991,13 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -1761,6 +1775,13 @@ def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -1815,6 +1836,13 @@ def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -1891,6 +1919,13 @@ def test_build_eval_inputs_strict_vaporock_unavailable_keeps_vaporock_key(
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -1998,6 +2033,13 @@ def test_build_eval_inputs_force_builtin_short_circuits_vaporock_probe(
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -2045,6 +2087,13 @@ def test_build_eval_inputs_keys_provider_code_fingerprint(
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -2167,6 +2216,13 @@ def test_build_eval_inputs_records_lab_overlay_scope_without_runtime_behavior() 
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -2223,6 +2279,13 @@ def test_build_eval_inputs_rejects_zero_mass_with_named_category() -> None:
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -2258,6 +2321,13 @@ def test_build_eval_inputs_projects_c3_alkali_dose_into_evalspec_additives() -> 
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -2315,6 +2385,13 @@ def test_build_eval_inputs_keys_disabled_stage0_redox_doses_without_runtime_effe
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -3309,6 +3386,8 @@ def test_active_recipe_local_furnace_field_admits_1843_c_after_default_ref_renam
         renamed_default,
         recipe_patch=active_patch,
         campaign="C2A_continuous",
+        track="pyrolysis",
+        c5_enabled=False,
     )
 
     assert spec.runtime_campaign_overrides["C2A_continuous"][
@@ -3343,6 +3422,8 @@ def test_explicit_furnace_constraint_stays_stricter_than_active_recipe_field() -
         explicit,
         recipe_patch=active_patch,
         campaign="C2A_continuous",
+        track="pyrolysis",
+        c5_enabled=False,
     )
     assert composed is not None
     assert composed.furnace_T_max_C == explicit.furnace_T_max_C
@@ -4012,6 +4093,13 @@ def _campaign_window_profile(
                 "units": "kg",
                 "weight": 1.0,
                 "rationale": "test oxygen objective evidence",
+            },
+            {
+                "metric": "duration_h",
+                "sense": "minimize",
+                "units": "h",
+                "weight": 1.0,
+                "rationale": "eligible on every campaign so oxygen can be withheld",
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},

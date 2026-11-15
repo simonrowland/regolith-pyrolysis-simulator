@@ -57,29 +57,17 @@ def test_reference_sources_migrate_in_isolation_with_conditions(
         row["observation_id"]: row for row in isolated_doc["observations"]
     }
     assert set(isolated_rows) == set(baseline_rows)
-    changed_reference_states = set()
-    # Mutation: removing a reference-state payload removes this row-by-row v2 diff.
-    for observation_id, before in baseline_rows.items():
-        after = isolated_rows[observation_id]
-        changed_fields = {
-            key
-            for key in before.keys() | after.keys()
-            if before.get(key) != after.get(key)
-        }
-        if (
-            before["identity"]["reference_state"]
-            != after["identity"]["reference_state"]
-        ):
-            changed_reference_states.add(observation_id)
-            assert changed_fields == {"identity"}
-        else:
-            assert changed_fields == set()
-    quoted_stoich_count = (
-        1
-        if source_id == "doyle-1988-feo-activity-multicomponent-magma"
-        else 0
+    # Fixed point (train b263, 2026-11-14): once the train regenerates the store, the isolated migration must
+    # reproduce every committed extracts-v2 row exactly, in every field. Asserting "N rows changed" instead
+    # held only while the committed v2 was stale, so it could never pass on a landed tree. Before the regen
+    # this node is a declared stale node (like the store byte-identity test). The reference-state move itself
+    # is pinned by VALUE below, from the isolated migration (endmember Fe(1-x)O, typed count per source).
+    mismatched = sorted(
+        observation_id
+        for observation_id, before in baseline_rows.items()
+        if before != isolated_rows[observation_id]
     )
-    assert len(changed_reference_states) == expected_count - quoted_stoich_count
+    assert mismatched == [], mismatched[:5]
     temperature_key = TEMPERATURE_CONDITION[source_id]
     typed = 0
     # Mutation: remove a source's typed state or located temperature coordinate and this fails.

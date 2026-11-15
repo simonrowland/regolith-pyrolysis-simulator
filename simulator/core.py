@@ -282,7 +282,6 @@ _TERMINAL_REFUSAL_RETAINED_ROOT_NAMES = frozenset({
     '_last_extraction_completeness_diagnostic',
     '_last_fe_redox_respeciation_diagnostic',
     '_last_high_t_melt_activity',
-    '_last_high_t_melt_activity_temperature_K',
     '_last_imcc_activity_shadow',
     '_last_impurity_delta',
     '_last_melt_redox_liquid_fraction_diagnostic',
@@ -648,6 +647,8 @@ from simulator.state import (
     Atmosphere,
     BatchRecord,
     CampaignPhase,
+    EVAPORATION_ROUTE_PHASES,
+    MRE_ANODE_OXYGEN_PHASES,
     CondensationStage,
     CondensationTrain,
     DecisionPoint,
@@ -1444,7 +1445,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._high_t_melt_activity = normalize_high_t_melt_activity(
             self.setpoints.get("high_t_melt_activity", "openimcc")
         )
-        self._last_high_t_melt_activity_temperature_K: float | None = None
         self._last_high_t_melt_activity: Dict[str, Any] = {}
         self._high_t_melt_activity_fallback_steps: list[Dict[str, Any]] = []
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
@@ -1821,7 +1821,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapour_batch_flux_overlay = {}
         self._last_vapour_batch_resolve_error = {}
         self._last_imcc_activity_shadow = {}
-        self._last_high_t_melt_activity_temperature_K = None
         self._last_high_t_melt_activity = {}
         self._high_t_melt_activity_fallback_steps = []
         self._last_target_inventory_diagnostic = {}
@@ -10300,9 +10299,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # removed at flip time per the goal spec ("comparing against the
         # same source is moot"). Subsequent intent flips
         # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
-        self._refresh_vapor_pressures_from_kernel(
-            result, simulation_hour=int(self.melt.hour) + 1,
-        )
+        self._refresh_vapor_pressures_from_kernel(result)
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
         # Stage 0 left sulfide / sulfate inventory behind; otherwise
         # short-circuits without touching PySulfSat. Never mutates the
@@ -10383,7 +10380,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result,
         *,
         include_diagnostic_shadows: bool = True,
-        simulation_hour: int | None = None,
         observation_pO2_bar: float | None = None,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
@@ -10392,9 +10388,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         \\goal BUILTIN-ENGINE-EXTRACTION (#7). Called from
         :meth:`_record_equilibrium_status` after the backend (or the
         legacy internal analytical path) produces an EquilibriumResult.
-
-        ``simulation_hour`` enables trajectory continuation for runtime calls;
-        standalone equilibrium probes omit it.
 
         Behaviour:
           - Below 400 K this method skips kernel vapor evaluation and preserves
@@ -10424,22 +10417,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             explicitly forbidden by the goal spec.
 
         Published vapor and high-temperature diagnostics are cleared at
-        entry so a failure cannot expose a prior call's result. The prior
-        high-temperature activity snapshot is retained locally as a
-        continuation input for this dispatch; only a successful dispatch
-        publishes this call's activity state.
+        entry so a failure cannot expose a prior call's result.
         """
 
-        previous_high_t_melt_activity = getattr(
-            self, '_last_high_t_melt_activity', {}
-        ) or {}
-        previous_high_t_melt_activity_temperature_K = getattr(
-            self, '_last_high_t_melt_activity_temperature_K', None
-        )
         self._last_vapor_pressure_diagnostic = {}
         self._last_vapor_pressures_source = {}
         self._last_high_t_melt_activity = {}
-        self._last_high_t_melt_activity_temperature_K = None
         backend_diagnostics = dict(
             getattr(self, '_last_backend_diagnostics', {}) or {}
         )
@@ -10580,11 +10563,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
                 ),
-                'high_t_melt_activity_previous_temperature_K': (
-                    previous_high_t_melt_activity_temperature_K
-                ),
-                'high_t_melt_activity_previous': previous_high_t_melt_activity,
-                'simulation_hour': simulation_hour,
             }
         dispatch_kwargs = {
             'control_inputs': {
@@ -10611,7 +10589,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ChemistryIntent.VAPOR_PRESSURE,
             **dispatch_kwargs,
         )
-        self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
 
         def append_kernel_warnings(
@@ -15650,6 +15627,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             history = getattr(self, '_subsolidus_bakeout_by_hour', None) or []
             if history:
                 summary['subsolidus_bakeout'] = [dict(item) for item in history]
+        elif campaign_name == 'C2A_STAGED':
+            staged = getattr(self.campaign_mgr, 'last_c2a_staged_termination', None)
+            if staged:
+                summary['c2a_staged_termination'] = dict(staged)
+        # Every completed step names endpoint_met, time_cap, or refused.
+        # A missing token stays stop_reason_unrecorded. It is not endpoint_met.
+        stop_reason = 'stop_reason_unrecorded'
+        stop_detail = None
+        refusal = None
+        if campaign_name == 'C4':
+            refusal = getattr(self, '_last_c4_refusal_diagnostic', None)
+        elif campaign_name == 'C6':
+            refusal = getattr(self, '_last_c6_refusal_diagnostic', None)
+        if isinstance(refusal, Mapping) and refusal.get('status') == 'refused':
+            stop_reason = 'refused'
+            diagnostic = refusal.get('diagnostic')
+            if isinstance(diagnostic, Mapping):
+                stop_detail = (
+                    diagnostic.get('reason_refused') or diagnostic.get('reason')
+                )
+            if not stop_detail:
+                stop_detail = (
+                    refusal.get('reason_refused') or refusal.get('reason')
+                )
+        else:
+            recorded = getattr(self.campaign_mgr, 'last_campaign_stop', None)
+            if isinstance(recorded, Mapping):
+                token = str(recorded.get('stop_reason') or '')
+                if token in ('endpoint_met', 'time_cap', 'refused'):
+                    stop_reason = token
+                    stop_detail = recorded.get('detail')
+        summary['stop_reason'] = stop_reason
+        if stop_detail:
+            summary['stop_detail'] = str(stop_detail)
         return summary
 
     def campaign_endpoint_refused(self) -> bool:
@@ -16078,8 +16089,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._shuttle_metal_this_hr = 0.0
             self._shuttle_phase = ''
 
-        if self.melt.campaign in (CampaignPhase.C5,
-                                   CampaignPhase.MRE_BASELINE):
+        if self.melt.campaign in MRE_ANODE_OXYGEN_PHASES:
             mre_O2_kg = self._step_mre(sample_time_h=sample_time_h)
             self._mre_anode_O2_kg_this_hr = mre_O2_kg
             mre_energy_kWh = self._mre_energy_this_hr
@@ -16111,12 +16121,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             self._step_c7_ca_aluminothermic()
 
-        evaporation_campaign = self.melt.campaign in (
-            CampaignPhase.C0, CampaignPhase.C0B,
-            CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
-            CampaignPhase.C2B, CampaignPhase.C3_K,
-            CampaignPhase.C3_NA, CampaignPhase.C4,
-        )
+        evaporation_campaign = self.melt.campaign in EVAPORATION_ROUTE_PHASES
         self._apply_fe_redox_respeciation()
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
         self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
@@ -16830,54 +16835,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"invalid {decision_type.name} choice {choice!r}; "
                 f"valid choices: {', '.join(valid_choices)}"
             )
-        record_updates: dict[str, str] = {}
-        next_campaign: CampaignPhase | None = None
-        complete = False
+        from simulator.campaigns import decision_successor
 
-        if decision_type == DecisionType.ROOT_BRANCH:
-            if choice == 'mre_baseline':
-                record_updates['track'] = 'mre_baseline'
-                next_campaign = CampaignPhase.MRE_BASELINE
-            else:
-                record_updates['track'] = 'pyrolysis'
-                next_campaign = CampaignPhase.C0
-
-        elif decision_type == DecisionType.PATH_AB:
-            record_updates['path'] = choice  # 'A', 'A_staged', or 'B'
-            if choice == 'A':
-                next_campaign = CampaignPhase.C2A
-            elif choice == 'A_staged':
-                next_campaign = CampaignPhase.C2A_STAGED
-            else:
-                next_campaign = CampaignPhase.C2B
-
-        elif decision_type == DecisionType.BRANCH_ONE_TWO:
-            record_updates['branch'] = choice  # 'one' or 'two'
-            if choice == 'two':
-                next_campaign = CampaignPhase.C4
-            elif self.melt.c5_enabled:
-                next_campaign = CampaignPhase.C5
-            else:
-                complete = True
-
-        elif decision_type == DecisionType.TI_RETENTION:
-            # Handled within C5 campaign logic
-            pass
-
-        elif decision_type == DecisionType.C6_PROCEED:
-            if choice == 'yes':
-                next_campaign = CampaignPhase.C6
-            else:
-                complete = True
-
-        elif decision_type == DecisionType.C7_PROCEED:
-            if choice == 'yes':
-                next_campaign = CampaignPhase.C7_CA_ALUMINOTHERMIC
-            else:
-                complete = True
-
-        else:
-            raise ValueError(f"unsupported decision type {decision_type.name}")
+        next_campaign, record_updates, complete = decision_successor(
+            decision_type,
+            choice,
+            c5_enabled=bool(self.melt.c5_enabled),
+        )
 
         if next_campaign is not None:
             self.start_campaign(next_campaign)

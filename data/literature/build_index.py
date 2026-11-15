@@ -52,6 +52,7 @@ COMPILATION_INBOX_EXCLUSION = (
     "compilation-path: source reaches the store through data/literature/compilations/ "
     "rather than a per-source extract; not counted as inbox"
 )
+COVERED_BY_INBOX_EXCLUSION = "covered_by: source is covered by {target}; {note}"
 # Closed v2.1 measured origin classes (simulator.battery.enums.MEASURED_EVIDENCE).
 # Copied as strings so this builder stays a standalone script.
 MEASURED_EVIDENCE_CLASSES = frozenset({"measured_direct", "measured_tabulated", "measured_reduced"})
@@ -442,6 +443,31 @@ def load_extracts(root: Path) -> dict[str, dict]:
                     extracts[path.stem]["files"][0]["locator_status"] = "private_path"
                     break
     return extracts
+
+
+def load_source_aliases(root: Path, extract_ids: set[str]) -> dict[str, dict[str, str]]:
+    """Load explicit source coverage declarations and refuse dangling targets."""
+    path = root / "data/literature/source_aliases.yaml"
+    if not path.is_file():
+        return {}
+    declarations = load_yaml(path)
+    if not isinstance(declarations, dict):
+        raise ValueError(f"{path} must map source ids to covered_by declarations")
+    aliases = {}
+    for source_id, declaration in declarations.items():
+        if not isinstance(source_id, str) or not source_id or not isinstance(declaration, dict):
+            raise ValueError(f"{path} has an invalid source alias declaration: {source_id!r}")
+        target = declaration.get("covered_by")
+        note = declaration.get("note")
+        if not isinstance(target, str) or not target or not isinstance(note, str) or not note:
+            raise ValueError(f"{path} declaration for {source_id} requires covered_by and note")
+        if target not in extract_ids:
+            raise ValueError(
+                f"{path} declaration for {source_id} targets {target!r}, "
+                "which is not a known source with an extract"
+            )
+        aliases[source_id] = {"covered_by": target, "note": note}
+    return aliases
 
 def load_pdfs(root: Path) -> dict[str, dict]:
     found, directory = {}, root / "docs/references/pdfs"
@@ -1444,6 +1470,7 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
     corpus_ok = corpus_available(corpus, None) or (corpus / ".git").exists() or corpus.is_dir()
     extracts = load_extracts(root)
     corpus_extracts = load_corpus_extract_stems(corpus) if corpus_ok else set()
+    source_aliases = load_source_aliases(root, set(extracts) | corpus_extracts)
     claims = load_corpus_claims(corpus) if corpus_ok else {}
     store = load_v21_store(root)
     residuals = load_scored_residuals(root)
@@ -1480,7 +1507,17 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
         compilation = is_compilation_source(source_id, doi, compilation_match, compilation_dois)
         usable = store[source_id]["usable_rows"] if in_store else 0
         total = store[source_id]["total_rows"] if in_store else 0
-        inbox_exclusion = COMPILATION_INBOX_EXCLUSION if compilation and has_document and not has_extract else None
+        alias_declaration = source_aliases.get(source_id)
+        covered_by = alias_declaration["covered_by"] if alias_declaration else None
+        covered_by_exclusion = (
+            COVERED_BY_INBOX_EXCLUSION.format(target=covered_by, note=alias_declaration["note"])
+            if covered_by and has_document and not has_extract else None
+        )
+        inbox_exclusion = (
+            COMPILATION_INBOX_EXCLUSION
+            if compilation and has_document and not has_extract
+            else covered_by_exclusion
+        )
 
         artefacts: list[str] = []
         reason = None
@@ -1514,7 +1551,7 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
                 "extract present; no v2.1 store work" if has_extract else "claim record")
         elif has_document:
             artefacts = [posix(path.relative_to(corpus)) for path in documents]
-            if compilation:
+            if compilation or covered_by_exclusion:
                 stage = "unknown"
                 reason = inbox_exclusion
             else:

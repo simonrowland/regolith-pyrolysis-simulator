@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 import os
+import sys
 from dataclasses import replace
 from decimal import Decimal
 from types import MappingProxyType
@@ -1345,9 +1346,13 @@ def test_closed_phase_residual_keeps_derived_dex_decision_band(
 ) -> None:
     import simulator.battery.score as score_module
 
-    metric_operation = score_module.metric_operation
+    # metric_operation_for_identity calls metric_operation in the defining
+    # module. Patch that module so the negative control still lands after
+    # the score_metrics move.
+    owner = sys.modules[score_module.metric_operation.__module__]
+    metric_operation = owner.metric_operation
     monkeypatch.setattr(
-        score_module,
+        owner,
         "metric_operation",
         lambda quantity: (
             MetricOperation.ABSOLUTE
