@@ -497,7 +497,7 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
             ]
             assert raw_reference_profile["engine_minor_phase_eutectic"][
                 "temperature_bracket_C"
-            ] == [1000.0, 1025.0]
+            ] == [825.0, 850.0]
             assert raw_reference_profile["engine_minor_phase_eutectic"][
                 "plateau_liquid_fraction"
             ] == pytest.approx(0.0026, abs=0.0002)
@@ -2190,6 +2190,72 @@ def test_tier_a_margin_triggers_anorthite_onset_at_1550_c():
         1528.0,
         1528.0,
     ]
+
+
+def test_tier_a_campaign_and_segment_share_the_pure_capped_onset():
+    liner = {"Na2O": 5.0, "SiO2": 95.0}
+    initial_deposit = {"Na": 0.1}
+    table = {
+        "invariants": [
+            {
+                "first_liquid_temperature_C": 1400.0,
+                "composition_bounds_wt_pct": {"Na2O": [0.0, 9.9]},
+            },
+            {
+                "first_liquid_temperature_C": 1600.0,
+                "composition_bounds_wt_pct": {"Na2O": [9.9, 100.0]},
+            },
+        ]
+    }
+    mixed = contaminated_interface_composition(
+        liner,
+        initial_deposit,
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+    )
+    assert first_liquid_tier_a(table, liner) == 1400.0
+    assert first_liquid_tier_a(table, mixed["composition_wt_pct"]) == 1600.0
+
+    recurrence = corrosion_campaign_recurrence(
+        liner,
+        initial_deposit,
+        {},
+        {},
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+        temperature_C=1450.0,
+        pressure_bar=None,
+        margin_C=25.0,
+        horizon=5,
+        sampler=TierAInvariantSampler(table),
+    )
+    segment = build_liner_state_segment(
+        {
+            "composition": liner,
+            "citation": "test first-liquid fields",
+            "criterion_tier": "A",
+            "invariant_table": table,
+            "density_kg_m3": 1.0,
+            "reacted_layer_depth_m": 1.0,
+            "margin_C": 25.0,
+            "horizon_campaigns": 5,
+            "porosity_fraction": 0.0,
+        },
+        initial_deposit,
+        area_m2=1.0,
+        service_temperature_C=1450.0,
+        pressure_bar=None,
+        sampler=None,
+        deposit_inert_kg_by_species={},
+        deposit_reactive_kg_by_species={},
+    )
+
+    assert segment["rating_temperature_C"] == 1375.0
+    assert segment["onset"] is True
+    assert segment["campaigns_to_runaway"] == [0, 0]
+    assert recurrence["campaigns_to_runaway"] == segment["campaigns_to_runaway"]
 
 
 def test_tier_a_dissolution_uses_the_matched_source_liquid_composition():

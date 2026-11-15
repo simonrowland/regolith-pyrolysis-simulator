@@ -152,6 +152,16 @@ def _rated_temperature_with_margin(
     return rating, cap
 
 
+def _rating_is_onset_at_service(
+    rating_temperature_C: float | None, service_temperature_C: float
+) -> bool:
+    if rating_temperature_C is None:
+        return False
+    return _finite_real(service_temperature_C, "service_temperature_C") >= _finite_real(
+        rating_temperature_C, "rating_temperature_C"
+    )
+
+
 def validate_oxide_composition(composition_wt_pct: Mapping[str, Any]) -> dict[str, float]:
     """Return a checked 100 wt% oxide map without silently normalizing it."""
 
@@ -603,11 +613,7 @@ def _campaign_branch(
     invariant_table: Mapping[str, Any] | None = None,
 ) -> tuple[int | str, dict[str, float], float, dict[str, Any] | None]:
     deposits = _checked_deposit(initial_deposit_kg_by_species)
-    # Tier A's binary field sampler tests onset at T_service + margin because
-    # the safety allowance lowers the equivalent service rating by margin.
-    service_sample_C = _finite_real(temperature_C, "temperature_C") + _finite_real(
-        margin_C, "margin_C"
-    )
+    service_temperature = _finite_real(temperature_C, "temperature_C")
     pressure = (
         None if pressure_bar is None else _positive(pressure_bar, "pressure_bar")
     )
@@ -621,17 +627,19 @@ def _campaign_branch(
             reacted_layer_depth_m=reacted_layer_depth_m,
         )["composition_wt_pct"]
         if isinstance(sampler, TierAInvariantSampler):
-            criterion_signal = _checked_liquid_fraction(
-                _sample_liquid_fraction(
-                    sampler,
-                    composition,
-                    deposits,
-                    liner_composition_wt_pct,
-                    service_sample_C,
-                    pressure,
-                )
+            tier_a_table = (
+                invariant_table
+                if isinstance(invariant_table, Mapping)
+                else sampler.invariant_table
             )
-            onset = criterion_signal > LIQUIDUS_SOLID_EPSILON
+            _, rating_C, onset = _tier_a_rating_state(
+                liner_composition_wt_pct,
+                composition,
+                tier_a_table,
+                margin_C=margin_C,
+                service_temperature_C=service_temperature,
+            )
+            criterion_signal = float(onset)
         else:
             if pure_reference is None:
                 raise LinerCorrosionRefusal("liner_bulk_melt_reference_missing")
@@ -642,7 +650,7 @@ def _campaign_branch(
                 sampler=sampler,
                 pressure_bar=pressure,
                 margin_C=margin_C,
-                service_temperature_C=temperature_C,
+                service_temperature_C=service_temperature,
                 literature_melting_temperature_C=pure_reference.get(
                     "literature_melting_temperature_C"
                 ),
@@ -659,7 +667,7 @@ def _campaign_branch(
             criterion_signal = float(criterion_signal_value)
             onset = _tier_b_onset_at_service_temperature(
                 last_activity,
-                temperature_C,
+                service_temperature,
             )
         if onset:
             return completed, deposits, criterion_signal, last_activity
@@ -1330,8 +1338,9 @@ def _tier_a_fallback_melt_activity(
     service_excess = 0.0
     onset_at_service = False
     if service_temperature_C is not None and deposits:
-        onset_at_service = rating <= (
-            _finite_real(service_temperature_C, "service_temperature_C")
+        onset_at_service = _rating_is_onset_at_service(
+            rating,
+            service_temperature_C,
         )
         service_excess = float(onset_at_service)
     result = {
@@ -1780,9 +1789,7 @@ def _tier_b_onset_at_service_temperature(
 ) -> bool:
     rating = melt_activity.get("rating_temperature_C")
     if rating is not None:
-        return _finite_real(service_temperature_C, "service_temperature_C") >= _finite_real(
-            rating, "rating_temperature_C"
-        )
+        return _rating_is_onset_at_service(rating, service_temperature_C)
     bracket = melt_activity.get("contaminated_melt_bracket_C")
     if (
         ONSET_BELOW_SCAN_RANGE_FLAG in set(melt_activity.get("flags", ()))
@@ -2323,16 +2330,52 @@ def tier_a_first_liquid_onset(
     margin_C: float,
 ) -> dict[str, Any]:
     first_liquid_C = first_liquid_tier_a(invariant_table, composition_wt_pct)
-    service_limit_C = (
-        _finite_real(service_temperature_C, "service_temperature_C")
-        + _finite_real(margin_C, "margin_C")
+    margin = _finite_real(margin_C, "margin_C")
+    service_temperature = _finite_real(service_temperature_C, "service_temperature_C")
+    service_limit_C = service_temperature + margin
+    rating_C, _rating_cap_C = _rated_temperature_with_margin(
+        first_liquid_C,
+        None,
+        margin,
     )
     return {
         "first_melt_T_C": first_liquid_C,
         "service_limit_T_C": service_limit_C,
-        "onset": first_liquid_C <= service_limit_C,
+        "onset": _rating_is_onset_at_service(rating_C, service_temperature),
         "flags": [TEMPERATURE_MARGIN_FLAG],
     }
+
+
+def _tier_a_rating_state(
+    liner_composition_wt_pct: Mapping[str, Any],
+    interface_composition_wt_pct: Mapping[str, Any],
+    invariant_table: Mapping[str, Any],
+    *,
+    margin_C: float,
+    service_temperature_C: float,
+) -> tuple[float, float, bool]:
+    """Resolve Tier A first liquid, pure cap, and shared service onset decision."""
+
+    first_liquid_C = first_liquid_tier_a(
+        invariant_table,
+        interface_composition_wt_pct,
+    )
+    pure_literature_temperature_C = first_liquid_tier_a(
+        invariant_table,
+        liner_composition_wt_pct,
+    )
+    rating_C, _rating_cap_C = _rated_temperature_with_margin(
+        first_liquid_C,
+        pure_literature_temperature_C,
+        margin_C,
+    )
+    if rating_C is None:
+        raise LinerCorrosionRefusal("tier_a_rating_unresolved")
+    return (
+        first_liquid_C,
+        rating_C,
+        _rating_is_onset_at_service(rating_C, service_temperature_C),
+    )
 
 
 @dataclass(frozen=True)
@@ -2454,27 +2497,19 @@ def _interface_state_at_depth(
     if criterion_tier == "A":
         if not isinstance(invariant_table, Mapping) or not invariant_table:
             raise LinerCorrosionRefusal("liner_invariant_table_missing")
-        first_melt_C = first_liquid_tier_a(
-            invariant_table,
-            mixed["composition_wt_pct"],
-        )
-        pure_literature_temperature_C = first_liquid_tier_a(
-            invariant_table,
+        first_melt_C, rating_temperature_C, onset = _tier_a_rating_state(
             liner_composition_wt_pct,
-        )
-        rating_temperature_C, _ = (
-            _rated_temperature_with_margin(
-                first_melt_C,
-                pure_literature_temperature_C,
-                margin_C,
-            )
+            mixed["composition_wt_pct"],
+            invariant_table,
+            margin_C=margin_C,
+            service_temperature_C=service_temperature_C,
         )
         return {
             "mixed": mixed,
             "first_melt_T_C": first_melt_C,
             "rating_temperature_C": rating_temperature_C,
             "liquid_fraction": None,
-            "onset": rating_temperature_C <= service_temperature_C,
+            "onset": onset,
         }
     if criterion_tier != "B":
         raise LinerCorrosionRefusal("liner_criterion_tier_invalid", criterion_tier)
