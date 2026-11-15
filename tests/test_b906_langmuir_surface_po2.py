@@ -2788,9 +2788,8 @@ def _with_proxy_zr(legacy):
     """Synthetic broad-proxy carrier, same admission class as Al2.
 
     ``_legacy_evaporation_shadow_pressure_map`` keeps a species only when
-    the full alpha loader has a row. A proxy tag passes that gate and is
-    then stripped by the measured view, so both consumers see an
-    unmeasured carrier. A species with no ``evaporation_alpha`` key never
+    the full alpha loader has a row. A proxy tag passes that gate and stays
+    in both consumers under d-426, carrying its proxy provenance. A species with no ``evaporation_alpha`` key never
     reaches the flux map; it is not a second alpha path.
     """
 
@@ -3082,6 +3081,14 @@ def test_every_species_uses_the_publisher_alpha_policy(
     alpha_used = dict(diagnostic_out.get("alpha_used_by_species") or {})
     missing = dict(diagnostic_out.get("missing_alpha") or {})
     fallback_rows = set(diagnostic_out.get("unmeasured_alpha_fallback_species") or [])
+    evaluations = diagnostic_out["alpha_s_evaluation_by_species"]
+    series = diagnostic_out["evaporation_series_resistance"]
+    # d-426, d-019: the old assertion omitted non-admitted species from
+    # flux/closed pressures. constackfix inverted those stripping tests:
+    # docs-private/research/2026-11-03-condenser-design/removed-tests-ledger.md.
+    # Policy labels authority; every positive-alpha carrier still emits.
+    assert set(alpha_used) == set(published)
+    assert "AlO" in alpha_used
     for species, published_pa in published.items():
         decision = publisher_effective_alpha(
             species,
@@ -3094,50 +3101,41 @@ def test_every_species_uses_the_publisher_alpha_policy(
             compiled, legacy, species, provenance.get(species) or {}, source_bar
         )
         assert exponent is not None, species
-        if decision.policy_emits():
-            assert species not in missing
-            assert alpha_used[species] == pytest.approx(decision.alpha)
-            flagged = decision.unmeasured or decision.evaluation.get(
-                "authority_status"
-            ) == "proxy/bridge"
-            assert (species in fallback_rows) is flagged
-            mass = _species_molar_kg(legacy, species)
-            molar = _series_molar_flux(
-                species=species,
-                pressure_pa=float(closed[species]),
-                bulk_pa=0.0,
-                molar_mass=mass,
-                alpha=decision.alpha,
-                temperature_K=_T_K,
-                overhead_pa=float(controls["overhead_pressure_pa"]),
-                gas_resistance_enabled=True,
+        assert decision.policy_emits(), species
+        assert species not in missing
+        assert alpha_used[species] == pytest.approx(decision.alpha)
+        status = decision.evaluation["authority_status"]
+        assert evaluations[species]["authority_status"] == status
+        assert series[species]["authority_status"] == status
+        if gate == "open" and exponent != 0.0:
+            assert notice["alpha_authority_status_by_species"][species] == status
+        flagged = decision.unmeasured or decision.evaluation.get(
+            "alpha_authority_status"
+        ) == "proxy/bridge"
+        assert (species in fallback_rows) is flagged
+        mass = _species_molar_kg(legacy, species)
+        molar = _series_molar_flux(
+            species=species,
+            pressure_pa=float(closed[species]),
+            bulk_pa=0.0,
+            molar_mass=mass,
+            alpha=decision.alpha,
+            temperature_K=_T_K,
+            overhead_pa=float(controls["overhead_pressure_pa"]),
+            gas_resistance_enabled=True,
+        )
+        expected_kg_hr = molar * mass * 3600.0
+        assert flux.get(species, 0.0) == pytest.approx(
+            expected_kg_hr, rel=1.0e-5, abs=1.0e-12
+        )
+        if gate == "buffered":
+            assert closed[species] == pytest.approx(published_pa)
+        elif exponent != 0.0:
+            expected_pa = published_pa * (surface / pref) ** exponent
+            assert closed[species] == pytest.approx(
+                expected_pa, rel=1.0e-4, abs=1.0e-12
             )
-            expected_kg_hr = molar * mass * 3600.0
-            assert flux.get(species, 0.0) == pytest.approx(
-                expected_kg_hr, rel=1.0e-5, abs=1.0e-12
-            )
-            if gate == "buffered":
-                assert closed[species] == pytest.approx(published_pa)
-            elif exponent != 0.0:
-                expected_pa = published_pa * (surface / pref) ** exponent
-                assert closed[species] == pytest.approx(
-                    expected_pa, rel=1.0e-4, abs=1.0e-12
-                )
-                assert closed[species] != pytest.approx(published_pa, rel=1.0e-3)
-        else:
-            assert species not in flux
-            assert species not in alpha_used
-            assert species not in fallback_rows
-            # Open gate: n != 0 is omitted. The publisher's missing-alpha
-            # record is the buffered-gate path, where the root did not run.
-            if gate == "open" and exponent not in (None, 0.0):
-                assert species not in closed
-                assert species in notice["refused_species"]
-                assert notice["refused_species"][species]
-                assert species not in missing
-            else:
-                assert species in missing, species
-                assert closed[species] == pytest.approx(published_pa)
+            assert closed[species] != pytest.approx(published_pa, rel=1.0e-3)
 
     # An explicit species coefficient wins even with a wildcard or a
     # legacy allowlist that omits it. Zr is an independent proxy carrier.
