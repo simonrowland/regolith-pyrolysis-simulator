@@ -353,9 +353,12 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                 1550.0,
                 1600.0,
             )
+            # The exact profile uses explicit controller literals derived
+            # from oxide molar masses 56.077 / 101.961 / 60.084; the rounded
+            # profile uses Morey 1964 Table 26, row 6's printed 0.01 wt% values.
             measured = {
-                "formula_exact": (
-                    formula_derived_anorthite,
+                "controller_exact_literal": (
+                    {"CaO": 20.156647, "Al2O3": 36.649461, "SiO2": 43.193892},
                     (0.0, 0.0, 0.00217, 0.00218, 0.00236, 0.00786, 0.04235, 1.0),
                 ),
                 "morey_rounded": (
@@ -389,6 +392,29 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                     abs=2e-5,
                 )
 
+            # The controller's direct profile uses the 56.077-based oxide
+            # mass literals above. Formula-owner atomic weights differ by less
+            # than 1e-3 wt%, but the engine gives a different 500 C result;
+            # keep this sensitivity example pinned on each exact composition.
+            controller_exact = measured["controller_exact_literal"][0]
+            assert max(
+                abs(formula_derived_anorthite[oxide] - controller_exact[oxide])
+                for oxide in controller_exact
+            ) < 1e-3
+            formula_owner_at_500 = direct_backend.equilibrate(
+                500.0,
+                composition_kg=dict(formula_derived_anorthite),
+                fO2_log=liner_corrosion.MAGEMIN_FO2_LOG,
+                pressure_bar=1.0,
+            )
+            assert formula_owner_at_500.status == "ok", formula_owner_at_500.warnings
+            assert formula_owner_at_500.liquid_fraction == pytest.approx(
+                0.0018800188, abs=2e-5
+            )
+            assert raw_profiles["controller_exact_literal"][500.0] == pytest.approx(
+                0.0, abs=1e-12
+            )
+
             # The sampler routes the request through projected oxide wt% and
             # measured 0.0018900189 at exact anorthite / 1000 C on studio-3;
             # keep that pin on the adapter call rather than equating its value
@@ -412,7 +438,7 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                 for name, (composition, _) in measured.items()
             }
             for name, expected_nominal_bracket in (
-                ("formula_exact", [975.0, 1000.0]),
+                ("controller_exact_literal", [975.0, 1000.0]),
                 ("morey_rounded", [None, 500.0]),
             ):
                 continuity_profile = profiles[name]
@@ -433,7 +459,7 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                     engine_version
                 )
 
-            profile = profiles["formula_exact"]
+            profile = profiles["controller_exact_literal"]
         except LinerCorrosionRefusal as exc:
             if exc.reason == "engine_unavailable":
                 pytest.skip("MAGEMin is required for the anorthite anchor")
@@ -492,6 +518,11 @@ def test_tier_b_reference_uses_neighbours_when_exact_anorthite_is_an_outlier():
             )
             if is_exact and temperature_C < 1550.0:
                 return 0.008
+            if (
+                composition.get("Na2O", 0.0) > 0.0
+                and 1025.0 <= temperature_C < 1550.0
+            ):
+                return 0.008
             if temperature_C <= 1000.0:
                 return 0.0
             if temperature_C < 1025.0:
@@ -518,6 +549,27 @@ def test_tier_b_reference_uses_neighbours_when_exact_anorthite_is_an_outlier():
     assert sensitivity["neighbour_bracket_C"] == [1000.0, 1025.0]
     assert sensitivity["delta_wt_pct"] == 0.01
     assert len(samples) == 3
+
+    aggressiveness_sampler = EndmemberDiscontinuity()
+    suppressed_at_scan_edge = liner_corrosion.species_aggressiveness_finite_difference(
+        exact_anorthite,
+        "Na",
+        sampler=aggressiveness_sampler,
+        temperature_C=500.0,
+        pressure_bar=1.0,
+    )
+    assert suppressed_at_scan_edge["delta_liquid_fraction_per_wt_pct"] == 0.0
+
+    positive_at_service = liner_corrosion.species_aggressiveness_finite_difference(
+        exact_anorthite,
+        "Na",
+        sampler=aggressiveness_sampler,
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+    )
+    assert positive_at_service["delta_liquid_fraction_per_wt_pct"] == pytest.approx(
+        0.0054
+    )
 
 
 def test_tier_b_contaminated_profile_checks_composition_continuity():
@@ -626,6 +678,21 @@ def test_tier_b_neighbour_disagreement_uses_tier_a_or_refuses():
             NeighboursDisagree(), liner, pressure_bar=1.0
         )
     assert refused.value.reason == "tier_b_composition_continuity_unresolved"
+
+    with pytest.raises(LinerCorrosionRefusal) as aggressiveness_refused:
+        liner_corrosion.species_aggressiveness_finite_difference(
+            liner,
+            "Na",
+            sampler=NeighboursDisagree(),
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+        )
+    assert aggressiveness_refused.value.reason == (
+        "tier_b_composition_continuity_unresolved"
+    )
+    assert "Na aggressiveness baseline profile refused" in (
+        aggressiveness_refused.value.detail
+    )
 
     fallback = liner_corrosion._tier_b_reference_profile(
         NeighboursDisagree(),

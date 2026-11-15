@@ -395,7 +395,28 @@ def species_aggressiveness_finite_difference(
     temperature_C: float,
     pressure_bar: float,
 ) -> dict[str, float | str]:
-    """Estimate d(liquid fraction)/d(deposit wt%) with a 1-point difference."""
+    """Estimate d(liquid fraction)/d(deposit wt%) through Tier B continuity."""
+
+    return _species_aggressiveness_finite_difference_with_reference(
+        liner_composition_wt_pct,
+        deposit_species,
+        sampler=sampler,
+        temperature_C=temperature_C,
+        pressure_bar=pressure_bar,
+        base_reference_profile=None,
+    )
+
+
+def _species_aggressiveness_finite_difference_with_reference(
+    liner_composition_wt_pct: Mapping[str, Any],
+    deposit_species: str,
+    *,
+    sampler: LiquidFractionSampler,
+    temperature_C: float,
+    pressure_bar: float,
+    base_reference_profile: Mapping[str, Any] | None,
+) -> dict[str, float | str]:
+    """Use corrected pure profiles for both sides of the one-point difference."""
 
     species = str(deposit_species).strip()
     oxide = DEPOSIT_OXIDE_BY_SPECIES.get(species)
@@ -404,15 +425,52 @@ def species_aggressiveness_finite_difference(
     base = validate_oxide_composition(liner_composition_wt_pct)
     service_C = _finite_real(temperature_C, "temperature_C")
     pressure = _positive(pressure_bar, "pressure_bar")
-    zero_state = _checked_liquid_fraction(sampler(base, service_C, pressure))
+    if base_reference_profile is None:
+        try:
+            base_reference_profile = _tier_b_reference_profile(
+                sampler,
+                base,
+                pressure_bar=pressure,
+            )
+        except LinerCorrosionRefusal as exc:
+            raise LinerCorrosionRefusal(
+                exc.reason,
+                f"{species} aggressiveness baseline profile refused: {exc.detail}",
+            ) from exc
 
     # A one wt%-point perturbation is a finite-difference unit, not a fitted
-    # threshold: it compares the same sampled equilibrium before and after the
-    # exact composition change and reports dphi per wt%-point.
+    # threshold. Resolve each side's d-421 profile first; if either profile is
+    # composition-sensitive, its two agreeing neighbours supply the point
+    # sample. This prevents an isolated endmember result from reversing the
+    # reported aggressiveness sign.
     perturbed = {key: value * 0.99 for key, value in base.items()}
     perturbed[oxide] = perturbed.get(oxide, 0.0) + 1.0
-    one_point_state = _checked_liquid_fraction(
-        sampler(perturbed, service_C, pressure)
+    try:
+        perturbed_reference_profile = _tier_b_reference_profile(
+            sampler,
+            perturbed,
+            pressure_bar=pressure,
+        )
+    except LinerCorrosionRefusal as exc:
+        raise LinerCorrosionRefusal(
+            exc.reason,
+            f"{species} aggressiveness perturbed profile refused: {exc.detail}",
+        ) from exc
+    zero_state = _tier_b_sample_at_temperature_with_reference(
+        sampler,
+        base,
+        service_C,
+        pressure,
+        base_reference_profile,
+        context=f"{species} aggressiveness baseline",
+    )
+    one_point_state = _tier_b_sample_at_temperature_with_reference(
+        sampler,
+        perturbed,
+        service_C,
+        pressure,
+        perturbed_reference_profile,
+        context=f"{species} aggressiveness perturbed composition",
     )
     return {
         "species": species,
@@ -1023,6 +1081,35 @@ def _tier_b_reference_profile(
     return selected
 
 
+def _tier_b_sample_at_temperature_with_reference(
+    sampler: LiquidFractionSampler,
+    composition_wt_pct: Mapping[str, Any],
+    temperature_C: float,
+    pressure_bar: float,
+    reference_profile: Mapping[str, Any],
+    *,
+    context: str,
+) -> float:
+    """Apply a profile's d-421 continuity decision to a service point sample."""
+
+    continuity = reference_profile.get("composition_continuity")
+    status = continuity.get("status") if isinstance(continuity, Mapping) else None
+    if status == "passed":
+        return _checked_liquid_fraction(
+            sampler(composition_wt_pct, temperature_C, pressure_bar)
+        )
+    if status == "sensitive":
+        first, second, _delta = _tier_b_composition_neighbours(composition_wt_pct)
+        return _symmetric_mean(
+            _checked_liquid_fraction(sampler(first, temperature_C, pressure_bar)),
+            _checked_liquid_fraction(sampler(second, temperature_C, pressure_bar)),
+        )
+    raise LinerCorrosionRefusal(
+        "tier_b_composition_continuity_unresolved",
+        f"{context}: no resolved Tier B continuity status ({status!r})",
+    )
+
+
 def _tier_b_reference_profile_for_liner(
     sampler: LiquidFractionSampler,
     liner_composition_wt_pct: Mapping[str, Any],
@@ -1360,22 +1447,14 @@ def _tier_b_melt_activity_rating(
     if service_temperature_C is not None and deposits and selected_contaminated is not None:
         service_temperature = _finite_real(service_temperature_C, "service_temperature_C")
         service_fraction = selected_contaminated.get("service_liquid_fraction")
-        first_liner_neighbour, second_liner_neighbour, _ = _tier_b_composition_neighbours(
-            liner
+        baseline_service = _tier_b_sample_at_temperature_with_reference(
+            sampler,
+            liner,
+            service_temperature,
+            pressure,
+            pure_reference,
+            context="pure-liner service baseline",
         )
-        if pure_reference.get("composition_continuity", {}).get("status") == "sensitive":
-            baseline_service = _symmetric_mean(
-                _checked_liquid_fraction(
-                    sampler(first_liner_neighbour, service_temperature, pressure)
-                ),
-                _checked_liquid_fraction(
-                    sampler(second_liner_neighbour, service_temperature, pressure)
-                ),
-            )
-        else:
-            baseline_service = _checked_liquid_fraction(
-                sampler(liner, service_temperature, pressure)
-            )
         service_excess = float(service_fraction) - baseline_service
     result = {
         "pure_bulk_melt_bracket_C": list(pure_reference["bulk_melt_bracket_C"]),
@@ -2335,29 +2414,20 @@ def _interface_state_at_depth(
     if melt_activity.get("tier_a_fallback"):
         liquid_fraction = None
     else:
-        continuity = melt_activity.get("composition_continuity", {})
-        use_neighbour_average = continuity.get("status") == "sensitive"
-        if not _checked_deposit(deposit_kg_by_species):
-            use_neighbour_average = (
-                pure_reference.get("composition_continuity", {}).get("status")
-                == "sensitive"
-            )
-        if use_neighbour_average:
-            first_neighbour, second_neighbour, _ = _tier_b_composition_neighbours(
-                mixed["composition_wt_pct"]
-            )
-            liquid_fraction = _symmetric_mean(
-                _checked_liquid_fraction(
-                    sampler(first_neighbour, sample_temperature_C, pressure_bar)
-                ),
-                _checked_liquid_fraction(
-                    sampler(second_neighbour, sample_temperature_C, pressure_bar)
-                ),
-            )
+        if _checked_deposit(deposit_kg_by_species):
+            continuity_reference = melt_activity
+            continuity_context = "mixed-interface service sample"
         else:
-            liquid_fraction = _checked_liquid_fraction(
-                sampler(mixed["composition_wt_pct"], sample_temperature_C, pressure_bar)
-            )
+            continuity_reference = pure_reference
+            continuity_context = "pure-liner service sample"
+        liquid_fraction = _tier_b_sample_at_temperature_with_reference(
+            sampler,
+            mixed["composition_wt_pct"],
+            sample_temperature_C,
+            pressure_bar,
+            continuity_reference,
+            context=continuity_context,
+        )
     return {
         "mixed": mixed,
         "first_melt_T_C": (
@@ -2371,6 +2441,7 @@ def _interface_state_at_depth(
             service_temperature_C,
         ),
         "melt_activity": melt_activity,
+        "pure_reference": pure_reference,
     }
 
 
@@ -2603,12 +2674,21 @@ def build_liner_state_segment(
             if mass_kg <= 0.0:
                 continue
             try:
-                species_aggressiveness[species] = species_aggressiveness_finite_difference(
-                    liner,
-                    species,
-                    sampler=sampler,
-                    temperature_C=sample_temperature_C,
-                    pressure_bar=pressure,
+                base_reference = interface_state.get("pure_reference")
+                if not isinstance(base_reference, Mapping):
+                    raise LinerCorrosionRefusal(
+                        "liner_bulk_melt_reference_missing",
+                        f"{species} aggressiveness baseline",
+                    )
+                species_aggressiveness[species] = (
+                    _species_aggressiveness_finite_difference_with_reference(
+                        liner,
+                        species,
+                        sampler=sampler,
+                        temperature_C=sample_temperature_C,
+                        pressure_bar=pressure,
+                        base_reference_profile=base_reference,
+                    )
                 )
             except LinerCorrosionRefusal as exc:
                 refusals.append(exc.as_dict())
