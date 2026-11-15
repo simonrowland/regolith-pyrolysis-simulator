@@ -34,7 +34,7 @@ from simulator.battery.enums import Quantity, Rail
 from simulator.battery.identity import State
 from simulator.battery.records import CandidateRequest, Value
 import simulator.battery.score as score_mod
-from tests.battery.test_score import _streaming_score_fixture
+from tests.battery.test_score import _predict, _streaming_score_fixture
 
 HEADING = "# Battery score report (schema v2.1)"
 FIXTURE_STORE_STAMP = {
@@ -2168,6 +2168,130 @@ def _score_outputs(
     }
 
 
+def test_predictor_sentinel_and_replacement_keyword_contract(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.enums import Engine, Fo2Mode
+
+    context, _engine, _fixture_residuals, _fixture_candidates = (
+        _streaming_score_fixture()
+    )
+    reference = context.observations["fixture-measured-vapour"]
+    experiment = context.experiments[reference.experiment_id]
+    handles: dict[str, object] = {}
+    bench = object()
+    siblings = {"SiO2": Decimal("1")}
+    prediction = _predict(Decimal("5"), reference.identity)
+    calls: list[tuple[object, ...]] = []
+
+    original_predictor = score_mod.predict_with_engine
+    assert score_mod._BUILTIN_SCORE_PREDICTOR is original_predictor
+
+    def builtin_predictor(
+        engine,
+        observation,
+        *,
+        handles,
+        experiment,
+        bench,
+        fo2_mode,
+        phase_siblings,
+        phase_sibling_refusal,
+        isolated,
+    ):
+        calls.append(
+            (
+                engine,
+                observation,
+                handles,
+                experiment,
+                bench,
+                fo2_mode,
+                phase_siblings,
+                phase_sibling_refusal,
+                isolated,
+            )
+        )
+        return prediction
+
+    monkeypatch.setattr(score_mod, "predict_with_engine", builtin_predictor)
+    monkeypatch.setattr(score_mod, "_BUILTIN_SCORE_PREDICTOR", builtin_predictor)
+    produced = score_mod._score_predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        reference,
+        handles=handles,
+        experiment=experiment,
+        bench=bench,
+        fo2_mode=Fo2Mode.SHARED_LADDER,
+        phase_siblings=siblings,
+        phase_sibling_refusal="fixture refusal",
+    )
+
+    assert produced is prediction
+    assert calls == [
+        (
+            Engine.INTERNAL_ANALYTICAL,
+            reference,
+            handles,
+            experiment,
+            bench,
+            Fo2Mode.SHARED_LADDER,
+            siblings,
+            "fixture refusal",
+            True,
+        )
+    ]
+
+    calls.clear()
+
+    def replacement_predictor(engine, observation, *, handles, experiment):
+        calls.append((engine, observation, handles, experiment))
+        return prediction
+
+    monkeypatch.setattr(score_mod, "_BUILTIN_SCORE_PREDICTOR", original_predictor)
+    monkeypatch.setattr(score_mod, "predict_with_engine", replacement_predictor)
+    produced = score_mod._score_predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        reference,
+        handles=handles,
+        experiment=experiment,
+        bench=bench,
+        fo2_mode=Fo2Mode.SHARED_LADDER,
+        phase_siblings=siblings,
+        phase_sibling_refusal="fixture refusal",
+    )
+
+    assert produced is prediction
+    assert calls == [(Engine.INTERNAL_ANALYTICAL, reference, handles, experiment)]
+
+
+def test_score_store_calls_injected_predictor_once_and_pins_its_result() -> None:
+    context, engine, _fixture_residuals, _fixture_candidates = (
+        _streaming_score_fixture()
+    )
+    reference = context.observations["fixture-measured-vapour"]
+    context = replace(context, observations={reference.observation_id: reference})
+    experiment = context.experiments[reference.experiment_id]
+    calls: list[tuple[object, ...]] = []
+
+    def predict(engine, observation, *, handles, experiment):
+        calls.append((engine, observation, handles, experiment))
+        return _predict(Decimal("5"), observation.identity)
+
+    residuals, _candidates = score_mod.score_store(
+        context,
+        engines=(engine,),
+        include_diagnostics=False,
+        predict=predict,
+    )
+
+    assert calls == [(engine, reference, {}, experiment)]
+    assert len(residuals) == 1
+    numeric = residuals[0].numeric
+    assert numeric is not None
+    assert numeric.value == Decimal("1")
+
+
 def test_direct_and_streamed_score_outputs_match_byte_pins(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -2183,11 +2307,17 @@ def test_direct_and_streamed_score_outputs_match_byte_pins(
         _assert_certified_counts_match_fixture(
             _report_certified_counts(got[key]), expected_counts
         )
-    assert got["direct_jsonl"] == got["streamed_jsonl"]
+    assert got["direct_jsonl"].encode("utf-8") == got["streamed_jsonl"].encode(
+        "utf-8"
+    )
     assert _without_certified_counts(got["direct_jsonl"]) == PIN_RESIDUAL_JSONL
-    assert got["direct_summary"] == got["streamed_summary"]
+    assert got["direct_summary"].encode("utf-8") == got["streamed_summary"].encode(
+        "utf-8"
+    )
     assert _without_certified_counts(got["direct_summary"]) == PIN_SUMMARY_JSON
-    assert got["direct_report"] == got["streamed_report"]
+    assert got["direct_report"].encode("utf-8") == got["streamed_report"].encode(
+        "utf-8"
+    )
     assert _without_certified_counts(got["direct_report"]) == _without_certified_counts(
         PIN_REPORT
     )

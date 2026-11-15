@@ -163,7 +163,16 @@ def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
 
 
 def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
-    assert Engine.OPENIMCC in SCORE_ENGINE_SET
+    assert SCORE_ENGINE_SET == (
+        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+        Engine.MAGEMIN,
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.NASA_CEA_9,
+        Engine.CATALOG_EVALUATOR,
+    )
     assert {engine.value for engine in SCORE_ENGINE_SET}.isdisjoint(
         {"imcc_sf04", "imcc_sf04_ext"}
     )
@@ -185,6 +194,66 @@ def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
     assert "Call" not in src
     assert engines_from_names(["nasa_cea_9"]) == (Engine.NASA_CEA_9,)
     assert engines_from_names(["catalog_evaluator"]) == (Engine.CATALOG_EVALUATOR,)
+
+
+def test_engine_payload_source_precedence_and_residual_key_tokens_are_pinned() -> None:
+    from simulator.battery.score import _engine_from_payload
+
+    assert _engine_from_payload(
+        {
+            "candidate_request": {"engine": Engine.OPENIMCC.value},
+            "candidate": "engine:vaporock",
+            "key": "row::T=1500::p_sat::vapour::thermoengine",
+        }
+    ) == Engine.OPENIMCC.value
+    assert _engine_from_payload(
+        {
+            "candidate": "engine:vaporock",
+            "key": "row::T=1500::p_sat::vapour::thermoengine",
+        }
+    ) == Engine.VAPOROCK.value
+    assert _engine_from_payload(
+        {"key": "row::T=1500::p_sat::vapour::thermoengine::fo2_mode=shared_ladder"}
+    ) == Engine.THERMOENGINE.value
+    assert _engine_from_payload({}) == "unknown"
+
+
+@pytest.mark.parametrize(
+    "cache_name", ("_janaf_pure_solid_table_index", "_catalog_score_rows")
+)
+def test_score_lru_cache_keeps_one_wrapper_and_cached_value(cache_name: str) -> None:
+    cache = getattr(score_mod, cache_name)
+    assert getattr(score_mod, cache_name) is cache
+    cache.cache_clear()
+
+    first = cache()
+    after_first = cache.cache_info()
+    second = getattr(score_mod, cache_name)()
+    after_second = cache.cache_info()
+
+    assert second is first
+    assert after_second.misses == after_first.misses
+    assert after_second.hits == after_first.hits + 1
+
+
+def test_catalog_score_rows_share_the_catalog_module_cache() -> None:
+    from simulator.vapour_rail import catalog as catalog_mod
+
+    compile_cache = catalog_mod._COMPILE_CACHE
+    score_mod._catalog_score_rows.cache_clear()
+    rows, error = score_mod._catalog_score_rows()
+
+    assert error is None
+    assert rows
+    assert catalog_mod._COMPILE_CACHE is compile_cache
+    assert all(
+        any(
+            row.species is species
+            for compiled in compile_cache.values()
+            for species in compiled.species.values()
+        )
+        for row in rows
+    )
 
 
 @pytest.mark.parametrize("name", ("imcc_sf04", "imcc_sf04_ext"))
