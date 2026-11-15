@@ -70,16 +70,44 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
     assert len(mapped_rows) == 73
 
     for row_number, source, row in mapped:
+        source_components = source["values"]["composition_wt_pct"]
+        point_composition = row.point_conditions["composition"]
+        if row_number in {58, 59}:
+            excluded_re = "4.36" if row_number == 58 else "4.32"
+            analysis_total = "94.66" if row_number == 58 else "93.53"
+            printed_components = source["values"][
+                "composition_wt_pct_as_published"
+            ]
+            assert printed_components["Re"] == excluded_re
+            assert "Re" not in source_components
+            assert row.identity.composition.is_unknown
+            assert f"kept sum={analysis_total} wt% is below 95 wt%" in (
+                row.identity.composition.reason or ""
+            )
+            assert point_composition.state.is_unknown
+            assert point_composition.locator is not None
+            notices = [
+                notice
+                for notice in row.notices
+                if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+            ]
+            assert len(notices) == 1
+            assert notices[0].dropped == ("Re",)
+            assert f"Re={excluded_re} wt%" in notices[0].reason
+            assert "physical page 7" in notices[0].reason
+            assert f"N{row_number}" in notices[0].reason
+            assert f"{analysis_total} wt%" in notices[0].reason
+            assert "no mole-fraction normalization was applied" in notices[0].reason
+            continue
+
         assert row.identity.composition.is_value
         composition = row.identity.composition.value
         assert composition.basis == "printed_oxides"
         assert composition.amount_basis is AmountBasis.MOLE_FRACTION
         projected = dict(composition.components)
         assert abs(sum(projected.values(), Decimal("0")) - Decimal("1")) < Decimal("1e-24")
-        source_components = source["values"]["composition_wt_pct"]
         if Decimal(source_components["Cl"]) > 0:
             assert projected["Cl"] > 0
-        point_composition = row.point_conditions["composition"]
         assert point_composition.locator is not None
         assert point_composition.locator.record == (
             f"sheet data, cells B{row_number}:R{row_number}"
@@ -97,24 +125,6 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
             condition = row.point_conditions[condition_name]
             assert condition.state.is_value
             assert condition.locator is not None
-        if row_number in {58, 59}:
-            excluded_re = "4.36" if row_number == 58 else "4.32"
-            assert "Re" not in projected
-            assert not any(
-                name == "original_Re_wt_pct"
-                for name, _value in point_composition.inference.parameters
-            )
-            notices = [
-                notice
-                for notice in row.notices
-                if notice.kind is NoticeKind.COMPOSITION_PROJECTED
-            ]
-            assert len(notices) == 1
-            assert notices[0].dropped == ("Re",)
-            assert f"Re={excluded_re} wt%" in notices[0].reason
-            assert "physical page 7" in notices[0].reason
-            assert f"N{row_number}" in notices[0].reason
-
     mutated_doc = deepcopy(doc)
     mutated_si = next(
         observation
@@ -277,11 +287,13 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
             assert len(projection_notices) == 1
             projection_notice = projection_notices[0]
             excluded_re = "4.36" if row_number == 58 else "4.32"
+            analysis_total = "94.66" if row_number == 58 else "93.53"
             assert projection_notice.dropped == ("Re",)
             assert f"Re={excluded_re} wt%" in projection_notice.reason
             assert "physical page 7" in projection_notice.reason
             assert f"N{row_number}" in projection_notice.reason
-            assert "normalized over those remaining components" in projection_notice.reason
+            assert f"{analysis_total} wt%" in projection_notice.reason
+            assert "no mole-fraction normalization was applied" in projection_notice.reason
 
     bound_compositions = [
         observation
@@ -298,7 +310,10 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
             )
             for column in range(2, 19)
         }
-        assert observation["values"]["composition_wt_pct"] == expected_composition
+        assert observation["values"].get(
+            "composition_wt_pct_as_published",
+            observation["values"]["composition_wt_pct"],
+        ) == expected_composition
         assert observation["values"]["composition_locator"] == {
             "source_path": (
                 "corpus/raw/rusiecka-2026-chlorine-data/"
@@ -309,8 +324,15 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         row = migrated[observation["observation_id"]]
         printed = row.point_conditions["printed_composition"]
         assert printed.state.is_value
-        assert printed.state.value == expected_composition
+        assert printed.state.value == observation["values"]["composition_wt_pct"]
         assert printed.locator is not None
+        if row_number in {58, 59}:
+            analysis_total = "94.66" if row_number == 58 else "93.53"
+            assert row.identity.composition.is_unknown
+            assert f"kept sum={analysis_total} wt% is below 95 wt%" in (
+                row.identity.composition.reason or ""
+            )
+            continue
         assert row.identity.composition.is_value
         composition = row.identity.composition.value
         assert composition.basis == "printed_oxides"

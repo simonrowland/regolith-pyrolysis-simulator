@@ -4051,7 +4051,7 @@ species:
               record: sheet data, cell X58
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
-        composition_wt_pct: &rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: &rusiecka_row58_composition_wt_pct_as_published
           SiO2: '44.31'
           TiO2: '0'
           Al2O3: '17.11'
@@ -4065,6 +4065,23 @@ species:
           I2O: '0.04'
           Ag2O: '0.66'
           Re: '4.36'
+          P2O5: '0'
+          Cr2O3: '0'
+          NiO: '0'
+          H2O: '0'
+        composition_wt_pct: &rusiecka_row58_composition_wt_pct
+          SiO2: '44.31'
+          TiO2: '0'
+          Al2O3: '17.11'
+          FeOT: '0'
+          MnO: '0'
+          MgO: '15.9'
+          CaO: '15.95'
+          Na2O: '0'
+          K2O: '0'
+          Cl: '0.69'
+          I2O: '0.04'
+          Ag2O: '0.66'
           P2O5: '0'
           Cr2O3: '0'
           NiO: '0'
@@ -4104,7 +4121,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_ag2o
         dropped:
         - Re
@@ -4153,7 +4170,7 @@ species:
               record: sheet data, cell X59
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
-        composition_wt_pct: &rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: &rusiecka_row59_composition_wt_pct_as_published
           SiO2: '51.09'
           TiO2: '1.01'
           Al2O3: '15.15'
@@ -4167,6 +4184,23 @@ species:
           I2O: '0.07'
           Ag2O: '0.83'
           Re: '4.32'
+          P2O5: '0'
+          Cr2O3: '0'
+          NiO: '0'
+          H2O: '0'
+        composition_wt_pct: &rusiecka_row59_composition_wt_pct
+          SiO2: '51.09'
+          TiO2: '1.01'
+          Al2O3: '15.15'
+          FeOT: '3.48'
+          MnO: '0'
+          MgO: '8.64'
+          CaO: '11.25'
+          Na2O: '1.68'
+          K2O: '0'
+          Cl: '0.33'
+          I2O: '0.07'
+          Ag2O: '0.83'
           P2O5: '0'
           Cr2O3: '0'
           NiO: '0'
@@ -4206,7 +4240,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_ag2o
         dropped:
         - Re
@@ -10021,6 +10055,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -10028,7 +10063,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_al2o3
         dropped:
         - Re
@@ -10078,6 +10113,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -10085,7 +10121,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_al2o3
         dropped:
         - Re
@@ -15120,6 +15156,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -15127,7 +15164,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_cao
         dropped:
         - Re
@@ -15177,6 +15214,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -15184,7 +15222,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_cao
         dropped:
         - Re
@@ -20219,6 +20257,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -20226,7 +20265,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_cl
         dropped:
         - Re
@@ -20276,6 +20315,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -20283,7 +20323,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_cl
         dropped:
         - Re
@@ -30894,6 +30934,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -30901,7 +30942,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_cr2o3
         dropped:
         - Re
@@ -30951,6 +30992,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -30958,7 +31000,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_cr2o3
         dropped:
         - Re
@@ -35993,6 +36035,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -36000,7 +36043,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_feot
         dropped:
         - Re
@@ -36050,6 +36093,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -36057,7 +36101,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_feot
         dropped:
         - Re
@@ -41092,6 +41136,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -41099,7 +41144,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_h2o
         dropped:
         - Re
@@ -41149,6 +41194,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -41156,7 +41202,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_h2o
         dropped:
         - Re
@@ -46191,6 +46237,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -46198,7 +46245,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_i2o
         dropped:
         - Re
@@ -46248,6 +46295,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -46255,7 +46303,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_i2o
         dropped:
         - Re
@@ -51290,6 +51338,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -51297,7 +51346,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_k2o
         dropped:
         - Re
@@ -51347,6 +51396,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -51354,7 +51404,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_k2o
         dropped:
         - Re
@@ -56389,6 +56439,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -56396,7 +56447,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_mgo
         dropped:
         - Re
@@ -56446,6 +56497,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -56453,7 +56505,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_mgo
         dropped:
         - Re
@@ -61488,6 +61540,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -61495,7 +61548,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_mno
         dropped:
         - Re
@@ -61545,6 +61598,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -61552,7 +61606,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_mno
         dropped:
         - Re
@@ -66587,6 +66641,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -66594,7 +66649,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_na2o
         dropped:
         - Re
@@ -66644,6 +66699,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -66651,7 +66707,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_na2o
         dropped:
         - Re
@@ -71686,6 +71742,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -71693,7 +71750,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_nio
         dropped:
         - Re
@@ -71743,6 +71800,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -71750,7 +71808,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_nio
         dropped:
         - Re
@@ -76785,6 +76843,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -76792,7 +76851,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_p2o5
         dropped:
         - Re
@@ -76842,6 +76901,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -76849,7 +76909,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_p2o5
         dropped:
         - Re
@@ -81884,6 +81944,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -81891,7 +81952,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_re
         dropped:
         - Re
@@ -81941,6 +82002,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -81948,7 +82010,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_re
         dropped:
         - Re
@@ -86983,6 +87045,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -86990,7 +87053,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_sio2
         dropped:
         - Re
@@ -87040,6 +87103,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -87047,7 +87111,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_sio2
         dropped:
         - Re
@@ -92082,6 +92146,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row58_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row58_composition_wt_pct_as_published
         composition_locator: *rusiecka_row58_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row58
@@ -92089,7 +92154,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.36 wt% as buffer-derived material: AgI/Cl-029 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N58 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 94.66 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row58_tio2
         dropped:
         - Re
@@ -92139,6 +92204,7 @@ species:
               note: Fugacities use the paper’s 1-bar standard state; source cell is preserved in the worksheet locator.
         notes: Measured composition of quenched glass; sample was equilibrated at the printed T and conditions.
         composition_wt_pct: *rusiecka_row59_composition_wt_pct
+        composition_wt_pct_as_published: *rusiecka_row59_composition_wt_pct_as_published
         composition_locator: *rusiecka_row59_composition_locator
       point_conditions:
         composition: *rusiecka_calculated_composition_row59
@@ -92146,7 +92212,7 @@ species:
       - kind: composition_projected
         affected_quantities:
         - equilibrium_phase_composition
-        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. Remaining printed wt% components including Cl are converted to mole fractions using x_i=(w_i/M_i)/sum_j(w_j/M_j) and normalized over those remaining components."
+        reason: "Calculated composition excludes Re=4.32 wt% as buffer-derived material: AgI/Cl-031 is marked RRO in Thomas and Wood (2021) Table 2 physical page 7; S4 cell N59 has no definition identifying Re as a glass component. The remaining printed wt% components including Cl total 93.53 wt%, below the 95 wt% minimum; no mole-fraction normalization was applied because the remaining total is below the projection minimum."
         origin: rusiecka_2026_data_row59_tio2
         dropped:
         - Re
