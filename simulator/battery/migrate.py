@@ -138,6 +138,7 @@ from simulator.battery.enums import (
     KINETIC_YIELD_QUANTITIES,
     MEASURED_EVIDENCE,
     MELT_ACTIVITY_QUANTITIES,
+    METHOD_TOKEN_ALIASES,
     MethodToken,
     NoticeKind,
     PHASE_BASIS_TOKENS,
@@ -752,45 +753,6 @@ RAIL_MAP = {
     "redox": Rail.REDOX,
     "alkali shuttle": Rail.ALKALI_SHUTTLE,
     "alkali_shuttle": Rail.ALKALI_SHUTTLE,
-}
-
-METHOD_TOKENS = {m.value: m for m in MethodToken}
-REGIME_TO_METHOD = {
-    # Static, closed-vessel pressure measurements report equilibrium pressure;
-    # they do not use the Knudsen-effusion correction.
-    "static_capsule_vapor_pressure": MethodToken.STATIC_EQUILIBRIUM,
-    # These extract labels all describe the Knudsen-effusion mass-spectrometric
-    # pressure method; the closed schema token is KNUDSEN_EFFUSION.
-    "kems_effusion": MethodToken.KNUDSEN_EFFUSION,
-    "kems_effusion_compiled_experiment": MethodToken.KNUDSEN_EFFUSION,
-    "kems_effusion_method_context": MethodToken.KNUDSEN_EFFUSION,
-    "kems_effusion_review_compilation": MethodToken.KNUDSEN_EFFUSION,
-    "kems_effusion_ion_comparison": MethodToken.KNUDSEN_EFFUSION,
-    "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
-    "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
-    # Rys (2007) stores these source method descriptions under values.method.
-    "Knudsen-cell mass-spectrometric ion currents converted to partial pressures using the thesis calibration.": MethodToken.KNUDSEN_EFFUSION,
-    "KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).": MethodToken.KNUDSEN_EFFUSION,
-    "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
-    "free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
-    "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
-    "transpiration": MethodToken.TRANSPIRATION,
-    "tga": MethodToken.TGA,
-    "dta_dsc": MethodToken.DTA_DSC,
-    "evolved_gas_ms": MethodToken.EVOLVED_GAS_MS,
-    "solar_furnace_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_furnace": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_vacuum_pyrolysis_free_evaporation": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_fresnel_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_fresnel_continuously_pumped_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "vacuum_chamber_pyrolysis": MethodToken.VACUUM_CHAMBER_PYROLYSIS,
-    "emf_cell": MethodToken.EMF_CELL,
-    "quench_equilibration": MethodToken.QUENCH_EQUILIBRATION,
-    "melt_equilibration_quench": MethodToken.QUENCH_EQUILIBRATION,
-    "tabulation": MethodToken.TABULATION,
-    "engine_evaluation": MethodToken.ENGINE_EVALUATION,
-    "gas_standard_state_thermo": MethodToken.TABULATION,
 }
 
 LOCATOR_FIELDS = {
@@ -12932,7 +12894,7 @@ def conditional_reduced_lineage_is_measured(
 def map_method(regime: object) -> State[MethodToken]:
     if not isinstance(regime, str) or not regime.strip():
         return State.unknown("source does not state method")
-    token = METHOD_TOKENS.get(regime) or REGIME_TO_METHOD.get(regime)
+    token = METHOD_TOKEN_ALIASES.get(regime)
     if token is None:
         return State.unknown(
             f"regime {regime!r} is not a closed method token "
