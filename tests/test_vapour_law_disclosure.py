@@ -2545,10 +2545,10 @@ def test_disclosure_survives_every_publication_point(
     from simulator.battery.records import (
         Apparatus,
         ApparatusGeometry,
-        Identity,
         Species,
-        State,
     )
+    from simulator.battery.identity import Identity
+    from simulator.state_types import State
     from simulator.battery.score import (
         ScoreContext,
         compile_residual,
@@ -2982,7 +2982,9 @@ def test_scoring_refuses_incomplete_residue_disclosures(
         Quantity,
         RefusalReason,
     )
-    from simulator.battery.records import Identity, Species, State
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import Species
+    from simulator.state_types import State
     from simulator.battery.score import predict_with_engine
     from tests.battery import factories as F
     import simulator.battery.residue as residue
@@ -5565,7 +5567,9 @@ def _serialized_residue_route_publications(monkeypatch):
         Phase,
         Quantity,
     )
-    from simulator.battery.records import Identity, Located, Locator, Species, State
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import Located, Locator, Species
+    from simulator.state_types import State
     from simulator.battery.score import (
         _HASHIMOTO_SOURCE_ID,
         _SOSSI_SOURCE_ID,
@@ -6173,6 +6177,9 @@ def test_every_published_extrapolation_class_is_disclosed(
                     )
                     continue
                 row = chosen
+            if expected_law_id == _FE_ASSOCIATION_LAW_ID:
+                # One dispatch evaluates the compiled law for reference and live pressure.
+                assert row["evaluation_count"] == 2
             expected_authority = (
                 "diagnostic/extrapolated"
                 if row.get("law_id") == _FE_ASSOCIATION_LAW_ID
@@ -6244,9 +6251,9 @@ def test_every_published_extrapolation_class_is_disclosed(
         item for item in snapshot if item["law_id"] == _FE_ASSOCIATION_LAW_ID
     ]
     assert len(fe_association) == 1
-    # This setup issues one dispatch, which evaluates the Fe association law once.
+    # One dispatch evaluates the compiled law for reference and live pressure.
     _assert_fe_disclosure(
-        fe_association[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1
+        fe_association[0], law_id=_FE_ASSOCIATION_LAW_ID, count=2
     )
     assert "Mg:ellingham" in law_ids
     assert "Mg2:nasa_cea_9" in law_ids
