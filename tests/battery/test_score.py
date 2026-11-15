@@ -12950,7 +12950,9 @@ def test_species_selection_count_printed_once_for_serial_and_worker_scoring(
         ),
     )
     if workers > 1:
-        monkeypatch.setattr(score_mod, "_SCORE_WORKER_SETUP", None)
+        from simulator.battery import score_run
+
+        monkeypatch.setattr(score_run, "_SCORE_WORKER_SETUP", None)
 
         def run_inline(tasks, worker, *, initializer, initargs, **_kwargs):
             initializer(*initargs)
