@@ -1065,6 +1065,7 @@ def _build_high_t_melt_activity_authority(
                 else "missing"
             )
         )
+    phase_basis_continuation = controls.get('phase_basis_continuation')
     if not openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K,
         controls=controls,
@@ -1089,6 +1090,7 @@ def _build_high_t_melt_activity_authority(
         "vapour_channel_switch_K": applied_vapour_switch_K,
         "vapour_channel_phase_basis": phase_basis,
         "phase_basis_source": phase_basis_source,
+        "phase_basis_continuation": phase_basis_continuation,
         "fallback": False,
         "provider": "openimcc",
         "composition_policy": {},
