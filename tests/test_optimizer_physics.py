@@ -15,6 +15,8 @@ from simulator.optimize.physics import (
     GATE_ORDER,
     PhysicsConstraintSet,
     ThresholdSpec,
+    _activity_one_bound_rate_kg_hr,
+    _classify_wall_supply_interval,
     extraction_completeness_report,
     physics_constraints_digest,
 )
@@ -216,6 +218,63 @@ def _assert_insufficient_target_evidence_is_unknown(
     ):
         assert key in target
         assert target[key] is None
+
+
+def test_catalog_bounded_refused_interval_reads_compiled_publisher_mass(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.evaporation import production_vapor_molar_mass_g_per_mol
+    from simulator.vapour_rail.catalog import VapourRailCatalog
+
+    projection = {
+        "metals": {"Ca": {"publisher": "compiled"}},
+        "oxide_vapors": {},
+    }
+    catalog = VapourRailCatalog(species={}, legacy_projection=projection)
+    legacy_view_calls = 0
+    original_legacy_view = VapourRailCatalog.legacy_view
+
+    def count_legacy_view(self: VapourRailCatalog) -> dict[str, object]:
+        nonlocal legacy_view_calls
+        legacy_view_calls += 1
+        return original_legacy_view(self)
+
+    monkeypatch.setattr(VapourRailCatalog, "legacy_view", count_legacy_view)
+    snapshot = SimpleNamespace(
+        duration_h=1.0,
+        temperature_C=1600.0,
+        melt_surface_area_m2=0.2,
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={},
+            species_kg_hr={},
+            carrier_authority_by_species={
+                "Ca": {
+                    "pressure": {"kind": "refusal"},
+                    "flux": {"kind": "refusal"},
+                    "is_refused": True,
+                    "activity_one_psat_pa": 12.0,
+                },
+            },
+        ),
+    )
+
+    interval = _classify_wall_supply_interval(snapshot, "Ca", catalog)
+    publisher_mass_g_mol = production_vapor_molar_mass_g_per_mol(
+        catalog._legacy_projection,
+        "Ca",
+    )
+    expected_rate = _activity_one_bound_rate_kg_hr(
+        temperature_K=1600.0 + 273.15,
+        pressure_pa=12.0,
+        molar_mass_kg_per_mol=float(publisher_mass_g_mol) / 1000.0,
+        area_m2=0.2,
+        alpha=1.0,
+    )
+
+    assert interval.kind == "supply_interval_upper_bound"
+    assert interval.evidence == "supply_interval_upper_bound_used"
+    assert interval.rate_kg_hr == pytest.approx(expected_rate)
+    assert legacy_view_calls == 0
 
 
 def test_delivered_stream_purity_is_diagnostic_until_explicitly_enabled() -> None:
