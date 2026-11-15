@@ -128,6 +128,24 @@ def extract_comparator(monkeypatch):
     return install
 
 
+@pytest.mark.parametrize(("source_id", "expected_kind"), [
+    ("kems-005-fedkin-2006", "derived measurement"),
+    ("kems-008-schaefer-fegley-2004", "literature correlation"),
+    ("kems-041-sossi-fegley-2018", "literature correlation"),
+])
+def test_calibration_source_kind_uses_source_declaration(
+    extract_comparator, source_id, expected_kind
+):
+    from scripts.calibration_battery import extract_rows
+
+    obs = extract_comparator("match")
+    obs.source_id = source_id
+
+    rows = extract_rows()
+
+    assert rows and {row["measurement_kind"] for row in rows} == {expected_kind}
+
+
 @pytest.mark.parametrize("markers", [
     *[{key: role} for key in ("class", "class_tag", "scientific_class")
       for role in ("model", "derived", "inverse", "figure_only", "compilation_only")],

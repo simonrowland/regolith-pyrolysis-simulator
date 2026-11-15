@@ -73,6 +73,21 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
             "Bischof ΔIW has no cited buffer calibration; no fO2_Pa assigned",
         ),
     },
+    "kems-005-fedkin-2006": {
+        "calibration_kind": SourceRule(
+            "derived measurement", "Calibration report classification for Fedkin (2006)"
+        ),
+    },
+    "kems-008-schaefer-fegley-2004": {
+        "calibration_kind": SourceRule(
+            "literature correlation", "Calibration report classification for Schaefer & Fegley (2004)"
+        ),
+    },
+    "kems-041-sossi-fegley-2018": {
+        "calibration_kind": SourceRule(
+            "literature correlation", "Calibration report classification for Sossi & Fegley (2018)"
+        ),
+    },
     B677_SOURCE_ID: {
         "printed_basis_protocol": SourceRule(
             "b677",
