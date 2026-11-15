@@ -13578,3 +13578,56 @@ def test_source_carrier_refusal_requires_a_complete_supply_booking(
         assert summary["wall_deposit_total_kg"] == pytest.approx(bound[species])
         assert summary["lifespan_cost_status"] == "threshold_unavailable"
         assert "wall_deposit_refusal" not in summary
+
+
+@pytest.fixture(scope="module")
+def _d424_real_catalog():
+    """Exercise every shipped source reaction, including elemental/suboxide gas."""
+    from pathlib import Path
+    import yaml
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+
+    payload = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data/vapor_pressures.yaml").read_text()
+    )
+    return compile_vapour_rail_catalog(payload)
+
+
+@pytest.mark.parametrize("temperature_K", [313.15, 1773.15])
+@pytest.mark.parametrize("oxygen_bar", [None, 1.0e-8])
+def test_d424_every_source_reaction_carrier_uses_the_existing_supply_owner(
+    _d424_real_catalog, temperature_K, oxygen_bar,
+) -> None:
+    catalog = _d424_real_catalog
+    source_species = {
+        species: compiled
+        for species, compiled in catalog.species.items()
+        if compiled.source_reaction_id is not None
+        and compiled.code_metadata.source_account == "process.cleaned_melt"
+    }
+    assert {"Na", "K", "Mg", "SiO", "Al", "Ca", "Ti", "Cr"} <= set(source_species)
+    outcomes = {}
+    for species, compiled in source_species.items():
+        snapshot = SimpleNamespace(
+            hour=1, duration_h=1.0, temperature_C=temperature_K - 273.15,
+            transport_pO2_bar=oxygen_bar,
+            evap_flux=SimpleNamespace(
+                published_species_kg_hr={}, melt_surface_area_m2=1.0,
+                carrier_authority_by_species={
+                    species: {"species_id": species, "is_refused": True},
+                },
+            ),
+        )
+        interval = _classify_wall_supply_interval(snapshot, species, catalog)
+        evaluator = compiled.evaluator
+        assert evaluator is not None, species
+        if oxygen_bar is None and evaluator.pO2_exponent != 0.0:
+            assert interval.kind == "unavailable", (species, interval)
+            assert interval.evidence == "missing_recorded_pO2", (species, interval)
+        else:
+            assert interval.kind == "supply_interval_upper_bound", (species, interval)
+            assert interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
+            assert math.isfinite(interval.rate_kg_hr) and interval.rate_kg_hr >= 0.0
+        outcomes[species] = interval.kind
+    if oxygen_bar is not None:
+        assert set(outcomes.values()) == {"supply_interval_upper_bound"}, outcomes
