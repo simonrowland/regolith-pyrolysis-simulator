@@ -3531,6 +3531,7 @@ class EvaporationMixin:
                         + (next_fraction - previous_fraction) * weight,
                     ),
                 )
+            previous_T, previous_fraction = next_T, next_fraction
         return None
 
     @staticmethod
