@@ -184,9 +184,12 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     assert activity.identity.total_pressure_Pa.is_value
     assert activity.identity.total_pressure_Pa.value == Decimal("101325")
     assert activity.identity.fO2_Pa.is_value
-    # Golden pin before sharing the existing log-fO2-to-Pa conversion.
+    # d-405 / b-1195 routes the printed CO cover through graphite C-CO.
+    # At T=1373.15 K and pCO=1.01325 bar, JANAF C-093 gives
+    # log10(K_CO)=8.85665069106; (pCO/K_CO)^2 is
+    # 1.986697945692431e-18 bar = 1.986697945692431e-13 Pa.
     assert activity.identity.fO2_Pa.value == Decimal(
-        "2.7984086093147045631324272098798262102922900122648E-7"
+        "1.9866979456924320515402100608188389705922720012554E-13"
     )
     assert activity.identity.fO2_Pa.value > 0
     assert activity.derivation is not None

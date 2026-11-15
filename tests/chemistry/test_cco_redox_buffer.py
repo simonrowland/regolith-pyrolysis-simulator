@@ -15,7 +15,9 @@ from simulator.oxygen_buffers import (
     cco_buffered_fO2,
     cco_log10_fO2_bar,
     cco_log10_fO2_interval_for_pressure_range,
-    log10_fo2_c_co_bar,
+    CCO_OUT_OF_BAND_NOTICE,
+    CCO_PRESSURE_RANGE_BAR,
+    CCO_TEMPERATURE_RANGE_K,
     qfm_log10_fO2_bar,
     stagno_frost_emog_emod_log10_fO2_interval,
 )
@@ -51,9 +53,9 @@ def _referenced_names(path: Path) -> set[str]:
 @pytest.mark.parametrize(
     ("temperature_K", "pressure_bar", "expected_log10_fO2"),
     (
-        (1473.15, 1.0, -10.475257950649965),
-        (1723.15, 1.0e-6, -8.32808940012709),
-        (1873.15, 1.0, -7.314751221204921),
+        (1473.15, 1.0, -17.12178614753933),
+        (1723.15, 1.0e-6, -27.92892926108145),
+        (1873.15, 1.0, -15.359251023327852),
     ),
 )
 def test_cco_anchor_values(
@@ -68,20 +70,14 @@ def test_cco_anchor_values(
     assert result.fO2_bar == pytest.approx(10.0**expected_log10_fO2)
 
 
-def test_certified_cco_point_provenance_credits_jakobsson_oskarsson_not_stagno_frost() -> None:
-    """The certified CCO point originates from Jakobsson & Oskarsson 1994 (via
-    LEPR/ThermoEngine); Stagno & Frost 2010 only supplies graphite-saturation
-    context (EMOG/EMOD). The point's formulation/source must NOT name Stagno &
-    Frost as origin (mandate clause: provenance honesty / no over-attribution).
-    """
-    result = cco_buffered_fO2(1723.15, 1.0, reference_buffer="QFM")
+def test_cco_fit_point_provenance_credits_jakobsson_oskarsson() -> None:
+    """The fitted point inside the cited field credits Jakobsson & Oskarsson."""
+    result = cco_buffered_fO2(1500.0, 10_000.0, reference_buffer="QFM")
     assert "stagno" not in result.formulation.lower()
     assert "stagnofrost" not in result.formulation.lower()
     assert "jakobsson" in result.formulation.lower()
-    # Source string may CITE Stagno & Frost as context, but must credit
-    # Jakobsson & Oskarsson for the point formula.
     assert "jakobsson" in result.source.lower()
-    assert "inside_cco_reference_range" in result.validity
+    assert result.validity == "inside_cco_jakobsson_oskarsson_calibration"
 
 
 def test_reference_delta_uses_absolute_log10_minus_qfm() -> None:
@@ -101,64 +97,39 @@ def test_oneill_qfm_reference_anchor() -> None:
 
 
 def test_cco_log10_fO2_increases_with_temperature() -> None:
-    low_t = cco_log10_fO2_bar(1473.15, 1.0e-6)
-    mid_t = cco_log10_fO2_bar(1723.15, 1.0e-6)
-    high_t = cco_log10_fO2_bar(1873.15, 1.0e-6)
+    with pytest.warns(RuntimeWarning, match=CCO_OUT_OF_BAND_NOTICE):
+        low_t = cco_log10_fO2_bar(1473.15, 1.0e-6)
+        mid_t = cco_log10_fO2_bar(1723.15, 1.0e-6)
+        high_t = cco_log10_fO2_bar(1873.15, 1.0e-6)
 
     assert low_t < mid_t < high_t
 
 
-def test_cco_outputs_are_bit_pinned_on_temperature_grid() -> None:
+def test_cco_fit_outputs_are_bit_pinned_inside_calibrated_field() -> None:
     output_grid = (
-        (
-            1273.15,
-            "-0x1.999b920f450c2p+3",
-            "-0x1.999b8e53d50b5p+3",
-            "-0x1.d99b8e53d50b5p+3",
-        ),
-        (
-            1473.15,
-            "-0x1.4f35502966942p+3",
-            "-0x1.4f354cefad3dfp+3",
-            "-0x1.8f354cefad3dfp+3",
-        ),
-        (
-            1723.15,
-            "-0x1.0a7ee53a21cdep+3",
-            "-0x1.0a7ee27834ea1p+3",
-            "-0x1.4a7ee27834ea1p+3",
-        ),
-        (
-            1873.15,
-            "-0x1.d424e24e5ce07p+2",
-            "-0x1.d424dd3b925b5p+2",
-            "-0x1.2a126e9dc92dap+3",
-        ),
+        (1373.15, 7_500.0, "-0x1.53d0bdd6d2af9p+3"),
+        (1473.15, 10_000.0, "-0x1.2a112bd90b710p+3"),
+        (1723.15, 15_000.0, "-0x1.b5baf72138a33p+2"),
+        (1773.15, 20_000.0, "-0x1.82b8acb1bc62ep+2"),
     )
 
-    for (
-        temperature_K,
-        expected_one_bar,
-        expected_one_atm,
-        expected_tenth_atm,
-    ) in output_grid:
-        assert cco_log10_fO2_bar(temperature_K, 1.0).hex() == expected_one_bar
-        assert (
-            log10_fo2_c_co_bar(temperature_K, 1.01325).hex()
-            == expected_one_atm
-        )
-        assert (
-            log10_fo2_c_co_bar(temperature_K, 0.101325).hex()
-            == expected_tenth_atm
-        )
+    assert CCO_TEMPERATURE_RANGE_K == (1373.15, 1773.15)
+    assert CCO_PRESSURE_RANGE_BAR == (7500.0, 20000.0)
+    for temperature_K, pressure_bar, expected in output_grid:
+        assert cco_log10_fO2_bar(temperature_K, pressure_bar).hex() == expected
 
 
-def test_low_overhead_pressure_term_is_small_near_graphite_saturation() -> None:
-    temperature_K = 1723.15
-    vacuum = cco_log10_fO2_bar(temperature_K, 1.0e-6)
-    one_bar = cco_log10_fO2_bar(temperature_K, 1.0)
-
-    assert abs(vacuum - one_bar) < 2e-4
+def test_closed_cco_fluid_uses_janaf_positive_root_and_flags_fit_fallback() -> None:
+    # NIST-JANAF C-093 rows 1600/1700 K: -252.284/-260.784 kJ/mol;
+    # C-095 rows 1600/1700 K: -396.323/-396.344 kJ/mol. Their interpolated
+    # formation Gibbs energies give the positive C–O fluid root at 1673.15 K.
+    point = cco_buffered_fO2(1673.15, 1.0, reference_buffer=None)
+    assert point.log10_fO2_bar == pytest.approx(-16.140341787742, abs=1e-12)
+    assert point.validity == (
+        "cco_fit_out_of_band_ideal_gas_used; T_K=[1373.15,1773.15]; "
+        "P_bar=[7500,20000]"
+    )
+    assert point.fO2_bar == pytest.approx(10.0 ** point.log10_fO2_bar)
 
 
 def test_unsupported_reference_buffer_fails_loud() -> None:
@@ -178,12 +149,15 @@ def test_purity_no_ledger_provider_or_melt_imports() -> None:
         "decimal",
         "decimal.Decimal",
         "math",
+        "warnings",
         "simulator.environment",
         "simulator.environment.DEFAULT_VACUUM_FLOOR_BAR",
         # The dependency-free constants owner (t-1748): stdlib-only, so it
         # cannot pull ledger, provider, inventory or melt code into the buffer.
         "simulator.physical_constants",
         "simulator.physical_constants.GAS_CONSTANT",
+        "simulator.reference_data.janaf",
+        "simulator.reference_data.janaf._formation_gibbs_energy_kj_per_mol_at",
         "simulator.scalar_boundary",
         "simulator.scalar_boundary.is_declared_real_scalar",
     }
@@ -202,9 +176,101 @@ def test_pressure_range_query_returns_interval_not_fabricated_point() -> None:
 
     assert isinstance(interval, RedoxBufferInterval)
     assert interval.certified_point is None
-    assert interval.reason == "pressure_range_not_certified_point"
+    assert "pressure_range_not_certified_point" in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE in interval.reason
+    assert "P_bar=[7500,20000]" in interval.reason
     assert interval.low_log10_fO2_bar < interval.high_log10_fO2_bar
-    assert interval.high_log10_fO2_bar - interval.low_log10_fO2_bar < 2e-4
+    assert 10.0 < interval.high_log10_fO2_bar - interval.low_log10_fO2_bar < 12.0
+
+
+def test_pressure_range_encloses_both_sides_of_cco_fit_boundary() -> None:
+    interval = cco_log10_fO2_interval_for_pressure_range(1473.15, (7_499.0, 20_001.0))
+    fit_boundary_value = cco_buffered_fO2(
+        1473.15, 20_000.0, reference_buffer=None
+    ).log10_fO2_bar
+
+    assert fit_boundary_value == pytest.approx(-8.153818178733, abs=1e-12)
+    assert interval.low_log10_fO2_bar <= fit_boundary_value
+    assert fit_boundary_value <= interval.high_log10_fO2_bar
+    assert "mixed branches" in interval.reason
+    assert "inside_cco_jakobsson_oskarsson_calibration" in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE in interval.reason
+
+
+@pytest.mark.parametrize("high_pressure_bar", (30_000.0, 20_001.0))
+def test_pressure_range_starting_at_upper_fit_boundary_encloses_right_limit(
+    high_pressure_bar: float,
+) -> None:
+    boundary_bar = CCO_PRESSURE_RANGE_BAR[1]
+    right_limit = cco_buffered_fO2(
+        1473.15,
+        math.nextafter(boundary_bar, math.inf),
+        reference_buffer=None,
+    )
+    interval = cco_log10_fO2_interval_for_pressure_range(
+        1473.15, (boundary_bar, high_pressure_bar)
+    )
+
+    assert right_limit.log10_fO2_bar == pytest.approx(-9.854774095834, abs=1e-12)
+    assert interval.low_log10_fO2_bar <= right_limit.log10_fO2_bar
+    assert right_limit.log10_fO2_bar <= interval.high_log10_fO2_bar
+    assert "mixed branches" in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE in interval.reason
+
+
+def test_pressure_range_starting_at_lower_fit_boundary_uses_fit_side_only() -> None:
+    boundary_bar = CCO_PRESSURE_RANGE_BAR[0]
+    right_limit = cco_buffered_fO2(
+        1473.15,
+        math.nextafter(boundary_bar, math.inf),
+        reference_buffer=None,
+    )
+    interval = cco_log10_fO2_interval_for_pressure_range(
+        1473.15, (boundary_bar, 8_000.0)
+    )
+
+    assert interval.low_log10_fO2_bar <= right_limit.log10_fO2_bar
+    assert right_limit.log10_fO2_bar <= interval.high_log10_fO2_bar
+    assert "inside_cco_jakobsson_oskarsson_calibration" in interval.reason
+    assert "mixed branches" not in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE not in interval.reason
+
+
+def test_pressure_range_ending_at_lower_fit_boundary_encloses_left_limit() -> None:
+    boundary_bar = CCO_PRESSURE_RANGE_BAR[0]
+    left_limit = cco_buffered_fO2(
+        1473.15,
+        math.nextafter(boundary_bar, -math.inf),
+        reference_buffer=None,
+    )
+    interval = cco_log10_fO2_interval_for_pressure_range(
+        1473.15, (7_000.0, boundary_bar)
+    )
+
+    assert left_limit.log10_fO2_bar == pytest.approx(-10.346546872339, abs=1e-12)
+    assert interval.low_log10_fO2_bar <= left_limit.log10_fO2_bar
+    assert left_limit.log10_fO2_bar <= interval.high_log10_fO2_bar
+    assert "mixed branches" in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE in interval.reason
+
+
+def test_degenerate_pressure_interval_contains_only_its_point_value() -> None:
+    point = cco_buffered_fO2(1473.15, 15_000.0, reference_buffer=None)
+    interval = cco_log10_fO2_interval_for_pressure_range(1473.15, (15_000.0, 15_000.0))
+
+    assert interval.low_log10_fO2_bar == point.log10_fO2_bar
+    assert interval.high_log10_fO2_bar == point.log10_fO2_bar
+    assert "inside_cco_jakobsson_oskarsson_calibration" in interval.reason
+    assert "mixed branches" not in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE not in interval.reason
+
+
+def test_wholly_calibrated_pressure_interval_reports_only_fit_branch() -> None:
+    interval = cco_log10_fO2_interval_for_pressure_range(1473.15, (9_000.0, 12_000.0))
+
+    assert "inside_cco_jakobsson_oskarsson_calibration" in interval.reason
+    assert "mixed branches" not in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE not in interval.reason
 
 
 def test_emog_emod_uncertainty_is_interval_only() -> None:
