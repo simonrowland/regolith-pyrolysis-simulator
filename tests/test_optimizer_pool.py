@@ -25,6 +25,7 @@ from simulator.core import PoisonedHourError, PoisonedHourState
 from simulator.engine_pool import EngineWorkerRemoteError
 import simulator.optimize.evaluate as evaluate_module
 import simulator.optimize.pool as pool_module
+from tests._plugins.time_isolation import patch_module_time
 from simulator.optimize.determinism import THREAD_ENV_VARS, deterministic_result_view, pin_worker_env
 from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
 from simulator.optimize.evaluate import (
@@ -2018,8 +2019,12 @@ def test_descendant_snapshot_retry_discovers_grandchild(
         return (202,) if scans == 1 else (202, 303)
 
     monkeypatch.setattr(pool_module, "_DESCENDANT_SNAPSHOT_SECONDS", 0.05)
-    monkeypatch.setattr(pool_module.time, "monotonic", fake_monotonic)
-    monkeypatch.setattr(pool_module.time, "sleep", fake_sleep)
+    patch_module_time(
+        monkeypatch,
+        pool_module,
+        monotonic=fake_monotonic,
+        sleep=fake_sleep,
+    )
     monkeypatch.setattr(pool_module, "_process_tree_pids", fake_process_tree_pids)
 
     found = pool_module._snapshot_descendant_pids(101)

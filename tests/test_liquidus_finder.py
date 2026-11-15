@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 import simulator.melt_backend.liquidus as liquidus_module
+from tests._plugins.time_isolation import patch_module_time
 from engines.alphamelts.thermoengine import (
     ThermoEngineFO2OmittedError,
     ThermoEngineFO2UndefinedError,
@@ -163,7 +164,7 @@ def test_liquidus_finder_result_and_sample_count_ignore_wall_clock(monkeypatch):
         elapsed['seconds'] += 10.0
         return elapsed['seconds']
 
-    monkeypatch.setattr(liquidus_module.time, 'monotonic', loaded_monotonic)
+    patch_module_time(monkeypatch, liquidus_module, monotonic=loaded_monotonic)
     loaded = find_liquidus_solidus_by_fraction(sample, **kwargs)
 
     assert loaded.status == unloaded.status == 'ok'
@@ -327,7 +328,9 @@ def test_liquidus_finder_reuses_duplicate_bisection_temperatures(monkeypatch):
         clock['t'] += 0.01
         return 0.0 if temperature_C < 1250.0 else 1.0
 
-    monkeypatch.setattr(liquidus_module.time, 'monotonic', lambda: clock['t'])
+    patch_module_time(
+        monkeypatch, liquidus_module, monotonic=lambda: clock['t']
+    )
     result = find_liquidus_solidus_by_fraction(
         step_fraction,
         min_T_C=800.0,
@@ -674,7 +677,7 @@ def test_liquidus_finder_stops_on_wall_clock_hang_guard(monkeypatch):
         clock['t'] += 0.1
         return 0.0
 
-    monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
+    patch_module_time(monkeypatch, liquidus_module, monotonic=fake_monotonic)
 
     result = find_liquidus_solidus_by_fraction(
         sample,
@@ -714,7 +717,7 @@ def test_liquidus_finder_does_not_thread_hang_guard_into_samples(monkeypatch):
         # Monotone liquidus-ish curve so the finder keeps sampling.
         return max(0.0, min(1.0, (temperature_C - 850.0) / 100.0))
 
-    monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
+    patch_module_time(monkeypatch, liquidus_module, monotonic=fake_monotonic)
 
     result = find_liquidus_solidus_by_fraction(
         sample,
@@ -753,7 +756,7 @@ def test_liquidus_finder_preserves_sample_timeout_over_hang_guard(
             },
         )
 
-    monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
+    patch_module_time(monkeypatch, liquidus_module, monotonic=fake_monotonic)
 
     result = find_liquidus_solidus_by_fraction(
         sample,

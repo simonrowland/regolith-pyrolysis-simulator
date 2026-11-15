@@ -20,6 +20,7 @@ from simulator.reduced_real_determinism import (
     PT1PersistentEquilibriumStore,
     canonical_json_bytes,
 )
+from tests._plugins.time_isolation import patch_module_time
 
 
 NO_FEASIBLE_MESSAGE = (
@@ -970,7 +971,7 @@ def test_run_driver_resume_after_sigterm_skips_done_job_and_retries_pending(
             ],
         }
 
-    monkeypatch.setattr(epoch_grind.time, "monotonic", fake_monotonic)
+    patch_module_time(monkeypatch, epoch_grind, monotonic=fake_monotonic)
     monkeypatch.setattr(epoch_grind, "_run_child", fake_run_child)
     monkeypatch.setattr(epoch_grind, "merge_epoch_shards", merge_recorder)
 

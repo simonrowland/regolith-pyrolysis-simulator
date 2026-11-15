@@ -12,6 +12,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from web import events as web_events
 from web import routes as web_routes
 from web.run_store import RunArtifactStore, persist_run_artifact
+from tests._plugins.time_isolation import patch_module_time
 
 # Thread-rendezvous guards throughout this module: these bound a HANG, they do not
 # assert a latency. Any test that means to claim "within N seconds" should use its own
@@ -364,7 +365,9 @@ def test_http_headless_run_has_no_lifetime_cutoff_and_slots_refuse_typed_429(
         backend.initialize({})
         return backend
 
-    monkeypatch.setattr(web_events.time, "monotonic", lambda: clock["now"])
+    patch_module_time(
+        monkeypatch, web_events, monotonic=lambda: clock["now"]
+    )
     monkeypatch.setattr(web_events, "_MAX_ACTIVE_RUNS", 1)
     monkeypatch.setattr(web_events, "_get_backend", force_backend)
     monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
@@ -448,7 +451,9 @@ def test_detached_socket_run_reclaims_at_deadline(tmp_path, monkeypatch):
         captured_tasks.append((target, args, kwargs))
         return object()
 
-    monkeypatch.setattr(web_events.time, "monotonic", lambda: clock["now"])
+    patch_module_time(
+        monkeypatch, web_events, monotonic=lambda: clock["now"]
+    )
     socket = _Socket()
     socket.start_background_task = capture_task
     sid = "detached-socket-reclaim"
