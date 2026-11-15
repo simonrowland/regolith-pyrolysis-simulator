@@ -206,6 +206,138 @@ def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
     assert float(shift) == pytest.approx(float(expected_log10_shift), abs=0.00005)
 
 
+def test_openimcc_melt_feo_normalisation_flags_extrapolation() -> None:
+    identity = _melt_pack_identity("default")
+    sources = _openimcc_sources(
+        pack_version=identity["pack_version"],
+        pack_digest=identity["binding_digest"],
+        condensate_digest="a" * 64,
+    )
+    _context, _experiment, _reference, prediction = _case(
+        Engine.OPENIMCC,
+        sources,
+        temperature_K=Decimal("1600"),
+        provenance={"melt_pack_identity": identity},
+    )
+
+    normalized = score_module._normalize_openimcc_feo_activity_prediction(
+        prediction
+    )
+    record = normalized.provenance["feo_standard_normalisation"]
+    from openimcc.redox_pack import load_redox_pack
+
+    owner_entry = load_redox_pack().content["thermo_species"]["FeO(l)"]
+
+    assert normalized.authority is Authority.EXTRAPOLATED
+    assert record["authority"] == "extrapolated"
+    assert record["certified_band"] == {
+        "temperature_K": owner_entry["fit_residual"]["temperature_range"]
+    }
+    assert record["range_flags"] == list(owner_entry["range_flags"])
+    assert (
+        feo_standard_module.openimcc_feo_activity_normalisation_refusal(
+            record, identity, sources, Decimal("1600")
+        )
+        is None
+    )
+
+
+def test_openimcc_melt_feo_normalisation_inside_band_is_not_extrapolated() -> None:
+    identity = _melt_pack_identity("default")
+    sources = _openimcc_sources(
+        pack_version=identity["pack_version"],
+        pack_digest=identity["binding_digest"],
+        condensate_digest="b" * 64,
+    )
+    _context, _experiment, _reference, prediction = _case(
+        Engine.OPENIMCC,
+        sources,
+        temperature_K=Decimal("1650"),
+        provenance={"melt_pack_identity": identity},
+    )
+
+    normalized = score_module._normalize_openimcc_feo_activity_prediction(
+        prediction
+    )
+    record = normalized.provenance["feo_standard_normalisation"]
+
+    assert normalized.authority is Authority.CERTIFIED
+    assert not {"authority", "certified_band", "range_flags"}.intersection(record)
+    assert (
+        feo_standard_module.openimcc_feo_activity_normalisation_refusal(
+            record, identity, sources, Decimal("1650")
+        )
+        is None
+    )
+
+
+def test_openimcc_melt_feo_normalisation_refuses_missing_extrapolation_mark() -> None:
+    identity = _melt_pack_identity("default")
+    sources = _openimcc_sources(
+        pack_version=identity["pack_version"],
+        pack_digest=identity["binding_digest"],
+        condensate_digest="c" * 64,
+    )
+    _context, _experiment, _reference, prediction = _case(
+        Engine.OPENIMCC,
+        sources,
+        temperature_K=Decimal("1600"),
+        provenance={"melt_pack_identity": identity},
+    )
+    normalized = score_module._normalize_openimcc_feo_activity_prediction(
+        prediction
+    )
+    record = dict(normalized.provenance["feo_standard_normalisation"])
+    for key in ("authority", "certified_band", "range_flags"):
+        record.pop(key)
+
+    refusal = feo_standard_module.openimcc_feo_activity_normalisation_refusal(
+        record,
+        identity,
+        sources,
+        Decimal("1600"),
+    )
+
+    assert refusal is not None
+    assert refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert refusal.detail["reason"] == "openimcc_feo_standard_not_normalised"
+
+
+def test_openimcc_melt_feo_candidate_refuses_a_dg46_delta_g_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    identity = _melt_pack_identity("default")
+    pinned_identity, payload = feo_standard_module._openimcc_pack_identity_and_payload(
+        "default"
+    )
+    changed_payload = dict(payload)
+    changed_payload["feo_liquid_candidate"] = {
+        **payload["feo_liquid_candidate"],
+        "delta_g_j_mol": "0 - 1*T",
+    }
+    monkeypatch.setattr(
+        feo_standard_module,
+        "_openimcc_pack_identity_and_payload",
+        lambda _pack_name: (pinned_identity, changed_payload),
+    )
+
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
+        Engine.OPENIMCC,
+        _openimcc_sources(
+            pack_version=identity["pack_version"],
+            pack_digest=identity["binding_digest"],
+            condensate_digest="d" * 64,
+        ),
+        melt_pack_identity=identity,
+        temperature_K=Decimal("1600"),
+    )
+
+    assert standard is None
+    assert refusal is not None
+    assert refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert refusal.detail["reason"] == "openimcc_feo_standard_delta_g_mismatch"
+
+
 def test_melt_pack_shift_matches_condensate_gibbs_rows_as_crosscheck() -> None:
     import openimcc
     from openimcc.gas import _lamor_gibbs

@@ -27,8 +27,8 @@ class _FeOActivityStandard:
     name: str
     offset_j_mol: Decimal
     melt_pack_identity: Mapping[str, str] | None = None
-    redox_certified_band_K: tuple[Decimal, Decimal] | None = None
-    redox_range_flags: tuple[str, ...] = ()
+    certified_band_K: tuple[Decimal, Decimal] | None = None
+    range_flags: tuple[str, ...] = ()
 
 
 _INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
@@ -51,6 +51,11 @@ _OPENIMCC_REDOX_DG46_FEO_COEFFICIENTS = {
     "dG_D": Decimal("0.15"),
     "dG_E": Decimal("-0.007697"),
 }
+# DG46-MASSON65's provenance dG is checked against the separate MELT binding.
+_OPENIMCC_DG46_FEO_DELTA_G_COEFFICIENTS = (
+    Decimal("27778.965828"),
+    Decimal("10.961554232"),
+)
 
 
 def _source_value(sources: Sequence[str], prefix: str) -> str | None:
@@ -60,14 +65,21 @@ def _source_value(sources: Sequence[str], prefix: str) -> str | None:
     )
 
 
-def _openimcc_redox_pack_feo_entry(redox_pack_digest: str) -> Mapping[str, object]:
+def _openimcc_redox_pack_feo_entry(
+    redox_pack_digest: str | None = None,
+) -> Mapping[str, object]:
     from openimcc.redox_pack import RedoxInputError, load_redox_pack
 
     try:
         pack = load_redox_pack()
     except RedoxInputError:
         pack = None
-    if pack is None or pack.canonical_digest != redox_pack_digest:
+    if pack is None or (
+        redox_pack_digest is not None
+        and pack.canonical_digest != redox_pack_digest
+    ):
+        if redox_pack_digest is None:
+            raise ValueError("default OpenIMCC redox pack is unavailable")
         pack_directory = resources.files("openimcc.data").joinpath("packs")
         for resource in sorted(pack_directory.iterdir(), key=lambda item: item.name):
             if not (
@@ -117,11 +129,11 @@ def _redox_pack_feo_row_refusal(
     return None
 
 
-def _redox_feo_extrapolation_evidence(
+def _feo_standard_extrapolation_evidence(
     standard: _FeOActivityStandard,
     temperature_K: Decimal,
 ) -> Mapping[str, object] | None:
-    band = standard.redox_certified_band_K
+    band = standard.certified_band_K
     if band is None or band[0] <= temperature_K <= band[1]:
         return None
     return {
@@ -129,20 +141,72 @@ def _redox_feo_extrapolation_evidence(
         "certified_band": {
             "temperature_K": [float(band[0]), float(band[1])]
         },
-        "range_flags": list(standard.redox_range_flags),
+        "range_flags": list(standard.range_flags),
     }
 
 
+def _openimcc_feo_standard_reference(
+    redox_pack_digest: str | None,
+) -> tuple[
+    tuple[Decimal, Decimal] | None,
+    tuple[str, ...],
+    ResidualRefusal | None,
+]:
+    try:
+        redox_entry = _openimcc_redox_pack_feo_entry(redox_pack_digest)
+    except (ImportError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        detail: dict[str, object] = {
+            "reason": "openimcc_feo_redox_pack_unresolved",
+        }
+        if redox_pack_digest is not None:
+            detail["redox_pack_digest"] = redox_pack_digest
+        detail["detail"] = str(exc)
+        return None, (), ResidualRefusal(RefusalReason.METRIC_DOMAIN, detail)
+
+    row_refusal = _redox_pack_feo_row_refusal(redox_entry["row"])
+    if row_refusal is not None:
+        return None, (), row_refusal
+    fit_residual = redox_entry.get("fit_residual")
+    raw_band = (
+        fit_residual.get("temperature_range")
+        if isinstance(fit_residual, Mapping)
+        else None
+    )
+    raw_flags = redox_entry.get("range_flags")
+    try:
+        if not isinstance(raw_band, (list, tuple)) or len(raw_band) != 2:
+            raise ValueError("fit_residual.temperature_range must have two edges")
+        band = (Decimal(str(raw_band[0])), Decimal(str(raw_band[1])))
+        if (
+            not all(edge.is_finite() for edge in band)
+            or band[0] >= band[1]
+            or not isinstance(raw_flags, (list, tuple))
+            or not raw_flags
+            or not all(isinstance(flag, str) for flag in raw_flags)
+        ):
+            raise ValueError("FeO(l) redox range metadata is invalid")
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        return None, (), ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_feo_redox_standard_range_unavailable",
+                "redox_pack_digest": redox_pack_digest,
+                "detail": str(exc),
+            },
+        )
+    return band, tuple(raw_flags), None
+
+
 def _redox_melt_standard_refusal(
-    standard: _FeOActivityStandard,
+    standard_name: str,
 ) -> ResidualRefusal | None:
-    if standard.name == "DG46-MASSON65":
+    if standard_name == "DG46-MASSON65":
         return None
     return ResidualRefusal(
         RefusalReason.METRIC_DOMAIN,
         {
             "reason": "openimcc_feo_redox_melt_standard_mismatch",
-            "melt_standard": standard.name,
+            "melt_standard": standard_name,
             "redox_standard": "DG46-MASSON65",
         },
     )
@@ -170,53 +234,14 @@ def _resolve_feo_activity_standard(
         coefficient_sources,
         "openimcc-redox-pack:sha256:",
     )
-    redox_certified_band_K = None
-    redox_range_flags: tuple[str, ...] = ()
+    certified_band_K = None
+    range_flags: tuple[str, ...] = ()
     if redox_pack_digest is not None:
-        try:
-            redox_entry = _openimcc_redox_pack_feo_entry(redox_pack_digest)
-        except (ImportError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "openimcc_feo_redox_pack_unresolved",
-                    "redox_pack_digest": redox_pack_digest,
-                    "detail": str(exc),
-                },
-            )
-        redox_row_refusal = _redox_pack_feo_row_refusal(redox_entry["row"])
-        if redox_row_refusal is not None:
-            return None, redox_row_refusal
-        fit_residual = redox_entry.get("fit_residual")
-        raw_band = (
-            fit_residual.get("temperature_range")
-            if isinstance(fit_residual, Mapping)
-            else None
+        certified_band_K, range_flags, refusal = (
+            _openimcc_feo_standard_reference(redox_pack_digest)
         )
-        raw_flags = redox_entry.get("range_flags")
-        try:
-            if not isinstance(raw_band, (list, tuple)) or len(raw_band) != 2:
-                raise ValueError("fit_residual.temperature_range must have two edges")
-            band = (Decimal(str(raw_band[0])), Decimal(str(raw_band[1])))
-            if (
-                not all(edge.is_finite() for edge in band)
-                or band[0] >= band[1]
-                or not isinstance(raw_flags, (list, tuple))
-                or not raw_flags
-                or not all(isinstance(flag, str) for flag in raw_flags)
-            ):
-                raise ValueError("FeO(l) redox range metadata is invalid")
-        except (InvalidOperation, TypeError, ValueError) as exc:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "openimcc_feo_redox_standard_range_unavailable",
-                    "redox_pack_digest": redox_pack_digest,
-                    "detail": str(exc),
-                },
-            )
-        redox_certified_band_K = band
-        redox_range_flags = tuple(raw_flags)
+        if refusal is not None:
+            return None, refusal
 
     if temperature_K is None or temperature_K <= 0:
         return None, ResidualRefusal(
@@ -282,13 +307,8 @@ def _resolve_feo_activity_standard(
 
     candidate = pack_payload.get("feo_liquid_candidate")
     if pack_name == "published-core" and candidate is None:
-        standard = _FeOActivityStandard(
-            name=_FEO_ACTIVITY_CANONICAL_STANDARD,
-            offset_j_mol=Decimal(0),
-            melt_pack_identity=identity,
-            redox_certified_band_K=redox_certified_band_K,
-            redox_range_flags=redox_range_flags,
-        )
+        standard_name = _FEO_ACTIVITY_CANONICAL_STANDARD
+        offset_j_mol = Decimal(0)
     else:
         if not isinstance(candidate, Mapping):
             return None, ResidualRefusal(
@@ -298,8 +318,10 @@ def _resolve_feo_activity_standard(
                     "melt_pack_identity": identity,
                 },
             )
-        offset, detail = _feo_liquid_candidate_delta_g(candidate, temperature_K)
-        if offset is None:
+        offset, delta_g_coefficients, detail = _feo_liquid_candidate_delta_g(
+            candidate, temperature_K
+        )
+        if offset is None or delta_g_coefficients is None:
             return None, ResidualRefusal(
                 RefusalReason.METRIC_DOMAIN,
                 {
@@ -308,18 +330,41 @@ def _resolve_feo_activity_standard(
                     "detail": detail,
                 },
             )
-        standard = _FeOActivityStandard(
-            name="DG46-MASSON65",
-            offset_j_mol=offset,
-            melt_pack_identity=identity,
-            redox_certified_band_K=redox_certified_band_K,
-            redox_range_flags=redox_range_flags,
-        )
+        if delta_g_coefficients != _OPENIMCC_DG46_FEO_DELTA_G_COEFFICIENTS:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_standard_delta_g_mismatch",
+                    "expected_coefficients": [
+                        str(value)
+                        for value in _OPENIMCC_DG46_FEO_DELTA_G_COEFFICIENTS
+                    ],
+                    "actual_coefficients": [
+                        str(value) for value in delta_g_coefficients
+                    ],
+                },
+            )
+        standard_name = "DG46-MASSON65"
+        offset_j_mol = offset
 
     if redox_pack_digest is not None:
-        refusal = _redox_melt_standard_refusal(standard)
+        refusal = _redox_melt_standard_refusal(standard_name)
         if refusal is not None:
             return None, refusal
+
+    if standard_name == "DG46-MASSON65" and certified_band_K is None:
+        certified_band_K, range_flags, refusal = (
+            _openimcc_feo_standard_reference(None)
+        )
+        if refusal is not None:
+            return None, refusal
+    standard = _FeOActivityStandard(
+        name=standard_name,
+        offset_j_mol=offset_j_mol,
+        melt_pack_identity=identity,
+        certified_band_K=certified_band_K,
+        range_flags=range_flags,
+    )
     return standard, None
 
 
@@ -413,7 +458,7 @@ def _openimcc_melt_pack_payload(
 
 def _feo_liquid_candidate_delta_g(
     candidate: Mapping[str, object], temperature_K: Decimal
-) -> tuple[Decimal | None, str | None]:
+) -> tuple[Decimal | None, tuple[Decimal, Decimal] | None, str | None]:
     raw = candidate.get("delta_g_j_mol")
     number = r"(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
     match = (
@@ -422,13 +467,19 @@ def _feo_liquid_candidate_delta_g(
         else None
     )
     if match is None:
-        return None, "delta_g_j_mol must match the pinned c0 - c1*T expression"
+        return (
+            None,
+            None,
+            "delta_g_j_mol must match the pinned c0 - c1*T expression",
+        )
     intercept_j_mol = Decimal(match.group(1))
     temperature_coefficient_j_mol_K = Decimal(match.group(2))
     if not intercept_j_mol.is_finite() or not temperature_coefficient_j_mol_K.is_finite():
-        return None, "delta_g_j_mol coefficients must be finite"
+        return None, None, "delta_g_j_mol coefficients must be finite"
+    coefficients = (intercept_j_mol, temperature_coefficient_j_mol_K)
     return (
         intercept_j_mol - temperature_coefficient_j_mol_K * temperature_K,
+        coefficients,
         None,
     )
 
@@ -489,7 +540,7 @@ def normalize_openimcc_feo_activity_value(
         "log10_shift": decimal_token(shift),
         "temperature_K": decimal_token(temperature_K),
     }
-    extrapolation_evidence = _redox_feo_extrapolation_evidence(
+    extrapolation_evidence = _feo_standard_extrapolation_evidence(
         standard, temperature_K
     )
     if extrapolation_evidence is not None:
@@ -562,7 +613,7 @@ def openimcc_feo_activity_normalisation_refusal(
             RefusalReason.METRIC_DOMAIN,
             {"reason": "openimcc_feo_standard_not_normalised"},
         )
-    expected_extrapolation_evidence = _redox_feo_extrapolation_evidence(
+    expected_extrapolation_evidence = _feo_standard_extrapolation_evidence(
         standard, temperature_K
     )
     extrapolation_keys = ("authority", "certified_band", "range_flags")
