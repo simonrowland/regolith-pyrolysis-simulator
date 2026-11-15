@@ -77,7 +77,11 @@ import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
-from simulator.battery.source_declarations import SOURCE_DECLARATIONS
+from simulator.battery.source_declarations import (
+    B677_SOURCE_ID,
+    B2131_SOURCE_ID as _B2131_SOURCE_ID,
+    SOURCE_DECLARATIONS,
+)
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
@@ -12240,7 +12244,7 @@ class CompilationColumnSeries:
 
 
 _PANKRATZ_H298_REFERENCE_K = {
-    "pankratz-1984-usbm-b677": Decimal("298.15"),
+    B677_SOURCE_ID: Decimal("298.15"),
     "pankratz-1987-usbm-b689": Decimal("298.15"),
     "pankratz-1994-usbm-b696": Decimal("298.15"),
 }
@@ -20557,8 +20561,6 @@ _LOG_BUFFER_UNITS_RE = re.compile(
     re.IGNORECASE,
 )
 _RELATIVE_LOG_FIELD_NAMES = frozenset({"logfo2", "log10fo2", "fo2log"})
-_MAVROGENES_SOURCE_ID = "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas"
-_KEMS_137_SOURCE_ID = "kems-137-bischof-2023"
 
 
 def _canonical_buffer_name(text: str) -> str:
@@ -20728,43 +20730,13 @@ def _pressure_bar_from_identity(value: object) -> Decimal | None:
     return pressure_pa / _BAR_PA
 
 
-def _delta_iw_ideal_ratio_notice(quoted_definition: str) -> str | None:
-    """Recognize only a source-quoted ideal FeO/Fe definition of ΔIW."""
-    normalized = quoted_definition.casefold().replace("δiw", "delta iw")
-    normalized = re.sub(r"[^a-z0-9]+", "", normalized)
-    if all(token in normalized for token in ("deltaiw", "2log", "xfeo", "xfe")):
-        return (
-            "delta_iw_from_ideal_feo_fe_ratio; source definition: "
-            f"{quoted_definition}"
-        )
-    return None
-
-
 def _relative_method_notice(source_id: str | None, buffer: str) -> str | None:
-    if (
-        source_id == _MAVROGENES_SOURCE_ID
-        and buffer == "IW"
-    ):
-        # Mavrogenes & O'Neill (1999), Eq. 12 and Table 2 footnote: log fO2
-        # uses a_FeO=1.7 X_FeO from Holzheid et al. (1997), not an ideal ratio.
-        return (
-            "delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7; "
-            "source definition: log fO2 = -ΔG°(11)/22.3RT + "
-            "2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO"
-        )
-    if source_id == _KEMS_137_SOURCE_ID and buffer == "IW":
-        # Bischof et al. (2023), abstract: experiments span ΔIW+1.5 to
-        # ΔIW+2.5 and define IW as the iron-wüstite buffer. The paper does not
-        # define ΔIW by an ideal x_FeO/x_Fe ratio.
-        definition = (
-            "log(fO2) range ΔIW+1.5 to ΔIW+2.5 "
-            "(IW = iron-wüstite buffer)"
-        )
-        ideal_ratio_notice = _delta_iw_ideal_ratio_notice(definition)
-        if ideal_ratio_notice is not None:
-            return ideal_ratio_notice
-        return f"delta_iw_reference=iron_wustite_buffer; source definition: {definition}"
-    return None
+    if buffer != "IW":
+        return None
+    rule = SOURCE_DECLARATIONS.get(source_id or "", {}).get(
+        "relative_oxygen_notice"
+    )
+    return rule.value if rule is not None and isinstance(rule.value, str) else None
 
 
 def _relative_buffer_calibration(
@@ -21582,16 +21554,18 @@ def _decision_for_buffer(
     *,
     run_pressure_bar: Decimal | None = None,
 ) -> PrintedOxygenDecision:
+    calibration_rule = SOURCE_DECLARATIONS.get(request.source_id or "", {}).get(
+        "printed_oxygen_requires_calibration"
+    )
     if (
-        request.source_id == _KEMS_137_SOURCE_ID
+        calibration_rule is not None
+        and calibration_rule.value is True
         and request.calibration_id is None
         and request.calibration_text is None
     ):
         return PrintedOxygenDecision(
             "refusal",
-            State.unknown(
-                "Bischof ΔIW has no cited buffer calibration; no fO2_Pa assigned"
-            ),
+            State.unknown(calibration_rule.reason),
         )
     pressure_bar = (
         total_pressure_pa / _BAR_PA
@@ -23416,9 +23390,6 @@ def discover_extracts(directory: Path | None = None) -> list[Path]:
 # Source-printed basis for compilation rows the engine can score
 # ---------------------------------------------------------------------------
 
-_B677_SOURCE_ID = "pankratz-1984-usbm-b677"
-_B592_SOURCE_ID = "kelley-king-1961-usbm-b592"
-_B2131_SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
 _B677_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S, Quantity.H_MINUS_H298})
 _B592_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S})
 _H_MINUS_H298_ANCHOR = "H(T)-H(298.15 K)"
@@ -23588,13 +23559,17 @@ def compilation_source_basis(
     """Basis the publication prints for this row. Empty leaves the axis unknown."""
 
     temperatures = _basis_temperatures(value, temperature_K)
-    if source_id == _B677_SOURCE_ID and quantity in _B677_GAS_QUANTITIES:
+    basis_protocol = SOURCE_DECLARATIONS.get(source_id, {}).get(
+        "printed_basis_protocol"
+    )
+    protocol = None if basis_protocol is None else basis_protocol.value
+    if protocol == "b677" and quantity in _B677_GAS_QUANTITIES:
         return _b677_gas_basis(formula, phase, quantity, temperatures)
-    if source_id == _B677_SOURCE_ID and quantity is Quantity.DELTA_FG:
+    if protocol == "b677" and quantity is Quantity.DELTA_FG:
         return _b677_formation_basis(formula)
-    if source_id == _B592_SOURCE_ID and quantity in _B592_GAS_QUANTITIES:
+    if protocol == "b592" and quantity in _B592_GAS_QUANTITIES:
         return _b592_gas_basis(formula, phase, quantity, temperatures)
-    if source_id == _B2131_SOURCE_ID and quantity in (
+    if protocol == "b2131" and quantity in (
         Quantity.LOG10_KF,
         Quantity.DELTA_FG,
     ):
@@ -32386,6 +32361,9 @@ class Migrator:
             count.metadata_in += 1
             return
         source_id = str(doc.get("source_id") or path.parent.parent.name)
+        source_basis_protocol = SOURCE_DECLARATIONS.get(source_id, {}).get(
+            "printed_basis_protocol"
+        )
         src = doc.get("source") if isinstance(doc.get("source"), Mapping) else {}
         citation = str((src or {}).get("citation") or source_id)
         doi = extract_doi((src or {}).get("doi"), citation)
@@ -32450,7 +32428,10 @@ class Migrator:
         t = _compilation_temperature_state(doc)
         p_std = None
         column_series = compilation_column_series_from_record(doc)
-        if source_id == _B2131_SOURCE_ID:
+        if (
+            source_basis_protocol is not None
+            and source_basis_protocol.value == "b2131"
+        ):
             # Phase windows own formation Gibbs. A converted column series
             # would put every printed phase in one series.
             column_series = tuple(
@@ -32612,7 +32593,8 @@ class Migrator:
             )
         formation_windows = (
             _b2131_formation_gibbs_windows(doc)
-            if source_id == _B2131_SOURCE_ID
+            if source_basis_protocol is not None
+            and source_basis_protocol.value == "b2131"
             else ()
         )
         if formation_windows:
