@@ -212,6 +212,7 @@ def _store_difference_details(
     return "\n".join(details)
 
 
+@pytest.mark.xdist_group("serial")
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
     actual = {}
     for row in _EXTRACT_ROWS:
@@ -2336,6 +2337,7 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
 
 
 @pytest.mark.nightly
+@pytest.mark.xdist_group("serial")
 @pytest.mark.cpu_budget(2600)
 def test_complete_store_regeneration_matches_checked_in_bytes() -> None:
     result = migrate(REPO_ROOT, write=False)
