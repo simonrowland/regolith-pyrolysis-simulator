@@ -900,6 +900,16 @@ def test_explicit_element_basis_heading_precedes_other_oxide_mentions(
     assert "OXIDE" in generator._normalized_letters(generator._header_text(record))
     assert generator._formation_basis_for_record(record) == "from_the_elements"
 
+    generated = _generation(record_id)
+    formation_rows = _formation_observations(
+        generated, basis="from_the_elements"
+    )
+    if formation_rows:
+        assert all(row.identity.quantity.is_value for row in formation_rows)
+    else:
+        # The 0179 temperature row is already withheld by the source-cell guard.
+        assert record_id.endswith("-0179")
+
 
 @pytest.mark.parametrize("record_id", OXIDE_BASIS_RECORDS)
 def test_every_b1452_oxide_basis_record_refuses_element_formation_quantities(
