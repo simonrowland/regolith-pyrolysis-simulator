@@ -30108,14 +30108,17 @@ class Migrator:
             self._author_derivations[point_id] = self._author_derivations[parent_id]
         unc = uncertainty
         if (
-            source_id == "wang-2001-solar-melt-evaporation-residues"
-            and q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
             and component_standard_error is None
+            and isinstance(raw_item, Mapping)
+            and isinstance(raw_item.get("standard_errors"), Mapping)
+            and isinstance(uncertainty.verbatim, Mapping)
+            and uncertainty.verbatim.get("kind") == UncertaintyKind.PRINTED.value
+            and isinstance(uncertainty.verbatim.get("verbatim"), str)
+            and uncertainty.verbatim.get("confidence_level") is not None
         ):
-            # Wang's observation-level declaration describes the numeric
-            # component errors only. Cells without one retain the old
-            # derived-band fallback instead of parsing that declaration as
-            # an uncertainty value.
+            # This series declaration defines the standard_errors convention;
+            # it does not supply a width for components omitted from a point.
             unc = Uncertainty(kind=UncertaintyKind.NONE)
         if component_standard_error is not None:
             unc = Uncertainty(

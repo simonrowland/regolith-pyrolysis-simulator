@@ -333,6 +333,9 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     pressure = sc1_experiment.pressure_environment.total_pressure_Pa
     assert pressure.state.value.point == Decimal("0.00013332236842105")
     assert pressure.state.value.approximate is True
+    assert pressure.locator.note == (
+        "About 10^-6 torr in the main furnace chamber; converted to pascals."
+    )
     sc1_silica = [
         row for row in observations
         if row.identity.species.formula == "SiO2"
@@ -471,3 +474,45 @@ def test_component_errors_without_extract_uncertainty_declaration_are_not_one_si
         )
         assert scored_band.notice is not None
         assert scored_band.notice.reason == "confidence_level_not_stated"
+
+
+def test_component_error_scope_is_declaration_driven_for_another_source(
+    tmp_path: Path,
+) -> None:
+    source = yaml.safe_load(EXTRACT.read_text())
+    source["source_id"] = "fixture-component-error-convention"
+    source["source"]["citation"] = "Synthetic source for component-error scope"
+    extract_path = tmp_path / "fixture-component-error-convention.yaml"
+    extract_path.write_text(yaml.safe_dump(source, sort_keys=False))
+
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(extract_path)
+    migrator.finalize()
+
+    source_observation = next(
+        observation
+        for observation in source["species"]["SiO2"]["observations"]
+        if observation["observation_id"]
+        == "wang_2001_table1_electron_microprobe_residue_compositions"
+    )
+    assert source_observation["uncertainty"]["confidence_level"] == "one_sigma"
+    assert "standard errors" in source_observation["uncertainty"]["verbatim"]
+    sc1_silica_has_no_error = next(
+        point
+        for point in source_observation["values"]["series"]
+        if point["sample"] == "SC1"
+    )
+    assert "SiO2" not in sc1_silica_has_no_error["standard_errors"]
+
+    matches = [
+        row
+        for row in migrator.result.observations.values()
+        if (
+            "::wang_2001_table1_electron_microprobe_residue_compositions::"
+            in row.observation_id
+        )
+        and re.search(r"row=SC1(?!\d)", row.locator.note or "")
+        and row.identity.species.formula == "SiO2"
+    ]
+    assert len(matches) == 1
+    assert matches[0].uncertainty.kind.value == "none"
