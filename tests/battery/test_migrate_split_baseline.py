@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 import yaml
 
 from simulator.battery.migrate import (
@@ -2334,6 +2335,9 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
     assert actual == expected, json.dumps(actual, sort_keys=True, separators=(",", ":"), default=str)
 
 
+@pytest.mark.nightly
+@pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(2600)
 def test_complete_store_regeneration_matches_checked_in_bytes() -> None:
     result = migrate(REPO_ROOT, write=False)
     stored = _store_output_file_bytes(REPO_ROOT)
