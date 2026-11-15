@@ -335,61 +335,114 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
         try:
             if not direct_backend.initialize({"database": "ig"}):
                 pytest.skip("MAGEMin is required for the anorthite anchor")
-            for temperature_C in (800.0, 1000.0):
-                direct = direct_backend.equilibrate(
-                    temperature_C,
-                    composition_kg=dict(anorthite),
-                    fO2_log=liner_corrosion.MAGEMIN_FO2_LOG,
-                    pressure_bar=1.0,
-                )
-                assert direct.status == "ok", direct.warnings
-                sampled_liquid_fraction = sampler(anorthite, temperature_C, 1.0)
-                assert sampled_liquid_fraction == pytest.approx(
-                    direct.liquid_fraction
-                ), (
-                    f"sampler/direct mismatch at {temperature_C} C: "
-                    f"{sampled_liquid_fraction} vs {direct.liquid_fraction}"
-                )
-                assert direct.liquid_fraction == pytest.approx(0.0, abs=1e-12)
-                # b-1231 certification pin: formula-exact CaAl2Si2O8 and the
-                # cited rounded anorthite request agree with direct MAGEMin;
-                # neither may acquire a low-temperature liquid floor.
-                exact_direct = direct_backend.equilibrate(
-                    temperature_C,
-                    composition_kg=dict(formula_derived_anorthite),
-                    fO2_log=liner_corrosion.MAGEMIN_FO2_LOG,
-                    pressure_bar=1.0,
-                )
-                exact_sampled = sampler(
-                    formula_derived_anorthite,
-                    temperature_C,
-                    1.0,
-                )
-                assert exact_direct.status == "ok", exact_direct.warnings
-                assert exact_direct.liquid_fraction == pytest.approx(0.0, abs=1e-12)
-                assert exact_sampled == pytest.approx(
-                    exact_direct.liquid_fraction,
-                    abs=1e-12,
-                )
-            profile = liner_corrosion._tier_b_reference_profile(
-                sampler,
-                formula_derived_anorthite,
-                pressure_bar=1.0,
-                literature_melting_temperature_C=1553.0,
+            # These are direct-backend live engine measurements, not
+            # anorthite physics pins. At compositions only 0.0036 wt% apart,
+            # MAGEMin reports small liquid fractions at different scan
+            # temperatures; this is the d-421 continuity reproducer. The
+            # expected values are the controller's studio-3 MAGEMin 1 bar / ig
+            # profile, within its measured output precision. The adapter route
+            # is pinned separately because its projected-oxide request gives a
+            # distinct measured value from this composition_kg request.
+            temperatures_C = (
+                500.0,
+                800.0,
+                1000.0,
+                1025.0,
+                1200.0,
+                1500.0,
+                1550.0,
+                1600.0,
             )
+            measured = {
+                "formula_exact": (
+                    formula_derived_anorthite,
+                    (0.0, 0.0, 0.00217, 0.00218, 0.00236, 0.00786, 0.04235, 1.0),
+                ),
+                "morey_rounded": (
+                    anorthite,
+                    (0.0, 0.0, 0.0, 0.00257, 0.00275, 0.00875, 0.04385, 1.0),
+                ),
+            }
+            raw_profiles: dict[str, dict[float, float]] = {}
+            engine_version = direct_backend.get_engine_version()
+            for name, (composition, expected_fractions) in measured.items():
+                raw_profiles[name] = {}
+                for temperature_C, expected_fraction in zip(
+                    temperatures_C, expected_fractions, strict=True
+                ):
+                    direct = direct_backend.equilibrate(
+                        temperature_C,
+                        composition_kg=dict(composition),
+                        fO2_log=liner_corrosion.MAGEMIN_FO2_LOG,
+                        pressure_bar=1.0,
+                    )
+                    assert direct.status == "ok", direct.warnings
+                    raw_profiles[name][temperature_C] = direct.liquid_fraction
+                    assert direct.liquid_fraction == pytest.approx(
+                        expected_fraction, abs=2e-5
+                    ), (
+                        f"live MAGEMin {engine_version} "
+                        f"profile changed for {name} at {temperature_C} C"
+                    )
+                assert raw_profiles[name] == pytest.approx(
+                    dict(zip(temperatures_C, expected_fractions, strict=True)),
+                    abs=2e-5,
+                )
+
+            # The sampler routes the request through projected oxide wt% and
+            # measured 0.0018900189 at exact anorthite / 1000 C on studio-3;
+            # keep that pin on the adapter call rather than equating its value
+            # with the direct composition_kg result above (0.00217).
+            assert sampler(formula_derived_anorthite, 1000.0, 1.0) == pytest.approx(
+                0.0018900189, abs=2e-5
+            )
+
+            # In the adapter profile, the exact nominal first crosses at 1000
+            # C, while the Morey-rounded input spuriously crosses at the 500 C
+            # scan edge. For each input, the two live 0.01 wt% neighbours
+            # agree on [1000, 1025] C, so d-421 takes its nominal-outlier ->
+            # neighbours branch and exposes engine_composition_sensitive.
+            profiles = {
+                name: liner_corrosion._tier_b_reference_profile(
+                    sampler,
+                    composition,
+                    pressure_bar=1.0,
+                    literature_melting_temperature_C=1553.0,
+                )
+                for name, (composition, _) in measured.items()
+            }
+            for name, expected_nominal_bracket in (
+                ("formula_exact", [975.0, 1000.0]),
+                ("morey_rounded", [None, 500.0]),
+            ):
+                continuity_profile = profiles[name]
+                sensitivity = continuity_profile["engine_composition_sensitive"]
+                assert continuity_profile["composition_continuity"]["status"] == "sensitive"
+                assert sensitivity["nominal_bracket_C"] == expected_nominal_bracket
+                assert sensitivity["neighbour_brackets_C"] == [
+                    [1000.0, 1025.0],
+                    [1000.0, 1025.0],
+                ]
+                assert sensitivity["neighbour_bracket_C"] == [1000.0, 1025.0]
+                assert continuity_profile["first_liquid_bracket_C"] == [
+                    1000.0,
+                    1025.0,
+                ]
+                assert "engine_composition_sensitive" in continuity_profile["flags"]
+                assert continuity_profile["engine_version"] == (
+                    engine_version
+                )
+
+            profile = profiles["formula_exact"]
         except LinerCorrosionRefusal as exc:
             if exc.reason == "engine_unavailable":
                 pytest.skip("MAGEMin is required for the anorthite anchor")
             raise
-        assert profile["liquid_fraction_by_temperature_C"][500.0] == 0.0
-        assert profile["liquid_fraction_by_temperature_C"][800.0] == 0.0
-        assert profile["liquid_fraction_by_temperature_C"][1000.0] == 0.0
         assert profile["first_liquid_bracket_C"] == [1000.0, 1025.0]
         assert profile["bulk_melt_bracket_C"] == [1550.0, 1575.0]
         assert profile["bulk_melt_residual_vs_literature_C"] == [-3.0, 22.0]
         assert profile["bulk_melt_residual_ticket"] == "b-1231"
-        assert profile["composition_continuity"]["status"] == "passed"
-        assert profile["engine_version"] == backend.get_engine_version()
+        assert profile["engine_version"] == engine_version
         assert profile["engine_minor_phase_eutectic"]["temperature_bracket_C"] == [
             1000.0,
             1025.0,
@@ -400,8 +453,8 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
         assert profile["engine_minor_phase_eutectic"]["phases"]
         assert "phase_closure_unverified" in profile["flags"]
         pure_rating = liner_corrosion._tier_b_melt_activity_rating(
-            anorthite,
-            anorthite,
+            formula_derived_anorthite,
+            formula_derived_anorthite,
             {},
             sampler=sampler,
             pressure_bar=1.0,

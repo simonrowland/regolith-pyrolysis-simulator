@@ -952,9 +952,9 @@ def _tier_b_reference_profile(
     """Apply d-419's composition-continuity decision table to a pure profile.
 
     Melting changes continuously with composition, so a 0.01 wt% numerical
-    nudge cannot create a hundreds-of-kelvin solidus jump. The exact and
-    0.01-rounded CaAl2Si2O8 profiles are the sanity example; the live b-1231
-    pin records their MAGEMin version and low-temperature liquid fractions.
+    nudge cannot create a hundreds-of-kelvin solidus jump. Formula-exact and
+    Morey-rounded CaAl2Si2O8 profiles exercise this rule in the live MAGEMin
+    test, which records route-specific engine values and version.
     Decision table: (1) if nominal and both neighbours have the same first-
     liquid and bulk brackets, keep nominal and record passed; (2) if only the
     nominal bracket differs, average the agreeing opposite neighbours and
