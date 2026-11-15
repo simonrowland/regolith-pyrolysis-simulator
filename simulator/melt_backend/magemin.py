@@ -1936,52 +1936,34 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 domain_dropped_mass_kg_by_species = (
                     domain_source_projection.dropped_mass_kg_by_species
                 )
-                source_bulk_projection = self._build_db_bulk_projection(
-                    domain_source_projection.oxide_wt_pct
-                )
-                source_dropped_components = set(
-                    source_bulk_projection.dropped_components
-                )
-                retained_domain_source = {
-                    species: amount
-                    for species, amount
-                    in domain_source_projection.oxide_wt_pct.items()
-                    if species not in source_dropped_components
-                }
-                domain_comp_wt = project_melt_to_oxide_projection(
-                    composition_kg=retained_domain_source,
-                    composition_mol=None,
-                    oxide_basis=self._MAGEMIN_INPUT_BASIS,
-                    species_formula_registry=species_formula_registry,
-                ).oxide_wt_pct
-            else:
-                # Standalone projected diagnostics may not carry the source
-                # oxides. MAGEMin's total-iron slot is FeO-equivalent, and
-                # the forward projection keeps the iron oxide mass in
-                # FeOt+O. Fold that same mass back through the shared iron
-                # alias resolver for the gate only; leave the engine vector
-                # untouched.
-                projected_gate_oxides = {
-                    species: amount
-                    for species, amount in comp_wt.items()
-                    if species not in {'FeOt', 'O'}
-                }
-                projected_feo, projected_fe2o3 = iron_oxide_values({
-                    'FeOt': (
-                        float(comp_wt.get('FeOt', 0.0))
-                        + float(comp_wt.get('O', 0.0))
-                    ),
-                })
-                if projected_feo > 0.0:
-                    projected_gate_oxides['FeO'] = projected_feo
-                if projected_fe2o3 > 0.0:
-                    projected_gate_oxides['Fe2O3'] = projected_fe2o3
-                domain_comp_wt = project_melt_to_oxide_projection(
-                    composition_kg=projected_gate_oxides,
-                    composition_mol=None,
-                    oxide_basis=self._MAGEMIN_INPUT_BASIS,
-                    species_formula_registry=species_formula_registry,
-                ).oxide_wt_pct
+            # The explicit projection is the bulk submitted to MAGEMin, even
+            # when its diagnostic source composition is also present. Gate
+            # that vector so a different projected bulk cannot inherit the
+            # source composition's in-domain decision. MAGEMin's total-iron
+            # slot is FeO-equivalent; fold FeOt+O back through the shared
+            # alias resolver for the gate while leaving the engine vector
+            # untouched.
+            projected_gate_oxides = {
+                species: amount
+                for species, amount in comp_wt.items()
+                if species not in {'FeOt', 'O'}
+            }
+            projected_feo, projected_fe2o3 = iron_oxide_values({
+                'FeOt': (
+                    float(comp_wt.get('FeOt', 0.0))
+                    + float(comp_wt.get('O', 0.0))
+                ),
+            })
+            if projected_feo > 0.0:
+                projected_gate_oxides['FeO'] = projected_feo
+            if projected_fe2o3 > 0.0:
+                projected_gate_oxides['Fe2O3'] = projected_fe2o3
+            domain_comp_wt = project_melt_to_oxide_projection(
+                composition_kg=projected_gate_oxides,
+                composition_mol=None,
+                oxide_basis=self._MAGEMIN_INPUT_BASIS,
+                species_formula_registry=species_formula_registry,
+            ).oxide_wt_pct
         domain_valid, domain_warnings, domain_reason = (
             _validate_magemin_projection_with_reason(
                 domain_comp_wt,

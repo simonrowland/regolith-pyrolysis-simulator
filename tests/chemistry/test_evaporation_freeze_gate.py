@@ -3714,11 +3714,13 @@ def test_magemin_cache_classifier_matches_live_gate_decision(
             submitted_projection.composition_wt_pct
         )
     live_result = backend.equilibrate(1200.0, **equilibrium_kwargs)
-    live_reason = (live_result.diagnostics or {}).get(
-        'backend_status_reason'
+    live_domain_reason = (
+        (live_result.diagnostics or {}).get('backend_status_reason')
+        if live_result.status == 'out_of_domain'
+        else None
     )
 
-    assert cache_reason == live_reason
+    assert cache_reason == live_domain_reason
     if cache_reason is None:
         assert live_result.status == 'unavailable'
     else:

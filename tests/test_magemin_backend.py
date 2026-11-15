@@ -2359,6 +2359,25 @@ def test_magemin_equilibrate_refuses_out_of_domain_silica(
     assert engine_calls == []
 
 
+def test_magemin_projected_equilibrate_gates_submitted_bulk(monkeypatch):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={'SiO2': 50.0, 'MgO': 50.0},
+        projected_oxide_wt_pct={'Al2O3': 100.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert (
+        result.diagnostics['backend_status_reason']
+        == 'magemin_domain_sio2_below_min'
+    )
+    assert engine_calls == []
+
+
 @pytest.mark.parametrize(
     ('composition', 'expected_status', 'expected_reason'),
     [
