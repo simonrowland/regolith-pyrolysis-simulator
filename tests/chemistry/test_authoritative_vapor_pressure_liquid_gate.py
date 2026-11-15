@@ -4,6 +4,7 @@ import types
 
 import pytest
 
+from engines.domain_reason import OutOfDomainReason
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentResult
 from simulator.core import PyrolysisSimulator
@@ -531,6 +532,13 @@ def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> No
         'curve': {
             'source': projected_source,
             'composition_projected_notice': projection_notice,
+            'gate_provider_refusal': {
+                'provider': 'magemin',
+                'status': 'out_of_domain',
+                'reasons': [
+                    OutOfDomainReason.COMPOSITION_PROJECTED.value,
+                ],
+            },
             'path': ((1200.0, 0.0), (1400.0, 1.0)),
         },
         'repair_notices': [source_repair],

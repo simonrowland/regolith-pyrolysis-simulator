@@ -83,21 +83,42 @@ def _projected_gate_provider_diagnostic():
     }
 
 
+def _projected_gate_phase_reader_result(
+    sim, monkeypatch, diagnostic, *, status,
+):
+    repair_notices = []
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *args, **kwargs: SimpleNamespace(
+            status=status, diagnostic=diagnostic, warnings=(),
+        ),
+    )
+    curve = sim._freeze_gate_curve_from_gate_dispatch(
+        [], fO2_log=-9.0, repair_notices=repair_notices,
+    )
+    record = {
+        'curve': curve,
+        'origin': {},
+        'repair_notices': repair_notices,
+        'disposition': 'live',
+        'provider_outcome': sim._freeze_gate_provider_outcome,
+    }
+    monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_record', lambda: record)
+    monkeypatch.setattr(
+        sim, '_melt_redox_gate_record_is_admitted', lambda _record: True,
+    )
+    return curve, sim._vapor_pressure_freeze_gate_phase_fraction()
+
+
 def test_projected_gate_dispatch_admits_projection_only_refusal(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     diagnostic = _projected_gate_provider_diagnostic()
-    monkeypatch.setattr(
-        sim,
-        '_dispatch_only',
-        lambda *args, **kwargs: SimpleNamespace(
-            status='out_of_domain', diagnostic=diagnostic, warnings=(),
-        ),
-    )
-
-    curve = sim._freeze_gate_curve_from_gate_dispatch(
-        [], fO2_log=-9.0, repair_notices=[],
+    sim.melt.temperature_C = 1150.0
+    curve, phase = _projected_gate_phase_reader_result(
+        sim, monkeypatch, diagnostic, status='out_of_domain',
     )
 
     assert curve['source'] == (
@@ -106,7 +127,14 @@ def test_projected_gate_dispatch_admits_projection_only_refusal(
     assert curve['composition_projected_notice']['dropped_components'] == [
         {'component': 'MnO', 'mass_fraction': 0.01},
     ]
+    assert curve['gate_provider_refusal']['status'] == 'out_of_domain'
+    assert set(curve['gate_provider_refusal']['reasons']) == {
+        OutOfDomainReason.COMPOSITION_PROJECTED.value,
+    }
     assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
+    assert phase[0] == pytest.approx(0.5)
+    assert phase[1] == f"freeze_gate_authority:{curve['source']}"
+    assert phase[3] == curve['composition_projected_notice']
 
 
 def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
@@ -116,22 +144,29 @@ def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
     from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
-    sim.melt.temperature_C = 1800.0 - 273.15
+    sim.melt.temperature_C = 1150.0
     diagnostic = _projected_gate_provider_diagnostic()
     diagnostic['backend_failure_reason_code'] = (
         OutOfDomainReason.SILICATE_WINDOW.value
     )
-    monkeypatch.setattr(
-        sim,
-        '_dispatch_only',
-        lambda *args, **kwargs: SimpleNamespace(
-            status='out_of_domain', diagnostic=diagnostic, warnings=(),
-        ),
+    curve, phase = _projected_gate_phase_reader_result(
+        sim, monkeypatch, diagnostic, status='out_of_domain',
     )
-
-    phase = sim._vapor_pressure_freeze_gate_phase_fraction()
+    assert curve['source'].endswith(':composition_projected')
+    assert set(curve['gate_provider_refusal']['reasons']) == {
+        OutOfDomainReason.COMPOSITION_PROJECTED.value,
+        OutOfDomainReason.SILICATE_WINDOW.value,
+    }
     assert phase[0] is None
-    assert phase[1] == 'freeze_gate_authority_refused'
+    assert phase[1] == 'freeze_gate_authority_fallback_or_projected'
+
+    melt_redox_fraction = sim._melt_redox_liquid_fraction_factor(
+        sim.melt.temperature_C + 273.15,
+    )
+    assert melt_redox_fraction == pytest.approx(0.5)
+    assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
+        curve['source']
+    )
 
     vapor_result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
         IntentRequest(
@@ -142,7 +177,7 @@ def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
                 }},
                 species_formula_registry={},
             ),
-            temperature_C=sim.melt.temperature_C,
+            temperature_C=1800.0 - 273.15,
             pressure_bar=1e-6,
             control_inputs={
                 'pO2_bar': 1e-9,
@@ -166,19 +201,16 @@ def test_projected_gate_dispatch_requires_projection_refusal_status(
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     diagnostic = _projected_gate_provider_diagnostic()
-    monkeypatch.setattr(
-        sim,
-        '_dispatch_only',
-        lambda *args, **kwargs: SimpleNamespace(
-            status='refused', diagnostic=diagnostic, warnings=(),
-        ),
+    diagnostic['backend_status'] = 'refused'
+    sim.melt.temperature_C = 1150.0
+    curve, phase = _projected_gate_phase_reader_result(
+        sim, monkeypatch, diagnostic, status='refused',
     )
 
-    curve = sim._freeze_gate_curve_from_gate_dispatch(
-        [], fO2_log=-9.0, repair_notices=[],
-    )
-
-    assert curve is None
+    assert curve['source'].endswith(':composition_projected')
+    assert curve['gate_provider_refusal']['status'] == 'refused'
+    assert phase[0] is None
+    assert phase[1] == 'freeze_gate_authority_fallback_or_projected'
 
 
 def _injected_launch_exception(name):
