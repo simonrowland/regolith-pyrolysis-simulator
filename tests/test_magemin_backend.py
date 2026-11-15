@@ -2400,6 +2400,24 @@ def test_magemin_projected_equilibrate_gates_submitted_bulk(monkeypatch):
             {'SiO2': 50.0, 'MgO': 39.0},
         ),
         (
+            {'SiO2': 79.0, 'MgO': 16.0, 'P2O5': 5.0},
+            {'SiO2': 79.0, 'MgO': 16.0},
+        ),
+        (
+            {'SiO2': 29.0, 'MgO': 66.0, 'P2O5': 5.0},
+            {'SiO2': 29.0, 'MgO': 66.0},
+        ),
+        (
+            {
+                'SiO2': 50.0,
+                'MgO': 35.0,
+                'FeO': 5.0,
+                'FeOt': 5.0,
+                'P2O5': 5.0,
+            },
+            {'SiO2': 50.0, 'MgO': 35.0, 'FeO': 5.0, 'FeOt': 5.0},
+        ),
+        (
             {'SiO2': 50.0, 'MgO': 50.0},
             {'SiO2': 49.0, 'MgO': 49.0, 'H2O': 2.0},
         ),

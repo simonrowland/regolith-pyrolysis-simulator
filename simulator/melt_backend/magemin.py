@@ -1819,20 +1819,44 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 dropped_accounts=dropped_accounts,
                 dropped_account_species=dropped_account_species,
             )
+        domain_source_projection = projection
+        if projected_oxide_wt_pct is not None and (
+            composition_kg is not None
+            or composition_mol is not None
+            or composition_mol_by_account is not None
+        ):
+            domain_source_mol = composition_mol
+            if composition_mol_by_account is not None:
+                domain_source_mol, _ = split_cleaned_melt_account(
+                    composition_mol_by_account
+                )
+            domain_source_projection = project_melt_to_oxide_projection(
+                composition_kg=composition_kg,
+                composition_mol=domain_source_mol,
+                oxide_basis=self._MAGEMIN_INPUT_BASIS,
+                species_formula_registry=species_formula_registry,
+            )
+
+        bulk_projection, domain_verdict = (
+            self._submitted_bulk_and_domain_verdict(
+                domain_source_projection,
+                species_formula_registry=species_formula_registry,
+                submitted_oxide_wt_pct=(
+                    comp_wt if projected_oxide_wt_pct is not None else None
+                ),
+                refuse_source=(
+                    bool(dropped_accounts) or bool(dropped_account_species)
+                ),
+            )
+        )
+
         if (
             projection.dropped_mass_kg_by_species
             or dropped_accounts
             or dropped_account_species
         ):
             diagnostics = dict(projection_diagnostics)
-            _, _, projection_reason = (
-                _validate_magemin_projection_with_reason(
-                    projection.oxide_wt_pct,
-                    dropped_mass_kg_by_species=(
-                        projection.dropped_mass_kg_by_species
-                    ),
-                )
-            )
+            _valid, _domain_warnings, projection_reason = domain_verdict
             diagnostics['backend_status_reason'] = (
                 projection_reason
                 or OutOfDomainReason.FORBIDDEN_SPECIES.value
@@ -1863,18 +1887,26 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics=projection_diagnostics,
             )
 
-        try:
-            bulk_projection = self._build_db_bulk_projection(comp_wt)
-        except MeltCompositionError as exc:
-            message = f'MAGEMin bulk projection failed: {exc}'
+        if bulk_projection is None:
+            _valid, domain_warnings, domain_reason = domain_verdict
+            message = (
+                domain_warnings[0]
+                if domain_warnings
+                else 'MAGEMin bulk projection produced no submitted bulk'
+            )
             self._last_error = message
+            diagnostics = dict(projection_diagnostics)
+            diagnostics.update({
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': domain_reason,
+            })
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='out_of_domain',
-                warnings=[*prior_warnings, message],
-                diagnostics=projection_diagnostics,
+                warnings=[*prior_warnings, *domain_warnings],
+                diagnostics=diagnostics,
             )
 
         result_diagnostics = projection_diagnostics_for_melt_input(
@@ -1911,74 +1943,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics=diagnostics,
             )
 
-        # The ig-order projection can refuse unsupported components before
-        # the domain gate. The liquidus finder's projected retry is a
-        # different bulk whose supplied wt% values can sum below 100; gate
-        # its normalized oxide composition while preserving those original
-        # values for the existing MAGEMin call.
-        domain_dropped_mass_kg_by_species = dict(
-            projection.dropped_mass_kg_by_species
-        )
-        if projected_oxide_wt_pct is not None:
-            domain_source_mol = composition_mol
-            if composition_mol_by_account is not None:
-                domain_source_mol, _ = (
-                    split_cleaned_melt_account(composition_mol_by_account)
-                )
-            if composition_kg is not None or domain_source_mol is not None:
-                domain_source_projection = project_melt_to_oxide_projection(
-                    composition_kg=composition_kg,
-                    composition_mol=domain_source_mol,
-                    oxide_basis=self._MAGEMIN_INPUT_BASIS,
-                    species_formula_registry=species_formula_registry,
-                )
-                domain_dropped_mass_kg_by_species = (
-                    dict(
-                        domain_source_projection.dropped_mass_kg_by_species
-                    )
-                )
-
-        # Gate the exact bulk projection passed to the engine. Its iron is
-        # represented as FeOt+O; fold that submitted pair back through the
-        # shared alias resolver, accumulating any existing iron mass.
-        submitted_oxides = dict(bulk_projection.composition_wt_pct)
-        submitted_feot_present = 'FeOt' in submitted_oxides
-        submitted_feot = float(submitted_oxides.pop('FeOt', 0.0))
-        submitted_oxygen = float(submitted_oxides.pop('O', 0.0))
-        if submitted_feot_present:
-            submitted_feo, submitted_fe2o3 = iron_oxide_values({
-                'FeOt': submitted_feot + submitted_oxygen,
-            })
-            if submitted_feo > 0.0:
-                submitted_oxides['FeO'] = (
-                    float(submitted_oxides.get('FeO', 0.0))
-                    + submitted_feo
-                )
-            if submitted_fe2o3 > 0.0:
-                submitted_oxides['Fe2O3'] = (
-                    float(submitted_oxides.get('Fe2O3', 0.0))
-                    + submitted_fe2o3
-                )
-        elif submitted_oxygen > 0.0:
-            submitted_oxides['O'] = submitted_oxygen
-        domain_projection = project_melt_to_oxide_projection(
-            composition_kg=submitted_oxides,
-            composition_mol=None,
-            oxide_basis=self._MAGEMIN_INPUT_BASIS,
-            species_formula_registry=species_formula_registry,
-        )
-        domain_comp_wt = domain_projection.oxide_wt_pct
-        domain_dropped_mass_kg_by_species.update(
-            domain_projection.dropped_mass_kg_by_species
-        )
-        domain_valid, domain_warnings, domain_reason = (
-            _validate_magemin_projection_with_reason(
-                domain_comp_wt,
-                dropped_mass_kg_by_species=(
-                    domain_dropped_mass_kg_by_species
-                ),
-            )
-        )
+        domain_valid, domain_warnings, domain_reason = domain_verdict
         if not domain_valid:
             diagnostics = dict(result_diagnostics)
             diagnostics.update({
@@ -3783,6 +3748,97 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             source_sum_wt_pct=source_sum_wt_pct,
             projected_sum_wt_pct=sum(float(value) for value in projected.values()),
         )
+
+    def _submitted_bulk_and_domain_verdict(
+        self,
+        source_projection: MeltOxideProjection,
+        *,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+        submitted_oxide_wt_pct: Optional[Mapping[str, float]] = None,
+        projected_retry: bool = False,
+        refuse_source: bool = False,
+    ) -> tuple[
+        Optional[_MAGEMinBulkProjection],
+        tuple[bool, List[str], str | None],
+    ]:
+        """Build the solver bulk and gate that same projected bulk."""
+        source_dropped = dict(source_projection.dropped_mass_kg_by_species)
+        if source_dropped or refuse_source:
+            return None, _validate_magemin_projection_with_reason(
+                source_projection.oxide_wt_pct,
+                dropped_mass_kg_by_species=source_dropped,
+            )
+
+        bulk_input = (
+            source_projection.oxide_wt_pct
+            if submitted_oxide_wt_pct is None
+            else submitted_oxide_wt_pct
+        )
+        if not bulk_input:
+            return None, _validate_magemin_projection_with_reason({})
+
+        try:
+            bulk_projection = self._build_db_bulk_projection(bulk_input)
+            if projected_retry and submitted_oxide_wt_pct is None:
+                if bulk_projection.dropped_components:
+                    bulk_projection = self._build_db_bulk_projection(
+                        bulk_projection.composition_wt_pct
+                    )
+        except MeltCompositionError as exc:
+            return (
+                None,
+                (
+                    False,
+                    [f'MAGEMin bulk projection failed: {exc}'],
+                    COMPOSITION_PROJECTED,
+                ),
+            )
+        if bulk_projection.dropped_components:
+            return (
+                bulk_projection,
+                (
+                    False,
+                    list(bulk_projection.warnings),
+                    COMPOSITION_PROJECTED,
+                ),
+            )
+
+        # The exact submitted bulk represents iron as FeOt+O. Fold that pair
+        # through the shared alias resolver for the domain gate while leaving
+        # the engine vector untouched.
+        submitted_oxides = dict(bulk_projection.composition_wt_pct)
+        submitted_feot_present = 'FeOt' in submitted_oxides
+        submitted_feot = float(submitted_oxides.pop('FeOt', 0.0))
+        submitted_oxygen = float(submitted_oxides.pop('O', 0.0))
+        if submitted_feot_present:
+            submitted_feo, submitted_fe2o3 = iron_oxide_values({
+                'FeOt': submitted_feot + submitted_oxygen,
+            })
+            if submitted_feo > 0.0:
+                submitted_oxides['FeO'] = (
+                    float(submitted_oxides.get('FeO', 0.0))
+                    + submitted_feo
+                )
+            if submitted_fe2o3 > 0.0:
+                submitted_oxides['Fe2O3'] = (
+                    float(submitted_oxides.get('Fe2O3', 0.0))
+                    + submitted_fe2o3
+                )
+        elif submitted_oxygen > 0.0:
+            submitted_oxides['O'] = submitted_oxygen
+        domain_projection = project_melt_to_oxide_projection(
+            composition_kg=submitted_oxides,
+            composition_mol=None,
+            oxide_basis=self._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=species_formula_registry,
+        )
+        dropped_mass = dict(source_dropped)
+        dropped_mass.update(domain_projection.dropped_mass_kg_by_species)
+        verdict = _validate_magemin_projection_with_reason(
+            domain_projection.oxide_wt_pct,
+            dropped_mass_kg_by_species=dropped_mass,
+        )
+        return bulk_projection, verdict
 
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:
