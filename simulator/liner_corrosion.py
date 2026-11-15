@@ -12,12 +12,15 @@ import math
 from pathlib import Path
 import re
 from types import SimpleNamespace
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping, Protocol, Sequence, runtime_checkable
 
 import yaml
 
 from simulator.accounting.formulas import parse_formula, resolve_species_formula
-from simulator.melt_backend.liquidus import LIQUIDUS_SOLID_EPSILON
+from simulator.melt_backend.liquidus import (
+    LIQUIDUS_LIQUID_EPSILON,
+    LIQUIDUS_SOLID_EPSILON,
+)
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
     PA_PER_BAR,
@@ -67,7 +70,30 @@ class LinerCorrosionRefusal(ValueError):
         return {"reason": self.reason, "detail": self.detail}
 
 
-LiquidFractionSampler = Callable[[Mapping[str, float], float, float | None], float]
+LiquidFractionSampler = Callable[
+    [Mapping[str, float], float, float | None], float
+]
+
+
+@runtime_checkable
+class CurveLiquidFractionSampler(Protocol):
+    """Sampler able to reuse a cached phi(f) curve for a deposit mix line."""
+
+    def __call__(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_C: float,
+        pressure_bar: float | None,
+    ) -> float: ...
+
+    def curve(
+        self,
+        liner_composition_wt_pct: Mapping[str, Any],
+        deposit_kg_by_species: Mapping[str, Any],
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+    ) -> Any: ...
 
 
 def _finite_real(value: Any, field: str) -> float:
@@ -407,7 +433,7 @@ def _sample_liquid_fraction(
         return sampler(composition_wt_pct, temperature_C, pressure_bar)
     if pressure_bar is None:
         raise LinerCorrosionRefusal("liner_service_pressure_missing")
-    if isinstance(sampler, MageminLinerSampler) and any(
+    if isinstance(sampler, CurveLiquidFractionSampler) and any(
         float(kg) > 0.0 for kg in deposit_kg_by_species.values()
     ):
         curve = sampler.curve(
@@ -522,8 +548,8 @@ def corrosion_campaign_recurrence(
     if margin < 0.0:
         raise LinerCorrosionRefusal("temperature_margin_invalid")
 
-    # The high-rate branch reaches the criterion first (lo); the inert branch
-    # is the slower bound (hi). Both are explicit M_(N+1)=M_N+D recurrences.
+    # Compute both stipulated deposition branches independently: composition
+    # changes can make the larger deposit branch reach first liquid later.
     hi, hi_deposit, hi_signal = _campaign_branch(
         liner,
         initial_deposit_kg_by_species,
@@ -586,8 +612,40 @@ def corrosion_campaign_recurrence(
     ]
     if reactive_refusal is not None:
         flags.append("reactive_deposit_branch_refused")
+    onset_by_branch: dict[str, int | str | None] = {
+        "inert_onset_campaign": hi,
+        "reactive_onset_campaign": lo,
+    }
+    if lo is None:
+        campaign_interval: list[int | str | None] = [None, hi]
+        interval_branch_labels = {"lower": None, "upper": "inert"}
+    else:
+        onset_values = (
+            ("inert", hi),
+            ("reactive_upper_bound", lo),
+        )
+
+        def onset_order(item: tuple[str, int | str]) -> tuple[int, str]:
+            branch, campaigns = item
+            if isinstance(campaigns, str):
+                return horizon + 1, branch
+            return campaigns, branch
+
+        ordered_onsets = sorted(onset_values, key=onset_order)
+        lower_branch, lower_onset = ordered_onsets[0]
+        upper_branch, upper_onset = ordered_onsets[-1]
+        if lower_onset == upper_onset:
+            interval_branch_labels = {"lower": "both", "upper": "both"}
+        else:
+            interval_branch_labels = {
+                "lower": lower_branch,
+                "upper": upper_branch,
+            }
+        campaign_interval = [lower_onset, upper_onset]
     return {
-        "campaigns_to_runaway": [lo, hi],
+        "campaigns_to_runaway": campaign_interval,
+        "onset_campaigns_by_branch": onset_by_branch,
+        "campaign_interval_branch_labels": interval_branch_labels,
         "coupled_campaigns_to_runaway": coupled,
         "branch_end_deposit_kg_by_species": {
             "reactive_upper_bound": lo_deposit,
@@ -609,6 +667,19 @@ def corrosion_campaign_recurrence(
         "horizon_campaigns": horizon,
         "flags": flags,
     }
+
+
+def _first_liquid_exclusion_reason(row: Mapping[str, Any]) -> str | None:
+    """Classify source transitions that are not first-liquid observations."""
+    phases = row.get("phases")
+    if isinstance(phases, Sequence) and not isinstance(phases, (str, bytes)):
+        if not any("liquid" in str(phase).lower() for phase in phases):
+            return "no_liquid_phase"
+        return None
+    invariant_type = str(row.get("invariant_type", "")).lower()
+    if "melting" in invariant_type or "fusion" in invariant_type:
+        return None
+    return "not_first_liquid_transition"
 
 
 def first_liquid_tier_a(
@@ -663,16 +734,10 @@ def first_liquid_tier_a(
         subsystem = row.get("subsystem")
         if not isinstance(liquid_composition, Mapping) or not isinstance(subsystem, str):
             continue
+        if _first_liquid_exclusion_reason(row) is not None:
+            continue
         components = set(subsystem.split("-"))
         if set(composition) != components or set(liquid_composition) != components:
-            continue
-        phases = row.get("phases")
-        if isinstance(phases, Sequence) and not isinstance(phases, (str, bytes)):
-            has_liquid = any("liquid" in str(phase).lower() for phase in phases)
-        else:
-            kind = str(row.get("invariant_type", "")).lower()
-            has_liquid = "melting" in kind or "fusion" in kind
-        if not has_liquid:
             continue
         if all(
             math.isclose(
@@ -887,6 +952,120 @@ def _interface_state_at_depth(
     }
 
 
+def _tier_a_saturated_deposit_fraction(
+    invariant_table: Mapping[str, Any],
+    liner: Mapping[str, float],
+    deposits: Mapping[str, float],
+    mixed_composition: Mapping[str, float],
+    first_melt_C: float,
+) -> float:
+    rows = invariant_table.get("invariants")
+    if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
+        raise LinerCorrosionRefusal("tier_a_saturated_liquid_composition_missing")
+    deposit_oxides = deposit_oxide_composition(deposits)
+    matches: set[float] = set()
+    for row in rows:
+        if not isinstance(row, Mapping) or _first_liquid_exclusion_reason(row):
+            continue
+        liquid = row.get("liquid_composition")
+        subsystem = row.get("subsystem")
+        temperature = row.get("T_invariant_C")
+        if (
+            not isinstance(liquid, Mapping)
+            or not isinstance(subsystem, str)
+            or set(subsystem.split("-")) != set(mixed_composition)
+            or temperature is None
+        ):
+            continue
+        if not math.isclose(
+            _finite_real(temperature, "T_invariant_C"),
+            first_melt_C,
+            rel_tol=0.0,
+            abs_tol=1.0e-9,
+        ):
+            continue
+        if set(liquid) != set(mixed_composition) or not all(
+            math.isclose(
+                _finite_real(liquid.get(oxide), f"{oxide}.liquid_wt_pct"),
+                mixed_composition[oxide],
+                rel_tol=0.0,
+                abs_tol=1.0e-9,
+            )
+            for oxide in mixed_composition
+        ):
+            continue
+        try:
+            matches.add(
+                _infer_deposit_fraction(liner, deposit_oxides, liquid)
+            )
+        except LinerCorrosionRefusal as exc:
+            if exc.reason != "magemin_curve_composition_mismatch":
+                raise
+    if not matches:
+        raise LinerCorrosionRefusal("tier_a_saturated_liquid_composition_missing")
+    if len(matches) != 1:
+        raise LinerCorrosionRefusal("tier_a_saturated_liquid_composition_ambiguous")
+    fraction = next(iter(matches))
+    if fraction <= 0.0:
+        raise LinerCorrosionRefusal("tier_a_saturated_liquid_deposit_fraction_invalid")
+    return fraction
+
+
+def _tier_b_saturated_deposit_fraction(
+    sampler: LiquidFractionSampler,
+    liner: Mapping[str, float],
+    deposits: Mapping[str, float],
+    *,
+    temperature_C: float,
+    pressure_bar: float | None,
+) -> float:
+    if not isinstance(sampler, CurveLiquidFractionSampler):
+        raise LinerCorrosionRefusal("tier_b_phi_curve_sampler_missing")
+    if pressure_bar is None:
+        raise LinerCorrosionRefusal("liner_service_pressure_missing")
+    curve = sampler.curve(
+        liner,
+        deposits,
+        temperature_C=temperature_C,
+        pressure_bar=pressure_bar,
+    )
+    target = 1.0 - LIQUIDUS_LIQUID_EPSILON
+    points = tuple(curve.points)
+    if len(points) < 2:
+        raise LinerCorrosionRefusal("tier_b_saturated_liquid_fraction_not_reached")
+    for (low_fraction, low_signal), (high_fraction, high_signal) in zip(
+        points, points[1:]
+    ):
+        if low_signal >= target:
+            if low_fraction <= 0.0:
+                raise LinerCorrosionRefusal(
+                    "tier_b_saturated_liquid_deposit_fraction_invalid"
+                )
+            return float(low_fraction)
+        if high_signal < target:
+            continue
+        low = float(low_fraction)
+        high = float(high_fraction)
+        for _ in range(52):
+            midpoint = (low + high) / 2.0
+            composition = _composition_at_fraction(
+                liner, curve.deposit_composition_wt_pct, midpoint
+            )
+            signal = _checked_liquid_fraction(
+                curve(composition, temperature_C, pressure_bar)
+            )
+            if signal >= target:
+                high = midpoint
+            else:
+                low = midpoint
+        if high <= 0.0:
+            raise LinerCorrosionRefusal(
+                "tier_b_saturated_liquid_deposit_fraction_invalid"
+            )
+        return high
+    raise LinerCorrosionRefusal("tier_b_saturated_liquid_fraction_not_reached")
+
+
 def build_liner_state_segment(
     interface_chemistry: Mapping[str, Any],
     deposit_kg_by_species: Mapping[str, Any],
@@ -1019,13 +1198,34 @@ def build_liner_state_segment(
     dissolution_ratio: float | None = None
     if onset:
         if x_star is None:
-            refusals.append(
-                LinerCorrosionRefusal(
-                    "saturated_liquid_deposit_fraction_missing"
-                ).as_dict()
-            )
-        else:
-            dissolution_ratio = post_onset_dissolution_ratio(x_star)
+            try:
+                if tier == "A":
+                    if not isinstance(table, Mapping) or first_melt_C is None:
+                        raise LinerCorrosionRefusal(
+                            "tier_a_saturated_liquid_composition_missing"
+                        )
+                    x_star = _tier_a_saturated_deposit_fraction(
+                        table,
+                        liner,
+                        deposits,
+                        mixed["composition_wt_pct"],
+                        first_melt_C,
+                    )
+                elif tier == "B":
+                    x_star = _tier_b_saturated_deposit_fraction(
+                        sampler,
+                        liner,
+                        deposits,
+                        temperature_C=sample_temperature_C,
+                        pressure_bar=pressure,
+                    )
+            except LinerCorrosionRefusal as exc:
+                refusals.append(exc.as_dict())
+        if x_star is not None:
+            try:
+                dissolution_ratio = post_onset_dissolution_ratio(x_star)
+            except LinerCorrosionRefusal as exc:
+                refusals.append(exc.as_dict())
         flags.append(DISSOLUTION_KINETICS_FLAG)
         flags.append(CORROSION_NO_RATE_FLAG)
 
@@ -1582,12 +1782,31 @@ def _check_element_closure(
     bulk_composition_wt_pct: Mapping[str, float],
     result: Any,
 ) -> None:
+    from simulator.melt_backend.base import (
+        LiquidFractionInvalidError,
+        liquid_fraction_from_phase_masses,
+    )
+
     phase_masses = getattr(result, "phase_masses_kg", None)
     phase_compositions = getattr(result, "phase_compositions", None)
     if not isinstance(phase_masses, Mapping) or not phase_masses:
         raise LinerCorrosionRefusal(ELEMENT_CLOSURE_FLAG, "phase masses are absent")
-    if not isinstance(phase_compositions, Mapping) or not phase_compositions:
-        raise LinerCorrosionRefusal(ELEMENT_CLOSURE_FLAG, "phase compositions are absent")
+    try:
+        mass_fraction_liquid = liquid_fraction_from_phase_masses(phase_masses)
+    except LiquidFractionInvalidError as exc:
+        raise LinerCorrosionRefusal(ELEMENT_CLOSURE_FLAG, str(exc)) from exc
+    if mass_fraction_liquid is None:
+        raise LinerCorrosionRefusal(ELEMENT_CLOSURE_FLAG, "zero total phase mass")
+    reported_fraction = getattr(result, "liquid_fraction", None)
+    if reported_fraction is not None and not math.isclose(
+        _checked_liquid_fraction(reported_fraction),
+        mass_fraction_liquid,
+        rel_tol=0.0,
+        abs_tol=ELEMENT_CLOSURE_REL_TOLERANCE,
+    ):
+        raise LinerCorrosionRefusal(
+            ELEMENT_CLOSURE_FLAG, "reported liquid fraction disagrees with phase masses"
+        )
     masses: dict[str, float] = {}
     for phase, raw_mass in phase_masses.items():
         mass = _finite_real(raw_mass, f"phase_masses_kg[{phase!r}]")
@@ -1599,21 +1818,62 @@ def _check_element_closure(
     if total_mass <= 0.0:
         raise LinerCorrosionRefusal(ELEMENT_CLOSURE_FLAG, "zero total phase mass")
 
-    output_elements: dict[str, float] = {}
-    for phase, mass in masses.items():
-        raw_composition = phase_compositions.get(phase)
-        if not isinstance(raw_composition, Mapping) or not raw_composition:
+    input_composition = validate_oxide_composition(bulk_composition_wt_pct)
+    complete_phase_compositions = isinstance(phase_compositions, Mapping) and all(
+        isinstance(phase_compositions.get(phase), Mapping)
+        and bool(phase_compositions.get(phase))
+        for phase in masses
+    )
+    output_composition: dict[str, float]
+    if complete_phase_compositions:
+        output_composition = {}
+        for phase, mass in masses.items():
+            phase_comp = validate_oxide_composition(phase_compositions[phase])
+            mass_fraction = mass / total_mass
+            for oxide, wt_pct in phase_comp.items():
+                output_composition[oxide] = output_composition.get(oxide, 0.0) + (
+                    mass_fraction * wt_pct
+                )
+    elif mass_fraction_liquid <= ELEMENT_CLOSURE_REL_TOLERANCE:
+        # With no melt, the reported solid mass closes against the full input
+        # bulk even when MAGEMin omits per-solid compositions.
+        output_composition = input_composition
+    else:
+        raw_liquid = getattr(result, "liquid_composition_wt_pct", None)
+        if not isinstance(raw_liquid, Mapping) or not raw_liquid:
             raise LinerCorrosionRefusal(
-                ELEMENT_CLOSURE_FLAG, f"phase {phase!r} has no oxide composition"
+                ELEMENT_CLOSURE_FLAG, "liquid composition is absent"
             )
-        phase_comp = validate_oxide_composition(raw_composition)
-        phase_elements = _element_moles_from_oxide_weights(phase_comp)
-        mass_fraction = mass / total_mass
-        for element, moles in phase_elements.items():
-            output_elements[element] = output_elements.get(element, 0.0) + (
-                mass_fraction * moles
-            )
-    input_elements = _element_moles_from_oxide_weights(bulk_composition_wt_pct)
+        liquid_composition = validate_oxide_composition(raw_liquid)
+        if mass_fraction_liquid >= 1.0 - ELEMENT_CLOSURE_REL_TOLERANCE:
+            output_composition = liquid_composition
+        else:
+            solid_fraction = 1.0 - mass_fraction_liquid
+            solid_composition: dict[str, float] = {}
+            for oxide in set(input_composition) | set(liquid_composition):
+                residual = (
+                    input_composition.get(oxide, 0.0)
+                    - mass_fraction_liquid * liquid_composition.get(oxide, 0.0)
+                ) / solid_fraction
+                if residual < -ELEMENT_CLOSURE_REL_TOLERANCE:
+                    raise LinerCorrosionRefusal(
+                        ELEMENT_CLOSURE_FLAG,
+                        f"liquid mass exceeds bulk {oxide} inventory",
+                    )
+                if residual > 0.0:
+                    solid_composition[oxide] = residual
+            solid_composition = validate_oxide_composition(solid_composition)
+            output_composition = {}
+            for oxide in set(input_composition) | set(liquid_composition) | set(
+                solid_composition
+            ):
+                output_composition[oxide] = (
+                    mass_fraction_liquid * liquid_composition.get(oxide, 0.0)
+                    + solid_fraction * solid_composition.get(oxide, 0.0)
+                )
+
+    output_elements = _element_moles_from_oxide_weights(output_composition)
+    input_elements = _element_moles_from_oxide_weights(input_composition)
     for element in set(input_elements) | set(output_elements):
         expected = input_elements.get(element, 0.0)
         actual = output_elements.get(element, 0.0)
@@ -2183,11 +2443,7 @@ def _reaction_type(
 ) -> tuple[str, list[str]]:
     sides, phases = _reaction_parts(reaction, source_id, observation_id)
     if "liquid" not in phases:
-        raise LinerCorrosionDataError(
-            source_id,
-            "reaction_has_no_liquid",
-            f"{observation_id} reaction has no liquid phase",
-        )
+        return "subsolidus transition", phases
     solid_counts = [sum(phase != "liquid" for phase in side) for side in sides]
     if sorted(solid_counts) == [0, 1]:
         kind = "congruent melting"
@@ -2271,14 +2527,14 @@ def _morey_context_records(document: Mapping[str, Any]) -> list[dict[str, Any]]:
                 source_id, "unknown_composition_unit", f"{observation_id} has no weight-percent basis"
             )
         reaction = values.get("phase_reaction_as_printed")
-        if "phases_as_printed" in values:
-            phases = _phases(
-                values["phases_as_printed"], source_id, observation_id
-            )
-            inferred_kind, _ = _reaction_type(reaction, source_id, observation_id)
-        elif reaction:
-            inferred_kind, phases = _reaction_type(
+        if reaction:
+            inferred_kind, reaction_phases = _reaction_type(
                 reaction, source_id, observation_id
+            )
+            phases = (
+                _phases(values["phases_as_printed"], source_id, observation_id)
+                if "phases_as_printed" in values
+                else reaction_phases
             )
         else:
             inferred_kind = values.get("invariant_type")
@@ -2286,6 +2542,11 @@ def _morey_context_records(document: Mapping[str, Any]) -> list[dict[str, Any]]:
                 values.get("phases_as_printed"), source_id, observation_id
             )
         kind = values.get("invariant_type", inferred_kind)
+        if inferred_kind == "subsolidus transition" or (
+            phases is not None
+            and not any("liquid" in str(phase).lower() for phase in phases)
+        ):
+            kind = "subsolidus transition"
         if not isinstance(kind, str) or not kind:
             raise LinerCorrosionDataError(
                 source_id, "missing_invariant_type", f"{observation_id} has no invariant type"
@@ -2549,4 +2810,8 @@ def load_liner_corrosion_invariants() -> list[dict[str, Any]]:
     shornikov = _read_extract(f"{shornikov_id}.yaml", shornikov_id)
     records.extend(_shornikov_records(shornikov))
 
+    for record in records:
+        exclusion = _first_liquid_exclusion_reason(record)
+        if exclusion is not None:
+            record["first_liquid_exclusion_reason"] = exclusion
     return records
