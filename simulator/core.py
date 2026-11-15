@@ -10493,6 +10493,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'vacuum_floor_bar': vacuum_floor,
                 'body': getattr(self.melt, 'body', ''),
                 'process_phase': process_phase,
+                'liquid_fraction': raw_liquid_fraction,
                 'ambient_pressure_bar': (
                     ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
                 ),
