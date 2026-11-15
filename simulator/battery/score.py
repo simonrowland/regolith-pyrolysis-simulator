@@ -993,6 +993,7 @@ class _PrintedBandResolution:
     refusal: Mapping[str, object] | None = None
     notice: Notice | None = None
     standard_uncertainty_dex: Decimal | None = None
+    two_sigma_band: DecisionBand | None = None
 
 
 @dataclass(frozen=True)
@@ -6166,7 +6167,13 @@ def _uncertainty_unit(
                     return unit
     suffix_re = re.compile(r"(" + _UNCERTAINTY_NUMBER + r")\s*([^\d\s].*)$")
     for text in unit_texts:
-        for suffix in reversed(tuple(suffix_re.finditer(text))):
+        unit_source = re.sub(
+            r"\s*\([^)]*(?:as printed|confidence level)[^)]*\)\s*$",
+            "",
+            text,
+            flags=re.IGNORECASE,
+        )
+        for suffix in reversed(tuple(suffix_re.finditer(unit_source))):
             try:
                 suffix_value = abs(as_decimal(suffix.group(1)))
             except (TypeError, ValueError, ArithmeticError, InvalidOperation):
@@ -6332,13 +6339,18 @@ def _confidence_level_notice(
     uncertainty: Uncertainty,
     source_observation: Observation | None,
     source_value: Decimal | tuple[Decimal, Decimal] | None,
+    *,
+    confidence_level_override: str | None = None,
+    assumed_one_sigma: bool = False,
 ) -> Notice | None:
     confidence_level = (
         uncertainty.verbatim.get("confidence_level", "not_stated")
         if isinstance(uncertainty.verbatim, Mapping)
         else "not_stated"
     )
-    if confidence_level != "not_stated" or (
+    if confidence_level == "not_stated" and confidence_level_override is not None:
+        confidence_level = confidence_level_override
+    if (confidence_level != "not_stated" and not assumed_one_sigma) or (
         quantity is Quantity.ACTIVITY
         and _is_log10_activity_standard_deviation(_uncertainty_original(uncertainty))
     ):
@@ -6366,10 +6378,18 @@ def _confidence_level_notice(
     return Notice(
         kind=NoticeKind.INPUT_OMITTED,
         affected_quantities=(quantity,),
-        reason="confidence_level_not_stated",
+        reason=(
+            "uncertainty_confidence_level_assumed_1sigma"
+            if assumed_one_sigma
+            else "confidence_level_not_stated"
+        ),
         origin="decision-band",
         band=f"field={field}; {detail}; locator={locator}",
     )
+
+
+def _has_printed_plus_minus(uncertainty: Uncertainty) -> bool:
+    return re.search(r"(?:±|\+/-|\\pm)", _uncertainty_original(uncertainty)) is not None
 
 
 def _verbatim_denies_printed_uncertainty(uncertainty: Uncertainty) -> bool:
@@ -6403,6 +6423,7 @@ def _printed_uncertainty_band(
     source_observation: Observation | None = None,
     method: MethodToken | None = None,
     band_basis: str = "row_printed",
+    confidence_level_override: str | None = None,
 ) -> _PrintedBandResolution:
     if uncertainty is None:
         return _PrintedBandResolution()
@@ -6515,6 +6536,8 @@ def _printed_uncertainty_band(
         if isinstance(uncertainty.verbatim, Mapping)
         else "not_stated"
     )
+    if confidence_level == "not_stated" and confidence_level_override is not None:
+        confidence_level = confidence_level_override
     log10_activity_sigma = (
         band_basis == "row_printed"
         and quantity is Quantity.ACTIVITY
@@ -6624,9 +6647,12 @@ def _printed_uncertainty_band(
     if confidence_level == "not_stated":
         if shape == "range" or kind == "printed_range":
             kind = "printed_range"
+        elif _has_printed_plus_minus(uncertainty):
+            confidence_level = "one_sigma"
+            kind = "printed_1sigma"
         else:
             kind = "printed_unstated"
-    elif kind == "printed_1sigma":
+    if confidence_level == "one_sigma" and kind == "printed_1sigma":
         ticket *= NORMAL_95_TICKET_MULTIPLIER
     unit = (
         "dimensionless"
@@ -6637,7 +6663,21 @@ def _printed_uncertainty_band(
     )
     rule = f"{kind}: source-printed uncertainty; original={raw_text}"
     notice = _confidence_level_notice(
-        quantity, uncertainty, source_observation, source_value
+        quantity,
+        uncertainty,
+        source_observation,
+        source_value,
+        confidence_level_override=confidence_level_override,
+        assumed_one_sigma=(
+            kind == "printed_1sigma"
+            and confidence_level_override is None
+            and not log10_activity_sigma
+            and (
+                not isinstance(uncertainty.verbatim, Mapping)
+                or uncertainty.verbatim.get("confidence_level", "not_stated")
+                == "not_stated"
+            )
+        ),
     )
     standard_uncertainty_dex = None
     if operation is MetricOperation.DEX:
@@ -6645,10 +6685,19 @@ def _printed_uncertainty_band(
             standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
         elif confidence_level == "two_sigma":
             standard_uncertainty_dex = ticket / Decimal(2)
+    two_sigma_band = None
+    if notice is not None and notice.reason == "uncertainty_confidence_level_assumed_1sigma":
+        two_sigma_band = DecisionBand(
+            ticket / NORMAL_95_TICKET_MULTIPLIER,
+            unit,
+            f"printed_2sigma_reading: source-printed uncertainty; original={raw_text}",
+            band_basis=band_basis,
+        )
     return _PrintedBandResolution(
         DecisionBand(ticket, unit, rule, band_basis=band_basis),
         notice=notice,
         standard_uncertainty_dex=standard_uncertainty_dex,
+        two_sigma_band=two_sigma_band,
     )
 
 
@@ -17611,6 +17660,28 @@ def _compile_residual_with_lineage(
         row_operation = _residual_metric_operation(quantity, reference)
         band_uncertainty = source_reference.uncertainty
         band_basis = None
+        confidence_level_override = None
+        work = (
+            None
+            if experiment is None
+            else context.works.get(experiment.work_id or "")
+        )
+        method_uncertainties = (
+            None if work is None else work.source_method_uncertainties
+        )
+        source_method_uncertainty = (
+            None
+            if method_uncertainties is None or source_reference.source_id is None
+            else method_uncertainties.get(source_reference.source_id)
+        )
+        if (
+            source_method_uncertainty is not None
+            and (
+                quantity is None
+                or source_method_uncertainty.quantity is not quantity
+            )
+        ):
+            source_method_uncertainty = None
         if _is_standard_pressure_ambiguity_uncertainty(band_uncertainty):
             band_basis = (
                 "printed_plus_derived_bound"
@@ -17619,59 +17690,56 @@ def _compile_residual_with_lineage(
             )
         elif band_uncertainty.kind is UncertaintyKind.PRINTED:
             band_basis = "row_printed"
-        elif band_uncertainty.kind is UncertaintyKind.NONE and experiment is not None:
-            work = context.works.get(experiment.work_id or "")
-            method_uncertainties = (
-                None if work is None else work.source_method_uncertainties
-            )
-            source_method_uncertainty = (
-                None
-                if method_uncertainties is None or source_reference.source_id is None
-                else method_uncertainties.get(source_reference.source_id)
+            row_confidence_level = (
+                band_uncertainty.verbatim.get("confidence_level", "not_stated")
+                if isinstance(band_uncertainty.verbatim, Mapping)
+                else "not_stated"
             )
             if (
-                source_method_uncertainty is not None
-                and (
-                    quantity is None
-                    or source_method_uncertainty.quantity is not quantity
-                )
+                row_confidence_level == "not_stated"
+                and source_method_uncertainty is not None
+                and source_method_uncertainty.meaning
+                in {"one_sigma", "two_sigma", "range_half_width"}
             ):
-                source_method_uncertainty = None
-            if source_method_uncertainty is not None:
-                band_basis = "source_method"
-                if source_method_uncertainty.basis not in {
-                    "log10_dex", "absolute", "relative_percent"
-                }:
-                    printed = _PrintedBandResolution(
-                        refusal={
-                            "reason": "source_method_uncertainty_basis_unmapped",
-                            "basis": source_method_uncertainty.basis,
-                        }
-                    )
-                elif source_method_uncertainty.value <= 0:
-                    printed = _PrintedBandResolution(
-                        refusal={
-                            "reason": "source_method_uncertainty_value_nonpositive",
-                            "value": str(source_method_uncertainty.value),
-                        }
-                    )
-                else:
-                    printed_unit = {
-                        "log10_dex": "dex",
-                        "absolute": QUANTITY_UNITS[quantity],
-                        "relative_percent": "%",
-                    }[source_method_uncertainty.basis]
-                    band_uncertainty = Uncertainty(
-                        kind=UncertaintyKind.PRINTED,
-                        verbatim={
-                            "value": source_method_uncertainty.value,
-                            "unit": printed_unit,
-                            "confidence_level": source_method_uncertainty.meaning,
-                            "note": source_method_uncertainty.locator.note,
-                        },
-                        value=source_method_uncertainty.value,
-                        basis=printed_unit,
-                    )
+                confidence_level_override = source_method_uncertainty.meaning
+        elif (
+            band_uncertainty.kind is UncertaintyKind.NONE
+            and source_method_uncertainty is not None
+        ):
+            band_basis = "source_method"
+            if source_method_uncertainty.basis not in {
+                "log10_dex", "absolute", "relative_percent"
+            }:
+                printed = _PrintedBandResolution(
+                    refusal={
+                        "reason": "source_method_uncertainty_basis_unmapped",
+                        "basis": source_method_uncertainty.basis,
+                    }
+                )
+            elif source_method_uncertainty.value <= 0:
+                printed = _PrintedBandResolution(
+                    refusal={
+                        "reason": "source_method_uncertainty_value_nonpositive",
+                        "value": str(source_method_uncertainty.value),
+                    }
+                )
+            else:
+                printed_unit = {
+                    "log10_dex": "dex",
+                    "absolute": QUANTITY_UNITS[quantity],
+                    "relative_percent": "%",
+                }[source_method_uncertainty.basis]
+                band_uncertainty = Uncertainty(
+                    kind=UncertaintyKind.PRINTED,
+                    verbatim={
+                        "value": source_method_uncertainty.value,
+                        "unit": printed_unit,
+                        "confidence_level": source_method_uncertainty.meaning,
+                        "note": source_method_uncertainty.locator.note,
+                    },
+                    value=source_method_uncertainty.value,
+                    basis=printed_unit,
+                )
         if printed.refusal is None:
             printed = _printed_uncertainty_band(
                 quantity,
@@ -17684,6 +17752,7 @@ def _compile_residual_with_lineage(
                     else None
                 ),
                 band_basis=band_basis or "row_printed",
+                confidence_level_override=confidence_level_override,
             )
         if printed.notice is not None:
             notices = union_notices(notices, (printed.notice,))
@@ -17746,6 +17815,24 @@ def _compile_residual_with_lineage(
                     if band_basis == "source_method"
                     else "fusion_combined_row_printed"
                 )
+                two_sigma_band = printed.two_sigma_band
+                if two_sigma_band is not None:
+                    two_sigma_measurement_dex = (
+                        printed.standard_uncertainty_dex / Decimal(2)
+                    )
+                    two_sigma_total_dex = (
+                        two_sigma_measurement_dex**2
+                        + sigma_conversion_dex**2
+                    ).sqrt()
+                    two_sigma_band = DecisionBand(
+                        NORMAL_95_TICKET_MULTIPLIER * two_sigma_total_dex,
+                        "dimensionless",
+                        (
+                            "printed_2sigma_reading: independent printed reading "
+                            "and JANAF conversion uncertainties; GUM quadrature"
+                        ),
+                        band_basis=combined_basis,
+                    )
                 printed = replace(
                     printed,
                     band=DecisionBand(
@@ -17758,6 +17845,7 @@ def _compile_residual_with_lineage(
                         band_basis=combined_basis,
                     ),
                     standard_uncertainty_dex=sigma_total_dex,
+                    two_sigma_band=two_sigma_band,
                 )
         if fusion_band_refusal is not None:
             reason = str(fusion_band_refusal["reason"])
@@ -17860,6 +17948,29 @@ def _compile_residual_with_lineage(
                 "reason": "observed_value_outside_metric_domain",
                 "observed_value": str(ref_point),
             }
+        if (
+            numeric is not None
+            and printed.refusal is None
+            and printed.notice is not None
+            and printed.two_sigma_band is not None
+            and numeric.decision_band is not None
+        ):
+            one_sigma_verdict = match_status(numeric)
+            two_sigma_verdict = match_status(
+                replace(numeric, decision_band=printed.two_sigma_band)
+            )
+            if two_sigma_verdict is not one_sigma_verdict:
+                updated_notice = replace(
+                    printed.notice,
+                    band=(
+                        f"{printed.notice.band}; "
+                        f"two_sigma_reading_verdict={two_sigma_verdict.value}"
+                    ),
+                )
+                notices = union_notices(
+                    tuple(notice for notice in notices if notice != printed.notice),
+                    (updated_notice,),
+                )
     if numeric is None:
         return _refused(
             metric_reason or RefusalReason.METRIC_DOMAIN,

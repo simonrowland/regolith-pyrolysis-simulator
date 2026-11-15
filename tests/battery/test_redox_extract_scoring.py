@@ -169,9 +169,12 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert len(residuals) == 1
     assert residuals[0].numeric is not None
     assert residuals[0].numeric.operation is MetricOperation.DEX
-    assert residuals[0].status is ResidualStatus.NO_BAND
-    assert residuals[0].refusal is not None
-    assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residuals[0].status is ResidualStatus.MISMATCH
+    assert residuals[0].refusal is None
+    assert not any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+        for notice in residuals[0].notices
+    )
 
 
 def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
@@ -515,9 +518,10 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # 1ab48f4d30da838c5ae5a6445b3a773bee1c04738637e2693f7b2e17263d46b2
     # and the twelve Sossi rows were refused input_phase_assemblage_unstated.
     # Those twelve now score. The six Aithala rows are byte-identical.
-    # The previous pin was already stale at that base.
+    # d-341 assumes 1 sigma for unstated printed ± values, changing the scored
+    # verdicts and serialized bands for the Sossi rows.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "5035aea8b78ad081fda458e8565b4f1bb49fd2e9381af7fedc68d111ae93dd23"
+        "972d3290592dc026f0b481e4648faa0bb34510ea58190730d2fe837ccc9ffd26"
     )
 
 
@@ -1362,8 +1366,13 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
             "openimcc",
         }:
             assert residual.numeric is not None
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+            assert residual.refusal is None
+            assert residual.numeric.decision_band is not None
+            assert residual.numeric.decision_band.rule.startswith("printed_1sigma:")
+            assert any(
+                notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+                for notice in residual.notices
+            )
         elif engine in {"alphamelts", "thermoengine"}:
             # Composition is printed, so these engines attempt a ferric split.
             # The unsupported-engine refusal is the one from before that path.

@@ -1527,7 +1527,7 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert printed.refusal is None
     assert printed.band is not None
     assert printed.band.band_basis == "row_printed"
-    assert printed.band.value == Decimal("0.01223445641701162951905623210")
+    assert printed.band.value == Decimal("0.02397909394776774589233425516")
 
     unparseable = _printed_uncertainty_band(
         Quantity.FE3_FE2_RATIO,
@@ -7510,6 +7510,91 @@ def test_unstated_printed_uncertainty_sets_a_band_and_notice() -> None:
         notice.reason == "confidence_level_not_stated"
         and "field=sigma" in notice.band
         and "printed_width=0.02" in notice.band
+        for notice in residual.notices
+    )
+
+
+def test_assumed_one_sigma_notice_reports_flipped_two_sigma_verdict() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    ref = replace(
+        F.observation(
+            "na-psat-unstated-plus-minus",
+            exp.experiment_id,
+            ident,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 0.01 Pa",
+        ),
+    )
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("1.015"), ident))
+
+    assert residual.numeric is not None
+    assert residual.refusal is None
+    assert residual.status is ResidualStatus.MATCH
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+    )
+    assert notice.band is not None
+    assert "two_sigma_reading_verdict=mismatch" in notice.band
+
+
+def test_source_method_confidence_level_overrides_assumption() -> None:
+    from simulator.battery.records import Locator, SourceMethodUncertainty
+
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    ref = replace(
+        F.observation(
+            "na-psat-method-two-sigma",
+            exp.experiment_id,
+            ident,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 0.01 Pa",
+        ),
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal("0.01"),
+        meaning="two_sigma",
+        quantity=Quantity.P_SAT,
+        basis="absolute",
+        quantity_basis="partial pressure in Pa",
+        locator=Locator(
+            page=2,
+            paragraph="Methods",
+            note="Reported ± uncertainties are two standard deviations.",
+        ),
+    )
+    work = replace(
+        F.work(), source_method_uncertainties={"work-1": method_uncertainty}
+    )
+    context = _context(work, exp, ref)
+
+    residual, _ = compile_residual(
+        ref,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={ref.observation_id},
+        prediction=_predict(Decimal("1.015"), ident),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.rule.startswith("printed_2sigma:")
+    assert not any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
         for notice in residual.notices
     )
 

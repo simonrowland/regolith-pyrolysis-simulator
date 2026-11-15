@@ -43,6 +43,7 @@ from simulator.battery.score import (
     DECISION_BAND_POLICY_VERSION,
     DECISION_BAND_PERCENTILE,
     EnginePrediction,
+    NORMAL_95_TICKET_MULTIPLIER,
     ScoreContext,
     _decision_band_kind,
     _group_token,
@@ -212,6 +213,25 @@ def test_printed_uncertainty_kinds_precede_derived_and_unparseable_refuses() -> 
         printed_refusal=unparseable.refusal,
         derived_band=derived,
     ) is None
+
+
+def test_unstated_plus_minus_defaults_to_one_sigma_with_two_sigma_alternative() -> None:
+    resolved = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 0.1 kJ/mol",
+        ),
+        Decimal("2"),
+    )
+
+    assert resolved.band is not None
+    assert _decision_band_kind(resolved.band) == "printed_1sigma"
+    assert resolved.band.value == Decimal("0.1") * NORMAL_95_TICKET_MULTIPLIER
+    assert resolved.notice is not None
+    assert resolved.notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+    assert resolved.two_sigma_band is not None
+    assert resolved.two_sigma_band.value == Decimal("0.1")
 
 
 def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
