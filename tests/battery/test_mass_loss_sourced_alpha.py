@@ -570,8 +570,7 @@ def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
     assert bound["inventory_capped_channels"] == list(gases)
     cap = bound["inventory_bound_kg_by_parent"]["CaO"]
     assert cap["uncapped_bound_kg"] == pytest.approx(6 * len(gases) * ceiling, rel=1e-14, abs=0.0)
-    assert cap["ceiling_kg"] == pytest.approx(ceiling, rel=1e-14, abs=0.0)
-    assert cap["applied_bound_kg"] == pytest.approx(ceiling, rel=1e-14, abs=0.0)
+    assert cap["ceiling_kg"] == cap["applied_bound_kg"] == ceiling
     assert 0.0 < bound["preheat_bound_kg"] < ceiling
     assert bound["bound_kg"] == pytest.approx(
         sum(bound["unsourced_bound_kg_by_channel"].values()) + bound["preheat_bound_kg"],
