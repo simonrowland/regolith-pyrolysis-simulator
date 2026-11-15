@@ -17,12 +17,13 @@ from simulator.oxygen_buffers import (
 def test_oneill_primary_emf_calibrations_match_source_sanity_values() -> None:
     # O'Neill 1988, eq. 11, Fe + "FeO", at 1000 K; O'Neill 1987, reaction
     # (2), QFM, at 1200 K. Values are the source equations converted from
-    # μO2 at the printed 1-bar standard.
+    # μO2 at the printed 1-bar standard; QFM uses its printed R and IW uses
+    # CODATA because equation (11) does not state an R.
     assert oneill_iw_log10_fO2_bar(1000.0) == pytest.approx(
-        -20.79998016889, abs=5e-12
+        -20.799980168890, abs=5e-12
     )
     assert oneill_1987_qfm_log10_fO2_bar(1200.0) == pytest.approx(
-        -12.296398239396, abs=5e-12
+        -12.296476057758, abs=5e-12
     )
     assert ONEILL_IW_TEMPERATURE_RANGES_K == (
         (833.0, 1042.0),

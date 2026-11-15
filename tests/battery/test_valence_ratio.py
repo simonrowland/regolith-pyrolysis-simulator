@@ -310,18 +310,19 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
         "SB-36": Decimal("0.0019"),
         "SB-41": Decimal("-0.0024"),
     }
-    # Independent arithmetic from O'Neill (1987), reaction (2), at 1323.15 K,
-    # plus Frost beta-quartz's printed pressure term
-    # 0.110 K/bar * (2000 - 1) bar / 1323.15 K = 0.166186751 dex, then each
-    # printed ΔFMQ offset. Values are log10(fO2/bar), rounded to nine places.
+    # O'Neill (1987) reaction (2), evaluated with its printed R=8.31441,
+    # gives -10.357570184 at 1 bar and 1323.15 K. Frost's beta-quartz
+    # molar-volume term adds 0.110 K/bar * (2000 - 1) bar / 1323.15 K
+    # = 0.166186751 dex. Add each printed ΔFMQ offset for these independent
+    # nine-decimal log literals.
     expected_log_by_control = {
-        "FMQ+2.7": Decimal("-7.491317884"),
-        "FMQ+1.8": Decimal("-8.391317884"),
-        "FMQ+1.6": Decimal("-8.591317884"),
-        "FMQ+1.3": Decimal("-8.891317884"),
-        "FMQ+0.9": Decimal("-9.291317884"),
-        "FMQ-0.1": Decimal("-10.291317884"),
-        "FMQ-1.4": Decimal("-11.591317884"),
+        "FMQ+2.7": Decimal("-7.491383432"),
+        "FMQ+1.8": Decimal("-8.391383432"),
+        "FMQ+1.6": Decimal("-8.591383432"),
+        "FMQ+1.3": Decimal("-8.891383432"),
+        "FMQ+0.9": Decimal("-9.291383432"),
+        "FMQ-0.1": Decimal("-10.291383432"),
+        "FMQ-1.4": Decimal("-11.591383432"),
     }
     assert len(rows) == 7  # Table 4, PDF index 7 (published page 5933)
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 0
@@ -389,7 +390,7 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
             "calibration=oneill_1987_ammin_72_reaction2_emf"
             in conversion_notices[0]
         )
-        assert "band=±0.125419 dex" in conversion_notices[0]
+        assert "band=±0.125484 dex" in conversion_notices[0]
         assert "pressure=2000 bar" in conversion_notices[0]
         assert (
             "pressure correction=Frost 1991 molar-volume ΔV term"

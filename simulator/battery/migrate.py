@@ -20767,12 +20767,18 @@ def _relative_method_notice(source_id: str | None, buffer: str) -> str | None:
     return None
 
 
+def _calibrated_log_decimal(value: Decimal | float) -> Decimal:
+    """Keep Decimal owner precision while adapting legacy float curves."""
+
+    return value if isinstance(value, Decimal) else Decimal(str(value))
+
+
 def _relative_buffer_calibration(
     buffer: str,
     temperature_K: float,
     pressure_bar: float,
     printed_calibration: str | None,
-) -> tuple[float, str, tuple[float, float], str, float | None] | None:
+) -> tuple[Decimal | float, str, tuple[float, float], str, float | None] | None:
     """Return log fO2, calibration id, range, authority, and dex band."""
     from simulator.oxygen_buffers import (
         FROST_BUFFER_TEMPERATURE_RANGES_K,
@@ -20865,13 +20871,14 @@ def _relative_buffer_calibration(
     if use_printed_oneill_1987:
         if buffer != "QFM":
             return None
-        value = oneill_1987_qfm_log10_fO2_bar(temperature_K)
-        frost = frost_log("QFM", temperature_K, 1.0)
-        correction = frost_log("QFM", temperature_K, corrected_pressure_bar)
-        if frost is None or correction is None:
-            return None
+        evaluation = evaluate_buffer(
+            "QFM",
+            Decimal(str(temperature_K)),
+            pressure_bar=Decimal(str(corrected_pressure_bar)),
+            calibration_id="oneill_1987_ammin_72_reaction2_emf",
+        )
         return (
-            value + correction - frost,
+            evaluation.log10_fO2_bar,
             "oneill_1987_ammin_72_reaction2_emf",
             ONEILL_QFM_TEMPERATURE_RANGE_K,
             "primary_EMF",
@@ -20896,14 +20903,16 @@ def _relative_buffer_calibration(
             abs(oneill_iw_log10_fO2_bar(temperature_K) - frost_at_reference),
         )
     if buffer == "QFM":
-        value = oneill_1987_qfm_log10_fO2_bar(temperature_K)
         frost_at_reference = frost_log("QFM", temperature_K, 1.0)
-        frost_at_pressure = frost_log("QFM", temperature_K, corrected_pressure_bar)
-        if frost_at_reference is None or frost_at_pressure is None:
+        if frost_at_reference is None:
             return None
-        value += frost_at_pressure - frost_at_reference
+        evaluation = evaluate_buffer(
+            "QFM",
+            Decimal(str(temperature_K)),
+            pressure_bar=Decimal(str(corrected_pressure_bar)),
+        )
         return (
-            value,
+            evaluation.log10_fO2_bar,
             "oneill_1987_ammin_72_reaction2_emf",
             ONEILL_QFM_TEMPERATURE_RANGE_K,
             "primary_EMF",
@@ -20930,7 +20939,7 @@ def _gate8_notice_from_calibration(
     offset_as_printed: str,
     temperature_K: Decimal,
     pressure_bar: Decimal,
-    calibrated: tuple[float, str, tuple[float, float], str, float | None],
+    calibrated: tuple[Decimal | float, str, tuple[float, float], str, float | None],
     source_id: str | None,
     calibration_text: str | None,
 ) -> tuple[str, NoticeKind, str]:
@@ -21052,8 +21061,7 @@ def _relative_oxygen_decision(
                 f"refused: {cited}; no fO2_Pa assigned"
             ),
         )
-    calibration_log = calibrated[0]
-    absolute_log = Decimal(str(calibration_log)) + offset
+    absolute_log = _calibrated_log_decimal(calibrated[0]) + offset
     # log10(fO2/bar) -> fO2_Pa = 10**(log fO2) × 1e5 Pa/bar.
     pressure_value = _log_fO2_to_pa(absolute_log, _BAR_PA)
     reason, notice_kind, notice_band = _gate8_notice_from_calibration(
@@ -21638,8 +21646,7 @@ def _decision_for_buffer(
                 raise RuntimeError(
                     f"gate-8 central curve missing for {request.buffer}"
                 )
-        # Same Decimal(str(float)) path as the pre-merge printed-row converter.
-        log_value = Decimal(str(calibrated[0])) + request.offset
+        log_value = _calibrated_log_decimal(calibrated[0]) + request.offset
         reported_id = calibrated[1]
         printed_offset = request.offset_as_printed
         if _BUFFER_OFFSET_TEXT_RE.match(request.buffer_as_printed or ""):

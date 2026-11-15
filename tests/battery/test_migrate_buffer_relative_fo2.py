@@ -71,8 +71,9 @@ def test_canonical_iw_conversion_carries_authority_and_calibration_band() -> Non
 
     assert decision is not None and decision.state.is_value
     # O'Neill (1988) eq. 11 first segment gives μ°O2 = -605812 + 1366.718T
-    # - 182.7955T ln(T) + 0.10359T² J/mol. At 1000 K, μ°/(R T ln 10) is
-    # -20.799980169 log10(fO2/bar), then the printed +1.0 gives this literal.
+    # - 182.7955T ln(T) + 0.10359T² J/mol. O'Neill (1988) states no R for
+    # this μ-to-log conversion, so use CODATA; at 1000 K the base is
+    # -20.799980169 log10(fO2/bar), then +1.0 gives this literal.
     # J/mol divided by (J mol-1 K-1)K is dimensionless; ln(10) changes bases.
     expected_log = Decimal("-19.799980169")
     assert abs(decision.state.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
@@ -193,5 +194,6 @@ def test_piston_cylinder_pressure_pins_frost_iw_delta_v_term() -> None:
     # (K/bar)*bar/K is dimensionless. Compare logs so Pa/bar cancels.
     expected_delta = Decimal("0.055") * Decimal("9999") / Decimal("1000")
     actual_delta = high_pressure.state.value.log10() - one_bar.state.value.log10()
-    assert abs(actual_delta - expected_delta) < Decimal("1e-25")
+    # The fO2 conversion and log10 round trip add a few Decimal ulps.
+    assert abs(actual_delta - expected_delta) < Decimal("2e-15")
     assert "pressure correction=Frost 1991 molar-volume ΔV term" in high_pressure.notice_reason

@@ -16,6 +16,7 @@ from simulator.physical_constants import (
     FARADAY_10SIG,
     GAS_CONSTANT,
     GAS_CONSTANT_6SIG,
+    _ONEILL_1987_R_J_PER_MOL_K,
     PA_PER_BAR,
     STANDARD_ATMOSPHERE_PA,
     STEFAN_BOLTZMANN,
@@ -39,6 +40,16 @@ def test_codata_leaf_bits() -> None:
     assert GAS_CONSTANT == 8.31446261815324
     assert PA_PER_BAR == 1e5
     assert STANDARD_ATMOSPHERE_PA == 101325.0
+
+
+def test_oneill_1987_qfm_r_is_the_printed_source_value() -> None:
+    from simulator.oxygen_buffers import _ONEILL_POWNCEBY_1993_IW_R
+
+    # O'Neill 1987 p. 73 states this R for the QFM μO2-to-log conversion.
+    # O'Neill 1988 eq. 11 states no R, so its conversion uses CODATA.
+    assert _ONEILL_1987_R_J_PER_MOL_K == 8.31441
+    assert _ONEILL_1987_R_J_PER_MOL_K != GAS_CONSTANT
+    assert _ONEILL_POWNCEBY_1993_IW_R is GAS_CONSTANT
 
 
 def test_state_truncations_stay_distinct_from_the_leaf() -> None:
@@ -156,7 +167,7 @@ def test_full_precision_gas_constant_has_one_owner() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _CELL_GAS_CONSTANT_J_MOL_K,
     )
-    from simulator.oxygen_buffers import _ONEILL_IW_R
+    from simulator.oxygen_buffers import _ONEILL_POWNCEBY_1993_IW_R
     from simulator.physical_constants import GAS_CONSTANT_DECIMAL, J_PER_KJ
 
     assert GAS_CONSTANT_DECIMAL == Decimal("8.31446261815324")
@@ -164,7 +175,7 @@ def test_full_precision_gas_constant_has_one_owner() -> None:
     assert R_J_PER_MOL_K is GAS_CONSTANT_DECIMAL
     assert waypoint_r is GAS_CONSTANT_DECIMAL
     assert _R_CODATA is GAS_CONSTANT_DECIMAL
-    assert _ONEILL_IW_R is GAS_CONSTANT
+    assert _ONEILL_POWNCEBY_1993_IW_R is GAS_CONSTANT
     assert _CELL_GAS_CONSTANT_J_MOL_K is GAS_CONSTANT
     assert R_KJ_PER_MOL_K.hex() == "0x1.1072c483af26dp-7"
     assert R_KJ_PER_MOL_K == GAS_CONSTANT / J_PER_KJ

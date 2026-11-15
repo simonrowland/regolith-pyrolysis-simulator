@@ -54,13 +54,6 @@ EXCLUSIONS = (
         "JANAF printed R; CODATA does not reproduce the printed log K",
     ),
     (
-        "simulator/chemistry/fo2_buffers.py",
-        "8.31441",
-        "gas",
-        1,
-        "O'Neill 1987 printed R; the CODATA path is a different name",
-    ),
-    (
         "simulator/battery/generators/usgs_b1452.py",
         "8.3143",
         "gas",

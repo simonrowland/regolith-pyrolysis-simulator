@@ -21,6 +21,9 @@ GAS_CONSTANT = 8.31446261815324  # J/(mol K); R = N_A k_B.
 # Decimal of that float via str(), so a second digit spelling cannot drift.
 # Equal to Decimal("8.31446261815324"). Not the 6-sig or 10-sig floats.
 GAS_CONSTANT_DECIMAL = Decimal(str(GAS_CONSTANT))
+# O'Neill 1987 p. 73 states this R for converting his printed QFM μO2 fit
+# (J/mol) to log10(fO2); it is not a coefficient inside the fit.
+_ONEILL_1987_R_J_PER_MOL_K = 8.31441
 FARADAY = 96485.33212  # C/mol; F = N_A e.
 AVOGADRO = 6.02214076e23  # 1/mol; exact by SI definition.
 BOLTZMANN = 1.380649e-23  # J/K; exact by SI definition.

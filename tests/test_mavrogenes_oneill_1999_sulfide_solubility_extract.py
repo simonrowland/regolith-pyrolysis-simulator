@@ -20,7 +20,8 @@ SOURCE = f"{SID}::"
 # Each run prints ΔIW, T, and P, not an absolute log. O'Neill (1988) eq. 11
 # third segment is the 1-bar IW base for every run here (T > 1184 K):
 # μ° = -551159 + 269.404 T - 16.9484 T ln(T) J/mol, then μ°/(R T ln 10)
-# with R = 8.31446261815324. Frost (1991) Table 1 adds the IW molar-volume
+# with CODATA R because the 1988 source does not state an R for the conversion.
+# Frost (1991) Table 1 adds the IW molar-volume
 # term 0.055 (P_bar - 1) / T, P_bar = printed kbar × 1000. The absolute log
 # is that sum plus the printed ΔIW. All of these temperatures are above the
 # 1450 K EMF window (predict-and-flag). J/mol over R T is dimensionless.

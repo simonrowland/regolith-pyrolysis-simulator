@@ -449,8 +449,8 @@ def test_activity_buffer_offset_uses_canonical_qfm(tmp_path: Path) -> None:
     assert "offset=+2.7" in observation.notices[0].reason or any(
         "offset=+2.7" in notice.reason for notice in observation.notices
     )
-    # Unprinted FMQ uses the gate-8 O'Neill 1987 curve (CODATA R), not the
-    # author-R survey row. _assert_buffer_conversion checks that value.
+    # Unprinted FMQ uses the gate-8 O'Neill 1987 curve with its printed R.
+    # _assert_buffer_conversion checks the shared owner value.
     assert _used_pressure_bar(observation) in (None, Decimal(1))
     assert observation.point_conditions["fO2_control"].state.value == "FMQ+2.7"
 
@@ -1028,11 +1028,12 @@ def test_jugo_sb5_uses_canonical_fmq_with_frost_pressure_correction() -> None:
     assert _decimal_point(observation.identity.total_pressure_Pa) == Decimal("200000000")
     oxygen = observation.identity.fO2_Pa
     assert oxygen is not None and oxygen.is_value
-    # O'Neill (1987) reaction (2) supplies the canonical 1-bar FMQ base at
-    # 1323.15 K. Frost's beta-quartz molar-volume term adds
+    # O'Neill (1987) reaction (2), evaluated with its printed R=8.31441,
+    # supplies the canonical 1-bar FMQ base at 1323.15 K. Frost's beta-quartz
+    # molar-volume term adds
     # 0.110 K/bar * (2000 - 1) bar / 1323.15 K = 0.166186751 dex; the printed
     # FMQ+2.7 then gives this independent nine-decimal log literal.
-    expected_log = Decimal("-7.491317884")
+    expected_log = Decimal("-7.491383432")
     assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
     notices = [
         notice.reason
@@ -1043,7 +1044,7 @@ def test_jugo_sb5_uses_canonical_fmq_with_frost_pressure_correction() -> None:
     reason = notices[0]
     assert "offset_as_printed=FMQ+2.7" in reason
     assert "calibration=oneill_1987_ammin_72_reaction2_emf" in reason
-    assert "band=±0.125419 dex" in reason
+    assert "band=±0.125484 dex" in reason
     assert "band_basis=absolute canonical-to-Frost 1991 spread" in reason
     assert "pressure=2000 bar" in reason
     assert "pressure correction=Frost 1991 molar-volume ΔV term" in reason
@@ -1059,6 +1060,7 @@ def test_mavrogenes_mav1_uses_pressure_delta_v_after_inheritance() -> None:
     assert oxygen is not None and oxygen.is_value
     # O'Neill (1988) eq. 11 third segment is the 1-bar IW base at 1673.15 K:
     # μ° = -551159 + 269.404T - 16.9484T ln(T) J/mol, then μ°/(R T ln 10).
+    # Equation (11) states no R, so CODATA is used for the conversion.
     # Frost's published IW pressure term adds 0.055(5000-1)/T dex, followed
     # by the printed -1.56. All terms are dimensionless; independent evaluation
     # gives -11.101141516 log10(fO2/bar) (predict-and-flag above IW's range).

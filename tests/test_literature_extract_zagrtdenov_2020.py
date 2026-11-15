@@ -63,14 +63,14 @@ TABLE2_COMPONENTS = ("Al2O3", "SiO2", "MnO", "FeO", "MgO", "TiO2", "Cr2O3", "V2O
 # O'Neill (1987) QFM's 900–1420 K EMF window, so every printed buffer
 # is predicted and flagged. μ° = -587474 + 1584.427 T - 203.3164 T ln(T)
 # + 0.092710 T² J/mol, and log10(fO2/bar) = μ°/(R T ln 10) with
-# R = 8.31446261815324. At 1713.15 K the 1-bar value is -5.932654703.
+# O'Neill's stated R = 8.31441. At 1713.15 K the 1-bar value is -5.932692248.
 # Frost (1991) beta-quartz QFM adds C(P-1)/T = 0.110*(1.01325-1)/1713.15
 # = 8.508e-7 dex (K/bar * bar / K). The buffer parser treats a bare
 # buffer name as offset 0, so FMQ uses that sum and FMQ±2 add the offset.
 _ZAGRTDENOV_QFM_LOG10_BAR = {
-    "FMQ-2": Decimal("-7.932653852"),
-    "FMQ": Decimal("-5.932653852"),
-    "FMQ+2": Decimal("-3.932653852"),
+    "FMQ-2": Decimal("-7.932691397"),
+    "FMQ": Decimal("-5.932691397"),
+    "FMQ+2": Decimal("-3.932691397"),
 }
 
 

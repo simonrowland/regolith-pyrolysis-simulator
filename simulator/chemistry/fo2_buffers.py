@@ -16,10 +16,13 @@ uses its own lines and must not call evaluate_buffer:
 * ``simulator/battery/waypoints.py`` still looks up Frost
   ``PUBLISHED_BUFFERS``. Repointing it would change experiment-buffer numbers.
 
-R for a μ fit is O'Neill 1987's 8.31441 J K^-1 mol^-1. An atmosphere equation
-becomes log10(fO2/bar) by adding log10(1.01325). The brief's +0.00570 is that
-shift rounded; the value used is the exact logarithm. Each function below
-records premise, algebra, the unit check, and one survey-table value.
+O'Neill's μ fits are evaluated by the source-form owner in
+``simulator.oxygen_buffers``; that owner uses each source's R in the μ-to-log
+conversion (1987 QFM: printed R; 1988 IW: CODATA, as no R is printed). An
+atmosphere equation becomes log10(fO2/bar) by
+adding log10(1.01325). The brief's +0.00570 is that shift rounded; the value
+used is the exact logarithm. Each calibration here records its provenance
+and range.
 
 Band rule (d-324). For QFM and NNO a calibration is valid at T only inside
 the authors' stated window. An unstated range does not certify, so it is not
@@ -31,8 +34,9 @@ and the authority of a calibration used there is extrapolated.
 
 IW is the band d-324 names as ~0.01 dex. It is |Wolf minus O'Neill 1988
 equation (11)| after each log is rounded to the survey's printed 0.0001.
-That printed residual is 0.0067, 0.0077, and 0.0085 at 1473, 1673, and
-1873 K. Myers & Gunter is not in the pair: inside 1073.15-1573.15 K it must
+With CODATA R (the 1988 source prints no conversion R), the residual is
+0.0068, 0.0078, and 0.0086 at 1473, 1673, and 1873 K. Myers & Gunter is not
+in the pair: inside 1073.15-1573.15 K it must
 not collapse the adopted curve's band to 0, and outside that window it must
 not re-enter through the empty-valid fallback.
 
@@ -43,9 +47,9 @@ central: the band widens by |0.110-0.092|·|P-1|/T and that spread is
 flagged. Hewitt 1978 already prints C = 0.110; a row that names Hewitt
 uses that equation and does not add a second volume term.
 Unprinted IW, QFM, and NNO use the gate-8 central curves in this module
-(O'Neill 1987/1988 with CODATA R, plus the Frost pressure term; NNO is
+(O'Neill 1987/1988 with source-faithful R, plus the Frost pressure term; NNO is
 Frost's Table 1 directly). An explicit calibration id keeps its survey
-equation, including O'Neill's printed R = 8.31441.
+equation and source-specific R choice.
 """
 
 from __future__ import annotations
@@ -61,19 +65,23 @@ from simulator.oxygen_buffers import (
     ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K,
     ONEILL_QFM_TEMPERATURE_RANGE_K,
     _qfm_logfo2_frost,
+    _oneill_iw_log10_fO2_bar_decimal,
+    _oneill_mu_o2_to_log10_fO2_bar,
+    _oneill_qfm_log10_fO2_bar_decimal,
     frost_buffer_log10_fO2_bar,
     oneill_1987_qfm_log10_fO2_bar,
     oneill_iw_log10_fO2_bar,
 )
-from simulator.physical_constants import GAS_CONSTANT_DECIMAL
+from simulator.physical_constants import (
+    GAS_CONSTANT_DECIMAL,
+    _ONEILL_1987_R_J_PER_MOL_K,
+)
 
 # 1 atm = 1.01325 bar. log10(fO2/bar) = log10(fO2/atm) + log10(1.01325).
 _ATM_BAR = Decimal("1.01325")
 _LOG10_ATM_TO_BAR = _ATM_BAR.log10()
-# O'Neill 1987, p. 73 arithmetic. Not the CODATA R used by Holzheid.
-_R_ONEILL = Decimal("8.31441")
+_R_ONEILL = Decimal(str(_ONEILL_1987_R_J_PER_MOL_K))
 _LN10 = Decimal(10).ln()
-
 BufferLog = Callable[[Decimal, Decimal | None], Decimal]
 
 
@@ -159,15 +167,11 @@ def _pressure_term(coefficient: Decimal, temperature_K: Decimal, pressure_bar: D
 
 
 def _mu_to_log10(mu_j_mol: Decimal, temperature_K: Decimal) -> Decimal:
-    """μ(J mol^-1) / (R T ln 10) = log10(fO2/bar).
+    """Convert the remaining O'Neill μ fits with their existing R convention."""
 
-    Premise: O'Neill prints μ_O2 at the 1 bar standard state. Dividing by
-    R T ln(10) with R = 8.31441 cancels J mol^-1 and leaves a pure number,
-    which is log10 of a fugacity whose reference is that 1 bar. Unit check:
-    R·T is J mol^-1, ln(10) is dimensionless, so the quotient is log10.
-    """
-
-    return mu_j_mol / (_R_ONEILL * temperature_K * _LN10)
+    return _oneill_mu_o2_to_log10_fO2_bar(
+        mu_j_mol, temperature_K, _R_ONEILL
+    )
 
 
 def _ab_atm(a: str, b: str, temperature_K: Decimal) -> Decimal:
@@ -226,26 +230,7 @@ def _log_iw_oneill1988(temperature_K: Decimal, pressure_bar: Decimal | None) -> 
     """
 
     del pressure_bar
-    if Decimal(833) < temperature_K < Decimal(1042):
-        mu = (
-            Decimal("-605812")
-            + Decimal("1366.718") * temperature_K
-            - Decimal("182.7955") * temperature_K * temperature_K.ln()
-            + Decimal("0.10359") * temperature_K * temperature_K
-        )
-    elif Decimal(1042) <= temperature_K < Decimal(1184):
-        mu = (
-            Decimal("-519357")
-            + Decimal("59.427") * temperature_K
-            + Decimal("8.9276") * temperature_K * temperature_K.ln()
-        )
-    else:
-        mu = (
-            Decimal("-551159")
-            + Decimal("269.404") * temperature_K
-            - Decimal("16.9484") * temperature_K * temperature_K.ln()
-        )
-    return _mu_to_log10(mu, temperature_K)
+    return _oneill_iw_log10_fO2_bar_decimal(temperature_K)
 
 
 def _log_iw_myers(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
@@ -277,8 +262,8 @@ def _log_qfm_oneill1987(temperature_K: Decimal, pressure_bar: Decimal | None) ->
     """O'Neill 1987 μ_O2^QFM, reference pressure 1 bar. Canonical QFM.
 
     Premise: abstract and p. 73, 900 < T < 1420, no volume coefficient.
-    Algebra: μ = -587474 + 1584.427 T - 203.3164 T ln T + 0.092710 T^2,
-    then log10 = μ / (8.31441 T ln 10). A requested P is ignored here.
+    Coefficients and μ-to-log conversion are evaluated by the shared
+    ``oxygen_buffers`` owner. A requested P is ignored here.
     ``evaluate_buffer`` adds Frost's phase-dependent Table 1 C when this
     calibration is the one used and P is not 1 bar. Chou's 0.092 is not
     that central term. Sanity at 1473 K (extrapolated): -8.4120 on the
@@ -286,13 +271,7 @@ def _log_qfm_oneill1987(temperature_K: Decimal, pressure_bar: Decimal | None) ->
     """
 
     del pressure_bar
-    mu = (
-        Decimal("-587474")
-        + Decimal("1584.427") * temperature_K
-        - Decimal("203.3164") * temperature_K * temperature_K.ln()
-        + Decimal("0.092710") * temperature_K * temperature_K
-    )
-    return _mu_to_log10(mu, temperature_K)
+    return _oneill_qfm_log10_fO2_bar_decimal(temperature_K)
 
 
 def _log_qfm_chou24(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
@@ -431,7 +410,8 @@ def _log_nno_charette(temperature_K: Decimal, pressure_bar: Decimal | None) -> D
 # Sanity at 1473 K, 1 bar, survey-rounded: JANAF Mo −11.5363 against
 # O'Neill 1986 −11.6492; JANAF MH −2.5237 against Haas Table 10.9
 # −2.7641; JANAF MW −9.8320 against Haas Table 10.7 −9.1649.
-# O'Neill μ fits keep R = 8.31441. The JANAF route uses the CODATA R.
+# O'Neill's μ fits use their source-faithful R through oxygen_buffers.
+# The JANAF route uses the CODATA R.
 _R_CODATA = GAS_CONSTANT_DECIMAL
 # Region 3. The token is NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS.
 UNSIZED_BAND_NOTICE = "buffer_band_unsized_beyond_all_calibrations"

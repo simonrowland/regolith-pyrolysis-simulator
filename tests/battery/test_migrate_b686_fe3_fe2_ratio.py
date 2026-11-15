@@ -554,9 +554,10 @@ def test_valence_rows_stamp_printed_po2_and_absolute_log(tmp_path: Path) -> None
     assert "fO2_Pa" in outcome.fields
     # log10(IW) = -1 at 1250 °C = 1523.15 K. O'Neill (1988) eq. 11 third
     # segment, μ° = -551159 + 269.404 T - 16.9484 T ln(T) J/mol, then
-    # μ°/(R T ln 10) with R = 8.31446261815324 J mol-1 K-1. That is
-    # -11.316814211 log10(fO2/bar) at 1 bar (no Frost term: P is not above
-    # 1 bar). The printed offset -1 gives -12.316814211. 1523.15 K is above
+    # μ°/(R T ln 10) with CODATA R because O'Neill (1988) does not state an R
+    # for converting the J/mol fit. That is -11.316814211 log10(fO2/bar) at
+    # 1 bar (no Frost term: P is not above 1 bar). The offset -1 gives
+    # -12.316814211. 1523.15 K is above
     # the 833–1450 K EMF window, so the value is predicted and flagged.
     # J/mol over (J mol-1 K-1)·K is dimensionless; ln(10) changes bases.
     oxygen = delta_iw.identity.fO2_Pa

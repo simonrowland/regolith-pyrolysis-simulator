@@ -36,7 +36,7 @@ def _q3(value: Decimal) -> Decimal:
 # Printed log10(fO2/bar) from the 2026-11-03 survey table, 1 bar.
 _TABLE = {
     "wolf2023_quote_oneill_pownceby1993": ("-11.9375", "-9.7147", "-7.9780"),
-    "oneill1988_eq11": ("-11.9308", "-9.7070", "-7.9695"),
+    "oneill1988_eq11": ("-11.9307", "-9.7069", "-7.9694"),
     "myers_gunter1979_iw": ("-11.8463", "-9.5706", "-7.7809"),
     "berry2024_eval_oneill_pownceby1993": ("-11.9380", "-9.7153", "-7.9786"),
     "oneill1987_mu": ("-8.4120", "-6.3051", "-4.5773"),
@@ -167,9 +167,9 @@ def test_band_rule_in_range_versus_extrapolated() -> None:
     oneill = [Decimal(item) for item in _TABLE["oneill1988_eq11"]]
     residuals = [left - right for left, right in zip(wolf, oneill, strict=True)]
     assert residuals == [
-        Decimal("-0.0067"),
-        Decimal("-0.0077"),
-        Decimal("-0.0085"),
+        Decimal("-0.0068"),
+        Decimal("-0.0078"),
+        Decimal("-0.0086"),
     ]
     at_1473 = evaluate_buffer("IW", Decimal(1473))
     assert at_1473.valid_calibration_ids == ("myers_gunter1979_iw",)

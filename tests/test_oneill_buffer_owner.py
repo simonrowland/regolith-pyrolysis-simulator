@@ -15,18 +15,17 @@ from simulator.oxygen_buffers import (
 
 # The expected values below were evaluated independently from O'Neill's
 # printed μO2 equations. O'Neill 1987 p. 73 gives R = 8.31441 J mol^-1 K^-1
-# for converting μO2 to log fO2; O'Neill 1988 p. 477, equation (11), prints
-# μO2 in J/mol and uses the same conversion. The runtime transcription still
-# uses CODATA here, while the calibration catalogue uses the printed R.
+# for QFM. O'Neill 1988 p. 477, equation (11), prints μO2 in J/mol and states
+# no conversion R, so the CODATA value applies to IW.
 _QFM = (
-    (1000, -16.442983538992, "-16.443087599223"),
-    (1100, -14.181288439296, "-14.181378186279"),
-    (1300, -10.695145557892, "-10.695213242648"),
+    (1000, -16.443087599223, "-16.443087599223"),
+    (1100, -14.181378186279, "-14.181378186279"),
+    (1300, -10.695213242648, "-10.695213242648"),
 )
 _IW = (
-    (1000, -20.799980168890, "-20.800111802589"),
-    (1100, -18.291960959829, "-18.292076721405"),
-    (1300, -14.420998176713, "-14.421089440711"),
+    (1000, -20.799980168890, "-20.799980168890"),
+    (1100, -18.291960959829, "-18.291960959829"),
+    (1300, -14.420998176713, "-14.420998176713"),
 )
 
 

@@ -56,7 +56,11 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import (
+    GAS_CONSTANT,
+    GAS_CONSTANT_DECIMAL,
+    _ONEILL_1987_R_J_PER_MOL_K,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -83,23 +87,48 @@ def oneill_qfm_log10_fO2_bar(temperature_K: float) -> float:
 # Premise: μ°_O2 for 3 Fe2SiO4 + O2 = 2 Fe3O4 + 3 SiO2 is printed as
 # μ_O2 (±200 J/mol) = -587474 + 1584.427 T - 203.3164 T ln(T) + 0.092710 T²
 # (900 < T < 1420 K; the quoted ±200 J/mol is the uncertainty, not an offset;
-# 1 bar). At equilibrium μ°_O2=RT ln(fO2/bar), so
-# log10(fO2/bar)=μ°_O2/(R T ln(10)). The units cancel to a dimensionless
-# base-10 logarithm. At 1200 K this gives -12.296398239 (rounded).
+# 1 bar). The source says to divide by R T ln(10), with R=8.31441 J mol^-1 K^-1.
+# Since the fit is already in J/mol, R appears only in this conversion. The
+# unit cancellation leaves a dimensionless base-10 logarithm. At 1200 K this
+# gives -12.296476058 (rounded).
 ONEILL_QFM_TEMPERATURE_RANGE_K = (900.0, 1420.0)
 ONEILL_QFM_UNCERTAINTY_J_MOL = 200.0
+
+
+_ONEILL_LN10 = Decimal(10).ln()
+_ONEILL_1987_R = Decimal(str(_ONEILL_1987_R_J_PER_MOL_K))
+
+
+def _oneill_mu_o2_to_log10_fO2_bar(
+    mu_o2_j_mol: Decimal, temperature_K: Decimal, gas_constant: Decimal
+) -> Decimal:
+    """Convert O'Neill's 1-bar μO2 (J/mol) fit to log10(fO2/bar).
+
+    Equilibrium gives μO2 = RT ln(fO2/bar), so division by R T ln(10)
+    converts the printed natural-log relation to the dimensionless base-10
+    log. The caller supplies the source's conversion R, or CODATA when none
+    is stated.
+    """
+
+    return mu_o2_j_mol / (gas_constant * temperature_K * _ONEILL_LN10)
+
+
+def _oneill_qfm_log10_fO2_bar_decimal(temperature_K: Decimal) -> Decimal:
+    mu_o2 = (
+        Decimal("-587474")
+        + Decimal("1584.427") * temperature_K
+        - Decimal("203.3164") * temperature_K * temperature_K.ln()
+        + Decimal("0.092710") * temperature_K * temperature_K
+    )
+    return _oneill_mu_o2_to_log10_fO2_bar(
+        mu_o2, temperature_K, _ONEILL_1987_R
+    )
 
 
 def oneill_1987_qfm_log10_fO2_bar(temperature_K: float) -> float:
     """Return O'Neill (1987) primary EMF QFM relation at 1 bar."""
     temperature = _require_finite_positive(temperature_K, "temperature_K")
-    mu_o2 = (
-        -587474.0
-        + 1584.427 * temperature
-        - 203.3164 * temperature * math.log(temperature)
-        + 0.092710 * temperature**2
-    )
-    return mu_o2 / (_ONEILL_IW_R * temperature * _ONEILL_IW_LN10)
+    return float(_oneill_qfm_log10_fO2_bar_decimal(Decimal(str(temperature))))
 
 
 # O'Neill (1988), Am. Mineral. 73, 470-486, equation (11), Fe + "FeO".
@@ -110,18 +139,15 @@ def oneill_1987_qfm_log10_fO2_bar(temperature_K: float) -> float:
 # μ_O2 (±100) = -605812 + 1366.718T - 182.7955T ln(T) + 0.10359T²
 # (833<T<1042); -519357 + 59.427T + 8.9276T ln(T) (1042<T<1184);
 # -551159 + 269.404T - 16.9484T ln(T) (1184<T<1450), all J mol^-1.
-# log10(fO2/bar) = μ°_O2 / (R T ln(10)); J mol^-1 /(J mol^-1 K^-1 K)
-# is dimensionless, and the 1-bar standard makes the numerical logarithm
-# directly log10(fO2/bar). At 1000 K the printed first segment gives
-# log10(fO2/bar) = -20.799980169 (rounded), a reducing IW value.
+# Equation (11) prints μO2 in J/mol but states no R for conversion to log10 fO2;
+# per source policy, use CODATA rather than borrowing O'Neill 1987's R.
+# At 1000 K, the first segment gives -20.799980169 (rounded).
 ONEILL_IW_TEMPERATURE_RANGES_K = (
     (833.0, 1042.0),
     (1042.0, 1184.0),
     (1184.0, 1450.0),
 )
 ONEILL_IW_UNCERTAINTY_J_MOL = 100.0
-_ONEILL_IW_R = GAS_CONSTANT
-_ONEILL_IW_LN10 = math.log(10.0)
 
 
 def oneill_iw_log10_fO2_bar(temperature_K: float) -> float:
@@ -133,26 +159,32 @@ def oneill_iw_log10_fO2_bar(temperature_K: float) -> float:
     uncertainty is metadata and does not shift μ°.
     """
     temperature = _require_finite_positive(temperature_K, "temperature_K")
-    if temperature < 1042.0:
+    return float(_oneill_iw_log10_fO2_bar_decimal(Decimal(str(temperature))))
+
+
+def _oneill_iw_log10_fO2_bar_decimal(temperature_K: Decimal) -> Decimal:
+    if temperature_K < Decimal(1042):
         mu_o2 = (
-            -605812.0
-            + 1366.718 * temperature
-            - 182.7955 * temperature * math.log(temperature)
-            + 0.10359 * temperature**2
+            Decimal("-605812")
+            + Decimal("1366.718") * temperature_K
+            - Decimal("182.7955") * temperature_K * temperature_K.ln()
+            + Decimal("0.10359") * temperature_K * temperature_K
         )
-    elif temperature < 1184.0:
+    elif temperature_K < Decimal(1184):
         mu_o2 = (
-            -519357.0
-            + 59.427 * temperature
-            + 8.9276 * temperature * math.log(temperature)
+            Decimal("-519357")
+            + Decimal("59.427") * temperature_K
+            + Decimal("8.9276") * temperature_K * temperature_K.ln()
         )
     else:
         mu_o2 = (
-            -551159.0
-            + 269.404 * temperature
-            - 16.9484 * temperature * math.log(temperature)
+            Decimal("-551159")
+            + Decimal("269.404") * temperature_K
+            - Decimal("16.9484") * temperature_K * temperature_K.ln()
         )
-    return mu_o2 / (_ONEILL_IW_R * temperature * _ONEILL_IW_LN10)
+    return _oneill_mu_o2_to_log10_fO2_bar(
+        mu_o2, temperature_K, GAS_CONSTANT_DECIMAL
+    )
 
 
 ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K = (
@@ -161,6 +193,11 @@ ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K = (
     (1184.0, 1644.0),
 )
 ONEILL_POWNCEBY_1993_IW_UNCERTAINTY_J_MOL = 150.0
+
+# This is the separate O'Neill & Pownceby 1993 fit, not the 1987/1988 μO2
+# calibrations above.
+_ONEILL_POWNCEBY_1993_IW_R = GAS_CONSTANT
+_ONEILL_POWNCEBY_1993_LN10 = math.log(10.0)
 
 
 def _oneill_pownceby_1993_iw_mu_o2_uncertainty_log10_dex(
@@ -174,7 +211,7 @@ def _oneill_pownceby_1993_iw_mu_o2_uncertainty_log10_dex(
     # is dimensionless and therefore a base-10 log band in dex.
     # Sanity check: at 1586.4 K, 150 J/mol gives 0.004939 dex.
     return ONEILL_POWNCEBY_1993_IW_UNCERTAINTY_J_MOL / (
-        _ONEILL_IW_R * temperature * _ONEILL_IW_LN10
+        _ONEILL_POWNCEBY_1993_IW_R * temperature * _ONEILL_POWNCEBY_1993_LN10
     )
 
 
@@ -206,7 +243,11 @@ def oneill_pownceby_1993_iw_log10_fO2_bar(temperature_K: float) -> float:
             + 269.106 * temperature
             - 16.9484 * temperature * math.log(temperature)
         )
-    return mu_o2 / (_ONEILL_IW_R * temperature * _ONEILL_IW_LN10)
+    return mu_o2 / (
+        _ONEILL_POWNCEBY_1993_IW_R
+        * temperature
+        * _ONEILL_POWNCEBY_1993_LN10
+    )
 
 
 def _require_finite_positive(value: float, label: str) -> float:
