@@ -50,6 +50,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
+from simulator.battery.non_observations import is_non_observation
 from simulator.battery.score import (
     liquid_model_subsolidus_sample_notice,
     parse_migration_headline,
@@ -15790,15 +15791,21 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
     assert not bad, bad[:20]
 
 
-def test_l05c5_store_unavailable_values_are_queued() -> None:
-    queue_path = REPO_ROOT / "data" / "battery" / "migration-queue.yaml"
+def _unavailable_store_queue_partition(
+    root: Path,
+) -> tuple[
+    list[tuple[Path, dict]],
+    list[tuple[Path, dict]],
+    dict[str, list[dict]],
+]:
+    queue_path = root / "data" / "battery" / "migration-queue.yaml"
     roots = [
-        REPO_ROOT / "data" / "literature" / "extracts-v2",
-        REPO_ROOT / "data" / "literature" / "observations-v2",
+        root / "data" / "literature" / "extracts-v2",
+        root / "data" / "literature" / "observations-v2",
     ]
-    if not queue_path.is_file() or not roots[0].is_dir():
-        pytest.skip("migrated store not generated yet")
-    queued = yaml.load(queue_path.read_text(encoding="utf-8"), Loader=_YAML_LOADER) or {}
+    queued = yaml.load(
+        queue_path.read_text(encoding="utf-8"), Loader=_YAML_LOADER
+    ) or {}
     entries = queued.get("entries") or queued.get("queue") or queued
     if isinstance(entries, dict):
         entries = entries.get("items") or []
@@ -15810,9 +15817,9 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
         why = str(e.get("why") or "")
         axes = e.get("axes") or []
         by_id.setdefault(oid, []).append(why + " " + " ".join(str(a) for a in axes))
-    missing = []
-    scanned = 0
-    summary = load_observation_store_summary(REPO_ROOT)
+    comparison_rows: list[tuple[Path, dict]] = []
+    non_observations: list[tuple[Path, dict]] = []
+    summary = load_observation_store_summary(root) if root == REPO_ROOT else {}
     needle = b"kind: unavailable"
     for folder in roots:
         for path in iter_observation_store_paths(folder):
@@ -15823,20 +15830,132 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
                 val = obs.get("value") or {}
                 if val.get("kind") != "unavailable":
                     continue
-                scanned += 1
-                oid = str(obs.get("observation_id") or "")
-                q = ((obs.get("identity") or {}).get("quantity") or {}).get("value") or (
-                    ((obs.get("identity") or {}).get("quantity") or {}).get("reason") or ""
+                origin = path.relative_to(root).as_posix()
+                target = (
+                    non_observations
+                    if is_non_observation(observation_from_plain(obs), origin)
+                    else comparison_rows
                 )
-                blob = " ".join(by_id.get(oid) or [])
-                if not blob:
-                    missing.append(oid)
-                    continue
-                token = str(q)
-                if token and token not in blob and "field" not in blob.lower() and "value" not in blob.lower():
-                    missing.append(f"{oid} queue={blob!r} token={token!r}")
-    assert scanned > 0
+                target.append((path, obs))
+    return comparison_rows, non_observations, by_id
+
+
+def _assert_typed_unavailable_values_are_queued(
+    rows: list[tuple[Path, dict]], by_id: dict[str, list[str]]
+) -> None:
+    missing = []
+    for _path, obs in rows:
+        oid = str(obs.get("observation_id") or "")
+        q = ((obs.get("identity") or {}).get("quantity") or {}).get("value") or (
+            ((obs.get("identity") or {}).get("quantity") or {}).get("reason") or ""
+        )
+        blob = " ".join(by_id.get(oid) or [])
+        if not blob:
+            missing.append(oid)
+            continue
+        token = str(q)
+        if (
+            token
+            and token not in blob
+            and "field" not in blob.lower()
+            and "value" not in blob.lower()
+        ):
+            missing.append(f"{oid} queue={blob!r} token={token!r}")
+    assert rows
     assert not missing, missing[:20]
+
+
+def test_l05c5_store_unavailable_values_are_queued() -> None:
+    queue_path = REPO_ROOT / "data" / "battery" / "migration-queue.yaml"
+    roots = [
+        REPO_ROOT / "data" / "literature" / "extracts-v2",
+        REPO_ROOT / "data" / "literature" / "observations-v2",
+    ]
+    if not queue_path.is_file() or not roots[0].is_dir():
+        pytest.skip("migrated store not generated yet")
+    comparison_rows, _non_observations, by_id = _unavailable_store_queue_partition(
+        REPO_ROOT
+    )
+    _assert_typed_unavailable_values_are_queued(comparison_rows, by_id)
+
+
+def test_fresh_store_unavailable_values_partition_queue(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "typed-unavailable",
+            "type": "psat_series",
+            "locator": {"table": "I", "page": 2},
+            "phase": "gas",
+            "units": "atm",
+            "values": {
+                "quantity": "partial_pressure",
+                "method_class": "measured_direct",
+                "series": [{"T_K": 1400.0}],
+            },
+        },
+        {
+            "observation_id": "unknown-context",
+            "type": "psat_series",
+            "locator": {"table": "II", "page": 3},
+            "phase": "gas",
+            "units": "atm",
+            "values": {
+                "quantity": "unknown_fixture_quantity",
+                "method_class": "measured_direct",
+                "series": [{"T_K": 1450.0}],
+            },
+        },
+        {
+            "observation_id": "unknown-context-repair",
+            "type": "psat_series",
+            "locator": {
+                "source_path": "ocr/missing.md",
+                "table": "III",
+                "page": 4,
+            },
+            "phase": "gas",
+            "units": "atm",
+            "values": {
+                "quantity": "unknown_fixture_quantity",
+                "method_class": "measured_direct",
+                "series": [{"T_K": 1500.0}],
+            },
+        },
+    ]
+    root = _write_min_tree(tmp_path / "repo", extract)
+    result = migrate(root, write=True)
+
+    comparison_rows, non_observations, by_id = _unavailable_store_queue_partition(
+        root
+    )
+    _assert_typed_unavailable_values_are_queued(comparison_rows, by_id)
+    assert any(
+        "typed-unavailable" in obs["observation_id"]
+        for _, obs in comparison_rows
+    )
+    assert any(
+        "unknown-context" in obs["observation_id"]
+        for _, obs in non_observations
+    )
+    unknown_context_ids = {
+        str(obs["observation_id"])
+        for _, obs in non_observations
+        if "unknown-context" in str(obs.get("observation_id"))
+    }
+    assert unknown_context_ids
+    repairs = [
+        entry
+        for entry in result.queue
+        if entry.observation_id in unknown_context_ids
+        and "read_from" in (entry.axes or ())
+    ]
+    assert repairs
+    assert all(
+        "read_from" in (entry.axes or ())
+        for entry in result.queue
+        if entry.observation_id in unknown_context_ids
+    )
 
 
 def _queue_fingerprints(entries: list[dict]) -> list[str]:
