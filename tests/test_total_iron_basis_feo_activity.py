@@ -128,7 +128,7 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
             assert row.uncertainty.kind is UncertaintyKind.DERIVED
             assert row.uncertainty.derivation.relation == "total_iron_basis"
             assert temperature_of(row.identity) is not None
-            assert row.point_conditions["T_C"].locator is not None
+            assert row.locator is not None
             located = row.point_conditions["composition"]
             assert isinstance(located, Located)
             assert located.locator is not None
