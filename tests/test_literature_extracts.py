@@ -2567,6 +2567,22 @@ def test_barin_1995_aluminate_tables_are_pinned_and_migrate_conditions(
 ) -> None:
     source_name = "barin-1995.yaml"
     doc = yaml.safe_load((EXTRACTS / source_name).read_text(encoding="utf-8"))
+    pending = [doc]
+    locators = []
+    while pending:
+        item = pending.pop()
+        if isinstance(item, dict):
+            locator = item.get("locator")
+            if isinstance(locator, dict):
+                locators.append(locator)
+            pending.extend(item.values())
+        elif isinstance(item, list):
+            pending.extend(item)
+    assert not any(
+        str(locator.get("source_path", "")).startswith("docs/references/")
+        and str(locator.get("source_path", "")).endswith(".md")
+        for locator in locators
+    )
     expected_tables = {
         "CaAl2O4": (17, 557, 442, 556, "barin95_caal2o4_sol_cp", "120.791"),
         "CaAl4O7": (19, 558, 443, 557, "barin95_caal4o7_sol_cp", "198.174"),

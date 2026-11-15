@@ -1,5 +1,7 @@
 # Barin (1995), NaFeO2 audit
 
+The companion aluminate and spinel transcription is audited in `barin-1995-aluminate-audit.md`.
+
 ## Scope and locators
 
 The only Barin 1995 NaFeO2 entry is printed as `FeNaO2`, “IRON SODIUM DIOXIDE,”
