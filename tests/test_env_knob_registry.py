@@ -23,8 +23,12 @@ PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # Current production token count after removing two local-alias tokens from
-# scripts/grind_home.py; its actual ``os.environ`` read remains counted once.
-ENV_ACCESS_TOKEN_CEILING = 94
+# scripts/grind_home.py; shared cache-setting reads use one ``os.environ`` token.
+# t-1747 adds two reviewed sites in scripts/check_named_manifest_mutations.py:
+# the child test environment `{**os.environ, **env}` and the
+# `os.environ.get("REGOLITH_CORPUS_ROOT")` read (REGOLITH_CORPUS_ROOT is already
+# registered in docs/configuration.md): 94 + 2 = 96.
+ENV_ACCESS_TOKEN_CEILING = 96
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep

@@ -28,10 +28,21 @@ from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterable,
+    Iterator,
+    Literal,
+    Mapping,
+    Protocol,
+    Sequence,
+)
 
 import yaml
 
+from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.enums import (
@@ -127,6 +138,9 @@ from simulator.battery.input_provenance import (
     single_phase_printed_bulk_policy,
 )
 from simulator.physical_constants import ATM_PA_DECIMAL, GAS_CONSTANT, PA_PER_BAR
+
+if TYPE_CHECKING:
+    from simulator.diagnostic_helpers.binary_pot_battery import Po2Request
 from simulator.battery.migrate import (
     REPO_ROOT,
     _COMPOSITION_COMPONENTS,
@@ -206,7 +220,10 @@ from simulator.battery.score_report import (
     render_payload_score_report_markdown,
     store_stamp_has_known_revision,
 )
-from simulator.battery.score_report_data import element_retention_report_data
+from simulator.battery.score_report_data import (
+    eligibility_failure_census,
+    element_retention_report_data,
+)
 from simulator.battery.score_metrics import (
     QUANTITY_METRIC,
     _phase_component_reference_wt_percent,
@@ -1110,7 +1127,7 @@ def parse_species_formula(
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
-    text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
+    text = fold_subscript_digits(text)
     # formula_composition reads the ASCII-dot water-adduct separator as a
     # decimal count. Refuse that normalized form first; raw fast-path results
     # and explicit middle-dot hydrates stay unchanged.
@@ -4173,11 +4190,12 @@ def _coughlin_n0() -> Decimal:
 def _composition_band_dex(n0: Decimal, *, extrapolated: bool, temperature_K: Decimal) -> Decimal:
     """Propagate |N0(D&G) - N0(Coughlin Fe0.947O)| onto log10 a.
 
-    A shift of the standard's Fe2+ fraction scales a stoichiometric activity
-    by N0, so the dex width is |log10(N0 / N0_Coughlin)|. Outside the anchor
-    window the band is at least the spread at the nearest anchor: the local
-    spread can shrink as the line moves toward 0.888, and the ruling forbids
-    a tighter band than the D&G-versus-Coughlin spread.
+    The ruled composition discrepancy band is the log ratio between owned
+    D&G N0 and cited Coughlin N0; it is not another factor in the JANAF
+    activity conversion. Outside the anchor window the band is at least the
+    spread at the nearest anchor: the local spread can shrink as the line
+    moves toward 0.888, and the ruling forbids a tighter band than the
+    D&G-versus-Coughlin spread.
     """
 
     coughlin = _coughlin_n0()
@@ -4385,29 +4403,21 @@ def _iron_saturated_feo_comparison(
 ) -> Observation | None:
     """Retag iron-saturated Fe(1-x)O(l) onto the comparison FeO frame.
 
-    Holzheid's standard is the iron-saturated liquid's chemical potential,
-    mu_FeO = mu_Fe + mu_O. a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
-    carries that partial onto JANAF Fe-019. Page 801's N_O/N_Fe = (3r−1)/(2r)
-    fixes the saturation composition and does not multiply this partial.
-    The composition itself comes from iron_saturation_composition. It does
-    not scale the activity.
+    An iron-saturated Fe(1-x)O standard has chemical potential
+    mu_FeO = mu_Fe + mu_O; a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
+    carries that partial onto JANAF Fe-019. iron_saturation_composition owns
+    the typed saturation composition and its comparison band; N0 is not a
+    second factor in the JANAF activity conversion.
 
-    Distin's tabulated activity is the oxygen ratio a_D = O_metal / O_sat
-    on that same iron-saturated standard (p. 74). O_sat is the oxygen
-    solubility of iron under pure iron oxide at that T. Printed p. 75
-    divides the measured metal oxygen by 0.44, 0.63 and 0.83 wt% at
-    1785, 1880 and 1960 °C (0.43/0.44 rounds to the stored 0.977). This
-    paper's eight references do not include Taylor & Chipman. The
-    levitation technique is their own prior paper (6), Can. Met. Quart.
-    10(1): 13 (1971); the saturation sentence does not say whether those
-    three percents were measured there or taken from an uncited table.
-    The extract records the printed percents in derivation prose and
-    carries no cited solubility source. That source is follow-up data,
-    not a number invented here. a_F019 = a_D * f, with
-    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Sanity: an iron-saturated melt
-    (a_D = 1) maps to f. The Temkin-frame reading a_F019 = a_D * f / N0
-    is withdrawn: the stored column is the oxygen ratio, and Masson's N0
-    multiply is not this Fe-019 step. No ion-fraction constant lives here.
+    Distin defines its tabulated activity as a_D = O_metal / O_sat (p. 74),
+    then identifies nonstoichiometric oxide in equilibrium with liquid iron
+    as the measured standard state (p. 75, Discussion). Chemical-potential
+    equality maps that activity onto JANAF Fe-019 with a_FeO = a_D * f, where
+    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Premise: f carries the measured
+    oxygen chemical potential onto the JANAF standard. Algebra:
+    a_FeO = a_D * exp((ΔG_w - ΔfG(Fe-019)) / RT). The exponent and both
+    activities are dimensionless, so a_FeO remains dimensionless. Sanity:
+    f = 1 leaves the measured activity unchanged.
 
     Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
     (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
@@ -4461,6 +4471,25 @@ def _iron_saturated_feo_comparison(
             band="Darken & Gurry iron-boundary conversion requires temperature_K",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    composition_decision = iron_saturation_composition(reference)
+    composition_notice = _composition_notice(
+        reference, composition_decision, quantity
+    )
+    n0 = composition_decision.n_fe2_plus
+    if composition_decision.failure is not None or n0 is None:
+        failure = composition_decision.failure or (
+            "iron-saturated FeO conversion requires a resolved Fe2+ fraction N0"
+        )
+        return replace(
+            reference,
+            identity=replace(
+                identity,
+                reference_state=State.unknown(
+                    f"{composition_decision.notice}: {failure}"
+                ),
+            ),
+            notices=union_notices(reference.notices, (composition_notice,)),
+        )
     try:
         calibration, delta_g_w = _iron_saturated_feo_calibration()
         factor = _feo_reference_factor(calibration, temperature_K)
@@ -4497,10 +4526,14 @@ def _iron_saturated_feo_comparison(
             f"{_display_decimal(2 * log_f_spread_dex, '0.001')} dex; "
             "Masson 1965 Temkin estimate 0.936 is EXCLUDED from the band "
             "(stated validity N_Fe2+ 0.7-0.9; this case lies outside it); "
-            "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric "
-            f"FeO(l); source_value={reference.value.point}; "
+            "iron-saturated Fe(1-x)O(l) activity converted to stoichiometric "
+            "FeO(l) by JANAF chemical-potential equality; N0 records the "
+            "saturation composition and its comparison band, not an extra "
+            "activity factor; "
+            f"source_value={reference.value.point}; "
             f"converted_value={converted}; "
             f"factor={_display_decimal(factor, '0.001')}; "
+            f"N0={_display_decimal(n0, '0.0001')}; "
             "jackknife sensitivity factor "
             f"[{_display_decimal(jackknife_low, '0.001')}, "
             f"{_display_decimal(jackknife_high, '0.001')}] "
@@ -4534,11 +4567,7 @@ def _iron_saturated_feo_comparison(
     )
     if row_band.notice is not None:
         notices += (row_band.notice,)
-    notices += (
-        _composition_notice(
-            reference, iron_saturation_composition(reference), quantity
-        ),
-    )
+    notices += (composition_notice,)
     return replace(
         reference,
         identity=replace(identity, reference_state=State.of(stoichiometric)),
@@ -4555,7 +4584,9 @@ def fusion_comparison_reference(
     Crystal activities move onto the liquid endmember by the JANAF fusion
     energy. Iron-saturated Fe(1-x)O(l) activities, including Distin's
     tabulated oxygen ratio, move onto stoichiometric FeO(l) by the Darken
-    & Gurry factor f. A recorded saturation composition does not scale them.
+    & Gurry factor f alone (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)
+    from the measured Fe/oxide equilibrium and JANAF). N0 parameterises the
+    iron-saturation composition and its d-333 band; it is not a second divisor.
     """
 
     iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
@@ -23023,6 +23054,12 @@ def _render_score_report_from_payloads_legacy(
     if not report_engine_names:
         report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
     report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
+    eligibility_census = eligibility_failure_census(
+        rows,
+        conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
+        observations=context.observations,
+        engine_for_row=_engine_from_payload,
+    )
     pending = 0
     admitted = 0
     for observation in comparison_candidates(context):
@@ -23041,6 +23078,7 @@ def _render_score_report_from_payloads_legacy(
         all_numeric_records=aggregate.all_numeric.records(
             engine.value for engine in engines
         ),
+        eligibility_census=eligibility_census,
         headline_rows=aggregate.headline_records(engines=report_engines),
         e15_lines=_e15_report_lines(aggregate.e15_points, context.observations),
         flagged_rows=aggregate.flagged_records(),
@@ -24631,6 +24669,12 @@ def render_score_report_from_payloads(
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
 ) -> str:
+    eligibility_census = eligibility_failure_census(
+        rows,
+        conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
+        observations=observations,
+        engine_for_row=_engine_from_payload,
+    )
     unflagged_rows = _FilteredPayloadRows(
         rows, lambda row: not _flagged_payload_strata(row)
     )
@@ -24723,6 +24767,7 @@ def render_score_report_from_payloads(
         engines=engines,
         observations_present=observations is not None,
         all_numeric_records=all_numeric_records,
+        eligibility_census=eligibility_census,
         measured_headline_rows=measured_headline_rows,
         e15_lines=e15_lines,
         flagged_rows=flagged_rows,

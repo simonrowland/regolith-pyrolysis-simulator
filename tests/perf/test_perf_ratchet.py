@@ -68,11 +68,15 @@ RESPONSE_POLICY = (
 )
 
 
-def _assert_optimizer_stage_measurement(measurement: dict) -> None:
+def _assert_optimizer_stage_measurement(
+    measurement: dict,
+    trial_count: int = bench.OPTIMIZER_STAGE_TRIALS,
+) -> None:
     trials = measurement["details"]["trial_records"]
     cpu_values = [float(trial["cpu_seconds"]) for trial in trials]
     median_cpu = float(measurement["cpu_seconds_median"])
-    assert len(trials) >= 5
+    assert len(trials) == trial_count
+    assert measurement["trial_count"] == trial_count
     assert math.isfinite(median_cpu)
     # The plan's measured 24 h analytical run is 7.42 CPU-s; a 1 h stage
     # cannot satisfy this derived lower bound, while the 60 h C4 path can.
@@ -99,12 +103,18 @@ def _assert_optimizer_stage_measurement(measurement: dict) -> None:
         assert math.isfinite(float(trial["wall_cpu_ratio"]))
 
 
+# Premise: the slowest observed single-trial CPU was about 145.3 CPU-s
+# (s1 serial: 726.6 CPU-s / 5); Studio-3 medians were 143.0 CPU-s at
+# f30a49a628 and 83.2 CPU-s at be76d28ad. A 2x factor covers host/trial
+# variation; 2 * 145.3 CPU-s = 290.6 CPU-s, rounded up to 300 CPU-s.
+@pytest.mark.cpu_budget(300)
 def test_optimizer_60h_stage_records_real_cold_work() -> None:
     assert bench.OPTIMIZER_STAGE_NAME in STAGE_NAMES, (
         "optimizer stage missing from STAGE_NAMES"
     )
     _assert_optimizer_stage_measurement(
-        bench._measure_one(bench.OPTIMIZER_STAGE_NAME)
+        bench._measure_optimizer_60h_eval_stage(trial_count=1),
+        trial_count=1,
     )
 
 
