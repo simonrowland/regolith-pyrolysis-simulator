@@ -15,6 +15,8 @@ from typing import Any
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.condensation_routing import (
     COLLECTOR_STAGE_KEY_BY_NUMBER,
+    K_TRAP_STAGE_KEY,
+    STAGE3_ROUTES,
     SUBSTAGE_COLLECTOR_KEYS,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
@@ -342,11 +344,76 @@ def resolve_substage_bands_C(
     }
 
 
+def resolve_alkali_cartridge_melt_out_C(
+    setpoints: Mapping[str, Any] | None = None,
+) -> float | None:
+    """Configured melt-out temperature for the stage-4 alkali cartridge.
+
+    Absent, or an explicit null, means the swing holds the mass on the
+    train and the caller flags ``melt_out_temperature_missing``. A
+    present value must be finite and above absolute zero. This is not
+    a melting point.
+    """
+
+    stages, default_stages = _collector_stage_tables(
+        setpoints, require_complete=False,
+    )
+    stage = stages.get(K_TRAP_STAGE_KEY, {})
+    if isinstance(stage, Mapping) and "melt_out_temperature_C" in stage:
+        raw = stage.get("melt_out_temperature_C")
+    else:
+        default = default_stages.get(K_TRAP_STAGE_KEY, {})
+        if (
+            not isinstance(default, Mapping)
+            or "melt_out_temperature_C" not in default
+        ):
+            return None
+        raw = default.get("melt_out_temperature_C")
+    if raw is None:
+        return None
+    label = f"{K_TRAP_STAGE_KEY}.melt_out_temperature_C"
+    if not is_declared_real_scalar(raw, allow_numeric_str=True):
+        raise ValueError(f"{label} must be numeric")
+    value = float(raw)
+    if not math.isfinite(value) or value <= -CELSIUS_TO_KELVIN_OFFSET:
+        raise ValueError(
+            f"{label} must be finite and above absolute zero"
+        )
+    return value
+
+
+def _validate_collection_commands(setpoints: Mapping[str, Any]) -> None:
+    """Complete recipe files declare each campaign and substage's diverter."""
+    from simulator.condensation_routing import STAGE3_PURITY_FIELDS, validate_stage3_purity
+    for field in STAGE3_PURITY_FIELDS:
+        validate_stage3_purity(setpoints.get('condensation_train', {}).get(field), field)
+    bypass = setpoints.get('condensation_train', {}).get('stage3_bypass')
+    required = ('liner_material', 'length_m', 'inner_diameter_m', 'wall_temperature_C')
+    if not isinstance(bypass, Mapping) or any(key not in bypass for key in required):
+        from simulator.recipe_errors import MalformedRecipeError
+        raise MalformedRecipeError('missing required stage3_bypass equipment inputs')
+    for phase, cfg in setpoints.get('campaigns', {}).items():
+        if not isinstance(cfg, Mapping):
+            continue
+        for field in STAGE3_PURITY_FIELDS:
+            if field in cfg:
+                validate_stage3_purity(cfg[field], field)
+        commands = [(phase, cfg)]
+        commands.extend((f'{phase}.{name}', cfg[name])
+                        for name in ('Na_phase', 'K_phase') if name in cfg)
+        commands.extend((f'{phase}.{stage.get("name")}', stage)
+                        for stage in cfg.get('stages', []) if isinstance(stage, Mapping))
+        for name, command in commands:
+            if command.get('stage3_route') not in STAGE3_ROUTES:
+                raise ValueError(f'{name}.stage3_route must be divert or through')
+
+
 def _load_setpoints_file(path: Path) -> dict[str, Any]:
     """Read complete setpoints without inheriting missing collector inputs."""
     setpoints, _ = _load_required_yaml(path, functional_digest=True)
     resolve_collector_bands_C(setpoints, require_complete=True)
     resolve_substage_bands_C(setpoints, require_complete=True)
+    _validate_collection_commands(setpoints)
     return setpoints
 
 
@@ -401,6 +468,7 @@ def load_config_bundle(
         )
     resolve_collector_bands_C(loaded["setpoints"], require_complete=True)
     resolve_substage_bands_C(loaded["setpoints"], require_complete=True)
+    _validate_collection_commands(loaded["setpoints"])
     return ConfigBundle(
         setpoints=loaded["setpoints"],
         feedstocks=loaded["feedstocks"],

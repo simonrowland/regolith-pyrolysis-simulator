@@ -36,6 +36,7 @@ import math
 import multiprocessing
 import os
 import re
+import selectors
 import signal
 import struct
 import subprocess
@@ -43,7 +44,9 @@ import tempfile
 import time
 import traceback
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from functools import lru_cache
+from itertools import product
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
@@ -111,6 +114,10 @@ from simulator.alphamelts_reference_pressure import (
     alphamelts_effective_pressure_policy,
 )
 from simulator.melt_backend.liquidus import (
+    DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
+    EquilibriumCrystallizationPathResult,
+    LiquidFractionPathPoint,
+    _equilibrium_path_from_cooling,
     LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
@@ -123,6 +130,7 @@ from simulator.physical_constants import (
     PA_PER_BAR,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -552,6 +560,7 @@ def _run_alphamelts_subprocess(
     text: bool = True,
     timeout: float,
     env: Mapping[str, str] | None = None,
+    interact=None,
 ) -> subprocess.CompletedProcess:
     if not capture_output:
         raise ValueError('AlphaMELTS subprocess requires captured output')
@@ -572,10 +581,13 @@ def _run_alphamelts_subprocess(
     timeout_error: subprocess.TimeoutExpired | None = None
     try:
         try:
-            stdout, stderr = process.communicate(
-                input=input,
-                timeout=execution_timeout_s,
-            )
+            if interact is None:
+                stdout, stderr = process.communicate(
+                    input=input,
+                    timeout=execution_timeout_s,
+                )
+            else:
+                stdout, stderr = interact(process, time.monotonic() + execution_timeout_s)
         except subprocess.TimeoutExpired as exc:
             try:
                 group_killed = _kill_alphamelts_process_group(process)
@@ -1132,6 +1144,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
         self._vapor_transport_floor_bar = vacuum_floor_bar_for_environment()
         self._configured_vapor_transport_floor_bar = self._vapor_transport_floor_bar
+        self._transport_pO2_extrapolation_notice: Optional[str] = None
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def _set_vapor_transport_pO2_bar(
@@ -1140,6 +1153,7 @@ class _MELTSBackendSupport(MeltBackend):
         from engines.builtin._common import (
             resolve_request_vacuum_floor_bar,
             resolve_transport_pO2_bar,
+            transport_pO2_extrapolation_notice,
         )
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -1168,6 +1182,11 @@ class _MELTSBackendSupport(MeltBackend):
         self._vapor_transport_pO2_bar = resolved_pO2
         self._vapor_transport_floor_bar = resolved_floor
         self._vapor_transport_pO2_admission = admission
+        # Same notice the builtin and VapoRock vapour audits record. A positive
+        # value below the numerical guard is kept; the flag stays with it.
+        self._transport_pO2_extrapolation_notice = (
+            transport_pO2_extrapolation_notice(request)
+        )
 
     def _initialize_vapor_transport(self, config: Mapping[str, object]) -> None:
         self._set_vapor_transport_pO2_bar(config.get(
@@ -1506,37 +1525,58 @@ class _MELTSBackendSupport(MeltBackend):
 
     def _subprocess_engine_version(self) -> Optional[str]:
         from simulator.engine_local_config import (
-            cache_version_for,
+            _cache_version_label,
+            _cache_version_for_binary,
+            identity_for,
             warn_legacy_once,
         )
 
-        config_version = cache_version_for('alphamelts')
-        if config_version is not None:
-            return config_version
-
-        if self._binary_path is None and self._engine_path is None:
-            return None
-        binary = self._binary_path or self._engine_path
-        try:
-            result = _run_alphamelts_subprocess(
-                [str(binary), '--version'],
-                capture_output=True,
-                text=True,
-                timeout=5,
+        config_identity = identity_for('alphamelts')
+        binary = self._binary_path
+        if binary is None or not Path(binary).is_file():
+            return (
+                config_identity.cache_version()
+                if config_identity is not None
+                else None
             )
-            text = (result.stdout or result.stderr).strip().splitlines()
-            if result.returncode == 0 and text:
-                legacy = text[0]
-            else:
-                legacy = f'alphaMELTS subprocess ({binary})'
-        except (OSError, subprocess.TimeoutExpired):
-            legacy = f'alphaMELTS subprocess ({binary})'
-        warn_legacy_once(
-            'alphamelts',
-            'engines.local.toml absent; using legacy alphaMELTS '
-            'path-based identity for cache comparison',
+
+        reported_version = (
+            config_identity.version
+            if config_identity is not None
+            and _cache_version_label(
+                'alphamelts', config_identity.version
+            ) != 'alphaMELTS'
+            else ""
         )
-        return legacy
+        if not reported_version:
+            try:
+                result = _run_alphamelts_subprocess(
+                    [str(binary), '--version'],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                )
+                text = (result.stdout or result.stderr).strip().splitlines()
+                if result.returncode == 0 and text:
+                    reported_version = text[0]
+            except (OSError, subprocess.TimeoutExpired):
+                pass
+        cache_version = _cache_version_for_binary(
+            'alphamelts', binary, reported_version
+        )
+        if cache_version is None:
+            return (
+                config_identity.cache_version()
+                if config_identity is not None
+                else None
+            )
+        if config_identity is None:
+            warn_legacy_once(
+                'alphamelts',
+                'engines.local.toml absent; using the alphaMELTS binary '
+                'SHA-256 identity for cache comparison',
+            )
+        return cache_version
 
     def capabilities(self) -> Dict[str, object]:
         caps = super().capabilities()
@@ -1770,7 +1810,20 @@ class _MELTSBackendSupport(MeltBackend):
         }
         if call_timeout_s is not None and self.backend_name == 'thermoengine':
             prepared_kwargs['call_timeout_s'] = float(call_timeout_s)
-        return self._equilibrate_prepared(**prepared_kwargs)
+        return self._with_transport_oxygen_notice(
+            self._equilibrate_prepared(**prepared_kwargs)
+        )
+
+    def _with_transport_oxygen_notice(
+        self, result: EquilibriumResult,
+    ) -> EquilibriumResult:
+        notice = self._transport_pO2_extrapolation_notice
+        if not notice:
+            return result
+        diagnostics = dict(result.diagnostics or {})
+        diagnostics['transport_pO2_extrapolation_notice'] = notice
+        result.diagnostics = diagnostics
+        return result
 
     def _equilibrate_prepared(
         self,
@@ -2165,6 +2218,235 @@ class _MELTSBackendSupport(MeltBackend):
             diagnostics=diagnostics_out,
         )
 
+    def _parse_gate_cooling_row(
+        self, system_output, phase_output, *, temperature_C, pressure_bar, fO2_log,
+    ) -> LiquidFractionPathPoint:
+        lines = [line.split() for line in system_output.splitlines() if line.strip()]
+        header_index = next((i for i, row in enumerate(lines) if row[0] == 'index'), None)
+        if header_index is None:
+            raise ValueError('cooling path lacks system header')
+        headers = lines[header_index]
+        values = lines[-1]
+        if len(values) != len(headers) or values[0] == 'index':
+            raise ValueError('cooling path has no completed system row')
+        row = dict(zip(headers, values))
+        for field in ('Temperature', 'Pressure', 'mass', 'F', 'H', 'S', 'fO2(absolute)'):
+            if not math.isfinite(float(row[field])):
+                raise ValueError(f'cooling path non-finite {field}')
+        # Native tables print T/P to 0.01 and log10 fO2 to 0.001.
+        if (abs(float(row['Temperature']) - temperature_C) > ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C
+                or abs(float(row['Pressure']) - pressure_bar) > .01
+                or not math.isclose(float(row['fO2(absolute)']), fO2_log, rel_tol=0,
+                                    abs_tol=ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10)):
+            raise ValueError('cooling path did not apply requested T/P/fO2')
+        phase_lines = phase_output.splitlines()
+        indices = [i for i, line in enumerate(phase_lines) if line.startswith('index ')]
+        if not indices:
+            raise ValueError('cooling path lacks phase row')
+        phase_block = '\n'.join(phase_lines[indices[-1]:])
+        phase_header = phase_lines[indices[-1]].split()
+        if (phase_header[1] != row['index']
+                or abs(float(phase_header[5]) - temperature_C) > ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C):
+            raise ValueError('cooling path system/phase rows disagree')
+        phases = self._parse_phase_main_output(phase_block)
+        instances = phases['phase_instances']
+        for phase in instances:
+            phase_thermodynamics = tuple(
+                phase.get(key)
+                for key in (
+                    'enthalpy_J', 'entropy_J_K', 'solver_basis_mass_kg',
+                )
+            )
+            if not all(
+                value is not None and math.isfinite(float(value))
+                for value in phase_thermodynamics
+            ) or phase_thermodynamics[2] < 0:
+                raise ValueError('cooling path invalid phase thermodynamics')
+        masses = {name: data['reference_mass_kg']
+                  for name, data in phases['phase_thermo'].items()}
+        total_mass = sum(masses.values())
+        fraction = float(row['F'])
+        try:
+            self._resolve_ok_liquid_fraction(
+                liquid_fraction=fraction, phase_masses_kg=masses,
+            )
+        except LiquidFractionInvalidError as exc:
+            raise ValueError('cooling path liquid fraction disagrees with phases') from exc
+        if (not 0 <= fraction <= 1
+                or abs(total_mass * 1000 - float(row['mass'])) > .001
+                or (melt_regime(liquid_fraction=fraction, epsilon=0) is MeltRegime.FROZEN
+                    and any(p['phase'] == 'liquid' for p in instances))):
+            raise ValueError('cooling path liquid fraction disagrees with phases')
+        return LiquidFractionPathPoint(
+            temperature_C, fraction, phases['phase_compositions'].get('liquid', {}),
+        )
+
+    def gate_cooling_path(
+        self, *, pressure_bar, fO2_log, composition_mol_by_account,
+        species_formula_registry, redox_state=None,
+    ) -> EquilibriumCrystallizationPathResult:
+        """Batch cooling with carried native state, stopping at liquid disappearance."""
+        if self._mode != 'subprocess':
+            return EquilibriumCrystallizationPathResult(status='unavailable')
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
+        if redox_state is not None and redox_state.kind != 'absolute':
+            return EquilibriumCrystallizationPathResult(
+                status='unavailable', diagnostics={'reason': 'redox_state_not_expressible'},
+            )
+        if pressure_bar < ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED, f'{pressure_bar:g} bar',
+            )
+        start_T_C, stop_T_C, step_C = 2200, 400, 10
+        comp = self._composition_for_liquidus_finder(
+            composition_kg=None, composition_mol=None,
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_formula_registry,
+            pressure_bar=pressure_bar, fO2_log=fO2_log, min_T_C=stop_T_C,
+        )
+        if isinstance(comp, LiquidusSolidusResult):
+            return EquilibriumCrystallizationPathResult(
+                status=comp.status, warnings=comp.warnings, diagnostics=comp.diagnostics,
+            )
+        _, calc_mode = resolve_alphamelts_subprocess_model(self._model)
+        if os.environ.get('ALPHAMELTS_CALC_MODE', calc_mode) != calc_mode:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_CALC_MODE_MISMATCH, 'ambient calculation mode mismatch',
+            )
+        points = []
+        path_warnings = []
+        diagnostics = self._apply_engine_commissioning(
+            comp, temperature_C=start_T_C, pressure_bar=pressure_bar,
+            fO2_log=fO2_log, warnings=path_warnings,
+        ) or {}
+        # The existing aggregate ceiling is retained; each menu step also
+        # uses the existing subprocess timeout, clamped to the residual.
+        timeout_s = _validated_timeout_s(self._timeout_s)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            self._write_melts_file(root / 'input.melts', comp, start_T_C, pressure_bar,
+                                   fO2_path='Absolute', fO2_offset=fO2_log)
+            with (root / 'input.melts').open('a') as stream:
+                stream.write(f'Final Temperature: {stop_T_C}\nIncrement Temperature: {-step_C}\n'
+                             f'Final Pressure: {pressure_bar}\nIncrement Pressure: 0\n')
+            env = os.environ.copy()
+            env.update(ALPHAMELTS_CALC_MODE=calc_mode, ALPHAMELTS_RUN_MODE='isobaric',
+                       ALPHAMELTS_DELTAT=str(-step_C), ALPHAMELTS_MINT=str(stop_T_C),
+                       ALPHAMELTS_MAXT=str(start_T_C), ALPHAMELTS_CELSIUS_OUTPUT='true')
+
+            def interact(process, deadline):
+                # One cooling path reads about 10k pipe chunks. Repeated str
+                # += copies the whole transcript each time, so the parent
+                # spends minutes in this loop. Append, and join once.
+                output_parts = {'stdout': [], 'stderr': []}
+                with selectors.DefaultSelector() as selector:
+                    selector.register(process.stdout, selectors.EVENT_READ, 'stdout')
+                    selector.register(process.stderr, selectors.EVENT_READ, 'stderr')
+
+                    def menu(command=None):
+                        if command is not None:
+                            process.stdin.write(command)
+                            process.stdin.flush()
+                        parts = []
+                        # The prompt can straddle two reads. Bytes already
+                        # scanned stay scanned; only the new read plus the
+                        # delimiter overlap is searched.
+                        marker = 'Your choice:'
+                        overlap = len(marker) - 1
+                        carry = ''
+                        step_deadline = min(deadline, time.monotonic() + timeout_s)
+                        while marker not in carry:
+                            remaining = step_deadline - time.monotonic()
+                            if remaining <= 0:
+                                raise subprocess.TimeoutExpired(process.args, timeout_s)
+                            for key, _ in selector.select(remaining):
+                                data = os.read(key.fileobj.fileno(), 65536).decode(errors='replace')
+                                if not data:
+                                    raise ValueError('cooling process ended before completed row')
+                                output_parts[key.data].append(data)
+                                if key.data == 'stdout':
+                                    parts.append(data)
+                                    window = carry + data
+                                    if marker in window:
+                                        carry = marker
+                                    else:
+                                        carry = window[-overlap:]
+                        return ''.join(parts)
+
+                    menu()
+                    menu('1\ninput.melts\n')
+                    completed_rows = 0
+                    for temperature in range(start_T_C, stop_T_C - 1, -step_C):
+                        # A continuation's first row repeats the current
+                        # equilibrium; two native rows advance exactly 10 C.
+                        output = menu('4\n1\n1\n' if not points else '4\n0\n2\n')
+                        if ('Successful return from alphamelts' not in output
+                                or self._subprocess_failure_reason(output)):
+                            raise ValueError('incomplete cooling path: native convergence failure')
+                        system_lines = (root / 'System_main_tbl.txt').read_text().splitlines()
+                        header = next((line for line in system_lines if line.startswith('index ')), None)
+                        if header is None:
+                            raise ValueError('cooling path lacks completed system output')
+                        rows = [line for line in system_lines if line.split() and line.split()[0].isdigit()]
+                        if len(rows) - completed_rows != (2 if points else 1):
+                            raise ValueError('cooling path missing completed rows')
+                        completed_rows = len(rows)
+                        # A resumed path writes the carried row again before
+                        # advancing. Check BOTH completed rows, including H/S.
+                        new_rows = rows[-(2 if points else 1):]
+                        phase_blocks = re.split(r'(?m)(?=^index )',
+                                                (root / 'Phase_main_tbl.txt').read_text())
+                        blocks = {block.split()[1]: block for block in phase_blocks
+                                  if block.startswith('index ')}
+                        for index, row in enumerate(new_rows):
+                            expected_T = points[-1].temperature_C if points and index == 0 else temperature
+                            point = self._parse_gate_cooling_row(
+                                header + '\n' + row, blocks[row.split()[0]],
+                                temperature_C=expected_T, pressure_bar=pressure_bar, fO2_log=fO2_log,
+                            )
+                        if not points and melt_regime(liquid_fraction=point.liquid_fraction, epsilon=0) is not MeltRegime.MOLTEN:
+                            raise ValueError('cooling start is not superliquidus')
+                        points.append(point)
+                        if melt_regime(liquid_fraction=point.liquid_fraction, epsilon=0) is MeltRegime.FROZEN:
+                            break
+                    process.stdin.write('x\n')
+                    process.stdin.flush()
+                    stdout, stderr = process.communicate(timeout=max(.001, deadline-time.monotonic()))
+                    return (
+                        ''.join(output_parts['stdout']) + stdout,
+                        ''.join(output_parts['stderr']) + stderr,
+                    )
+
+            try:
+                result = _run_alphamelts_subprocess(
+                    [str(self._binary_path or self._engine_path), '1'], cwd=tmpdir,
+                    input='', env=env, timeout=DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
+                    interact=interact,
+                )
+                if (result.returncode != 0 or not points
+                        or melt_regime(liquid_fraction=points[-1].liquid_fraction, epsilon=0) is not MeltRegime.FROZEN):
+                    raise ValueError('incomplete cooling path: no checked solidus')
+            except (ValueError, OSError, IndexError, KeyError, subprocess.TimeoutExpired) as exc:
+                return EquilibriumCrystallizationPathResult(
+                    status='not_converged', warnings=(*path_warnings, str(exc)),
+                    diagnostics={**diagnostics,
+                                 'reason': ('timeout' if isinstance(exc, subprocess.TimeoutExpired)
+                                            else 'incomplete_cooling_path'),
+                                 'last_completed_temperature_C': points[-1].temperature_C if points else None,
+                                 'completed_rows': len(points)},
+                )
+        bounds = _equilibrium_path_from_cooling(tuple(points), step_C=step_C)
+        if bounds.status != 'ok':
+            return bounds
+        diagnostics.update(bounds.diagnostics)
+        if 'accepted, but non-optimal' in result.stdout:
+            diagnostics['numerical_path_warning'] = 'accepted, but non-optimal equilibria'
+        return replace(
+            bounds, diagnostics=diagnostics,
+            warnings=(*path_warnings, *((diagnostics['numerical_path_warning'],)
+                                      if 'numerical_path_warning' in diagnostics else ())),
+        )
+
     def _unapplied_absolute_fo2_result(
         self,
         *,
@@ -2312,7 +2594,12 @@ class _MELTSBackendSupport(MeltBackend):
                 'clamped_operating_point',
             )
         result_diagnostics.setdefault('backend_name', self.backend_name)
-        result_diagnostics.setdefault('engine_version', self.get_engine_version())
+        engine_version = (
+            self.get_engine_version()
+            if result_status == 'ok'
+            else self._engine_version or 'unavailable'
+        )
+        result_diagnostics.setdefault('engine_version', engine_version)
         result = EquilibriumResult(
             temperature_C=float(temperature_C),
             pressure_bar=float(pressure_bar),
@@ -2399,7 +2686,7 @@ class _MELTSBackendSupport(MeltBackend):
             ),
         )
         result.backend_name = self.backend_name
-        result.engine_version = self.get_engine_version()
+        result.engine_version = str(result_diagnostics['engine_version'])
         return result
 
     @staticmethod
@@ -6128,6 +6415,13 @@ class _MELTSBackendSupport(MeltBackend):
                 f'status={result.status!r}; warnings={list(result.warnings)!r}',
             )
         diagnostic = dict(result.diagnostic or {})
+        audit = getattr(result, 'control_audit', None)
+        if audit is not None:
+            diagnostic['control_audit'] = {
+                'requested': dict(audit.requested),
+                'applied': dict(audit.applied),
+                'notes': list(audit.notes),
+            }
         pressures = dict(diagnostic.get('vapor_pressures_Pa') or {})
         sources = dict(diagnostic.get('vapor_pressures_source') or {})
         if not pressures:

@@ -287,7 +287,7 @@ def _unidentified_molecular_input(row: Observation) -> bool:
 
 
 def _janaf_atomic_oxygen(temperature_K: Decimal) -> tuple[Decimal, float, Locator]:
-    from simulator.battery.generators.janaf import (
+    from simulator.reference_data.janaf import (
         _fusion_table_points,
         _interpolate_formation_gibbs,
     )

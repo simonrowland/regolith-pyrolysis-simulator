@@ -28,7 +28,9 @@ OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # the child test environment `{**os.environ, **env}` and the
 # `os.environ.get("REGOLITH_CORPUS_ROOT")` read (REGOLITH_CORPUS_ROOT is already
 # registered in docs/configuration.md): 94 + 2 = 96.
-ENV_ACCESS_TOKEN_CEILING = 96
+# +2 alphaMELTS continuation reads: ALPHAMELTS_CALC_MODE and subprocess
+# os.environ.copy(); combined production ceiling is 98.
+ENV_ACCESS_TOKEN_CEILING = 98
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep

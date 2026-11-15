@@ -8,6 +8,7 @@ from typing import Any
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+    PROXY_BRIDGE_ALPHA_STATUS,
 )
 from simulator.backend_names import (
     LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
@@ -86,13 +87,18 @@ def optimizer_tier_label(
             backend_status=backend_status,
             backend_authoritative=backend_authoritative,
         )
-    ceiling_species = alpha_ceiling_species(
+    authority_statuses = alpha_authority_statuses(
         run_reference,
         result_blob,
         backend_payload,
     )
+    ceiling_species = alpha_ceiling_species({"alpha_authority_status_by_species": authority_statuses})
+    noncertifying_alpha = any(
+        status in {ANALYTICAL_UPPER_BOUND_ALPHA_STATUS, PROXY_BRIDGE_ALPHA_STATUS}
+        for status in authority_statuses.values()
+    )
     certification_allowed = bool(canonical.get("certification_allowed", False))
-    if ceiling_species:
+    if noncertifying_alpha:
         certification_allowed = False
         canonical = dict(canonical)
         canonical["certification_allowed"] = False
@@ -120,6 +126,8 @@ def optimizer_tier_label(
         label["evidence_rank"] = proof_rank
         label["proof_rank"] = proof_rank
         label["proof_grade"] = proof_rank
+    if authority_statuses:
+        label["alpha_authority_status_by_species"] = authority_statuses
     if ceiling_species:
         label[ALPHA_AUTHORITY_STATUS_FIELD] = (
             ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
@@ -133,15 +141,22 @@ def _mapping_value(value: Any) -> Mapping[str, Any]:
 
 
 def alpha_ceiling_species(*carriers: Any) -> tuple[str, ...]:
-    species: set[str] = set()
+    return tuple(
+        name for name, status in alpha_authority_statuses(*carriers).items()
+        if status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+    )
+
+
+def alpha_authority_statuses(*carriers: Any) -> dict[str, str]:
+    """Collect engaged alpha provenance through nested cache/report carriers."""
+    statuses: dict[str, str] = {}
 
     def visit(value: Any) -> None:
         if isinstance(value, Mapping):
             by_species = value.get("alpha_authority_status_by_species")
             if isinstance(by_species, Mapping):
                 for name, status in by_species.items():
-                    if status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
-                        species.add(str(name))
+                    statuses[str(name)] = str(status)
             for key, nested in value.items():
                 if key != "alpha_authority_status_by_species":
                     visit(nested)
@@ -151,7 +166,7 @@ def alpha_ceiling_species(*carriers: Any) -> tuple[str, ...]:
 
     for carrier in carriers:
         visit(carrier)
-    return tuple(sorted(species))
+    return dict(sorted(statuses.items()))
 
 
 def _optional_bool(value: Any) -> bool | None:

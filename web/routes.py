@@ -19,6 +19,7 @@ from flask import Blueprint, Response, abort, current_app, render_template, json
 import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
+from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS
 from simulator.backends import BackendResolutionStatus, backend_resolution_status
 from simulator.additive_calculations import (
     ADDITIVE_MASS_MARGIN,
@@ -31,7 +32,8 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.cost_parameters import RECIPE_COST_PARAMETERS_KEY
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, parse_campaign_override_value
+from simulator.config import _load_setpoints_file
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
@@ -2389,12 +2391,14 @@ def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
             'items': [],
         }
 
+    # Strip order only. Class assignment stays in classify_products.
     order = {
         'ingots_metals': 0,
         'glass': 1,
         'oxygen': 2,
         'captured_volatiles': 3,
         'refractory_ceramic_rump': 4,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS: 5,
     }
     items = []
     for row in outputs:
@@ -3555,6 +3559,9 @@ def _recipe_runtime_overrides_from_controls(
                 raise BadRequest(
                     f'controls.runtime_campaign_overrides.{campaign_name} field is required'
                 )
+            if raw_value in (None, ''):
+                continue
+            label = f'controls.runtime_campaign_overrides.{campaign_name}.{field_name}'
             if field_name == 'carrier_gas':
                 clean_fields[field_name] = raw_value
                 continue
@@ -3562,12 +3569,18 @@ def _recipe_runtime_overrides_from_controls(
                 if raw_value is not None and raw_value != '':
                     clean_fields[field_name] = raw_value
                 continue
-            value = _recipe_non_negative_number(
-                raw_value,
-                f'controls.runtime_campaign_overrides.{campaign_name}.{field_name}',
-            )
-            if value is not None:
-                clean_fields[field_name] = value
+            try:
+                value = parse_campaign_override_value(field_name, raw_value, label)
+            except (TypeError, ValueError) as exc:
+                message = str(exc)
+                if message.startswith(f'{field_name} '):
+                    raise BadRequest(
+                        f'{label}{message[len(field_name):]}'
+                    ) from exc
+                raise BadRequest(f'{label} must be a finite non-negative number') from exc
+            if isinstance(value, float):
+                value = _recipe_non_negative_number(value, label)
+            clean_fields[field_name] = value
         if clean_fields:
             overrides[campaign_name] = clean_fields
     try:

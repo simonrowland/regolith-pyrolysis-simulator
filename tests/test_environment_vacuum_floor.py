@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from engines.builtin._common import resolve_transport_pO2_bar
+from engines.builtin._common import resolve_transport_pO2_bar, diagnostic_control_audit
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
@@ -274,3 +274,17 @@ def test_unknown_controlled_background_is_not_assumed_inert():
     sim.melt.background_gas_mole_fraction = 1.0
     with pytest.raises(CoverGasCompositionUnavailable, match='cover-gas composition'):
         sim._headspace_transport_pO2_bar_from_ledger(0.0)
+
+
+@pytest.mark.parametrize("oxygen_request", [_request({"pO2_bar": 1e-16}), _fo2_request(-16.)])
+def test_positive_oxygen_below_guard_is_retained_with_notice(oxygen_request):
+    assert resolve_transport_pO2_bar(oxygen_request) == 1e-16
+    notes = diagnostic_control_audit(oxygen_request).notes
+    assert any("below transport model floor" in note and "authority_level=extrapolated" in note
+               and "certified_band=none" in note for note in notes)
+
+
+@pytest.mark.parametrize("oxygen", [0., -1., float("nan"), float("inf")])
+def test_non_observation_oxygen_still_refuses_invalid_input(oxygen):
+    with pytest.raises(ValueError, match="finite and > 0"):
+        resolve_transport_pO2_bar(_request({"pO2_bar": oxygen}))

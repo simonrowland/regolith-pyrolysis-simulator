@@ -114,8 +114,14 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.fe_redox import RedoxState, normalize_redox_state
-from simulator.oxygen_buffers import oneill_qfm_log10_fO2_bar
+from simulator.oxygen_buffers import (
+    ONEILL_QFM_TEMPERATURE_RANGE_K,
+    oneill_qfm_log10_fO2_bar,
+    _magemin_corrected_buffer_offset,
+    _oneill_qfm_outside_reference_band,
+)
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
@@ -154,8 +160,20 @@ from simulator.melt_backend.pure_phase import (
     PurePhaseUnsupportedDatabaseError,
 )
 from simulator.state import OXIDE_SPECIES
-from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.feedstock_composition import iron_oxide_values, total_fe
+from simulator.scalar_boundary import finite_float, is_declared_real_scalar
+from simulator.feedstock_composition import (
+    feot_equivalent_moles,
+    iron_oxide_values,
+    total_fe,
+)
+
+
+# dump_function.c:1514 prints log10(fO2) with %e (six fractional digits).
+# For a 10-99-dex log that rounds at 5e-6 dex; two readouts in the correction
+# plus six-decimal n serialization (s=1.0000202 dex/n) bound roundoff at
+# 1.05e-5 dex. Round that bound up to one significant digit: 2e-5 dex.
+# This is a text-resolution tolerance, not a fit to an equilibrium result.
+_MAGEMIN_FO2_TOL_DEX = 2.0e-5
 
 
 # 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
@@ -1504,6 +1522,76 @@ def _assert_magemin_bulk_echo(
             )
 
 
+def _fold_ferric_split_into_feo_total(
+    composition: Mapping[str, float],
+    *,
+    moles: bool,
+) -> Mapping[str, float]:
+    """Fold a positive Fe2O3 split onto FeO. Absent Fe2O3 is unchanged.
+
+    Premise: one Fe2O3 formula holds two Fe atoms. The mole identity is
+    owned by ``feot_equivalent_moles``:
+        n(FeO)_new = n(FeO) + 2 * n(Fe2O3).
+    The mass identity is owned by ``total_fe``:
+        m(FeO)_new = m(FeO) + m(Fe2O3) * (2 * M_FeO / M_Fe2O3).
+    Unit check: 1 mol Fe2O3 (159.687 g) becomes 2 mol FeO (143.688 g).
+    The 15.999 g excess O is not kept on Fe2O3; the FeO_T peel then
+    provisions qfm buffer O from the combined FeO inventory.
+    Limiting case: Fe2O3 <= 0 leaves the mapping object unchanged.
+    """
+    _feo, fe2o3 = iron_oxide_values(composition)
+    if fe2o3 <= 0.0:
+        return composition
+    folded = {
+        str(name): value
+        for name, value in composition.items()
+        if str(name) != 'Fe2O3'
+    }
+    folded['FeO'] = (
+        feot_equivalent_moles(composition) if moles else total_fe(composition)
+    )
+    return folded
+
+
+def _liquidus_inputs_on_feo_total_iron_basis(
+    *,
+    composition_kg: Optional[Mapping[str, float]],
+    composition_mol: Optional[Mapping[str, float]],
+    composition_mol_by_account: Optional[Mapping[str, Mapping[str, float]]],
+) -> tuple[
+    Optional[Mapping[str, float]],
+    Optional[Mapping[str, float]],
+    Optional[Mapping[str, Mapping[str, float]]],
+]:
+    """Present imposed-fO2 liquidus iron as FeO_T.
+
+    ``_build_db_bulk_projection`` peels buffer O from FeO only while Fe2O3
+    is absent, because an explicit ferric analysis is a closed oxygen budget.
+    A ledger redox split writes trace Fe2O3 into an FeO_T melt and that guard
+    then drops buffer O to the ferric excess. The qfm buffer does not
+    participate, native fO2 misses the request, and the freeze gate holds
+    the last honoured curve. Direct ``equilibrate`` keeps the closed-budget
+    rule. Only the cleaned-melt account is the liquidus bulk.
+    """
+    kg = (
+        None if composition_kg is None
+        else _fold_ferric_split_into_feo_total(composition_kg, moles=False)
+    )
+    mol = (
+        None if composition_mol is None
+        else _fold_ferric_split_into_feo_total(composition_mol, moles=True)
+    )
+    if composition_mol_by_account is None:
+        return kg, mol, None
+    accounts = dict(composition_mol_by_account)
+    melt = accounts.get(CLEANED_MELT_ACCOUNT)
+    if isinstance(melt, Mapping):
+        accounts[CLEANED_MELT_ACCOUNT] = _fold_ferric_split_into_feo_total(
+            melt, moles=True,
+        )
+    return kg, mol, accounts
+
+
 class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
     MAGEMin silicate phase equilibrium adapter.
@@ -1977,40 +2065,48 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 warnings=[*all_warnings, message],
                 diagnostics=result_diagnostics,
             )
+        if not (isinstance(raw, Mapping) and 'operating_point_diagnostics' in raw):
+            # MAGEMin_C's stable-system fO2 is already log10(fO2/bar),
+            # dump_function.c:127; ph is its stable phase-name list.
+            read = (
+                raw.get if isinstance(raw, Mapping)
+                else lambda key: getattr(raw, key, None)
+            )
+            phase_names = read('ph')
+            operating_point = self._fo2_operating_point(
+                fO2_log, read('fO2'),
+                phase_names is not None and any(
+                    name in self._BUFFER_CHOICES for name in phase_names
+                ),
+            )
+        else:
+            operating_point = raw['operating_point_diagnostics']
         if isinstance(raw, dict):
             buffer_warnings = raw.get('buffer_warnings') or []
             for line in buffer_warnings:
                 if line not in all_warnings:
                     all_warnings.append(line)
-            operating_point = raw.get('operating_point_diagnostics') or {}
-            if isinstance(operating_point, Mapping):
-                result_diagnostics.update(dict(operating_point))
-                solved_fO2_log = operating_point.get('solved_fO2_log')
-                if solved_fO2_log is not None:
-                    result_fO2_log = float(solved_fO2_log)
-                requested_point_non_authoritative = (
-                    bool(operating_point.get('operating_point_clamped'))
-                    or operating_point.get(
-                        'authoritative_for_requested_conditions'
-                    ) is False
-                )
-                if requested_point_non_authoritative:
-                    result_status = 'out_of_domain'
-                    result_diagnostics['backend_status'] = 'out_of_domain'
-                    result_diagnostics.setdefault(
-                        'backend_status_reason',
-                        'clamped_operating_point',
-                    )
+        result_diagnostics.update(operating_point)
+        result_fO2_log = operating_point['solved_fO2_log']
+        if operating_point['authoritative_for_requested_conditions'] is False:
+            result_status = operating_point['backend_status']
+            all_warnings.append(str(operating_point['fO2_control_notice']))
         if isinstance(raw, Mapping):
             mode_deficit = raw.get('mode_vector_mass_deficit')
             if isinstance(mode_deficit, Mapping):
                 mode_sum = float(mode_deficit['mode_sum'])
                 deficit = float(mode_deficit['deficit'])
+                # Native control failure takes precedence over incomplete Mode
+                # evidence: preserve its numerical reason for gate hold/floor.
+                # A deficit alone remains out_of_domain; record it in both cases.
+                if result_status == 'ok':
+                    result_status = 'out_of_domain'
+                    result_diagnostics.update({
+                        'backend_status': result_status,
+                        'backend_status_reason': MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
+                    })
                 result_diagnostics.update({
-                    'backend_status': 'out_of_domain',
-                    'backend_status_reason': (
-                        MAGEMIN_MODE_VECTOR_MASS_DEFICIT
-                    ),
+                    MAGEMIN_MODE_VECTOR_MASS_DEFICIT: True,
                     'magemin_mode_vector_raw_sum': mode_sum,
                     'magemin_mode_vector_deficit': deficit,
                     'magemin_mode_vector_input_components': {
@@ -2039,7 +2135,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     temperature_C=temperature_C,
                     pressure_bar=pressure_bar,
                     fO2_log=result_fO2_log,
-                    status='out_of_domain',
+                    status=result_status,
                     warnings=[*all_warnings, message],
                     diagnostics=result_diagnostics,
                 )
@@ -2103,6 +2199,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 if math.isfinite(value) and value > 0.0:
                     native_activities[formula] = value
         repair_notices: List[str] = []
+        if result_status == 'not_converged':
+            return EquilibriumResult(
+                temperature_C=temperature_C, pressure_bar=pressure_bar,
+                fO2_log=result_fO2_log, status=result_status,
+                warnings=all_warnings, diagnostics=result_diagnostics,
+            )
         (
             phases_present,
             phase_masses_kg,
@@ -2202,13 +2304,28 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics={'reason': 'invalid_input'},
             )
 
+        # An already-projected ig bulk (the composition_projected retry) is
+        # FeOt+O, not FeO/Fe2O3. Folding it again would treat buffer O as
+        # ferric oxide. The outer search folds the ledger split first, so
+        # the projection that builds this retry still gets the FeO_T peel.
+        if not projected_retry:
+            (
+                composition_kg,
+                composition_mol,
+                composition_mol_by_account,
+            ) = _liquidus_inputs_on_feo_total_iron_basis(
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+            )
+
         def sample_fraction(
             temperature_C: float,
         ) -> float:
             sample_fO2_log = (
                 fO2_log
                 if redox_state is None
-                else redox_state.log_fO2_at(float(temperature_C) + 273.15)
+                else redox_state.log_fO2_at(float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET)
             )
             result = self.equilibrate(
                 float(temperature_C),
@@ -2297,6 +2414,22 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             notice is not None
             and result.status == 'out_of_domain'
         ):
+            from simulator.composition_projection import (
+                _projected_liquidus_refusal_reason,
+            )
+
+            refusal = _projected_liquidus_refusal_reason(notice)
+            if refusal is not None:
+                diagnostics['composition_projected_notice'] = {
+                    **notice, 'reason': refusal,
+                }
+                return LiquidusSolidusResult(
+                    status='out_of_domain',
+                    warnings=tuple([*warnings_out, refusal]),
+                    samples=result.samples,
+                    iterations=result.iterations,
+                    diagnostics=diagnostics,
+                )
             projection_payload = (
                 diagnostics.get('input_composition_projection') or {}
             )
@@ -2957,7 +3090,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 call_timeout_s,
             )
         )
-        temperature_K = temperature_C + 273.15
+        temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
         pressure_GPa = self._pressure_bar_to_GPa(pressure_bar)
         pressure_kbar = self._GPa_to_kbar(pressure_GPa)
 
@@ -3324,7 +3457,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 '--Verb=1' if item == '--Verb=0' else item
                 for item in args
             ]
-            args.append('--out_matlab=1')
+        # Native oxygen potential must be read back for every solve.
+        args.append('--out_matlab=1')
         return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
     def _call_magemin_subprocess(
@@ -3347,12 +3481,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         binary echoes back is dropped — it is a control row, not a
         material phase.
 
-        The caller's absolute ``fO2_log`` is honoured by translating it
-        into MAGEMin's ``--buffer + --buffer_n`` form via
-        ``_resolve_buffer`` (O'Neill 1987 QFM calibration); the
-        substitution warning is returned alongside the parsed phase
-        block so ``equilibrate`` can surface it on the
-        ``EquilibriumResult``.
+        ``_resolve_buffer`` supplies an initial QFM offset. Native solved
+        oxygen potential determines the honour verdict; one correction of
+        an active QFM buffer removes the external-reference zero-point gap.
 
         Returns a typed mode-deficit marker when a finite mode row omits mass.
         Raises ``RuntimeError`` on a non-zero exit, a timeout, or other
@@ -3368,36 +3499,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 capture_native_activities=capture_native_activities,
             )
         )
-        solved_fO2_log: Optional[float]
-        if buffer_name == 'qfm':
-            solved_fO2_log = self._qfm_logfo2_oneill(temperature_C) + buffer_n
-        else:
-            solved_fO2_log = None
-        if solved_fO2_log is None:
-            fO2_clamped = True
-        else:
-            fO2_clamped = not math.isclose(
-                float(solved_fO2_log),
-                float(fO2_log),
-                rel_tol=0.0,
-                abs_tol=1.0e-9,
-            )
-        operating_point_diagnostics: Dict[str, Any] = {
-            'requested_fO2_log': float(fO2_log),
-            'applied_fO2_buffer': buffer_name,
-            'applied_fO2_buffer_n': float(buffer_n),
-            'solved_fO2_log': solved_fO2_log,
-            'fO2_clamped': fO2_clamped,
-            'authoritative_for_requested_conditions': not fO2_clamped,
-            'authoritative_for_solved_conditions': solved_fO2_log is not None,
-        }
-        if fO2_clamped:
-            operating_point_diagnostics.update({
-                'operating_point_clamped': True,
-                'backend_status': 'out_of_domain',
-                'backend_status_reason': 'clamped_operating_point',
-            })
-
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s
@@ -3423,41 +3524,82 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin call cancelled while waiting for subprocess slot',
                 )
             with tempfile.TemporaryDirectory() as tmpdir:
-                try:
-                    completed = subprocess.run(  # noqa: S603 - adapter-built
-                        args,
-                        cwd=tmpdir,
-                        capture_output=True,
-                        text=True,
-                        timeout=remaining_timeout_s,
-                        check=False,
-                        env=_magemin_subprocess_env(),
+                for attempt in range(2):
+                    remaining_timeout_s = self._residual_call_timeout_s(
+                        timeout_s, call_started,
                     )
-                except subprocess.TimeoutExpired as exc:
-                    raise _MAGEMinEngineCallError(
-                        type(exc).__name__, f'MAGEMin binary timed out after '
-                        f'{timeout_s:g}s',
-                        failure_disposition='environment',
-                    ) from exc
-                except (subprocess.SubprocessError, MemoryError) as exc:
-                    raise _MAGEMinEngineCallError(
-                        type(exc).__name__,
-                        f'MAGEMin binary launch failed: {exc}',
-                        failure_disposition='environment',
-                    ) from exc
-                except OSError as exc:
-                    raise _MAGEMinEngineCallError(
-                        type(exc).__name__,
-                        f'MAGEMin binary could not be executed: {exc}',
-                        failure_disposition='environment',
-                    ) from exc
-                if capture_native_activities:
+                    try:
+                        completed = subprocess.run(  # noqa: S603 - adapter-built
+                            args,
+                            cwd=tmpdir,
+                            capture_output=True,
+                            text=True,
+                            timeout=remaining_timeout_s,
+                            check=False,
+                            env=_magemin_subprocess_env(),
+                        )
+                    except subprocess.TimeoutExpired as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__, f'MAGEMin binary timed out after '
+                            f'{timeout_s:g}s',
+                            failure_disposition='environment',
+                        ) from exc
+                    except (subprocess.SubprocessError, MemoryError) as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__,
+                            f'MAGEMin binary launch failed: {exc}',
+                            failure_disposition='environment',
+                        ) from exc
+                    except OSError as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__,
+                            f'MAGEMin binary could not be executed: {exc}',
+                            failure_disposition='environment',
+                        ) from exc
                     matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
-                    matlab_text = (
-                        matlab_path.read_text()
-                        if matlab_path.exists()
-                        else ''
+                    matlab_text = matlab_path.read_text() if matlab_path.exists() else ''
+                    native_log, buffer_present = self._read_subprocess_fo2(
+                        completed.stdout or '', matlab_text, buffer_name,
                     )
+                    if (completed.returncode != 0 or attempt == 1
+                            or buffer_name != 'qfm' or not buffer_present
+                            or native_log is None
+                            or abs(native_log - fO2_log) <= _MAGEMIN_FO2_TOL_DEX):
+                        break
+                    buffer_n = _magemin_corrected_buffer_offset(
+                        float(f'{buffer_n:.6f}'), fO2_log, native_log,
+                    )
+                    buffer_warnings = (*buffer_warnings, (
+                        f'MAGEMin: native fO2_log={native_log:.7g} differs from '
+                        f'requested {fO2_log:.7g}; one QFM correction to '
+                        f'--buffer_n={buffer_n:.6f}'
+                    ))
+                    args = [
+                        f'--buffer_n={buffer_n:.6f}'
+                        if item.startswith('--buffer_n=') else item for item in args
+                    ]
+                    # Never accept a stale first-attempt dump as a readback.
+                    if matlab_path.exists():
+                        matlab_path.unlink()
+
+        operating_point_diagnostics = self._fo2_operating_point(
+            fO2_log, native_log, buffer_present,
+        )
+        operating_point_diagnostics.update({
+            'applied_fO2_buffer': buffer_name,
+            'applied_fO2_buffer_n': float(f'{buffer_n:.6f}'),
+        })
+        if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + CELSIUS_TO_KELVIN_OFFSET):
+            operating_point_diagnostics['qfm_reference_notice'] = {
+                'kind': 'out_of_certified_band', 'authority': 'extrapolated',
+                'reference': 'PySulfSat Oneill linearisation; initial offset only',
+                'temperature_K': temperature_C + CELSIUS_TO_KELVIN_OFFSET,
+                'certified_temperature_K': list(ONEILL_QFM_TEMPERATURE_RANGE_K),
+            }
+            buffer_warnings = (*buffer_warnings, (
+                'MAGEMin QFM initial-offset reference: out_of_certified_band '
+                f'at {temperature_C + CELSIUS_TO_KELVIN_OFFSET:g} K (extrapolated)'
+            ))
 
         if completed.returncode != 0:
             stderr = (completed.stderr or '').strip()
@@ -3672,7 +3814,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:
         """Convert Celsius to Kelvin and evaluate the O'Neill QFM fit."""
-        T_K = float(temperature_C) + 273.15
+        T_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         return oneill_qfm_log10_fO2_bar(T_K)
 
     def _resolve_buffer(
@@ -3687,18 +3829,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         ΔQFM idiom used elsewhere in this codebase) — see MAGEMin's
         ``examples/MAGEMin_C_single_point_with_buffer.jl`` and the
         ``pp_min_function.c`` Gibbs-energy correction
-        ``z_b.T * 0.019145 * gv.buffer_n``.  The substitution must
-        honour the caller's absolute value: this method computes
-        ``delta = fO2_log - QFM(T)`` and returns it as the buffer
-        offset so the subprocess receives the requested fO2 instead of
-        silently snapping to the named buffer.
+        ``z_b.T * 0.019145 * gv.buffer_n``. This method computes only an
+        initial offset, ``delta = fO2_log - QFM(T)``. The subprocess path
+        corrects against native readback and verifies buffer participation;
+        this external-reference estimate cannot establish an honour verdict.
 
         An explicit ``fO2_buffer`` config (one of the legacy named
         buffers ``qfm``, ``mw``, ``qif``, ``nno``, ``hm``, ``cco``)
         overrides the offset-translation path and is passed through
         with ``buffer_n=0.0`` for backwards compatibility — the
         substitution warning still names the buffer so callers can
-        spot mismatches.  Today only ``qfm`` has a calibration table
+        spot mismatches. Today only ``qfm`` has an initial-reference estimate
         here; configuring any other buffer keeps the legacy "named
         buffer only" behaviour but is flagged as a warning so the
         caller knows their absolute fO2 was NOT honoured.
@@ -3729,14 +3870,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'MAGEMin: translated absolute fO2_log={fO2_log:.4f} at '
                     f'{temperature_C:.2f} C to --buffer=qfm '
                     f'--buffer_n={buffer_n:.4f} '
-                    "(O'Neill 1987 QFM calibration)"
+                    '(PySulfSat Oneill linearisation; initial offset)'
                 )
                 return 'qfm', buffer_n, warnings_out
             warnings_out.append(
                 f'MAGEMin: configured fO2_buffer={name!r} has no offset '
                 f'calibration in this adapter; passing --buffer={name} '
                 f'with --buffer_n=0 so the absolute fO2_log={fO2_log:.4f} '
-                'is NOT honoured'
+                'requires native readback to establish honour'
             )
             return name, 0.0, warnings_out
 
@@ -3746,9 +3887,52 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             f'MAGEMin: translated absolute fO2_log={fO2_log:.4f} at '
             f'{temperature_C:.2f} C to --buffer=qfm '
             f'--buffer_n={buffer_n:.4f} '
-            "(O'Neill 1987 QFM calibration)"
+            '(PySulfSat Oneill linearisation; initial offset)'
         )
         return 'qfm', buffer_n, warnings_out
+
+    @staticmethod
+    def _fo2_operating_point(
+        requested: float, native: Any, buffer_present: bool,
+    ) -> Dict[str, Any]:
+        solved = finite_float(native)
+        delta = None if solved is None else solved - requested
+        honoured = (
+            buffer_present and delta is not None
+            and abs(delta) <= _MAGEMIN_FO2_TOL_DEX
+        )
+        diagnostics = {
+            'requested_fO2_log': requested, 'solved_fO2_log': solved,
+            'buffer_phase_present': buffer_present, 'fO2_clamped': not honoured,
+            'authoritative_for_requested_conditions': honoured,
+            'authoritative_for_solved_conditions': solved is not None and buffer_present,
+        }
+        if not honoured:
+            diagnostics.update({
+                'operating_point_clamped': True,
+                'backend_status': ('not_converged' if solved is None or not buffer_present
+                                   else 'out_of_domain'),
+                'backend_status_reason': 'engine_not_converged',
+                'backend_failure_disposition': 'numerical',
+                'fO2_control_notice': {
+                    'requested_fO2_log': requested, 'native_fO2_log': solved,
+                    'delta_log10': delta, 'buffer_phase_present': buffer_present,
+                    'reason': 'native fO2 or buffer does not honour requested controls',
+                },
+            })
+        return diagnostics
+
+    @staticmethod
+    def _read_subprocess_fo2(
+        stdout: str, matlab_text: str, buffer_name: str,
+    ) -> Tuple[Optional[float], bool]:
+        # Native solved chemical potential, never the commanded buffer offset:
+        # MAGEMin src/dump_function.c:1514, output/_matlab_output.txt.
+        match = re.search(r'^\s*log10\(fO2\)\s+(\S+)', matlab_text, re.MULTILINE)
+        native = finite_float(match[1]) if match else None
+        phase_rows = re.findall(r'^\s*Phase\s*:\s*(.*)$', stdout, re.MULTILINE)
+        present = bool(phase_rows and buffer_name in phase_rows[-1].split())
+        return native, present
 
     @staticmethod
     def _parse_subprocess_stdout(
@@ -3878,7 +4062,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     # ------------------------------------------------------------------
     #
     # This path never touches equilibrate(): it runs the binary with
-    # --Verb=1 --out_matlab=1.  The matlab dump is the bulk-echo guard only.
+    # --Verb=1 --out_matlab=1. The dump guards bulk echo and reports native fO2.
     #
     # G, S, Cp and H are one object: the pure endmember.  G is the Verb=1
     # pre-minimisation gbase (kJ per mol of the printed formula; Holland-
@@ -3955,7 +4139,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         def endmember_g_j(temperature_K_query: float) -> Tuple[float, List[str]]:
             stdout, matlab_text, notes = self._run_pure_phase_probe(
                 bulk_wt_ig=dict(spec.bulk_wt_pct),
-                temperature_C=temperature_K_query - 273.15,
+                temperature_C=temperature_K_query - CELSIUS_TO_KELVIN_OFFSET,
                 pressure_kbar=pressure_kbar,
             )
             _assert_magemin_bulk_echo(spec.bulk_wt_pct, matlab_text)
@@ -4088,6 +4272,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             raise PurePhaseAccessError(
                 'MAGEMin produced no output/_matlab_output.txt '
                 '(out_matlab=1); cannot verify the bulk echo'
+            )
+        native_log, buffer_present = self._read_subprocess_fo2(
+            completed.stdout or '', matlab_text, buffer_name,
+        )
+        # This accessor reads pre-minimisation standard-state endmember G,
+        # not an equilibrium at -9. Preserve the native control failure as
+        # a notice rather than certifying the probe's arbitrary redox input.
+        control = self._fo2_operating_point(-9.0, native_log, buffer_present)
+        buffer_warnings.append(f'MAGEMin pure-phase native fO2 readback: {control}')
+        if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + CELSIUS_TO_KELVIN_OFFSET):
+            buffer_warnings.append(
+                'out_of_certified_band: QFM initial-offset reference is '
+                f'extrapolated at {temperature_C + CELSIUS_TO_KELVIN_OFFSET:g} K; '
+                'the native endmember temperature was not clamped'
             )
         return completed.stdout or '', matlab_text, buffer_warnings
 

@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from functools import lru_cache
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 
+from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
+from simulator.accounting.formulas import resolve_species_formula
 from simulator import condensation as condensation_module
 from simulator.condensation import (
     CondensationModel,
@@ -25,15 +28,124 @@ from tests.studio_pin_support import sio_pin_values, sio_wall_report_at_temperat
 from simulator.state import EvaporationFlux, MeltState, PipeSegment
 
 
+def _dalton_partial_pa(
+    *,
+    inlet_partial_mbar: float,
+    total_mbar: float,
+    rate_kg_hr: float,
+    remaining_kg_hr: float,
+) -> float:
+    """Partial pressure after upstream capture, on the persisting carrier.
+
+    y_i,0 = p_i,0/P and r = m_remaining/m_inlet. The mass ratio is the
+    molar-flow ratio for one species. y_c = 1 - y_i,0, so
+    y_i = (y_i,0 * r) / (y_c + y_i,0 * r) and p_i = y_i * P.
+    r <= 0 leaves no vapour. mbar/mbar cancels; total_mbar * 100 is Pa.
+    """
+
+    if remaining_kg_hr <= 0.0 or rate_kg_hr <= 0.0:
+        return 0.0
+    remaining_ratio = remaining_kg_hr / rate_kg_hr
+    inlet_mole_fraction = inlet_partial_mbar / total_mbar
+    carrier_mole_fraction = 1.0 - inlet_mole_fraction
+    denominator = (
+        carrier_mole_fraction + inlet_mole_fraction * remaining_ratio
+    )
+    if denominator <= 0.0:
+        return 0.0
+    return (
+        total_mbar
+        * 100.0
+        * (inlet_mole_fraction * remaining_ratio)
+        / denominator
+    )
+
+
+def _cr_remaining_at_lab_wall_kg(result, rate_kg_hr: float, wall_index: int) -> float:
+    """Cr still flowing at wall_N.
+
+    Lab segments bind to stage 1. Captures with stage_number < 1, then
+    earlier walls on that stage, have already left the stream.
+    """
+
+    captured = 0.0
+    for identity, species_kg in result.capture_kg_by_stage_identity.items():
+        if int(identity[0]) < 1:
+            captured += float(species_kg.get("Cr", 0.0))
+    deposits = result.wall_deposit_by_segment_species
+    for index in range(1, wall_index):
+        captured += float(deposits.get(f"wall_{index}", {}).get("Cr", 0.0))
+    return max(0.0, rate_kg_hr - captured)
+
+
 @lru_cache(maxsize=None)
-def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[str, float]]:
-    return sio_wall_report_at_temperature(liner_temperature_c)
+def _report_at_wall_T(
+    liner_temperature_c: float,
+) -> tuple[dict[str, Any], dict[str, Any], float, int]:
+    rollback_sio_credit_kg: list[float] = []
+    rollback_transition_count = 0
+    original_dispatch = BuiltinCondensationRouteProvider.dispatch
+
+    def capture_rollback_credits(provider, request):
+        nonlocal rollback_transition_count
+        result = original_dispatch(provider, request)
+        rollback_accounts = [
+            account
+            for account, diagnostic in result.diagnostic.get(
+                "wall_reaction_diagnostics_by_account", {}
+            ).items()
+            if diagnostic.get("materialization_adjustment")
+            == "rollback_coupled_reaction_to_unchanged_arrival"
+        ]
+        if rollback_accounts:
+            assert result.transition is not None
+            rollback_transition_count += len(rollback_accounts)
+            sio_molar_mass_kg_per_mol = resolve_species_formula(
+                "SiO", request.account_view.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for account in rollback_accounts:
+                credited_sio_mol = float(
+                    result.transition.credits.get(account, {}).get("SiO", 0.0)
+                )
+                # Route transition credits are mol; project them to the kg
+                # reported from the wall-deposit ledger account.
+                rollback_sio_credit_kg.append(
+                    credited_sio_mol * sio_molar_mass_kg_per_mol
+                )
+        return result
+
+    with patch.object(
+        BuiltinCondensationRouteProvider,
+        "dispatch",
+        new=capture_rollback_credits,
+    ):
+        report, diagnostics = sio_wall_report_at_temperature(
+            liner_temperature_c
+        )
+    return (
+        report,
+        diagnostics,
+        sum(rollback_sio_credit_kg),
+        rollback_transition_count,
+    )
 
 
 def _sio_wall_product_deposit_kg(liner_temperature_c: float) -> float:
-    report, _ = _report_at_wall_T(liner_temperature_c)
+    report, _, rollback_sio_credit_kg, rollback_transition_count = (
+        _report_at_wall_T(liner_temperature_c)
+    )
     values = sio_pin_values(report)
-    assert values["wall_SiO_kg"] == pytest.approx(0.0)
+    # Car 1 round 3 diagnosis (docs-private/research/2026-10-28-car1/car1-r3.md):
+    # a sub-floor coupled wall reaction rolls back to unchanged arrival and
+    # credits raw SiO to the cool wall, which is physically plausible below
+    # about 850 C. Account for the SiO on the named rollback transitions.
+    assert values["wall_SiO_kg"] == pytest.approx(
+        rollback_sio_credit_kg,
+        rel=1e-9,
+        abs=1e-24,
+    )
+    if rollback_transition_count == 0:
+        assert values["wall_SiO_kg"] == pytest.approx(0.0, abs=1e-24)
     return values["sio_wall_deposit_kg"]
 
 
@@ -237,11 +349,11 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # dimensionless and an absent parcel contributes zero to the sum.
         # Reverting only _route to its pre-21f065338 version recovers the old
         # 8.428322859789999e-06 kg pin; preserving flow gives the measured value below.
-        # With t-1217 causal capture and b-850 parent-oxide alkali-dimer
-        # activity both active, the merged unavailable-MAGEMin run measures
-        # 8.42832285937e-06 kg at 1050 C.
+        # With c679673f5/85fedcb8e band-integrated capture across collector
+        # and saturation thresholds, the unavailable-MAGEMin run measures
+        # 5.12945178146e-06 kg at 1050 C.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.42832285937e-06, rel=1e-9
+            5.12945178146e-06, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
@@ -671,25 +783,27 @@ def test_wall_route_depletes_partial_pressure_after_upstream_wall_capture(
         "wall_1"
     ]["Cr"]
     assert first_wall_deposit_kg > 0.0
-    remaining_ratio = 1.0 - first_wall_deposit_kg / rate_kg_hr
-    inlet_mole_fraction = partial_pressure_mbar / 10.0
-    carrier_mole_fraction = 1.0 - inlet_mole_fraction
-    # With complete wall capture and no carrier, no gas remains: p_Cr=0.
-    # Otherwise Dalton's fraction is n_Cr/(n_Cr+n_carrier), dimensionless.
-    expected_second_partial_pa = 0.0 if remaining_ratio == 0.0 else (
-        1000.0
-        * (inlet_mole_fraction * remaining_ratio)
-        / (
-            carrier_mole_fraction
-            + inlet_mole_fraction * remaining_ratio
+    # b1113: Cr is no longer isolated to its harvester. Lab walls bind to
+    # stage 1, so the hot duct (stage_number < 1) has already captured.
+    # Dalton's fraction at a wall is the flowing mass there, not the inlet.
+    # y_i,0 = p_i,0/P, r = m_remaining/m_inlet, y_c = 1-y_i,0,
+    # p_i = y_i,0*r / (y_c + y_i,0*r) * P. r = 0 leaves p_i = 0.
+    # Pa = mbar * 100. A zero upstream capture recovers the inlet partial.
+    for wall_index in (1, 2):
+        remaining_kg_hr = _cr_remaining_at_lab_wall_kg(
+            result, rate_kg_hr, wall_index,
         )
-    )
-    assert model.wall_species_partial_pressures_pa_by_segment["wall_1"][
-        "Cr"
-    ] == pytest.approx(partial_pressure_mbar * 100.0)
-    assert model.wall_species_partial_pressures_pa_by_segment["wall_2"][
-        "Cr"
-    ] == pytest.approx(expected_second_partial_pa, rel=1.0e-6)
+        assert model.wall_species_partial_pressures_pa_by_segment[
+            f"wall_{wall_index}"
+        ]["Cr"] == pytest.approx(
+            _dalton_partial_pa(
+                inlet_partial_mbar=partial_pressure_mbar,
+                total_mbar=10.0,
+                rate_kg_hr=rate_kg_hr,
+                remaining_kg_hr=remaining_kg_hr,
+            ),
+            rel=1.0e-6,
+        )
 
 
 def test_wall_deposition_saturation_and_hot_alkali_limits() -> None:

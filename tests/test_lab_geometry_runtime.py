@@ -11,6 +11,7 @@ from simulator.accounting import AtomLedger, LedgerTransition
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.condensation import (
     CondensationModel,
     KnudsenRegimeRefusal,
@@ -26,6 +27,7 @@ from simulator.lab_geometry import (
     require_lab_pipe_length,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.overhead import OverheadGasModel
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.runner import (
     WALL_DEPOSIT_ACCOUNT,
@@ -943,6 +945,12 @@ def test_wall_deposit_report_includes_formula_only_species() -> None:
 
 
 def test_wall_deposit_report_tracks_condensation_bookings_and_labels() -> None:
+    condenser_geometry = load_config_bundle(DEFAULT_DATA_DIR).setpoints[
+        "condenser_geometry"
+    ]
+    stage_areas = OverheadGasModel(
+        condenser_geometry_config=condenser_geometry
+    ).stage_area_m2_by_stage()
     pass_through_model = CondensationModel(
         CondensationTrain.create_default(),
         vapor_pressure_data=VAPOR_PRESSURE_DATA,
@@ -957,7 +965,8 @@ def test_wall_deposit_report_tracks_condensation_bookings_and_labels() -> None:
             "SiO": 9.999999999998,
         },
         stage_area_m2_by_stage={
-            f"stage_{number}": 1.0e-4 for number in range(8)
+            **{f"stage_{number}": 1.0e-4 for number in range(8)},
+            "k_stage4b": stage_areas["k_stage4b"],
         },
         gas_temperature_C=1700.0,
     )
@@ -977,6 +986,7 @@ def test_wall_deposit_report_tracks_condensation_bookings_and_labels() -> None:
     deposit_model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"SiO": 10.0},
+        stage_area_m2_by_stage=stage_areas,
         gas_temperature_C=1700.0,
     )
     deposit_flux = EvaporationFlux(

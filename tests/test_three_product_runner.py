@@ -50,6 +50,7 @@ def test_run_returns_classification_dict():
         'glass',
         'captured_volatiles',
         'process_inventory_spent_reductant',
+        'alkali_cartridge_solid_residue',
     }
     assert canonical_buckets <= result.keys()
     assert set(result.keys()) == canonical_buckets | additive_buckets
@@ -271,7 +272,7 @@ def test_cli_rejects_nonpositive_or_nonfinite_mass(mass_kg):
         ])
 
 
-def test_default_classification_values_preserve_pre_change_digest():
+def test_default_classification_source_accounted_digest():
     result = run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
@@ -280,7 +281,10 @@ def test_default_classification_values_preserve_pre_change_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # d137: production classification now counts tapped and stage-accepted
-    # metals, with untapped metal-phase balances represented in their own
-    # source-accounted inventory field. This pins the complete runner payload.
-    assert digest == "bd3769a6a08b23046527cbc7f8c81cb064d6e786b3c4b2292e900c16dc60f58c"
+    # The condenser stack (film-temperature diffusivity, cold-stage
+    # capture of every species, e-NTU bulk temperature, and the d-344
+    # cartridge) moves the payload. The full digest is
+    # 2c1e06d28b3dc5608de3c8ac1556c454b5fe4d53bf7fa2ea325f3cf40374cafb,
+    # reproduced on this seat and on the studio gate.
+    assert digest.startswith("2c1e06d28b3d")
+    assert digest.endswith("5f3cf40374cafb")

@@ -13,7 +13,10 @@ from simulator.diagnostics import _coating_wall_deposit_selection
 import simulator.condensation as condensation_module
 from simulator.condensation import CondensationModel
 from simulator.core import CondensationTrain, EvaporationFlux, MeltState
-from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.diagnostics import (
+    WALL_STICKING_ALPHA_UNCERTIFIED_CODE,
+    wall_deposit_sticking_authority_status,
+)
 from simulator.optimize.objective import _coating_product_summary
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.study import (
@@ -252,6 +255,68 @@ def _materials_with_liner_alpha(
     return materials
 
 
+def test_fused_silica_sio_stage_and_liner_share_uncertified_proxy() -> None:
+    materials = condensation_module.MATERIALS_DATA
+    owner_map = materials["fused_silica_alpha_s_by_species"]
+    owner_entry = owner_map["SiO"]
+    assert materials["stages"][3]["alpha_s_by_species"] == owner_map
+    assert (
+        materials["liner_materials"]["fused_silica_baffles"][
+            "alpha_s_by_species"
+        ]
+        == owner_map
+    )
+
+    stage = next(
+        stage
+        for stage in CondensationTrain.create_default().stages
+        if stage.stage_number == 3
+    )
+    temperature_K = condensation_module._stage_midpoint_temperature_K(stage)
+    stage_record = condensation_module._stage_alpha_record(
+        stage,
+        "SiO",
+        T_K=temperature_K,
+    )
+    sidecar_record = condensation_module._sidecar_alpha_record(
+        "SiO",
+        T_K=temperature_K,
+    )
+
+    assert stage_record["alpha_s"] == sidecar_record["alpha_s"]
+    assert stage_record["value_ref"] == sidecar_record["value_ref"]
+    assert stage_record["source_class"] == owner_entry["source_class"]
+    assert stage_record["citation_status"] == "UNCERTIFIED"
+    assert stage_record["output_status"] == "status_bearing"
+    assert stage_record["uncertainty_flag"] == owner_entry["uncertainty_flag"]
+
+    liner_record = condensation_module._wall_alpha_record(
+        "SiO",
+        segment=SimpleNamespace(
+            name="stage_2_to_stage_3",
+            liner_material="fused_silica_baffles",
+            wall_temperature_C=stage.temp_range_C[0],
+        ),
+        T_K=temperature_K,
+    )
+    assert liner_record["alpha_s"] == stage_record["alpha_s"]
+    assert liner_record["source_class"] == owner_entry["source_class"]
+    assert liner_record["citation_status"] == "UNCERTIFIED"
+    assert liner_record["output_status"] == "status_bearing"
+    assert liner_record["uncertainty_flag"] == owner_entry["uncertainty_flag"]
+
+    route, _ = _route_wall_deposit_authority(
+        "SiO", wall_temperature_C=1700.0, stage3_route="through"
+    )
+    route_provenance = route.sticking_alpha_provenance_notice[
+        "alpha_s_provenance_by_species"
+    ]["SiO"]
+    for surface in ("stage_3", "stage_2_to_stage_3"):
+        assert route_provenance[surface]["uncertainty_flag"] == (
+            owner_entry["uncertainty_flag"]
+        )
+
+
 @pytest.mark.parametrize("temperature_K", [1200.0, 1523.15])
 @pytest.mark.parametrize("entrypoint", ["stage", "wall"])
 @pytest.mark.parametrize(
@@ -344,9 +409,12 @@ def _route_wall_deposit_authority(
     *,
     materials: dict[str, object] | None = None,
     wall_temperature_C: float = 900.0,
+    stage3_route: str = "divert",
 ) -> tuple[object, dict[str, object]]:
+    train = CondensationTrain.create_default()
+    train.collection_route["stage3_route"] = stage3_route
     model = CondensationModel(
-        CondensationTrain.create_default(),
+        train,
         wall_temperature_C=wall_temperature_C,
         materials=materials,
     )
@@ -668,7 +736,7 @@ def test_cited_fe_collector_inference_cannot_certify_wall_deposit() -> None:
     assert route.wall_deposit_by_species["Fe"] > 0.0
     assert authority["authoritative_for_deposit_mass"] is False
     # wall_temperature_C sets the interstage wall, not the condenser's stage
-    # setpoints. Stage 1 stays at the shipped 1150 C (1423.15 K), just below
+    # setpoints. Stage 1 stays at the shipped 1100 C (1373.15 K), below
     # the Tachibana band; its production-resolved Arrhenius value is flagged
     # out of domain, and transfer to this collector remains an inference.
     assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
@@ -702,8 +770,12 @@ def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
     assert extrapolated
     assert all(record["output_status"] == "status_bearing" for record in extrapolated)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
-    assert authority["uncertified_alpha_species"] == []
+    # b1113 evaluates Fe on every stage. Stage 2 is inside the cited
+    # domain and its record is status_bearing, which
+    # _uncertified_alpha_record ranks as uncertified. That outranks
+    # the out-of-domain code. Fe stays out of domain on the other stages.
+    assert authority["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert authority["uncertified_alpha_species"] == ["Fe"]
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -958,7 +1030,10 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
 
     assert second.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert cumulative["authoritative_for_deposit_mass"] is False
-    assert cumulative["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    # The later notice still carries the in-domain status-bearing stage-2
+    # record, so the fold stays uncertified. It does not become authoritative.
+    assert cumulative["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert cumulative["uncertified_alpha_species"] == ["Fe"]
     assert cumulative["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -1265,7 +1340,10 @@ def test_zero_deposit_out_of_domain_alpha_remains_non_authoritative() -> None:
 
     assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    # Same fold as the depositing route: the in-domain status-bearing
+    # stage-2 record keeps the code uncertified when nothing deposits.
+    assert authority["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert authority["uncertified_alpha_species"] == ["Fe"]
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
     assert authority["deposited_species"] == []
 

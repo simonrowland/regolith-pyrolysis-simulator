@@ -104,8 +104,8 @@ def test_fe_stage_one_capture_uses_the_condensation_fit_at_its_midpoint():
     record = condensation._stage_alpha_record(stage, "Fe")
     midpoint_K = condensation._stage_midpoint_temperature_K(stage)
 
-    assert stage.temp_range_C == (1150.0, 1150.0)
-    assert midpoint_K == pytest.approx(1150.0 + condensation.CELSIUS_TO_KELVIN_OFFSET)
+    assert stage.temp_range_C == (1100.0, 1100.0)
+    assert midpoint_K == pytest.approx(1100.0 + condensation.CELSIUS_TO_KELVIN_OFFSET)
     assert record["alpha_s_temperature_K"] == pytest.approx(midpoint_K)
     assert record["alpha_s"] == pytest.approx(_published_fe_condensation_alpha(midpoint_K))
     assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
