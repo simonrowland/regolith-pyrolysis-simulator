@@ -781,6 +781,10 @@ class EvaporationMixin:
         """
         from engines.domain_reason import OutOfDomainReason
 
+        phase_diagnostic_sequence = getattr(
+            self, "_melt_redox_liquidus_gate_diagnostic_seq", 0
+        )
+
         def phase_detail_payload(
             code: str,
             *,
@@ -789,11 +793,15 @@ class EvaporationMixin:
         ) -> dict[str, Any]:
             payload = {"code": code, **detail}
             if not isinstance(diagnostic, Mapping) or not diagnostic:
-                diagnostic = getattr(
-                    self,
-                    "_last_melt_redox_liquidus_gate_diagnostic",
-                    None,
+                current_sequence = getattr(
+                    self, "_melt_redox_liquidus_gate_diagnostic_seq", 0
                 )
+                if current_sequence > phase_diagnostic_sequence:
+                    diagnostic = getattr(
+                        self,
+                        "_last_melt_redox_liquidus_gate_diagnostic",
+                        None,
+                    )
             if isinstance(diagnostic, Mapping) and diagnostic:
                 payload["diagnostic"] = copy.deepcopy(dict(diagnostic))
             return payload
@@ -829,10 +837,6 @@ class EvaporationMixin:
                     **detail,
                 ),
             )
-
-        # The core instance is reused across cells. A resolver diagnostic is
-        # evidence for this lookup only when this call writes it.
-        self._last_melt_redox_liquidus_gate_diagnostic = {}
 
         register = getattr(
             self, '_register_freeze_gate_liquid_fraction_providers', None,
