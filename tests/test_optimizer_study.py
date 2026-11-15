@@ -7702,7 +7702,8 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert summary["wall_deposit_kg_by_segment_species"] == {}
     assert summary["resinter_threshold_kg"] is None
     assert summary["has_positive_qualified_fouling"] is None
-    assert summary["furnace_amortization_status"] == "available"
+    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+    assert summary["furnace_amortization_batch_cost_equivalents"] is None
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(
