@@ -546,23 +546,17 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
             assert "engine_composition_sensitive" in profile["flags"]
             assert profile["engine_version"] == engine_version
 
-            # The Morey-rounded input retains its separately measured
-            # nominal-outlier branch: both neighbours first liquefy at
-            # [1000, 1025] C and select their symmetric profile.
+            # The Morey-rounded input's current route has agreeing nominal
+            # and neighbour brackets, so no sensitivity correction applies.
             morey_profile = liner_corrosion._tier_b_reference_profile(
                 sampler,
                 measured["morey_rounded"][0],
                 pressure_bar=1.0,
                 literature_melting_temperature_C=1553.0,
             )
-            assert morey_profile["composition_continuity"]["status"] == "sensitive"
-            morey_sensitivity = morey_profile["engine_composition_sensitive"]
-            assert morey_sensitivity["nominal_bracket_C"] == [None, 500.0]
-            assert morey_sensitivity["neighbour_brackets_C"] == [
-                [1000.0, 1025.0],
-                [1000.0, 1025.0],
-            ]
-            assert liner_corrosion.ENGINE_COMPOSITION_SENSITIVE_FLAG in morey_profile[
+            assert morey_profile["composition_continuity"]["status"] == "passed"
+            assert "engine_composition_sensitive" not in morey_profile
+            assert liner_corrosion.ENGINE_COMPOSITION_SENSITIVE_FLAG not in morey_profile[
                 "flags"
             ]
             assert morey_profile["engine_version"] == engine_version
@@ -1115,8 +1109,244 @@ def test_tier_b_neighbour_disagreement_uses_tier_a_or_refuses():
     assert fallback_activity["tier_a_fallback"] is True
     # A 25 C safety allowance lowers the 1450 C first-liquid rating to 1425 C.
     assert fallback_activity["rating_temperature_C"] == 1425.0
-    assert fallback_activity["rating_cap_temperature_C"] is None
+    assert fallback_activity["rating_cap_temperature_C"] == 1425.0
+    assert fallback_activity["rating_cap_source"] == "pure_liner_first_liquid"
+    assert fallback_activity["onset_at_service_temperature"] is True
     assert fallback_activity["criterion_signal_at_service_temperature"] == 1.0
+
+
+@pytest.mark.parametrize(
+    ("pure_first_liquid_C", "contaminated_first_liquid_C"),
+    [
+        (None, 1500.0),
+        (1400.0, 1600.0),
+        (1500.0, 1500.0),
+        (1600.0, 1400.0),
+    ],
+)
+@pytest.mark.parametrize("margin_C", [0.0, 25.0])
+@pytest.mark.parametrize("service_offset_C", [-1.0, 0.0, 1.0])
+def test_rating_resolution_is_shared_by_tier_paths_and_recurrence(
+    monkeypatch,
+    pure_first_liquid_C,
+    contaminated_first_liquid_C,
+    margin_C,
+    service_offset_C,
+):
+    from simulator import liner_corrosion
+
+    liner = {"CaO": 50.0, "SiO2": 50.0}
+    deposits = {"Na": 0.01}
+    mixed = contaminated_interface_composition(
+        liner,
+        deposits,
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+    )["composition_wt_pct"]
+    resolution = liner_corrosion._resolve_rating_and_onset(
+        pure_first_liquid_C,
+        contaminated_first_liquid_C,
+        margin_C,
+        0.0,
+    )
+    assert resolution.rating_temperature_C is not None
+    service_temperature_C = resolution.rating_temperature_C + service_offset_C
+    review_case = (
+        pure_first_liquid_C == 1400.0
+        and contaminated_first_liquid_C == 1600.0
+        and margin_C == 25.0
+        and service_offset_C == 1.0
+    )
+    if review_case:
+        service_temperature_C = 1450.0
+        assert resolution.rating_temperature_C == 1375.0
+
+    all_oxides = set(liner) | set(mixed)
+
+    def invariant_row(composition, temperature_C):
+        bounds = {}
+        for oxide in all_oxides:
+            wt_pct = composition.get(oxide, 0.0)
+            bounds[oxide] = [max(0.0, wt_pct - 1e-8), wt_pct + 1e-8]
+        return {
+            "composition_bounds_wt_pct": bounds,
+            "first_liquid_temperature_C": temperature_C,
+        }
+
+    rows = []
+    if pure_first_liquid_C is not None:
+        rows.append(invariant_row(liner, pure_first_liquid_C))
+    rows.append(invariant_row(mixed, contaminated_first_liquid_C))
+    table = {"invariants": rows}
+
+    _first, direct, _cap_refusal = liner_corrosion._tier_a_rating_state(
+        liner,
+        mixed,
+        table,
+        margin_C=margin_C,
+        service_temperature_C=service_temperature_C,
+    )
+    expected_direct = liner_corrosion._resolve_rating_and_onset(
+        pure_first_liquid_C,
+        contaminated_first_liquid_C,
+        margin_C,
+        service_temperature_C,
+    )
+    assert direct == expected_direct
+
+    fallback = liner_corrosion._tier_a_fallback_melt_activity(
+        mixed,
+        deposits=deposits,
+        invariant_table=table,
+        pure_reference={
+            "flags": [],
+            "tier_a_first_liquid_T_C": pure_first_liquid_C,
+        },
+        literature_melting_temperature_C=None,
+        margin_C=margin_C,
+        service_temperature_C=service_temperature_C,
+        sensitivity={"status": "test"},
+    )
+    assert fallback["rating_temperature_C"] == expected_direct.rating_temperature_C
+    assert fallback["rating_cap_temperature_C"] == expected_direct.cap_temperature_C
+    assert fallback["rating_cap_source"] == expected_direct.cap_source
+    assert (
+        fallback["onset_at_service_temperature"]
+        == expected_direct.onset_at_service_temperature
+    )
+    if review_case:
+        assert fallback["rating_temperature_C"] == 1375.0
+        assert fallback["onset_at_service_temperature"] is True
+
+    bulk_low_C = 2000.0
+    tier_b_pure_C = (
+        pure_first_liquid_C
+        if pure_first_liquid_C is not None
+        else bulk_low_C
+    )
+    bracket_low_C = bulk_low_C + (
+        contaminated_first_liquid_C - tier_b_pure_C
+    )
+    bracket_high_C = bracket_low_C + 25.0
+    scan_temperatures_C = [500.0, bulk_low_C]
+    pure_reference = {
+        "scan_temperature_C": scan_temperatures_C,
+        "liquid_fraction_by_temperature_C": {
+            temperature_C: 0.0 for temperature_C in scan_temperatures_C
+        },
+        "bulk_melt_bracket_C": [bulk_low_C, bulk_low_C + 25.0],
+        "literature_melting_temperature_C": pure_first_liquid_C,
+        "composition_continuity": {"status": "passed"},
+        "flags": [],
+    }
+
+    def synthetic_contaminated_profile(
+        _sampler,
+        _composition,
+        *,
+        temperatures,
+        service_temperature_C,
+        **_kwargs,
+    ):
+        liquid = {temperature_C: 0.01 for temperature_C in temperatures}
+        liquid[bracket_high_C] = 0.01
+        excess = dict(liquid)
+        return {
+            "scan_temperature_C": list(temperatures),
+            "liquid_fraction_by_temperature_C": liquid,
+            "excess_liquid_fraction_by_temperature_C": excess,
+            "contaminated_melt_bracket_C": [bracket_low_C, bracket_high_C],
+            "service_liquid_fraction": 0.01,
+        }
+
+    class SyntheticTierBSampler:
+        def __call__(self, _composition, _temperature_C, _pressure_bar):
+            return 0.0
+
+    monkeypatch.setattr(
+        liner_corrosion,
+        "_tier_b_contaminated_profile",
+        synthetic_contaminated_profile,
+    )
+    tier_b_sampler = SyntheticTierBSampler()
+    tier_b_activity = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        mixed,
+        deposits,
+        sampler=tier_b_sampler,
+        pressure_bar=1.0,
+        margin_C=margin_C,
+        literature_melting_temperature_C=pure_first_liquid_C,
+        pure_reference=pure_reference,
+        service_temperature_C=service_temperature_C,
+    )
+    tier_b_resolution = liner_corrosion._resolve_rating_and_onset(
+        tier_b_pure_C,
+        contaminated_first_liquid_C,
+        margin_C,
+        service_temperature_C,
+    )
+    assert tier_b_activity["rating_temperature_C"] == tier_b_resolution.rating_temperature_C
+    assert tier_b_activity["rating_cap_temperature_C"] == tier_b_resolution.cap_temperature_C
+    assert tier_b_activity["rating_cap_source"] == tier_b_resolution.cap_source
+    assert (
+        tier_b_activity["onset_at_service_temperature"]
+        == tier_b_resolution.onset_at_service_temperature
+    )
+
+    tier_a_recurrence = corrosion_campaign_recurrence(
+        liner,
+        deposits,
+        {},
+        {},
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+        temperature_C=service_temperature_C,
+        pressure_bar=None,
+        margin_C=margin_C,
+        horizon=0,
+        sampler=TierAInvariantSampler(table),
+    )
+    expected_a_campaigns = (
+        [0, 0]
+        if expected_direct.onset_at_service_temperature
+        else ["> 0", "> 0"]
+    )
+    assert tier_a_recurrence["campaigns_to_runaway"] == expected_a_campaigns
+    assert tier_a_recurrence["coupled_campaigns_to_runaway"] == (
+        0 if expected_direct.onset_at_service_temperature else "> 0"
+    )
+
+    monkeypatch.setattr(
+        liner_corrosion,
+        "_tier_b_reference_profile_for_liner",
+        lambda *_args, **_kwargs: pure_reference,
+    )
+    tier_b_recurrence = corrosion_campaign_recurrence(
+        liner,
+        deposits,
+        {},
+        {},
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+        temperature_C=service_temperature_C,
+        pressure_bar=1.0,
+        margin_C=margin_C,
+        horizon=0,
+        sampler=tier_b_sampler,
+    )
+    expected_b_campaigns = (
+        [0, 0]
+        if tier_b_resolution.onset_at_service_temperature
+        else ["> 0", "> 0"]
+    )
+    assert tier_b_recurrence["campaigns_to_runaway"] == expected_b_campaigns
+    assert tier_b_recurrence["coupled_campaigns_to_runaway"] == (
+        0 if tier_b_resolution.onset_at_service_temperature else "> 0"
+    )
 
 
 def test_tier_b_reference_refuses_a_scan_that_stops_at_minor_phase_melting():
