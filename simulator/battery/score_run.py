@@ -908,9 +908,13 @@ def _score_shard_worker_error_result(
 def _initialize_score_worker(
     prepared: _PreparedScoreRun,
     predict: Callable[..., EnginePrediction] | None,
+    engine_cache_path_scope_state: tuple[bool, str | None] = (False, None),
 ) -> None:
     global _SCORE_WORKER_SETUP
     _SCORE_WORKER_SETUP = (prepared, predict)
+    from simulator.engine_cache import _set_engine_cache_path_scope_state
+
+    _set_engine_cache_path_scope_state(engine_cache_path_scope_state)
 
 
 def _score_group_shard(
@@ -1091,10 +1095,12 @@ def _score_store_to_jsonl(
         compact_static_refusals=compact_static_refusals,
     )
     from simulator.engine_cache import (
+        _engine_cache_path_scope_state,
         engine_cache_counters,
         engine_cache_runtime_identities,
     )
 
+    cache_path_scope_state = _engine_cache_path_scope_state()
     cache_counters: dict[str, dict[str, object]] | None = None
     cache_runtime_identities: dict[str, str] | None = None
     shard_failures: list[Mapping[str, object]] = []
@@ -1169,6 +1175,7 @@ def _score_store_to_jsonl(
                         initargs=(
                             prepared,
                             predict,
+                            cache_path_scope_state,
                         ),
                         mp_context=mp.get_context("spawn"),
                         timeout_seconds=None,

@@ -835,7 +835,7 @@ def _capture_engine_cache_settings_paths(
         requests.append(dict(request))
         return solve()
 
-    monkeypatch.setattr(engine_cache, "_configured_engine_cache_path", lambda: "test")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", "test")
     monkeypatch.setattr(engine_cache, "engine_cache_settings", record_projection)
     monkeypatch.setattr(engine_cache, "cached_engine_call", cached_call)
 
