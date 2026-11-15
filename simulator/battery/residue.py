@@ -4124,7 +4124,7 @@ def _predict_sossi_residue_cohort(
                 from simulator.diagnostic_helpers.binary_pot_battery import (
                     PO2_COMMANDED,
                     Po2Request,
-                    _internal_analytical_vapor_pressure_adapter,
+                    internal_analytical_residue_vapor_pressure,
                     _new_internal_analytical_core,
                 )
 
@@ -4133,7 +4133,7 @@ def _predict_sossi_residue_cohort(
                 def pressure_model(
                     composition: Mapping[str, float], log10_pO2_bar: float
                 ) -> Mapping[str, float]:
-                    response = _internal_analytical_vapor_pressure_adapter(
+                    response = internal_analytical_residue_vapor_pressure(
                         core=analytical_core,
                         temperature_C=temperature_K - 273.15,
                         pressure_bar=total_pressure_Pa / PA_PER_BAR,

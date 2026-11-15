@@ -4857,6 +4857,7 @@ def _sossi_reference(experiment_id: str):
 def _exercise_sossi_row(_tmp_path, monkeypatch) -> None:
     """Warm the scorer cache in run A and read it through the production scorer."""
 
+    from simulator import engine_cache
     from simulator.battery.enums import Engine, ExecutionState
     from simulator.battery.score import (
         _SOSSI_SOURCE_ID,
@@ -4864,7 +4865,30 @@ def _exercise_sossi_row(_tmp_path, monkeypatch) -> None:
         _sossi_residue_prediction,
     )
 
+    monkeypatch.setenv(
+        "REGOLITH_ENGINE_CACHE", str(_tmp_path / "sossi-runtime-identity.sqlite")
+    )
+    recorded_engine_opens = []
+    record_engine_open = engine_cache.record_engine_open
+
+    def record_and_capture(engine_id, backend=None):
+        identity = record_engine_open(engine_id, backend)
+        recorded_engine_opens.append((engine_id, identity))
+        return identity
+
+    monkeypatch.setattr(engine_cache, "record_engine_open", record_and_capture)
     row = _one_internal_analytical_sossi_row(monkeypatch)
+    assert any(
+        engine_id == "internal-analytical" and identity
+        for engine_id, identity in recorded_engine_opens
+    )
+    assert engine_cache.engine_cache_runtime_identities()[
+        "internal-analytical"
+    ] == next(
+        identity
+        for engine_id, identity in recorded_engine_opens
+        if engine_id == "internal-analytical" and identity
+    )
     assert "run_refusal" not in row.provenance
     raw = row.provenance["law_disclosures"]
     assert isinstance(raw, list) and raw
