@@ -188,7 +188,11 @@ def _run_reference(**kwargs: Any) -> RunReference:
     return RunReference(product_summary=product_summary, **kwargs)
 
 
-def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
+def _write_cli_physics_smoke_profile(
+    tmp_path: Path,
+    *,
+    include_coating: bool = False,
+) -> Path:
     profile = copy.deepcopy(PROFILE)
     profile["profile_id"] = "cli-physics-smoke"
     # Stay on the profile's one-hour campaign. A C0 pyrolysis start follows
@@ -198,8 +202,11 @@ def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
     # test_lunar_highland_c0_horizon_changes_extracted_metals.
     # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
     profile["run"]["allow_unmeasured_alpha_fallback"] = True
+    gates = ["furnace_temperature"]
+    if include_coating:
+        gates.append("coating")
     profile["constraints"] = {
-        "gates": ["furnace_temperature"],
+        "gates": gates,
         "furnace_T_max_C": 1800.0,
     }
     path = tmp_path / "cli-physics-smoke.yaml"
@@ -7405,6 +7412,12 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     if instrumented_env.get("PYTHONPATH"):
         pythonpath.append(instrumented_env["PYTHONPATH"])
     instrumented_env["PYTHONPATH"] = os.pathsep.join(pythonpath)
+    # The d-401 wall-supply booking is published by the coating report, so
+    # this end-to-end booking pin explicitly activates that gate.
+    cli_profile = _write_cli_physics_smoke_profile(
+        tmp_path,
+        include_coating=True,
+    )
     good = subprocess.run(
         [
             sys.executable,
@@ -7456,12 +7469,11 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     assert events_by_pid[evaluator_pids[0]].get("magemin_initialize", 0) == 1
     assert events_by_pid[evaluator_pids[0]].get("magemin_equilibrate", 0) == 48
     assert (out_dir / "pareto.json").exists()
-    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
-    # 20 C. Seed 7's liner is now about 822 C; the same unit coordinate on
-    # the old 1400-2200 C map was about 1694 C. The CrO2 saturation pressure
-    # is still refused. d-401 supplies the bounded estimate; this case falls
-    # below ledger resolution and books an authorized zero, so the candidate
-    # remains priced. Furnace amortization remains available at zero cost.
+    # The explicit coating gate publishes the CrO2 wall-saturation-pressure
+    # refusal for this one-hour C2A_continuous run. d-401 bounds its source
+    # supply below ledger resolution, books the authorized zero, and keeps
+    # the candidate priced. Furnace amortization remains available at zero
+    # cost.
     # This profile evaluates its one-hour C2A_continuous campaign. It does
     # not enter the C0 AUTO_APPLY sequence or encounter a C6 refusal. The
     # returned priced objective makes the single feasible candidate rankable.
@@ -7497,10 +7509,10 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     assert cro2["ledger_resolution_kg"] == pytest.approx(
         1000.0 * MASS_BALANCE_ABORT_PCT / 100.0
     )
-    refused = (
-        summary.get("wall_deposit_sticking_authority") or {}
-    ).get("wall_saturation_pressure_refused_species") or []
-    assert "CrO2" in list(refused)
+    authority = summary["wall_deposit_sticking_authority"]
+    assert "CrO2" in list(
+        authority.get("wall_saturation_pressure_refused_species") or []
+    )
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
     assert provenance[0]["candidate_id"] == "random-7-000000"
