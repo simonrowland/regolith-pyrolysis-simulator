@@ -32287,16 +32287,32 @@ class Migrator:
                     if isinstance(row, Mapping):
                         require_rail_if_stated(row)
             if _is_nist_janaf_table(path, doc):
-                self._lift_janaf_from_generator(work, source_id, rel, count, doc)
+                from simulator.battery.generators.janaf import generate_table
+
+                self._lift_generator_backed_compilation(
+                    work, rel, count, doc, generate_table, source_path=rel
+                )
                 return
         if _is_usgs_b1544_record(path, doc):
-            self._lift_b1544_from_generator(work, source_id, rel, count, doc)
+            from simulator.battery.generators.usgs_b1544 import generate_record
+
+            self._lift_generator_backed_compilation(
+                work, rel, count, doc, generate_record
+            )
             return
         if _is_usgs_b1452_record(path, doc):
-            self._lift_b1452_from_generator(work, source_id, rel, count, doc)
+            from simulator.battery.generators.usgs_b1452 import generate_record
+
+            self._lift_generator_backed_compilation(
+                work, rel, count, doc, generate_record
+            )
             return
         if _is_usgs_b1259_record(path, doc):
-            self._lift_b1259_from_generator(work, source_id, rel, count, doc)
+            from simulator.battery.generators.usgs_b1259 import generate_record
+
+            self._lift_generator_backed_compilation(
+                work, rel, count, doc, generate_record
+            )
             return
         if _is_usgs_b2131_record(path, doc):
             from simulator.battery.generators.usgs_b2131 import owns_record
@@ -32619,17 +32635,20 @@ class Migrator:
             ),
         )
 
-    def _lift_janaf_from_generator(
+    def _lift_generator_backed_compilation(
         self,
         work: Work,
-        source_id: str,
         rel: str,
         count: SourceCount,
         doc: Mapping[str, Any],
+        generator: Callable[..., Any],
+        source_path: str | None = None,
     ) -> None:
-        from simulator.battery.generators.janaf import generate_table
-
-        generated = generate_table(doc, source_path=rel)
+        generated = (
+            generator(doc, source_path=source_path)
+            if source_path is not None
+            else generator(doc)
+        )
         count.rows_in += 1
         for observation in generated.observations:
             work = self._register_compilation_record_asset(
@@ -32645,259 +32664,7 @@ class Migrator:
             if observation.derivation is not None and observation.derivation.inputs != (
                 read_from,
             ):
-                # Generator staging records the table path. The store requires
-                # derivation.inputs to resolve as a Work asset or observation id.
-                updates["derivation"] = replace(
-                    observation.derivation, inputs=(read_from,)
-                )
-            if updates:
-                observation = replace(observation, **updates)
-            self._ensure_experiment(
-                work_id=work.work_id,
-                experiment_id=observation.experiment_id,
-                locator=observation.locator,
-                method=State.of(MethodToken.TABULATION),
-                equipment=None,
-                observation_id=observation.observation_id,
-                source=rel,
-            )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            if observation.value.kind is ValueKind.UNAVAILABLE:
-                q_label = (
-                    observation.identity.quantity.value
-                    if observation.identity.quantity.is_value
-                    else "unknown"
-                )
-                why = observation.value.unavailable_reason or (
-                    f"{q_label} value is unavailable"
-                )
-                if str(q_label) not in why:
-                    why = f"{q_label}: {why}"
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["value"],
-                    why,
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            unmatched = unmatched_read_from_reason(
-                observation.locator, observation.read_from
-            )
-            if unmatched:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["read_from"],
-                    unmatched,
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            self._add_observation(observation, rel)
-
-    def _lift_b1544_from_generator(
-        self,
-        work: Work,
-        source_id: str,
-        rel: str,
-        count: SourceCount,
-        doc: Mapping[str, Any],
-    ) -> None:
-        from simulator.battery.generators.usgs_b1544 import generate_record
-
-        generated = generate_record(doc)
-        count.rows_in += 1
-        for observation in generated.observations:
-            work = self._register_compilation_record_asset(
-                self.result.works.get(work.work_id, work),
-                observation.locator.source_path
-                if observation.locator is not None
-                else rel,
-            )
-            read_from = choose_read_from(work, observation.locator)
-            updates: dict[str, Any] = {}
-            if read_from != observation.read_from:
-                updates["read_from"] = read_from
-            if observation.derivation is not None and observation.derivation.inputs != (
-                read_from,
-            ):
-                # Generator staging records the JSON path. The store requires
-                # derivation.inputs to resolve as a Work asset or observation id.
-                updates["derivation"] = replace(
-                    observation.derivation, inputs=(read_from,)
-                )
-            if updates:
-                observation = replace(observation, **updates)
-            self._ensure_experiment(
-                work_id=work.work_id,
-                experiment_id=observation.experiment_id,
-                locator=observation.locator,
-                method=State.of(MethodToken.TABULATION),
-                equipment=None,
-                observation_id=observation.observation_id,
-                source=rel,
-            )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            if observation.value.kind is ValueKind.UNAVAILABLE:
-                q_label = (
-                    observation.identity.quantity.value
-                    if observation.identity.quantity.is_value
-                    else "unknown"
-                )
-                why = observation.value.unavailable_reason or (
-                    f"{q_label} value is unavailable"
-                )
-                if str(q_label) not in why:
-                    why = f"{q_label}: {why}"
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["value"],
-                    why,
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            unmatched = unmatched_read_from_reason(
-                observation.locator, observation.read_from
-            )
-            if unmatched:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["read_from"],
-                    unmatched,
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            self._add_observation(observation, rel)
-
-    def _lift_b1452_from_generator(
-        self,
-        work: Work,
-        source_id: str,
-        rel: str,
-        count: SourceCount,
-        doc: Mapping[str, Any],
-    ) -> None:
-        from simulator.battery.generators.usgs_b1452 import generate_record
-
-        generated = generate_record(doc)
-        count.rows_in += 1
-        for observation in generated.observations:
-            work = self._register_compilation_record_asset(
-                self.result.works.get(work.work_id, work),
-                observation.locator.source_path
-                if observation.locator is not None
-                else rel,
-            )
-            read_from = choose_read_from(work, observation.locator)
-            updates: dict[str, Any] = {}
-            if read_from != observation.read_from:
-                updates["read_from"] = read_from
-            if observation.derivation is not None and observation.derivation.inputs != (
-                read_from,
-            ):
-                # Generator staging records the JSON path. The store requires
-                # derivation.inputs to resolve as a Work asset or observation id.
-                updates["derivation"] = replace(
-                    observation.derivation, inputs=(read_from,)
-                )
-            if updates:
-                observation = replace(observation, **updates)
-            self._ensure_experiment(
-                work_id=work.work_id,
-                experiment_id=observation.experiment_id,
-                locator=observation.locator,
-                method=State.of(MethodToken.TABULATION),
-                equipment=None,
-                observation_id=observation.observation_id,
-                source=rel,
-            )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            if observation.value.kind is ValueKind.UNAVAILABLE:
-                q_label = (
-                    observation.identity.quantity.value
-                    if observation.identity.quantity.is_value
-                    else "unknown"
-                )
-                why = observation.value.unavailable_reason or (
-                    f"{q_label} value is unavailable"
-                )
-                if str(q_label) not in why:
-                    why = f"{q_label}: {why}"
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["value"],
-                    why,
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            unmatched = unmatched_read_from_reason(
-                observation.locator, observation.read_from
-            )
-            if unmatched:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["read_from"],
-                    unmatched,
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
-            self._add_observation(observation, rel)
-
-    def _lift_b1259_from_generator(
-        self,
-        work: Work,
-        source_id: str,
-        rel: str,
-        count: SourceCount,
-        doc: Mapping[str, Any],
-    ) -> None:
-        from simulator.battery.generators.usgs_b1259 import generate_record
-
-        generated = generate_record(doc)
-        count.rows_in += 1
-        for observation in generated.observations:
-            work = self._register_compilation_record_asset(
-                self.result.works.get(work.work_id, work),
-                observation.locator.source_path
-                if observation.locator is not None
-                else rel,
-            )
-            read_from = choose_read_from(work, observation.locator)
-            updates: dict[str, Any] = {}
-            if read_from != observation.read_from:
-                updates["read_from"] = read_from
-            if observation.derivation is not None and observation.derivation.inputs != (
-                read_from,
-            ):
-                # Generator staging records the JSON path. The store requires
+                # Generator staging records the source path. The store requires
                 # derivation.inputs to resolve as a Work asset or observation id.
                 updates["derivation"] = replace(
                     observation.derivation, inputs=(read_from,)

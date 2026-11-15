@@ -12,7 +12,9 @@ _GENERATOR_SOURCE_DIRS = (
     "robie-hemingway-fisher-1978-usgs-b1452",
     "robie-waldbaum-1968-usgs-b1259",
 )
-_BASELINE_STORE_SHA256 = "406d9c40fa8724586a26151c68453e1a1ce6ea8bfe5a4b3d2381f758463bf3dc"
+_BASELINE_STORE_SHA256 = (
+    "406d9c40fa8724586a26151c68453e1a1ce6ea8bfe5a4b3d2381f758463bf3dc"
+)
 
 
 def _isolated_generator_store(root: Path, output_root: Path) -> tuple[str, int, int]:
