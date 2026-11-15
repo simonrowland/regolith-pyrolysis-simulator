@@ -3059,6 +3059,9 @@ def test_every_species_uses_the_publisher_alpha_policy(
         assert not hasattr(host, "_last_langmuir_surface_oxygen")
         surface = None
     controls = captured["controls"]
+    # Real caller contract: closure and flux see every tagged proxy and
+    # dormant zero from the same loader after constackfix's alpha union.
+    assert controls["alpha"] == _load_evaporation_alpha_by_species(legacy)
     closed = dict(controls[CONTROL_FLUX_PRESSURES_KEY])
     if "unmeasured_alpha_fallback_species" in kernel:
         assert controls["unmeasured_alpha_fallback_species"] == tuple(
