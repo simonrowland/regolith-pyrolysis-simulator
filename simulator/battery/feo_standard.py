@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from importlib import resources
+from math import isclose
 from typing import Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token
@@ -19,7 +20,7 @@ from simulator.battery.enums import (
     RefusalReason,
 )
 from simulator.battery.records import Notice, ResidualRefusal
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import GAS_CONSTANT, GAS_CONSTANT_DECIMAL
 
 
 @dataclass(frozen=True)
@@ -43,19 +44,20 @@ _OPENIMCC_DEFAULT_PACK_VERSION = "1.0.6-d066-v4"
 _OPENIMCC_DEFAULT_PACK_DIGEST = (
     "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
 )
-_OPENIMCC_REDOX_DG46_FEO_COEFFICIENTS = {
+# DG46's unique row values; dG_B..E are shared with the Fe-019 row below.
+_OPENIMCC_REDOX_DG46_FEO_ROW_VALUES = {
     "dH298_R": Decimal("-26.668958359186785"),
     "dG_A": Decimal("8.03837194242113"),
+}
+# Existing Fe-019 FeO(l) row paired with DG46 in the condensate standard check.
+_OPENIMCC_FE019_FEO_REFERENCE_ROW = {
+    "dH298_R": Decimal("-30.01"),
+    "dG_A": Decimal("6.72"),
     "dG_B": Decimal("6.588"),
     "dG_C": Decimal("-1.248"),
-    "dG_D": Decimal("0.15"),
+    "dG_D": Decimal("0.150"),
     "dG_E": Decimal("-0.007697"),
 }
-# DG46-MASSON65's provenance dG is checked against the separate MELT binding.
-_OPENIMCC_DG46_FEO_DELTA_G_COEFFICIENTS = (
-    Decimal("27778.965828"),
-    Decimal("10.961554232"),
-)
 
 
 def _source_value(sources: Sequence[str], prefix: str) -> str | None:
@@ -108,16 +110,37 @@ def _openimcc_redox_pack_feo_entry(
     return species_entry
 
 
-def _redox_pack_feo_row_refusal(
+def _redox_pack_feo_row_delta_g_coefficients(
     row: Mapping[str, object],
-) -> ResidualRefusal | None:
-    for key, expected in _OPENIMCC_REDOX_DG46_FEO_COEFFICIENTS.items():
+) -> tuple[tuple[Decimal, Decimal] | None, ResidualRefusal | None]:
+    actual_values: dict[str, Decimal] = {}
+    for key in (
+        _OPENIMCC_REDOX_DG46_FEO_ROW_VALUES.keys()
+        | _OPENIMCC_FE019_FEO_REFERENCE_ROW.keys()
+    ):
         try:
             actual = Decimal(str(row[key]))
         except (InvalidOperation, KeyError, TypeError, ValueError):
             actual = None
+        if actual is not None:
+            actual_values[key] = actual
+    for key in ("dG_B", "dG_C", "dG_D", "dG_E"):
+        actual = actual_values.get(key)
+        expected = _OPENIMCC_FE019_FEO_REFERENCE_ROW[key]
         if actual != expected:
-            return ResidualRefusal(
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_standard_delta_g_non_linear",
+                    "field": key,
+                    "expected": str(expected),
+                    "actual": None if actual is None else str(actual),
+                },
+            )
+    for key, expected in _OPENIMCC_REDOX_DG46_FEO_ROW_VALUES.items():
+        actual = actual_values.get(key)
+        if actual != expected:
+            return None, ResidualRefusal(
                 RefusalReason.METRIC_DOMAIN,
                 {
                     "reason": "openimcc_feo_redox_standard_row_mismatch",
@@ -126,7 +149,30 @@ def _redox_pack_feo_row_refusal(
                     "actual": None if actual is None else str(actual),
                 },
             )
-    return None
+    # Derive the DG46-minus-Fe-019 dG from the source rows, not the MELT text.
+    # In G(T) = -R*T*(A + B*tau + ... + E*tau**4) + R*dH298_R*1000,
+    # equal dG_B..E cancel, leaving c0=R*1000*delta(dH298_R) and
+    # c1=R*delta(dG_A) for deltaG(T)=c0-c1*T.
+    return (
+        GAS_CONSTANT_DECIMAL
+        * Decimal(1000)
+        * (
+            actual_values["dH298_R"]
+            - _OPENIMCC_FE019_FEO_REFERENCE_ROW["dH298_R"]
+        ),
+        GAS_CONSTANT_DECIMAL
+        * (
+            actual_values["dG_A"]
+            - _OPENIMCC_FE019_FEO_REFERENCE_ROW["dG_A"]
+        ),
+    ), None
+
+
+def _redox_pack_feo_row_refusal(
+    row: Mapping[str, object],
+) -> ResidualRefusal | None:
+    _delta_g_coefficients, refusal = _redox_pack_feo_row_delta_g_coefficients(row)
+    return refusal
 
 
 def _feo_standard_extrapolation_evidence(
@@ -150,6 +196,7 @@ def _openimcc_feo_standard_reference(
 ) -> tuple[
     tuple[Decimal, Decimal] | None,
     tuple[str, ...],
+    tuple[Decimal, Decimal] | None,
     ResidualRefusal | None,
 ]:
     try:
@@ -161,11 +208,13 @@ def _openimcc_feo_standard_reference(
         if redox_pack_digest is not None:
             detail["redox_pack_digest"] = redox_pack_digest
         detail["detail"] = str(exc)
-        return None, (), ResidualRefusal(RefusalReason.METRIC_DOMAIN, detail)
+        return None, (), None, ResidualRefusal(RefusalReason.METRIC_DOMAIN, detail)
 
-    row_refusal = _redox_pack_feo_row_refusal(redox_entry["row"])
+    delta_g_coefficients, row_refusal = _redox_pack_feo_row_delta_g_coefficients(
+        redox_entry["row"]
+    )
     if row_refusal is not None:
-        return None, (), row_refusal
+        return None, (), None, row_refusal
     fit_residual = redox_entry.get("fit_residual")
     raw_band = (
         fit_residual.get("temperature_range")
@@ -186,7 +235,7 @@ def _openimcc_feo_standard_reference(
         ):
             raise ValueError("FeO(l) redox range metadata is invalid")
     except (InvalidOperation, TypeError, ValueError) as exc:
-        return None, (), ResidualRefusal(
+        return None, (), None, ResidualRefusal(
             RefusalReason.METRIC_DOMAIN,
             {
                 "reason": "openimcc_feo_redox_standard_range_unavailable",
@@ -194,7 +243,7 @@ def _openimcc_feo_standard_reference(
                 "detail": str(exc),
             },
         )
-    return band, tuple(raw_flags), None
+    return band, tuple(raw_flags), delta_g_coefficients, None
 
 
 def _redox_melt_standard_refusal(
@@ -236,8 +285,9 @@ def _resolve_feo_activity_standard(
     )
     certified_band_K = None
     range_flags: tuple[str, ...] = ()
+    owner_delta_g_coefficients = None
     if redox_pack_digest is not None:
-        certified_band_K, range_flags, refusal = (
+        certified_band_K, range_flags, owner_delta_g_coefficients, refusal = (
             _openimcc_feo_standard_reference(redox_pack_digest)
         )
         if refusal is not None:
@@ -306,6 +356,7 @@ def _resolve_feo_activity_standard(
             )
 
     candidate = pack_payload.get("feo_liquid_candidate")
+    delta_g_coefficients = None
     if pack_name == "published-core" and candidate is None:
         standard_name = _FEO_ACTIVITY_CANONICAL_STANDARD
         offset_j_mol = Decimal(0)
@@ -330,20 +381,6 @@ def _resolve_feo_activity_standard(
                     "detail": detail,
                 },
             )
-        if delta_g_coefficients != _OPENIMCC_DG46_FEO_DELTA_G_COEFFICIENTS:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "openimcc_feo_standard_delta_g_mismatch",
-                    "expected_coefficients": [
-                        str(value)
-                        for value in _OPENIMCC_DG46_FEO_DELTA_G_COEFFICIENTS
-                    ],
-                    "actual_coefficients": [
-                        str(value) for value in delta_g_coefficients
-                    ],
-                },
-            )
         standard_name = "DG46-MASSON65"
         offset_j_mol = offset
 
@@ -352,12 +389,47 @@ def _resolve_feo_activity_standard(
         if refusal is not None:
             return None, refusal
 
-    if standard_name == "DG46-MASSON65" and certified_band_K is None:
-        certified_band_K, range_flags, refusal = (
-            _openimcc_feo_standard_reference(None)
-        )
+    if standard_name == "DG46-MASSON65" and owner_delta_g_coefficients is None:
+        (
+            certified_band_K,
+            range_flags,
+            owner_delta_g_coefficients,
+            refusal,
+        ) = _openimcc_feo_standard_reference(None)
         if refusal is not None:
             return None, refusal
+    if standard_name == "DG46-MASSON65":
+        assert owner_delta_g_coefficients is not None
+        assert delta_g_coefficients is not None
+        # MELT prints c0 to 6 decimal places and c1 to 9. Half of each final
+        # printed unit is the absolute float tolerance; float conversion error
+        # is smaller than either bound.
+        if not (
+            isclose(
+                float(delta_g_coefficients[0]),
+                float(owner_delta_g_coefficients[0]),
+                rel_tol=0.0,
+                abs_tol=0.5e-6,
+            )
+            and isclose(
+                float(delta_g_coefficients[1]),
+                float(owner_delta_g_coefficients[1]),
+                rel_tol=0.0,
+                abs_tol=0.5e-9,
+            )
+        ):
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_standard_delta_g_mismatch",
+                    "expected_coefficients": [
+                        str(value) for value in owner_delta_g_coefficients
+                    ],
+                    "actual_coefficients": [
+                        str(value) for value in delta_g_coefficients
+                    ],
+                },
+            )
     standard = _FeOActivityStandard(
         name=standard_name,
         offset_j_mol=offset_j_mol,
