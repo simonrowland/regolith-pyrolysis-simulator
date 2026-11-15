@@ -8681,7 +8681,10 @@ class _LoopSession:
     def __init__(self, *, complete_after: int, phase: CampaignPhase) -> None:
         self.advanced = 0
         self.complete_after = complete_after
-        self.simulator = SimpleNamespace(melt=SimpleNamespace(campaign=phase))
+        self.simulator = SimpleNamespace(
+            melt=SimpleNamespace(campaign=phase, hour=0),
+            campaign_mgr=SimpleNamespace(_lab_schedule=lambda _phase: None),
+        )
 
     def is_complete(self) -> bool:
         return self.advanced >= self.complete_after
@@ -8689,8 +8692,9 @@ class _LoopSession:
     def pending_decision(self) -> None:
         return None
 
-    def advance(self) -> SimpleNamespace:
+    def advance(self, dt_hr: float = 1.0) -> SimpleNamespace:
         self.advanced += 1
+        self.simulator.melt.hour += dt_hr
         return SimpleNamespace(campaign_summary=None)
 
 
