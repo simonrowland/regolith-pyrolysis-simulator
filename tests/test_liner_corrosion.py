@@ -1164,6 +1164,16 @@ def test_all_source_records_load_with_temperature_phases_and_locators() -> None:
     )
     assert morey_subsolidus["invariant_type"] == "subsolidus transition"
     assert morey_subsolidus["first_liquid_exclusion_reason"] == "no_liquid_phase"
+    morey_non_event = next(
+        row
+        for row in records
+        if row["observation_id"] == "morey1964_cas_c3as_1335"
+    )
+    assert morey_non_event["first_liquid_exclusion_reason"] == "not_first_liquid_transition"
+    shults_dissociation = next(
+        row for row in records if row["observation_id"] == "shults1995_ca_dissociation"
+    )
+    assert shults_dissociation["first_liquid_exclusion_reason"] == "not_first_liquid_transition"
     source_row_counts = {
         "rankin-wright-1915-ajs-cao-al2o3-sio2": 412,
         "morey-1964-usgs-pp440l-phase-equilibria": 236,
@@ -1198,14 +1208,14 @@ def test_all_source_records_load_with_temperature_phases_and_locators() -> None:
             "skipped": 365,
         },
         "morey-1964-usgs-pp440l-phase-equilibria": {
-            "consumed": 48,
-            "solid_state": 2,
+            "consumed": 49,
+            "solid_state": 1,
             "unparsed": 0,
             "skipped": 186,
         },
         "shults-1995-calcium-aluminate-thermodynamics": {
-            "consumed": 5,
-            "solid_state": 1,
+            "consumed": 6,
+            "solid_state": 0,
             "unparsed": 0,
             "skipped": 25,
         },
