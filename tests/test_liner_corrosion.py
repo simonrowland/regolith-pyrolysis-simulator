@@ -1081,9 +1081,14 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
     assert segment_state["deposit_inert_kg_by_species"] == {"Na": 1.0e-4}
     assert segment_state["deposit_reactive_kg_by_species"]["Na"] >= 1.0e-4
     # phi reaches 1-epsilon on the line from (0.001, 0) to (0.01, 1):
-    # x*=0.001+0.009*0.999=0.009991, so (1-x*)/x*=99.09008107296567.
+    # x*=0.001+0.009*0.999=0.009991, so the oxide-basis ratio is
+    # (1-x*)/x*=99.09008107296567. The exported raw-Na basis also multiplies
+    # by M(Na2O)/(2*M(Na)), the kg oxide equivalent per kg deposited Na.
+    na_to_na2o = parse_formula("Na2O").molar_mass_g_per_mol() / (
+        2.0 * parse_formula("Na").molar_mass_g_per_mol()
+    )
     assert segment_state["liner_consumed_kg_per_kg_deposit"] == pytest.approx(
-        99.09008107296567
+        99.09008107296567 * na_to_na2o
     )
     assert 1500.0 in FixtureSampler.curve_temperatures
     assert "engine_phase_closure_unverified" in segment_state["flags"]
@@ -1244,23 +1249,37 @@ def test_tier_a_dissolution_uses_the_matched_source_liquid_composition():
         "horizon_campaigns": 2,
         "porosity_fraction": 0.0,
     }
-    state = build_liner_state_segment(
-        chemistry,
-        deposits,
-        area_m2=1.0,
-        service_temperature_C=1500.0,
-        pressure_bar=None,
-        sampler=None,
-        deposit_inert_kg_by_species=deposits,
-        deposit_reactive_kg_by_species=deposits,
-    )
+    def build_state(x_star=None):
+        return build_liner_state_segment(
+            chemistry,
+            deposits,
+            area_m2=1.0,
+            service_temperature_C=1500.0,
+            pressure_bar=None,
+            sampler=None,
+            deposit_inert_kg_by_species=deposits,
+            deposit_reactive_kg_by_species=deposits,
+            x_star=x_star,
+        )
+
+    state = build_state()
 
     # The liner layer is 1 kg. 0.01 kg Na gives
     # 0.01*M(Na2O)/(2*M(Na)) = 0.013479591248860067 kg oxide, hence
-    # x*=M/(1+M) and (1-x*)/x*=1/M=74.18622579409204.
+    # x*=M/(1+M) and (1-x*)/x*=1/M=74.18622579409204 kg liner/kg oxide.
+    # Since 1 kg Na produces 1.3479591248860067 kg Na2O, this is exactly
+    # 100 kg liner/kg raw Na. With the independent x*=0.5 pin, the output is
+    # 1*M(Na2O)/(2*M(Na)) = 1.3479591248860067 kg liner/kg raw Na.
     assert state["onset"]
     assert state["liner_consumed_kg_per_kg_deposit"] == pytest.approx(
-        74.18622579409204
+        100.0
+    )
+    half_saturated = build_state(x_star=0.5)
+    na_oxide_per_na = parse_formula("Na2O").molar_mass_g_per_mol() / (
+        2.0 * parse_formula("Na").molar_mass_g_per_mol()
+    )
+    assert half_saturated["liner_consumed_kg_per_kg_deposit"] == pytest.approx(
+        na_oxide_per_na
     )
 
 

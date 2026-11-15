@@ -1762,7 +1762,21 @@ def build_liner_state_segment(
             refusals.append(exc.as_dict())
     if x_star is not None:
         try:
-            dissolution_ratio = post_onset_dissolution_ratio(x_star)
+            # x* is the oxide-equivalent deposit mass fraction, so the helper
+            # returns kg liner / kg oxide equivalent. The exported field is
+            # per kg of measured deposit species; convert bases through the
+            # same species-to-oxide owner used by interface mixing.
+            oxide_equivalent_kg = math.fsum(
+                _oxide_equivalent_kg_by_species(deposits).values()
+            )
+            raw_deposit_kg = math.fsum(deposits.values())
+            if raw_deposit_kg <= 0.0:
+                raise LinerCorrosionRefusal(
+                    "deposit_mass_missing_for_dissolution_ratio"
+                )
+            dissolution_ratio = post_onset_dissolution_ratio(x_star) * (
+                oxide_equivalent_kg / raw_deposit_kg
+            )
         except LinerCorrosionRefusal as exc:
             refusals.append(exc.as_dict())
         if dissolution_ratio is not None:
