@@ -115,6 +115,7 @@ from simulator.battery.composition import (
     unidentified_component_refusal,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
+from simulator.battery.non_observations import is_non_observation
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
@@ -33616,6 +33617,15 @@ class Migrator:
             validation.issues + tuple(self.result.registry_issues),
             validation.notices,
         )
+        self.result.queue[:] = [
+            entry
+            for entry in self.result.queue
+            if entry.observation_id not in self.result.observations
+            or not is_non_observation(
+                self.result.observations[entry.observation_id],
+                self._obs_source.get(entry.observation_id, entry.source),
+            )
+        ]
         self.result.queue_work_counts = _queue_work_counts(
             self.result.queue, self.root
         )

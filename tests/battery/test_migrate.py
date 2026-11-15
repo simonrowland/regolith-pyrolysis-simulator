@@ -2816,6 +2816,10 @@ def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> Non
         obs.identity.quantity.is_unknown and obs.value.kind is ValueKind.UNAVAILABLE
         for obs in table_rows
     )
+    queued_observation_ids = {
+        entry.observation_id for entry in migrator.result.queue
+    }
+    assert not {obs.observation_id for obs in table_rows} & queued_observation_ids
     activities = [
         obs
         for obs in observations
@@ -16023,6 +16027,116 @@ def test_queue_accounting_uses_manifest_eligibility_and_tracks_mutation(
         "fixture-unmarked": 1,
     }
     assert counts.reference_by_source == {}
+
+
+def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
+    from tests.battery import factories as F
+    from simulator.battery.records import Derivation, Value
+
+    root = _write_min_tree(tmp_path / "repo")
+    work = F.work("fixture-source")
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    known_identity = F.psat_identity("K")
+    unknown_identity = replace(
+        known_identity, quantity=State.unknown("run-condition table row")
+    )
+    context_row = replace(
+        F.observation(
+            "context-row",
+            experiment.experiment_id,
+            unknown_identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="no observable"),
+    )
+    reference_row = F.observation(
+        "reference-row",
+        experiment.experiment_id,
+        F.psat_identity("Zn"),
+        Decimal("2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-reference",
+        derivation=Derivation(
+            relation=(
+                "compilation_role engine_reference_input=true, "
+                "scoring_eligible=false"
+            ),
+            inputs=("record",),
+            parameters=(),
+            output_unit="Pa",
+        ),
+    )
+    ledger_row = F.observation(
+        "ledger-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-source",
+    )
+    known_absence = replace(
+        F.observation(
+            "known-absence",
+            experiment.experiment_id,
+            known_identity,
+            Decimal("4"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
+    )
+    sources = {
+        "context-row": "data/literature/extracts/fixture-source.yaml",
+        "reference-row": (
+            "data/literature/compilations/fixture-reference/records/row.json"
+        ),
+        "ledger-row": (
+            "data/literature/observations-v2/"
+            "species_rail_differential_ledger.yaml"
+        ),
+        "known-absence": "data/literature/extracts/fixture-source.yaml",
+    }
+    reference_manifest = (
+        root / "data/literature/compilations/fixture-reference/manifest.yaml"
+    )
+    reference_manifest.parent.mkdir(parents=True)
+    reference_manifest.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "fixture-reference",
+                "compilation_role": {"scoring_eligible": False},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    migrator = Migrator(root, aliases={}, index={})
+    migrator.result.works[work.work_id] = work
+    migrator.result.experiments[experiment.experiment_id] = experiment
+    for observation in (context_row, reference_row, ledger_row, known_absence):
+        migrator.result.observations[observation.observation_id] = observation
+        source = sources[observation.observation_id]
+        migrator._obs_source[observation.observation_id] = source
+        migrator.result.add_queue(
+            work.work_id,
+            observation.locator,
+            ["value"],
+            "fixture queue reason",
+            source=source,
+            observation_id=observation.observation_id,
+        )
+
+    migrator.finalize()
+
+    assert [entry.observation_id for entry in migrator.result.queue] == [
+        "known-absence"
+    ]
+    assert migrator.result.queue_work_counts is not None
+    assert sum(
+        migrator.result.queue_work_counts.reference_by_source.values()
+    ) == 0
 
 
 def test_migration_report_headline_is_accepted_by_scorer(tmp_path: Path) -> None:
