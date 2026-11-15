@@ -1059,6 +1059,172 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
                 for notice in record["notices"]
             )
             assert expected_notice in scored_notices
+        if expected_basis == "liquid":
+            assert not any(
+                notice.get("source") == "vaporock"
+                and notice.get("destination") == "antoine_fallback"
+                for notice in candidate.get("notices") or ()
+            )
         if expected_basis == "missing":
             assert record["phase_basis_detail"]["code"]
             assert record["phase_basis_detail"]["diagnostic"]
+
+
+def test_internal_analytical_timeout_kills_magemin_descendants(
+    monkeypatch,
+    request,
+    tmp_path: Path,
+) -> None:
+    import os
+    import signal
+    import time
+    from concurrent.futures import ThreadPoolExecutor
+
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    parent_core = _new_internal_analytical_core()
+    parent_magemin = _magemin_gate_backend(parent_core)
+    if (
+        parent_magemin is None
+        or not parent_magemin.is_available()
+        or parent_magemin._bridge != "subprocess"
+    ):
+        pytest.skip("MAGEMin subprocess backend unavailable in the parent")
+    request.addfinalizer(parent_magemin.close)
+
+    monkeypatch.delenv(
+        "REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP", raising=False
+    )
+    trace_path = tmp_path / "magemin-processes.jsonl"
+    sitecustomize_path = tmp_path / "sitecustomize.py"
+    sitecustomize_path.write_text(
+        "\n".join(
+            (
+                "import json",
+                "import os",
+                "import signal",
+                "import subprocess",
+                "_trace = os.environ.get('D207_MAGEMIN_PROCESS_TRACE')",
+                "if _trace:",
+                "    _popen = subprocess.Popen",
+                "    class _TraceMageminPopen(_popen):",
+                "        def __init__(self, args, *positional, **keywords):",
+                "            super().__init__(args, *positional, **keywords)",
+                "            command = (args[0] if isinstance(args, (tuple, list)) "
+                "else args)",
+                "            if 'magemin' not in os.path.basename("
+                "os.fsdecode(command)).lower():",
+                "                return",
+                "            os.kill(self.pid, signal.SIGSTOP)",
+                "            event = {",
+                "                'launcher_pid': os.getpid(),",
+                "                'launcher_pgid': os.getpgrp(),",
+                "                'binary_pid': self.pid,",
+                "                'binary_pgid': os.getpgid(self.pid),",
+                "            }",
+                "            descriptor = os.open(",
+                "                _trace, os.O_CREAT | os.O_APPEND | os.O_WRONLY, 0o600",
+                "            )",
+                "            try:",
+                "                os.write(descriptor, (json.dumps(event) + '\\n').encode())",
+                "            finally:",
+                "                os.close(descriptor)",
+                "    subprocess.Popen = _TraceMageminPopen",
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    old_pythonpath = os.environ.get("PYTHONPATH")
+    pythonpath = [str(tmp_path)]
+    if old_pythonpath:
+        pythonpath.append(old_pythonpath)
+    monkeypatch.setenv("PYTHONPATH", os.pathsep.join(pythonpath))
+    monkeypatch.setenv("D207_MAGEMIN_PROCESS_TRACE", str(trace_path))
+
+    worker = battery._IsolatedCellWorker("internal-analytical")
+    cell_pid = None
+    nested_events = []
+    future = None
+    executor = ThreadPoolExecutor(max_workers=1)
+
+    def read_events():
+        if not trace_path.exists():
+            return []
+        return [
+            json.loads(line)
+            for line in trace_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+
+    try:
+        future = executor.submit(
+            worker.request,
+            {
+                "pot_id": "d207-magemin-timeout",
+                "why": "real isolated-cell MAGEMin descendant cleanup",
+                "composition_wt_pct": {"CaO": 48.28, "SiO2": 51.72},
+                "temperature_K": 1933.0,
+                "engine": "internal-analytical",
+                "po2": {"mode": PO2_COMMANDED, "po2_bar": 1.0e-9},
+                "timeout_s": 120.0,
+            },
+            timeout_s=120.0,
+        )
+        startup_deadline = time.monotonic() + 60.0
+        while time.monotonic() < startup_deadline:
+            process = worker._worker.process
+            if process is not None and process.pid is not None:
+                cell_pid = int(process.pid)
+                break
+            if future.done():
+                future.result()
+            time.sleep(0.02)
+        assert cell_pid is not None, "isolated internal-analytical cell did not start"
+
+        magemin_deadline = time.monotonic() + 90.0
+        while time.monotonic() < magemin_deadline:
+            nested_events = read_events()
+            if nested_events:
+                break
+            if future.done():
+                future.result()
+            time.sleep(0.02)
+        assert nested_events, "isolated cell did not launch the MAGEMin binary"
+        event = nested_events[0]
+        assert event["launcher_pid"] != cell_pid
+        assert event["launcher_pgid"] == cell_pid
+        assert event["binary_pgid"] == cell_pid
+
+        os.kill(cell_pid, signal.SIGPROF)
+        with pytest.raises(battery._IsolatedCellWorkerFailure) as raised:
+            future.result(timeout=45.0)
+        assert raised.value.timed_out is True
+        worker.close()
+
+        for pid in (event["launcher_pid"], event["binary_pid"]):
+            gone_deadline = time.monotonic() + 5.0
+            while time.monotonic() < gone_deadline:
+                try:
+                    os.kill(pid, 0)
+                except ProcessLookupError:
+                    break
+                time.sleep(0.02)
+            else:
+                pytest.fail(f"MAGEMin descendant {pid} survived cell timeout")
+    finally:
+        process_groups = {int(cell_pid)} if cell_pid is not None else set()
+        for event in read_events():
+            process_groups.add(int(event["launcher_pgid"]))
+        for process_group in process_groups:
+            try:
+                os.killpg(process_group, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        if future is not None:
+            try:
+                future.result(timeout=45.0)
+            except BaseException:
+                pass
+        worker.close()
+        executor.shutdown(wait=True)
