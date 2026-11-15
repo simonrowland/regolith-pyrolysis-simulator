@@ -4617,9 +4617,10 @@ class _IsolatedCellWorker:
             ),
             call_timeout_s=_ENGINE_OUTER_TIMEOUT_S.get(self.engine, 30.0) + 2.0,
             diagnostic_signal=signal.SIGCONT,
-            # ThermoEngine cold start measured 43.99s here; only it needs this
-            # separate READY budget and child-capable worker.
-            daemon=self.engine != "thermoengine",
+            # InternalAnalytical resolves vapour phase through a nested
+            # MAGEMin worker pool; ThermoEngine needs child processes for its
+            # adapter. Neither isolated-cell worker can be daemonic.
+            daemon=self.engine not in {"internal-analytical", "thermoengine"},
         )
 
     @property
