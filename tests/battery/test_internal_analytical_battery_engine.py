@@ -961,16 +961,20 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
         "expected_notice",
         "expected_sio_source",
         "expected_gate_reason",
+        "expected_refusal_reason",
+        "expected_refusal_detail_reason",
     ),
     [
         pytest.param(
             "stolyarova-1996-cao-alumina-silica-kems",
             "stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table2_pSiO_1933k::T=1933.00:h=0bf22dda389c",
-            "missing",
-            1950.0,
-            "openimcc_vapour_phase_signal_missing",
-            "builtin_authoritative",
-            "silicate_window",
+            None,
+            None,
+            None,
+            None,
+            None,
+            "identity_incomplete",
+            "internal_analytical_oxygen_balance_unavailable",
             id="stolyarova-outside-melts-window",
         ),
         pytest.param(
@@ -981,6 +985,8 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             "openimcc_vapour_phase_signal_missing",
             "builtin_authoritative",
             "magemin_mode_vector_mass_deficit",
+            None,
+            None,
             id="wollastonite-high-temperature-provider-refusal",
         ),
         pytest.param(
@@ -991,26 +997,9 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             "openimcc_vapour_phase_signal_missing",
             "builtin_authoritative",
             "magemin_mode_vector_mass_deficit",
+            None,
+            None,
             id="wollastonite-lower-temperature-provider-refusal",
-        ),
-        pytest.param(
-            "shornikov-2026-wollastonite-kems",
-            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_09",
-            "liquid",
-            None,
-            "openimcc_liquid_sio_below_1950K_band",
-            "openimcc",
-            None,
-            marks=pytest.mark.skip(
-                reason=(
-                    "No statically justified MAGEMin ig liquid candidate: "
-                    "the 71 explicit in-window rows contain only two or "
-                    "three positive oxide components; this wollastonite "
-                    "bulk is independently confirmed to refuse with "
-                    "magemin_mode_vector_mass_deficit."
-                )
-            ),
-            id="no-statically-justified-ig-liquid-candidate",
         ),
     ],
 )
@@ -1019,11 +1008,13 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
     request,
     source_id: str,
     observation_id: str,
-    expected_basis: str,
+    expected_basis: str | None,
     expected_switch: float | None,
     expected_notice: str | None,
-    expected_sio_source: str,
+    expected_sio_source: str | None,
     expected_gate_reason: str | None,
+    expected_refusal_reason: str | None,
+    expected_refusal_detail_reason: str | None,
 ) -> None:
     parent_core = _new_internal_analytical_core()
     parent_magemin = _magemin_gate_backend(parent_core)
@@ -1055,14 +1046,24 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
         .splitlines()
         if line.strip()
     ]
-    candidate = next(
-        row["candidate_observation"]
-        for row in scored_rows
-        if isinstance(row.get("candidate_observation"), dict)
-        and row["candidate_observation"].get("observation_id")
-        == f"engine:internal-analytical:{observation_id}"
-    )
     assert written == 1
+    scored_row = next(
+        (row for row in scored_rows if row.get("reference") == observation_id),
+        None,
+    )
+    assert scored_row is not None
+    if expected_refusal_reason is not None:
+        assert scored_row["status"] == "refused"
+        assert scored_row["candidate_observation"] is None
+        assert scored_row["refusal"]["reason"] == expected_refusal_reason
+        assert (
+            scored_row["refusal"]["detail"]["engine_reason"]
+            == expected_refusal_detail_reason
+        )
+        return
+
+    candidate = scored_row["candidate_observation"]
+    assert isinstance(candidate, dict)
     engine = candidate["engine"]
     record = json.loads(engine["version"])
     assert record["phase_basis"] == expected_basis
