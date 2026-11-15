@@ -41,9 +41,10 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # sha 3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0
 # dex -0.013180332034779389
 # The offer frame is a_D * f from the Darken & Gurry factor.
-# The numeric pin is green; the digest captures the current JANAF and d-333 notices.
+# The byte pin includes the active OpenIMCC redox-pack identity and current
+# JANAF/d-333 lineage. Updating the pack requires updating this digest.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "0fff59993ae0152972c7b42731fe2cbc82cbfe5eee25b06bdf1b7f497085a658"
+    "db630fbbbf4b810f60a09b2e37ee4e9c5be53fc4ff2cd94fb0df4f195cb7cf3a"
 )
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10531292782444457")
 
