@@ -36,6 +36,7 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.residue import _initial_oxide_wt_percent
+from simulator.battery.residue_cohorts import richter_2007_table1_sample_inputs
 from simulator.battery.score import (
     QUANTITY_METRIC,
     compile_residual,
@@ -280,7 +281,7 @@ def test_finalize_never_promotes_untyped_observation_map_to_initial(
 ) -> None:
     source = LITERATURE / "extracts" / "kems-010-richter-2007.yaml"
     original = load_yaml(source)
-    enriched = migrate_module.Migrator._richter_table1_sample_inputs(original)
+    enriched = richter_2007_table1_sample_inputs(original)
     experiment = next(
         deepcopy(item)
         for item in enriched["experiments"]
@@ -572,7 +573,7 @@ def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
         ],
     }
 
-    migrated = Migrator._richter_table1_sample_inputs(document)
+    migrated = richter_2007_table1_sample_inputs(document)
     experiment = migrated["experiments"][0]
     sample_mass = experiment["sample"]["mass_kg"]["state"]["value"]["point"]
     exposed_area = experiment["apparatus"]["geometry"]["exposed_area_m2"]["state"]["value"]["point"]
