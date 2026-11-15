@@ -13261,6 +13261,13 @@ def _yield_point_admission(
 def uncertainty_for(raw: object) -> Uncertainty:
     if raw is None or raw == "":
         return Uncertainty(kind=UncertaintyKind.NONE)
+    if (
+        isinstance(raw, Mapping)
+        and raw.get("kind") == UncertaintyKind.DERIVED.value
+    ):
+        # Keep the existing typed uncertainty shape intact when an extract
+        # carries a derived comparison band instead of author-printed prose.
+        return _uncertainty_from_plain(raw)
     if isinstance(raw, (str, Mapping)):
         return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=raw)
     return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=str(raw))

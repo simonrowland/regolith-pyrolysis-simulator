@@ -3832,6 +3832,10 @@ _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
+_TOTAL_IRON_BASIS_RELATION = "total_iron_basis"
+_SOLID_WUSTITE_REFERENCE_UNGROUNDED = (
+    "solid_wustite_reference_conversion_not_grounded"
+)
 _DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
 # Ruled Darken & Gurry iron–liquid-oxide saturation, Tables III A/B, at the
 # three Table III B temperatures. These are the owner's anchors. A linear fit
@@ -4590,6 +4594,35 @@ def fusion_comparison_reference(
         return iron_saturated
 
     identity = reference.identity
+    if (
+        reference.admission.status is AdmissionStatus.ADMITTED
+        and isinstance(identity, Identity)
+        and quantity_token(identity)
+        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+    ):
+        standard = identity.reference_state.value
+        if (
+            standard.endmember.formula
+            in {_FEO_WUSTITE_FORMULA, "Fe0.947O"}
+            and phase_token(standard.endmember) is Phase.CR
+        ):
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(quantity_token(identity),),
+                reason=_SOLID_WUSTITE_REFERENCE_UNGROUNDED,
+                origin=reference.observation_id,
+                band=(
+                    "solid wüstite to stoichiometric FeO requires a sourced "
+                    "stoichiometry correction and solid/liquid standard-state term"
+                ),
+            )
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (notice,)),
+            )
     if (
         reference.admission.status is not AdmissionStatus.ADMITTED
         or not isinstance(identity, Identity)
@@ -6395,6 +6428,80 @@ def _is_standard_pressure_ambiguity_uncertainty(
     )
 
 
+def _total_iron_basis_band(
+    quantity: Quantity,
+    uncertainty: Uncertainty,
+    source_observation: Observation | None,
+) -> _PrintedBandResolution:
+    derivation = uncertainty.derivation
+    if (
+        uncertainty.kind is not UncertaintyKind.DERIVED
+        or derivation is None
+        or derivation.relation != _TOTAL_IRON_BASIS_RELATION
+    ):
+        return _PrintedBandResolution()
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_quantity_unmapped"}
+        )
+    if source_observation is None:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_source_observation_missing"}
+        )
+    located = (source_observation.point_conditions or {}).get("composition")
+    composition = (
+        located.state.value
+        if isinstance(located, Located) and located.state.is_value
+        else None
+    )
+    if (
+        not isinstance(composition, Composition)
+        or composition.amount_basis is not AmountBasis.MOLE_FRACTION
+    ):
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_mole_composition_missing"}
+        )
+    components = dict(composition.components)
+    feo = components.get("FeO", Decimal(0))
+    fe2o3 = components.get("Fe2O3", Decimal(0))
+    total_iron = feo + 2 * fe2o3
+    if (
+        not feo.is_finite()
+        or not fe2o3.is_finite()
+        or feo <= 0
+        or total_iron <= 0
+    ):
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_ferric_split_invalid"}
+        )
+
+    # FetO counts all Fe as FeO. On the source mole-fraction oxide basis,
+    # FeO contributes one ferrous Fe per formula unit and Fe2O3 contributes
+    # two ferric Fe. Thus f_Fe2+ = x_FeO/(x_FeO + 2*x_Fe2O3). The largest
+    # log10 activity shift hidden by total-iron reporting is |log10(f_Fe2+)|;
+    # applying it symmetrically gives the conservative per-row half-width.
+    fe2plus_fraction = feo / total_iron
+    width_dex = abs(fe2plus_fraction.log10())
+    band = DecisionBand(
+        width_dex,
+        "dimensionless",
+        "total_iron_basis: source FeO/Fe2O3 ferric split bounds hidden Fe3+",
+        band_basis="derived_bound",
+    )
+    notice = Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(quantity,),
+        reason=(
+            "total_iron_basis: FetO counts total Fe as FeO; the score band "
+            f"uses source f_Fe2+={fe2plus_fraction}"
+        ),
+        origin=source_observation.observation_id,
+        band=f"{width_dex} dex",
+        authority=Authority.DERIVED,
+    )
+    return _PrintedBandResolution(band=band, notice=notice)
+
+
 def _printed_uncertainty_band(
     quantity: Quantity,
     uncertainty: Uncertainty | None,
@@ -6406,6 +6513,15 @@ def _printed_uncertainty_band(
 ) -> _PrintedBandResolution:
     if uncertainty is None:
         return _PrintedBandResolution()
+    total_iron = _total_iron_basis_band(
+        quantity, uncertainty, source_observation
+    )
+    if (
+        uncertainty.kind is UncertaintyKind.DERIVED
+        and uncertainty.derivation is not None
+        and uncertainty.derivation.relation == _TOTAL_IRON_BASIS_RELATION
+    ):
+        return total_iron
     if _is_standard_pressure_ambiguity_uncertainty(uncertainty):
         width = uncertainty.value
         if (

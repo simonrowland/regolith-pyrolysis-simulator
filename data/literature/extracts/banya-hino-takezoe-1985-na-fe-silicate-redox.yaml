@@ -2671,6 +2671,13 @@ species:
             equation: '2'
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id027
         page: 2
         pdf_page_index: 1
@@ -2686,14 +2693,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -2740,7 +2747,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.452'
         a_FetO_as_printed: '0.452'
         Fe3_over_Fe2_as_printed: '0.044'
@@ -2780,6 +2787,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id028
         page: 2
         pdf_page_index: 1
@@ -2795,14 +2809,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -2849,7 +2863,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.450'
         a_FetO_as_printed: '0.450'
         Fe3_over_Fe2_as_printed: '0.066'
@@ -2889,6 +2903,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id029
         page: 2
         pdf_page_index: 1
@@ -2904,14 +2925,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -2958,7 +2979,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.449'
         a_FetO_as_printed: '0.449'
         Fe3_over_Fe2_as_printed: '0.115'
@@ -2998,6 +3019,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id030
         page: 2
         pdf_page_index: 1
@@ -3013,14 +3041,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3067,7 +3095,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.450'
         a_FetO_as_printed: '0.450'
         Fe3_over_Fe2_as_printed: '0.120'
@@ -3107,6 +3135,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id031
         page: 2
         pdf_page_index: 1
@@ -3122,14 +3157,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3176,7 +3211,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.448'
         a_FetO_as_printed: '0.448'
         Fe3_over_Fe2_as_printed: '0.089'
@@ -3216,6 +3251,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id032
         page: 2
         pdf_page_index: 1
@@ -3231,14 +3273,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3285,7 +3327,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.551'
         a_FetO_as_printed: '0.551'
         Fe3_over_Fe2_as_printed: '0.065'
@@ -3325,6 +3367,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id033
         page: 2
         pdf_page_index: 1
@@ -3340,14 +3389,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3394,7 +3443,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.550'
         a_FetO_as_printed: '0.550'
         Fe3_over_Fe2_as_printed: '0.152'
@@ -3434,6 +3483,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id034
         page: 2
         pdf_page_index: 1
@@ -3449,14 +3505,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3503,7 +3559,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.551'
         a_FetO_as_printed: '0.551'
         Fe3_over_Fe2_as_printed: '0.014'
@@ -3543,6 +3599,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id035
         page: 2
         pdf_page_index: 1
@@ -3558,14 +3621,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3612,7 +3675,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.550'
         a_FetO_as_printed: '0.550'
         Fe3_over_Fe2_as_printed: '0.158'
@@ -3652,6 +3715,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id036
         page: 2
         pdf_page_index: 1
@@ -3667,14 +3737,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3721,7 +3791,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.551'
         a_FetO_as_printed: '0.551'
         Fe3_over_Fe2_as_printed: '0.059'
@@ -3761,6 +3831,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id037
         page: 2
         pdf_page_index: 1
@@ -3776,14 +3853,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3830,7 +3907,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.653'
         a_FetO_as_printed: '0.653'
         Fe3_over_Fe2_as_printed: '0.118'
@@ -3870,6 +3947,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id038
         page: 2
         pdf_page_index: 1
@@ -3885,14 +3969,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -3939,7 +4023,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.654'
         a_FetO_as_printed: '0.654'
         Fe3_over_Fe2_as_printed: '0.048'
@@ -3979,6 +4063,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id039
         page: 2
         pdf_page_index: 1
@@ -3994,14 +4085,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -4048,7 +4139,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.650'
         a_FetO_as_printed: '0.650'
         Fe3_over_Fe2_as_printed: '0.206'
@@ -4088,6 +4179,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id040
         page: 2
         pdf_page_index: 1
@@ -4103,14 +4201,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -4157,7 +4255,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.649'
         a_FetO_as_printed: '0.649'
         Fe3_over_Fe2_as_printed: '0.052'
@@ -4197,6 +4295,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id041
         page: 2
         pdf_page_index: 1
@@ -4212,14 +4317,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -4266,7 +4371,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.647'
         a_FetO_as_printed: '0.647'
         Fe3_over_Fe2_as_printed: '0.052'
@@ -4306,6 +4411,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id042
         page: 2
         pdf_page_index: 1
@@ -4321,14 +4433,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -4375,7 +4487,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.648'
         a_FetO_as_printed: '0.648'
         Fe3_over_Fe2_as_printed: '0.097'
@@ -4415,6 +4527,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id043
         page: 2
         pdf_page_index: 1
@@ -4430,14 +4549,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -4484,7 +4603,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.702'
         a_FetO_as_printed: '0.702'
         Fe3_over_Fe2_as_printed: '0.112'
@@ -4524,6 +4643,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id044
         page: 2
         pdf_page_index: 1
@@ -4539,14 +4665,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -4593,7 +4719,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.698'
         a_FetO_as_printed: '0.698'
         Fe3_over_Fe2_as_printed: '0.068'
@@ -4633,6 +4759,13 @@ species:
         method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id045
         page: 2
         pdf_page_index: 1
@@ -4648,14 +4781,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: FeO
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: FeO
         inferred: false
         note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
           is kept distinct from ferrous FeO.
@@ -4702,7 +4835,7 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
-        component: FetO
+        component: FeO
         activity: '0.696'
         a_FetO_as_printed: '0.696'
         Fe3_over_Fe2_as_printed: '0.108'

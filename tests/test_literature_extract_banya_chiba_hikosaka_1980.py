@@ -56,7 +56,7 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     assert by_id["bch80_t1_c_b_1_valence_ratio"]["values"]["value"] == 0.107
     standard = by_id["bch80_t1_c_b_1_activity"]["standard_state"]
     assert standard["inferred"] is False
-    assert standard["state"]["value"]["endmember"]["formula"] == "Fe_tO"
+    assert standard["state"]["value"]["endmember"]["formula"] == "FeO"
     assert "pure liquid FetO" in standard["note"]
     assert "in equilibrium with solid iron" in standard["note"]
     assert standard["locator"]["page"] == 2
@@ -115,6 +115,9 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
         migrated_t1.point_conditions["composition"].state.value.as_map()
         == expected_composition.as_map()
     )
+    assert migrated_t1.identity.species.formula == "FeO"
+    assert migrated_t1.identity.reference_state.value.endmember.formula == "FeO"
+    assert migrated_t1.uncertainty.derivation.relation == "total_iron_basis"
 
     gas_ratio = result.experiments[
         migrated_t1.experiment_id
