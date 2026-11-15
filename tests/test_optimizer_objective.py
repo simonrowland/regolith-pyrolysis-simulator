@@ -13598,6 +13598,8 @@ def _d424_real_catalog():
 def test_d424_every_source_reaction_carrier_uses_the_existing_supply_owner(
     _d424_real_catalog, temperature_K, oxygen_bar,
 ) -> None:
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
     catalog = _d424_real_catalog
     source_species = {
         species: compiled
@@ -13607,6 +13609,25 @@ def test_d424_every_source_reaction_carrier_uses_the_existing_supply_owner(
     }
     assert {"Na", "K", "Mg", "SiO", "Al", "Ca", "Ti", "Cr"} <= set(source_species)
     outcomes = {}
+    computable = set()
+    refused = set()
+    # Catalog admission/evaluation owns which source reactions can supply
+    # an activity-1 pressure. A source_reaction_id alone is not a pressure
+    # law (d-424); do not maintain a second hand-written species allowlist.
+    for species in source_species:
+        try:
+            evaluator = catalog.evaluator_for_hot_train(species)
+            evaluator.evaluate(
+                temperature_K, source_activity=1.0,
+                pO2_bar=oxygen_bar if oxygen_bar is not None else evaluator.pO2_reference_bar,
+            )
+        except (CatalogCompileError, ValueError):
+            refused.add(species)
+        else:
+            computable.add(species)
+    assert computable | refused == set(source_species)
+    assert not computable & refused
+    print(f"D424_CATALOG computable={sorted(computable)} refused={sorted(refused)}")
     for species, compiled in source_species.items():
         snapshot = SimpleNamespace(
             hour=1, duration_h=1.0, temperature_C=temperature_K - physics_module.CELSIUS_TO_KELVIN_OFFSET,
@@ -13620,8 +13641,11 @@ def test_d424_every_source_reaction_carrier_uses_the_existing_supply_owner(
         )
         interval = _classify_wall_supply_interval(snapshot, species, catalog)
         evaluator = compiled.evaluator
-        assert evaluator is not None, species
-        if oxygen_bar is None and evaluator.pO2_exponent != 0.0:
+        if species in refused:
+            assert interval.kind == "unavailable", (species, interval)
+            assert interval.evidence == "no_flux_law_and_no_psat", (species, interval)
+            assert interval.rate_kg_hr is None, (species, interval)
+        elif oxygen_bar is None and evaluator.pO2_exponent != 0.0:
             assert interval.kind == "unavailable", (species, interval)
             assert interval.evidence == "missing_recorded_pO2", (species, interval)
         else:
@@ -13630,4 +13654,7 @@ def test_d424_every_source_reaction_carrier_uses_the_existing_supply_owner(
             assert math.isfinite(interval.rate_kg_hr) and interval.rate_kg_hr >= 0.0
         outcomes[species] = interval.kind
     if oxygen_bar is not None:
-        assert set(outcomes.values()) == {"supply_interval_upper_bound"}, outcomes
+        assert {species for species, kind in outcomes.items()
+                if kind == "supply_interval_upper_bound"} == computable
+        assert {species for species, kind in outcomes.items()
+                if kind == "unavailable"} == refused
