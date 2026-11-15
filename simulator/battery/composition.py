@@ -496,6 +496,12 @@ class ElementMassFractionRedox:
     charge_mass_g_per_100g: Decimal | None = None
 
 
+@dataclass(frozen=True)
+class _ElementWtOxideProjection:
+    components: tuple[tuple[str, Decimal], ...]
+    oxygen_closure_residual_wt_percent: Decimal | None
+
+
 def canonical_element_symbol(name: str) -> str:
     """Map a printed total-iron label onto Fe. Other symbols stay as printed."""
 
@@ -674,6 +680,98 @@ def _element_wt_percent_to_oxide_moles(
         oxygen_demand += cation_moles * Decimal(valence) / Decimal(2)
         cation_moles_by_element[element] = cation_moles
     return formula_moles, oxygen_demand, cation_moles_by_element
+
+
+def _element_wt_percent_stoichiometric_oxide_projection(
+    elements: Mapping[str, object],
+    *,
+    valence_by_element: Mapping[str, int],
+    retained_components: Sequence[str] = (),
+) -> _ElementWtOxideProjection:
+    """Project elemental wt% to oxide mole fractions with an O closure check.
+
+    For each cation, ``n_E = w_E / M_E`` and a valence ``z+`` gives the
+    smallest neutral oxide ``E_(2/g)O_(z/g)``, where ``g = gcd(z, 2)``.
+    Thus Si4+ -> SiO2, Fe3+ -> Fe2O3, Mg2+ -> MgO and Na+ -> Na2O.
+    Formula-unit moles are ``n_E / (2/g)``; oxygen demand is ``n_E*z/2``.
+    Retained components such as Cl, CO2 and H2O remain their own formula
+    units. The residual is measured O wt% minus oxygen in these oxides and
+    retained compounds. Measured O never enters the component moles or their
+    normalization, and Cl contributes no oxygen correction.
+
+    Unit check: wt% is g per 100 g, so ``w_E/M_E`` and oxygen demand are
+    mol per 100 g; multiplying the residual oxygen moles by ``M_O`` returns
+    wt% on that same 100 g basis. Sanity: 28.085 g Si is 1 mol Si, so SiO2
+    requires 2 mol O = 31.998 g; measured O of 31.998 g gives zero residual.
+    """
+
+    retained = tuple(str(name).strip() for name in retained_components)
+    if len(set(retained)) != len(retained) or "O" in retained:
+        raise ValueError("element_projection_invalid_retained_components")
+    if set(retained) & set(valence_by_element):
+        raise ValueError("element_projection_component_has_two_roles")
+
+    cation_weights: dict[str, Decimal] = {}
+    retained_weights: dict[str, Decimal] = {}
+    measured_oxygen: Decimal | None = None
+    seen: set[str] = set()
+    for raw_name, raw_weight in elements.items():
+        name = canonical_element_symbol(str(raw_name).strip())
+        if name in seen:
+            raise ValueError(f"element_projection_duplicate_component: {name}")
+        seen.add(name)
+        weight = _as_printed_amount(raw_weight)
+        if weight is None or weight < 0:
+            raise ValueError(
+                f"element_projection_amount_not_nonnegative: {raw_name}"
+            )
+        if name == "O":
+            measured_oxygen = weight
+        elif name in valence_by_element:
+            cation_weights[name] = weight
+        elif name in retained:
+            if parse_species_formula(name) is None:
+                raise ValueError(f"element_projection_invalid_formula: {name}")
+            retained_weights[name] = weight
+        else:
+            raise ValueError(f"element_reference_valence_not_stated: {name}")
+
+    for element, valence in valence_by_element.items():
+        _oxide_formula_for_valence(element, valence)
+    oxide_moles, oxygen_demand_mol, _ = _element_wt_percent_to_oxide_moles(
+        cation_weights, valence_by_element
+    )
+    component_moles = dict(oxide_moles)
+    retained_oxygen_mol = Decimal(0)
+    for name in retained:
+        weight = retained_weights.get(name, Decimal(0))
+        if weight == 0:
+            continue
+        formula_moles = weight / _formula_molar_mass(name)
+        component_moles[name] = formula_moles
+        parsed = parse_species_formula(name)
+        assert parsed is not None
+        oxygen_atoms = sum(
+            (Decimal(str(count)) for element, count in parsed if element == "O"),
+            Decimal(0),
+        )
+        retained_oxygen_mol += formula_moles * oxygen_atoms
+
+    mole_total = sum(component_moles.values(), Decimal(0))
+    if mole_total <= 0:
+        raise ValueError("element_projection_has_no_positive_components")
+    mole_fractions = tuple(
+        (name, amount / mole_total)
+        for name, amount in component_moles.items()
+        if amount > 0
+    )
+    residual = None
+    if measured_oxygen is not None:
+        oxygen_weight = _atomic_weight("O")
+        residual = measured_oxygen - (
+            oxygen_demand_mol + retained_oxygen_mol
+        ) * oxygen_weight
+    return _ElementWtOxideProjection(mole_fractions, residual)
 
 
 def _is_circular_observable(observable: object | None) -> bool:
