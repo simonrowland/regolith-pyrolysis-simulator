@@ -853,7 +853,7 @@ def test_internal_analytical_runner_uses_real_equilibrium_phase_result(
     )
     snapshot = sim._make_snapshot()
     assert (
-        snapshot.oxygen_reservoir['liquid_fraction_gate']['redox']
+        snapshot.liquid_fraction_gate['redox']
         == first_cell_gate_diagnostic
     )
 
