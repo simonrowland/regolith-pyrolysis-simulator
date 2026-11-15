@@ -2286,23 +2286,6 @@ class EvaporationMixin:
                 )
             return gate_curve_memo_record(curve, None, (), 'live')
 
-        # Same gate as the local and shared slots. A hold with no readable
-        # disclosure is unknown, not "no flagged law", so it is not returned.
-        # Dropping it lets this hour recompute; a known disclosure is
-        # re-registered before the copy is returned.
-        held = self._freeze_gate_held_curve_record
-        if (
-            isinstance(held, Mapping)
-            and held.get('hour') == int(self.melt.hour)
-            and held.get('provider') == self._liquid_fraction_provider
-        ):
-            published = accept_stored_memo(held.get('record'), owner=self)
-            if published is not None:
-                record = copy.deepcopy(held['record'])
-                record['law_disclosures'] = published
-                return record
-            self._freeze_gate_held_curve_record = None
-
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
         self._freeze_gate_provider_outcome = None
@@ -2315,18 +2298,38 @@ class EvaporationMixin:
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
-        key = self._freeze_gate_cache_key(
+        key, magemin_domain_reason = self._freeze_gate_cache_key_and_domain(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
             **redox_state_kwargs,
         )
+        # Classify MAGEMin before reading the held curve. A known held
+        # disclosure is replayed into this run; an unknown one is recomputed.
+        if magemin_domain_reason is None:
+            held = self._freeze_gate_held_curve_record
+            if (
+                isinstance(held, Mapping)
+                and held.get('hour') == int(self.melt.hour)
+                and held.get('provider') == self._liquid_fraction_provider
+            ):
+                held_record = held.get('record')
+                published = accept_stored_memo(held_record, owner=self)
+                if published is not None:
+                    record = copy.deepcopy(held_record)
+                    record['law_disclosures'] = published
+                    return record
+                self._freeze_gate_held_curve_record = None
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
         from simulator.engine_binding_admission import (
             gate_curve_memo_origin_matches,
         )
 
-        if store is not None and getattr(store, 'replay_enabled', False):
+        if (
+            store is not None
+            and getattr(store, 'replay_enabled', False)
+            and magemin_domain_reason is None
+        ):
             # Same registry as the live solve. The store hit re-registers
             # into it before this returns.
             with bind_simulation_run(self):
@@ -2358,7 +2361,8 @@ class EvaporationMixin:
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         if (
-            cache
+            magemin_domain_reason is None
+            and cache
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
             and gate_curve_memo_is_cacheable(
@@ -2419,7 +2423,10 @@ class EvaporationMixin:
             '_freeze_gate_shared_curve_cache',
             None,
         )
-        if isinstance(shared_curve_cache, dict):
+        if (
+            magemin_domain_reason is None
+            and isinstance(shared_curve_cache, dict)
+        ):
             process_cached = shared_curve_cache.get(key)
             if isinstance(process_cached, Mapping):
                 shared_value = process_cached.get('curve')
@@ -2740,6 +2747,22 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
         provider_melt_inputs: _SilicateProviderMeltInputs | None = None,
     ) -> FreezeGateCurveCacheKey:
+        key, _magemin_domain_reason = self._freeze_gate_cache_key_and_domain(
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            redox_state=redox_state,
+            provider_melt_inputs=provider_melt_inputs,
+        )
+        return key
+
+    def _freeze_gate_cache_key_and_domain(
+        self,
+        *,
+        pressure_bar: float,
+        fO2_log: float,
+        redox_state: RedoxState | None = None,
+        provider_melt_inputs: _SilicateProviderMeltInputs | None = None,
+    ) -> tuple[FreezeGateCurveCacheKey, str | None]:
         from simulator.reduced_real_determinism import _digest
         from simulator.chemistry.kernel import ChemistryIntent
 
@@ -2838,7 +2861,32 @@ class EvaporationMixin:
             provider_formula_identity.append(
                 (species_key, normalized_elements)
             )
-        return FreezeGateCurveCacheKey(
+        # Cache callers bypass reads for a domain refusal. Keep the
+        # production key itself byte-identical for in-domain inputs.
+        magemin_domain_reason = None
+        if self._liquid_fraction_provider == 'magemin':
+            from simulator.melt_backend.base import (
+                project_melt_to_oxide_projection,
+            )
+            from simulator.melt_backend.magemin import MAGEMinBackend
+
+            magemin_projection = project_melt_to_oxide_projection(
+                composition_kg=None,
+                composition_mol=provider_mol,
+                oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
+                species_formula_registry=formula_registry,
+            )
+            _submitted_bulk, verdict = (
+                MAGEMinBackend()._submitted_bulk_and_domain_verdict(
+                    magemin_projection,
+                    species_formula_registry=formula_registry,
+                    projected_retry=True,
+                )
+            )
+            valid, _warnings, reason = verdict
+            if not valid:
+                magemin_domain_reason = reason
+        key = FreezeGateCurveCacheKey(
             # v7 moves explicitly inert species out of the submitted curve
             # composition while keeping their membership as a separate input.
             schema='oxide_mol_fraction_p_fO2_v7',
@@ -2852,6 +2900,7 @@ class EvaporationMixin:
             inert_species=inert_species,
             redox_state_identity=redox_identity_key,
         )
+        return key, magemin_domain_reason
 
     def _silicate_provider_melt_inputs(
         self,

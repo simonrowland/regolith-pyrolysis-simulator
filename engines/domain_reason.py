@@ -8,6 +8,8 @@ from enum import Enum
 class OutOfDomainReason(str, Enum):
     FORBIDDEN_SPECIES = "forbidden_species"
     SILICATE_WINDOW = "silicate_window"
+    MAGEMIN_DOMAIN_SIO2_BELOW_MIN = "magemin_domain_sio2_below_min"
+    MAGEMIN_DOMAIN_SIO2_ABOVE_MAX = "magemin_domain_sio2_above_max"
     MAJOR_SUM = "major_sum"
     NOT_CONVERGED = "not_converged"
     BACKEND_UNAVAILABLE = "backend_unavailable"
