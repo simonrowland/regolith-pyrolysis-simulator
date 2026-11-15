@@ -2288,53 +2288,53 @@ def _magemin_backend_with_spied_engine_call(monkeypatch):
     [
         (
             {'Al2O3': 100.0},
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             {'MgO': 100.0},
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             {'CaO': 60.0, 'Al2O3': 40.0},
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             {'Al2O3': 95.0, 'Na2O': 5.0},
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             _basalt_like_bulk_at_sio2(0.0),
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             _basalt_like_bulk_at_sio2(10.0),
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 10.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 10.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             _basalt_like_bulk_at_sio2(20.0),
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 20.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 20.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             _basalt_like_bulk_at_sio2(29.9),
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 29.90 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 29.90 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             {'Al2O3': 90.0, 'SiO2': 5.0, 'Na2O': 5.0},
-            'magemin_domain_sio2_below_min',
-            'MAGEMinDomainGate: SiO2 = 5.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 5.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
         ),
         (
             _basalt_like_bulk_at_sio2(80.1),
-            'magemin_domain_sio2_above_max',
-            'MAGEMinDomainGate: SiO2 = 80.10 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 80.10 wt% is outside MELTS calibration window [30.0, 80.0] wt% (above the window).',
         ),
     ],
 )
@@ -2373,7 +2373,7 @@ def test_magemin_projected_equilibrate_gates_submitted_bulk(monkeypatch):
     assert result.status == 'out_of_domain'
     assert (
         result.diagnostics['backend_status_reason']
-        == 'magemin_domain_sio2_below_min'
+        == 'silicate_window'
     )
     assert engine_calls == []
 
@@ -2587,7 +2587,7 @@ def test_magemin_projected_gate_input_matches_submitted_bulk(
         'FeOt': 10.0,
     }:
         assert result.diagnostics['backend_status_reason'] == (
-            'magemin_domain_sio2_below_min'
+            'silicate_window'
         )
         assert any(
             'SiO2 = 25.00 wt%' in warning

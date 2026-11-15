@@ -1281,7 +1281,7 @@ def test_magemin_freeze_gate_memo_key_preserves_domain_boundary_identity() -> No
 
     assert inside.composition_mol_fractions == outside.composition_mol_fractions
     assert inside_reason is None
-    assert outside_reason == "magemin_domain_sio2_below_min"
+    assert outside_reason == "silicate_window"
     assert live_gate.status == "out_of_domain"
     assert (
         live_gate.diagnostics["backend_status_reason"] == outside_reason

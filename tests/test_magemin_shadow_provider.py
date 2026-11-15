@@ -27,6 +27,8 @@ from __future__ import annotations
 
 import ast
 import inspect
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -52,6 +54,18 @@ from simulator.melt_backend.magemin import MAGEMinBackend
 # ----------------------------------------------------------------------
 # Domain gate
 # ----------------------------------------------------------------------
+
+
+def test_magemin_import_first_in_a_fresh_interpreter() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-c", "import engines.magemin"],
+        cwd=Path(__file__).resolve().parents[1],
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=30,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def _basalt_wt_pct() -> dict:
@@ -444,9 +458,13 @@ def test_provider_dispatch_preserves_domain_refusal_when_engine_unavailable(
 
     assert result.status == 'out_of_domain'
     assert result.diagnostic['backend_status_reason'] == (
-        'magemin_domain_sio2_below_min'
+        'silicate_window'
     )
-    assert any('SiO2 = 0.00 wt%' in warning for warning in result.warnings)
+    assert any(
+        'SiO2 = 0.00 wt% is outside MELTS calibration window '
+        '[30.0, 80.0] wt% (below the window).' in warning
+        for warning in result.warnings
+    )
     assert engine_calls == []
 
 

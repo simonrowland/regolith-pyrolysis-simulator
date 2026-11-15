@@ -18,8 +18,15 @@ from __future__ import annotations
 from typing import Dict, Iterable, List, Mapping, Tuple
 
 from engines.domain_reason import OutOfDomainReason, reason_value
-from simulator.scalar_boundary import is_finite
-from simulator.state import OXIDE_SPECIES
+
+
+def __getattr__(name: str) -> object:
+    """Keep the legacy scalar helper available without a package import cycle."""
+    if name == 'is_finite':
+        from simulator.scalar_boundary import is_finite
+
+        return is_finite
+    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
 
 # Native melt activities exposed by the ig database. These are standard
 # states, not liquid-endmember activities: periclase for MgO and quartz for
@@ -34,8 +41,6 @@ MAGEMIN_NATIVE_MELT_ACTIVITIES = {
 # ``simulator.state.OXIDE_SPECIES`` (the single source of truth; also the
 # basis declared in
 # ``engines/magemin/provider.py::MAGEMinShadowProvider.capability_profile``).
-_MELTS_OXIDE_BASIS: Tuple[str, ...] = tuple(OXIDE_SPECIES)
-_MELTS_OXIDE_SET = frozenset(_MELTS_OXIDE_BASIS)
 _TOTAL_IRON_OXIDE_ALIASES: Dict[str, str] = {
     'feo_total': 'FeO_total',
     'feot': 'FeO_total',
@@ -128,6 +133,11 @@ class MAGEMinDomainGate:
         composition_wt_pct: Mapping[str, float],
     ) -> Tuple[bool, List[str], str | None]:
         """Validate and return the structured out-of-domain reason code."""
+        from simulator.scalar_boundary import is_finite
+        from simulator.state import OXIDE_SPECIES
+
+        oxide_basis = tuple(OXIDE_SPECIES)
+        oxide_species = frozenset(oxide_basis)
         warnings: List[str] = []
         reason: OutOfDomainReason | None = None
 
@@ -141,7 +151,10 @@ class MAGEMinDomainGate:
         for species, value in composition_wt_pct.items():
             if not is_finite(value):
                 continue
-            normalized_name = _canonical_domain_species(species)
+            normalized_name = _canonical_domain_species(
+                species,
+                oxide_species,
+            )
             # H2O is a positional bulk component in MAGEMin's ig database.
             # Keep its effect in the oxide wt% total (the input is already
             # normalized), but do not treat it as an unknown melt species.
@@ -174,7 +187,7 @@ class MAGEMinDomainGate:
             species
             for species, amount in normalized.items()
             if amount > 0.0
-            and species not in _MELTS_OXIDE_SET
+            and species not in oxide_species
             and species not in _FORBIDDEN_SET
             and species != 'FeO_total'
         )
@@ -188,24 +201,24 @@ class MAGEMinDomainGate:
         # Check 3: SiO2 in [30, 80] wt%.
         sio2 = normalized.get('SiO2', 0.0)
         if sio2 < _SIO2_MIN_WT_PCT:
-            reason = reason or OutOfDomainReason.MAGEMIN_DOMAIN_SIO2_BELOW_MIN
+            reason = reason or OutOfDomainReason.SILICATE_WINDOW
             warnings.append(
-                f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% outside MELTS '
-                f'calibration range [{_SIO2_MIN_WT_PCT}, '
-                f'{_SIO2_MAX_WT_PCT}] wt%.'
+                f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% is outside '
+                f'MELTS calibration window [{_SIO2_MIN_WT_PCT}, '
+                f'{_SIO2_MAX_WT_PCT}] wt% (below the window).'
             )
         elif sio2 > _SIO2_MAX_WT_PCT:
-            reason = reason or OutOfDomainReason.MAGEMIN_DOMAIN_SIO2_ABOVE_MAX
+            reason = reason or OutOfDomainReason.SILICATE_WINDOW
             warnings.append(
-                f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% outside MELTS '
-                f'calibration range [{_SIO2_MIN_WT_PCT}, '
-                f'{_SIO2_MAX_WT_PCT}] wt%.'
+                f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% is outside '
+                f'MELTS calibration window [{_SIO2_MIN_WT_PCT}, '
+                f'{_SIO2_MAX_WT_PCT}] wt% (above the window).'
             )
 
         # Check 4: major oxides total > 95 wt%.
         major_total = sum(
             normalized.get(species, 0.0)
-            for species in _MELTS_OXIDE_BASIS
+            for species in oxide_basis
         )
         if major_total <= _MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
             reason = reason or OutOfDomainReason.MAJOR_SUM
@@ -222,7 +235,9 @@ class MAGEMinDomainGate:
     @staticmethod
     def oxide_basis() -> Tuple[str, ...]:
         """Return the canonical MELTS 14-oxide basis."""
-        return _MELTS_OXIDE_BASIS
+        from simulator.state import OXIDE_SPECIES
+
+        return tuple(OXIDE_SPECIES)
 
     @staticmethod
     def forbidden_species() -> Iterable[str]:
@@ -236,6 +251,8 @@ def _validate_magemin_projection_with_reason(
     dropped_mass_kg_by_species: Mapping[str, float] | None = None,
 ) -> Tuple[bool, List[str], str | None]:
     """Validate an oxide projection, including species dropped by its resolver."""
+    from simulator.scalar_boundary import is_finite
+
     dropped = sorted(
         str(species)
         for species, mass_kg in (dropped_mass_kg_by_species or {}).items()
@@ -254,9 +271,12 @@ def _validate_magemin_projection_with_reason(
     return MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
 
 
-def _canonical_domain_species(name: object) -> str:
+def _canonical_domain_species(
+    name: object,
+    oxide_species: frozenset[str],
+) -> str:
     key = str(name).strip()
-    if key in _MELTS_OXIDE_SET:
+    if key in oxide_species:
         return key
     alias_key = key[:-4] if key.endswith('_Liq') else key
     return _TOTAL_IRON_OXIDE_ALIASES.get(alias_key.lower(), key)
