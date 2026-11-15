@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from decimal import Decimal
 from types import MappingProxyType
 
 import pytest
@@ -92,13 +93,14 @@ def test_richter_2007_table1_migration_pins_r3_10_source_inputs(
         if row.get("experiment_id") == "cai-r3-10"
     )
 
-    assert (
+    assert Decimal(
         experiment["sample"]["mass_kg"]["state"]["value"]["point"]
-        == "0.0000284"
-    )
+    ) == Decimal("0.0000284")
     assert (
-        experiment["apparatus"]["geometry"]["exposed_area_m2"]["state"]["value"]["point"]
-        == "0.000024"
+        Decimal(
+            experiment["apparatus"]["geometry"]["exposed_area_m2"]["state"]["value"]["point"]
+        )
+        == Decimal("0.000024")
     )
     assert (
         "row: Starting material"
