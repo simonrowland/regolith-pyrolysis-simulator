@@ -108,13 +108,13 @@ def test_ordering_pair_counts_are_categorical_not_measurements(observation, stat
 def extract_comparator(monkeypatch):
     from simulator.diagnostic_helpers import extract_reproduction as e
     from simulator.diagnostic_helpers.reproduction_compare import compare_values
-    obs = e.AdoptedObservation(species_id="Fe", source_id="fixture", observation_id="measured_alpha",
-        obs_type="alpha", review_status="reviewed", phase="solid", regime="vacuum", standard_state=None,
-        T_range_K=[1500, 1600], units="alpha", uncertainty={"kind": "absolute", "value": 0.1},
-        locator="Table 1", values={}, equipment={}, disagreement_dex=None, is_priority_winner=True,
-        geometry_assumption="no geometry needed")
 
-    def install(status, extrapolated=False):
+    def install(status, extrapolated=False, source_id="fixture"):
+        obs = e.AdoptedObservation(species_id="Fe", source_id=source_id, observation_id="measured_alpha",
+            obs_type="alpha", review_status="reviewed", phase="solid", regime="vacuum", standard_state=None,
+            T_range_K=[1500, 1600], units="alpha", uncertainty={"kind": "absolute", "value": 0.1},
+            locator="Table 1", values={}, equipment={}, disagreement_dex=None, is_priority_winner=True,
+            geometry_assumption="no geometry needed")
         records = [compare_values(case_id=obs.case_id, source_id=obs.source_id,
             observable_id=f"measured_alpha:T={t}", species="Fe", coordinate={"temperature_K": t},
             expected_value=0.1, expected_uncertainty=obs.uncertainty, actual_value=0.2,
@@ -138,8 +138,7 @@ def test_calibration_source_kind_uses_source_declaration(
 ):
     from scripts.calibration_battery import extract_rows
 
-    obs = extract_comparator("match")
-    obs.source_id = source_id
+    obs = extract_comparator("match", source_id=source_id)
     obs.values["fit"] = True
 
     rows = extract_rows()
