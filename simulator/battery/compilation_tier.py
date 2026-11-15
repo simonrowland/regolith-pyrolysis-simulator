@@ -270,6 +270,31 @@ def _compilation_engines_for_pair(
     return tuple(routed)
 
 
+def _compilation_engine_selected(
+    engine: Engine,
+    observation: Observation,
+    origin: str | None,
+    *,
+    production_scoring: bool,
+) -> bool:
+    """Apply production compilation filtering before building a residual."""
+
+    if not production_scoring:
+        return True
+    from simulator.battery.score import is_compilation_source, is_internal_consistency
+
+    if not (
+        is_compilation_evidence(observation)
+        or is_compilation_source(observation.source_id, origin)
+    ):
+        return True
+    if is_internal_consistency(origin):
+        return False
+    if not isinstance(observation.identity, Identity):
+        return True
+    return engine in _compilation_engines_for_pair((engine,), observation.identity)
+
+
 def unrouted_compilation_summary_lines(
     observations: Mapping[str, Observation],
     origins: Mapping[str, str],

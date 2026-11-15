@@ -18409,8 +18409,8 @@ def _score_store_with_decisions(
                 flush=True,
             )
     from simulator.battery.compilation_tier import (
+        _compilation_engine_selected,
         _compilation_series_point_count,
-        _compilation_engines_for_pair,
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
@@ -18540,24 +18540,12 @@ def _score_store_with_decisions(
                     ):
                         derived_band = kems_partial_pressure_band
                         derived_band_reason = None
-                    compilation_source = (
-                        is_compilation_evidence(point)
-                        or is_compilation_source(point.source_id, point_origin)
-                    )
-                    if (
-                        predict is None
-                        and compilation_source
-                        and is_internal_consistency(point_origin)
-                    ):
-                        continue
                     for engine in engine_set:
-                        if (
-                            predict is None
-                            and compilation_source
-                            and isinstance(point.identity, Identity)
-                            and engine not in _compilation_engines_for_pair(
-                                (engine,), point.identity
-                            )
+                        if not _compilation_engine_selected(
+                            engine,
+                            point,
+                            point_origin,
+                            production_scoring=predict is None,
                         ):
                             continue
                         lineage_id = (
