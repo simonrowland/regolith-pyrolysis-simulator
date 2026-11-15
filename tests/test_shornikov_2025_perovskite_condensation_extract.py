@@ -191,9 +191,8 @@ def test_table_cells_and_prose_pressures_are_decimal_and_migrate() -> None:
             assert pressure['values']['quantity'] == 'partial_pressure'
             assert pressure['values']['method_class'] == 'quoted_attributed'
             assert pressure['values']['T_K'] == str(temperature)
-            assert Decimal(str(pressure['values']['pressure_atm'])) == Decimal(
-                pressure_literal
-            )
+            assert pressure['values']['pressure_atm'] == pressure_literal
+            assert Decimal(pressure['values']['pressure_atm']) == Decimal(pressure_literal)
             assert pressure['values']['pressure_atm_as_printed'] == pressure_printed
             expected_points[pressure_id] = Decimal(TABLE_PRESSURES_PA[species][index])
             expected_temperatures[pressure_id] = Decimal(temperature)
@@ -243,9 +242,8 @@ def test_table_cells_and_prose_pressures_are_decimal_and_migrate() -> None:
         assert observation['type'] == 'partial_pressure'
         assert observation['values']['quantity'] == 'partial_pressure'
         assert observation['values']['method_class'] == 'quoted_attributed'
-        assert Decimal(str(observation['values']['pressure_atm'])) == Decimal(
-            expected_literal
-        )
+        assert observation['values']['pressure_atm'] == expected_literal
+        assert Decimal(observation['values']['pressure_atm']) == Decimal(expected_literal)
         assert observation['values']['pressure_atm_as_printed'] == expected_printed
         assert observation['point_conditions']['temperature_K']['state']['value']['point'] == '2200'
         assert observation['locator']['published_page'] == 34

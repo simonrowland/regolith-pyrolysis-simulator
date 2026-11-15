@@ -101,7 +101,7 @@ def test_table_1_transcription_render_pins_and_interior_mutation() -> None:
         k_point = kp["values"]["points"][row_number - 1]
         assert p_point["row_number_as_printed"] == str(row_number)
         assert p_point["T_K"] == temperature
-        assert Decimal(str(p_point["partial_pressure_pa"])) == Decimal(pressure_pa)
+        assert p_point["partial_pressure_pa"] == pressure_pa
         assert g_point["T_K"] == temperature
         assert g_point["value"] == reaction_gibbs
         assert k_point["T_K"] == temperature

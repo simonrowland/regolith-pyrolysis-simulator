@@ -1138,8 +1138,6 @@ def _values_equal(
     """Exact structural equality for fidelity pins.
 
     Default is exact equality (no float tolerance, no bool/int coercion).
-    Dotless exponent strings can equal their parsed numeric value so YAML
-    scalar typing does not change a fidelity result.
     ``rel_tol`` is only applied when the sample explicitly requests it (and
     both sides are non-bool numbers).
     """
@@ -1158,21 +1156,6 @@ def _values_equal(
         return expected == actual
     if isinstance(expected, str) and isinstance(actual, str):
         return expected == actual
-    mixed_text = expected if isinstance(expected, str) else actual
-    if (
-        isinstance(mixed_text, str)
-        and _DOTLESS_EXPONENT_RE.fullmatch(mixed_text)
-        and (
-            isinstance(expected, str)
-            and isinstance(actual, (int, float))
-            or isinstance(actual, str)
-            and isinstance(expected, (int, float))
-        )
-    ):
-        try:
-            return Decimal(str(expected)) == Decimal(str(actual))
-        except DecimalException:
-            return False
     if isinstance(expected, Mapping) and isinstance(actual, Mapping):
         if type(expected) is not type(actual) or len(expected) != len(actual):
             return False

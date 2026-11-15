@@ -145,7 +145,7 @@ def _assert_figure_reads(shornikov, shornikov_rows, stolyarova, stolyarova_rows)
         observation = shornikov_obs[_shornikov_observation_id(row["panel"], row["species"])]
         point = next(item for item in observation["values"]["points"] if item["point_id"] == row["point_id"])
         assert point["T_C"] == row["stored_T_C"]
-        assert Decimal(str(point["pressure_atm"])) == Decimal(row["stored_p_atm"])
+        assert point["pressure_atm"] == row["stored_p_atm"]
         assert observation["values"]["method_class"] == "figure_only"
         assert observation["values"]["admission_status"] == "admitted"
         assert point["point_conditions"]["composition"]["state"]["tag"] == "unknown"
@@ -168,8 +168,8 @@ def _assert_figure_reads(shornikov, shornikov_rows, stolyarova, stolyarova_rows)
     for row in kept:
         observation = stolyarova_obs[_stolyarova_observation_id(row)]
         point = next(item for item in observation["values"]["points"] if item["point_id"] == row["point_id"])
-        assert Decimal(str(point["activity"])) == Decimal(row["stored_activity"])
-        assert Decimal(str(point["activity_log10_mean"])) == Decimal(row["stored_log10_a"])
+        assert point["activity"] == row["stored_activity"]
+        assert point["activity_log10_mean"] == row["stored_log10_a"]
         assert observation["values"]["method_class"] == "figure_only"
         assert observation["values"]["admission_status"] == "admitted"
         components = point["point_conditions"]["composition"]["state"]["value"]["components"]

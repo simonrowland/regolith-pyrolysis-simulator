@@ -57,9 +57,7 @@ def _assert_render_pins(document: dict, pins: dict[str, str] = RENDER_PINS) -> N
     for observation_id, expected in pins.items():
         values = rows[observation_id]["values"]
         actual = values.get("pressure_Pa", values.get("value"))
-        assert Decimal(str(actual)) == Decimal(expected), (
-            f"{observation_id}: expected rendered {expected}, got {actual}"
-        )
+        assert actual == expected, f"{observation_id}: expected rendered {expected}, got {actual}"
 
 
 def test_printed_row_counts_and_render_pins_are_independent() -> None:

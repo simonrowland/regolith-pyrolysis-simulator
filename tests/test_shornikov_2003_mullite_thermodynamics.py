@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -86,7 +85,7 @@ def _assert_figure_pins(document: dict) -> None:
         row = rows[
             f"shornikov_2003_mullite_thermodynamics_fig1_marker_{series:02d}"
         ]
-        assert Decimal(str(row["values"]["value"])) == Decimal(value)
+        assert row["values"]["value"] == value
         first_read = row["values"]["figure_read"]["reads"][0]
         assert first_read["temperature_K"] == first_temperature
         assert first_read["page_pixel_xy"] == first_page_pixel

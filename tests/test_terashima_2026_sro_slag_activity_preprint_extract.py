@@ -146,9 +146,7 @@ def test_render_transcription_matches_independent_table_grids(document):
                         observation["values"]["table4_pO2_as_published"]
                     ) == printed_decimal(p_o2)
                     assert observation["values"]["table4_pO2_unit_inferred"] == "atm"
-                    assert Decimal(
-                        str(observation["values"]["oxygen_partial_pressure"]["value"])
-                    ) == Decimal("4.70e-11")
+                    assert observation["values"]["oxygen_partial_pressure"]["value"] == "4.70e-11"
                     assert observation["values"]["oxygen_partial_pressure"]["units"] == "Pa"
                 else:
                     oxygen = observation["values"]["oxygen_partial_pressure"]

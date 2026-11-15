@@ -106,6 +106,7 @@ def _find_untyped_exponents(node: yaml.Node, path: tuple[str, ...]):
     if isinstance(node, yaml.ScalarNode):
         if (
             node.tag == "tag:yaml.org,2002:str"
+            and node.style is None
             and _DOTLESS_EXPONENT_RE.fullmatch(node.value)
         ):
             yield (

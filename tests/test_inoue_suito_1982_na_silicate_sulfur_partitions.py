@@ -168,7 +168,7 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
     assert set(rate_rows) == set(expected_rates)
     for key, (normalized, printed) in expected_rates.items():
         row = rate_rows[key]
-        assert Decimal(str(row["values"]["value"])) == Decimal(normalized)
+        assert Decimal(row["values"]["value"]) == Decimal(normalized)
         assert row["values"]["value_as_published"] == printed
         assert row["locator"]["printed_cell"] == printed
         assert row["values"]["note"] == "The first numeric cell prints ×10^-3 as the column multiplier; apply it to every row."

@@ -132,13 +132,10 @@ def test_zaitsev_1999_render_pins_and_table1_row_count():
     )
 
     assert len(na2o) == len(sio2) == 29
-    assert Decimal(str(na2o[0]["activity"])) == Decimal("7.19e-10")
-    assert (na2o[0]["locator"]["row"]) == "1"
-    assert Decimal(str(na2o[-1]["activity"])) == Decimal("8.62e-5")
-    assert na2o[-1]["locator"]["row"] == "29"
+    assert (na2o[0]["activity"], na2o[0]["locator"]["row"]) == ("7.19e-10", "1")
+    assert (na2o[-1]["activity"], na2o[-1]["locator"]["row"]) == ("8.62e-5", "29")
     assert (sio2[0]["activity"], sio2[0]["locator"]["row"]) == ("0.860", "1")
-    assert Decimal(str(sio2[-1]["activity"])) == Decimal("3.77e-6")
-    assert sio2[-1]["locator"]["row"] == "29"
+    assert (sio2[-1]["activity"], sio2[-1]["locator"]["row"]) == ("3.77e-6", "29")
     assert all(point["locator"]["published_page"] == 1901 for point in na2o + sio2)
     measured_na2o = next(
         item

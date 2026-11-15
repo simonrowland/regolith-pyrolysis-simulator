@@ -49,10 +49,7 @@ def _assert_printed_values(document):
     assert "pNa denotes sodium partial pressure" in document["extraction"]["method"]
     pressures = document["species"]["Na"]["observations"]
     assert [row["values"]["points"][0]["pressure_as_printed"] for row in pressures] == ["6 × 10^4 Pa (0.6 atm)", "1 × 10^3 Pa"]
-    assert [
-        Decimal(str(row["values"]["points"][0]["pressure_Pa"]))
-        for row in pressures
-    ] == [Decimal("6e4"), Decimal("1e3")]
+    assert [row["values"]["points"][0]["pressure_Pa"] for row in pressures] == ["6e4", "1e3"]
     assert all(row["values"]["method_class"] == "measured_reduced" for row in pressures)
     assert all(
         row["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"

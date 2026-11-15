@@ -398,7 +398,7 @@ def _assert_sato_1973_table_pins(extract: dict) -> None:
             temperature = point["temperature_C_as_printed"]
             expected_pa = Decimal("101325") * (Decimal(10) ** -Decimal(printed_log))
             relative_error = abs(
-                Decimal(str(point["fugacity_Pa"])) / expected_pa - Decimal(1)
+                Decimal(point["fugacity_Pa"]) / expected_pa - Decimal(1)
             )
             assert relative_error <= Decimal("1e-6"), (observation_id, temperature)
 
@@ -526,7 +526,7 @@ def test_sato_1973_source_pins_reject_mutations(mutation: str) -> None:
     row = rows[6]
     point = row["values"]["points"][0]
     if mutation == "pressure_x10":
-        point["fugacity_Pa"] = str(Decimal(str(point["fugacity_Pa"])) * 10)
+        point["fugacity_Pa"] = str(Decimal(point["fugacity_Pa"]) * 10)
     elif mutation == "printed_log_plus_001":
         point["neg_log_fO2_as_printed"] = str(
             Decimal(point["neg_log_fO2_as_printed"]) + Decimal("0.01")
@@ -643,13 +643,13 @@ def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
         ):
             assert point["neg_log_fO2_as_printed"] == expected_log
             assert point["temperature_C_as_printed"] == expected_temperature
-            assert Decimal(str(point["temperature_K"])) == (
+            assert Decimal(point["temperature_K"]) == (
                 Decimal(expected_temperature) + Decimal("273.15")
             )
             expected_pa = Decimal("101325") * (
                 Decimal(10) ** -Decimal(point["neg_log_fO2_as_printed"])
             )
-            consumed_pa = Decimal(str(point["fugacity_Pa"]))
+            consumed_pa = Decimal(point["fugacity_Pa"])
             relative_error = abs(consumed_pa / expected_pa - Decimal(1))
             assert relative_error <= Decimal("1e-6"), (
                 row["observation_id"], point["temperature_C_as_printed"]
@@ -659,7 +659,7 @@ def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
                 if row["observation_id"] in observation_id
                 and obs.point_conditions.get("temperature_K") is not None
                 and obs.point_conditions["temperature_K"].state.value
-                == Decimal(str(point["temperature_K"]))
+                == Decimal(point["temperature_K"])
             ]
             assert len(matches) == 1, (
                 row["observation_id"], point["temperature_C_as_printed"]
@@ -921,7 +921,7 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     assert len(source_cells) == 55
     for key, (row, point, expected_log) in source_cells.items():
         sample, temperature, condition = key
-        fugacity_pa = Decimal(str(point["fugacity_Pa"]))
+        fugacity_pa = Decimal(point["fugacity_Pa"])
         expected_pa = Decimal("101325") * (Decimal(10) ** expected_log)
         relative_error = abs(fugacity_pa / expected_pa - Decimal(1))
         assert relative_error <= Decimal("1e-6"), (sample, temperature, condition)
@@ -1618,7 +1618,7 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     )
     assert row["values"]["log10_activity_as_published"] == "-9.0"
     assert row["values"]["value_as_printed"] == "-9.0"
-    assert Decimal(str(row["values"]["activity"])) == Decimal("1e-9")
+    assert row["values"]["activity"] == "1e-9"
     assert row["locator"]["page"] == 4
     assert row["locator"]["published_page"] == 882
     assert row["locator"]["equation"] == "5"
@@ -1631,7 +1631,7 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     assert printed_log["locator"]["page"] == 4
     assert printed_log["locator"]["published_page"] == 882
     assert printed_log["locator"]["equation"] == "5"
-    assert Decimal(str(row["uncertainty"]["value"])) == Decimal("1.1512925465e-10")
+    assert row["uncertainty"]["value"] == "1.1512925465e-10"
     assert row["values"]["T_K"] == "1300"
     assert row["values"]["point_conditions"]["temperature_K"]["locator"][
         "page"
@@ -1684,9 +1684,7 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     assert parent_id == "itoh_yokokawa_1984_eq5_printed_log_input"
     assert migrated_rows[parent_id]["admission"]["status"] == "rejected"
     assert migrated_rows[parent_id]["value"]["kind"] == "unavailable"
-    assert Decimal(str(migrated["uncertainty"]["verbatim"]["value"])) == Decimal(
-        "1.1512925465e-10"
-    )
+    assert migrated["uncertainty"]["verbatim"]["value"] == "1.1512925465e-10"
     assert migrated["identity"]["temperature_K"]["value"] == "1300"
     assert migrated["identity"]["composition"]["tag"] == "value"
     assert dict(migrated["identity"]["composition"]["value"]["components"]) == {
@@ -4339,10 +4337,12 @@ def test_lh84_top_level_payloads_not_empty():
     # under nist-webbook or a dedicated extract.
     nist = load_cached_safe_yaml((EXTRACTS / "nist-webbook.yaml").read_text(encoding="utf-8"))
     # Se may be under Se_n_ladder
+    found_coeff = False
     for sid, block in nist.get("species", {}).items():
         for obs in block.get("observations") or []:
             vals = obs.get("values") or {}
             if isinstance(vals, dict) and "coefficients" in vals:
+                found_coeff = True
                 coeffs = vals["coefficients"]
                 assert coeffs  # non-empty
     br = EXTRACTS / "behrens-rosenblatt-1972.yaml"
@@ -5178,11 +5178,6 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
         doc, label=extract_path.stem
     )
     assert match_errors == [], "\n".join(match_errors)
-
-
-def test_fidelity_sample_numeric_string_matches_exact_yaml_number() -> None:
-    assert vle._values_equal(1.5e-4, "1.5e-4")
-    assert not vle._values_equal(1.5e-4, "1.5000000000000001e-4")
 
 
 # Measured on this corpus. Six ``observations[<integer>]`` pins are positions

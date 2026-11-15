@@ -135,7 +135,7 @@ def _figure_pins(document: dict) -> None:
         document,
         "shornikov_2020_fig1_s2_solidus_marker_01",
     )
-    assert Decimal(str(fig1["values"]["T_K"])) == Decimal("2.7e+03")
+    assert fig1["values"]["T_K"] == "2.7e+03"
     assert fig1["values"]["FeO_mol_pct_as_plotted"] == "13"
     assert fig1["values"]["MgO_mol_pct_as_binary_remainder"] == "87"
     assert fig1["phase"] == "(Mg,Fe)O solid solution + liquid"

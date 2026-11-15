@@ -88,12 +88,12 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     table4_activity = _point_by_observation_id(
         document, "rys_2007_appendix_na2o_activity_table4", 0
     )
-    assert Decimal(str(table4_activity["activity"])) == Decimal("2.38E-13")
+    assert table4_activity["activity"] == "2.38E-13"
 
     table10_k2o_activity = _point_by_observation_id(
         document, "rys_2007_appendix_k2o_activity_table10a", 0
     )
-    assert Decimal(str(table10_k2o_activity["activity"])) == Decimal("3.85E-16")
+    assert table10_k2o_activity["activity"] == "3.85E-16"
 
     table12_context = next(
         observation
@@ -192,7 +192,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     table16_activity = _point_by_observation_id(
         document, "rys_2007_tables16_17_19_na2o_activity_1750k", 2
     )
-    assert Decimal(str(table16_activity["activity"])) == Decimal("9.740E-12")
+    assert table16_activity["activity"] == "9.740E-12"
 
     figure_records = [
         observation

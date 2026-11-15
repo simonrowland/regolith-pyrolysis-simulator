@@ -388,10 +388,10 @@ def test_all_scored_rows_migrate_as_points_with_printed_conditions() -> None:
             oxygen = values["oxygen_partial_pressure"]
             assert oxygen["units"] == "atm"
             pressure_by_printed_atm = {
-                Decimal("6.9e-11"): Decimal("0.000006991425"),
-                Decimal("1.7e-9"): Decimal("0.0001722525"),
+                "6.9e-11": Decimal("0.000006991425"),
+                "1.7e-9": Decimal("0.0001722525"),
             }
-            printed_atm = Decimal(str(oxygen["value"]))
+            printed_atm = str(oxygen["value"])
             assert printed_atm in pressure_by_printed_atm
             mapped_condition = observation.point_conditions["fO2_Pa"]
             assert mapped_condition.state.value.point == pressure_by_printed_atm[printed_atm]

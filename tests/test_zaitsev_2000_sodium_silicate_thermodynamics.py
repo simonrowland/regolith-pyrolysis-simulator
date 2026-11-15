@@ -113,10 +113,8 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
         if row["observation_id"] == "zaitsev_2000_table4_na2o_experimental_activity"
     )
     # These printed Table 4 cells were confirmed against the 600 dpi p. 535 render.
-    assert Decimal(str(sio2[0]["activity"])) == Decimal("0.860")
-    assert sio2[0]["locator"]["page"] == 7
-    assert Decimal(str(sio2[-1]["activity"])) == Decimal("3.77e-6")
-    assert sio2[-1]["locator"]["page"] == 7
+    assert (sio2[0]["activity"], sio2[0]["locator"]["page"]) == ("0.860", 7)
+    assert (sio2[-1]["activity"], sio2[-1]["locator"]["page"]) == ("3.77e-6", 7)
     assert (na2o[0]["activity"], na2o[0]["locator"]["page"]) == ("7.19e-10", 7)
     model_activities = next(
         item
