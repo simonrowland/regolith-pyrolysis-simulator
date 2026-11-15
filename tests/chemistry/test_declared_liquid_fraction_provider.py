@@ -84,12 +84,28 @@ def _projected_gate_provider_diagnostic():
 
 
 def _projected_gate_phase_reader_result(
-    sim, monkeypatch, diagnostic, *, status,
+    sim, monkeypatch, tmp_path, diagnostic, *, status,
 ):
+    from simulator.engine_binding_admission import BindingIdentity
     from tests.binding_admission_fixtures import (
+        install_synthetic_binding_receipt,
         register_synthetic_gate_curve_producer,
     )
 
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=BindingIdentity(
+            'magemin', 'ig', 'magemin-ig-r1', 'subprocess',
+        ),
+        provenance_override={
+            'binding_provenance_verifiable': True,
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
+    )
     register_synthetic_gate_curve_producer(sim)
     monkeypatch.setattr(
         sim,
@@ -104,13 +120,14 @@ def _projected_gate_phase_reader_result(
 
 
 def test_projected_gate_dispatch_admits_projection_only_refusal(
-    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch, tmp_path, vapor_pressure_data, feedstocks_data,
+    setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     diagnostic = _projected_gate_provider_diagnostic()
     sim.melt.temperature_C = 1150.0
     curve, phase = _projected_gate_phase_reader_result(
-        sim, monkeypatch, diagnostic, status='out_of_domain',
+        sim, monkeypatch, tmp_path, diagnostic, status='out_of_domain',
     )
 
     assert curve['source'] == (
@@ -131,7 +148,8 @@ def test_projected_gate_dispatch_admits_projection_only_refusal(
 
 
 def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
-    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch, tmp_path, vapor_pressure_data, feedstocks_data,
+    setpoints_data,
 ):
     from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
     from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -143,7 +161,7 @@ def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
         OutOfDomainReason.SILICATE_WINDOW.value
     )
     curve, phase = _projected_gate_phase_reader_result(
-        sim, monkeypatch, diagnostic, status='out_of_domain',
+        sim, monkeypatch, tmp_path, diagnostic, status='out_of_domain',
     )
     assert curve['source'].endswith(':composition_projected')
     assert set(curve['original_bulk_refusal']['reasons']) == {
@@ -223,14 +241,15 @@ def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
 
 
 def test_projected_gate_dispatch_requires_projection_refusal_status(
-    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch, tmp_path, vapor_pressure_data, feedstocks_data,
+    setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     diagnostic = _projected_gate_provider_diagnostic()
     diagnostic['backend_status'] = 'refused'
     sim.melt.temperature_C = 1150.0
     curve, phase = _projected_gate_phase_reader_result(
-        sim, monkeypatch, diagnostic, status='refused',
+        sim, monkeypatch, tmp_path, diagnostic, status='refused',
     )
 
     assert curve['source'].endswith(':composition_projected')
