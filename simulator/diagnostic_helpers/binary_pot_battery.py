@@ -3950,15 +3950,19 @@ class _InternalAnalyticalBatteryBackend:
         po2_request: Po2Request | None = None,
         **_unused: object,
     ) -> Any:
-        # One core serves every cell. Reset high-temperature activity
-        # continuation state so each battery cell starts independently; the
-        # core refresh owns the per-call vapor-pressure diagnostic on every
-        # temperature path. Residue integration calls the adapter directly
-        # and keeps its within-row trajectory state.
+        # One core serves every cell. Reset temperature continuation and
+        # unkeyed held freeze-gate curves so one independent cell cannot
+        # supply another cell's vapor phase basis. The input-keyed live curve
+        # memo remains safe to reuse. The core refresh owns the per-call
+        # vapor-pressure diagnostic on every temperature path. Residue
+        # integration calls the adapter directly and keeps its within-row
+        # trajectory state.
         core = self._core
         core._last_high_t_melt_activity = {}
         core._last_high_t_melt_activity_temperature_K = None
         core._high_t_melt_activity_fallback_steps = []
+        core._freeze_gate_last_good_curve = None
+        core._freeze_gate_held_curve_record = None
         core._last_vapor_pressure_diagnostic = {}
         return _internal_analytical_vapor_pressure_adapter(
             core=self._core,
