@@ -1140,8 +1140,21 @@ def test_all_source_records_load_with_temperature_phases_and_locators() -> None:
     for row in records:
         if row.get("first_liquid_exclusion_reason"):
             excluded_counts[row["source_id"]] += 1
+    # The extract contains 35 CaO transition observations and 12 eligible
+    # Table A compound rows. Only Table A rows 11 and 19 dissociate without a
+    # liquid phase, so the Rankin first-liquid exclusion count is two.
+    rankin_no_liquid_ids = {
+        row["observation_id"]
+        for row in records
+        if row["source_id"] == "rankin-wright-1915-ajs-cao-al2o3-sio2"
+        and row.get("first_liquid_exclusion_reason") == "no_liquid_phase"
+    }
+    assert rankin_no_liquid_ids == {
+        "rankin_wright_1915_tA_r11",
+        "rankin_wright_1915_tA_r19",
+    }
     assert excluded_counts == {
-        "rankin-wright-1915-ajs-cao-al2o3-sio2": 4,
+        "rankin-wright-1915-ajs-cao-al2o3-sio2": 2,
         "morey-1964-usgs-pp440l-phase-equilibria": 2,
         "shults-1995-calcium-aluminate-thermodynamics": 1,
         "shornikov-1997-cao-al2o3": 0,
@@ -1179,8 +1192,8 @@ def test_all_source_records_load_with_temperature_phases_and_locators() -> None:
         }
     assert source_census == {
         "rankin-wright-1915-ajs-cao-al2o3-sio2": {
-            "consumed": 43,
-            "solid_state": 4,
+            "consumed": 45,
+            "solid_state": 2,
             "unparsed": 0,
             "skipped": 365,
         },
