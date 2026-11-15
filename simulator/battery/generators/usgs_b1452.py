@@ -1455,7 +1455,6 @@ def _observation(
     identity_quantity: Quantity | State[Quantity] = quantity
     if (
         basis == "from_the_oxides"
-        and species.formula == "3Al2O3.2SiO2"
         and quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
     ):
         identity_quantity = State.unknown(

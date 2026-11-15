@@ -6,6 +6,7 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import (
@@ -70,6 +71,86 @@ TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
 FAYALITE_ELEMENTS = "robie-hemingway-fisher-1978-usgs-b1452-0335"
 FAYALITE_OXIDES = "robie-hemingway-fisher-1978-usgs-b1452-0336"
+OXIDE_HEADING_RECORDS = (
+    "robie-hemingway-fisher-1978-usgs-b1452-0232",
+    "robie-hemingway-fisher-1978-usgs-b1452-0232-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0320",
+    "robie-hemingway-fisher-1978-usgs-b1452-0324",
+    "robie-hemingway-fisher-1978-usgs-b1452-0336",
+    "robie-hemingway-fisher-1978-usgs-b1452-0336-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0358",
+    "robie-hemingway-fisher-1978-usgs-b1452-0360",
+    "robie-hemingway-fisher-1978-usgs-b1452-0374",
+    "robie-hemingway-fisher-1978-usgs-b1452-0382",
+    "robie-hemingway-fisher-1978-usgs-b1452-0382-phase-02",
+)
+OXIDE_BASIS_RECORDS = (
+    "robie-hemingway-fisher-1978-usgs-b1452-0228-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0228",
+    "robie-hemingway-fisher-1978-usgs-b1452-0232-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0232",
+    "robie-hemingway-fisher-1978-usgs-b1452-0241",
+    "robie-hemingway-fisher-1978-usgs-b1452-0273-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0273-phase-03",
+    "robie-hemingway-fisher-1978-usgs-b1452-0273",
+    "robie-hemingway-fisher-1978-usgs-b1452-0275",
+    "robie-hemingway-fisher-1978-usgs-b1452-0277",
+    "robie-hemingway-fisher-1978-usgs-b1452-0279",
+    "robie-hemingway-fisher-1978-usgs-b1452-0281",
+    "robie-hemingway-fisher-1978-usgs-b1452-0284-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0284",
+    "robie-hemingway-fisher-1978-usgs-b1452-0307",
+    "robie-hemingway-fisher-1978-usgs-b1452-0314",
+    "robie-hemingway-fisher-1978-usgs-b1452-0316",
+    "robie-hemingway-fisher-1978-usgs-b1452-0318",
+    "robie-hemingway-fisher-1978-usgs-b1452-0320",
+    "robie-hemingway-fisher-1978-usgs-b1452-0322-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0322-phase-03",
+    "robie-hemingway-fisher-1978-usgs-b1452-0322",
+    "robie-hemingway-fisher-1978-usgs-b1452-0324",
+    "robie-hemingway-fisher-1978-usgs-b1452-0326",
+    "robie-hemingway-fisher-1978-usgs-b1452-0328",
+    "robie-hemingway-fisher-1978-usgs-b1452-0330",
+    "robie-hemingway-fisher-1978-usgs-b1452-0332",
+    "robie-hemingway-fisher-1978-usgs-b1452-0334-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0334",
+    "robie-hemingway-fisher-1978-usgs-b1452-0336-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0336",
+    "robie-hemingway-fisher-1978-usgs-b1452-0338",
+    "robie-hemingway-fisher-1978-usgs-b1452-0340",
+    "robie-hemingway-fisher-1978-usgs-b1452-0342",
+    "robie-hemingway-fisher-1978-usgs-b1452-0344-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0344",
+    "robie-hemingway-fisher-1978-usgs-b1452-0346",
+    "robie-hemingway-fisher-1978-usgs-b1452-0348",
+    "robie-hemingway-fisher-1978-usgs-b1452-0350",
+    "robie-hemingway-fisher-1978-usgs-b1452-0352",
+    "robie-hemingway-fisher-1978-usgs-b1452-0354",
+    "robie-hemingway-fisher-1978-usgs-b1452-0356",
+    "robie-hemingway-fisher-1978-usgs-b1452-0358",
+    "robie-hemingway-fisher-1978-usgs-b1452-0360",
+    "robie-hemingway-fisher-1978-usgs-b1452-0362",
+    "robie-hemingway-fisher-1978-usgs-b1452-0364",
+    "robie-hemingway-fisher-1978-usgs-b1452-0366",
+    "robie-hemingway-fisher-1978-usgs-b1452-0368",
+    "robie-hemingway-fisher-1978-usgs-b1452-0370",
+    "robie-hemingway-fisher-1978-usgs-b1452-0372",
+    "robie-hemingway-fisher-1978-usgs-b1452-0374",
+    "robie-hemingway-fisher-1978-usgs-b1452-0376",
+    "robie-hemingway-fisher-1978-usgs-b1452-0378",
+    "robie-hemingway-fisher-1978-usgs-b1452-0380-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0380",
+    "robie-hemingway-fisher-1978-usgs-b1452-0382-phase-02",
+    "robie-hemingway-fisher-1978-usgs-b1452-0382",
+    "robie-hemingway-fisher-1978-usgs-b1452-0385",
+    "robie-hemingway-fisher-1978-usgs-b1452-0387",
+    "robie-hemingway-fisher-1978-usgs-b1452-0389",
+    "robie-hemingway-fisher-1978-usgs-b1452-0391",
+    "robie-hemingway-fisher-1978-usgs-b1452-0393",
+    "robie-hemingway-fisher-1978-usgs-b1452-0396",
+    "robie-hemingway-fisher-1978-usgs-b1452-0398",
+)
+FORMATION_QUANTITIES = (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
 
 
 def _load(record_id: str) -> dict:
@@ -84,6 +165,15 @@ def _generation(record_id: str) -> generator.RecordGeneration:
 
 
 _LAST_RECORD: dict | None = None
+
+
+def _oxide_basis_record_ids() -> tuple[str, ...]:
+    record_ids = []
+    for path in RECORDS_DIR.glob("*.json"):
+        record = json.loads(path.read_text(encoding="utf-8"))
+        if generator._formation_basis_for_record(record) == "from_the_oxides":
+            record_ids.append(str(record["record_id"]))
+    return tuple(sorted(record_ids))
 
 
 def _observations_for(
@@ -122,6 +212,32 @@ def _observations_for(
                 slug = _name_slug(printed)
                 if f":name={slug}" not in observation.observation_id:
                     continue
+        result.append(observation)
+    return result
+
+
+def _formation_observations(
+    generated: generator.RecordGeneration,
+    *,
+    basis: str,
+    quantity: Quantity | None = None,
+    temperature: str | None = None,
+) -> list:
+    result = []
+    quantities = (quantity,) if quantity is not None else FORMATION_QUANTITIES
+    for observation in generated.observations:
+        if not any(
+            f":{candidate.value}:" in observation.observation_id
+            for candidate in quantities
+        ):
+            continue
+        note = observation.locator.note if observation.locator is not None else ""
+        if f"formation_basis={basis}" not in (note or ""):
+            continue
+        if temperature is not None:
+            temp = observation.identity.temperature_K
+            if temp is None or not temp.is_value or str(temp.value) != temperature:
+                continue
         result.append(observation)
     return result
 
@@ -726,11 +842,16 @@ def test_ocr_suspect_without_image_correction_is_refused() -> None:
 
 def test_oxide_asterisk_is_basis_not_damage() -> None:
     generated = _generation(FAYALITE_OXIDES)
-    gibbs = _observations_for(
-        generated, Quantity.DELTA_FG, temperature="298.15", basis="from_the_oxides"
+    gibbs = _formation_observations(
+        generated,
+        quantity=Quantity.DELTA_FG,
+        temperature="298.15",
+        basis="from_the_oxides",
     )
     assert len(gibbs) == 1
     assert gibbs[0].value.point == Decimal("-20.775")
+    # No oxide-formation quantity exists in the schema; retain the value as typed absence.
+    assert gibbs[0].identity.quantity.is_unknown
     note = gibbs[0].locator.note or ""
     assert "as_published='-20.775 *'" in note or "as_published='-20.775*'" in note.replace(" ", "")
     assert "formation_basis=from_the_oxides" in note
@@ -740,6 +861,52 @@ def test_oxide_asterisk_is_basis_not_damage() -> None:
         if "*" in row["as_published"] and row["column"] == "formation_gibbs_energy"
     ]
     assert refused_star == []
+
+
+def test_b1452_oxide_basis_record_census_is_complete() -> None:
+    assert set(_oxide_basis_record_ids()) == set(OXIDE_BASIS_RECORDS)
+
+
+def test_b1452_oxide_heading_record_census_is_complete() -> None:
+    captured_heading_records = set()
+    for path in RECORDS_DIR.glob("*.json"):
+        record = json.loads(path.read_text(encoding="utf-8"))
+        heading = generator._normalized_letters(
+            str(record.get("formation_basis_header_as_published") or "")
+        )
+        if "OXIDE" in heading:
+            captured_heading_records.add(str(record["record_id"]))
+    assert captured_heading_records == set(OXIDE_HEADING_RECORDS)
+
+
+@pytest.mark.parametrize("record_id", OXIDE_BASIS_RECORDS)
+def test_every_b1452_oxide_basis_record_refuses_element_formation_quantities(
+    record_id: str,
+) -> None:
+    record = _load(record_id)
+    assert generator._formation_basis_for_record(record) == "from_the_oxides"
+
+    generated = _generation(record_id)
+    formation_rows = _formation_observations(generated, basis="from_the_oxides")
+    assert formation_rows
+    assert {
+        quantity
+        for quantity in FORMATION_QUANTITIES
+        if any(f":{quantity.value}:" in row.observation_id for row in formation_rows)
+    } == set(FORMATION_QUANTITIES)
+    for row in formation_rows:
+        quantity = next(
+            quantity
+            for quantity in FORMATION_QUANTITIES
+            if f":{quantity.value}:" in row.observation_id
+        )
+        assert row.identity.quantity.is_unknown
+        assert row.identity.quantity.reason == (
+            "No quantity token represents formation from simple oxides; "
+            f"{quantity.value} denotes formation from the elements."
+        )
+        assert row.value.point is not None
+        assert row.identity.reaction is not None and row.identity.reaction.is_value
 
 
 def test_mullite_oxide_caption_keeps_all_formation_rows_typed_refused() -> None:
@@ -815,9 +982,9 @@ def test_formation_basis_is_identity_axis() -> None:
         formula="Fe2SiO4",
         row=674,
     )
-    oxides = _observations_for(
+    oxides = _formation_observations(
         _generation(FAYALITE_OXIDES),
-        Quantity.DELTA_FG,
+        quantity=Quantity.DELTA_FG,
         temperature="298.15",
         basis="from_the_oxides",
     )
@@ -829,6 +996,8 @@ def test_formation_basis_is_identity_axis() -> None:
     assert oxides[0].identity.reaction is not None
     assert elements[0].identity.reaction.is_value
     assert oxides[0].identity.reaction.is_value
+    # The reaction remains oxide-based; DELTA_FG has only an elements-frame token.
+    assert oxides[0].identity.quantity.is_unknown
     assert elements[0].identity.reaction.value != oxides[0].identity.reaction.value
     kyanite = _observations_for(
         _generation(TABLE_298K),
