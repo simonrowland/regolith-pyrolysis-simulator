@@ -74,13 +74,20 @@ from simulator.optimize.objective import (
     ObjectiveDefinition,
     ObjectiveProfileError,
     ObjectiveVector,
+    ask_time_objective_definitions,
+    candidate_rank_key,
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
+    executed_objective_definitions,
     objective_definitions,
     objective_importance_evidence,
     objective_scores,
     objective_value_for_metric,
     pareto_front,
+    profile_scored_at_fidelity,
+    rank_axis_metrics,
+    scoring_profile_for_executed_spec,
+    unrenormalized_study_scalar_weights,
 )
 from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
@@ -611,6 +618,7 @@ def run(
             config.profile,
             expected_feedstock=config.feedstock,
             schema=base_schema,
+            scoring_fidelity=fidelity,
         )
     except ProfileValidationError as exc:
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
@@ -632,13 +640,14 @@ def run(
         profile_pinned_paths=_profile_pinned_paths(resolved_profile),
         cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
-    definitions = objective_definitions(resolved_profile)
-    importance_by_metric = {
-        row.metric: row.weight for row in objective_importance_evidence(resolved_profile)
-    }
-    objective_weights = tuple(
-        importance_by_metric[definition.metric] for definition in definitions
-    )
+    # Ask-time identity only. A voltage cap or conditional pin can change
+    # c5_enabled after this copy. Result scoring, the study scalar, and
+    # honest-result checks read the EvalSpec through
+    # scoring_profile_for_executed_spec. An empty pre-candidate list falls
+    # back to the declared rows so a later cap can restore a product.
+    # That fallback is not a score and it is not renormalised.
+    scoring_profile = profile_scored_at_fidelity(resolved_profile, fidelity)
+    definitions, objective_weights = _ask_time_scoring(scoring_profile)
     two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
     try:
@@ -677,7 +686,7 @@ def run(
     if requested_topologies is None:
         active_strategy = resolve_strategy(
             config.strategy,
-            profile=resolved_profile,
+            profile=scoring_profile,
             seed=config.seed,
             schema=active_schema,
             parallel=config.parallel,
@@ -691,7 +700,7 @@ def run(
             or isinstance(config.strategy, StagedStrategy)
         ):
             raise ValueError("topologies are only supported for staged strategy")
-        single_topology_profile = _profile_without_staged_topologies(resolved_profile)
+        single_topology_profile = _profile_without_staged_topologies(scoring_profile)
         staged_strategies = tuple(
             StagedStrategy(
                 active_schema,
@@ -780,6 +789,7 @@ def run(
         records,
         definitions,
         objective_weights,
+        profile=resolved_profile,
     )
     progress_has_feasible = any(record.feasible for record in records)
     use_pareto_stall = len(best_pareto_signature) > 1
@@ -860,7 +870,7 @@ def run(
             prefix_evals_run += prefix_evals_in_batch
             tell_batch: list[tuple[Candidate, ScoredResult]] = []
             for candidate, scored, cache_hit in results:
-                _assert_honest_result(scored, definitions)
+                _assert_honest_result(scored, definitions, profile=resolved_profile)
                 light_scored = _strip_heavy_result(scored)
                 try:
                     ask_ordinal = ask_seq_by_id[candidate.id]
@@ -933,6 +943,7 @@ def run(
                 records,
                 definitions,
                 objective_weights,
+                profile=resolved_profile,
             )
             has_feasible = any(record.feasible for record in records)
             if has_feasible and not progress_has_feasible:
@@ -999,8 +1010,15 @@ def run(
 
     failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
-    explore_leaderboard = tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
-    explore_selection = _select_pareto(feasible, definitions)
+    explore_leaderboard = tuple(
+        sorted(
+            feasible,
+            key=lambda row: _rank_key(row, definitions, profile=resolved_profile),
+        )
+    )
+    explore_selection = _select_pareto(
+        feasible, definitions, profile=resolved_profile
+    )
     non_finite_count = failure_counts.get(FailureCategory.NON_FINITE_PAYLOAD.value, 0)
     if not records:
         _write_empty_artifacts(
@@ -1220,11 +1238,13 @@ def run_certify(
         seed=0,
         per_eval_timeout_seconds=resolve_eval_timeout_seconds(per_eval_timeout_seconds),
     )
+    scoring_fidelity = str(canonical_backend_name(fidelity))
     try:
         resolved_profile = resolve_profile(
             config.profile,
             expected_feedstock=config.feedstock,
             schema=base_schema,
+            scoring_fidelity=scoring_fidelity,
         )
     except ProfileValidationError as exc:
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
@@ -1243,7 +1263,8 @@ def run_certify(
         profile_pinned_paths=_profile_pinned_paths(resolved_profile),
         cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
-    definitions = objective_definitions(resolved_profile)
+    scoring_profile = profile_scored_at_fidelity(resolved_profile, scoring_fidelity)
+    definitions = _ask_time_scoring(scoring_profile)[0]
     _validate_inputs(config, resolved_profile)
     try:
         active_constraints = _constraints_for_profile(resolved_profile)
@@ -1287,7 +1308,7 @@ def run_certify(
         constraints=active_constraints,
         per_eval_timeout_seconds=config.per_eval_timeout_seconds,
     )
-    _assert_honest_result(scored, definitions)
+    _assert_honest_result(scored, definitions, profile=resolved_profile)
     if scored.eval_spec is None:
         category = (
             scored.failure_category.value
@@ -1338,11 +1359,16 @@ def run_certify(
         )
     eligible = (record,) if record.feasible else ()
     leaderboard = (
-        tuple(sorted(eligible, key=lambda row: _rank_key(row, definitions)))
+        tuple(
+            sorted(
+                eligible,
+                key=lambda row: _rank_key(row, definitions, profile=resolved_profile),
+            )
+        )
         if eligible
         else (record,)
     )
-    selection = _select_pareto(eligible, definitions)
+    selection = _select_pareto(eligible, definitions, profile=resolved_profile)
     winner = selection.winner
     result_status = (
         COMPLETED_STATUS if winner is not None else COMPLETED_NO_FEASIBLE_WINNER_STATUS
@@ -1779,10 +1805,12 @@ def _load_study_journal(
     feedstock = str(manifest.get("feedstock_id") or profile_payload.get("feedstock") or "")
     if not feedstock:
         raise StudyReplayError("study manifest missing feedstock_id")
+    scoring_fidelity = str(canonical_backend_name(str(manifest.get("fidelity"))))
     resolved_profile = resolve_profile(
         profile_payload,
         expected_feedstock=feedstock,
         schema=base_schema,
+        scoring_fidelity=scoring_fidelity,
     )
     manifest_identity = _mapping_or_empty(manifest.get("search_space_identity"))
     active_schema = _schema_with_pinned_paths(
@@ -1822,7 +1850,7 @@ def _load_study_journal(
         profile=resolved_profile,
         feedstock=feedstock,
         strategy=strategy_key,
-        fidelity=str(canonical_backend_name(str(manifest.get("fidelity")))),
+        fidelity=scoring_fidelity,
         parallel=int(manifest_scalars["parallel"]),
         budget=int(manifest_scalars["budget"]),
         out_dir=root,
@@ -1846,10 +1874,11 @@ def _load_study_journal(
         search_space_identity=search_space_identity,
         requested_topologies=requested_topologies,
     )
+    scoring_profile = profile_scored_at_fidelity(resolved_profile, scoring_fidelity)
     if requested_topologies is None:
         active_strategy = resolve_strategy(
             strategy_key,
-            profile=resolved_profile,
+            profile=scoring_profile,
             seed=config.seed,
             schema=active_schema,
             parallel=config.parallel,
@@ -1858,7 +1887,7 @@ def _load_study_journal(
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
     else:
-        single_topology_profile = _profile_without_staged_topologies(resolved_profile)
+        single_topology_profile = _profile_without_staged_topologies(scoring_profile)
         staged_strategies = tuple(
             StagedStrategy(
                 active_schema,
@@ -1873,7 +1902,7 @@ def _load_study_journal(
 
     warnings_seen.extend(_strategy_manifest_warnings(manifest, active_strategy))
     events = _load_replay_events(events_path)
-    definitions = objective_definitions(resolved_profile)
+    definitions = _ask_time_scoring(scoring_profile)[0]
     records: list[StudyRecord] = []
     pending_candidates: list[Candidate] = []
     topology_cursor = 0
@@ -1933,11 +1962,18 @@ def _load_study_journal(
 
     feasible = tuple(record for record in records if record.feasible)
     leaderboard = (
-        tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
+        tuple(
+            sorted(
+                feasible,
+                key=lambda row: _rank_key(row, definitions, profile=resolved_profile),
+            )
+        )
         if feasible
         else tuple(sorted(records, key=_sampling_order_key))
     )
-    pareto = _select_pareto(feasible, definitions).published
+    pareto = _select_pareto(
+        feasible, definitions, profile=resolved_profile
+    ).published
     replay_state = _strategy_replay_state(active_strategy, *staged_strategies)
     stored_state = _load_latest_strategy_state(root / STRATEGY_STATE_NAME)
     if stored_state is not None and stored_state != replay_state:
@@ -2748,7 +2784,7 @@ def _run_exact_certification(
             per_eval_timeout_seconds=config.per_eval_timeout_seconds,
         )
         _, scored, _ = results[0]
-        _assert_honest_result(scored, definitions)
+        _assert_honest_result(scored, definitions, profile=profile)
         certified = _to_record(candidate, scored, cache_hit=False)
         certified_records.append(certified)
         cache_state = _cache_state_from_scored(scored)
@@ -2833,8 +2869,15 @@ def _run_exact_certification(
             status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
         )
-    leaderboard = tuple(sorted(certified_feasible, key=lambda row: _rank_key(row, definitions)))
-    selection = _select_pareto(certified_feasible, definitions)
+    leaderboard = tuple(
+        sorted(
+            certified_feasible,
+            key=lambda row: _rank_key(row, definitions, profile=profile),
+        )
+    )
+    selection = _select_pareto(
+        certified_feasible, definitions, profile=profile
+    )
     if selection.winner is None:
         return _CertificationPassResult(
             leaderboard=leaderboard,
@@ -2934,6 +2977,7 @@ def resolve_profile(
     *,
     expected_feedstock: str | None = None,
     schema: RecipeSchema | None = None,
+    scoring_fidelity: str | None = None,
 ) -> Mapping[str, Any]:
     if isinstance(profile, str):
         try:
@@ -2947,6 +2991,7 @@ def resolve_profile(
             expected_feedstock=expected_feedstock,
             source=f"<profile:{profile}>",
             schema=schema,
+            scoring_fidelity=scoring_fidelity,
         )
         _requested_staged_topologies(validated, None)
         return validated
@@ -2957,6 +3002,7 @@ def resolve_profile(
         expected_feedstock=expected_feedstock,
         source=getattr(profile, "source", "<profile>"),
         schema=schema,
+        scoring_fidelity=scoring_fidelity,
     )
     _requested_staged_topologies(validated, None)
     return validated
@@ -3780,7 +3826,7 @@ def _ensure_staged_prefix_replay(
     )
     if fresh.eval_spec is None:
         return fresh, True
-    _assert_honest_result(fresh, definitions)
+    _assert_honest_result(fresh, definitions, profile=profile)
     light_fresh = _strip_heavy_result(fresh)
     # A rejected write is non-fatal, but it cannot create a verified replay.
     # Leave the replay cache empty so a sibling through this prefix recomputes
@@ -4197,9 +4243,137 @@ def _with_candidate_id(scored: ScoredResult, candidate_id: str) -> ScoredResult:
     return replace(scored, candidate_id=candidate_id)
 
 
+def _ask_time_scoring(
+    profile: Mapping[str, Any],
+) -> tuple[tuple[ObjectiveDefinition, ...], tuple[float, ...]]:
+    """Definitions and weights before a candidate exists.
+
+    An empty scoring list is the pre-candidate identity, not a study abort.
+    A later voltage cap can restore a product. The declared rows let the
+    sampler start. They are not entered as zeros and they are not
+    renormalised.
+    """
+
+    try:
+        definitions = objective_definitions(profile)
+        return definitions, unrenormalized_study_scalar_weights(profile)
+    except ObjectiveProfileError:
+        definitions = ask_time_objective_definitions(profile)
+        weights = tuple(
+            row.weight for row in objective_importance_evidence(profile)
+        )
+        return definitions, weights
+
+
+def _executed_definitions(
+    record: StudyRecord,
+    definitions: Sequence[ObjectiveDefinition],
+    profile: Mapping[str, Any] | None,
+) -> Sequence[ObjectiveDefinition]:
+    """Definitions of the triple this record's EvalSpec executed.
+
+    ``profile is None`` or a missing spec keeps the ask-time definitions.
+    Those are the only identities that exist before a candidate.
+    """
+
+    if profile is None:
+        return definitions
+    return executed_objective_definitions(profile, record.eval_spec, definitions)
+
+
+def _definition_metrics(
+    definitions: Sequence[ObjectiveDefinition],
+) -> tuple[str, ...]:
+    return tuple(definition.metric for definition in definitions)
+
+
+def _executed_weights(
+    record: StudyRecord,
+    definitions: Sequence[ObjectiveDefinition],
+    weights: Sequence[float],
+    profile: Mapping[str, Any] | None,
+) -> Sequence[float]:
+    executed = _executed_definitions(record, definitions, profile)
+    if _definition_metrics(executed) == _definition_metrics(definitions):
+        return weights
+    if profile is None or record.eval_spec is None:
+        return weights
+    try:
+        return unrenormalized_study_scalar_weights(
+            scoring_profile_for_executed_spec(profile, record.eval_spec)
+        )
+    except ObjectiveProfileError:
+        return weights
+
+
+def _records_share_fallback_metrics(
+    records: Sequence[StudyRecord],
+    definitions: Sequence[ObjectiveDefinition],
+    profile: Mapping[str, Any] | None,
+) -> bool:
+    fallback = _definition_metrics(definitions)
+    return all(
+        _definition_metrics(_executed_definitions(record, definitions, profile))
+        == fallback
+        for record in records
+    )
+
+
+def _pareto_records(
+    records: Sequence[StudyRecord],
+    definitions: Sequence[ObjectiveDefinition],
+    *,
+    profile: Mapping[str, Any] | None = None,
+) -> tuple[StudyRecord, ...]:
+    """Non-dominated records, grouped when candidates execute different metrics.
+
+    One shared metric tuple uses the ask-time definitions, so a study whose
+    caps do not change claims keeps today's front. Mixed tuples are not
+    zip-compared: each signature has its own front, and the fronts are united.
+    """
+
+    if not records:
+        return ()
+    if profile is None or _records_share_fallback_metrics(records, definitions, profile):
+        return pareto_front(
+            records,
+            definitions,
+            objective_getter=lambda row: row.objectives,
+            score_getter=lambda row: _record_objective_scores(row, definitions),
+        )
+    grouped: dict[
+        tuple[str, ...],
+        tuple[list[StudyRecord], Sequence[ObjectiveDefinition]],
+    ] = {}
+    for record in records:
+        active = _executed_definitions(record, definitions, profile)
+        signature = _definition_metrics(active)
+        bucket = grouped.get(signature)
+        if bucket is None:
+            grouped[signature] = ([record], active)
+        else:
+            bucket[0].append(record)
+    front: list[StudyRecord] = []
+    for members, active in grouped.values():
+        group = tuple(members)
+        selected = pareto_front(
+            group,
+            active,
+            objective_getter=lambda row: row.objectives,
+            score_getter=lambda row, active=active: _record_objective_scores(
+                row,
+                active,
+            ),
+        )
+        front.extend(selected)
+    return tuple(front)
+
+
 def _assert_honest_result(
     scored: ScoredResult,
     definitions: Sequence[ObjectiveDefinition],
+    *,
+    profile: Mapping[str, Any] | None = None,
 ) -> None:
     if scored.failure_category is FailureCategory.STALE_PROFILE:
         if scored.feasible:
@@ -4232,8 +4406,13 @@ def _assert_honest_result(
     if scored.objectives is None:
         raise StudyAbort("feasible result missing objective vector")
     try:
-        objective_scores(scored.objectives, definitions)
-    except ObjectiveComputationError as exc:
+        active = definitions
+        if profile is not None and scored.eval_spec is not None:
+            active = objective_definitions(
+                scoring_profile_for_executed_spec(profile, scored.eval_spec)
+            )
+        objective_scores(scored.objectives, active)
+    except (ObjectiveComputationError, ObjectiveProfileError) as exc:
         raise StudyAbort(str(exc)) from exc
 
 
@@ -4303,6 +4482,11 @@ def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
     return replace(scored, run_reference=light_reference)
 
 
+# Completed-step stop records. Both light-trace projections spread this
+# tuple. A C4 time_cap that continues must stay on the ranking record.
+_CAMPAIGN_STOP_TRACE_KEYS = ("campaign_stops",)
+
+
 def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | None:
     reference = scored.run_reference
     status = _result_backend_status(scored)
@@ -4333,6 +4517,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "refusal_reason",
             "refusal_diagnostic",
             "rump_terminal",
+            *_CAMPAIGN_STOP_TRACE_KEYS,
             "terminal_rump_by_species_kg",
             "composition_target",
             "vapor_pressure_source_report",
@@ -4662,6 +4847,7 @@ def _light_backend_status_trace_for_reference(
             "refusal_reason",
             "refusal_diagnostic",
             "rump_terminal",
+            *_CAMPAIGN_STOP_TRACE_KEYS,
             "terminal_rump_by_species_kg",
             "composition_target",
             "vapor_pressure_source_report",
@@ -5057,6 +5243,8 @@ class _ParetoSelection:
 def _select_pareto(
     feasible: Sequence[StudyRecord],
     definitions: Sequence[ObjectiveDefinition],
+    *,
+    profile: Mapping[str, Any] | None = None,
 ) -> _ParetoSelection:
     """Build the feasible front once, then split winner from publication.
 
@@ -5065,13 +5253,13 @@ def _select_pareto(
     """
 
     feasible_rows = tuple(record for record in feasible if record.feasible)
-    front = pareto_front(
-        feasible_rows,
-        definitions,
-        objective_getter=lambda row: row.objectives,
-        score_getter=lambda row: _record_objective_scores(row, definitions),
+    front = _pareto_records(feasible_rows, definitions, profile=profile)
+    ranked = tuple(
+        sorted(
+            front,
+            key=lambda row: _rank_key(row, definitions, profile=profile),
+        )
     )
-    ranked = tuple(sorted(front, key=lambda row: _rank_key(row, definitions)))
     return _ParetoSelection(
         published=_publish_pareto(front),
         ranked=ranked,
@@ -5082,12 +5270,21 @@ def _select_pareto(
 def _rank_key(
     record: StudyRecord,
     definitions: Sequence[ObjectiveDefinition],
+    *,
+    profile: Mapping[str, Any] | None = None,
 ) -> tuple[Any, ...]:
-    scores = _record_objective_scores(record, definitions)
-    return (
-        *_rank_score_components(scores),
-        *_sampling_order_key(record),
+    retained = _executed_definitions(record, definitions, profile)
+    scores = _record_objective_scores(record, retained)
+    # Keep profile-aware objective slots while using green's sampling order for
+    # exact ties in the shared selection helper.
+    rank = candidate_rank_key(
+        rank_axis_metrics(profile, definitions),
+        _definition_metrics(retained),
+        scores,
+        cache_key="",
+        candidate_id="",
     )
+    return (*rank, *_sampling_order_key(record))
 
 
 def _record_objective_scores(
@@ -5108,9 +5305,12 @@ def _study_progress(
     records: Sequence[StudyRecord],
     definitions: Sequence[ObjectiveDefinition],
     weights: Sequence[float],
-) -> tuple[float | None, frozenset[tuple[float, ...]]]:
+    *,
+    profile: Mapping[str, Any] | None = None,
+) -> tuple[float | None, frozenset[tuple[Any, ...]]]:
     scored_records: list[StudyRecord] = []
     scores_by_candidate: dict[str, tuple[float, ...]] = {}
+    metrics_by_candidate: dict[str, tuple[str, ...]] = {}
     scalarized_scores: list[float] = []
     # Once a feasible result exists, infeasible outliers cannot pin the stall
     # baseline or Pareto signature while the feasible front keeps improving.
@@ -5120,35 +5320,59 @@ def _study_progress(
         else records
     )
     for record in progress_records:
-        scores = _record_objective_scores(record, definitions)
-        if len(scores) != len(weights) or any(score is None for score in scores):
+        active_definitions = definitions
+        active_weights = weights
+        if profile is not None:
+            active_definitions = _executed_definitions(record, definitions, profile)
+            active_weights = _executed_weights(
+                record,
+                definitions,
+                weights,
+                profile,
+            )
+        scores = _record_objective_scores(record, active_definitions)
+        if len(scores) != len(active_weights) or any(score is None for score in scores):
             continue
         score_row = tuple(float(score) for score in scores)
         # Objective scores already reverse minimized metrics; summing each by its
         # profile weight makes larger weighted totals better across all objectives.
+        # Withheld products stay out of this sum. Their weight is not redistributed.
         scalarized_scores.append(
-            math.fsum(weight * score for weight, score in zip(weights, score_row))
+            math.fsum(
+                weight * score for weight, score in zip(active_weights, score_row)
+            )
         )
         scored_records.append(record)
         scores_by_candidate[record.candidate_id] = score_row
+        metrics_by_candidate[record.candidate_id] = _definition_metrics(
+            active_definitions
+        )
     if not scored_records:
         return None, frozenset()
-    front = pareto_front(
+    if profile is None or _records_share_fallback_metrics(
         scored_records,
         definitions,
-        objective_getter=lambda record: record.objectives,
-        score_getter=lambda record: scores_by_candidate[record.candidate_id],
-    )
+        profile,
+    ):
+        front = pareto_front(
+            scored_records,
+            definitions,
+            objective_getter=lambda record: record.objectives,
+            score_getter=lambda record: scores_by_candidate[record.candidate_id],
+        )
+        pareto_signature = frozenset(
+            scores_by_candidate[record.candidate_id] for record in front
+        )
+        return max(scalarized_scores), pareto_signature
+    front_records = _pareto_records(scored_records, definitions, profile=profile)
     pareto_signature = frozenset(
-        scores_by_candidate[record.candidate_id] for record in front
+        (
+            metrics_by_candidate[record.candidate_id],
+            scores_by_candidate[record.candidate_id],
+        )
+        for record in front_records
     )
     return max(scalarized_scores), pareto_signature
-
-
-def _rank_score_components(
-    scores: Sequence[float | None],
-) -> tuple[tuple[int, float], ...]:
-    return tuple((1, 0.0) if score is None else (0, -score) for score in scores)
 
 
 def _write_artifacts(
@@ -6222,11 +6446,18 @@ def _write_aborted_artifacts_from_cache(
     resolved_failure_counts.update(computed_failures)
     feasible = tuple(record for record in records if record.feasible)
     leaderboard = (
-        tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
+        tuple(
+            sorted(
+                feasible,
+                key=lambda row: _rank_key(row, definitions, profile=profile),
+            )
+        )
         if feasible
         else tuple(sorted(records, key=_sampling_order_key))
     )
-    published_pareto = _select_pareto(feasible, definitions).published
+    published_pareto = _select_pareto(
+        feasible, definitions, profile=profile
+    ).published
     _write_artifacts(
         out,
         profile=profile,
@@ -6649,6 +6880,33 @@ def _flagged_law_leaderboard_row(record: StudyRecord) -> dict[str, str]:
     }
 
 
+def _leaderboard_definitions(
+    leaderboard: Sequence[StudyRecord],
+    definitions: Sequence[ObjectiveDefinition],
+    profile: Mapping[str, Any] | None,
+) -> Sequence[ObjectiveDefinition]:
+    """Ask-time columns, plus metrics a candidate's execution restored.
+
+    A homogeneous study returns the same definitions object, so the CSV
+    header is unchanged. A restored product is an extra column. A withheld
+    product stays an empty cell, never a zero.
+    """
+
+    if profile is None:
+        return definitions
+    seen = set(_definition_metrics(definitions))
+    extras: list[ObjectiveDefinition] = []
+    for record in leaderboard:
+        for definition in _executed_definitions(record, definitions, profile):
+            if definition.metric in seen:
+                continue
+            seen.add(definition.metric)
+            extras.append(definition)
+    if not extras:
+        return definitions
+    return tuple(definitions) + tuple(extras)
+
+
 def _write_leaderboard(
     path: Path,
     leaderboard: Sequence[StudyRecord],
@@ -6659,6 +6917,7 @@ def _write_leaderboard(
     *,
     profile: Mapping[str, Any] | None = None,
 ) -> None:
+    definitions = _leaderboard_definitions(leaderboard, definitions, profile)
     pareto_ids = {record.candidate_id for record in pareto}
     margin_names = sorted({name for record in leaderboard for name in record.feasibility_margins})
     coating_fields = _coating_leaderboard_fields(leaderboard)

@@ -15,7 +15,11 @@ from simulator.optimize.evaluate import (
     _composition_target_constraints,
     evaluate,
 )
-from simulator.optimize.objective import ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    campaign_claims_product_objective,
+    campaign_product_claim_keys,
+)
 from simulator.optimize.product_pools import MELT_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.optimize.profiles import (
     ProfileValidationError,
@@ -343,12 +347,24 @@ def test_target_menu_extraction_minima_reach_physics_constraints(
         expected_feedstock="lunar_mare_low_ti",
         source=out,
     )
-    target = profile["objectives"][0]["target"]
+    objective = profile["objectives"][0]
+    target = objective["target"]
     completeness_min = dict(target["extraction"]["completeness_min"])
+    # Thresholds follow the same claim as the score. An unclaimed composition
+    # objective, including a ceramic rump and an extract species with no
+    # product key, installs nothing. The oracle is the claim helper, not
+    # composition_target_specs.
+    claim_keys = campaign_product_claim_keys(str(profile["run"]["campaign"]))
+    claimed = campaign_claims_product_objective(
+        str(objective["metric"]),
+        claim_keys,
+        composition=True,
+        target=target,
+    )
     constraints = _composition_target_constraints(profile, None)
 
-    if completeness_min:
-        assert constraints is not None
+    assert constraints is not None
+    if completeness_min and claimed:
         assert set(constraints.extraction_min_fraction_by_species) == set(completeness_min)
         for species, value in completeness_min.items():
             threshold = constraints.extraction_min_fraction_by_species[species]
@@ -356,7 +372,6 @@ def test_target_menu_extraction_minima_reach_physics_constraints(
             assert threshold.source == "profile"
             assert f"completeness_min.{species}" in threshold.source_ref
     else:
-        assert constraints is not None
         assert constraints.extraction_min_fraction_by_species == {}
 
 

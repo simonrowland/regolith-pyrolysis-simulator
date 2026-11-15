@@ -123,6 +123,41 @@ class RunExecution:
     failure_exception: BaseException | None = field(
         default=None, compare=False, repr=False
     )
+    # One record per completed campaign: campaign, stop_reason, duration_h,
+    # and the cap or refusal name when the endpoint recorded one.
+    campaign_stops: tuple[Mapping[str, Any], ...] = ()
+
+
+_CAMPAIGN_STOP_REASONS = frozenset({
+    "endpoint_met",
+    "time_cap",
+    "refused",
+    "stop_reason_unrecorded",
+})
+
+
+def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    """Compact ranking record for one completed campaign.
+
+    Accepts a campaign summary (``stop_detail``) or an already compact
+    record (``detail``). A summary with no stop token returns None. It is
+    not stored as ``endpoint_met``.
+    """
+
+    if not isinstance(summary, Mapping):
+        return None
+    reason = str(summary.get("stop_reason") or "")
+    if reason not in _CAMPAIGN_STOP_REASONS:
+        return None
+    record: dict[str, Any] = {
+        "campaign": str(summary.get("campaign") or ""),
+        "stop_reason": reason,
+        "duration_h": summary.get("duration_h"),
+    }
+    detail = summary.get("stop_detail", summary.get("detail"))
+    if detail:
+        record["detail"] = str(detail)
+    return record
 
 
 def _campaigns_elapsed_from_session_history(
@@ -312,11 +347,15 @@ class RunExecutor:
             session,
             fallback=0.0,
         )
+        config = getattr(session, "_config", None)
         if stop_at_stage0_exit is None:
-            config = getattr(session, "_config", None)
             stop_at_stage0_exit = bool(
                 getattr(config, "stop_at_stage0_exit", False)
             )
+        until_campaign_complete = bool(
+            getattr(config, "until_campaign_complete", False)
+        )
+        campaign_stops: list[dict[str, Any]] = []
 
         try:
             if initial_refusal is not None:
@@ -327,6 +366,7 @@ class RunExecutor:
                 DecisionPolicy.AUTO_APPLY,
                 operator_decisions=operator_decisions,
                 stop_at_stage0_exit=bool(stop_at_stage0_exit),
+                until_campaign_complete=until_campaign_complete,
             ))
             while True:
                 # A typed refusal is an infeasible point, not a partially
@@ -368,6 +408,9 @@ class RunExecutor:
                     failure_exc = RuntimeError(reason)
                     break
                 campaign_summary = result.campaign_summary
+                recorded_stop = campaign_stop_record(campaign_summary)
+                if recorded_stop is not None:
+                    campaign_stops.append(recorded_stop)
                 c4_refusal = (
                     campaign_summary.get("c4_refusal_diagnostic")
                     if isinstance(campaign_summary, Mapping)
@@ -452,6 +495,15 @@ class RunExecutor:
                 elif pending_decision is not None:
                     status = "partial"
                     reason = "pending_decision"
+                elif until_campaign_complete:
+                    # Authored hours are not the stop. A finished campaign
+                    # is ok even when melt.hour is under that budget. Still
+                    # in a phase means the controller did not end it.
+                    if not sim.is_complete():
+                        status = "partial"
+                        phase = getattr(sim.melt, "campaign", None)
+                        phase_name = getattr(phase, "name", None) or str(phase)
+                        reason = f"campaign_did_not_end:{phase_name}"
                 elif sim.melt.hour < hours:
                     status = "partial"
         except (
@@ -574,6 +626,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
+                campaign_stops=tuple(campaign_stops),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
             if failure_exc is None:
@@ -661,6 +714,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
+                campaign_stops=tuple(campaign_stops),
             )
 
 
