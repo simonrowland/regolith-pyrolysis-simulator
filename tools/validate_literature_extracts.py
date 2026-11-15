@@ -46,6 +46,113 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   not 1 and a cell 1,000 is not 1. A line_range selects only records that lie entirely
   inside it. A span that cuts through a quoted cell is source-blind and
   is not re-parsed from the sliced lines. 1 K is not 1 KPa.
+  A MinerU markdown table is one ``<table>`` line, so a line_range cannot
+  isolate a row. ``table_row`` and ``table_column`` (the same indexes as
+  ``table_row_number`` and ``table_column_number``) select one cell after
+  the HTML table is parsed, rowspan and colspan included. The stored
+  number must be that whole trimmed cell. A cited span that includes a
+  line of an HTML table and has no ``table_row`` or ``table_column``
+  refuses with ``html_table_requires_cell_address``. A value on a prose
+  line in that span still certifies. A value present only in the table
+  does not. A superscript cell certifies only when that cell is a
+  complete power and nothing else: exactly one optional leading sign
+  and an unsigned base, an optional × or x or ·, then 10 and the
+  superscript exponent, or the unsigned base raised to that exponent.
+  ``10<sup>3</sup>`` certifies ``1e3``.
+  ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``. A leading minus
+  applies to the whole power, so ``-10<sup>2</sup>`` and the caret
+  spelling ``-10^2`` are ``-100`` and not ``100``. A second sign is not
+  that grammar: ``--10<sup>2</sup>``, ``+-10<sup>2</sup>``, and
+  ``-−10<sup>2</sup>`` are ``superscript_in_cell``. A missing base,
+  including ``<sup>2</sup>``, is ``superscript_in_cell`` and does not
+  raise. ``10<sup>3</sup>2`` and any other leading or trailing content
+  are ``superscript_in_cell``, as is a plain number. ``0<sup>2</sup>``
+  certifies ``0.0`` and does not certify ``-0.0``. ``-0<sup>2</sup>``
+  is that power negated with ``copy_negate``, so it certifies ``-0.0``
+  and does not certify ``0.0``. The power, including a times-ten
+  product, is one ``localcontext`` that traps inexact, rounded,
+  underflow, overflow, subnormal, and invalid results. Any of those is
+  ``superscript_in_cell``. ``12345678901234567890123456789<sup>1</sup>``
+  does not certify ``1.2345678901234567890123456790e28``.
+  ``10<sup>-1000</sup>`` does not certify 0. ``1.5×10<sup>3</sup>``
+  still certifies 1500. A value in another row
+  does not certify. Formula and species labels are normalized before every
+  comparison, including a label with no ASCII digit. Markup folds
+  inside each whitespace token and does not delete a separator. ``_{n}``,
+  a bare ``_`` digit, Unicode subscript digits, ``$...$``, and a
+  ``\\mathrm`` / ``\\text`` / ``\\rm`` command are removed inside the
+  token. A space inside ``$...$`` stays a separator, so ``$H_{2} O_{2}$``
+  is ``H2`` and ``O2``, and ``$SiO_{2} 100$`` is ``SiO2`` and ``100``.
+  A caret is a superscript. A token that contains ``^`` is not unwrapped
+  and does not certify as a plain formula or a plain number, so
+  ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
+  A raw whitespace token, before formula folding, that carries ``^``,
+  ``<sup>``, a Unicode superscript, or any charge sign together with an
+  uppercase element letter is a charged species. The charge signs are
+  ASCII plus and hyphen-minus plus ``UNICODE_MINUS_SIGNS`` and
+  ``UNICODE_PLUS_SIGNS``, anywhere in the token. ``Cl−,``, ``SO₄−``,
+  ``SO_{4}−``, and ``Fe-rich`` do not certify the neutral label. ``Cl``
+  does. The same rule applies to a whole HTML, CSV, or TSV cell. It
+  certifies no formula or species label and no number.
+  For a charge sign that is not a superscript, the refusal is
+  ``charged_species_unsupported`` only when the label is that token's
+  element symbols, lowercase letters included, after the subscript fold.
+  ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``, and
+  ``MnO−`` does not type ``MgO``; those misses stay
+  ``cited_token_absent``. An empty ``<sup></sup>`` is still a superscript
+  tag. ``SiO<sup></sup>2`` does not certify ``SiO2``; that refusal is
+  ``charged_species_unsupported``. ``Fe<sup>2</sup>`` is
+  ``charged_species_unsupported`` for ``Fe`` and ``Fe2``, not
+  ``cited_token_absent``. A ``<sup>`` tag, including one whose content
+  is letters, a caret, a character whose Unicode name contains
+  SUPERSCRIPT, or a modifier letter, is decided on the raw token or
+  cell before spans are stripped. That superscripted token or cell
+  certifies no formula or species label, so ``<sup>SiO2</sup>``,
+  ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` are
+  ``charged_species_unsupported``. A superscript in another token of
+  the same cited span does not type an unrelated miss. An addressed
+  HTML, CSV, or TSV cell is one unit on that same check, so a space
+  inside the cell does not split it. ``Fe -`` is
+  ``charged_species_unsupported`` for ``Fe``. ``SiO2 ⁿ`` is
+  ``charged_species_unsupported`` for ``SiO2``. Only prose is split
+  on whitespace. That guard is a formula or species label. A numeric
+  or measured leaf, including a unit, does not take it, so ``-6.98``,
+  ``-1Pa``, and ``1.2E-3K`` still certify. ``Fe`` is not
+  ``$\\mathrm{Fe}^{2+}$`` and ``Fe^{2+}`` is not an identical CSV cell.
+  A plain numeric cell with no element symbol is still a power.
+  A subscript digit inside a formula token is not a number: ``SiO_{2}``
+  and ``SiO₂`` do not certify 2, and ``Fe_{2}O_{3}`` does not certify 2.
+  ``SiO_{2} 100`` still certifies 100. A formula label matches one whole
+  run of element symbols, digits, parentheses, square brackets, and the
+  charge marks ·, +, and -. ``SO4`` is not ``Fe₂(SO₄)₃``. ``Fe2(SO4)3``
+  is. ``CaO·SiO2`` certifies only as that whole run, so ``SiO2`` does not.
+  A ``.`` followed by a digit, directly after an element letter, a
+  digit, or ``)``, stays in the run. ``_{.5}`` folds to ``.5`` in
+  ``printed_formula``. ``FeO.5``, ``FeO_{.5}``, and ``FeO_{0.5}`` do
+  not certify ``FeO``. ``SiO2.5`` and ``SiO_{2.5}`` do not certify
+  ``SiO2``, and ``FeO1.5`` does not certify ``FeO``. A period that is
+  not followed by a digit is still a boundary, so ``FeO.`` and
+  ``SiO2.`` at the end of a sentence certify ``FeO`` and ``SiO2``.
+  A token with no internal space, including
+  ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, goes through
+  ``printed_formula``. A space always separates tokens, so ``SiO 2``
+  does not certify ``SiO2`` and ``Fe 6.98`` certifies ``Fe`` and
+  ``6.98`` and does not certify ``Fe6``. ``H2 O2``, ``SiO2 Al2O3``,
+  and ``Fe 2 O 3`` stay separate tokens. ``CO`` is not ``CO₂`` and ``SiO₂`` is
+  not ``SiO₂₂``. A thin space (U+2009), narrow no-break space (U+202F),
+  or no-break space (U+00A0) in an unsigned digit run is typography.
+  An ASCII space is not, so ``1 100`` certifies 1 and 100 and does not
+  certify 1100. The first group is one to three digits and each group
+  after it is exactly three, so ``1 650`` and ``1 650`` are 1650. The
+  run starts at the beginning of the text or after whitespace or
+  punctuation, never after a letter, so ``SiO2 100`` stays ``SiO2``
+  and ``100``. ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are
+  not one number. A short group leaves the separated run unjoined, so
+  ``12\\u200934\\u2009567`` is not ``34567`` and ``1\\u2009650\\u20091``
+  is not ``1650``. The formula-label path does not apply this fold.
+  A comma is
+  not that separator. A numeric leaf does not match a formula by the
+  formula fold.
   A leading decimal is a number, so .24 is not a label
   and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
   only when it parses back to the stored number, so
@@ -66,14 +173,20 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   (``T_range_K``, ``T_K``, ``T_C``, ``temperature_C``, ``temp_C``,
   ``point_conditions``). A locator inside a condition is provenance, not
   a leaf. A coverable measured leaf is a finite int or float (not a
-  boolean), or a string that contains any digit [0-9]. A non-finite float
+  boolean), or a string that contains any digit [0-9] unless that string
+  is an admitted annotation: a direct child of ``values`` other than
+  ``reason``, or a ``reason`` whose parent condition state has a non-value
+  ``StateTag``, at any depth. A ``reason`` beside ``tag: value``, or in a
+  mapping with no state tag, stays a leaf at the observation root and
+  nested under ``values``. A nested ``locator.note`` stays a leaf. A non-finite float
   is not coverable and is not dropped: it is ``non_finite_evidence``.
   A quantity name, a unit on its
   own, or another label with no digit is not a leaf and may be attested
   as text. A string the numeric parser cannot read, such as ``0.91Pa``
   or ``0.0614K``, is still a leaf: it is uncovered unless the opened
   source carries that printed value. Zero recognised leaves in a block
-  that still contains a digit is a refusal, not coverage. Repeating a
+  that still contains a digit outside an annotation string is a refusal,
+  not coverage. Repeating a
   pin of one address does not cover a sibling, even when the numbers
   are equal, and a ``values`` pin does not cover a sibling condition.
   A descriptive label such as ``quantity: pressure`` does not cover a
@@ -100,14 +213,25 @@ import argparse
 import csv
 import hashlib
 from copy import deepcopy
-from dataclasses import dataclass
-from decimal import Decimal, DecimalException
+from dataclasses import dataclass, field
+from decimal import (
+    Decimal,
+    DecimalException,
+    Inexact,
+    InvalidOperation,
+    Overflow,
+    Rounded,
+    Subnormal,
+    Underflow,
+    localcontext,
+)
 from functools import lru_cache
 import math
 import os
 import re
 import subprocess
 import sys
+import unicodedata
 from collections.abc import (
     MutableMapping,
     MutableSequence,
@@ -127,6 +251,19 @@ from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
 )
+from simulator.chemistry.formula_text import (
+    UNICODE_MINUS_SIGNS,
+    UNICODE_PLUS_SIGNS,
+    fold_subscript_digits,
+    is_superscripted,
+)
+from simulator.state_types import StateTag
+from tools.mineru_table_draft import (
+    Cell,
+    TableGeometryError,
+    parse_table_html,
+    printed_formula_tokens,
+)
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
@@ -143,7 +280,13 @@ LAB_PARAMETER_VOCABULARY_PATH = ROOT / "data" / "literature" / "lab_parameter_vo
 
 @lru_cache(maxsize=512)
 def _load_extract_yaml_cached(path: str, mtime_ns: int, size: int) -> Any:
-    return yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    text = Path(path).read_text(encoding="utf-8")
+    # Same YAML 1.1 safe schema as yaml.safe_load. The pure-Python loader
+    # is the corpus-validation CPU cost; libyaml parses these files the same.
+    loader = getattr(yaml, "CSafeLoader", None)
+    if loader is None:
+        return yaml.safe_load(text)
+    return yaml.load(text, Loader=loader)
 
 
 def load_extract_yaml(path: Path) -> Any:
@@ -240,31 +383,12 @@ def _valid_source_sha256(value: Any) -> bool:
 # Unicode minus and the other dash/plus signs are not ASCII "+" or "-".
 # The citation grammar below only sees ASCII signs, so a raw scan of
 # "−0.24" (U+2212) yields the token "0.24" and certifies the opposite
-# sign. Fold these onto ASCII before that grammar runs. Plus-minus is
-# absent here on purpose: it is neither "+" nor "-" and stays in the
-# grammar as its own sign.
-_UNICODE_MINUS_SIGNS = (
-    "\u2212"  # MINUS SIGN
-    "\u2010"  # HYPHEN
-    "\u2011"  # NON-BREAKING HYPHEN
-    "\u2012"  # FIGURE DASH
-    "\u2013"  # EN DASH
-    "\u2014"  # EM DASH
-    "\u2015"  # HORIZONTAL BAR
-    "\ufe63"  # SMALL HYPHEN-MINUS
-    "\uff0d"  # FULLWIDTH HYPHEN-MINUS
-    "\u02d7"  # MODIFIER LETTER MINUS SIGN
-    "\u207b"  # SUPERSCRIPT MINUS
-    "\u208b"  # SUBSCRIPT MINUS
-    "\u2796"  # HEAVY MINUS SIGN
-)
-_UNICODE_PLUS_SIGNS = (
-    "\uff0b"  # FULLWIDTH PLUS SIGN
-    "\ufe62"  # SMALL PLUS SIGN
-    "\u207a"  # SUPERSCRIPT PLUS
-    "\u208a"  # SUBSCRIPT PLUS
-    "\u2795"  # HEAVY PLUS SIGN
-)
+# sign. Fold the owned class onto ASCII before that grammar runs.
+# Plus-minus is absent from that class on purpose: it is neither "+" nor
+# "-" and stays in the grammar as its own sign. Charge detection uses
+# the same characters.
+_UNICODE_MINUS_SIGNS = UNICODE_MINUS_SIGNS
+_UNICODE_PLUS_SIGNS = UNICODE_PLUS_SIGNS
 _NUMERIC_SIGN_FOLD = str.maketrans(
     {ord(ch): "-" for ch in _UNICODE_MINUS_SIGNS}
     | {ord(ch): "+" for ch in _UNICODE_PLUS_SIGNS}
@@ -282,7 +406,8 @@ _TOKEN_LOOKBEHIND_CLASS = "A-Za-z0-9_." + "+" + _DISTINCT_NUMERIC_SIGNS + "-"
 # decimal: ".24" is a number. Without that alternative the string ".91"
 # is not a measured leaf, and the non-numeric substring path treats ".24"
 # as text inside "-.24". Callers scan text only through
-# ``_citation_token_matches``, which folds Unicode signs first and drops
+# ``_citation_token_matches``, which folds Unicode signs and typographic
+# digit groups first and drops
 # any span ``_span_is_complete_printed_value`` rejects. The grammar is not
 # the boundary: a comma is not a hard edge here, and a yielded match is
 # still not a token of ``1,000``. A period is not a hard edge either.
@@ -311,17 +436,88 @@ def _fold_numeric_signs(text: str) -> str:
     return text.translate(_NUMERIC_SIGN_FOLD)
 
 
+# Thin space, narrow no-break space, and no-break space. One separator
+# between groups. An ASCII space is two measurements: ``1 100`` stays
+# ``1 100``. A comma is not this separator: ``1,000`` stays ``1,000``.
+_DIGIT_GROUP_SEPARATORS = "\u2009\u202f\u00a0"
+# The whole separated run, including a short group. A well-formed prefix
+# is not deleted while a later separator remains.
+_DIGIT_GROUP_RUN_RE = re.compile(
+    r"\d+(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d+)+"
+)
+# First group is 1–3 digits. Every group after it is exactly three.
+_DIGIT_GROUP_WELL_FORMED_RE = re.compile(
+    r"\d{1,3}(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d{3})+"
+)
+
+
+def _digit_run_may_start(text: str, start: int) -> bool:
+    """True when a grouped digit run may begin at ``start``.
+
+    The previous character is the start of the text, whitespace, or
+    punctuation. A letter never starts a run. A digit, decimal point,
+    exponent marker, or sign does not either.
+    """
+    if start <= 0:
+        return True
+    previous = text[start - 1]
+    if previous in "0123456789.eE+-" or previous.isalpha():
+        return False
+    return previous.isspace() or unicodedata.category(previous).startswith("P")
+
+
+def _fold_digit_groups(text: str) -> str:
+    """Join one unsigned digit run on a typographic separator.
+
+    A thin space, narrow no-break space, or no-break space joins groups.
+    An ASCII space does not, so ``1 100`` stays ``1 100``. The run starts
+    at the beginning of the text or after whitespace or punctuation, never
+    after a letter, so ``SiO2 100`` stays ``SiO2 100``. The first group is
+    one to three digits. Each following group is exactly three. The whole
+    separated run must be that shape. A short group is not deleted, and a
+    well-formed piece of the same run is not joined on its own, so
+    ``12\\u200934\\u2009567`` stays and is not ``34567``, and
+    ``1\\u2009650\\u20091`` is not ``1650``. A decimal point may follow the
+    run. ``12 34``, ``1e0 001``, ``1.5 000``, ``1 550e3``, and a signed
+    run stay apart. A second call keeps the same spans. Text with none of
+    those separators is returned unchanged.
+    """
+    if not any(separator in text for separator in _DIGIT_GROUP_SEPARATORS):
+        return text
+    pieces: list[str] = []
+    cursor = 0
+    for match in _DIGIT_GROUP_RUN_RE.finditer(text):
+        if match.end() < len(text) and text[match.end()] in "eE":
+            continue
+        if not _digit_run_may_start(text, match.start()):
+            continue
+        grouped = match.group(0)
+        if _DIGIT_GROUP_WELL_FORMED_RE.fullmatch(grouped) is None:
+            continue
+        pieces.append(text[cursor : match.start()])
+        for separator in _DIGIT_GROUP_SEPARATORS:
+            grouped = grouped.replace(separator, "")
+        pieces.append(grouped)
+        cursor = match.end()
+    pieces.append(text[cursor:])
+    return "".join(pieces)
+
+
 def _citation_token_matches(text: str) -> list[re.Match[str]]:
-    """Numeric tokens after Unicode signs are folded.
+    """Numeric tokens after signs and digit groups are folded.
 
     Spelling equality and string alignment read this list. A sign cannot
     be dropped on one of those paths and kept on another. A match whose
     span fails ``_span_is_complete_printed_value`` is not a token, so
-    ``1`` is not a token of ``1,000``. This grammar is not the coverage
-    membership test: a string that contains a digit is a measured leaf
-    even when this list is empty.
+    ``1`` is not a token of ``1,000``. Typographic digit groups of one
+    number are joined first, so ``1 650`` is the token ``1650``. An ASCII
+    space is not joined, so ``1 100`` is the tokens ``1`` and ``100``,
+    and ``12 34`` is two tokens. A second fold does not move those spans.
+    This grammar is
+    not the coverage membership test: a string that contains a digit is
+    a measured leaf even when this list is empty.
     """
-    folded = _fold_numeric_signs(text)
+    folded = _fold_digit_groups(_fold_numeric_signs(text))
     return [
         match
         for match in _NUMERIC_TOKEN_RE.finditer(folded)
@@ -353,7 +549,7 @@ def _parser_reads_every_digit(text: str) -> bool:
     The numeric grammar still compares values it can read. A digit that
     sits outside every token, as in ``0.91Pa`` or ``91.``, is not read.
     """
-    folded = _fold_numeric_signs(text)
+    folded = _fold_digit_groups(_fold_numeric_signs(text))
     if not _string_has_ascii_digit(folded):
         return False
     covered = [False] * len(folded)
@@ -395,10 +591,19 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     occupies ``[start, end)``, and neither neighbour extends that span.
     ``1 K`` is not ``1 KPa``. ``1`` is not ``1,000``. ``1,000`` is not
     ``1,000,000``. ``1`` is not ``-1`` or ``1µ``. ``1`` is ``the value is 1.``
+    A whitespace token that contains ``^`` holds a superscript. No span
+    inside that token certifies a plain formula or a plain number.
+    A formula subscript count is not a measurement: ``_{n}`` and a bare
+    ``_`` digit do not certify as that number, so ``SiO_{2}`` does not
+    certify 2. ``SiO_{2} 100`` still certifies 100.
     This predicate is the prose boundary only. A CSV or TSV source does
     not call it. The table is parsed first, and the whole cell is compared.
     """
     if not (0 <= start < end <= len(text)):
+        return False
+    if _token_holds_superscript(text, start, end):
+        return False
+    if _span_is_formula_subscript(text, start):
         return False
     if start > 0 and _extends_printed_value(
         text, start - 1, text[start], sign_attaches=True
@@ -414,15 +619,53 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     return True
 
 
-def _printed_value_carried(leaf: str, text: str) -> bool:
-    """True when sign-folded ``leaf`` occurs in sign-folded ``text`` whole.
+def _span_is_formula_subscript(text: str, start: int) -> bool:
+    """True when a numeric span opens a formula subscript count.
 
-    Acceptance is ``_span_is_complete_printed_value`` on that span.
-    ``0.91Pa`` is not ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not
-    ``91.0``, ``1 K`` is not ``1 KPa``, and ``1,000`` is not ``1,000,000``.
+    ``_{12}`` and ``_12`` are the formula's count. Those digits are not
+    a measurement. A later token still is, so ``SiO_{2} 100`` keeps
+    ``100``. A Unicode subscript digit is not an ASCII number, so it is
+    not this span.
     """
-    leaf = _fold_numeric_signs(leaf)
-    text = _fold_numeric_signs(text)
+    if start <= 0:
+        return False
+    if text[start - 1] == "_":
+        return True
+    return start >= 2 and text[start - 1] == "{" and text[start - 2] == "_"
+
+
+def _token_holds_superscript(text: str, start: int, end: int) -> bool:
+    """True when the whitespace token covering ``[start, end)`` contains ``^``.
+
+    This is the numeric span. A caret still blocks a plain number. The
+    charge guard is not applied here. It belongs to a formula or species
+    label, so ``-1Pa`` and ``1.2E-3K`` certify.
+    """
+    left = start
+    while left > 0 and not text[left - 1].isspace():
+        left -= 1
+    right = end
+    limit = len(text)
+    while right < limit and not text[right].isspace():
+        right += 1
+    return "^" in text[left:right]
+
+
+def _printed_value_carried(leaf: str, text: str) -> bool:
+    """True when the folded ``leaf`` occurs in the folded ``text`` whole.
+
+    Signs and typographic digit groups are folded on both sides. This is
+    the numeric boundary. A formula label does not use it: parentheses
+    would split ``Fe2(SO4)3``. Acceptance is
+    ``_span_is_complete_printed_value`` on that span. ``0.91Pa`` is not
+    ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not ``91.0``, ``1 K`` is not
+    ``1 KPa``, ``1,000`` is not ``1,000,000``, and ``12 34`` is not ``1234``.
+    A thin space, narrow no-break space, or no-break space joins an
+    unsigned digit run, so ``1 650`` is ``1650``. An ASCII space does not,
+    so ``1 100`` is not ``1100``. ``SiO2 100`` is not ``SiO2100``.
+    """
+    leaf = _fold_digit_groups(_fold_numeric_signs(leaf))
+    text = _fold_digit_groups(_fold_numeric_signs(text))
     if not leaf:
         return False
     start = 0
@@ -553,10 +796,13 @@ def _whole_cell_number(cell: str) -> Decimal | None:
     ``Decimal``, never a float conversion: ``0.9100`` is ``0.91``,
     ``1e-999`` is not ``0``, and ``9007199254740993`` is not
     ``9007199254740992``. ``1/2``, ``1,000``, and ``0.91Pa`` do not parse.
-    NaN, Infinity, and an exponent Decimal rejects are refusals. This is
-    not a list of spellings of a stored leaf.
+    A typographic digit group does: a thin space or a no-break space makes
+    1650, and an ASCII space does not, so ``1 550`` is not ``1550`` and
+    ``12 34`` is not ``1234``. NaN, Infinity, and an exponent Decimal
+    rejects are refusals.
+    This is not a list of spellings of a stored leaf.
     """
-    folded = _fold_numeric_signs(cell.strip())
+    folded = _fold_digit_groups(_fold_numeric_signs(cell.strip()))
     return _finite_decimal(folded)
 
 
@@ -603,14 +849,22 @@ def _cell_certifies_leaf(leaf: Any, cell: str) -> bool:
         stored = _stored_number_decimal(leaf)
         if parsed is None or stored is None:
             return False
-        if parsed != stored:
-            return False
-        # Decimal equality collapses the sign of zero. The sign is part
-        # of the value, so a negative zero does not certify a positive zero.
-        if parsed.is_zero():
-            return parsed.as_tuple().sign == stored.as_tuple().sign
-        return True
+        return _same_signed_decimal(parsed, stored)
     return False
+
+
+def _same_signed_decimal(parsed: Decimal, stored: Decimal) -> bool:
+    """True when the numbers are equal, including the sign of zero.
+
+    ``Decimal`` equality treats negative zero as zero. The sign is part
+    of the certified value, so ``-0.0`` is not ``0.0``. This is the only
+    comparison. A plain cell and a superscript power both call it.
+    """
+    if parsed != stored:
+        return False
+    if parsed.is_zero():
+        return parsed.as_tuple().sign == stored.as_tuple().sign
+    return True
 
 
 def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
@@ -622,6 +876,395 @@ def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
     ``note 1`` is not that stored number.
     """
     return any(_cell_certifies_leaf(leaf, cell) for cell in cells)
+
+
+# One MinerU table is a single ``<table>...</table>`` line. Nested tables
+# are not a MinerU shape this matcher reads.
+_HTML_TABLE_RE = re.compile(
+    r"<table\b[^>]*>.*?</table>", re.IGNORECASE | re.DOTALL
+)
+# 1-based grid coordinates, header rows included. The longer names are the
+# cell keys already written on locators; they are the same indexes.
+_HTML_ROW_KEYS = ("table_row", "table_row_number")
+_HTML_COLUMN_KEYS = ("table_column", "table_column_number")
+# Formula-bearing label keys only. Every other key, and every number, keeps
+# the ordinary token or whole-cell comparison. A space always separates
+# formula tokens. There is no symbol-space-count join.
+_FORMULA_LABEL_KEYS = frozenset({"formula", "species"})
+
+
+def _html_table_grid(
+    table_html: str,
+) -> tuple[list[list[Cell]] | None, str | None]:
+    """One table from ``parse_table_html``, which owns rowspan and colspan.
+
+    Certification reads ``Cell.text``, ``Cell.superscript_spans``, and
+    ``Cell.has_superscript``. An empty ``<sup></sup>`` still sets the
+    flag. The text keeps formula markup. The draft's split numeric
+    value is not used.
+    """
+    try:
+        grid = parse_table_html(table_html)
+    except TableGeometryError as exc:
+        return None, str(exc)
+    except Exception:
+        return None, "html_table_unparsed: HTML table could not be parsed"
+    if not grid:
+        return None, "html_table_unparsed: HTML table has no rows"
+    return grid, None
+
+
+_EXPLICIT_SCIENCE_RE = re.compile(
+    r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))[eE]([+\-]?\d+)"
+)
+# × U+00D7, ASCII x, · U+00B7. The optional group is mantissa times 10.
+# Without it the prefix is the base of base**exponent.
+_SUPERSCRIPT_TIMES = "\u00d7x\u00b7"
+# Unsigned base. The one optional leading sign is stripped before this match.
+_SUPERSCRIPT_CELL_RE = re.compile(
+    r"((?:\d+(?:\.\d+)?|\.\d+))(?:\s*(["
+    + _SUPERSCRIPT_TIMES
+    + r"])\s*10)?"
+)
+
+
+def _superscript_power_decimal(
+    text: str, spans: tuple[tuple[int, int], ...]
+) -> Decimal | None:
+    """One complete power. One leading sign applies to the whole value.
+
+    The grammar is exactly one optional leading sign and an unsigned
+    base, an optional × or x or middle dot, then 10, and one superscript
+    exponent. Or that unsigned base raised to the exponent. A second
+    sign does not match: ``--10<sup>2</sup>``, ``+-10<sup>2</sup>``, and
+    ``-−10<sup>2</sup>`` are not powers. ``-10<sup>2</sup>`` and the
+    caret spelling ``-10^2`` are ``-(10**2)`` = ``-100``, not
+    ``(-10)**2``. ``-1.5×10<sup>3</sup>`` is ``-1500``. ``10<sup>3</sup>``
+    is ``10**3``, which is ``1e3``. ``1.5×10<sup>3</sup>`` is
+    ``1.5 * 10**3``. A trailing or leading extra, including
+    ``10<sup>3</sup>2``, is not a power. A missing base, including
+    ``<sup>2</sup>``, is not a power. ``-0<sup>2</sup>`` is ``-(0**2)``.
+    ``copy_negate`` keeps that negative zero. The product is evaluated
+    in one context that traps an inexact, rounded, underflow, overflow,
+    subnormal, or invalid result, and that result is not a power.
+    ``12345678901234567890123456789<sup>1</sup>`` and ``10<sup>-1000</sup>``
+    do not certify a rounded stand-in or 0. This is the only signed-power
+    parser. Any failure, including an empty prefix, returns None. The
+    caller refuses with ``superscript_in_cell``.
+    """
+    try:
+        return _read_superscript_power(text, spans)
+    except Exception:  # noqa: BLE001 — a power that cannot be read is a refusal
+        return None
+
+
+def _read_superscript_power(
+    text: str, spans: tuple[tuple[int, int], ...]
+) -> Decimal | None:
+    """The power grammar. Callers use ``_superscript_power_decimal``."""
+    if len(spans) != 1:
+        return None
+    start, end = spans[0]
+    if not (0 <= start < end <= len(text)):
+        return None
+    if text[end:].strip():
+        return None
+    exponent = _fold_numeric_signs(text[start:end].strip())
+    if not re.fullmatch(r"[+\-]?\d+", exponent):
+        return None
+    prefix = _fold_numeric_signs(text[:start].strip())
+    negative = False
+    # One optional leading sign. The base pattern is unsigned, so a
+    # second sign, including ``--``, ``+-``, and a folded ``-−``, refuses.
+    # ``"" in "+-"`` is true, so the test is a one-character set. An empty
+    # prefix, as in ``<sup>2</sup>``, is a missing base and is not indexed.
+    if prefix[:1] in {"+", "-"}:
+        if prefix[0] == "-":
+            negative = True
+        prefix = prefix[1:].strip()
+    parsed = _SUPERSCRIPT_CELL_RE.fullmatch(prefix)
+    if parsed is None:
+        return None
+    base = _finite_decimal(parsed.group(1))
+    if base is None:
+        return None
+    power = int(exponent)
+    # One exact product. Unary negation drops the sign of zero, so a
+    # negative result uses copy_negate. A trap is not a rounded stand-in.
+    try:
+        with localcontext() as ctx:
+            ctx.traps[Inexact] = True
+            ctx.traps[Rounded] = True
+            ctx.traps[Underflow] = True
+            ctx.traps[Overflow] = True
+            ctx.traps[Subnormal] = True
+            ctx.traps[InvalidOperation] = True
+            if parsed.group(2) is None:
+                value = base ** power
+            else:
+                value = base * (Decimal(10) ** power)
+            if negative:
+                value = value.copy_negate()
+    except (ArithmeticError, DecimalException):
+        return None
+    if not value.is_finite():
+        return None
+    return value
+
+
+def _explicit_power_decimal(text: str) -> Decimal | None:
+    """Value of one explicit power spelling, or None.
+
+    ``1e3``, ``10^3``, and ``1×10^3`` are powers. ``1000`` and ``103``
+    are plain numbers. A caret spelling is the HTML power parser, so
+    ``-10^2`` is ``-100``.
+    """
+    token = _fold_numeric_signs(text.strip())
+    scientific = _EXPLICIT_SCIENCE_RE.fullmatch(token)
+    if scientific:
+        return _finite_decimal(f"{scientific.group(1)}e{scientific.group(2)}")
+    if "^" not in token:
+        return None
+    prefix, _, exponent = token.partition("^")
+    prefix = prefix.strip()
+    exponent = exponent.strip()
+    if not prefix or not exponent:
+        return None
+    return _superscript_power_decimal(
+        prefix + exponent, ((len(prefix), len(prefix) + len(exponent)),)
+    )
+
+
+def _superscript_leaf_certifies(
+    leaf: Any, text: str, spans: tuple[tuple[int, int], ...]
+) -> bool:
+    """True when ``leaf`` spells the cell's power and equals it.
+
+    An int and a float use the same numeric equality. ``1000`` and
+    ``1000.0`` certify ``10<sup>3</sup>``. ``1e3`` certifies
+    ``10<sup>3</sup>`` and ``1.5e3`` certifies ``1.5×10<sup>3</sup>``.
+    ``103`` does not, because it is not that power. A string certifies
+    only as ``1e3``, ``10^3``, or ``1×10^3`` (the same value). Extra
+    characters in the cell are not a power. ``0<sup>2</sup>`` certifies
+    ``0.0`` and does not certify ``-0.0``. ``-0<sup>2</sup>`` certifies
+    ``-0.0`` and does not certify ``0.0``. An inexact power certifies
+    nothing. Both comparisons use ``_same_signed_decimal``.
+    """
+    power = _superscript_power_decimal(text, spans)
+    if power is None:
+        return False
+    if isinstance(leaf, str):
+        spelled = _explicit_power_decimal(leaf)
+        return spelled is not None and _same_signed_decimal(spelled, power)
+    if isinstance(leaf, bool) or not isinstance(leaf, (int, float)):
+        return False
+    stored = _stored_number_decimal(leaf)
+    return stored is not None and _same_signed_decimal(stored, power)
+
+
+def _parse_positive_index(raw: Any) -> int | None:
+    """1-based index. Bool, float, zero, and a non-digit string are refusals."""
+    if isinstance(raw, bool) or raw is None:
+        return None
+    if isinstance(raw, int):
+        return raw if raw >= 1 else None
+    if isinstance(raw, str) and re.fullmatch(r"[0-9]+", raw.strip()):
+        number = int(raw.strip())
+        return number if number >= 1 else None
+    return None
+
+
+def _locator_has_html_cell_address(locator: Mapping[str, Any]) -> bool:
+    return any(key in locator for key in (*_HTML_ROW_KEYS, *_HTML_COLUMN_KEYS))
+
+
+def _one_html_index(
+    locator: Mapping[str, Any], keys: tuple[str, ...], label: str
+) -> tuple[int | None, str | None]:
+    """The shared index, or an error. ``(None, None)`` means the keys are absent."""
+    present = [key for key in keys if key in locator]
+    if not present:
+        return None, None
+    parsed: list[int] = []
+    for key in present:
+        value = _parse_positive_index(locator.get(key))
+        if value is None:
+            return None, (
+                f"html_cell_address_invalid: {key} is not a 1-based cell index"
+            )
+        parsed.append(value)
+    if any(item != parsed[0] for item in parsed):
+        return None, f"html_cell_address_invalid: {label} keys disagree"
+    return parsed[0], None
+
+
+def _html_cell_address(
+    locator: Mapping[str, Any],
+) -> tuple[tuple[int, int] | None, str | None]:
+    """``(row, column)`` when the locator cites one HTML cell."""
+    if not _locator_has_html_cell_address(locator):
+        return None, None
+    row, row_error = _one_html_index(locator, _HTML_ROW_KEYS, "table row")
+    if row_error:
+        return None, row_error
+    column, column_error = _one_html_index(
+        locator, _HTML_COLUMN_KEYS, "table column"
+    )
+    if column_error:
+        return None, column_error
+    if row is None or column is None:
+        return None, (
+            "html_cell_address_incomplete: table_row and table_column "
+            "are both required"
+        )
+    return (row, column), None
+
+
+def _html_table_line_bounds(text: str, match: re.Match[str]) -> tuple[int, int]:
+    """1-based inclusive lines this ``<table>`` match occupies."""
+    start_line = text.count("\n", 0, match.start()) + 1
+    end_line = text.count("\n", 0, max(match.start(), match.end() - 1)) + 1
+    return start_line, end_line
+
+
+def _prose_line_span(
+    text: str, locator: Mapping[str, Any]
+) -> tuple[int, int] | None:
+    """1-based inclusive lines a prose locator cites.
+
+    Absent ``line_range`` is the opened text. A bad range is None; callers
+    that already refused that range do not need this.
+    """
+    if "line_range" not in locator or locator.get("line_range") is None:
+        count = len(text.splitlines())
+        if count == 0:
+            return 1, 0
+        return 1, count
+    return _parse_line_range(locator.get("line_range"))
+
+
+def _cited_span_includes_html_table(text: str, locator: Mapping[str, Any]) -> bool:
+    """True when a cited line holds an HTML ``<table>``."""
+    span = _prose_line_span(text, locator)
+    if span is None:
+        return False
+    start, end = span
+    if end < start:
+        return False
+    for match in _HTML_TABLE_RE.finditer(text):
+        table_start, table_end = _html_table_line_bounds(text, match)
+        if not (end < table_start or start > table_end):
+            return True
+    return False
+
+
+def _cited_prose_outside_html_tables(text: str, locator: Mapping[str, Any]) -> str:
+    """Cited lines that do not hold an HTML table."""
+    span = _prose_line_span(text, locator)
+    if span is None:
+        return ""
+    start, end = span
+    lines = text.splitlines()
+    if end < start or start > len(lines):
+        return ""
+    end = min(end, len(lines))
+    table_lines: set[int] = set()
+    for match in _HTML_TABLE_RE.finditer(text):
+        table_start, table_end = _html_table_line_bounds(text, match)
+        if end < table_start or start > table_end:
+            continue
+        table_lines.update(
+            range(max(start, table_start), min(end, table_end) + 1)
+        )
+    kept = [
+        lines[index]
+        for index in range(start - 1, end)
+        if (index + 1) not in table_lines
+    ]
+    return "\n".join(kept)
+
+
+def _cited_html_cell(
+    text: str, locator: Mapping[str, Any]
+) -> tuple[str | None, tuple[tuple[int, int], ...], str | None, bool, str]:
+    """The one cited cell, after the complete table is parsed.
+
+    The second item is the cell's superscript spans. The fourth is tag
+    presence, true for an empty ``<sup></sup>`` that has no span. The
+    fifth is the raw cell, ``<sup>`` tags included. ``line_range`` selects
+    tables that lie entirely inside it. A span that cuts a table is
+    source-blind. More than one table in the cited span is source-blind.
+    The sliced line is not searched as prose.
+    """
+    address, address_error = _html_cell_address(locator)
+    if address_error:
+        return None, (), address_error, False, ""
+    if address is None:
+        return None, (), (
+            "html_cell_address_incomplete: table_row and table_column "
+            "are both required"
+        ), False, ""
+    row, column = address
+    span: tuple[int, int] | None = None
+    if "line_range" in locator and locator.get("line_range") is not None:
+        span = _parse_line_range(locator.get("line_range"))
+        if span is None:
+            return None, (), "line_range is not a line number or start-end span", False, ""
+        start, end = span
+        line_count = len(text.splitlines())
+        if end > line_count:
+            return None, (), (
+                f"line_range {start}-{end} is outside the artifact "
+                f"({line_count} lines)"
+            ), False, ""
+    chosen: list[str] = []
+    for match in _HTML_TABLE_RE.finditer(text):
+        start_line, end_line = _html_table_line_bounds(text, match)
+        if span is None:
+            chosen.append(match.group(0))
+            continue
+        range_start, range_end = span
+        overlaps = not (range_end < start_line or range_start > end_line)
+        covers = range_start <= start_line and end_line <= range_end
+        if overlaps and not covers:
+            return None, (), (
+                f"line_range {range_start}-{range_end} cuts through an HTML "
+                f"table on lines {start_line}-{end_line}"
+            ), False, ""
+        if covers:
+            chosen.append(match.group(0))
+    if not chosen:
+        return None, (), "html_table_absent: cited span has no HTML table", False, ""
+    if len(chosen) > 1:
+        return None, (), (
+            f"html_table_ambiguous: cited span has {len(chosen)} HTML tables"
+        ), False, ""
+    grid, grid_error = _html_table_grid(chosen[0])
+    if grid_error or not grid:
+        return None, (), (
+            grid_error or "html_table_unparsed: HTML table has no rows"
+        ), False, ""
+    width = len(grid[row - 1]) if row <= len(grid) else 0
+    if row > len(grid) or column > width:
+        return None, (), (
+            f"html_cell_outside_table: table_row {row} table_column {column} "
+            f"is outside the table ({len(grid)} rows, {width} columns)"
+        ), False, ""
+    cited = grid[row - 1][column - 1]
+    return (
+        cited.text,
+        cited.superscript_spans,
+        None,
+        cited.has_superscript,
+        cited.raw_text,
+    )
+
+
+def _html_blind_code(message: str) -> str:
+    head = message.split(":", 1)[0].strip()
+    if head.startswith("html_"):
+        return head
+    return "cited_span_missing"
 
 
 # Corpus-relative roots that hold a paper, OCR, or quotes. Reference
@@ -1757,12 +2400,49 @@ class FidelityWarning:
     count: int
     label: str
     detail: str = ""
+    reason_codes_by_pin: tuple[frozenset[str], ...] = ()
 
     def render(self) -> str:
         text = f"{self.label}: fidelity warning {self.kind} count={self.count}"
         if self.detail:
             text = f"{text}: {self.detail}"
         return text
+
+
+@dataclass(frozen=True)
+class _LocatorSourceBlindReason:
+    detail: str
+    reason_codes: frozenset[str] = frozenset()
+
+
+# A pin is unverified, not failed, only when every code is in this set.
+# cited_token_absent and every other content refusal stay failures.
+_MOUNT_ABSENCE_CODES = frozenset({
+    "corpus_root_unset",
+    "corpus_prefix_unmounted",
+})
+
+
+def _mount_absence_only(reason_codes: frozenset[str]) -> bool:
+    """True when every code is a missing mount or an unmounted prefix."""
+    return bool(reason_codes) and reason_codes <= _MOUNT_ABSENCE_CODES
+
+
+@dataclass
+class CorpusMountTally:
+    """Corpus pins observed while counting fidelity warnings for one walk.
+
+    ``verified_opens`` are attestation-complete pins whose top-level prefix
+    directory exists and which opened with a matching digest and token.
+    ``unverified_pins`` are pins whose source-blind codes are all
+    mount-absence codes. A pin that also carries any other code, including
+    ``cited_token_absent``, stays on the warning list. ``unverified_by_prefix``
+    counts unmounted-prefix pins by the missing directory.
+    """
+
+    verified_opens: int = 0
+    unverified_pins: int = 0
+    unverified_by_prefix: dict[str, int] = field(default_factory=dict)
 
 
 def _note_reason(reasons: list[str], extra: list[int], text: str) -> None:
@@ -1793,6 +2473,53 @@ _SCORED_NUMERIC_CONDITIONS = (
 )
 # A locator cites a condition. Its page numbers are not measured leaves.
 _CONDITION_PROVENANCE_KEYS = frozenset({"locator"})
+# Closed keys whose string values are extractor-authored annotation, not
+# transcriptions. Numeric values under these keys remain measured leaves.
+ANNOTATION_KEYS = frozenset(
+    {
+        "attribution",
+        "note",
+        "reason",
+        "schema_gap",
+        "composition_derivation",
+        "parents_not_printed",
+    }
+)
+# Condition-state refusal tags. StateTag is the schema owner. ``value`` is
+# the printed-evidence case and is not in this set.
+_NON_VALUE_STATE_TAGS = frozenset(
+    member.value for member in StateTag if member is not StateTag.VALUE
+)
+
+
+def _is_annotation_string(
+    prefix: tuple[Any, ...],
+    key: Any,
+    value: Any,
+    parent: Mapping[str, Any],
+) -> bool:
+    """True for an extractor annotation string the evidence walk skips.
+
+    A string under an annotation key other than ``reason`` is annotation
+    only as a direct child of ``values``. A ``reason`` string is annotation
+    only when ``parent`` is a condition state whose ``tag`` is a non-value
+    ``StateTag``, at any depth. ``tag: value`` and a mapping with no state
+    tag stay leaves, at the observation root and nested under ``values``.
+    Numbers stay leaves. A nested ``locator.note`` is not a direct child
+    of ``values``, so it stays a leaf.
+    """
+    if not isinstance(value, str) or key not in ANNOTATION_KEYS:
+        return False
+    if key != "reason":
+        return prefix == ("values",)
+    tag = parent.get("tag")
+    if isinstance(tag, StateTag):
+        token = tag.value
+    elif isinstance(tag, str):
+        token = tag
+    else:
+        return False
+    return token in _NON_VALUE_STATE_TAGS
 
 
 def _scored_observations(
@@ -1889,8 +2616,14 @@ def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, .
     Addresses sit in one evidence tree. ``("values", "alpha")`` and
     ``("T_range_K", 0)`` are different leaves even when the numbers are
     equal. A ``locator`` inside a condition is provenance and is not a
-    leaf. Locator keys inside ``values`` stay leaves. Non-finite floats
-    are not in this list; ``_scored_evidence_leaves`` records them.
+    leaf. An annotation string other than ``reason`` is skipped only as a
+    direct child of ``values``. A ``reason`` is skipped only when its
+    parent condition state has a non-value ``StateTag``, at any depth.
+    ``tag: value`` and a mapping with no state tag stay leaves, at the
+    observation root and nested under ``values``. A nested ``locator.note``
+    stays a leaf, as does a number under an annotation key. Non-finite
+    floats are not in this list;
+    ``_scored_evidence_leaves`` records them.
     """
     coverable, _non_finite = _scored_evidence_leaves(observation)
     return coverable
@@ -1903,7 +2636,8 @@ def _coverable_leaves_are_pinned(
 ) -> bool:
     """True when every coverable leaf is pinned, or there is no coverable leaf.
 
-    An empty leaf list is pinned only when the evidence also has no digit.
+    An empty leaf list is pinned only when the evidence has no digit-bearing
+    string outside ``ANNOTATION_KEYS``.
     A non-finite quantity is not a coverable leaf. Callers refuse it on
     its own; this predicate does not certify the observation.
     """
@@ -1913,32 +2647,43 @@ def _coverable_leaves_are_pinned(
 
 
 def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> bool:
-    """True when scored evidence contains a string with a digit [0-9].
+    """True when scored evidence contains a non-annotation string with a digit.
 
     The walk is the same evidence the measured-leaf walker uses. A locator
     inside a condition is provenance. This is the backstop for a recognizer
-    that returns no leaves: the coverage decision refuses that block.
+    that returns no leaves: the coverage decision refuses that block. A
+    ``reason`` in a non-value condition state is not evidence. A nested
+    ``locator.note``, a ``tag: value`` reason, and a reason in a mapping
+    with no state tag are evidence.
     """
 
-    def contains(value: Any, skip_keys: frozenset[str]) -> bool:
+    def contains(
+        value: Any, prefix: tuple[Any, ...], skip_keys: frozenset[str]
+    ) -> bool:
         if isinstance(value, str):
             return _string_has_ascii_digit(value)
         if isinstance(value, Mapping):
             return any(
-                contains(child, skip_keys)
+                contains(child, prefix + (key,), skip_keys)
                 for key, child in value.items()
                 if key not in skip_keys
+                and not _is_annotation_string(prefix, key, child, value)
             )
         if isinstance(value, (list, tuple)):
-            return any(contains(child, skip_keys) for child in value)
+            return any(
+                contains(child, prefix + (index,), skip_keys)
+                for index, child in enumerate(value)
+            )
         return False
 
-    if "values" in observation and contains(observation.get("values"), frozenset()):
+    if "values" in observation and contains(
+        observation.get("values"), ("values",), frozenset()
+    ):
         return True
     for key in _SCORED_NUMERIC_CONDITIONS:
         if key not in observation or observation.get(key) is None:
             continue
-        if contains(observation.get(key), _CONDITION_PROVENANCE_KEYS):
+        if contains(observation.get(key), (key,), _CONDITION_PROVENANCE_KEYS):
             return True
     return False
 
@@ -2043,7 +2788,13 @@ def _classify_measured_leaves(
     """Split measured leaves into coverable addresses and non-finite addresses.
 
     Invariant: every float is accounted for. A finite int or float (not a
-    boolean) and a string that contains any digit [0-9] are coverable. A
+    boolean) and a string that contains any digit [0-9] are coverable unless
+    the string is an admitted annotation: a direct child of ``values``
+    other than ``reason``, or a ``reason`` whose parent condition state
+    has a non-value ``StateTag``, at any depth. ``tag: value`` and a
+    mapping with no state tag stay leaves, at the observation root and
+    nested under ``values``. A nested ``locator.note`` stays a leaf.
+    Numbers under annotation keys remain leaves. A
     non-finite float (NaN, +Inf, -Inf) is the second list. It is never
     omitted and never coverable. A label with no digit is neither. The
     address is the path of mapping keys and list indexes from ``value``.
@@ -2069,7 +2820,9 @@ def _classify_measured_leaves(
         coverable: list[tuple[Any, ...]] = []
         non_finite: list[tuple[Any, ...]] = []
         for key, child in value.items():
-            if key in skip_keys:
+            if key in skip_keys or _is_annotation_string(
+                prefix, key, child, value
+            ):
                 continue
             child_coverable, child_non_finite = _classify_measured_leaves(
                 child, prefix + (key,), skip_keys=skip_keys
@@ -2294,6 +3047,14 @@ def _source_artifact_path_refusal(path: Path, root: Path) -> str | None:
     return None
 
 
+def _corpus_top_prefix(relative: str) -> str:
+    """First directory of a corpus-relative artifact path, or empty."""
+    parts = Path(relative).parts
+    if not parts or parts[0] in {".", ".."}:
+        return ""
+    return parts[0]
+
+
 def _open_source_artifact(
     raw: str,
     *,
@@ -2326,6 +3087,7 @@ def _open_source_artifact(
 
     is_corpus = False
     resolved = repository_path
+    corpus_root_resolved: Path | None = None
     if not repository_path.is_file():
         if corpus_root is None:
             return None, None, None, "corpus_root_unset"
@@ -2337,6 +3099,12 @@ def _open_source_artifact(
         resolved = corpus_path
         is_corpus = True
     if not resolved.is_file():
+        if is_corpus and corpus_root_resolved is not None:
+            prefix = _corpus_top_prefix(relative)
+            # A sparse mount has no directory for this prefix. The pin is
+            # unverified here; a later mount of the directory verifies it.
+            if prefix and not (corpus_root_resolved / prefix).is_dir():
+                return None, None, None, "corpus_prefix_unmounted"
         return (
             None,
             None,
@@ -2403,20 +3171,67 @@ def _cited_text(
     return "\n".join(lines[start - 1 : end]), None
 
 
-def _scalar_leaves(value: Any) -> list[Any]:
+@dataclass(frozen=True)
+class _PinnedLeaf:
+    """One scalar the opened source must contain."""
+
+    value: Any
+    formula_label: bool
+
+
+def _string_is_plain_number(text: str) -> bool:
+    """True when the whole trimmed string is one finite number.
+
+    A formula key that stores a number stays on the numeric comparison.
+    ``SiO2`` is not a number. ``2`` and ``6.98`` are.
+    """
+    return _finite_decimal(_fold_numeric_signs(text.strip())) is not None
+
+
+def _sample_root_is_formula_label(sample: Mapping[str, Any]) -> bool:
+    """True when the addressed value itself is a formula or species label."""
+    path_keys, _structured = _sample_addressing_keys(sample)
+    if path_keys:
+        raw = sample.get(path_keys[0])
+        if not isinstance(raw, str):
+            return False
+        match = _PATH_SEGMENT_RE.match(raw.split(".")[-1])
+        return bool(match) and match.group(1) in _FORMULA_LABEL_KEYS
+    for key in ("field", "value_key"):
+        name = sample.get(key)
+        if isinstance(name, str) and name in _FORMULA_LABEL_KEYS:
+            return True
+    return False
+
+
+def _pinned_leaves(value: Any, *, formula_label: bool) -> list[_PinnedLeaf]:
+    """Scalar leaves. A mapping key named formula or species marks that child.
+
+    The flag does not pass into a child mapping. A list keeps the flag of
+    the value that contains it. A number, including a numeric string, is
+    never a formula label.
+    """
     if isinstance(value, str):
-        return [value] if value.strip() else []
+        if not value.strip():
+            return []
+        return [
+            _PinnedLeaf(
+                value,
+                formula_label and not _string_is_plain_number(value),
+            )
+        ]
     if isinstance(value, bool) or isinstance(value, (int, float)):
-        return [value]
+        return [_PinnedLeaf(value, False)]
     if isinstance(value, Mapping):
-        leaves: list[Any] = []
-        for child in value.values():
-            leaves.extend(_scalar_leaves(child))
+        leaves: list[_PinnedLeaf] = []
+        for key, child in value.items():
+            child_label = isinstance(key, str) and key in _FORMULA_LABEL_KEYS
+            leaves.extend(_pinned_leaves(child, formula_label=child_label))
         return leaves
     if isinstance(value, (list, tuple)):
         leaves = []
         for child in value:
-            leaves.extend(_scalar_leaves(child))
+            leaves.extend(_pinned_leaves(child, formula_label=formula_label))
         return leaves
     return []
 
@@ -2457,7 +3272,9 @@ def _spelling_is_complete_token(spelling: str, text: str) -> bool:
     """True when ``spelling`` is one whole numeric token in ``text``.
 
     The span has to pass ``_span_is_complete_printed_value`` and equal a
-    citation token. ``1`` is not a token of ``1,000``.
+    citation token. ``1`` is not a token of ``1,000``. A canonical
+    spelling has no digit-group separator, so this path does not join
+    groups. The text join lives with the token scan.
     """
     folded = _fold_numeric_signs(spelling)
     if not _printed_value_carried(folded, text):
@@ -2476,12 +3293,16 @@ def _string_leaf_in_text(leaf: str, text: str) -> bool:
     to be the same complete token, so ``0.24`` is not ``-0.24`` or
     ``0.24e-5``. A leading decimal is a number, so ``.24`` is not ``-.24``
     or ``10.24``. Unicode signs are folded before either string is
-    searched, so ``−0.24`` is ``-0.24``.
+    searched, so ``−0.24`` is ``-0.24``. A digitless leaf does not join
+    digit groups. A digit-bearing leaf does, so its token spans stay
+    aligned with the citation scan.
     """
     leaf = _fold_numeric_signs(leaf)
     text = _fold_numeric_signs(text)
     if not _string_has_ascii_digit(leaf):
         return leaf in text
+    leaf = _fold_digit_groups(leaf)
+    text = _fold_digit_groups(text)
     if not _printed_value_carried(leaf, text):
         return False
     if not _parser_reads_every_digit(leaf):
@@ -2543,28 +3364,410 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
     return False
 
 
+def _normalize_formula_label(text: str) -> str:
+    """Fold formula markup inside each whitespace token.
+
+    Invariant: folding does not change how many whitespace-separated
+    tokens ``text`` has. A space always separates tokens. ``SiO 2``
+    stays ``SiO`` and ``2`` and does not certify ``SiO2``. ``Fe 6.98``
+    stays ``Fe`` and ``6.98`` and does not certify ``Fe6``. ``$...$``,
+    ``\\mathrm``, ``\\text``, ``\\rm``, braces, and ``_{n}`` are removed
+    inside the token. A space inside ``$...$`` is a separator.
+    A caret is a superscript: a token that contains ``^`` is left as it
+    is, and no plain formula or plain number certifies from that token.
+    ``printed_formula_tokens`` applies ``printed_formula`` to each other
+    token and does not cross a space. Unicode subscript digits then become
+    plain digits. ``(OH) 2`` stays ``(OH)`` and ``2``. ``$H_{2} O_{2}$``
+    stays ``H2`` and ``O2``. ``$SiO_{2} 100$`` stays ``SiO2`` and ``100``.
+    ``Fe 2 O 3`` stays four tokens. ``H2 O2`` and ``SiO2 Al2O3`` stay
+    two tokens. ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``. ``page 2``
+    stays ``page 2``. ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``
+    becomes ``Al2O3``.
+    """
+    return fold_subscript_digits(printed_formula_tokens(text))
+
+
+def _strip_wrapping_math(text: str) -> str:
+    """Remove one ``$...$`` pair that wraps the whole trimmed cell."""
+    stripped = text.strip()
+    if len(stripped) >= 2 and stripped.startswith("$") and stripped.endswith("$"):
+        return stripped[1:-1].strip()
+    return stripped
+
+
+def _formula_cell_matches(leaf: str, cell: str) -> bool:
+    """True when the whole cell is this formula label after markup is folded.
+
+    A numeric string does not match here. A longer cell that merely
+    contains the label does not match. A superscripted cell matches no
+    formula label. The caller passes the raw cell, before spans are
+    stripped.
+    """
+    if _string_is_plain_number(leaf):
+        return False
+    if is_superscripted(cell):
+        return False
+    if _label_is_charged_species(leaf) or _html_cell_is_charged_species(cell, ()):
+        return False
+    left = _normalize_formula_label(_strip_wrapping_math(cell))
+    right = _normalize_formula_label(_strip_wrapping_math(leaf))
+    return bool(right) and left == right
+
+
+# A formula run is element symbols, digits, parentheses, square brackets,
+# and the charge marks · U+00B7, +, and -. A '.' followed by a digit,
+# directly after an element letter, a digit, or ')', stays in the run.
+# A folded '_{.5}' is that same count. Any other character, including a
+# sentence period, ends it. Parentheses do not.
+_FORMULA_RUN_MARKS = "()[]+-\u00b7"
+
+
+def _formula_run_char(ch: str) -> bool:
+    """True when ``ch`` stays inside one formula run."""
+    return (ch.isascii() and ch.isalnum()) or ch in _FORMULA_RUN_MARKS
+
+
+# ``is_superscripted`` is the one superscript test. It sees the raw token,
+# including a ``<sup>`` tag, before any span is stripped.
+_SUP_TAG_RE = re.compile(r"</?\s*sup\b[^>]*>", re.IGNORECASE)
+# The numeric times sign in ``1.5x10``. It is not an element symbol.
+_TIMES_X_RE = re.compile(r"(?<=\d)\s*[xX]\s*(?=10)")
+# ASCII plus and hyphen-minus, plus the owned certification sign class.
+# Superscript and subscript plus and minus are already in that class.
+# Plus-minus is a distinct numeric sign, not a charge sign.
+_CHARGE_SIGNS = frozenset("+-" + UNICODE_MINUS_SIGNS + UNICODE_PLUS_SIGNS)
+
+
+def _raw_has_element_symbol(text: str) -> bool:
+    """True when ``text`` has an element letter, not a numeric times sign."""
+    stripped = _TIMES_X_RE.sub("", _SUP_TAG_RE.sub("", text))
+    return re.search(r"[A-Za-z]", stripped) is not None
+
+
+def _has_uppercase_element_letter(token: str) -> bool:
+    """True when ``token`` has an uppercase element letter.
+
+    The check is on the raw token. Numeric signs are folded only so the
+    certification grammar sees ASCII signs; formula markup is not folded.
+    A match of that same numeric grammar, and the times sign in
+    ``1.5x10``, are not element letters, so ``-6.98`` and ``1.2E-3``
+    are not charged species.
+    """
+    folded = _fold_numeric_signs(_TIMES_X_RE.sub("", token))
+    without_number = _NUMERIC_TOKEN_RE.sub("", folded)
+    return re.search(r"[A-Z]", without_number) is not None
+
+
+def _raw_token_is_charged_species(token: str) -> bool:
+    """True before folding when this raw token is a charged species.
+
+    ``is_superscripted`` is true, and the token has an element letter.
+    Or any charge sign anywhere in the token together with an uppercase
+    element letter. ``Cl−,``, ``SO₄−``, ``SO_{4}−``, and ``Fe-rich`` are
+    charged, so they do not certify the neutral label. A closing brace
+    between ``Fe`` and ``^{2+}`` does not make ``Fe`` a neutral label.
+    ``10<sup>3</sup>``, ``1.5x10<sup>3</sup>``, and ``-6.98`` have no
+    element letter, so they are not this. A superscripted token still
+    certifies no formula label; that check is ``is_superscripted`` on
+    the raw token, including one with no element letter.
+    """
+    raw = token.strip()
+    if not raw:
+        return False
+    if is_superscripted(raw) and _raw_has_element_symbol(raw):
+        return True
+    return any(ch in _CHARGE_SIGNS for ch in raw) and _has_uppercase_element_letter(
+        raw
+    )
+
+
+def _label_is_charged_species(label: str) -> bool:
+    """True when the stored label is itself a charged species."""
+    if _raw_token_is_charged_species(label):
+        return True
+    return any(
+        _raw_token_is_charged_species(token) for token in re.findall(r"\S+", label)
+    )
+
+
+def _text_outside_superscript_spans(
+    text: str, spans: tuple[tuple[int, int], ...]
+) -> str:
+    """Cell text with superscript slices removed."""
+    if not spans:
+        return text
+    pieces: list[str] = []
+    cursor = 0
+    for start, end in sorted(spans):
+        if start > cursor:
+            pieces.append(text[cursor:start])
+        cursor = max(cursor, end)
+    pieces.append(text[cursor:])
+    return "".join(pieces)
+
+
+def _superscript_marks_formula(
+    text: str,
+    spans: tuple[tuple[int, int], ...],
+    has_superscript: bool,
+) -> bool:
+    """True when a ``<sup>`` leaves an element letter in the cell.
+
+    Tag presence counts when the tag is empty and has no span. The
+    letter is the text outside the spans, so ``10<sup>3</sup>`` and
+    ``10<sup></sup>`` are not formulas. A leading ``x`` that is not the
+    times sign in ``1.5x10`` is a letter.
+    """
+    if not has_superscript and not spans:
+        return False
+    return _raw_has_element_symbol(_text_outside_superscript_spans(text, spans))
+
+
+def _html_cell_is_charged_species(
+    cell: str,
+    spans: tuple[tuple[int, int], ...] = (),
+    *,
+    has_superscript: bool = False,
+) -> bool:
+    """True when the cell holds a charged formula, not a numeric power.
+
+    Any ``<sup>``, including an empty one, makes a formula cell charged.
+    ``SiO<sup></sup>2`` is charged. ``10<sup>3</sup>`` and
+    ``10<sup></sup>`` have no element letter outside the superscript.
+    """
+    if _superscript_marks_formula(cell, spans, has_superscript):
+        return True
+    return _raw_token_is_charged_species(cell)
+
+
+def _formula_text_without_charged_tokens(text: str) -> str:
+    """Replace each charged raw token with a newline before folding."""
+    pieces: list[str] = []
+    cursor = 0
+    for match in re.finditer(r"\S+", text):
+        pieces.append(text[cursor : match.start()])
+        token = match.group(0)
+        blocked = _raw_token_is_charged_species(token) or is_superscripted(token)
+        pieces.append("\n" if blocked else token)
+        cursor = match.end()
+    pieces.append(text[cursor:])
+    return "".join(pieces)
+
+
+# One element symbol: an uppercase letter and the lowercase letters that
+# follow it. Digits and charge marks are not part of the symbol.
+_ELEMENT_SYMBOL_RE = re.compile(r"[A-Z][a-z]*")
+
+
+def _formula_element_symbols(text: str) -> tuple[str, ...]:
+    """Element symbols after the subscript fold, lowercase letters included.
+
+    ``SO₄`` and ``SO4`` are both ``S``, ``O``. ``Si`` stays ``Si``.
+    This is the formula the charged-reason check compares. It is not an
+    uppercase skeleton.
+    """
+    return tuple(_ELEMENT_SYMBOL_RE.findall(_normalize_formula_label(text)))
+
+
+def _charged_token_carries_label(token: str, label: str) -> bool:
+    """True when ``label`` is this token's formula, as element symbols.
+
+    Both sides are ``_formula_element_symbols``: the symbols after the
+    subscript fold, lowercase letters included. Digits and charge marks
+    are not symbols, so ``Fe2`` and ``Fe^{2+}`` are the same symbols and
+    ``SO4`` is ``SO₄−``. An uppercase skeleton is not the comparison:
+    ``SO₄−`` does not carry ``SiO2``, ``F−`` does not carry ``Fe``, and
+    ``MnO−`` does not carry ``MgO``.
+    """
+    wanted = _formula_element_symbols(label)
+    if not wanted:
+        return False
+    return _formula_element_symbols(token) == wanted
+
+
+def _charged_formula_miss(
+    missing: Sequence[_PinnedLeaf],
+    text: str,
+    spans: tuple[tuple[int, int], ...] = (),
+    *,
+    has_superscript: bool = False,
+    cells: Sequence[str] | None = None,
+) -> bool:
+    """True when a formula miss is the unsupported charged-species refusal.
+
+    A charged token elsewhere in the text does not type an unrelated
+    miss. The label is charged, or a charged raw token's element symbols
+    are the label's. A superscripted token is that token, not the whole
+    cited span. One such token certifies no formula label. A superscript
+    in another token leaves an unrelated miss as
+    ``cited_token_absent``. ``has_superscript`` is the HTML cell, so
+    every formula label on that cell is charged, including an unrelated
+    one. ``cells`` is every addressed cell: HTML, CSV, and TSV. Each
+    cell is one unit and is not split on whitespace, so ``Fe -`` charges
+    ``Fe`` and ``SiO2 ⁿ`` charges ``SiO2``. One superscripted cell
+    charges every formula label. Another cell does not. Only prose,
+    when ``cells`` is omitted, splits on whitespace. A number on one
+    charged cell is the same refusal. Lowercase letters stay on the
+    charge-sign path, so ``SO₄−`` is not ``SiO2``.
+    """
+    formula_miss = [
+        leaf
+        for leaf in missing
+        if leaf.formula_label and isinstance(leaf.value, str)
+    ]
+    if not formula_miss:
+        # A number on one charged cell stays charged. Spans belong to
+        # that cell. A second cell does not type the number.
+        if (
+            cells is not None
+            and len(cells) == 1
+            and _html_cell_is_charged_species(
+                cells[0], spans, has_superscript=has_superscript
+            )
+        ):
+            return True
+        return False
+    if any(
+        _label_is_charged_species(leaf.value) or is_superscripted(leaf.value)
+        for leaf in formula_miss
+    ):
+        return True
+    if has_superscript:
+        return True
+    # An addressed cell is one unit, classified by the HTML cell test.
+    # Only prose splits on whitespace. Spans belong to a single cell.
+    if cells is None:
+        tokens = re.findall(r"\S+", text)
+        charged = [
+            token for token in tokens if _raw_token_is_charged_species(token)
+        ]
+    else:
+        tokens = list(cells)
+        cell_spans = spans if len(tokens) == 1 else ()
+        cell_superscript = has_superscript if len(tokens) == 1 else False
+        charged = [
+            token
+            for token in tokens
+            if _html_cell_is_charged_species(
+                token, cell_spans, has_superscript=cell_superscript
+            )
+        ]
+    if len(tokens) == 1 and is_superscripted(tokens[0]):
+        return True
+    return any(
+        _charged_token_carries_label(token, leaf.value)
+        for leaf in formula_miss
+        for token in charged
+    )
+
+
+def _formula_label_in_text(leaf: str, text: str) -> bool:
+    """True when the folded label equals one whole formula run.
+
+    The run is a maximal span of element symbols, digits, parentheses,
+    square brackets, and the charge marks ·, +, and -. A ``.`` followed
+    by a digit, directly after an element letter, a digit, or ``)``,
+    stays in the run. ``_{.5}`` folds to ``.5`` before the scan, so
+    ``FeO.5``, ``FeO_{.5}``, and ``FeO_{0.5}`` do not certify ``FeO``.
+    ``SiO2.5`` and a folded ``_{2.5}`` do not certify ``SiO2``.
+    ``FeO1.5`` does not certify ``FeO``. A period that is not followed
+    by a digit is still a boundary, so ``FeO.`` and ``SiO2.`` certify
+    ``FeO`` and ``SiO2``. Whitespace, either end of the text, or any
+    other character delimits the run. The stored label matches only
+    that whole run.
+    ``SO4`` is not ``Fe2(SO4)3``. ``SiO2`` is not ``CaO·SiO2``. ``CO``
+    is not ``CO2``. A raw token that carries
+    ``^``, ``<sup>``, a Unicode superscript, a modifier letter, or a
+    charge sign beside an uppercase element letter is a charged species.
+    It is dropped before this scan, so it certifies no formula, and a
+    charged label never matches. A numeric string does
+    not match here. This path does not fold digit groups, so ``SiO2 100``
+    is ``SiO2`` and is not ``SiO2100``.
+    """
+    if _string_is_plain_number(leaf):
+        return False
+    if _label_is_charged_species(leaf):
+        return False
+    normalized = _normalize_formula_label(leaf)
+    if not normalized.strip():
+        return False
+    folded = _normalize_formula_label(_formula_text_without_charged_tokens(text))
+    start = 0
+    limit = len(folded)
+    while start < limit:
+        if not _formula_run_char(folded[start]):
+            start += 1
+            continue
+        end = start + 1
+        while end < limit and (
+            _formula_run_char(folded[end])
+            or (
+                folded[end] == "."
+                and end + 1 < limit
+                and folded[end + 1].isascii()
+                and folded[end + 1].isdigit()
+                and (
+                    folded[end - 1] == ")"
+                    or (
+                        folded[end - 1].isascii()
+                        and folded[end - 1].isalnum()
+                    )
+                )
+            )
+        ):
+            end += 1
+        if folded[start:end] == normalized:
+            return True
+        start = end
+    return False
+
+
+def _pinned_leaf_certifies(
+    leaf: _PinnedLeaf,
+    text: str,
+    cells: Sequence[str] | None = None,
+) -> bool:
+    """Formula and species labels use the guarded comparison first.
+
+    Prose and repository text pass ``text`` and leave ``cells`` unset.
+    An HTML cell, a CSV cell, and a TSV cell pass ``cells``. A formula
+    label never falls through to a raw string or numeric match, so an
+    identical ``Fe^{2+}`` cell does not certify. Other leaves keep the
+    text token or the whole-cell match.
+    """
+    if leaf.formula_label and isinstance(leaf.value, str):
+        if cells is None:
+            return _formula_label_in_text(leaf.value, text)
+        return any(_formula_cell_matches(leaf.value, cell) for cell in cells)
+    if cells is None:
+        return _leaf_in_text(leaf.value, text)
+    return any(_cell_certifies_leaf(leaf.value, cell) for cell in cells)
+
+
 def _certification_scalar_leaves(
     sample: Mapping[str, Any],
     doc: Mapping[str, Any] | None,
-) -> tuple[list[Any], str | None]:
+) -> tuple[list[_PinnedLeaf], str | None]:
     """Scalar leaves the opened source must contain.
 
     The sample spelling and the resolved extract value are both required.
     ``rel_tol`` can make those numbers differ. Dropping the resolved leaf
     would certify a stored number the source was never searched for.
+    ``formula`` and ``species`` strings carry the formula-label mark.
     """
     try:
         expected = _sample_expected_value(sample)
     except KeyError as exc:
         return [], f"locator was not opened: {exc}"
-    leaves = _scalar_leaves(expected)
+    formula_label = _sample_root_is_formula_label(sample)
+    leaves = _pinned_leaves(expected, formula_label=formula_label)
     if doc is not None:
         try:
             resolved = resolve_fidelity_sample(doc, sample)
         except KeyError:
             resolved = None
         if resolved is not None:
-            leaves.extend(_scalar_leaves(resolved))
+            leaves.extend(_pinned_leaves(resolved, formula_label=formula_label))
     if not leaves:
         return [], "locator was not opened: pinned value has no scalar leaf to find"
     return leaves, None
@@ -2576,7 +3779,8 @@ def _locator_source_blind_reason(
     artifact_root: Path,
     corpus_root: Path | None,
     doc: Mapping[str, Any] | None = None,
-) -> str | None:
+    corpus_mount: CorpusMountTally | None = None,
+) -> _LocatorSourceBlindReason | None:
     """Return a source-blind reason when the locator evidence is inadequate.
 
     No source-blind reason means a candidate was opened and contained the
@@ -2588,13 +3792,16 @@ def _locator_source_blind_reason(
     """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
-        return "locator was not opened: attestation locator is missing"
+        return _LocatorSourceBlindReason(
+            "locator was not opened: attestation locator is missing"
+        )
     locator = sample[keys[0]]
     malformed_keys = _malformed_locator_artifact_keys(locator)
     if malformed_keys:
-        return (
+        return _LocatorSourceBlindReason(
             "locator source-blind: locator_key_malformed "
-            f"({', '.join(malformed_keys)} must be non-empty strings)"
+            f"({', '.join(malformed_keys)} must be non-empty strings)",
+            frozenset({"locator_key_malformed"}),
         )
     candidate_groups = [
         (key, [raw.strip()])
@@ -2608,20 +3815,37 @@ def _locator_source_blind_reason(
         candidates = [text] if token == text else [text, token]
         candidate_groups.append(("record", candidates))
     if not candidate_groups:
-        return (
+        return _LocatorSourceBlindReason(
             "locator was not opened: no source_path, quotes_path, or file record "
             "points at a text artifact"
         )
     leaves, leaf_error = _certification_scalar_leaves(sample, doc)
     if leaf_error:
-        return leaf_error
+        return _LocatorSourceBlindReason(leaf_error)
     reasons: list[str] = []
+    reason_codes: set[str] = set()
+    unmounted_prefixes: list[str] = []
+
+    def note_corpus_mount(opened_corpus: bool, codes: frozenset[str]) -> None:
+        if corpus_mount is None:
+            return
+        if opened_corpus and not codes:
+            corpus_mount.verified_opens += 1
+            return
+        if not _mount_absence_only(codes):
+            return
+        corpus_mount.unverified_pins += 1
+        for prefix in sorted(set(unmounted_prefixes)):
+            corpus_mount.unverified_by_prefix[prefix] = (
+                corpus_mount.unverified_by_prefix.get(prefix, 0) + 1
+            )
     resolved_corpus_root = (
         corpus_root.expanduser().resolve() if corpus_root is not None else None
     )
     corpus_artifact_keys = 0
     for _key, candidates in candidate_groups:
         candidate_reasons: list[str] = []
+        candidate_reason_codes: set[str] = set()
         key_matched = False
         resolved_to_corpus = False
         for raw in candidates:
@@ -2635,6 +3859,7 @@ def _locator_source_blind_reason(
                 # The first opened record candidate decides this key. Discard
                 # refusals from candidates that did not open.
                 candidate_reasons.clear()
+                candidate_reason_codes.clear()
             if (
                 path is not None
                 and blob is not None
@@ -2643,9 +3868,14 @@ def _locator_source_blind_reason(
             ):
                 resolved_to_corpus = True
             if open_refusal:
+                if open_refusal == "corpus_prefix_unmounted":
+                    prefix = _corpus_top_prefix(raw)
+                    if prefix:
+                        unmounted_prefixes.append(prefix)
                 candidate_reasons.append(
                     f"locator was not opened: {open_refusal} ({raw})"
                 )
+                candidate_reason_codes.add(open_refusal)
                 if path is not None and blob is not None:
                     break
                 continue
@@ -2653,32 +3883,156 @@ def _locator_source_blind_reason(
                 candidate_reasons.append(
                     f"locator was not opened: artifact_not_opened ({raw})"
                 )
+                candidate_reason_codes.add("artifact_not_opened")
                 continue
             if path.suffix.lower() == ".pdf" or blob.startswith(b"%PDF"):
                 candidate_reasons.append(
                     f"{path.name} is a PDF; certification opens a text or OCR artifact"
                 )
+                candidate_reason_codes.add("artifact_is_pdf")
                 break
             try:
                 text = blob.decode("utf-8")
             except UnicodeError:
                 candidate_reasons.append(f"{path.name} is not UTF-8 text")
+                candidate_reason_codes.add("artifact_not_utf8")
                 break
             if _text_is_extract_document(text):
                 candidate_reasons.append(
                     "locator was not opened: "
                     f"{path.name} is an extract document, not an independent source"
                 )
+                candidate_reason_codes.add("artifact_is_extract_document")
                 break
             delimiter = _tabular_delimiter(path)
-            if delimiter is None:
+            charge_text = ""
+            charge_cells = None
+            charge_spans: tuple[tuple[int, int], ...] = ()
+            charge_superscript = False
+            if delimiter is None and _locator_has_html_cell_address(locator):
+                # One parsed cell. A miss is source-blind, not a prose search
+                # of the same line. The cell reaches the one charge check
+                # below as one unit. Only prose splits on whitespace.
+                (
+                    cell,
+                    superscript_spans,
+                    span_error,
+                    has_superscript,
+                    raw_text,
+                ) = _cited_html_cell(text, locator)
+                if cell is None:
+                    candidate_reasons.append(
+                        span_error or "cited span was not opened"
+                    )
+                    candidate_reason_codes.add(
+                        _html_blind_code(span_error or "cited span was not opened")
+                    )
+                    break
+                charge_text = cell
+                formula_only = all(
+                    leaf.formula_label and isinstance(leaf.value, str)
+                    for leaf in leaves
+                )
+                # The raw cell still has its <sup> tags. A formula match on
+                # that cell is not a match: the charge check sees the miss.
+                raw_superscripted = bool(leaves) and is_superscripted(
+                    raw_text or cell
+                )
+                # A numeric superscript stays on the power path. A formula
+                # cell and a charged formula cell fall through as one unit.
+                numeric_superscript = (
+                    (superscript_spans or has_superscript)
+                    and not (formula_only and raw_superscripted)
+                    and not _html_cell_is_charged_species(
+                        cell,
+                        superscript_spans,
+                        has_superscript=has_superscript,
+                    )
+                )
+                if numeric_superscript:
+                    missing = []
+                    for leaf in leaves:
+                        if leaf.formula_label and isinstance(leaf.value, str):
+                            matched = (
+                                False
+                                if raw_superscripted
+                                else _pinned_leaf_certifies(leaf, cell, (cell,))
+                            )
+                        else:
+                            matched = _superscript_leaf_certifies(
+                                leaf.value, cell, superscript_spans
+                            )
+                        if not matched:
+                            missing.append(leaf)
+                    if not missing:
+                        key_matched = True
+                        break
+                    formula_missing = all(
+                        leaf.formula_label and isinstance(leaf.value, str)
+                        for leaf in missing
+                    )
+                    if not (formula_missing and raw_superscripted):
+                        rendered = ", ".join(
+                            repr(leaf.value) for leaf in missing[:3]
+                        )
+                        candidate_reasons.append(
+                            "superscript_in_cell: a superscript cell certifies "
+                            f"only a complete explicit power ({rendered})"
+                        )
+                        candidate_reason_codes.add("superscript_in_cell")
+                        break
+                else:
+                    missing = []
+                    for leaf in leaves:
+                        if (
+                            raw_superscripted
+                            and leaf.formula_label
+                            and isinstance(leaf.value, str)
+                        ):
+                            matched = False
+                        else:
+                            matched = _pinned_leaf_certifies(leaf, cell, (cell,))
+                        if not matched:
+                            missing.append(leaf)
+                charge_cells = (cell,)
+                charge_spans = superscript_spans
+                charge_superscript = has_superscript
+            elif delimiter is None:
                 cited, span_error = _cited_text(text, locator)
                 if cited is None:
                     candidate_reasons.append(
                         span_error or "cited span was not opened"
                     )
+                    candidate_reason_codes.add("cited_span_missing")
                     break
-                missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
+                if _cited_span_includes_html_table(text, locator):
+                    # Table lines are not prose. A value that survives only
+                    # inside the table needs a cell address. A value on a
+                    # prose line in the same span still certifies.
+                    prose = _cited_prose_outside_html_tables(text, locator)
+                    missing = [
+                        leaf
+                        for leaf in leaves
+                        if not _pinned_leaf_certifies(leaf, prose)
+                    ]
+                    if missing:
+                        candidate_reasons.append(
+                            "html_table_requires_cell_address: cited span "
+                            "includes an HTML table and has no table_row "
+                            "or table_column"
+                        )
+                        candidate_reason_codes.add(
+                            "html_table_requires_cell_address"
+                        )
+                        break
+                    key_matched = True
+                    break
+                charge_text = cited
+                missing = [
+                    leaf
+                    for leaf in leaves
+                    if not _pinned_leaf_certifies(leaf, cited)
+                ]
             else:
                 # Parse the complete table, then select. A sliced line is not a table.
                 try:
@@ -2687,30 +4041,63 @@ def _locator_source_blind_reason(
                     candidate_reasons.append(
                         f"opened {path.name} but the table could not be parsed ({exc})"
                     )
+                    candidate_reason_codes.add("cited_table_unparsed")
                     break
                 if cells is None:
                     candidate_reasons.append(
                         span_error or "cited span was not opened"
                     )
+                    candidate_reason_codes.add("cited_span_missing")
                     break
-                missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
+                charge_text = "\n".join(cells)
+                missing = [
+                    leaf
+                    for leaf in leaves
+                    if not _pinned_leaf_certifies(leaf, charge_text, cells)
+                ]
+                charge_cells = cells
             if not missing:
                 key_matched = True
                 break
-            rendered = ", ".join(repr(leaf) for leaf in missing[:3])
-            candidate_reasons.append(
-                f"opened {path.name} but the resolved extract value is not in the "
-                f"cited text ({rendered})"
-            )
+            rendered = ", ".join(repr(leaf.value) for leaf in missing[:3])
+            if _charged_formula_miss(
+                missing,
+                charge_text,
+                charge_spans,
+                has_superscript=charge_superscript,
+                cells=charge_cells,
+            ):
+                candidate_reasons.append(
+                    "charged_species_unsupported: a charged or powered species "
+                    f"certifies no formula or species label ({rendered})"
+                )
+                candidate_reason_codes.add("charged_species_unsupported")
+            else:
+                candidate_reasons.append(
+                    f"opened {path.name} but the resolved extract value is not in the "
+                    f"cited text ({rendered})"
+                )
+                candidate_reason_codes.add("cited_token_absent")
             break
         if resolved_to_corpus:
             corpus_artifact_keys += 1
             if corpus_artifact_keys > 1:
-                return "locator source-blind: multiple_corpus_artifacts"
+                note_corpus_mount(False, frozenset({"multiple_corpus_artifacts"}))
+                return _LocatorSourceBlindReason(
+                    "locator source-blind: multiple_corpus_artifacts",
+                    frozenset({"multiple_corpus_artifacts"}),
+                )
         if not key_matched:
             reasons.extend(candidate_reasons)
+            reason_codes.update(candidate_reason_codes)
     if reasons:
-        return "locator source-blind: " + "; ".join(reasons)
+        codes = frozenset(reason_codes)
+        note_corpus_mount(False, codes)
+        return _LocatorSourceBlindReason(
+            "locator source-blind: " + "; ".join(reasons),
+            codes,
+        )
+    note_corpus_mount(corpus_artifact_keys > 0, frozenset())
     return None
 
 
@@ -2719,6 +4106,7 @@ def fidelity_source_warnings(
     *,
     label: str = "<document>",
     artifact_root: Path | None = None,
+    corpus_mount: CorpusMountTally | None = None,
 ) -> list[FidelityWarning]:
     """Count source-fidelity holes. Empty means the certification invariant holds.
 
@@ -2742,7 +4130,101 @@ def fidelity_source_warnings(
     ``1``. A
     ``line_range`` selects records that lie entirely inside it. A span that
     cuts through a quoted cell is source-blind and is not re-parsed from
-    the sliced lines. ``1 K`` is not ``1 KPa``.
+    the sliced lines. A MinerU ``<table>`` on a text artifact is parsed
+    whole when the locator carries ``table_row`` and ``table_column``
+    (the same indexes as ``table_row_number`` and ``table_column_number``).
+    The stored value must be that whole trimmed cell after rowspan and
+    colspan expansion. A cited span that includes a table line and has
+    neither address refuses with ``html_table_requires_cell_address``.
+    A value on a prose line in that span still certifies. A value in
+    another row is source-blind. Formula
+    and species labels fold markup inside each whitespace token. A space
+    inside ``$...$`` stays a separator, so ``$H_{2} O_{2}$`` is not
+    ``H2O2``. A token that contains ``^`` holds a superscript and does
+    not certify as a plain formula or a plain number. A raw token that
+    carries ``^``, ``<sup>``, a Unicode superscript, or a charge sign
+    beside an uppercase element letter is unsupported. ``Cl−,``,
+    ``SO₄−``, ``SO_{4}−``, and ``Fe-rich`` certify no neutral label.
+    ``Cl`` does, and ``-6.98`` still certifies. The charge guard is a
+    formula or species label, so a measured leaf such as ``-1Pa`` or
+    ``1.2E-3K`` still certifies. A whole HTML, CSV, or TSV cell takes
+    that guard for a formula or species label. The comparison is that
+    one guard, before a raw cell match. The refusal is
+    ``charged_species_unsupported`` when the label is that token's
+    element symbols, lowercase letters included, after the subscript
+    fold. ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``,
+    and ``MnO−`` does not type ``MgO``. For a charge sign that is not a
+    superscript, an unrelated formula miss stays ``cited_token_absent``.
+    An empty ``<sup></sup>`` is still a superscript.
+    ``SiO<sup></sup>2`` does not certify ``SiO2``; that refusal is
+    ``charged_species_unsupported``. ``Fe<sup>2</sup>`` is
+    ``charged_species_unsupported`` for ``Fe`` and ``Fe2``, not
+    ``cited_token_absent``. A ``<sup>`` tag whose content is letters,
+    a Unicode superscript, or a modifier letter is decided on the raw
+    token or cell before spans are stripped. ``<sup>SiO2</sup>``,
+    ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` certify no formula or species
+    label. The refusal is ``charged_species_unsupported``. A superscript
+    in another token of the same cited span does not type an unrelated
+    miss; that miss stays ``cited_token_absent``. An addressed HTML,
+    CSV, or TSV cell is one unit on that check. A space inside the
+    cell does not split it, so ``Fe -`` is
+    ``charged_species_unsupported`` for ``Fe`` and ``SiO2 ⁿ`` is
+    ``charged_species_unsupported`` for ``SiO2``. Only prose splits
+    on whitespace.
+    A subscript digit inside a formula token is not a number, so
+    ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
+    measurement still does. A formula label equals one whole run of
+    element symbols, digits, parentheses, square brackets, and the
+    charge marks ·, +, and -. A ``.`` followed by a digit, directly
+    after an element letter, a digit, or ``)``, stays in the run.
+    ``_{.5}`` folds to ``.5``. ``FeO.5``, ``FeO_{.5}``, and
+    ``FeO_{0.5}`` do not certify ``FeO``. ``SiO2.5`` and ``SiO_{2.5}``
+    do not certify ``SiO2``. ``FeO1.5`` does not certify ``FeO``. A
+    period not followed by a digit is still a boundary, so ``FeO.``
+    and ``SiO2.`` at the end of a sentence certify ``FeO`` and
+    ``SiO2``. ``SO4`` is not
+    ``Fe2(SO4)3``. ``SiO2`` is not ``CaO·SiO2``.
+    ``printed_formula`` unwraps one token, including a
+    ``\\mathrm`` / ``\\text`` / ``\\rm`` command, so
+    ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A space
+    always separates tokens, before every comparison. ``SiO 2`` does
+    not certify ``SiO2``. ``Fe 6.98`` certifies ``Fe`` and ``6.98``
+    and does not certify ``Fe6``. ``Fe 2 O 3`` does not certify
+    ``Fe2O3``. A digitless
+    label is a complete token, a preceding number is not joined, and two
+    formulas stay two tokens. A superscript cell certifies only when it
+    is a complete power and nothing else. ``10<sup>3</sup>`` certifies
+    ``1e3``. ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``.
+    A leading minus applies to the whole power, so ``-10<sup>2</sup>``
+    and the caret spelling ``-10^2`` are ``-100``. ``100`` does not
+    certify. A second sign refuses, so ``--10<sup>2</sup>``,
+    ``+-10<sup>2</sup>``, and ``-−10<sup>2</sup>`` are
+    ``superscript_in_cell``. A missing base, including ``<sup>2</sup>``,
+    is the same refusal and does not raise. ``0<sup>2</sup>`` certifies
+    ``0.0`` and does not certify ``-0.0``. ``-0<sup>2</sup>`` certifies
+    ``-0.0`` and does not certify ``0.0``, because negation uses
+    ``copy_negate``. The power is one context that traps an inexact,
+    rounded, underflow, overflow, subnormal, or invalid result. Any of
+    those is ``superscript_in_cell``.
+    ``12345678901234567890123456789<sup>1</sup>`` does not certify
+    ``1.2345678901234567890123456790e28``, and ``10<sup>-1000</sup>``
+    does not certify 0. ``1.5×10<sup>3</sup>`` still certifies 1500.
+    The sign of zero is
+    ``_same_signed_decimal``, the comparison a plain numeric cell uses.
+    ``10<sup>3</sup>2`` and a number that is not that power are
+    ``superscript_in_cell``. ``103`` is not. A stored integer uses the
+    same equality as a float, so ``1000`` certifies ``10<sup>3</sup>``.
+    An unsigned digit run joins on a thin space, narrow no-break space,
+    or no-break space. An ASCII space does not. The first group is one
+    to three digits, then groups of three, and the run starts at the
+    beginning of the text or after whitespace or punctuation, never after
+    a letter. ``1 650`` and ``1 650`` are ``1650``. ``1 100`` is 1 and
+    100, not ``1100``. ``SiO2 100`` is not ``SiO2100``. ``1e0 001``,
+    ``12 34``, ``1.5 000``, and ``1 550e3`` are not one number. A short
+    group leaves the separated run unjoined, so ``12\\u200934\\u2009567``
+    is not ``34567`` and ``1\\u2009650\\u20091`` is not ``1650``. The
+    formula-label path does not apply this fold. A comma is not that
+    separator. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
     that token. The sample's own spelling is not a substitute: a ``rel_tol``
@@ -2756,23 +4238,32 @@ def fidelity_source_warnings(
     that leaf or an ancestor of it. Evidence is ``values`` plus each
     present scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``): the
     fields the scored temperature payload copies beside ``values``. A
-    locator inside a condition is provenance, not a leaf. Repeating a pin
+    locator inside a condition is provenance, not a leaf. Digit-bearing
+    strings are extractor-authored annotation, and not evidence, only as a
+    direct child of ``values`` other than ``reason``, or as a ``reason``
+    whose parent condition state has a non-value ``StateTag``, at any
+    depth. A ``reason`` beside ``tag: value``, or in a mapping with no
+    state tag, stays evidence at the observation root and nested under
+    ``values``. A nested ``locator.note`` stays evidence. Numbers under
+    annotation keys remain leaves. Repeating a pin
     of one address does not cover a sibling, even when the numbers are
     equal, and a ``values`` pin does not cover a sibling condition. A
     measured leaf is a finite int or float (not a boolean), or a string
-    that contains any digit [0-9]. A non-finite float (NaN, +Inf, -Inf)
+    that contains any digit [0-9] outside ``ANNOTATION_KEYS``. A non-finite
+    float (NaN, +Inf, -Inf)
     is ``non_finite_evidence``. It is never omitted and never contributes
     "no required address": a pin of a finite sibling does not certify
     the observation, and a pin of the non-finite value does not either.
     A descriptive label with no digit is
     not a leaf and does not cover a sibling measurement. A string the
     numeric parser cannot read is uncovered unless the opened source
-    carries that printed value; it is never skipped. Several samples may
+    carries that printed value; annotation strings are the only skipped
+    strings. Several samples may
     each pin part of the evidence. Equipment pins and a numeric
     observation index do not contribute. Evidence with no measured leaf
     is covered by any matching evidence pin only when that evidence also
-    contains no digit. Zero recognised leaves in a digit-bearing block
-    is a refusal. A pilot pin or an
+    contains no non-annotation digit-bearing string. Zero recognised leaves
+    in a block with such a string is a refusal. A pilot pin or an
     unattested sample can still supply addresses toward
     ``uncovered_observation``; attestation is its own count. Certification
     refuses while any of these counts is non-zero: a pilot pin or an
@@ -2819,6 +4310,7 @@ def fidelity_source_warnings(
     source_blind = 0
     source_blind_reasons: list[str] = []
     source_blind_extra = [0]
+    source_blind_reason_codes: list[frozenset[str]] = []
     root = artifact_root if artifact_root is not None else ROOT
     configured_corpus_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
     corpus_root = (
@@ -2859,13 +4351,15 @@ def fidelity_source_warnings(
                 artifact_root=root,
                 corpus_root=corpus_root,
                 doc=doc,
+                corpus_mount=corpus_mount,
             )
             if blind:
                 source_blind += 1
+                source_blind_reason_codes.append(blind.reason_codes)
                 _note_reason(
                     source_blind_reasons,
                     source_blind_extra,
-                    f"{sample_label}: {blind}",
+                    f"{sample_label}: {blind.detail}",
                 )
         match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
         observation_key = _fidelity_sample_observation_key(doc, sample)
@@ -2962,6 +4456,7 @@ def fidelity_source_warnings(
                 source_blind,
                 label,
                 _finish_detail(source_blind_reasons, source_blind_extra[0]),
+                tuple(source_blind_reason_codes),
             )
         )
     if ambiguous_ids:
@@ -3067,7 +4562,9 @@ def certify_extract_source_fidelity(
     gate on a cell. NaN, Infinity, and InvalidOperation do not certify.
     A non-finite measured value refuses that observation. A
     substring does not certify, so a cell ``1/2`` is not ``1`` and a cell
-    ``1,000`` is not ``1``. A span
+    ``1,000`` is not ``1``. A MinerU HTML cell address and a formula or
+    species label follow the same whole-cell and complete-token rules,
+    after the folds described on ``fidelity_source_warnings``. A span
     that cuts through a quoted cell is source-blind and is not re-parsed
     from the sliced lines. A leading decimal
     is a numeric token. A spelling
@@ -3082,10 +4579,11 @@ def certify_extract_source_fidelity(
     condition) must be covered by a matching, non-pilot, attested sample
     whose address is that leaf or an ancestor, and whose source artifact
     was opened and contains each resolved number. A measured string is
-    every leaf that contains a digit [0-9]. A label with no digit is not
-    a leaf. A digit-bearing string the numeric parser cannot read is
-    uncovered unless the opened source carries that printed value, and
-    zero recognised leaves in a digit-bearing block refuses. A
+    every non-annotation string that contains a digit [0-9]. A label with
+    no digit is not a leaf. A digit-bearing string outside
+    ``ANNOTATION_KEYS`` that the numeric parser cannot read is uncovered
+    unless the opened source carries that printed value, and zero recognised
+    leaves in a block with such a string refuses. A
     Unicode minus is a minus. An observation id that names more than one
     scored row refuses; the rows are not one coverage entry.
     Repeating a pin of one address does not cover a sibling, even when the
