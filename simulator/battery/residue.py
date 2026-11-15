@@ -519,10 +519,14 @@ def _initial_oxide_inventory_mol(
     # For normalized cohorts, printed oxide wt% can round away from 100. Each
     # oxide mass is m0*w_i/Σw, so Σm_i=m0 exactly. Dividing kg by kg mol^-1 gives
     # mol. R3-10's 99.99 wt% total therefore gives 28.4 mg; using /100 gives
-    # 28.39716 mg.
-    percentage_basis = total_wt_pct if normalize_to_sample_mass else 100.0
+    # 28.39716 mg. Hashimoto keeps its original multiplication/division order
+    # because its numeric digest pins the legacy result.
     return {
-        str(oxide): sample_mass_kg * (float(amount) / percentage_basis)
+        str(oxide): (
+            sample_mass_kg * (float(amount) / total_wt_pct)
+            if normalize_to_sample_mass
+            else float(amount) * sample_mass_kg / 100.0
+        )
         / _formula_terms(str(oxide))[1]
         for oxide, amount in wt_pct.items()
     }
