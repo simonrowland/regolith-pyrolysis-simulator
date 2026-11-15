@@ -52,7 +52,7 @@ from simulator.melt_backend.base import (
     MeltCompositionError,
     project_melt_to_oxide_projection,
 )
-from simulator.feedstock_composition import FEOT_FROM_FE2O3
+from simulator.feedstock_composition import FEOT_FROM_FE2O3, iron_oxide_values
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
     REDOX_STATE_REFERENCE_T_K,
@@ -2376,6 +2376,166 @@ def test_magemin_projected_equilibrate_gates_submitted_bulk(monkeypatch):
         == 'magemin_domain_sio2_below_min'
     )
     assert engine_calls == []
+
+
+@pytest.mark.parametrize(
+    ('source', 'submitted'),
+    [
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 25.0, 'MgO': 15.0, 'FeO': 50.0, 'FeOt': 10.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {
+                'SiO2': 29.9,
+                'MgO': 10.1,
+                'FeO': 30.0,
+                'FeOt': 10.0,
+                'O': 20.0,
+            },
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 39.0, 'P2O5': 10.0, 'MnO': 1.0},
+            {'SiO2': 50.0, 'MgO': 39.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 49.0, 'MgO': 49.0, 'H2O': 2.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 48.0, 'MgO': 46.0, 'H2O': 6.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 25.0, 'MgO': 25.0},
+        ),
+        ({'SiO2': 50.0, 'MgO': 50.0}, {'SiO2': 29.9, 'MgO': 70.1}),
+        ({'SiO2': 50.0, 'MgO': 50.0}, {'SiO2': 30.0, 'MgO': 70.0}),
+        ({'SiO2': 50.0, 'MgO': 50.0}, {'SiO2': 30.1, 'MgO': 69.9}),
+        ({'SiO2': 50.0, 'MgO': 50.0}, {'SiO2': 79.9, 'MgO': 20.1}),
+        ({'SiO2': 50.0, 'MgO': 50.0}, {'SiO2': 80.0, 'MgO': 20.0}),
+        ({'SiO2': 50.0, 'MgO': 50.0}, {'SiO2': 80.1, 'MgO': 19.9}),
+    ],
+)
+def test_magemin_projected_gate_input_matches_submitted_bulk(
+    monkeypatch, source, submitted
+):
+    import simulator.melt_backend.magemin as magemin_module
+
+    backend, _ = _magemin_backend_with_spied_engine_call(monkeypatch)
+    built_bulks = []
+    build_bulk = backend._build_db_bulk_projection
+
+    def capture_bulk(composition_wt_pct, **kwargs):
+        bulk = build_bulk(composition_wt_pct, **kwargs)
+        built_bulks.append(bulk)
+        return bulk
+
+    monkeypatch.setattr(backend, '_build_db_bulk_projection', capture_bulk)
+    engine_submissions = []
+
+    def submit(*, bulk_projection, **_kwargs):
+        engine_submissions.append(bulk_projection)
+        return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+    monkeypatch.setattr(backend, '_call_magemin', submit)
+    gate_inputs = []
+    validate = magemin_module._validate_magemin_projection_with_reason
+
+    def capture_gate_input(composition_wt_pct, **kwargs):
+        gate_inputs.append(dict(composition_wt_pct))
+        return validate(composition_wt_pct, **kwargs)
+
+    monkeypatch.setattr(
+        magemin_module,
+        '_validate_magemin_projection_with_reason',
+        capture_gate_input,
+    )
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=source,
+        projected_oxide_wt_pct=submitted,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert len(built_bulks) == 1
+    assert len(gate_inputs) == 1
+    submitted_bulk = built_bulks[0]
+    gate_input = gate_inputs[0]
+    assert tuple(
+        submitted_bulk.composition_wt_pct.get(component, 0.0)
+        for component in submitted_bulk.order
+    ) == submitted_bulk.vector
+
+    gate_basis_masses = dict(submitted_bulk.composition_wt_pct)
+    feot_present = 'FeOt' in gate_basis_masses
+    feot_mass = float(gate_basis_masses.pop('FeOt', 0.0))
+    oxygen_mass = float(gate_basis_masses.pop('O', 0.0))
+    if feot_present:
+        feo, fe2o3 = iron_oxide_values({
+            'FeOt': feot_mass + oxygen_mass,
+        })
+        if feo > 0.0:
+            gate_basis_masses['FeO'] = (
+                float(gate_basis_masses.get('FeO', 0.0)) + feo
+            )
+        if fe2o3 > 0.0:
+            gate_basis_masses['Fe2O3'] = (
+                float(gate_basis_masses.get('Fe2O3', 0.0)) + fe2o3
+            )
+    elif oxygen_mass > 0.0:
+        gate_basis_masses['O'] = oxygen_mass
+    normalized_submitted = project_melt_to_oxide_projection(
+        composition_kg=gate_basis_masses,
+        composition_mol=None,
+        oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+    ).oxide_wt_pct
+    assert set(gate_input) == set(normalized_submitted)
+    for species, amount in normalized_submitted.items():
+        assert gate_input[species] == pytest.approx(
+            amount, rel=0.0, abs=1e-9
+        )
+
+    submitted_total = sum(submitted_bulk.composition_wt_pct.values())
+    submitted_sio2_wt_pct = (
+        100.0 * submitted_bulk.composition_wt_pct.get('SiO2', 0.0)
+        / submitted_total
+    )
+    auxiliary_mass = sum(
+        submitted_bulk.composition_wt_pct.get(species, 0.0)
+        for species in ('H2O', 'S')
+    )
+    submitted_major_wt_pct = (
+        100.0 * (submitted_total - auxiliary_mass) / submitted_total
+    )
+    expected_in_domain = (
+        30.0 <= submitted_sio2_wt_pct <= 80.0
+        and submitted_major_wt_pct > 95.0
+    )
+    assert (result.status == 'ok') is expected_in_domain
+    if expected_in_domain:
+        assert len(engine_submissions) == 1
+        assert engine_submissions[0] is submitted_bulk
+    else:
+        assert result.status == 'out_of_domain'
+        assert engine_submissions == []
+    if submitted == {
+        'SiO2': 25.0,
+        'MgO': 15.0,
+        'FeO': 50.0,
+        'FeOt': 10.0,
+    }:
+        assert result.diagnostics['backend_status_reason'] == (
+            'magemin_domain_sio2_below_min'
+        )
+        assert any(
+            'SiO2 = 25.00 wt%' in warning
+            for warning in result.warnings
+        )
 
 
 @pytest.mark.parametrize(

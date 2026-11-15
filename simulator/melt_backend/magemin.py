@@ -1916,8 +1916,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # different bulk whose supplied wt% values can sum below 100; gate
         # its normalized oxide composition while preserving those original
         # values for the existing MAGEMin call.
-        domain_comp_wt = comp_wt
-        domain_dropped_mass_kg_by_species = (
+        domain_dropped_mass_kg_by_species = dict(
             projection.dropped_mass_kg_by_species
         )
         if projected_oxide_wt_pct is not None:
@@ -1934,36 +1933,44 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     species_formula_registry=species_formula_registry,
                 )
                 domain_dropped_mass_kg_by_species = (
-                    domain_source_projection.dropped_mass_kg_by_species
+                    dict(
+                        domain_source_projection.dropped_mass_kg_by_species
+                    )
                 )
-            # The explicit projection is the bulk submitted to MAGEMin, even
-            # when its diagnostic source composition is also present. Gate
-            # that vector so a different projected bulk cannot inherit the
-            # source composition's in-domain decision. MAGEMin's total-iron
-            # slot is FeO-equivalent; fold FeOt+O back through the shared
-            # alias resolver for the gate while leaving the engine vector
-            # untouched.
-            projected_gate_oxides = {
-                species: amount
-                for species, amount in comp_wt.items()
-                if species not in {'FeOt', 'O'}
-            }
-            projected_feo, projected_fe2o3 = iron_oxide_values({
-                'FeOt': (
-                    float(comp_wt.get('FeOt', 0.0))
-                    + float(comp_wt.get('O', 0.0))
-                ),
+
+        # Gate the exact bulk projection passed to the engine. Its iron is
+        # represented as FeOt+O; fold that submitted pair back through the
+        # shared alias resolver, accumulating any existing iron mass.
+        submitted_oxides = dict(bulk_projection.composition_wt_pct)
+        submitted_feot_present = 'FeOt' in submitted_oxides
+        submitted_feot = float(submitted_oxides.pop('FeOt', 0.0))
+        submitted_oxygen = float(submitted_oxides.pop('O', 0.0))
+        if submitted_feot_present:
+            submitted_feo, submitted_fe2o3 = iron_oxide_values({
+                'FeOt': submitted_feot + submitted_oxygen,
             })
-            if projected_feo > 0.0:
-                projected_gate_oxides['FeO'] = projected_feo
-            if projected_fe2o3 > 0.0:
-                projected_gate_oxides['Fe2O3'] = projected_fe2o3
-            domain_comp_wt = project_melt_to_oxide_projection(
-                composition_kg=projected_gate_oxides,
-                composition_mol=None,
-                oxide_basis=self._MAGEMIN_INPUT_BASIS,
-                species_formula_registry=species_formula_registry,
-            ).oxide_wt_pct
+            if submitted_feo > 0.0:
+                submitted_oxides['FeO'] = (
+                    float(submitted_oxides.get('FeO', 0.0))
+                    + submitted_feo
+                )
+            if submitted_fe2o3 > 0.0:
+                submitted_oxides['Fe2O3'] = (
+                    float(submitted_oxides.get('Fe2O3', 0.0))
+                    + submitted_fe2o3
+                )
+        elif submitted_oxygen > 0.0:
+            submitted_oxides['O'] = submitted_oxygen
+        domain_projection = project_melt_to_oxide_projection(
+            composition_kg=submitted_oxides,
+            composition_mol=None,
+            oxide_basis=self._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=species_formula_registry,
+        )
+        domain_comp_wt = domain_projection.oxide_wt_pct
+        domain_dropped_mass_kg_by_species.update(
+            domain_projection.dropped_mass_kg_by_species
+        )
         domain_valid, domain_warnings, domain_reason = (
             _validate_magemin_projection_with_reason(
                 domain_comp_wt,
