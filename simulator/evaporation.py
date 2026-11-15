@@ -5220,9 +5220,7 @@ class EvaporationMixin:
             # Green's publisher never read that top-level key: the film
             # stays on unless the nested series override says otherwise.
             # Copying it changed buffered in-band rates. b-906 round 7.
-            'alpha': _measured_alpha_control_view(
-                _load_evaporation_alpha_by_species(self.vapor_pressures)
-            ),
+            'alpha': _load_evaporation_alpha_by_species(self.vapor_pressures),
             'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
                 self.vapor_pressures
             ),
