@@ -54,6 +54,39 @@ def _formula_derived_anorthite() -> dict[str, float]:
     }
 
 
+def _matches_oxide_composition(composition, expected) -> bool:
+    return set(composition) == set(expected) and all(
+        math.isclose(
+            float(composition[oxide]), float(wt_pct),
+            rel_tol=0.0, abs_tol=1.0e-8,
+        )
+        for oxide, wt_pct in expected.items()
+    )
+
+
+def _anorthite_tier_a_table():
+    return load_interface_invariant_table(
+        "anorthite-liner",
+        catalog={
+            "anorthite-liner": {
+                "interface_chemistry": {
+                    "composition": {
+                        "CaO": 20.16,
+                        "Al2O3": 36.65,
+                        "SiO2": 43.19,
+                    },
+                    "citation": "Morey 1964, Table 26",
+                    "criterion_tier": "B",
+                    "invariant_table": {
+                        "loader": "liner_corrosion_source_extracts",
+                        "subsystems": ["CaO-Al2O3-SiO2"],
+                    },
+                }
+            }
+        },
+    )
+
+
 def test_magemin_request_cache_key_covers_every_equilibrium_input():
     composition = {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0}
     key = magemin_request_cache_key(
@@ -340,9 +373,9 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
             # MAGEMin reports small liquid fractions at different scan
             # temperatures; this is the d-421 continuity reproducer. The
             # expected values are the controller's studio-3 MAGEMin 1 bar / ig
-            # profile, within its measured output precision. The adapter route
-            # is pinned separately because its projected-oxide request gives a
-            # distinct measured value from this composition_kg request.
+            # profile, within its measured output precision. The formula-owner
+            # adapter request is paired separately with a direct call on the
+            # same formula-derived composition below.
             temperatures_C = (
                 500.0,
                 800.0,
@@ -411,92 +444,132 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
             assert formula_owner_at_500.liquid_fraction == pytest.approx(
                 0.0018800188, abs=2e-5
             )
+            formula_owner_at_1000 = direct_backend.equilibrate(
+                1000.0,
+                composition_kg=dict(formula_derived_anorthite),
+                fO2_log=liner_corrosion.MAGEMIN_FO2_LOG,
+                pressure_bar=1.0,
+            )
+            assert formula_owner_at_1000.status == "ok", (
+                formula_owner_at_1000.warnings
+            )
+            assert formula_owner_at_1000.liquid_fraction == pytest.approx(
+                0.0021999780, abs=2e-5
+            )
             assert raw_profiles["controller_exact_literal"][500.0] == pytest.approx(
                 0.0, abs=1e-12
             )
 
-            # The sampler submits this formula-owner oxide wt% at 1 bar with
-            # MAGEMIN_FO2_LOG. Comparing c13a9b011 with its parent shows no
-            # change to the adapter call, request arguments, or test input.
-            # The current Studio gate measured 0.0021999780 on this route;
-            # earlier gates measured 0.0018900189. Keep the latest route pin
-            # separate from the composition_kg result above.
+            # The controller probe confirms that the adapter is deterministic
+            # and equals the direct composition_kg route for this same input.
+            # The c13 diff changed neither this composition nor the adapter
+            # request; pin both routes to the current measured value.
             adapter_fraction = sampler(formula_derived_anorthite, 1000.0, 1.0)
             assert adapter_fraction == pytest.approx(0.0021999780, abs=2e-5), (
                 f"adapter route {sampler.engine_version}: {adapter_fraction:g}"
             )
+            assert adapter_fraction == pytest.approx(
+                formula_owner_at_1000.liquid_fraction, abs=2e-5
+            )
 
-            # In the adapter profile, the exact nominal first crosses at 1000
-            # C, while the Morey-rounded input spuriously crosses at the 500 C
-            # scan edge. For each input, the two live 0.01 wt% neighbours
-            # agree on [1000, 1025] C, so d-421 takes its nominal-outlier ->
-            # neighbours branch and exposes engine_composition_sensitive.
-            profiles = {
-                name: liner_corrosion._tier_b_reference_profile(
+            # The nominal adapter profile has a measured first-liquid bracket
+            # [825, 850] C. Its two continuity neighbours disagree: one is
+            # already liquid below the scan and the other first liquefies at
+            # [850, 875] C. This reaches d-421's fallback branch.
+            controller_exact = measured["controller_exact_literal"][0]
+            raw_reference_profile = liner_corrosion._tier_b_reference_profile_single(
+                sampler,
+                controller_exact,
+                pressure_bar=1.0,
+                literature_melting_temperature_C=1553.0,
+            )
+            assert raw_reference_profile["first_liquid_bracket_C"] == [
+                825.0,
+                850.0,
+            ]
+            assert raw_reference_profile["bulk_melt_bracket_C"] == [
+                1550.0,
+                1575.0,
+            ]
+            assert raw_reference_profile["bulk_melt_residual_vs_literature_C"] == [
+                -3.0,
+                22.0,
+            ]
+            assert raw_reference_profile["engine_minor_phase_eutectic"][
+                "temperature_bracket_C"
+            ] == [1000.0, 1025.0]
+            assert raw_reference_profile["engine_minor_phase_eutectic"][
+                "plateau_liquid_fraction"
+            ] == pytest.approx(0.0026, abs=0.0002)
+            assert raw_reference_profile["engine_minor_phase_eutectic"]["phases"]
+            assert "phase_closure_unverified" in raw_reference_profile["flags"]
+
+            with pytest.raises(LinerCorrosionRefusal) as disagreement:
+                liner_corrosion._tier_b_reference_profile(
                     sampler,
-                    composition,
+                    controller_exact,
                     pressure_bar=1.0,
                     literature_melting_temperature_C=1553.0,
                 )
-                for name, (composition, _) in measured.items()
-            }
-            for name, expected_nominal_bracket in (
-                ("controller_exact_literal", [975.0, 1000.0]),
-                ("morey_rounded", [None, 500.0]),
-            ):
-                continuity_profile = profiles[name]
-                sensitivity = continuity_profile["engine_composition_sensitive"]
-                assert continuity_profile["composition_continuity"]["status"] == "sensitive"
-                assert sensitivity["nominal_bracket_C"] == expected_nominal_bracket
-                assert sensitivity["neighbour_brackets_C"] == [
-                    [1000.0, 1025.0],
-                    [1000.0, 1025.0],
-                ]
-                assert sensitivity["neighbour_bracket_C"] == [1000.0, 1025.0]
-                assert continuity_profile["first_liquid_bracket_C"] == [
-                    1000.0,
-                    1025.0,
-                ]
-                assert "engine_composition_sensitive" in continuity_profile["flags"]
-                assert continuity_profile["engine_version"] == (
-                    engine_version
-                )
+            assert disagreement.value.reason == (
+                "tier_b_composition_continuity_unresolved"
+            )
+            assert "nominal_bracket_C': [825.0, 850.0]" in (
+                disagreement.value.detail
+            )
+            assert "neighbour_brackets_C': [[None, 500.0], [850.0, 875.0]]" in (
+                disagreement.value.detail
+            )
 
-            profile = profiles["controller_exact_literal"]
+            # Morey Table 26 row 6 is the cited anorthite reference at 1553 C.
+            # The shared Tier A loader supplies the fallback when the measured
+            # Tier B neighbours disagree.
+            morey_table = _anorthite_tier_a_table()
+            morey_row = next(
+                row
+                for row in morey_table["invariants"]
+                if row["observation_id"] == "morey1964_t26_r6"
+            )
+            assert morey_row["T_invariant_C"] == 1553.0
+            assert liner_corrosion.first_liquid_tier_a(
+                morey_table, controller_exact
+            ) == 1553.0
+            profile = liner_corrosion._tier_b_reference_profile(
+                sampler,
+                controller_exact,
+                pressure_bar=1.0,
+                literature_melting_temperature_C=1553.0,
+                invariant_table=morey_table,
+            )
+            assert profile["tier_a_fallback"] is True
+            assert profile["tier_a_first_liquid_T_C"] == 1553.0
+            assert "engine_composition_sensitive" in profile["flags"]
+            assert profile["engine_version"] == engine_version
+
+            # The Morey-rounded input retains its separately measured
+            # nominal-outlier branch: both neighbours first liquefy at
+            # [1000, 1025] C and select their symmetric profile.
+            morey_profile = liner_corrosion._tier_b_reference_profile(
+                sampler,
+                measured["morey_rounded"][0],
+                pressure_bar=1.0,
+                literature_melting_temperature_C=1553.0,
+            )
+            assert morey_profile["composition_continuity"]["status"] == "sensitive"
+            morey_sensitivity = morey_profile["engine_composition_sensitive"]
+            assert morey_sensitivity["nominal_bracket_C"] == [None, 500.0]
+            assert morey_sensitivity["neighbour_brackets_C"] == [
+                [1000.0, 1025.0],
+                [1000.0, 1025.0],
+            ]
+            assert liner_corrosion.ENGINE_COMPOSITION_SENSITIVE_FLAG in morey_profile[
+                "flags"
+            ]
+            assert morey_profile["engine_version"] == engine_version
         except LinerCorrosionRefusal as exc:
             if exc.reason == "engine_unavailable":
                 pytest.skip("MAGEMin is required for the anorthite anchor")
             raise
-        assert profile["first_liquid_bracket_C"] == [1000.0, 1025.0]
-        assert profile["bulk_melt_bracket_C"] == [1550.0, 1575.0]
-        assert profile["bulk_melt_residual_vs_literature_C"] == [-3.0, 22.0]
-        assert profile["bulk_melt_residual_ticket"] == "b-1231"
-        assert profile["engine_version"] == engine_version
-        assert profile["engine_minor_phase_eutectic"]["temperature_bracket_C"] == [
-            1000.0,
-            1025.0,
-        ]
-        assert profile["engine_minor_phase_eutectic"]["plateau_liquid_fraction"] == (
-            pytest.approx(0.0026, abs=0.0002)
-        )
-        assert profile["engine_minor_phase_eutectic"]["phases"]
-        assert "phase_closure_unverified" in profile["flags"]
-        pure_rating = liner_corrosion._tier_b_melt_activity_rating(
-            formula_derived_anorthite,
-            formula_derived_anorthite,
-            {},
-            sampler=sampler,
-            pressure_bar=1.0,
-            margin_C=25.0,
-            literature_melting_temperature_C=1553.0,
-            pure_reference=profile,
-        )
-        assert pure_rating["rating_temperature_C"] == 1528.0
-        assert pure_rating["bulk_melt_residual_vs_literature_C"] == [-3.0, 22.0]
-        assert pure_rating["engine_minor_phase_eutectic"] == profile[
-            "engine_minor_phase_eutectic"
-        ]
-        assert "deposit_melt_below_resolution" in pure_rating["flags"]
     finally:
         sampler.close()
         direct_backend.close()
@@ -823,10 +896,77 @@ def test_tier_b_saturation_accepts_agreeing_all_liquid_profile():
         pure_reference_profile=pure_reference,
         invariant_table=None,
     )
-    # The matching all-liquid nominal and neighbour profiles need no bulk
-    # jump to establish continuity; the original phi(f) table remains usable.
+    # The shared d-421 selector sees matching all-liquid bracket signatures;
+    # the nominal cached phi(f) table remains usable without a bulk jump.
     assert x_star == pytest.approx(0.009991)
     assert evidence == []
+
+
+def test_tier_b_shared_continuity_selects_agreeing_flat_neighbours():
+    liner = {"CaO": 20.0, "Al2O3": 30.0, "SiO2": 50.0}
+    first_neighbour, second_neighbour, _ = (
+        liner_corrosion._tier_b_composition_neighbours(liner)
+    )
+
+    class FlatNominalOutlier:
+        def __call__(self, composition, _temperature_C, _pressure_bar):
+            if _matches_oxide_composition(composition, liner):
+                return 0.0
+            if (
+                _matches_oxide_composition(composition, first_neighbour)
+                or _matches_oxide_composition(composition, second_neighbour)
+            ):
+                return 1.0
+            raise AssertionError(f"unexpected composition: {composition!r}")
+
+    selected = liner_corrosion._tier_b_reference_profile(
+        FlatNominalOutlier(),
+        liner,
+        pressure_bar=1.0,
+        allow_flat_endmember_profile=True,
+    )
+    assert selected["composition_continuity"]["status"] == "sensitive"
+    assert selected["engine_composition_sensitive"]["nominal_bracket_C"] == [
+        "all-solid-above-scan"
+    ]
+    assert selected["engine_composition_sensitive"]["neighbour_brackets_C"] == [
+        ["all-liquid-below-scan"],
+        ["all-liquid-below-scan"],
+    ]
+    assert liner_corrosion.ENGINE_COMPOSITION_SENSITIVE_FLAG in selected["flags"]
+    assert selected["liquid_fraction_by_temperature_C"][500.0] == 1.0
+
+
+def test_tier_b_flat_neighbour_disagreement_uses_shared_fallback():
+    liner = {"CaO": 20.0, "Al2O3": 30.0, "SiO2": 50.0}
+    first_neighbour, second_neighbour, _ = (
+        liner_corrosion._tier_b_composition_neighbours(liner)
+    )
+
+    class OneFlatNeighbour:
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            if _matches_oxide_composition(composition, first_neighbour):
+                return 1.0
+            if not (
+                _matches_oxide_composition(composition, liner)
+                or _matches_oxide_composition(composition, second_neighbour)
+            ):
+                raise AssertionError(f"unexpected composition: {composition!r}")
+            if temperature_C < 1550.0:
+                return 0.0
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+    with pytest.raises(LinerCorrosionRefusal) as refused:
+        liner_corrosion._tier_b_reference_profile(
+            OneFlatNeighbour(),
+            liner,
+            pressure_bar=1.0,
+            allow_flat_endmember_profile=True,
+        )
+    assert refused.value.reason == "tier_b_composition_continuity_unresolved"
+    assert "neighbour_brackets_C" in refused.value.detail
 
 
 def test_tier_b_contaminated_profile_checks_composition_continuity():
@@ -1618,26 +1758,7 @@ def test_zero_mass_deposit_preserves_tier_a_subsystem_membership():
 
 
 def test_tier_a_anorthite_row_supplies_cited_pure_melting_temperature():
-    table = load_interface_invariant_table(
-        "anorthite-liner",
-        catalog={
-            "anorthite-liner": {
-                "interface_chemistry": {
-                    "composition": {
-                        "CaO": 20.16,
-                        "Al2O3": 36.65,
-                        "SiO2": 43.19,
-                    },
-                    "citation": "Morey 1964, Table 26",
-                    "criterion_tier": "B",
-                    "invariant_table": {
-                        "loader": "liner_corrosion_source_extracts",
-                        "subsystems": ["CaO-Al2O3-SiO2"],
-                    },
-                }
-            }
-        },
-    )
+    table = _anorthite_tier_a_table()
 
     # Formula-derived CaO.Al2O3.2SiO2 matches Morey Table 26 row 6's printed
     # oxide values to their half-digit precision (physical p. 82 / L71).

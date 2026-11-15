@@ -702,16 +702,17 @@ def _tier_b_reference_profile_single(
 
     fully_liquid_threshold = 1.0 - LIQUIDUS_LIQUID_EPSILON
     scanned_liquid = tuple(liquid_by_temperature.values())
-    constant_endmember_profile = (
+    constant_endmember_bracket: str | None = None
+    if (
         allow_flat_endmember_profile
         and bool(scanned_liquid)
         and all(value == scanned_liquid[0] for value in scanned_liquid)
-        and (
-            all(value <= LIQUIDUS_SOLID_EPSILON for value in scanned_liquid)
-            or all(value >= fully_liquid_threshold for value in scanned_liquid)
-        )
-    )
-    if not constant_endmember_profile:
+    ):
+        if all(value <= LIQUIDUS_SOLID_EPSILON for value in scanned_liquid):
+            constant_endmember_bracket = "all-solid-above-scan"
+        elif all(value >= fully_liquid_threshold for value in scanned_liquid):
+            constant_endmember_bracket = "all-liquid-below-scan"
+    if constant_endmember_bracket is None:
         while (
             liquid_by_temperature[temperatures[-1]] < fully_liquid_threshold
             and temperatures[-1] < DEFAULT_LIQUIDUS_FINDER_MAX_T_C
@@ -737,7 +738,7 @@ def _tier_b_reference_profile_single(
         liquid_by_temperature[high] - liquid_by_temperature[low]
         for low, high in zip(temperatures, temperatures[1:])
     )
-    if constant_endmember_profile:
+    if constant_endmember_bracket is not None:
         bulk_index = None
         bulk_bracket = None
         bulk_jump = None
@@ -814,6 +815,10 @@ def _tier_b_reference_profile_single(
         "engine_minor_phase_eutectic": minor_phase,
         "flags": flags,
     }
+    if constant_endmember_bracket is not None:
+        # Explicit bracket signatures let the shared d-421 selector compare
+        # constant saturation profiles with ordinary onset brackets.
+        result["constant_endmember_bracket"] = constant_endmember_bracket
     if literature_melting_temperature_C is not None:
         literature_temperature = _finite_real(
             literature_melting_temperature_C,
@@ -873,7 +878,13 @@ def _symmetric_mean(left: float, right: float) -> float:
 
 def _first_liquid_profile_bracket(
     profile: Mapping[str, Any],
-) -> tuple[float | None, float] | None:
+) -> Sequence[Any] | None:
+    constant_endmember = profile.get("constant_endmember_bracket")
+    if constant_endmember in (
+        "all-solid-above-scan",
+        "all-liquid-below-scan",
+    ):
+        return [constant_endmember]
     bracket = profile.get("first_liquid_bracket_C")
     if (
         isinstance(bracket, Sequence)
@@ -1087,36 +1098,6 @@ def _tier_b_reference_profile(
     if all(profile is None for profile in profiles):
         first_refusal = next(refusal for refusal in refusals if refusal is not None)
         raise first_refusal
-    if all(
-        profile is not None and profile.get("bulk_melt_bracket_C") is None
-        for profile in profiles
-    ):
-        flat_profiles = [profile for profile in profiles if profile is not None]
-        assert nominal_profile is not None
-        nominal_liquid = nominal_profile["liquid_fraction_by_temperature_C"]
-        if any(
-            not math.isclose(
-                float(nominal_liquid[temperature]),
-                float(profile["liquid_fraction_by_temperature_C"][temperature]),
-                rel_tol=0.0,
-                abs_tol=LIQUIDUS_SOLID_EPSILON,
-            )
-            for profile in flat_profiles[1:]
-            for temperature in nominal_profile["scan_temperature_C"]
-        ):
-            raise LinerCorrosionRefusal(
-                "tier_b_composition_continuity_unresolved",
-                "constant fully-solid/fully-liquid saturation profiles disagree",
-            )
-        selected = dict(nominal_profile)
-        selected["composition_continuity"] = {
-            "status": "passed",
-            "flat_profile_liquid_fraction": next(iter(nominal_liquid.values())),
-        }
-        engine_version = getattr(sampler, "engine_version", None)
-        if engine_version is not None:
-            selected["engine_version"] = str(engine_version)
-        return selected
     selected, continuity, sensitivity = _composition_continuity_selection(
         nominal_profile,
         first_profile,
