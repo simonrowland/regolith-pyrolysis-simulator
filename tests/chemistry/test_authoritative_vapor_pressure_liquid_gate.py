@@ -532,7 +532,7 @@ def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> No
         'curve': {
             'source': projected_source,
             'composition_projected_notice': projection_notice,
-            'gate_provider_refusal': {
+            'original_bulk_refusal': {
                 'provider': 'magemin',
                 'status': 'out_of_domain',
                 'reasons': [
