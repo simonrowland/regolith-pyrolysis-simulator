@@ -33,6 +33,7 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.condensation import KnudsenRegimeRefusal
+from simulator.condensation_routing import STAGE3_BYPASS_SEGMENT_NAME
 from simulator.electrolysis import (
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
@@ -3853,9 +3854,12 @@ def test_parallel_composition_target_stub_study_completes(
             sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
                 "SiO"
             ]
+            # The bypass remains upstream of SiO's next active collector.
+            # Its configured 1500 C wall shares this SiO saturation refusal.
             assert set(sio_refusals) == {
                 "stage_0_to_stage_1",
                 "stage_1_to_stage_2",
+                STAGE3_BYPASS_SEGMENT_NAME,
             }
             assert all(
                 record["status"] == "refused"
@@ -3865,16 +3869,15 @@ def test_parallel_composition_target_stub_study_completes(
 
         wall_authority = summary["wall_deposit_sticking_authority"]
         fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
-        # The shipped Stage-1 condenser wall stays 1150 C = 1423.15 K. That
-        # is the train's fixed Fe stage, not a searched overhead dew point,
-        # and it remains just below the Tachibana fit's 1443 K lower bound.
-        # This pins the Arrhenius domain of the sticking coefficient. It does
-        # not pin an Fe dew point or an Fe Psat number (d-383 owns Psat).
+        # d-335 sets the fixed Fe collector to 1100 C = 1373.15 K;
+        # d-384 changes the searched overhead walls independently. This
+        # remains below the Tachibana fit lower bound of 1443 K and
+        # predicts and flags the Arrhenius sticking coefficient flank.
         assert any(
             record.get("alpha_s_form") == "arrhenius"
             and record.get("citation_status") == "CITED"
             and record.get("alpha_s_domain_status") == "out_of_domain"
-            and record.get("alpha_s_temperature_K") == pytest.approx(1423.15)
+            and record.get("alpha_s_temperature_K") == pytest.approx(1373.15)
             for record in fe_records
         )
 
@@ -7316,6 +7319,14 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             str(out_dir),
             "--seed",
             "7",
+            # c3 adds four substage route dimensions. Keep this C0 artifact
+            # smoke test on its original sampler subspace and shipped routes.
+            *[
+                argument
+                for spec in RecipeSchema().search_allowlist
+                if spec.path[-1] == "stage3_route"
+                for argument in ("--pin", ".".join(spec.path))
+            ],
         ],
         text=True,
         capture_output=True,
@@ -7516,23 +7527,21 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
-    # 20 C. Seed 0's pipe default is now about 782 C; the same unit
-    # coordinate on the old 1400-2200 C map was about 1680 C. Saturation at
-    # the colder wall is no longer a refusal: wall_deposit_total_kg is a
-    # measured 0, so lifespan status is threshold_unavailable because
-    # resinter_threshold_kg is still null. The consumed fraction stays
-    # empty and the row remains rank 1.
-    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
+    # The merged knob vocabulary moves seed 0's wall coordinates. The
+    # sampled CrO2 wall has no executable saturation curve, so the missing
+    # wall quantity takes precedence over the null resinter threshold.
+    assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
     summary = provenance[0]["product_summary"]
-    assert summary["lifespan_cost_status"] == "threshold_unavailable"
-    assert "resinter_threshold_kg is null" in summary["lifespan_cost_status_reason"]
-    assert summary["wall_deposit_total_kg"] == 0.0
+    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
+    authority = summary["wall_deposit_refusal"]["authority"]
+    assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
+    assert authority["wall_saturation_pressure_refused_species"] == ["CrO2"]
+    assert summary["wall_deposit_total_kg"] is None
     assert summary["resinter_threshold_kg"] is None
-    assert summary["has_positive_qualified_fouling"] is False
-    assert summary["furnace_amortization_status"] == "available"
+    assert summary["has_positive_qualified_fouling"] is None
+    assert summary.get("furnace_amortization_status") is None
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

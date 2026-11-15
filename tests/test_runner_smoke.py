@@ -22,6 +22,7 @@ without spinning up a child process.
 from __future__ import annotations
 
 import hashlib
+import re
 from collections import Counter, defaultdict
 from copy import deepcopy
 from dataclasses import replace
@@ -77,6 +78,7 @@ from simulator.runner import (
     build_sio_yield_report,
     _vapor_pressure_source_report,
 )
+from tests.golden_sections import nodes
 from simulator.condensation import (
     STAGE_PURITY_NO_CAPTURED_MASS,
     STAGE_PURITY_VERDICT_INDETERMINATE,
@@ -102,6 +104,8 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # from the runner JSON because its public envelope does not include raw flux maps.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
+        # car1: studio-3 production regen after Na2O/JANAF, silica, MRE, and
+        # diverted-route condensation changes.
         # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
         # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
         # (trace Si flux; largest product move 6.3e-7 relative). Same values on
@@ -116,8 +120,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "87508c1755a8c9521e7396ca37168f20c55088b6464763cea51514ce6443767d",
-        "ledger_sha256": "d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db",
+        "flux_maps_sha256": "f35a18fca674c3e6eb14bd01621c007a941d4b9029bf876bb8ed7a9663f62eae",
+        "ledger_sha256": "7569fdaa31127ae0fd5f00b48482b58da8f04822a33378cba5299b4d1a349bb2",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
@@ -129,7 +133,7 @@ SCENARIO_FLUX_LEDGER_PINS = {
     },
     "ci_carbonaceous_chondrite_C2B_12h": {
         "flux_maps_sha256": "d827049039f82a8b65a9b0f52e637cf3bc5d1e0dec7d6198edf901a5e3dcae7d",
-        "ledger_sha256": "fe7c19dbc6195a7f115e8cac385d539f84cf0a3670c35415ee058a5f41a56348",
+        "ledger_sha256": "e57eb891d3804521d05deadc1b0a3db56a484667d3d94f5364bcc0854548bec7",
     },
 }
 
@@ -374,7 +378,7 @@ def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
 
 
 @pytest.mark.xdist_group("lunar_c0_shared")
-def test_default_lunar_c0_product_story_is_numeric_with_si_channel(
+def test_default_lunar_c0_product_story_has_no_stage3_si_channel(
     lunar_c0_scenario_result, _lunar_c0_scenario_result_copy_factory
 ):
     assert _LUNAR_C0_RESULT_BUILD_COUNT == 1
@@ -390,7 +394,7 @@ def test_default_lunar_c0_product_story_is_numeric_with_si_channel(
     classification = payload["product_classification"]["classification"]
     metals_and_oxygen = classification["metals_plus_O2"]
     assert "Na" in metals_and_oxygen["metals_kg"]
-    assert "Si" in metals_and_oxygen["metals_kg"]
+    assert "Si" not in metals_and_oxygen["metals_kg"]
     class_total = metals_and_oxygen["class_total_kg"]
     assert isinstance(class_total, (int, float))
     assert math.isfinite(class_total)
@@ -743,6 +747,7 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
         shuttle_cycle=0,
         mre_voltage_V=0.0,
         mre_current_A=0.0,
+        mre_decomposition_voltage_status_by_oxide={},
         condensation_totals={},
         evap_flux=SimpleNamespace(species_kg_hr={}),
         wall_deposit_by_segment_species_delta={},
@@ -824,12 +829,14 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
-    # 40 C K trap. The c679673f5/85fedcb8e band-integrated capture path gives
-    # this production row total; the next row transfers it to reagent, so live
-    # product returns to zero while cumulative condensate and recycled mass
-    # retain the capture.
+    # 40 C K trap. c679673f5/85fedcb8e band integration changes the row total
+    # from 0.0004975311735864234 to 0.0004974950336209987 kg. The d-344
+    # cartridge (14.7388 m2) and the e-NTU bulk temperature then raise that
+    # hour's live Na+K product to 0.0007693717261912645 kg. The next row
+    # transfers it to reagent, so live product returns to zero while cumulative
+    # condensate and recycled mass retain the capture.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975311735864234, rel=1e-12, abs=1e-15
+        0.0007693717261912645, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -1062,6 +1069,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "evap_plane_selectivity",
     "mre_uncertified_yield",
     "mre_ellingham_ladder_diagnostic",
+    "mre_decomposition_voltage_status_by_oxide",
     "fe_redox_split",
     "stage_3_capture",
     "redox_source_breakdown",
@@ -1188,6 +1196,33 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
         "flux_dispatch_temperatures": flux_dispatch_temperatures,
         "ledger_output": ledger_output,
     }
+
+
+@pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda scenario: scenario["name"])
+def test_runner_payload_engine_versions_have_no_host_identity(
+    scenario, runner_golden_loader
+):
+    payload, _, expected_text = runner_golden_loader(scenario)
+    versions = [
+        token["value"]
+        for path, token in nodes(payload).items()
+        if path.rsplit("/", 1)[-1] == "engine_version"
+    ]
+    expected_versions = [
+        token["value"]
+        for path, token in nodes(json.loads(expected_text)).items()
+        if path.rsplit("/", 1)[-1] == "engine_version"
+    ]
+
+    assert bool(versions) == bool(expected_versions)
+    for version in versions:
+        assert re.search(
+            r"/(?:Users|home|private|tmp|var|root|opt)(?:/|\b)",
+            version,
+            flags=re.IGNORECASE,
+        ) is None
+        assert re.search(r"\b[A-Za-z]:\\", version) is None
+        assert "server=" not in version.casefold()
 
 
 _LUNAR_C0_RESULT_BUILD_COUNT = 0
@@ -2217,8 +2252,10 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
             allow_nan=False,
         ).encode("utf-8")
         assert canonical_hours == expected_hours
+        # The committed mars golden's per-hour summary. The condenser stack
+        # regenerated that fixture; this is its sha256, not a second run.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "665da64c22e002174f2dd792d3621ffe2707687e3240b6e746724d810edd6b16"
+            "118530d56fec9d6494325767f9dd68bad70213a1bfe252e97d6b6a9c3fdf38f8"
         )
 
 
@@ -2454,6 +2491,35 @@ def test_runner_cli_entry_point_writes_output_file(tmp_path):
     payload = json.loads(output.read_text())
     assert payload["status"] == "ok"
     assert payload["run_metadata"]["hours_completed"] == 2
+
+
+def test_runner_cli_reports_known_refusal_on_stderr(tmp_path):
+    output = tmp_path / "refused.json"
+    repo_root = Path(__file__).resolve().parent.parent
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner",
+            "--feedstock=lunar_mare_low_ti",
+            "--campaign=C0",
+            "--hours=1",
+            '--runtime-campaign-overrides={"C0":{"o2_bubbler_kg_per_hr":-1}}',
+            f"--output={output}",
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    payload = json.loads(output.read_text())
+    assert payload["status"] == "refused"
+    # Engines and libraries may also write to stderr; the runner's own line is last.
+    assert result.stderr.splitlines()[-1] == (
+        f"refused: {payload['error_message'] or payload['reason']}"
+    )
 
 
 def test_runner_cli_rejects_zero_mass_with_named_failure(tmp_path):

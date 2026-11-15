@@ -24,7 +24,6 @@ from typing import Any
 
 import yaml
 
-from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -63,7 +62,7 @@ from simulator.optimize.evalspec import (
     canonical_evalspec_json,
     current_code_version,
 )
-from simulator.optimize.honesty import alpha_ceiling_species, optimizer_tier_label
+from simulator.optimize.honesty import alpha_authority_statuses, optimizer_tier_label
 from simulator.optimize.result_trust import (
     attach_producer_engine_stamp,
     real_producer_stamp_pair,
@@ -4522,12 +4521,9 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
                     ]
                 else:
                     payload[key] = _jsonable_value(value)
-        ceiling_species = alpha_ceiling_species(trace)
-        if ceiling_species:
-            payload["alpha_authority_status_by_species"] = {
-                species: ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-                for species in ceiling_species
-            }
+        authority_statuses = alpha_authority_statuses(trace)
+        if authority_statuses:
+            payload["alpha_authority_status_by_species"] = authority_statuses
         _project_interpolation_ranked_drain_summary(trace, payload)
         _project_producer_engine_stamp(trace, payload)
     return MappingProxyType(payload) if payload else None
@@ -4753,7 +4749,7 @@ def _apply_tap_coating_product_summary(
         )
     for key in _TAP_COATING_DERIVED_AUTHORITY_FIELDS:
         summary.pop(key, None)
-    for key in _TAP_COATING_PRODUCT_SUMMARY_FIELDS:
+    for key in sorted(_TAP_COATING_PRODUCT_SUMMARY_FIELDS, key=str):
         if key in tap_summary:
             summary[key] = tap_summary[key]
 

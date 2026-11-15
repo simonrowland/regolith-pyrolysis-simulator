@@ -42,6 +42,20 @@ class ProviderRegistry:
         self._authoritative: dict[ChemistryIntent, ChemistryProvider] = {}
         self._fallback: dict[ChemistryIntent, ChemistryProvider] = {}
         self._shadows: dict[ChemistryIntent, list[ChemistryProvider]] = {}
+        self.gate_provider_order: tuple[ChemistryProvider, ...] = ()
+
+    def register_gate_provider_order(self, providers: Iterable[ChemistryProvider]) -> None:
+        """Declare the read-only freeze-gate ladder, keeping the primary slot."""
+        order = tuple(providers)
+        intent = ChemistryIntent.GATE_LIQUID_FRACTION
+        if not order:
+            raise KernelError('gate provider order must not be empty')
+        for provider in order:
+            profile = provider.capability_profile()
+            if not profile.can_dispatch(intent) or intent not in profile.is_authoritative_for:
+                raise KernelError('gate provider must declare gate dispatch authority')
+        self.register_idempotent(order[0], [intent], fallback=True)
+        self.gate_provider_order = order
 
     def register(
         self,

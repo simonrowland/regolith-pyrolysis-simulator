@@ -804,16 +804,21 @@ families:
                 digitized-line extrapolation ~24 K beyond the last digitized
                 12065 point (span ends 1474.93 K) -- effective sigma exceeds
                 the per-point 0.30 dex (t-383 final review P2-2)
-          pure_component_antoine:
-            source: REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235);
-              log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5
-            source_certification: source_equation_fit
-            A: 7.46077
-            B: 1873.728
-            C: -416.372
-            valid_range_K:
-            - 924
-            - 1118
+          pure_component_saturation:
+            equation: browning_potter
+            source: "Fink and Leibowitz, ANL/RE-95/2 (1995), section 1.2 equation (1), Browning and Potter liquid sodium in equilibrium with its vapor. ln(P/MPa)=11.9463-12633.73/T-0.4672*ln(T). Certified 864-2499 K. The Rodebush Antoine row is retired as a runtime source."
+            source_certification: source_equation
+            ln_p_mpa:
+              a: 11.9463
+              b: 12633.73
+              c: 0.4672
+            certified_range_K:
+            - 864.0
+            - 2499.0
+            melting_temperature_K: 370.98
+            fusion_enthalpy_J_per_mol: 2598.0
+            fusion_source: "Fink and Leibowitz ANL/RE-95/2 Table 1.1-4 (CODATA via Cordfunke and Konings). At the printed 371 K transition, H(liquid)=4752 J/mol and H(solid)=2154 J/mol relative to the solid at 298.15 K, so dH_fus=2598 J/mol. The branch temperature is the melting point 370.98 K."
+            extrapolation_caution: "Fink section 1.2: extrapolated equation (1) at 400 K differs by 24% from the LMFBR equation. Table 1.2-2 assigns 25-9% over 400-600 K and 6-4% over 600-864 K."
           oxide_activity_exponent: 1.0
           # Premise: NaO0.5(l) -> Na(g) + 0.25 O2(g).
           # Algebra: K=(p_Na/Pstd)(fO2/Pstd)^0.25 / a_NaO0.5;

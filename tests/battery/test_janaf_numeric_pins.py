@@ -23,6 +23,17 @@ def test_mgo_janaf_fusion_gibbs_interpolation_numeric_pin() -> None:
     assert _interpolate_formation_gibbs(liquid, Decimal("1873")) == Decimal("-314.74819")
 
 
+def test_janaf_interpolation_refuses_declared_missing_grid_node() -> None:
+    points = ((Decimal("300"), Decimal("-1")), (Decimal("400"), Decimal("-2")))
+
+    with pytest.raises(ValueError, match="missing grid node 350 K"):
+        _interpolate_formation_gibbs(
+            points,
+            Decimal("375"),
+            (Decimal("350"),),
+        )
+
+
 def test_mgo_janaf_fusion_enthalpy_uses_printed_3000_k_values() -> None:
     # Mg-008/Mg-009 print −709.524/−632.496 kJ/mol at 3000 K.
     enthalpy, *_ = janaf_fusion_enthalpy("MgO", Decimal("3000"))

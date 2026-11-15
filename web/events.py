@@ -39,7 +39,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, parse_campaign_override_value
 from simulator.condensation import (
     KnudsenRegimeRefusal,
     minimum_pressure_mbar_for_knudsen,
@@ -2007,12 +2007,12 @@ def _coerce_additives_kg(value) -> dict[str, float]:
     return additives_kg
 
 
-def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, object]]:
+def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float | str]]:
     if value is None:
         return {}
     if not isinstance(value, Mapping):
         raise InputValidationError('runtime_campaign_overrides must be an object')
-    overrides: dict[str, dict[str, object]] = {}
+    overrides: dict[str, dict[str, float | str]] = {}
     for campaign, fields in value.items():
         campaign_name = str(campaign).strip()
         if not campaign_name:
@@ -2023,7 +2023,7 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, object]]:
             raise InputValidationError(
                 f'runtime_campaign_overrides.{campaign_name} must be an object'
             )
-        clean_fields: dict[str, object] = {}
+        clean_fields: dict[str, float | str] = {}
         for field_name, field_value in fields.items():
             field_key = str(field_name).strip()
             if not field_key:
@@ -2035,17 +2035,21 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, object]]:
                 clean_fields[field_key] = field_value
                 continue
             if field_key in {'p_total_mbar', 'pO2_mbar'}:
+                # Pressure sign and the pO2-above-total ceiling are owned by
+                # validate_runtime_campaign_overrides below. A raw value keeps
+                # a non-numeric override on that typed refusal.
                 clean_fields[field_key] = field_value
                 continue
-            clean_value = _coerce_bounded_float(
-                field_value,
-                field=f'runtime_campaign_overrides.{campaign_name}.{field_key}',
-            )
-            if field_key == 'pO2_mbar' and clean_value < 0.0:
-                raise InputValidationError(
-                    f'runtime_campaign_overrides.{campaign_name}.{field_key} '
-                    'must be >= 0'
-                )
+            label = f'runtime_campaign_overrides.{campaign_name}.{field_key}'
+            if field_value is None or field_value == '':
+                raise InputValidationError(f'{label} is required')
+            try:
+                clean_value = parse_campaign_override_value(field_key, field_value, label)
+            except (TypeError, ValueError) as exc:
+                message = str(exc)
+                if message.startswith(f'{field_key} '):
+                    message = f'{label}{message[len(field_key):]}'
+                raise InputValidationError(message) from exc
             clean_fields[field_key] = clean_value
         if clean_fields:
             overrides[campaign_name] = clean_fields

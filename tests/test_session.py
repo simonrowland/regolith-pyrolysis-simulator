@@ -642,6 +642,25 @@ def test_campaign_override_po2_numeric_string_is_refused():
     assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
 
 
+def test_session_start_campaign_pressure_override_validates_raw_value():
+    config = _config(
+        campaign="C2A",
+        runtime_campaign_overrides={
+            "C2A": {"pO2_mbar": 0.1, "p_total_mbar": 10.0},
+        },
+    )
+    # The frozen config contains a mutable nested mapping; startup must still
+    # admit raw pressure values before coercing them to floats.
+    config.runtime_campaign_overrides["C2A"]["pO2_mbar"] = "1.0"
+    session = SimSession()
+
+    with pytest.raises(ValueError) as exc_info:
+        session.start(config)
+
+    assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_not_numeric"
+    assert session._sim is None
+
+
 def test_session_adjust_campaign_override_po2_zero_leaves_atmosphere_alone():
     """W5 complement: pO2=0 is the operator CLEARING the setpoint, not
     requesting controlled-O2. Atmosphere must stay where it is — the

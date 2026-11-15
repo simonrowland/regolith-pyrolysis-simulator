@@ -1583,17 +1583,31 @@ def _append_child_pid(path: str, pid: int) -> None:
 def _install_child_pid_tracking() -> Callable[[], None]:
     previous_popen = subprocess.Popen
 
-    def _tracked_popen(*args: Any, **kwargs: Any) -> Any:
-        process = previous_popen(*args, **kwargs)
-        log_path = os.environ.get(_CHILD_PID_LOG_ENV)
-        if log_path:
-            _append_child_pid(log_path, int(process.pid))
-        return process
+    class _TrackedPopen(previous_popen):
+        # Subclass the captured Popen, not the name after this function
+        # assigns over subprocess.Popen. While the subclass is installed,
+        # isinstance(proc, subprocess.Popen) has to hold for children started
+        # through it. A __new__ stand-in that returns a raw Popen makes that
+        # check false. Log the pid after super().__init__ so a constructor
+        # failure is not recorded.
+        #
+        # Studio IPython 9.14 evaluates ``subprocess.Popen[bytes]`` at import
+        # (VapoRock → IPython, no ``from __future__ import annotations``).
+        # Forward the subscript to the captured class so the alias is that
+        # class's GenericAlias, not this subclass.
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            log_path = os.environ.get(_CHILD_PID_LOG_ENV)
+            if log_path:
+                _append_child_pid(log_path, int(self.pid))
+
+        def __class_getitem__(cls, item: Any) -> Any:
+            return previous_popen[item]
 
     # subprocess is shared process-wide, and in-process executor doubles can
     # invoke this worker path. Restore the class after each evaluation instead
-    # of leaking this callable into unrelated consumers of subprocess.Popen.
-    subprocess.Popen = _tracked_popen  # type: ignore[assignment]
+    # of leaking this stand-in into unrelated consumers of subprocess.Popen.
+    subprocess.Popen = _TrackedPopen  # type: ignore[assignment]
 
     def _restore() -> None:
         subprocess.Popen = previous_popen

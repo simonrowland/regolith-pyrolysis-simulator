@@ -1754,7 +1754,7 @@ def _target_species_yield_payload(
         status = "not-applicable"
     elif result.yield_fraction is None:
         status = "insufficient-evidence"
-    return MappingProxyType({
+    payload = {
         "status": status,
         "conclusion": "reported" if has_denominator else status,
         "applicable": has_denominator,
@@ -1793,7 +1793,10 @@ def _target_species_yield_payload(
             else None
         ),
         "reason": result.reason,
-    })
+    }
+    if result.notices:
+        payload["notices"] = result.notices
+    return MappingProxyType(payload)
 
 
 def _target_species_yield_insufficient_payload(
@@ -1980,6 +1983,8 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
         if isinstance(owner, Mapping):
             add_source(owner.get("coating_diagnostics"))
             add_source(owner.get("stage3_route_diagnostic"))
+            add_source(owner.get("shadow_trace"))
+        add_source(getattr(owner, "shadow_trace", None))
         add_source(getattr(owner, "coating_diagnostics", None))
         for attr in ("condensation_model", "_condensation_model"):
             model = getattr(owner, attr, None)
@@ -2050,7 +2055,8 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
         elif isinstance(source, (tuple, list)):
             for item in source:
                 if isinstance(item, Mapping):
-                    if item.get("key") == "silica_exposed_to_alkali":
+                    if (item.get("key") == "silica_exposed_to_alkali"
+                            or item.get("event") == "stage3_opening_refused"):
                         silica_exposed_to_alkali_findings.append(dict(item))
                     if item.get("stage3_route_diagnostic"):
                         add_source(item["stage3_route_diagnostic"])

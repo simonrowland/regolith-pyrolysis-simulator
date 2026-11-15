@@ -5,7 +5,8 @@ import math
 import pytest
 
 from simulator import condensation
-from simulator.state import EvaporationFlux, MeltState
+from simulator.condensation_routing import NA_COLLECTOR_STAGE_KEY
+from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from tests.test_condensation_input_refusals import _configured_model
 
 
@@ -399,15 +400,9 @@ def test_route_keeps_capture_at_its_stage_and_depletes_inlet_pressure(monkeypatc
 
     monkeypatch.setattr(model, "_condensation_efficiency", capture_half)
     result = model.route(EvaporationFlux(species_kg_hr={"Fe": 1.0}), MeltState(temperature_C=1700.0))
-    assert result.condensed_by_stage_species == {
-        "stage_1_fe_condenser": {"Fe": 0.5},
-        "stage_3_sio_zone": {"Fe": 0.25},
-    }
-    assert result.remaining_by_species["Fe"] == pytest.approx(0.25)
-    assert seen[0] == (1, 1.0, 100.0)
-    # Dalton: 0.1 Fe + 0.9 carrier at inlet; after half Fe removal,
-    # y_Fe = 0.05/(0.05+0.9), and p_Fe = y_Fe * 1000 Pa.
-    assert seen[1] == pytest.approx((3, 0.5, 1000 * 0.05 / 0.95))
+    assert result.condensed_by_stage_species == {"stage_1_fe_condenser": {"Fe": 0.5}}
+    assert result.remaining_by_species["Fe"] == pytest.approx(0.5)
+    assert seen == [(1, 1.0, 100.0)]
 
 
 def test_hot_sio_passes_to_its_reactive_product_stage():
@@ -420,7 +415,8 @@ def test_hot_sio_passes_to_its_reactive_product_stage():
         "stage_1_fe_condenser", {})
     assert "SiO" not in result.condensed_by_stage_species.get(
         "stage_2_cr_oxide_harvest", {})
-    assert result.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
+    assert "SiO" not in result.condensed_by_stage_species.get(
+        "stage_3_sio_zone", {})
 
 
 def test_unavailable_wall_pressure_preserves_flow_with_typed_refusal(monkeypatch):
@@ -447,3 +443,487 @@ def test_unavailable_wall_pressure_preserves_flow_with_typed_refusal(monkeypatch
     refused_stage = next(item for item in refusal["stage_outcomes"] if item["status"] == "refused")
     assert refused_stage["eta"] is None
     assert refused_stage["refusal_type"] == "WallSaturationPressureRefusal"
+
+
+def _published_neufeld_omega_d(reduced_temperature: float) -> float:
+    """Neufeld, Janzen and Aziz, J. Chem. Phys. 57, 1100 (1972).
+
+    The collision-integral correlation, written from the published
+    coefficients. This is not a call to the production helper.
+    """
+    t_star = reduced_temperature
+    return (
+        1.06036 / t_star ** 0.1561
+        + 0.193 / math.exp(0.47635 * t_star)
+        + 1.03587 / math.exp(1.52996 * t_star)
+        + 1.76474 / math.exp(3.89411 * t_star)
+    )
+
+
+def _hand_chapman_enskog_temperature_ratio(
+    temperature_film_K: float,
+    temperature_bulk_K: float,
+    *,
+    species: str,
+    carrier: str,
+) -> tuple[float, float]:
+    """D(T_film)/D(T_bulk) from T^1.5 and the published Ω_D.
+
+    Lennard-Jones ε/k comes from the condensation table (the data owner).
+    ε_AB = sqrt(ε_A * ε_B). D ∝ T^1.5 / Ω_D(T/ε_AB) at fixed pressure.
+    """
+    species_row = condensation._LENNARD_JONES_PARAMS[species]
+    carrier_key = condensation._canonical_carrier_gas_key(carrier)
+    carrier_row = condensation._LENNARD_JONES_PARAMS[carrier_key]
+    epsilon_ab_K = math.sqrt(species_row[1] * carrier_row[1])
+    omega_film = _published_neufeld_omega_d(temperature_film_K / epsilon_ab_K)
+    omega_bulk = _published_neufeld_omega_d(temperature_bulk_K / epsilon_ab_K)
+    power = (temperature_film_K / temperature_bulk_K) ** 1.5
+    return power, power * omega_bulk / omega_film
+
+
+def test_stage_diffusivity_uses_film_temperature(monkeypatch):
+    model = _configured_model()
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 1.0},
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1450.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    stage = next(
+        item for item in model.train.stages
+        if getattr(item, "stage_key", "") == NA_COLLECTOR_STAGE_KEY
+    )
+    seen: list[tuple[str, float, float, float]] = []
+    original = condensation._chapman_enskog_d_ab_m2_s
+
+    def spy(species, temperature_K, pressure_pa, carrier="N2", **kwargs):
+        value = original(
+            species, temperature_K, pressure_pa, carrier=carrier, **kwargs,
+        )
+        seen.append((species, float(temperature_K), float(pressure_pa), float(value)))
+        return value
+
+    monkeypatch.setattr(condensation, "_chapman_enskog_d_ab_m2_s", spy)
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species="Na",
+        T_cond_C=883.0,
+        residence_s=3.0,
+        available_kg=0.01,
+        alpha_s_value=1.0,
+        inlet_partial_pressure_pa=10.0,
+    )
+
+    assert eta > 0.0
+    gas_K = model.gas_temperature_C + condensation.CELSIUS_TO_KELVIN_OFFSET
+    wall_K = condensation._stage_midpoint_temperature_K(stage)
+    film_K = condensation._stage_film_temperature_K(gas_K, wall_K)
+    assert gas_K == pytest.approx(1723.15)
+    assert wall_K == pytest.approx(523.15)
+    assert film_K == pytest.approx(1123.15)
+    assert seen
+    assert {row[0] for row in seen} == {"Na"}
+    assert all(row[1] == pytest.approx(film_K) for row in seen)
+    power, expected_ratio = _hand_chapman_enskog_temperature_ratio(
+        film_K, gas_K, species="Na", carrier=model.carrier_gas,
+    )
+    # Controller sanity, Celsius offset omitted: (1123/1723)^1.5 = 0.526.
+    assert (1123.0 / 1723.0) ** 1.5 == pytest.approx(0.526, abs=5e-4)
+    assert power == pytest.approx((1123.15 / 1723.15) ** 1.5)
+    produced = seen[0][3] / original(
+        "Na", gas_K, seen[0][2], carrier=model.carrier_gas,
+    )
+    # Na–N2 ε/k is 1375 K, so Ω_D is not flat between 1123 K and 1723 K.
+    # The published collision integral carries the whole residual off T^1.5.
+    # The wall-only power (523.15/1723.15)^1.5 is about 0.167 and is not used.
+    assert produced == pytest.approx(expected_ratio, rel=1e-12)
+    assert produced / power == pytest.approx(expected_ratio / power, rel=1e-12)
+    assert (wall_K / gas_K) ** 1.5 < 0.2
+    assert produced > 2.0 * (wall_K / gas_K) ** 1.5
+
+
+def test_stage_band_uses_each_sample_wall_in_the_film_temperature(monkeypatch):
+    model = _configured_model()
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1450.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    stage = model.train.stages[3]
+    stage.temp_range_C = (900.0, 1200.0)
+    seen: list[float] = []
+    original = condensation._chapman_enskog_d_ab_m2_s
+
+    def spy(species, temperature_K, pressure_pa, carrier="N2", **kwargs):
+        seen.append(float(temperature_K))
+        return original(
+            species, temperature_K, pressure_pa, carrier=carrier, **kwargs,
+        )
+
+    def saturated_nowhere(_species, pressure_pa, _temperature_K, **kwargs):
+        diagnostic = kwargs.get("diagnostic_out")
+        if diagnostic is not None:
+            diagnostic["wall_saturation_pressure_pa"] = 0.0
+            diagnostic["wall_saturation_pressure_refused"] = False
+        return float(pressure_pa)
+
+    monkeypatch.setattr(condensation, "_chapman_enskog_d_ab_m2_s", spy)
+    monkeypatch.setattr(
+        condensation, "_wall_deposition_driving_pressure_pa", saturated_nowhere,
+    )
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species="SiO",
+        T_cond_C=1200.0,
+        residence_s=4.0,
+        available_kg=1.0,
+        alpha_s_value=0.5,
+        inlet_partial_pressure_pa=100.0,
+    )
+
+    gas_K = model.gas_temperature_C + condensation.CELSIUS_TO_KELVIN_OFFSET
+    lo_C, hi_C = condensation._stage_temp_band_C(stage)
+    width_C = hi_C - lo_C
+    expected = [
+        condensation._stage_film_temperature_K(
+            gas_K,
+            lo_C + width_C * (sample + 0.5) / condensation.HKL_BAND_SAMPLES
+            + condensation.CELSIUS_TO_KELVIN_OFFSET,
+        )
+        for sample in range(condensation.HKL_BAND_SAMPLES)
+    ]
+    assert eta > 0.0
+    assert len(seen) == condensation.HKL_BAND_SAMPLES
+    assert seen == pytest.approx(expected)
+    assert min(seen) < max(seen)
+
+
+def test_omitted_diffusivity_temperature_stays_at_bulk_gas(monkeypatch):
+    seen: list[float] = []
+    original = condensation._chapman_enskog_d_ab_m2_s
+
+    def spy(species, temperature_K, pressure_pa, carrier="N2", **kwargs):
+        seen.append(float(temperature_K))
+        return original(
+            species, temperature_K, pressure_pa, carrier=carrier, **kwargs,
+        )
+
+    monkeypatch.setattr(condensation, "_chapman_enskog_d_ab_m2_s", spy)
+    bulk_K = 1700.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    condensation._series_resistance_deposition_flux_mol_m2_s(
+        "Na",
+        10.0,
+        523.15,
+        0.4,
+        pipe_diameter_m=0.02,
+        T_gas_K=bulk_K,
+        overhead_pressure_pa=1000.0,
+        equilibrium_pressure_pa=0.0,
+        regime_factor=0.0,
+        carrier_gas="N2",
+    )
+    assert seen == pytest.approx([bulk_K])
+
+
+def test_mass_transfer_denominator_stays_at_bulk_temperature():
+    bulk_K = 1450.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    wall_K = 250.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    film_K = condensation._stage_film_temperature_K(bulk_K, wall_K)
+    overhead_pa = 1000.0
+    partial_pa = 10.0
+    alpha = 0.4
+    diameter_m = 0.02
+    diffusivity = condensation._chapman_enskog_d_ab_m2_s(
+        "Na", film_K, overhead_pa, carrier="N2",
+    )
+    sherwood = condensation._stirring_enhanced_sherwood(
+        1.0, radial_stir_factor=1.0,
+    )
+    molar_mass = condensation.MOLAR_MASS["Na"] / 1000.0
+    k_hkl = alpha / math.sqrt(
+        2.0 * math.pi * molar_mass * condensation.GAS_CONSTANT_J_MOL_K * bulk_K
+    )
+    k_mt_bulk = (
+        sherwood * diffusivity
+        / (diameter_m * condensation.GAS_CONSTANT_J_MOL_K * bulk_K)
+    )
+    k_mt_film = (
+        sherwood * diffusivity
+        / (diameter_m * condensation.GAS_CONSTANT_J_MOL_K * film_K)
+    )
+    at_bulk_denominator = partial_pa / (1.0 / k_hkl + 1.0 / k_mt_bulk)
+    at_film_denominator = partial_pa / (1.0 / k_hkl + 1.0 / k_mt_film)
+    flux = condensation._series_resistance_deposition_flux_mol_m2_s(
+        "Na",
+        partial_pa,
+        wall_K,
+        alpha,
+        pipe_diameter_m=diameter_m,
+        stir_factor=1.0,
+        radial_stir_factor=1.0,
+        regime_factor=0.0,
+        T_gas_K=bulk_K,
+        overhead_pressure_pa=overhead_pa,
+        carrier_gas="N2",
+        equilibrium_pressure_pa=0.0,
+        diffusivity_temperature_K=film_K,
+    )
+    assert flux == pytest.approx(at_bulk_denominator, rel=1e-12)
+    assert flux != pytest.approx(at_film_denominator, rel=1e-4)
+
+
+def test_isothermal_wall_outlet_limits():
+    """NTU = 0 holds the inlet. NTU = ln(2) leaves half the approach. Large NTU reaches the wall."""
+
+    assert condensation._stage_bulk_outlet_temperature_K(1000.0, 400.0, 0.0) == 1000.0
+    assert condensation._stage_bulk_mean_temperature_K(1000.0, 400.0, 0.0) == 1000.0
+    outlet = condensation._stage_bulk_outlet_temperature_K(1000.0, 400.0, math.log(2.0))
+    mean = condensation._stage_bulk_mean_temperature_K(1000.0, 400.0, math.log(2.0))
+    assert outlet == pytest.approx(700.0)
+    assert 1000.0 > mean > outlet
+    hot_wall = condensation._stage_bulk_outlet_temperature_K(400.0, 1000.0, math.log(2.0))
+    assert hot_wall == pytest.approx(700.0)
+    assert condensation._stage_bulk_outlet_temperature_K(
+        1800.0, 1373.15, 20.0,
+    ) == pytest.approx(1373.15, abs=1.0e-3)
+
+
+def test_heat_exchanger_ntu_cancels_pressure_and_is_zero_without_flow_or_area():
+    common = dict(
+        area_m2=0.2828,
+        hydraulic_diameter_m=0.020,
+        gas_inlet_K=1800.0,
+        wall_K=1373.15,
+        total_molar_flow_mol_s=0.01,
+        sherwood=3.66,
+        carrier_gas="N2",
+    )
+    low, low_notice = condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=500.0, **common,
+    )
+    high, high_notice = condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=2000.0, **common,
+    )
+    assert low_notice is None
+    assert high_notice is None
+    assert low > 1.0
+    assert high == pytest.approx(low, rel=1.0e-9)
+    assert condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=500.0, **{**common, "area_m2": 0.0},
+    ) == (0.0, None)
+    assert condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=500.0, **{**common, "total_molar_flow_mol_s": 0.0},
+    ) == (0.0, None)
+    assert condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=0.0, **common,
+    ) == (0.0, None)
+
+
+def _mass_transfer_ntu(carrier, temperature_K, pressure_pa, **common):
+    """k_c A / Q from the production diffusivity. Not the heat-NTU factor."""
+
+    diffusivity = condensation._chapman_enskog_d_ab_m2_s(
+        carrier, temperature_K, pressure_pa, carrier=carrier,
+    )
+    coefficient = common["sherwood"] * diffusivity / common["hydraulic_diameter_m"]
+    volumetric = (
+        common["total_molar_flow_mol_s"]
+        * condensation.GAS_CONSTANT_J_MOL_K
+        * common["gas_inlet_K"]
+        / pressure_pa
+    )
+    return coefficient * common["area_m2"] / volumetric
+
+
+def test_carrier_self_lewis_matches_the_review_table():
+    """constackb-ror Le_self, printed to three digits past the leading one.
+
+    N2 1000 K 1.076, Ar 1500 K 1.118, Kr 1500 K 1.128. The acceptance is
+    half a unit in that last printed digit.
+    """
+
+    cases = (("N2", 1000.0, 1.076), ("Ar", 1500.0, 1.118), ("Kr", 1500.0, 1.128))
+    for carrier, temperature_K, expected in cases:
+        lewis, notice = condensation._carrier_self_lewis_number(
+            carrier, temperature_K, 101325.0,
+        )
+        assert notice is None
+        assert lewis == pytest.approx(expected, abs=5.0e-4)
+    low, _ = condensation._carrier_self_lewis_number("N2", 1500.0, 500.0)
+    high, _ = condensation._carrier_self_lewis_number("N2", 1500.0, 2000.0)
+    assert low == pytest.approx(high, rel=1.0e-12)
+    for carrier in ("He", "O2", "CO2"):
+        lewis, notice = condensation._carrier_self_lewis_number(
+            carrier, 1500.0, 101325.0,
+        )
+        assert notice is None
+        assert lewis > 1.0
+
+
+def test_heat_ntu_is_the_review_lewis_factor_on_self_diffusion():
+    """N2 at a 1000 K film. The review's Le_self^(2/3) is 1.050."""
+
+    common = dict(
+        area_m2=0.2828,
+        hydraulic_diameter_m=0.020,
+        gas_inlet_K=1000.0,
+        wall_K=1000.0,
+        total_molar_flow_mol_s=0.01,
+        sherwood=3.66,
+        carrier_gas="N2",
+    )
+    ntu, notice = condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=101325.0, **common,
+    )
+    mass_ntu = _mass_transfer_ntu("N2", 1000.0, 101325.0, **common)
+    assert notice is None
+    assert ntu / mass_ntu == pytest.approx(1.050, abs=5.0e-4)
+
+
+def test_missing_cp_segment_uses_lewis_unity_and_names_the_notice():
+    """N2's CEA gas record starts at 200 K. 100 K has no segment."""
+
+    common = dict(
+        area_m2=0.2828,
+        hydraulic_diameter_m=0.020,
+        gas_inlet_K=100.0,
+        wall_K=100.0,
+        total_molar_flow_mol_s=0.01,
+        sherwood=3.66,
+        carrier_gas="N2",
+    )
+    ntu, notice = condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=500.0, **common,
+    )
+    assert notice == condensation.HEAT_TRANSFER_LEWIS_UNITY_ASSUMED
+    assert ntu == pytest.approx(
+        _mass_transfer_ntu("N2", 100.0, 500.0, **common),
+        rel=1.0e-12,
+    )
+
+
+def test_heat_ntu_refuses_a_missing_lennard_jones_row(monkeypatch):
+    params = dict(condensation._LENNARD_JONES_PARAMS)
+    params.pop("N2")
+    monkeypatch.setattr(condensation, "_LENNARD_JONES_PARAMS", params)
+    with pytest.raises(condensation.DepositionInputRefusal) as exc_info:
+        condensation._stage_heat_exchanger_ntu(
+            area_m2=0.2828,
+            hydraulic_diameter_m=0.020,
+            gas_inlet_K=1000.0,
+            wall_K=1000.0,
+            total_molar_flow_mol_s=0.01,
+            total_pressure_pa=101325.0,
+            sherwood=3.66,
+            carrier_gas="N2",
+        )
+    assert exc_info.value.parameter == "lennard_jones"
+
+
+def test_heat_ntu_refuses_nonpositive_self_diffusion(monkeypatch):
+    monkeypatch.setattr(
+        condensation,
+        "_chapman_enskog_d_ab_m2_s",
+        lambda *args, **kwargs: 0.0,
+    )
+    with pytest.raises(condensation.DepositionInputRefusal) as exc_info:
+        condensation._stage_heat_exchanger_ntu(
+            area_m2=0.2828,
+            hydraulic_diameter_m=0.020,
+            gas_inlet_K=1000.0,
+            wall_K=1000.0,
+            total_molar_flow_mol_s=0.01,
+            total_pressure_pa=101325.0,
+            sherwood=3.66,
+            carrier_gas="N2",
+        )
+    assert exc_info.value.parameter == "self_diffusion_m2_s"
+
+
+def test_stage1_cools_toward_its_wall_and_a_hot_duct_does_not_reheat():
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 0.0589, "K": 0.0589},
+        gas_temperature_C=1600.0,
+        stage_area_m2_by_stage={
+            "fe_stage1": 0.2828,
+            "cr_stage2": 1.0e-3,
+            "alkali_stage4": 1.0e-3,
+            "k_stage4b": 1.0e-3,
+            "terminal": 1.0e-3,
+            "5": 1.0e-3,
+            "6": 1.0e-3,
+        },
+        stage_hydraulic_diameter_m_by_stage={"fe_stage1": 0.020},
+        pipe_segment_temperatures_C={
+            segment.name: 1650.0 for segment in model.pipe_segments
+        },
+    )
+    model.route(
+        EvaporationFlux(
+            species_kg_hr={"Na": 0.01, "K": 0.01},
+            total_kg_hr=0.02,
+        ),
+        MeltState(temperature_C=1600.0, hour=6, campaign_hour=6),
+    )
+    rows = model.last_stage_bulk_gas
+    train_inlet_K = 1600.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    hot_duct_K = 1650.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    assert rows[0]["stage_number"] == 0
+    assert rows[0]["ntu"] == 0.0
+    assert rows[0]["T_in_K"] == pytest.approx(train_inlet_K)
+    assert rows[0]["T_out_K"] == pytest.approx(train_inlet_K)
+    for earlier, later in zip(rows, rows[1:]):
+        assert later["T_in_K"] == earlier["T_out_K"]
+    stage1 = next(row for row in rows if row["stage_number"] == 1)
+    assert stage1["ntu"] > 1.0
+    assert "heat_transfer_notice" not in stage1
+    assert stage1["T_wall_K"] == pytest.approx(_fe_stage_wall_K(model))
+    assert abs(stage1["T_out_K"] - stage1["T_wall_K"]) < (
+        abs(stage1["T_in_K"] - stage1["T_wall_K"]) * 0.5
+    )
+    for row in rows:
+        assert row["T_in_K"] != pytest.approx(hot_duct_K)
+        assert row["T_out_K"] != pytest.approx(hot_duct_K)
+        wall_K = row["T_in_K"] if row["T_wall_K"] is None else row["T_wall_K"]
+        assert row["T_out_K"] == pytest.approx(
+            condensation._stage_bulk_outlet_temperature_K(
+                row["T_in_K"], wall_K, row["ntu"],
+            )
+        )
+        assert row["T_bulk_mean_K"] == pytest.approx(
+            condensation._stage_bulk_mean_temperature_K(
+                row["T_in_K"], wall_K, row["ntu"],
+            )
+        )
+
+
+def test_film_temperature_refuses_a_non_positive_temperature():
+    with pytest.raises(condensation.DepositionInputRefusal, match="T_gas_K"):
+        condensation._stage_film_temperature_K(0.0, 523.15)
+    with pytest.raises(condensation.DepositionInputRefusal, match="T_surface_K"):
+        condensation._stage_film_temperature_K(1723.15, -1.0)
+    with pytest.raises(
+        condensation.DepositionInputRefusal, match="diffusivity_temperature_K",
+    ):
+        condensation._series_resistance_deposition_flux_mol_m2_s(
+            "Na",
+            10.0,
+            523.15,
+            0.4,
+            pipe_diameter_m=0.02,
+            T_gas_K=1723.15,
+            overhead_pressure_pa=1000.0,
+            equilibrium_pressure_pa=0.0,
+            regime_factor=0.0,
+            diffusivity_temperature_K=0.0,
+        )

@@ -957,14 +957,17 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
         cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
         if cro2_kg > 0.0:
             wall_cro2_by_account_kg[account] = cro2_kg
-    # t-1217: causal inlet-driven wall capture sets these CrO2 deposits before terminal conversion.
+    # t-1217 set these deposits from the inlet. b1113 now condenses CrO2
+    # on stage 1, so the wall after that stage keeps only the leftover.
+    # The wall before stage 1 is unchanged. Cr2O3 below is the converted
+    # remainder, and the chromium atoms stay on the wall plus the terminal.
     assert wall_cro2_by_account_kg == pytest.approx(
         {
             "process.wall_deposit_segment_stage_0_to_stage_1": (
                 0.017091617459996433
             ),
             "process.wall_deposit_segment_stage_1_to_stage_2": (
-                0.019228069642495987
+                2.443690283478522e-08
             ),
         },
         rel=1e-12,

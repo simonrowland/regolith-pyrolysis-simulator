@@ -33,6 +33,8 @@ furnace_material: zirconia_ysz
 # and never raises it, and an out-of-envelope or non-finite request is REFUSED
 # (not clamped) by CampaignManager.
 furnace_max_T_C: null
+# source_tag: "owner 2026-11-11 d-388: '0.05%, go ahead'"
+outdoor_alkali_loss_limit_fraction_of_feed: 0.0005
 # ============================================================================
 # 1. CAMPAIGNS
 # ============================================================================
@@ -56,6 +58,7 @@ campaigns:
   # C0 -- Dry Inert Bakeoff & Volatile Recovery
   # --------------------------------------------------------------------------
   C0:
+    stage3_route: divert
     label: "Dry Inert Bakeoff & Volatile Recovery"
     temp_range_C: [20, 950]
     # Owner d-240's provisional ramp; release curves remain uncertified
@@ -88,6 +91,7 @@ campaigns:
   # C0b -- Standardised P-Cleanup (mild oxidative hold)
   # --------------------------------------------------------------------------
   C0b_p_cleanup:
+    stage3_route: divert
     label: "Standardised P-Cleanup (Mild Oxidative Hold)"
     activation_condition: >
       default_recommended_for_all_lunar OR P2O5_wt_pct > 0.04
@@ -129,6 +133,9 @@ campaigns:
   #        Replaces deprecated separate C1 + C2A entries.
   # --------------------------------------------------------------------------
   C2A_continuous:
+    # d-268: collect the hot SiO release, including the post-C4 continuation.
+    # d-278: the hourly purity gate refuses alkali-rich parcels to the bypass.
+    stage3_route: through
     label: "Continuous Adaptive pN2 Ramp -- Na/K + Fe + SiO2 Co-Extraction (Path A)"
     activation_condition: "Path_A AND NOT preserving_CMAS_glass_for_glass_or_ceramics"
     preferred_default: false
@@ -213,6 +220,7 @@ campaigns:
       (wicking/centrifugal condensers).
 
   C2A_staged:
+    stage3_route: divert
     label: "Staged pN2 Bakeout -- Alkali / SiO / Fe Hold / Cool Na Cleanup"
     activation_condition: "Path_A_staged AND sequential_product_collection"
     preferred_default: true
@@ -242,6 +250,7 @@ campaigns:
     termination_class: "A"
     stages:
       - name: alkali_early_fe
+        stage3_route: divert
         target_C: 1250
         ramp_rate_C_per_hr: 600
         duration_h: 4
@@ -258,6 +267,7 @@ campaigns:
             Fe: 0.00
             SiO: 0.00
       - name: sio_window
+        stage3_route: through
         target_C: 1600
         ramp_rate_C_per_hr: 175
         duration_h: 3
@@ -272,6 +282,7 @@ campaigns:
             Engine ladder shows Fe/SiO/Mg overlap above ~1600 C; this stage
             isolates the first SiO pulse but cannot make a pure SiO window.
       - name: fe_hot_hold
+        stage3_route: divert
         ramp_rate_C_per_hr: 150
         duration_h: 1
         target_species: ["Fe"]
@@ -286,6 +297,7 @@ campaigns:
             FeO_residual: 20.3
             thermal_Fe_pct: 88.0
       - name: cool_for_na_shuttle
+        stage3_route: divert
         target_C: 1150
         ramp_rate_C_per_hr: 600
         duration_h: 1
@@ -303,7 +315,7 @@ campaigns:
       Na2O_solubility_cap_wt_pct: 10
       JANAF_4th_multiphase_margin_kJ_per_mol_O2:   # 2026-07-09 re-ground; recomputed from ellingham_thermo multiphase fits
         Na_FeO_1150C: 11.1     # was 9.6 under the earlier linear fit
-        Na_FeO_crossover_C: 1181.5     # was 1173.4
+        Na_FeO_crossover_C: 1183.6715578613794  # BuiltinMetallothermicStepProvider._crossover_temperature_C("Na", "Fe"); tests/test_physics_ground_truth.py window is 1184 +/- 1 C. Was 1181.5, before that 1173.4.
         K_FeO_1150C: -127.4    # was -125.7
         K_FeO_crossover_C: 836.25    # was 832.0
       reactions:
@@ -315,7 +327,7 @@ campaigns:
         The JANAF-4th multiphase refit (2026-07-09 re-ground) removes K/FeO from
         practical melt temperatures (K/Fe crossover 836 C). The staged cleanup is
         now Na-only at 1150 C, inside a narrow Na/FeO window with about +11.1 kJ/mol O2
-        margin and a 1181.5 C crossover. Do not retune upward without new thermodynamic evidence.
+        margin and a 1183.6715578613794 C crossover. Do not retune upward without new thermodynamic evidence.
     downstream_impact: >
       Adds an operator-selectable Path A staged route without changing
       C2A_continuous. The cool Na cleanup uses additive/recycled Na for
@@ -331,6 +343,7 @@ campaigns:
   # C2B -- pO2-Managed Fe Pyrolysis (Path B)
   # --------------------------------------------------------------------------
   C2B:
+    stage3_route: divert
     label: "pO2-Managed Fe Pyrolysis (Path B)"
     activation_condition: "Path_B -- preserving CMAS glass for Material 1 or terminal ceramics"
     temp_range_C: [1320, 1480]
@@ -368,6 +381,7 @@ campaigns:
   # C3 -- Na/K Metallothermic Polish (Shuttle Cycles)
   # --------------------------------------------------------------------------
   C3:
+    stage3_route: divert
     label: "Deprecated Na/K Metallothermic Polish"
     JANAF_4th_multiphase_status: >
       K/FeO is refused throughout practical melt temperatures (formal
@@ -382,6 +396,7 @@ campaigns:
       Na_kg: 0.0
       K_kg: 0.0
     K_phase:
+      stage3_route: divert
       name: "Deprecated K FeO reduction diagnostic"
       T_inject_C: [760, 820]
       T_bakeout_C: [1520, 1680]
@@ -394,6 +409,7 @@ campaigns:
       Fe_reduction_per_cycle_pct: [0, 0]
       Si_conditioned_kg: [20, 40]
     Na_phase:
+      stage3_route: divert
       name: "Cool Fe cleanup or refused Cr/Ti diagnostic"
       T_inject_C: [1050, 1150]
       T_bakeout_C: [1520, 1680]
@@ -434,9 +450,12 @@ campaigns:
   # C4 -- Mg Selective Pyrolysis (Branch Two)
   # --------------------------------------------------------------------------
   C4:
+    stage3_route: divert
     label: "Mg Selective Pyrolysis (Branch Two)"
     temp_range_C: [1580, 1670]
-    max_target_acquisition_hr: 60       # 42 h nominal preheat from 1160 C at 10 C/h, plus latent-cooling margin
+    # 120 opportunity hours cover the 100 h needed by the slower diagnosed
+    # fallback route to acquire 1580 C, with 20 h of margin.
+    max_target_acquisition_hr: 120
     max_process_wall_clock_hr: 40       # finite wall clock around the 20 in-window reaction ticks
     dT_dt_C_per_hr: null                 # IR-controlled
     atmosphere: "controlled_O2"
@@ -523,6 +542,7 @@ campaigns:
   # C5 -- Limited MRE Under O2 Backpressure
   # --------------------------------------------------------------------------
   C5:
+    stage3_route: divert
     label: "Limited MRE Under O2 Backpressure"
     temp_range_C: [1500, 1650]
     dT_dt_C_per_hr: null                 # electrochemical; not ramp-driven
@@ -566,6 +586,7 @@ campaigns:
       longevity and energy budget.
 
   mre_baseline:
+    stage3_route: divert
     pO2_mbar_default: 50.0
     p_total_mbar_default: 50.0
     max_hold_hr: 120
@@ -580,6 +601,7 @@ campaigns:
   # C6 -- Mg Thermite Reduction (Separate Solar Furnace)
   # --------------------------------------------------------------------------
   C6:
+    stage3_route: divert
     label: "Mg Thermite Reduction (Separate Solar Furnace)"
     temp_range_C: [1380, 1450]
     default_hold_T_C: 1400
@@ -683,6 +705,7 @@ campaigns:
   # C7 -- Aluminothermic Ca Recovery (Optional / Default Off)
   # --------------------------------------------------------------------------
   C7:
+    stage3_route: divert
     label: "Aluminothermic Ca Recovery (Optional)"
     enabled: false
     objective: "ree_enrichment"
@@ -729,6 +752,8 @@ completion_contracts:
     mechanism: "vaporization"
     product_accounts: &vapor_product_accounts
       - "process.condensation_train"
+      - "process.alkali_cartridge"
+      - "process.alkali_cartridge_solid_residue"
       - "process.overhead_gas"
       - "terminal.chromium_condensed_oxide_stored"
     residual_accounts: &vapor_residual_accounts
@@ -987,6 +1012,18 @@ completion_contracts:
 # 2. CONDENSATION TRAIN
 # ============================================================================
 condensation_train:
+  # SiO2 / (SiO2 + Na2O/K2O equivalent inflow), owner d-279.
+  # Default lowered by owner ruling d-287 (amending d-278; 2026-10-25).
+  stage3_product_purity: 0.98
+  # ENGINEERING DEFAULT: stricter than the revised product default; owner may revise.
+  # Chunk 3 conservatively uses p_product; chunk 4 activates this burst ceiling.
+  stage3_instantaneous_purity: 0.99
+  stage3_bypass:
+    liner_material: hot_wall_refractory_liner
+    length_m: 1.0
+    inner_diameter_m: 0.12
+    wall_temperature_C: 1500
+    # Maintained hot duct and ideal valve isolation are engineering assumptions.
 
   # 0.5.4.1 B1-tunable (CW3 follow-on, 2026-05-28): per-species
   # condensation temperature overrides. The simulator's hardcoded
@@ -1110,10 +1147,12 @@ condensation_train:
 
     stage_1_fe_condenser:
       label: "Fe Condenser"
-      # Owner ruling d-137 (2026-10-29): parallel-plate collector, 10 mm gap,
-      # wall 1150 C. Wall >= 1100 C keeps SiO off the Fe tap. Equal endpoints
-      # are the wall temperature the capture law uses (band midpoint).
-      temp_range_C: [1150, 1150]
+      # Owner ruling d-335 (2026-11-03), "quench plus vortex", Stage-1 Fe.
+      # Equal endpoints are the wall the capture law uses (band midpoint).
+      # Source: condesign Option 1,
+      # docs-private/research/2026-11-03-condenser-design/condesign-report.md
+      # Area and hydraulic diameter stay on condenser_geometry.
+      temp_range_C: [1100, 1100]
       coating: "MZO (MgO-ZrO2)"
       max_service_T_C: 1450
       product: "liquid Fe draining to sump"
@@ -1155,11 +1194,18 @@ condensation_train:
         K: [400, 500]
 
     stage_4b_k_trap:
-      label: "K Cold Trap"
+      label: "Alkali freeze-out cartridge"
       # Sub-stage of 4. route() visits it after the Na collector and before
-      # stage 5. Wall 40 C is below the K Antoine band (679-1033 K):
-      # predict-and-flag. Provisional on b-588 and b-599.
+      # stage 5. Wall 40 C is inside the 25-40 C freeze-out band and below
+      # the Na melting point. K has no solid-branch saturation owner:
+      # predict-and-flag (d-019). Melt-out returns liquid Na and K to the
+      # train the C3 transfer reads. Solids leave that product. One
+      # cartridge is in service for the hour and is regenerated off-line.
+      # No baffle spacing, passage count, droplet diameter, or droplet
+      # density is declared, so the aerosol term stays unevaluable.
+      # Provisional on b-588 and b-599.
       temp_range_C: [40, 40]
+      melt_out_temperature_C: 120
 
     stage_5_vortex_dust_filter:
       label: "Vortex Dust Filter"
@@ -1196,18 +1242,35 @@ condenser_geometry:
   # at or above throat area and expose conservative baffle/cyclone surface
   # multipliers for later per-stage Kn/coating work.
   stage_area_ratios:
-    fe_stage1: 20.866981427604056
+    # Premise: d-335 Option 1 sets the Stage-1 plate to 0.2828 m2 on the
+    # shipped throat. Hydraulic diameter stays 0.020 m below.
+    # Algebra: ratio = 0.2828 m2 / initial_throat_area_m2,
+    # initial_throat_area_m2 = pi*(0.06 m)^2 = 0.011309733552923255 m2,
+    # ratio = 25.005009947993337.
+    # Unit check: m2/m2 is dimensionless, and the product is 0.2828 m2.
+    # Limit: ratio 1 would be the throat itself.
+    fe_stage1: 25.005009947993337
     cr_stage2: 4.5
     sio_stage3: 6.0
     alkali_stage4: 4.5093900542703675
-    k_stage4b: 5.658842421045168
+    # Stage-4 alkali freeze-out cartridge (owner d-344, 2026-11-05).
+    # Premise: 14.7388 m2 of cold area takes Na to 99.9 % of its f_eq
+    # ceiling on the binding run (lunar C2A_staged; cartsize study, model's
+    # own e-NTU with the carrier self-Lewis factor), at the 0.120 m throat.
+    # Algebra: ratio = 14.7388 m2 / initial_throat_area_m2,
+    # initial_throat_area_m2 = pi*(0.06 m)^2 = 0.011309733552923255 m2,
+    # ratio = 1303.1960418015706.
+    # Unit check: m2/m2 is dimensionless; the product is 14.7388 m2.
+    # Limit: the previous 5.658842421045168 gave 0.064 m2, which reached only
+    # about 6 % of the Na ceiling. Built as parallel tubes/baffles, not one duct.
+    k_stage4b: 1303.1960418015706
     terminal: 2.0
   stage_area_ratio_sources:
-    fe_stage1: "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window"
+    fe_stage1: "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md"
     cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
     sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
     alkali_stage4: "owner-ruling-d137: Na collector, area 0.051 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
-    k_stage4b: "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
+    k_stage4b: "owner-ruling-d344: alkali freeze-out cartridge, area 14.7388 m2, parallel tubes on the 0.120 m throat; 99.9 percent of the Na f_eq ceiling on lunar C2A_staged; provisional on b-588 and b-599"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
   # Capture-law gas-side length only. Parallel plates of gap g have
   # Dh = 2*g. The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.
@@ -2007,7 +2070,6 @@ chemistry_kernel:
   # Mn measurements cannot silently execute production evaporation with α=1.0.
   # V1e-followon (task #36) is the post-0.5.0 work to either measure α or refine
   # the placeholder policy.
-  allow_unmeasured_alpha_fallback: false
   evaporation_series_resistance:
     # J=M_i*k_L,i*Delta-C and Delta-p=H_i*Delta-C imply
     # k_m,i=M_i*k_L,i/H_i [s/m], R_m,i=H_i/(M_i*k_L,i) [m/s]. Runtime has

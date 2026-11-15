@@ -157,6 +157,20 @@ setImmediate(() => process.stdout.write(Object.values(els).map((e) => e._html).j
     assert "not emitted" in html
 
 
+def test_report_viewer_metal_projection_omits_cartridge_residue() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "makeHeader({header:{name:'n',run_id:'r',feedstock_id:'lunar',campaign_chain:['C0'],charge_mass_kg:16,engine_identity:{name:'builtin'}},execution_status:'ok',lifecycle:'complete',artifact_schema_version:'1'},[{T_C:1400,product_ledger_kg_at_hour:{Fe:6},metal_yields_kg:{Fe:6},O2_metric_label:'source-side O2'}],{electrical:1,evaporation:1}) + yieldsSection([{product_ledger_kg_at_hour:{Fe:6,Na:2},metal_yields_kg:{Fe:6,Na:2}}],{alkali_cartridge_solid_residue:{kg_by_species:{Fe:4,SiO2:3,MgO:1},class_total_kg:8}})",
+    )
+
+    assert "Fe product-ledger projection" in html
+    assert ">6 kg<" in html or ">6.00 kg<" in html
+    assert "10 kg" not in html
+    assert "4 kg" not in html
+    assert "SiO2" not in html
+    assert "MgO" not in html
+
+
 def test_report_viewer_c3_dose_rejects_string_numeric_coercion() -> None:
     html = _run_viewer_expression(
         "report-viewer.js",

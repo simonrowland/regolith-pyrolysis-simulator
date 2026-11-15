@@ -22,9 +22,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
-# Current production token count after removing two local-alias tokens from
-# scripts/grind_home.py; shared cache-setting reads use one ``os.environ`` token.
-ENV_ACCESS_TOKEN_CEILING = 94
+# Measured merged-tree token count. Relative to the engine-car base (94):
+# simulator/melt_backend/alphamelts.py adds ALPHAMELTS_CALC_MODE's os.environ
+# read and subprocess os.environ.copy(); both come from b56619a8f8.
+ENV_ACCESS_TOKEN_CEILING = 96
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep

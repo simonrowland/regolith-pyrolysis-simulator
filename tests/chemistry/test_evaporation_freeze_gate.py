@@ -626,6 +626,9 @@ def test_freeze_gate_cache_key_distinguishes_nio_coo_moles(
     )
 
 
+# Full 24 h / 12 h / 12 h runner campaigns: review call 294.56 s;
+# base run timed out at 310.90 s total under the unchanged 300 s test limit.
+@pytest.mark.nightly
 def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     from simulator.accounting.run_artifact import build_run_artifact
     from simulator.core import PyrolysisSimulator
@@ -645,9 +648,15 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     # Stage 4 now resolves Na and K through separate collectors. In the lunar
     # staged run, that path records the C3_NA gate curve once; the prior
     # single-stage capture contained a second identical C3_NA curve record.
-    # The production output therefore moves from two copies to one, while all
-    # six remaining curve tuples retain their pinned endpoints and paths.
+    # The production output therefore moves from two copies to one. The lunar
+    # endpoints below were re-measured on studio-3 (see the lunar comment).
     expected = {
+        # Studio-3 actual after the imposed-fO2 liquidus search folds ledger
+        # Fe2O3 back onto FeO (the fixed-fO2 solve has an open oxygen budget).
+        # The earlier 1042/1375 brackets came from an oxygen-starved bulk
+        # (native fO2 about -15.5) accepted before MAGEMin fO2 readback, and
+        # after readback the gate held the C0 curve all day. Each record is a
+        # committed rebuild; hours that do not move the cache key add none.
         'lunar_mare_low_ti_C0_24h': [
             (
                 'C0',
@@ -673,23 +682,30 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1042.1875,
-                1375.0,
-                ((1042.1875, 0.0), (1375.0, 1.0)),
+                920.3125,
+                1370.3125,
+                ((920.3125, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
-                1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
+                921.875,
+                1368.75,
+                ((921.875, 0.0), (1368.75, 1.0)),
             ),
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
-                1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
+                921.875,
+                1368.75,
+                ((921.875, 0.0), (1368.75, 1.0)),
+            ),
+            (
+                'C3_NA',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                921.875,
+                1368.75,
+                ((921.875, 0.0), (1368.75, 1.0)),
             ),
         ],
         'mars_basalt_C2A_12h': [
@@ -701,7 +717,8 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        # Executable capture: 12 hours, six hour-local curve reads per hour.
+        # d-297 rejects >1 wt% NiO before a retry. The stable refusal's
+        # qualified floor is reusable, unlike the old numerical failure.
         'ci_carbonaceous_chondrite_C2B_12h': [
             (
                 'C2B',
@@ -710,7 +727,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1200.000001,
                 ((1200.0, 0.0), (1200.000001, 1.0)),
             ),
-        ] * 72,
+        ],
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
@@ -727,12 +744,10 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             return record
         curve = record['curve']
         if current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h':
-            notice = curve['gate_provider_refusal']
-            assert notice['authority'] == 'extrapolated (lower-rung)'
-            assert notice['outcome'] == 'numerical_failure'
-            assert notice['provider_diagnostic']['backend_diagnostics'][
-                'projected_liquidus_status'
-            ] in {'unavailable', 'not_converged'}
+            notice = curve['composition_projected_notice']
+            assert notice['authority'] == 'extrapolated'
+            assert notice['reason'].startswith('composition_projected_over_threshold:')
+            assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
         row = (
             sim.melt.campaign.name,
             curve['source'],
@@ -774,7 +789,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             assert result['status'] == 'ok'
             artifact = build_run_artifact(result, run_id='ci-first-call-floor')
             assert len(artifact['timesteps']) == scenario['hours']
-            assert rebuild_counts.get(name, 0) == 0
+            assert rebuild_counts.get(name, 0) == 1
             assert equilibrium_count[0] > equilibrations_before
 
     assert observed == expected
@@ -1091,9 +1106,9 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
         ),
         pytest.param(
             {'missing_alpha': {'CrO2': {}, 'CrO': {}}},
-            'missing evaporation_alpha for sampled species: CrO, CrO2; set '
-            'chemistry_kernel.allow_unmeasured_alpha_fallback '
-            'for alpha=1.0 prototype fallback',
+            # Artificial unavailable provider output gets the generic refusal;
+            # absent measured alpha alone now predicts proxy/upper-bound flux.
+            'evaporation_flux_unavailable',
             id='missing-alpha-alone',
         ),
         pytest.param(
@@ -1945,6 +1960,43 @@ def test_redox_gate_propagates_keyerror_from_curve_notice_recording(
         sim._melt_redox_liquidus_gate_curve()
 
     assert sim._melt_redox_liquidus_gate_fallback_count == fallback_count == 0
+
+
+@pytest.mark.parametrize('held', [False, True])
+def test_over_limit_projection_steps_down_to_hold_or_floor(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data, held,
+):
+    from simulator.melt_backend.magemin import MAGEMinBackend, _magemin_bulk_projection_details
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=True,
+    )
+    if held:
+        sim._remember_freeze_gate_provider_curve({
+            'source': 'gate_liquid_fraction',
+            'solidus_T_C': 1200.0, 'liquidus_T_C': 1500.0,
+            'path': ((1200.0, 0.0), (1500.0, 1.0)),
+        })
+    projection = MAGEMinBackend()._build_db_bulk_projection(
+        {'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 3.0, 'MnO': 2.0},
+    )
+    monkeypatch.setattr(sim, '_dispatch_only', lambda *args, **kwargs: SimpleNamespace(
+        status='out_of_domain', warnings=(), diagnostic={
+            'backend_status_reason': 'composition_projected',
+            'input_composition_projection': _magemin_bulk_projection_details(projection),
+            'solidus_T_C': 900.0, 'liquidus_T_C': 1100.0,
+        },
+    ))
+    curve = sim._melt_redox_liquidus_gate_curve()
+    notice = curve['composition_projected_notice']
+    assert 'composition_projected_over_threshold' in notice['reason']
+    assert 'MnO' in notice['reason'] and 'total=2 wt%' in notice['reason']
+    if held:
+        assert curve['path'] == ((1200.0, 0.0), (1500.0, 1.0))
+        assert curve['gate_provider_refusal']['qualification'] == 'held_last_good_curve'
+    else:
+        assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+        assert notice['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
 
 
 def _lunar_composition_projected_diagnostic(sim):

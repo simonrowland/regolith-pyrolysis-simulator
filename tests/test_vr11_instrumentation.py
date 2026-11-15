@@ -287,8 +287,8 @@ def _b127_uncovered_na_vapor_data() -> tuple[dict[str, Any], float]:
     import simulator.condensation as condensation_module
 
     na_row = dict(condensation_module._species_vapor_data("Na"))
-    valid_range = na_row["pure_component_antoine"]["valid_range_K"]
-    test_temperature_K = math.nextafter(float(valid_range[1]), math.inf)
+    valid_range = na_row["pure_component_saturation"]["certified_range_K"]
+    test_temperature_K = math.nextafter(float(valid_range[0]), 0.0)
     na_row["interval_required"] = True
     return {"metals": {"Na": na_row}}, test_temperature_K
 
@@ -339,8 +339,8 @@ def test_b127_uncovered_antoine_segment_predicts_and_flags_not_100_pa() -> None:
 
     vapor_data, test_temperature_K = _b127_uncovered_na_vapor_data()
     production_row = condensation_module._species_vapor_data("Na")
-    production_fit = production_row["pure_component_antoine"]
-    valid_range = tuple(float(value) for value in production_fit["valid_range_K"])
+    production_fit = production_row["pure_component_saturation"]
+    valid_range = tuple(float(value) for value in production_fit["certified_range_K"])
     extrapolation_notices: dict[str, dict[str, Any]] = {}
     extrapolated_psat_pa = condensation_module._antoine_psat_pa(
         "Na",
@@ -1457,6 +1457,7 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
         DESIGNATED_STAGE,
         METAL_PHASE_DESTINATIONS,
     )
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
     from simulator.config import load_config_bundle
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -1520,6 +1521,7 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
         "process.condensation_retained_holdup",
         "process.wall_deposit",
         "terminal.offgas",
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     }
     by_account = sim.atom_ledger.account_species_kg()
@@ -2207,6 +2209,8 @@ def test_b3_production_route_folds_stage_outcomes() -> None:
         gas_temperature_C=1500.0,
         campaign_name="C2A",
     )
+    # This fixture has no K cartridge; zero is pass-through, missing refuses.
+    model.stage_area_m2_by_stage["k_stage4b"] = 0.0
     # Force zero residence on every stage so efficiency mints pass-through.
     model.residence_time_s = {
         int(stage.stage_number): 0.0 for stage in model.train.stages

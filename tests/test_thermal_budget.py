@@ -518,3 +518,18 @@ def test_injected_furnace_catalog_is_not_labeled_as_canonical_evidence():
     assert context["conductivity_W_m_K"]["status"] == ASSUMED
     assert "caller-supplied" in context["max_service_T_C"]["source"]
     assert "caller-supplied" in context["conductivity_W_m_K"]["source"]
+
+
+def test_out_of_domain_thermal_budget_keeps_refusal_without_enthalpy_extension():
+    from simulator.vapour_rail.nasa_cea import NasaCeaDomainError
+
+    payload = yaml.safe_load((Path(__file__).resolve().parents[1] / 'data/vapor_pressures.yaml').read_text())
+    with pytest.raises(NasaCeaDomainError, match='outside domain'):
+        evaporation_enthalpy_budget({'PO': 1e-6}, vapor_pressures=compile_vapour_rail_catalog(payload, emit_u0_request_rules=False).legacy_view(), temperature_K=500.)
+
+
+@pytest.mark.parametrize('temperature', [None, 0., float('nan')])
+def test_thermal_budget_still_refuses_missing_or_invalid_reaction_temperature(temperature):
+    payload = yaml.safe_load((Path(__file__).resolve().parents[1] / 'data/vapor_pressures.yaml').read_text())
+    with pytest.raises(ValueError, match='temperature_K'):
+        evaporation_enthalpy_budget({'PO': 1e-6}, vapor_pressures=compile_vapour_rail_catalog(payload, emit_u0_request_rules=False).legacy_view(), temperature_K=temperature)
