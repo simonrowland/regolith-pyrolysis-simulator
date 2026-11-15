@@ -22,8 +22,7 @@ _ORIGINAL_SETATTR = MonkeyPatch.setattr
 _SETATTR_SIGNATURE = inspect.signature(_ORIGINAL_SETATTR)
 _CURRENT_NODEID: str | None = None
 _SIGNATURE_LOOKUP_SKIPS = 0
-_SIGNATURE_GUARD_DISABLED_ENV = "SIGNATURE_DOUBLE_GUARD_DISABLED"
-_SIGNATURE_GUARD_DISABLED_TEST_PATHS = frozenset(
+_SIGNATURE_GUARD_PLUMBING_TEST_PATHS = frozenset(
     {
         "tests/test_pytest_session_safety.py",
         "tests/test_pytest_cache_isolation.py",
@@ -49,10 +48,7 @@ if _COLLECT_SIGNATURES and not _COLLECT_FILE:
 
 
 def _guarded_setattr(self: MonkeyPatch, *args: Any, **kwargs: Any) -> Any:
-    if (
-        _CURRENT_NODEID is None
-        or os.environ.get(_SIGNATURE_GUARD_DISABLED_ENV) == "1"
-    ):
+    if _CURRENT_NODEID is None:
         return _ORIGINAL_SETATTR(self, *args, **kwargs)
 
     global _SIGNATURE_LOOKUP_SKIPS
@@ -93,23 +89,16 @@ MonkeyPatch.setattr = _guarded_setattr
 def signature_guard_test_context(request):
     global _CURRENT_NODEID
     previous = _CURRENT_NODEID
-    previous_disabled = os.environ.get(_SIGNATURE_GUARD_DISABLED_ENV)
     test_path = request.node.nodeid.partition("::")[0]
-    disable_for_test = (
-        previous_disabled == "1"
-        or test_path in _SIGNATURE_GUARD_DISABLED_TEST_PATHS
+    _CURRENT_NODEID = (
+        None
+        if test_path in _SIGNATURE_GUARD_PLUMBING_TEST_PATHS
+        else request.node.nodeid
     )
-    if test_path in _SIGNATURE_GUARD_DISABLED_TEST_PATHS:
-        os.environ[_SIGNATURE_GUARD_DISABLED_ENV] = "1"
-    _CURRENT_NODEID = None if disable_for_test else request.node.nodeid
     try:
         yield
     finally:
         _CURRENT_NODEID = previous
-        if previous_disabled is None:
-            os.environ.pop(_SIGNATURE_GUARD_DISABLED_ENV, None)
-        else:
-            os.environ[_SIGNATURE_GUARD_DISABLED_ENV] = previous_disabled
 
 
 def pytest_sessionfinish(
@@ -118,17 +107,14 @@ def pytest_sessionfinish(
 ) -> None:
     del exitstatus
     reporter = session.config.pluginmanager.get_plugin("terminalreporter")
-    guard_disabled = os.environ.get(_SIGNATURE_GUARD_DISABLED_ENV) == "1"
-    if _COLLECT_SIGNATURES and not guard_disabled:
+    if _COLLECT_SIGNATURES:
         collected_path = Path(f"{_COLLECT_FILE}.{os.getpid()}")
         collected_path.parent.mkdir(parents=True, exist_ok=True)
         with collected_path.open("a", encoding="utf-8") as collected_file:
             for key, reason in sorted(_COLLECTED_SIGNATURE_MISMATCHES.items()):
                 collected_file.write(f"{key} # {reason}\n")
     xdist_worker = hasattr(session.config, "workerinput")
-    if reporter is not None and not guard_disabled and not (
-        _COLLECT_SIGNATURES and xdist_worker
-    ):
+    if reporter is not None and not (_COLLECT_SIGNATURES and xdist_worker):
         reporter.write_line(
             "signature double guard: "
             f"{_SIGNATURE_LOOKUP_SKIPS} unavailable signature lookup(s) skipped"

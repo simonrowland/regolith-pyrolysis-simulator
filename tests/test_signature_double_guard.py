@@ -37,6 +37,26 @@ def _signature_cache_test_callable(value):
     return value
 
 
+def _install_signature_guard_plugin(pytester):
+    repo_root = Path(__file__).resolve().parents[1]
+    plugin_path = repo_root / "tests" / "signature_double_guard_plugin.py"
+    pytester.makeconftest(
+        "import importlib.util\n"
+        "import sys\n"
+        f"repo_root = {str(repo_root)!r}\n"
+        f"plugin_path = {str(plugin_path)!r}\n"
+        "sys.path.insert(0, repo_root)\n"
+        "spec = importlib.util.spec_from_file_location(\n"
+        "    '_signature_double_guard_plugin',\n"
+        "    plugin_path,\n"
+        ")\n"
+        "plugin = importlib.util.module_from_spec(spec)\n"
+        "sys.modules[spec.name] = plugin\n"
+        "spec.loader.exec_module(plugin)\n"
+        "pytest_plugins = (spec.name,)\n"
+    )
+
+
 def test_guard_catches_a_narrowed_lambda_mutation():
     mismatch, skipped = signature_mismatch(
         _all_keyword_calls, lambda left: left
@@ -136,26 +156,10 @@ def test_collect_mode_nested_session_records_same_target_twice(
     pytester, monkeypatch, tmp_path
 ):
     collect_file = tmp_path / "collected-allowlist"
-    repo_root = Path(__file__).resolve().parents[1]
-    plugin_path = repo_root / "tests" / "signature_double_guard_plugin.py"
     monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_COLLECT", "1")
     monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_COLLECT_FILE", str(collect_file))
     monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_FAIL_UNLISTED", "0")
-    pytester.makeconftest(
-        "import importlib.util\n"
-        "import sys\n"
-        f"repo_root = {str(repo_root)!r}\n"
-        f"plugin_path = {str(plugin_path)!r}\n"
-        "sys.path.insert(0, repo_root)\n"
-        "spec = importlib.util.spec_from_file_location(\n"
-        "    '_signature_double_guard_plugin',\n"
-        "    plugin_path,\n"
-        ")\n"
-        "plugin = importlib.util.module_from_spec(spec)\n"
-        "sys.modules[spec.name] = plugin\n"
-        "spec.loader.exec_module(plugin)\n"
-        "pytest_plugins = (spec.name,)\n"
-    )
+    _install_signature_guard_plugin(pytester)
 
     pytester.makepyfile(
         target="def operation(left, right=0):\n    return left + right\n",
@@ -186,6 +190,32 @@ def test_collect_mode_nested_session_records_same_target_twice(
     assert len(entries) == 2
     assert any("test_first.py::test_first" in entry for entry in entries)
     assert any("test_second.py::test_second" in entry for entry in entries)
+
+
+def test_runtime_environment_cannot_disable_guard_in_nested_session(
+    pytester, monkeypatch
+):
+    monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_DISABLED", "1")
+    _install_signature_guard_plugin(pytester)
+    pytester.makepyfile(
+        target="def operation(left, right=0):\n    return left + right\n",
+        test_guard=(
+            "from types import SimpleNamespace\n"
+            "import pytest\n"
+            "import target as target_module\n"
+            "def test_environment_cannot_disable_guard(monkeypatch):\n"
+            "    monkeypatch.setenv('SIGNATURE_DOUBLE_GUARD_DISABLED', '1')\n"
+            "    target = SimpleNamespace(run=target_module.operation)\n"
+            "    with pytest.raises(AssertionError, match='incompatible'):\n"
+            "        monkeypatch.setattr(target, 'run', lambda left: left)\n"
+        ),
+    )
+
+    result = pytester.runpytest_subprocess(
+        "-q", "-n", "0", "-p", "no:cacheprovider", "test_guard.py", timeout=30
+    )
+
+    assert result.ret == pytest.ExitCode.OK
 
 
 def test_instance_patch_uses_the_bound_production_signature(monkeypatch):
@@ -271,6 +301,30 @@ def test_staticmethod_replacement_uses_descriptor_binding(monkeypatch):
         monkeypatch.setattr(Worker, "run", replacement)
 
 
+def test_class_replacement_variadic_accepts_implicit_receiver(monkeypatch):
+    class Worker:
+        def run(self, value=0):
+            return value
+
+    def broad_double(*args, **kwargs):
+        return args, kwargs
+
+    monkeypatch.setattr(Worker, "run", broad_double)
+
+    worker = Worker()
+    assert worker.run(2) == ((worker, 2), {})
+    assert worker.run(value=3) == ((worker,), {"value": 3})
+
+
+def test_class_replacement_must_accept_implicit_receiver(monkeypatch):
+    class Worker:
+        def run(self):
+            return 1
+
+    with pytest.raises(AssertionError, match="implicit receiver"):
+        monkeypatch.setattr(Worker, "run", lambda: 0)
+
+
 def test_partial_production_callable_is_checked(monkeypatch):
     def production(left, right=0):
         return left + right
@@ -302,6 +356,22 @@ def test_variadic_keyword_collision_is_checked(monkeypatch):
 
     with pytest.raises(AssertionError, match="multiple values"):
         monkeypatch.setattr(target, "run", collision)
+
+
+def test_variadic_positional_optional_keyword_collision_is_checked(monkeypatch):
+    def production(*args, option=0):
+        return args, option
+
+    def replacement(option=0, *args):
+        return args, option
+
+    assert production(1, option=2) == ((1,), 2)
+    with pytest.raises(TypeError, match="multiple values"):
+        replacement(1, option=2)
+
+    target = SimpleNamespace(run=production)
+    with pytest.raises(AssertionError, match="multiple values"):
+        monkeypatch.setattr(target, "run", replacement)
 
 
 def test_waiver_covers_only_its_exact_replacement_signature():

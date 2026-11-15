@@ -112,6 +112,8 @@ def signature_mismatch(
         production_signature = _signature(production)
         replacement_signature = _signature(replacement, replacement=True)
         if isinstance(replacement, classmethod):
+            if not _accepts_receiver(replacement_signature):
+                return "replacement cannot bind the implicit receiver", False
             replacement_signature = _without_receiver(replacement_signature)
     except (TypeError, ValueError):
         return None, True
@@ -227,34 +229,35 @@ def _compare_signatures(
                 f"{count} positional argument(s), optional keyword {parameter.name!r}",
             )
 
-    # If **kwargs accepts a replacement's positional name, passing that name
-    # alongside the matching positional slot is a valid production call but a
-    # duplicate binding for the replacement. Probe each such collision.
+    # Passing an accepted keyword beside its positional slot is valid production
+    # only when the production signature gives that keyword a separate binding.
     replacement_positional = tuple(
         parameter
         for parameter in replacement_parameters
         if parameter.kind
         in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
     )
-    if production_varkw:
-        for index, parameter in enumerate(replacement_positional):
-            if parameter.kind is not inspect.Parameter.POSITIONAL_OR_KEYWORD:
-                continue
-            count = max(index + 1, required_positional_only)
-            required_keywords = {
-                item.name: marker
-                for item in named
-                if item.default is inspect.Parameter.empty
-                and not (
-                    item.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD
-                    and item in positional[:count]
-                )
-            }
-            add(
-                (marker,) * count,
-                {**required_keywords, parameter.name: marker},
-                f"variadic keyword collides with positional parameter {parameter.name!r}",
+    production_keyword_names = {parameter.name for parameter in named}
+    for index, parameter in enumerate(replacement_positional):
+        if not production_varkw and parameter.name not in production_keyword_names:
+            continue
+        if parameter.kind is not inspect.Parameter.POSITIONAL_OR_KEYWORD:
+            continue
+        count = max(index + 1, required_positional_only)
+        required_keywords = {
+            item.name: marker
+            for item in named
+            if item.default is inspect.Parameter.empty
+            and not (
+                item.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD
+                and item in positional[:count]
             )
+        }
+        add(
+            (marker,) * count,
+            {**required_keywords, parameter.name: marker},
+            f"keyword collides with positional parameter {parameter.name!r}",
+        )
 
     if production_varargs:
         # More positional arguments than production declares remain legal.
@@ -265,11 +268,27 @@ def _compare_signatures(
                 if parameter.default is inspect.Parameter.empty
                 and parameter.kind is inspect.Parameter.KEYWORD_ONLY
             }
+            optional_keywords = {
+                parameter.name: marker
+                for parameter in named
+                if parameter.default is not inspect.Parameter.empty
+            }
             add(
                 (marker,) * count,
                 required_keywords,
                 f"{count} positional argument(s) through *args",
             )
+            add(
+                (marker,) * count,
+                {**required_keywords, **optional_keywords},
+                f"{count} positional argument(s) through *args, all optional keywords",
+            )
+            for name in optional_keywords:
+                add(
+                    (marker,) * count,
+                    {**required_keywords, name: marker},
+                    f"{count} positional argument(s) through *args, optional keyword {name!r}",
+                )
 
     for args, kwargs, label in call_shapes:
         try:
@@ -285,7 +304,7 @@ def _production_callable(target: Any, name: str, value: Any) -> tuple[Any, bool]
         if isinstance(value, staticmethod):
             return value.__func__, False
         if isinstance(value, classmethod):
-            return value.__get__(None, target), False
+            return value.__func__, True
         if inspect.isfunction(value):
             # Class patches are called through instances; Python binds this
             # receiver before the test double receives user arguments.
@@ -298,7 +317,7 @@ def _production_callable(target: Any, name: str, value: Any) -> tuple[Any, bool]
     if isinstance(value, staticmethod):
         return value.__func__, False
     if isinstance(value, classmethod):
-        return value.__get__(target, type(target)), False
+        return value.__func__, True
     if inspect.isfunction(value):
         return value.__get__(target, type(target)), False
     return value, False
@@ -313,7 +332,7 @@ def _replacement_callable(target: Any, value: Any) -> tuple[Any, bool]:
     if isinstance(value, staticmethod):
         return value.__func__, False
     if isinstance(value, classmethod):
-        return value.__get__(None, target), False
+        return value.__func__, True
     if inspect.isfunction(value):
         return value, True
     return value, False
@@ -342,6 +361,12 @@ def patch_signature_mismatch(
         if bind_production_receiver:
             production_signature = _without_receiver(production_signature)
         if bind_replacement_receiver:
+            if not _accepts_receiver(replacement_signature):
+                return (
+                    production,
+                    "replacement cannot bind the implicit receiver",
+                    False,
+                )
             replacement_signature = _without_receiver(replacement_signature)
     except (TypeError, ValueError):
         return production, None, True
@@ -380,7 +405,21 @@ def check_patch_signature(
 
 def _without_receiver(signature: inspect.Signature) -> inspect.Signature:
     parameters = tuple(signature.parameters.values())
+    if not parameters or parameters[0].kind not in (
+        inspect.Parameter.POSITIONAL_ONLY,
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+    ):
+        return signature
     return signature.replace(parameters=parameters[1:])
+
+
+def _accepts_receiver(signature: inspect.Signature) -> bool:
+    parameters = tuple(signature.parameters.values())
+    return bool(parameters) and parameters[0].kind in (
+        inspect.Parameter.POSITIONAL_ONLY,
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        inspect.Parameter.VAR_POSITIONAL,
+    )
 
 
 def signature_target_name(value: Any) -> str:
