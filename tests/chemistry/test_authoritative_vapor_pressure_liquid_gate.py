@@ -531,7 +531,7 @@ def test_refused_freeze_gate_phase_lookup_keeps_vapor_pressure_refresh() -> None
     assert result.vapor_pressures_Pa == {'Na': 12.5}
 
 
-def test_internal_analytical_default_core_uses_real_magemin_gate_fallback(
+def test_internal_analytical_adapter_uses_real_magemin_gate_fallback(
     request,
 ) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -599,6 +599,72 @@ def test_internal_analytical_default_core_uses_real_magemin_gate_fallback(
     assert gate_curve_rebuilds_after_refresh == gate_curve_rebuilds_before_refresh + 1
     core._melt_redox_liquidus_gate_record()
     assert core._freeze_gate_cache_rebuild_count == gate_curve_rebuilds_after_refresh
+
+
+def test_internal_analytical_runner_uses_real_equilibrium_phase_result(
+    request,
+) -> None:
+    from pathlib import Path
+
+    import yaml
+
+    from engines.builtin.vapor_pressure import openimcc_binding_selected_by_inputs
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+    from tests.engine_availability import magemin_binary_available
+
+    if not magemin_binary_available():
+        pytest.skip('MAGEMin binary unavailable for the real runner contract')
+
+    repo_root = Path(__file__).resolve().parents[2]
+    with (repo_root / 'data' / 'feedstocks.yaml').open(
+        encoding='utf-8'
+    ) as stream:
+        feedstocks = yaml.safe_load(stream)
+    with (repo_root / 'data' / 'vapor_pressures.yaml').open(
+        encoding='utf-8'
+    ) as stream:
+        vapor_pressures = yaml.safe_load(stream)
+    sim = PyrolysisSimulator(
+        InternalAnalyticalBackend(),
+        {'campaigns': {}},
+        {'lunar_mare_low_ti': feedstocks['lunar_mare_low_ti']},
+        vapor_pressures,
+    )
+    sim.load_batch('lunar_mare_low_ti', mass_kg=1000.0)
+    sim.melt.temperature_C = 1800.0 - 273.15
+    sim.melt.p_total_mbar = 1.0e-3
+    sim.melt.pO2_mbar = 1.0e-6
+    assert sim._liquid_fraction_provider == 'magemin'
+    sim._register_freeze_gate_liquid_fraction_providers()
+    gate_provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert gate_provider is not None
+    magemin = gate_provider._ensure_backend()
+    if magemin is None or not magemin.is_available():
+        pytest.skip('MAGEMin backend unavailable after initialization')
+    request.addfinalizer(magemin.close)
+
+    result = sim._get_equilibrium(run_post_equilibrium_sulfsat=False)
+
+    assert isinstance(result, EquilibriumResult)
+    assert result.liquid_fraction is None
+    assert result.phase_assemblage_available is False
+    authority = sim._last_high_t_melt_activity
+    assert authority['vapour_channel_phase_basis'] == 'liquid'
+    assert authority['phase_basis_source'] == (
+        'freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow'
+    )
+    assert authority['vapour_channel_switch_K'] == (
+        openimcc_bridge._temperature_domain_K()[0]
+    )
+    assert openimcc_binding_selected_by_inputs(
+        temperature_K=1800.0,
+        controls={},
+        quantity_class='vapour',
+        phase_basis=authority['vapour_channel_phase_basis'],
+    )
 
 
 def test_internal_analytical_real_kress_floor_stays_missing_phase() -> None:
