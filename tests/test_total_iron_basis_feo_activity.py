@@ -1,6 +1,8 @@
 from dataclasses import replace
 from decimal import Decimal
 
+import pytest
+
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
@@ -10,6 +12,7 @@ from simulator.battery.enums import (
     UncertaintyKind,
 )
 from simulator.battery.records import Composition, Located, State
+from simulator.battery import score as score_module
 from simulator.battery.score import (
     _printed_uncertainty_band,
     fusion_comparison_reference,
@@ -105,6 +108,7 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
 ) -> None:
     total_rows = 0
     mutation_checked = set()
+    explicit_zero_ferric_rows = 0
     for source_id, expected_count in TOTAL_IRON_SOURCES.items():
         migration = _migrate(tmp_path, source_id)
         rows = [
@@ -124,8 +128,8 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
                 source_id,
                 row.observation_id,
             )
-            assert standard.endmember.formula == "FeO"
-            assert standard.component_basis == "FeO"
+            assert standard.endmember.formula == "Fe(1-x)O"
+            assert standard.component_basis == "Fe(1-x)O"
             assert row.uncertainty.kind is UncertaintyKind.DERIVED
             assert row.uncertainty.derivation.relation == "total_iron_basis"
             assert temperature_of(row.identity) is not None
@@ -137,6 +141,7 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
             composition = located.state.value
             assert isinstance(composition, Composition)
             assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+            composition_components = dict(composition.components)
 
             resolution = _printed_uncertainty_band(
                 Quantity.ACTIVITY,
@@ -151,13 +156,29 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
             assert resolution.notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
             assert resolution.notice.authority is Authority.DERIVED
             assert resolution.notice.reason.startswith("total_iron_basis:")
+            ferric = composition_components.get("Fe2O3")
+            if ferric == 0:
+                explicit_zero_ferric_rows += 1
+                assert resolution.band.value == 0
 
-            if source_id not in mutation_checked and dict(composition.components).get(
+            comparison = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
+            assert comparison.identity.reference_state.value.endmember.formula == "FeO"
+            assert comparison.value.point > row.value.point
+            if row.observation_id.endswith("bch80_t1_c_b_1_activity"):
+                assert comparison.value.point.quantize(Decimal("0.0000000001")) == Decimal(
+                    "1.7650575301"
+                )
+                assert resolution.band.value.quantize(
+                    Decimal("0.0000000001")
+                ) == Decimal("0.0441221941")
+
+            if source_id not in mutation_checked and composition_components.get(
                 "Fe2O3", Decimal(0)
             ) > 0:
                 changed_components = tuple(
-                    (name, Decimal(0) if name == "Fe2O3" else amount)
+                    (name, amount)
                     for name, amount in composition.components
+                    if name != "Fe2O3"
                 )
                 changed_composition = replace(
                     composition, components=changed_components
@@ -174,9 +195,91 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
                     source_observation=changed_row,
                 )
                 assert resolution.band.value > 0
-                assert mutated.refusal is None
-                assert mutated.band is not None
-                assert mutated.band.value == 0
+                assert mutated.refusal == {
+                    "reason": "total_iron_basis_ferric_analysis_missing"
+                }
+                assert mutated.band is None
                 mutation_checked.add(source_id)
     assert total_rows == 118
     assert mutation_checked == set(TOTAL_IRON_SOURCES)
+    assert explicit_zero_ferric_rows > 0
+
+
+def test_total_iron_band_distinguishes_missing_from_explicit_zero_ferric(tmp_path):
+    migration = _migrate(
+        tmp_path, "banya-chiba-hikosaka-1980-feto-binary-solid-iron"
+    )
+    rows = [
+        row
+        for row in migration.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    positive = next(
+        row
+        for row in rows
+        if dict(row.point_conditions["composition"].state.value.components).get(
+            "Fe2O3", Decimal(0)
+        )
+        > 0
+    )
+    located = positive.point_conditions["composition"]
+    composition = located.state.value
+    missing_ferric = replace(
+        composition,
+        components=tuple(
+            (name, amount)
+            for name, amount in composition.components
+            if name != "Fe2O3"
+        ),
+    )
+    missing_row = replace(
+        positive,
+        point_conditions={
+            **positive.point_conditions,
+            "composition": replace(located, state=State.of(missing_ferric)),
+        },
+    )
+    missing = score_module._total_iron_basis_band(
+        Quantity.ACTIVITY, missing_row.uncertainty, missing_row
+    )
+    assert missing.refusal == {
+        "reason": "total_iron_basis_ferric_analysis_missing"
+    }
+    assert missing.band is None
+
+    explicit_zero = next(
+        row
+        for row in rows
+        if dict(row.point_conditions["composition"].state.value.components).get(
+            "Fe2O3"
+        )
+        == 0
+    )
+    zero_band = score_module._total_iron_basis_band(
+        Quantity.ACTIVITY, explicit_zero.uncertainty, explicit_zero
+    )
+    assert zero_band.refusal is None
+    assert zero_band.band is not None
+    assert zero_band.band.value == 0
+
+
+def test_total_iron_band_numeric_pin_detects_a_doubled_width(tmp_path, monkeypatch):
+    original = score_module._total_iron_basis_band
+
+    def doubled_width(*args, **kwargs):
+        resolution = original(*args, **kwargs)
+        if resolution.band is not None:
+            return replace(
+                resolution,
+                band=replace(
+                    resolution.band, value=resolution.band.value * 2
+                ),
+            )
+        return resolution
+
+    monkeypatch.setattr(score_module, "_total_iron_basis_band", doubled_width)
+    with pytest.raises(AssertionError, match="0.0441221941"):
+        test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
+            tmp_path
+        )
