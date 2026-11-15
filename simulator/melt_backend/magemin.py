@@ -2008,12 +2008,19 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # Apply the gate before availability so out-of-domain bulks receive
         # the same typed answer whether or not the binary is installed.
         if not self._available or self._bridge is None:
+            diagnostics = {
+                'backend_status': 'unavailable',
+                'backend_failure_disposition': 'environment',
+            }
+            if self._binary_path is None:
+                diagnostics['backend_status_reason'] = 'missing_binary'
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='unavailable',
                 warnings=['MAGEMin backend not initialized'],
+                diagnostics=diagnostics,
             )
 
         try:
