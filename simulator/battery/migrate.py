@@ -20084,13 +20084,14 @@ def _bare_log_frame_decision(
         band_text: str,
         authority: Authority,
         notices: tuple[PrintedOxygenNotice, ...] = (),
+        expected_method: str = "JANAF full-balance",
     ) -> PrintedOxygenDecision | None:
         checked.append((atmosphere, expected, owner_band))
         if abs(log10_fO2 - expected) > tolerance + owner_band:
             return None
         reason = (
             "printed fO2 frame matched printed atmosphere "
-            f"{atmosphere!r}; expected JANAF full-balance log10(fO2/bar)="
+            f"{atmosphere!r}; expected {expected_method} log10(fO2/bar)="
             f"{_display_fo2_dex(expected)}; {band_text}"
         )
         return PrintedOxygenDecision(
@@ -20145,6 +20146,7 @@ def _bare_log_frame_decision(
 
                 species_mol, relative_precision = parsed_mix
                 formation_gibbs: dict[str, float] | None = None
+                janaf_gas_constant: float | None = None
                 thermo_missing_reason = ""
                 try:
                     formation_gibbs, janaf_gas_constant = (
@@ -20161,14 +20163,6 @@ def _bare_log_frame_decision(
                     ValueError,
                 ) as exc:
                     thermo_missing_reason = str(exc)
-                if formation_gibbs is None:
-                    unsupported.append(
-                        f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
-                        "JANAF full-balance data missing"
-                        + (f" ({thermo_missing_reason})" if thermo_missing_reason else "")
-                        + ")"
-                    )
-                    continue
                 try:
                     resolution, _cea_log_fO2, full_balance_band = (
                         _full_balance_fo2_with_janaf_band(
@@ -20179,7 +20173,11 @@ def _bare_log_frame_decision(
                             load_buffer_polynomials(),
                             initial_total_pressure_bar=float(pressure_bar),
                             relative_precision=relative_precision,
-                            methane_formation_gibbs_J_per_mol=formation_gibbs["CH4"],
+                            methane_formation_gibbs_J_per_mol=(
+                                formation_gibbs["CH4"]
+                                if formation_gibbs is not None
+                                else None
+                            ),
                         )
                     )
                 except (
@@ -20188,24 +20186,52 @@ def _bare_log_frame_decision(
                     TypeError,
                     ValueError,
                 ) as exc:
-                    unsupported.append(
-                        f"{atmosphere!r} (gas_mix_fo2_band_unavailable: {exc})"
-                    )
+                    if formation_gibbs is None:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
+                            "JANAF full-balance data missing"
+                            + (
+                                f" ({thermo_missing_reason})"
+                                if thermo_missing_reason
+                                else ""
+                            )
+                            + ")"
+                        )
+                    else:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: {exc})"
+                        )
                     continue
                 expected = Decimal(str(resolution.log10_fO2))
                 full_band = Decimal(str(full_balance_band))
+                domain_reasons = resolution.domain_reasons
+                # The owner only resolves a missing-JANAF input for its
+                # explicitly supported out-of-domain direct CO2/CO couple.
+                direct_couple_extrapolation = formation_gibbs is None
                 band_text = (
                     f"tolerance={_dec_str(tolerance)} dex; "
-                    f"full_balance_cea_janaf_and_mix_band={_dec_str(full_band)} dex; "
+                    "direct_CEA_couple_extrapolation; JANAF source spread and "
+                    "mixture precision band unavailable; "
                     f"combined_allowance={_dec_str(tolerance + full_band)} dex"
+                    if direct_couple_extrapolation
+                    else (
+                        f"tolerance={_dec_str(tolerance)} dex; "
+                        f"full_balance_cea_janaf_and_mix_band={_dec_str(full_band)} dex; "
+                        f"combined_allowance={_dec_str(tolerance + full_band)} dex"
+                    )
                 )
-                domain_reasons = resolution.domain_reasons
                 domain_notice = (
                     PrintedOxygenNotice(
                         kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                         reason=(
-                            "gas-mixture full balance is outside its certified "
-                            "species domain: " + "; ".join(domain_reasons)
+                            (
+                                "printed gas couple is outside its certified CEA "
+                                "domain: "
+                                if direct_couple_extrapolation
+                                else "gas-mixture full balance is outside its certified "
+                                "species domain: "
+                            )
+                            + "; ".join(domain_reasons)
                         ),
                     ),
                 ) if domain_reasons else ()
@@ -20217,6 +20243,11 @@ def _bare_log_frame_decision(
                     band_text,
                     Authority.EXTRAPOLATED if domain_reasons else Authority.CERTIFIED,
                     notices=mix_notices,
+                    expected_method=(
+                        "extrapolated CEA direct-couple"
+                        if direct_couple_extrapolation
+                        else "JANAF full-balance"
+                    ),
                 )
                 if decision is not None:
                     return decision

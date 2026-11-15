@@ -503,8 +503,8 @@ def _full_element_balance_fo2(
 def _full_balance_fo2_with_janaf_band(
     initial_mole_fractions: Mapping[str, float],
     T_K: float,
-    janaf_formation_gibbs_J_per_mol: Mapping[str, float],
-    janaf_gas_constant_J_per_mol_K: float,
+    janaf_formation_gibbs_J_per_mol: Mapping[str, float] | None,
+    janaf_gas_constant_J_per_mol_K: float | None,
     polynomials: Mapping[str, NasaCeaPolynomial],
     *,
     initial_total_pressure_bar: float,
@@ -515,6 +515,21 @@ def _full_balance_fo2_with_janaf_band(
 
     required = ("CO", "CO2", "H2", "H2O", "O2")
     T = _coerce_T_K(T_K)
+    extrapolated_couple = _extrapolated_direct_gas_couple_fo2(
+        initial_mole_fractions, T, polynomials
+    )
+    if extrapolated_couple is not None:
+        # Outside the CEA interval a single printed couple still gives a
+        # flagged prediction, per d-332. The full JANAF/CEA comparison band is
+        # unavailable there, so do not fabricate one.
+        return extrapolated_couple, extrapolated_couple.log10_fO2, 0.0
+    if (
+        janaf_formation_gibbs_J_per_mol is None
+        or janaf_gas_constant_J_per_mol_K is None
+    ):
+        raise OffgasFO2Unavailable(
+            "full gas balance needs JANAF Gibbs data for a multi-species mixture"
+        )
     cea_gibbs = {name: polynomials[name].evaluate(T).g_J_per_mol for name in required}
     cea_R = NASA_CEA_R_J_PER_MOL_K
     janaf = _full_element_balance_fo2(
@@ -1002,6 +1017,52 @@ def _couple_log10_fO2(ratio: float, log10_K: float) -> float:
     """Invert one of the two direct oxygen couples from its oxidised/reduced ratio."""
 
     return 2.0 * (math.log10(ratio) - log10_K)
+
+
+def _extrapolated_direct_gas_couple_fo2(
+    initial_mole_fractions: Mapping[str, float],
+    T_K: float,
+    polynomials: Mapping[str, NasaCeaPolynomial],
+) -> _ElementBalanceFO2 | None:
+    """Resolve one printed gas couple outside CEA's declared temperature range.
+
+    A single CO2/CO ratio directly imposes fO2. Mixed C-H-O feeds still
+    require the full JANAF/CEA balance and do not use this fallback.
+    """
+
+    try:
+        amounts = {
+            str(name).upper(): float(value)
+            for name, value in initial_mole_fractions.items()
+        }
+    except (AttributeError, TypeError, ValueError, OverflowError):
+        return None
+    if any(not math.isfinite(value) or value < 0.0 for value in amounts.values()):
+        return None
+    active = {name for name, amount in amounts.items() if amount > 0.0}
+    pair = {"CO2", "CO"}
+    if not pair <= active or not active <= pair | {"N2", "AR"}:
+        return None
+
+    couple = "CO"
+    T = _coerce_T_K(T_K)
+    lo, hi = _effective_domain_K(polynomials, _COUPLE_RECORDS[couple])
+    if lo <= T <= hi:
+        return None
+    log10_k = _log10_K_couple(
+        polynomials, couple, T, allow_extrapolation=True
+    )
+    log10_fO2 = _couple_log10_fO2(
+        amounts["CO2"] / amounts["CO"], log10_k
+    )
+    return _ElementBalanceFO2(
+        log10_fO2,
+        {},
+        (
+            "direct printed gas-couple CEA extrapolation: "
+            f"CO2/CO couple at {T!r} K is outside [{lo!r}, {hi!r}] K",
+        ),
+    )
 
 
 def _log10_K_from_formation_gibbs_J_per_mol(

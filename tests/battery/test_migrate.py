@@ -19444,6 +19444,37 @@ def test_bare_log_accepts_printed_gas_mix_from_full_balance_band(
     assert "expected JANAF full-balance log10(fO2/bar)=" in decision.notice_reason
 
 
+def test_direct_printed_co_couple_below_cea_domain_is_extrapolated() -> None:
+    from simulator.battery.enums import Authority, NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.chemistry.offgas_fo2 import (
+        _couple_log10_fO2,
+        _log10_K_couple,
+        load_buffer_polynomials,
+    )
+
+    temperature_K = 199.0
+    atmosphere = "CO2 1.000 × 1.00 SCCM + CO 1.000 × 1.00 SCCM"
+    polynomials = load_buffer_polynomials()
+    expected = _couple_log10_fO2(
+        1.0,
+        _log10_K_couple(
+            polynomials, "CO", temperature_K, allow_extrapolation=True
+        ),
+    )
+
+    decision = _bare_log_frame_decision(
+        Decimal(str(expected)),
+        Decimal(str(temperature_K)),
+        printed_atmospheres=(atmosphere,),
+    )
+
+    assert decision.state.is_value
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert decision.notice_authority is Authority.EXTRAPOLATED
+    assert any("extrapolat" in notice.reason for notice in decision.notices)
+
+
 def test_bare_log_direct_couple_mismatch_is_refused_as_possible_misprint() -> None:
     from simulator.battery.enums import NoticeKind
     from simulator.battery.migrate import _bare_log_frame_decision
@@ -19460,21 +19491,6 @@ def test_bare_log_direct_couple_mismatch_is_refused_as_possible_misprint() -> No
         notice.kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
         for notice in decision.notices
     )
-
-
-def test_bare_log_mix_without_janaf_temperature_refuses() -> None:
-    from simulator.battery.migrate import _bare_log_frame_decision
-
-    decision = _bare_log_frame_decision(
-        Decimal("-1.0"),
-        Decimal("199"),
-        printed_atmospheres=(
-            "CO2 1.000 × 1.00 SCCM + CO 1.000 × 1.00 SCCM",
-        ),
-    )
-
-    assert decision.state.is_unknown
-    assert "gas_mix_fo2_band_unavailable" in decision.state.reason
 
 
 def test_gas_couple_without_janaf_refuses_without_fabricating_a_band(monkeypatch) -> None:
