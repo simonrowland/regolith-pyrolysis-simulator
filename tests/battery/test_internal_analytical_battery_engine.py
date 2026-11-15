@@ -1044,10 +1044,6 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
             assert record["phase_basis_source"].startswith(
                 "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow"
             )
-            assert any(
-                notice["code"] == "liquidus_low_end_samples_excluded"
-                for notice in record["notices"]
-            )
         if expected_switch is None:
             from simulator.melt_backend import openimcc_bridge
 
@@ -1080,7 +1076,7 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
             assert "silicate_window" in str(gate_evidence["reason"])
 
 
-def test_internal_analytical_low_end_liquidus_notice_reaches_gate_diagnostic(
+def test_internal_analytical_low_end_notice_reaches_vapor_and_phase_records(
     request,
 ) -> None:
     core = _new_internal_analytical_core()
@@ -1104,19 +1100,40 @@ def test_internal_analytical_low_end_liquidus_notice_reaches_gate_diagnostic(
     )
 
     assert output.status == 'ok'
-    notice = core._last_freeze_gate_diagnostic[
+    vapor_notice = next(
+        row
+        for row in core._last_vapor_pressure_diagnostic['d207_notices']
+        if row['code'] == 'liquidus_low_end_samples_excluded'
+    )
+    assert vapor_notice['authority'] == 'extrapolated'
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+
+    engine_notices, _authority, _certified_band = engine_flags_from_result(
+        output
+    )
+    scored_notice = next(
+        row
+        for row in engine_notices
+        if row['kind'] == 'openimcc_notice'
+        and 'liquidus_low_end_samples_excluded' in row['reason']
+    )
+    assert scored_notice['authority'] == 'extrapolated'
+    phase_basis_notice = core._last_high_t_melt_activity[
+        'phase_basis_notice'
+    ]
+    assert phase_basis_notice['code'] == (
+        'liquidus_low_end_samples_excluded'
+    )
+    assert phase_basis_notice['authority'] == 'extrapolated'
+    liquidus_notice = phase_basis_notice[
         'liquidus_sample_exclusion_notice'
     ]
-    assert notice['code'] == 'liquidus_low_end_samples_excluded'
-    assert notice['authority'] == 'extrapolated'
-    assert notice['solidus_qualification'] == (
+    assert liquidus_notice['solidus_qualification'] == (
         'lowest_crossing_within_supported_range'
     )
-    assert notice['excluded_samples'][0]['temperature_C'] == 400.0
-    assert any(
-        row['code'] == 'liquidus_low_end_samples_excluded'
-        for row in core._last_high_t_melt_activity['notices']
-    )
+    assert liquidus_notice['excluded_samples'][0]['temperature_C'] == 400.0
 
 
 def test_internal_analytical_timeout_kills_magemin_descendants(
