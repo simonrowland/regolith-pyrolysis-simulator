@@ -7464,14 +7464,9 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     assert events_by_pid[evaluator_pids[0]].get("magemin_initialize", 0) == 1
     assert events_by_pid[evaluator_pids[0]].get("magemin_equilibrate", 0) == 48
     assert (out_dir / "pareto.json").exists()
-    # This smoke profile explicitly enables only the furnace_temperature
-    # gate, so no coating report publishes a wall-saturation-pressure
-    # refusal. Studio summaries at green and the merged tip have no refused
-    # wall-pressure species; CrO2's carrier authority is instead refused for
-    # missing_evidence (no assemblage/potential evidence and no Henrian upper
-    # bound). d-401 books wall-saturation-pressure refusals, so this run has
-    # no CrO2 wall-supply booking. Furnace amortization remains available at
-    # zero cost.
+    # Only the furnace gate is enabled. Source-carrier refusals still reach
+    # d-401 without a wall-pressure refusal; a bounded zero is priced and
+    # retains its non-authoritative source flag.
     # This profile evaluates its one-hour C2A_continuous campaign. It does
     # not enter the C0 AUTO_APPLY sequence or encounter a C6 refusal. The
     # returned priced objective makes the single feasible candidate rankable.
@@ -7492,7 +7487,10 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     summary = winner_rows[0].get("product_summary") or {}
     assert summary["furnace_amortization_status"] == "available"
     authority = summary["wall_deposit_sticking_authority"]
-    assert summary.get("wall_supply_bound_bookings") is None
+    bookings = {item["species"]: item for item in summary["wall_supply_bound_bookings"]}
+    assert bookings["CrO2"]["deposit_kg"] == 0.0
+    assert bookings["CrO2"]["supply_interval_upper_bound_used"] == 1
+    assert authority["output_status"] == "status_bearing"
     assert authority.get("wall_saturation_pressure_refused_species") in (None, [])
     assert (
         authority["vapour_carrier_authority_status_by_species"]["CrO2"]
@@ -7645,8 +7643,8 @@ def test_cli_rejects_incoherent_constrained_max_args(
 
 
 def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> None:
-    # One-hour C2A_continuous smoke. Source activity is unavailable before
-    # Cr oxide vapour can be materialized, so wall lifetime is unpriced.
+    # One-hour C2A_continuous smoke. Refused Cr carrier activity is bounded
+    # by d-401, so the wall figure stays numeric with its authority flag.
     # A C0 start would continue through later steps. The live
     # continuation pin is test_lunar_highland_c0_horizon_changes_extracted_metals.
     out_dir = tmp_path / "constrained-max"
@@ -7680,30 +7678,41 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    # Seed 0 starts at 40 C. Cr oxide source activity refuses before any
-    # vapour supply is materialized; this is not a wall-pO2 refusal or a
-    # proven negligible supply. The empty ledger cannot price that unknown.
-    assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
+    # Seed 0 starts at 40 C (313.15 K). Missing Cr activity refuses the
+    # carriers, but activity-1 HK supply is bounded at essentially 0 kg.
+    # The numeric wall figure still cannot price an ungrounded threshold.
+    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
     summary = provenance[0]["product_summary"]
-    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
-    authority = summary["wall_deposit_refusal"]["authority"]
+    assert summary["lifespan_cost_status"] == "threshold_unavailable"
+    assert "wall_deposit_refusal" not in summary
+    authority = summary["wall_deposit_sticking_authority"]
     assert authority["code"] == "wall_deposit_vapour_carrier_non_authoritative"
+    assert authority["output_status"] == "status_bearing"
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["authoritative_for_resinter"] is False
     assert "wall_deposit_saturation_pressure_refused" not in authority["codes"]
     assert not authority.get("wall_saturation_pressure_refusals_by_species")
+    bookings = {item["species"]: item for item in summary["wall_supply_bound_bookings"]}
     for species in ("CrO2", "CrO3"):
         assert species in authority["refused_carrier_species"]
         carrier = authority["vapour_carrier_authority_by_species"][species]
         assert carrier["refusal_code"] == "missing_evidence"
         assert carrier["source_reaction_activity"]["value"] is None
         assert carrier["is_flux_active"] is False
-    assert summary["wall_deposit_total_kg"] is None
+        booking = bookings[species]
+        assert booking["reason"] == "below_wall_supply_upper_bound"
+        assert booking["supply_upper_bound_kg"] == pytest.approx(0.0, abs=1e-12)
+        assert booking["deposit_kg"] == 0.0
+        assert booking["supply_interval_upper_bound_used"] == 1
+        assert summary["supply_interval_upper_bound_used"][species] == 1
+    assert summary["wall_deposit_total_kg"] == 0.0
     assert summary["wall_deposit_kg_by_segment_species"] == {}
     assert summary["resinter_threshold_kg"] is None
-    assert summary["has_positive_qualified_fouling"] is None
-    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-    assert summary["furnace_amortization_batch_cost_equivalents"] is None
+    assert summary["has_positive_qualified_fouling"] is False
+    assert summary["furnace_amortization_status"] == "available"
+    assert summary["furnace_amortization_batch_cost_equivalents"] == 0.0
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

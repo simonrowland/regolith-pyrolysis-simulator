@@ -13540,3 +13540,41 @@ def test_booked_wall_availability_numeric_refactor_pin(
     assert summary["lifespan_cost_status"] == "available"
     # 1 kg/campaign / 4 kg/resinter = 0.25 resinter/campaign; zero stays zero.
     assert summary["furnace_lifespan_consumed_fraction"].hex() == expected_fraction_hex
+
+
+@pytest.mark.parametrize("species", ["CrO2", "CrO3"])
+@pytest.mark.parametrize("pressure_pa", [None, 0.0, 1.0])
+def test_source_carrier_refusal_requires_a_complete_supply_booking(
+    monkeypatch, species, pressure_pa,
+) -> None:
+    """No wall-pressure refusal is needed; no P_sat cannot become zero."""
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
+    snapshot = _activity_one_refusal_snapshot(species, hour=1, pressure_pa=pressure_pa)
+    execution = _refused_supply_execution((snapshot,), ())
+    execution.trace.wall_zone_by_segment = {"upstream": "Hot"}
+    execution.trace.wall_deposit_sticking_authority = {
+        "vapour_carrier_authority_by_species": {
+            species: snapshot.evap_flux.carrier_authority_by_species[species],
+        },
+    }
+    summary = objective_module._coating_product_summary(execution)
+    authority = summary["wall_deposit_sticking_authority"]
+    assert species in authority["refused_carrier_species"]
+    assert authority["output_status"] == "status_bearing"
+    assert authority["authoritative_for_resinter"] is False
+    assert not authority.get("wall_saturation_pressure_refused_species")
+    if pressure_pa is None:
+        assert not summary.get("wall_supply_bound_bookings")
+        assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
+        assert summary["wall_deposit_total_kg"] is None
+        assert species in summary["wall_deposit_refusal"]["authority"]["refused_carrier_species"]
+        assert authority[SUPPLY_UNAVAILABLE][species] == ["no_flux_law_and_no_psat"]
+    else:
+        bound = _optimizer_refused_flux_bounds((snapshot,), (species,), campaigns_elapsed=1.0)
+        booking, = summary["wall_supply_bound_bookings"]
+        assert booking["species"] == species
+        assert booking["supply_upper_bound_kg"] == pytest.approx(bound[species])
+        assert booking[SUPPLY_INTERVAL_UPPER_BOUND_USED] == 1
+        assert summary["wall_deposit_total_kg"] == pytest.approx(bound[species])
+        assert summary["lifespan_cost_status"] == "threshold_unavailable"
+        assert "wall_deposit_refusal" not in summary

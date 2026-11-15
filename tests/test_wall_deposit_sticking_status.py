@@ -1995,3 +1995,29 @@ def test_wall_figure_preserves_upstream_carrier_refusal(
     else:
         assert figure.status == ("available" if has_positive_deposit else "measured_empty")
         assert figure.refusal is None
+
+
+@pytest.mark.parametrize("has_positive_deposit", [False, True])
+@pytest.mark.parametrize("booked", [(), ("Fe",), ("Fe", "CrO2")])
+def test_wall_figure_only_prices_fully_booked_refused_carriers(has_positive_deposit, booked):
+    from simulator.wall_deposit_availability import wall_deposit_figure_availability
+
+    authority = {
+        "refused_carrier_species": ["Fe", "CrO2"],
+        "wall_supply_bound_bookings": [
+            {"species": species, "supply_upper_bound_kg": 0.0, "deposit_kg": 0.0}
+            for species in booked
+        ],
+        "output_status": "status_bearing",
+        "authoritative_for_resinter": False,
+    }
+    figure = wall_deposit_figure_availability(
+        has_positive_deposit=has_positive_deposit, authority=authority,
+    )
+    if len(booked) < 2:
+        assert figure.status == "refused"
+        assert figure.refusal["authority"] == authority
+    else:
+        assert figure.status == ("available" if has_positive_deposit else "measured_empty")
+        assert figure.refusal is None
+    assert authority["refused_carrier_species"] == ["Fe", "CrO2"]

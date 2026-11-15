@@ -53,6 +53,7 @@ from simulator.cost_energy import (
 from simulator.core import read_high_t_melt_activity_fallback_notice
 from simulator.wall_deposit_availability import (
     WALL_SATURATION_PRESSURE_REFUSED_CODE,
+    _authority_without_booked_refusals,
     wall_deposit_figure_availability,
 )
 from simulator.physical_constants import GAS_CONSTANT
@@ -5688,69 +5689,6 @@ def _assign_refused_supplies_at_binding_load(
     }
 
 
-def _authority_without_booked_refusals(
-    authority: Mapping[str, Any],
-    booked_species: set[str],
-) -> dict[str, Any]:
-    """Drop booked species from the refusal that poisons figure availability.
-
-    The published authority keeps the refusal. This copy is only the
-    availability input, so a booked supply cannot refuse the whole figure.
-    """
-
-    payload = _plain_payload(authority)
-    if not booked_species:
-        return payload
-    raw_species = payload.get("wall_saturation_pressure_refused_species")
-    if isinstance(raw_species, str):
-        remaining = [] if raw_species in booked_species else [raw_species]
-    elif isinstance(raw_species, (list, tuple, set, frozenset)):
-        remaining = [str(item) for item in raw_species if str(item) not in booked_species]
-    else:
-        remaining = []
-    records = payload.get("wall_saturation_pressure_refusals_by_species")
-    if isinstance(records, Mapping):
-        kept_records = {
-            str(species): value
-            for species, value in records.items()
-            if str(species) not in booked_species
-        }
-    else:
-        kept_records = {}
-    events = payload.get("wall_saturation_pressure_refusal_events")
-    if isinstance(events, list):
-        payload["wall_saturation_pressure_refusal_events"] = [
-            event
-            for event in events
-            if not (
-                isinstance(event, Mapping)
-                and str(event.get("species", "")) in booked_species
-            )
-        ]
-    still_refused = bool(remaining or kept_records)
-    if still_refused:
-        payload["wall_saturation_pressure_refused_species"] = remaining
-        payload["wall_saturation_pressure_refusals_by_species"] = kept_records
-        payload["status_bearing_refusal_count"] = len(set(remaining) | set(kept_records))
-        return payload
-    payload.pop("wall_saturation_pressure_refused_species", None)
-    payload.pop("wall_saturation_pressure_refusals_by_species", None)
-    payload["status_bearing_refusal_count"] = 0
-    codes = payload.get("codes")
-    if isinstance(codes, list):
-        payload["codes"] = [
-            code for code in codes if code != WALL_SATURATION_PRESSURE_REFUSED_CODE
-        ]
-    if payload.get("code") == WALL_SATURATION_PRESSURE_REFUSED_CODE:
-        remaining_codes = payload.get("codes")
-        payload["code"] = (
-            remaining_codes[0]
-            if isinstance(remaining_codes, list) and remaining_codes
-            else "wall_deposit_supply_bound"
-        )
-    return payload
-
-
 def _book_wall_deposits_at_vapour_supply(
     wall_deposit: Mapping[Any, Any],
     authority: Mapping[str, Any],
@@ -5808,7 +5746,10 @@ def _book_wall_deposits_at_vapour_supply(
     """
 
     notice_authority = _plain_payload(authority)
-    refused = _coating_wall_refused_species(notice_authority)
+    refused = tuple(sorted(
+        set(_coating_wall_refused_species(notice_authority))
+        | set(notice_authority.get("refused_carrier_species") or ())
+    ))
     if not refused or run_execution is None:
         return {
             "deposit": wall_deposit,
@@ -5980,6 +5921,8 @@ def _book_wall_deposits_at_vapour_supply(
             and interval_count > 0
         ):
             booking[SUPPLY_INTERVAL_UPPER_BOUND_USED] = int(interval_count)
+    if bookings:
+        notice_authority["wall_supply_bound_bookings"] = tuple(bookings)
     booked = {
         "deposit": booked_deposit,
         "availability_authority": _authority_without_booked_refusals(
@@ -6028,13 +5971,14 @@ def _booked_margin_refusal_is_priced(
     refused = _margin_wall_refused_species(payload)
     if not refused or str(summary.get("coating_status", "")) == "unavailable":
         return False
-    bookings = summary.get("wall_supply_bound_bookings") or ()
-    booked = {
-        str(item.get("species"))
-        for item in bookings
-        if isinstance(item, Mapping) and item.get("species")
-    }
-    return all(species in booked for species in refused)
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=False,
+        authority={
+            "wall_saturation_pressure_refused_species": refused,
+            "wall_supply_bound_bookings": summary.get("wall_supply_bound_bookings") or (),
+        },
+    )
+    return availability.status != "refused"
 
 
 def _coating_lifetime_projection(
