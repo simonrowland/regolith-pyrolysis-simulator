@@ -6334,6 +6334,14 @@ def _metric_uncertainty_width(
     return None
 
 
+def _combine_independent_standard_uncertainties(
+    first: Decimal,
+    second: Decimal,
+) -> Decimal:
+    """Combine independent standard uncertainties by GUM quadrature."""
+    return (first**2 + second**2).sqrt()
+
+
 def _confidence_level_notice(
     quantity: Quantity,
     uncertainty: Uncertainty,
@@ -17806,10 +17814,10 @@ def _compile_residual_with_lineage(
                     * Decimal(1000)
                     / _rt_ln_10_j_per_mol_K(T)
                 )
-                sigma_total_dex = (
-                    printed.standard_uncertainty_dex**2
-                    + sigma_conversion_dex**2
-                ).sqrt()
+                sigma_total_dex = _combine_independent_standard_uncertainties(
+                    printed.standard_uncertainty_dex,
+                    sigma_conversion_dex,
+                )
                 combined_basis = (
                     "fusion_combined_source_method"
                     if band_basis == "source_method"
@@ -17821,9 +17829,11 @@ def _compile_residual_with_lineage(
                         printed.standard_uncertainty_dex / Decimal(2)
                     )
                     two_sigma_total_dex = (
-                        two_sigma_measurement_dex**2
-                        + sigma_conversion_dex**2
-                    ).sqrt()
+                        _combine_independent_standard_uncertainties(
+                            two_sigma_measurement_dex,
+                            sigma_conversion_dex,
+                        )
+                    )
                     two_sigma_band = DecisionBand(
                         NORMAL_95_TICKET_MULTIPLIER * two_sigma_total_dex,
                         "dimensionless",
