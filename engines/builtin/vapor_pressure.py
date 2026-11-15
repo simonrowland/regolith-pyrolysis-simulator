@@ -885,9 +885,11 @@ def _append_openimcc_liquid_sio_band_notice(
         for notice in diagnostic["notices"]
     ):
         return
-    diagnostic["notices"].append(
-        dict(OPENIMCC_LIQUID_SIO_BELOW_1950K_NOTICE)
-    )
+    notice = dict(OPENIMCC_LIQUID_SIO_BELOW_1950K_NOTICE)
+    phase_basis_notice = diagnostic.get("phase_basis_notice")
+    if isinstance(phase_basis_notice, Mapping):
+        notice["phase_basis_notice"] = dict(phase_basis_notice)
+    diagnostic["notices"].append(notice)
 
 
 def _high_t_composition_vector(composition_mol: Mapping[str, float]) -> dict[str, float]:
@@ -1243,6 +1245,9 @@ def _build_high_t_melt_activity_authority(
         "seam": {},
         "authority_exclusions": {},
     }
+    phase_basis_notice = controls.get("phase_basis_notice")
+    if isinstance(phase_basis_notice, Mapping):
+        base["phase_basis_notice"] = dict(phase_basis_notice)
     if phase_basis == "missing":
         base["notices"].append(
             dict(OPENIMCC_VAPOUR_PHASE_SIGNAL_MISSING_NOTICE)
