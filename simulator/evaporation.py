@@ -861,7 +861,7 @@ class EvaporationMixin:
             and isinstance(projected_notice.get('dropped_components'), list)
             and bool(projected_notice.get('dropped_components'))
         )
-        provider_refusal = curve.get('gate_provider_refusal')
+        provider_refusal = curve.get('original_bulk_refusal')
         refusal_reasons = (
             provider_refusal.get('reasons')
             if isinstance(provider_refusal, Mapping)
@@ -2230,7 +2230,7 @@ class EvaporationMixin:
             )
         curve = dict(curve)
         curve['composition_projected_notice'] = notice
-        curve['gate_provider_refusal'] = {
+        curve['original_bulk_refusal'] = {
             'provider': self._liquid_fraction_provider,
             'status': diagnostic.get('backend_status'),
             'reasons': list(

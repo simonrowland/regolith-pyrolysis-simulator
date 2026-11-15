@@ -86,7 +86,11 @@ def _projected_gate_provider_diagnostic():
 def _projected_gate_phase_reader_result(
     sim, monkeypatch, diagnostic, *, status,
 ):
-    repair_notices = []
+    from tests.binding_admission_fixtures import (
+        register_synthetic_gate_curve_producer,
+    )
+
+    register_synthetic_gate_curve_producer(sim)
     monkeypatch.setattr(
         sim,
         '_dispatch_only',
@@ -94,21 +98,9 @@ def _projected_gate_phase_reader_result(
             status=status, diagnostic=diagnostic, warnings=(),
         ),
     )
-    curve = sim._freeze_gate_curve_from_gate_dispatch(
-        [], fO2_log=-9.0, repair_notices=repair_notices,
-    )
-    record = {
-        'curve': curve,
-        'origin': {},
-        'repair_notices': repair_notices,
-        'disposition': 'live',
-        'provider_outcome': sim._freeze_gate_provider_outcome,
-    }
-    monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_record', lambda: record)
-    monkeypatch.setattr(
-        sim, '_melt_redox_gate_record_is_admitted', lambda _record: True,
-    )
-    return curve, sim._vapor_pressure_freeze_gate_phase_fraction()
+    record = sim._freeze_gate_curve_record()
+    assert sim._melt_redox_gate_record_is_admitted(record)
+    return record['curve'], sim._vapor_pressure_freeze_gate_phase_fraction()
 
 
 def test_projected_gate_dispatch_admits_projection_only_refusal(
@@ -127,10 +119,11 @@ def test_projected_gate_dispatch_admits_projection_only_refusal(
     assert curve['composition_projected_notice']['dropped_components'] == [
         {'component': 'MnO', 'mass_fraction': 0.01},
     ]
-    assert curve['gate_provider_refusal']['status'] == 'out_of_domain'
-    assert set(curve['gate_provider_refusal']['reasons']) == {
+    assert curve['original_bulk_refusal']['status'] == 'out_of_domain'
+    assert set(curve['original_bulk_refusal']['reasons']) == {
         OutOfDomainReason.COMPOSITION_PROJECTED.value,
     }
+    assert 'gate_provider_refusal' not in curve
     assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
     assert phase[0] == pytest.approx(0.5)
     assert phase[1] == f"freeze_gate_authority:{curve['source']}"
@@ -153,7 +146,7 @@ def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
         sim, monkeypatch, diagnostic, status='out_of_domain',
     )
     assert curve['source'].endswith(':composition_projected')
-    assert set(curve['gate_provider_refusal']['reasons']) == {
+    assert set(curve['original_bulk_refusal']['reasons']) == {
         OutOfDomainReason.COMPOSITION_PROJECTED.value,
         OutOfDomainReason.SILICATE_WINDOW.value,
     }
@@ -167,6 +160,39 @@ def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
     assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
         curve['source']
     )
+    assert sim._last_melt_redox_liquidus_gate_diagnostic == {
+        'status': 'ok',
+        'source': curve['source'],
+        'solidus_T_C': curve['solidus_T_C'],
+        'liquidus_T_C': curve['liquidus_T_C'],
+        'composition_projected_notice': curve['composition_projected_notice'],
+    }
+    assert sim._last_melt_redox_liquid_fraction_diagnostic == {
+        'status': 'ok',
+        'source': curve['source'],
+        'liquid_fraction': 0.5,
+        'solidus_T_C': curve['solidus_T_C'],
+        'liquidus_T_C': curve['liquidus_T_C'],
+        'composition_projected_notice': curve['composition_projected_notice'],
+    }
+    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(0.5)
+    assert sim._last_freeze_gate_diagnostic == {
+        'enabled': True,
+        'source': curve['source'],
+        'solidus_T_C': curve['solidus_T_C'],
+        'liquidus_T_C': curve['liquidus_T_C'],
+        'liquid_fraction': 0.5,
+        'composition_projected_notice': curve['composition_projected_notice'],
+    }
+    from simulator.reduced_real_determinism import _curve_payload
+
+    assert set(_curve_payload(curve)) == {
+        'source',
+        'solidus_T_C',
+        'liquidus_T_C',
+        'path',
+        'composition_projected_notice',
+    }
 
     vapor_result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
         IntentRequest(
@@ -208,7 +234,7 @@ def test_projected_gate_dispatch_requires_projection_refusal_status(
     )
 
     assert curve['source'].endswith(':composition_projected')
-    assert curve['gate_provider_refusal']['status'] == 'refused'
+    assert curve['original_bulk_refusal']['status'] == 'refused'
     assert phase[0] is None
     assert phase[1] == 'freeze_gate_authority_fallback_or_projected'
 
