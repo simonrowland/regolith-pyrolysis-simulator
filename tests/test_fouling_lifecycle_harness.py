@@ -247,6 +247,136 @@ def test_accumulated_changing_deposit_mix_keeps_oxide_species_separate():
     assert states[-1]["onset"] is False
 
 
+def test_production_liner_rebuild_uses_per_run_net_for_seeded_exports(monkeypatch):
+    from simulator import furnace_materials, liner_corrosion
+    from simulator.state import PipeSegment
+
+    invariant_table = {
+        "invariants": [
+            {
+                "composition_bounds_wt_pct": {
+                    "CaO": [0.0, 100.0],
+                    "Al2O3": [0.0, 100.0],
+                    "Na2O": [0.0, 50.0],
+                },
+                "first_liquid_temperature_C": 1600.0,
+            },
+            {
+                "composition_bounds_wt_pct": {
+                    "CaO": [0.0, 100.0],
+                    "Al2O3": [0.0, 100.0],
+                    "Na2O": [50.0, 100.0],
+                },
+                "first_liquid_temperature_C": 1400.0,
+            },
+        ]
+    }
+    catalog = {
+        "fixture-liner": {
+            "interface_chemistry": {
+                "composition": {"CaO": 50.0, "Al2O3": 50.0},
+                "citation": "test fixture composition",
+                "criterion_tier": "A",
+                "invariant_table": invariant_table,
+                "density_kg_m3": 1.0,
+                "reacted_layer_depth_m": 1.0,
+                "margin_C": 0.0,
+                "horizon_campaigns": 3,
+                "porosity_fraction": 0.0,
+            }
+        }
+    }
+    monkeypatch.setattr(furnace_materials, "load_furnace_materials", lambda: catalog)
+    segment = PipeSegment(
+        name="hot-wall",
+        upstream_stage="stage_0",
+        downstream_stage="stage_1",
+        wall_temperature_C=1500.0,
+        length_m=1.0,
+        inner_diameter_m=0.12,
+        declared_area_m2=1.0,
+    )
+    simulator = SimpleNamespace(
+        condensation_model=SimpleNamespace(
+            pipe_segments=(segment,),
+            operating_history=(
+                {"pipe_segment_temperatures_C": {"hot-wall": 1500.0}},
+            ),
+            overhead_pressure_mbar=10.0,
+        ),
+        melt=SimpleNamespace(temperature_C=1500.0),
+    )
+
+    def run_campaign(exported_na_kg):
+        trace = SimpleNamespace(
+            wall_deposit_by_segment_species_kg={
+                ("hot-wall", "Na"): exported_na_kg
+            },
+            wall_deposit_sticking_authority={"authoritative_for_resinter": True},
+            snapshots=(),
+        )
+        run_metadata = {"furnace_material_id": "fixture-liner"}
+        liner_corrosion.attach_liner_state_metadata(
+            run_metadata, "fixture-liner", simulator, trace
+        )
+        return FoulingRunArtifact(
+            trace=trace,
+            simulator=simulator,
+            result_document={"run_metadata": run_metadata},
+        )
+
+    result = FoulingLifecycleHarness(
+        run_campaign,
+        segment_area_m2={},
+        export_includes_carried=True,
+    ).run((0.6, 1.0))
+
+    interface = result.lifecycle_projection.to_dict()["interface_first_melt"]
+    assert interface["fired"] is True
+    assert interface["campaign_index"] == 2
+    assert result.run_records[1].per_run_net_deposit_by_segment_species_kg[
+        "hot-wall"
+    ]["Na"] == pytest.approx(0.4)
+    assert result.run_records[1].cumulative_snapshot.deposit_plain()["hot-wall"][
+        "Na"
+    ] == pytest.approx(1.0)
+
+
+def test_cool_segment_does_not_hide_hot_segment_refusal():
+    cool_state = _liner_state_for_accumulated_deposit({}, {})
+    hot_refusal = {
+        "status": "refused",
+        "refusal": {
+            "reason": "liner_service_temperature_missing",
+            "detail": "hot-wall",
+        },
+    }
+    artifact = _artifact(
+        {},
+        result_document={
+            "run_metadata": {
+                "liner_state": {
+                    "schema": "liner-state-v1",
+                    "segments": {
+                        "cool-wall": cool_state,
+                        "hot-wall": hot_refusal,
+                    },
+                }
+            }
+        },
+    )
+
+    result = FoulingLifecycleHarness(lambda _input: artifact, segment_area_m2={}).run(
+        (None,)
+    )
+    interface = result.lifecycle_projection.to_dict()["interface_first_melt"]
+
+    assert interface["fired"] is False
+    assert interface["refusal"]["reason"] == "liner_segment_coverage_incomplete"
+    assert interface["refusal"]["no_onset_segments"] == ["cool-wall"]
+    assert interface["refusal"]["refusals"] == [hot_refusal["refusal"]]
+
+
 def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:
     return {
         "vapour_carrier_authority_by_species": {

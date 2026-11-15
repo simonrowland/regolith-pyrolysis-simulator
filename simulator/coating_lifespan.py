@@ -601,7 +601,8 @@ def _interface_first_melt_from_liner_states(
         cumulative_by_segment = _snapshot.deposit_plain()
         fired_segments: list[str] = []
         refusals: list[dict[str, Any]] = []
-        evaluated = 0
+        evaluated_segments: list[str] = []
+        no_onset_segments: list[str] = []
         for raw_name, raw_state in segments.items():
             segment = str(raw_name)
             if not isinstance(raw_state, Mapping):
@@ -682,9 +683,11 @@ def _interface_first_melt_from_liner_states(
                     }
                 )
                 continue
-            evaluated += 1
+            evaluated_segments.append(segment)
             if onset:
                 fired_segments.append(segment)
+            else:
+                no_onset_segments.append(segment)
         if fired_segments:
             segment = sorted(fired_segments)[0]
             return LimiterEvaluation(
@@ -693,7 +696,19 @@ def _interface_first_melt_from_liner_states(
                 segment=segment,
                 campaign_index=campaign_index,
             )
-        if not evaluated:
+        if refusals and (evaluated_segments or len(refusals) > 1):
+            return LimiterEvaluation(
+                name=INTERFACE_FIRST_MELT_LIMITER,
+                fired=False,
+                campaign_index=campaign_index,
+                refusal={
+                    "reason": "liner_segment_coverage_incomplete",
+                    "detail": "one or more liner segments could not be evaluated",
+                    "no_onset_segments": sorted(no_onset_segments),
+                    "refusals": refusals,
+                },
+            )
+        if not evaluated_segments:
             refusal = refusals[0] if refusals else {
                 "reason": "liner_accumulated_onset_missing",
                 "detail": "no segment has a verified cumulative d-419 onset result",

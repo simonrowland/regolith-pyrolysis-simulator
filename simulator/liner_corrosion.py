@@ -1138,6 +1138,166 @@ def _is_liquid_phase(phase: Any) -> bool:
     ) is not None
 
 
+def _printed_half_digit(value: Any) -> float:
+    """Return half of the last printed digit for one source/input value."""
+
+    text = str(value).strip().lower()
+    mantissa, marker, exponent = text.partition("e")
+    decimal_places = len(mantissa.partition(".")[2])
+    power = int(exponent) if marker else 0
+    return 0.5 * (10.0 ** (power - decimal_places))
+
+
+def _source_precision_matches(
+    left: Mapping[str, float],
+    right: Mapping[str, float],
+    printed: Mapping[str, Any],
+) -> bool:
+    """Compare compositions within the cited composition's printed precision."""
+
+    if set(left) != set(right) or set(left) != set(printed):
+        return False
+    return all(
+        abs(left[oxide] - right[oxide]) <= _printed_half_digit(printed[oxide])
+        for oxide in left
+    )
+
+
+def _phase_oxide_composition(
+    phase: str, components: Sequence[str]
+) -> dict[str, float] | None:
+    """Resolve a printed oxide-compound formula onto its subsystem oxide basis."""
+
+    try:
+        phase_formula = parse_formula(phase)
+        phase_molar_mass = phase_formula.molar_mass_g_per_mol()
+        if phase_molar_mass is None:
+            return None
+        component_moles: dict[str, float] = {}
+        oxide_masses: dict[str, float] = {}
+        expected_oxygen = 0.0
+        represented_cations: set[str] = set()
+        # Each phase cation count fixes its oxide moles; oxygen and total mass
+        # must close to the parsed formula before its compatibility point is used.
+        for oxide in components:
+            oxide_formula = parse_formula(oxide)
+            cations = [element for element in oxide_formula.elements if element != "O"]
+            if len(cations) != 1 or "O" not in oxide_formula.elements:
+                return None
+            cation = cations[0]
+            phase_cation_atoms = float(phase_formula.elements.get(cation, 0.0))
+            oxide_cation_atoms = float(oxide_formula.elements[cation])
+            moles = phase_cation_atoms / oxide_cation_atoms
+            component_moles[oxide] = moles
+            if moles:
+                represented_cations.add(cation)
+            expected_oxygen += moles * float(oxide_formula.elements["O"])
+            oxide_molar_mass = oxide_formula.molar_mass_g_per_mol()
+            if oxide_molar_mass is None:
+                return None
+            oxide_masses[oxide] = moles * oxide_molar_mass
+        phase_cations = {
+            element
+            for element in phase_formula.elements
+            if element != "O" and phase_formula.elements[element] > 0.0
+        }
+        if represented_cations != phase_cations or not math.isclose(
+            expected_oxygen,
+            float(phase_formula.elements.get("O", 0.0)),
+            rel_tol=0.0,
+            abs_tol=1.0e-9,
+        ):
+            return None
+    except (LinerCorrosionRefusal, TypeError, ValueError):
+        return None
+    total = math.fsum(oxide_masses.values())
+    if total <= 0.0 or not math.isclose(
+        total, phase_molar_mass, rel_tol=0.0, abs_tol=1.0e-8
+    ):
+        return None
+    return {oxide: 100.0 * mass / total for oxide, mass in oxide_masses.items()}
+
+
+def _bulk_inside_open_compatibility_field(
+    composition: Mapping[str, float],
+    phase_compositions: Sequence[Mapping[str, float]],
+) -> bool:
+    """Test the strict interior of a binary segment or ternary triangle.
+
+    The open boundary excludes a pure compound from borrowing an adjacent
+    eutectic's temperature; its own congruent or peritectic transition applies.
+    """
+
+    if len(phase_compositions) not in {2, 3}:
+        return False
+    oxides = tuple(composition)
+    if len(oxides) not in {2, 3} or any(
+        set(point) != set(oxides) for point in phase_compositions
+    ):
+        return False
+    if len(phase_compositions) == 2:
+        first, second = phase_compositions
+        vector = [first[oxide] - second[oxide] for oxide in oxides]
+        offset = [composition[oxide] - second[oxide] for oxide in oxides]
+        denominator = math.fsum(value * value for value in vector)
+        if denominator == 0.0:
+            return False
+        fraction = math.fsum(a * b for a, b in zip(offset, vector)) / denominator
+        residual = math.sqrt(
+            math.fsum(
+                (offset[index] - fraction * vector[index]) ** 2
+                for index in range(len(oxides))
+            )
+        )
+        return 1.0e-8 < fraction < 1.0 - 1.0e-8 and residual <= 1.0e-7
+
+    first, second, third = phase_compositions
+    oxide_a, oxide_b = oxides[:2]
+    ax = first[oxide_a] - third[oxide_a]
+    ay = first[oxide_b] - third[oxide_b]
+    bx = second[oxide_a] - third[oxide_a]
+    by = second[oxide_b] - third[oxide_b]
+    px = composition[oxide_a] - third[oxide_a]
+    py = composition[oxide_b] - third[oxide_b]
+    determinant = ax * by - ay * bx
+    if abs(determinant) <= 1.0e-12:
+        return False
+    first_weight = (px * by - py * bx) / determinant
+    second_weight = (ax * py - ay * px) / determinant
+    third_weight = 1.0 - first_weight - second_weight
+    if min(first_weight, second_weight, third_weight) <= 1.0e-8:
+        return False
+    reconstructed = {
+        oxide: (
+            first_weight * first[oxide]
+            + second_weight * second[oxide]
+            + third_weight * third[oxide]
+        )
+        for oxide in oxides
+    }
+    return all(
+        math.isclose(
+            composition[oxide], reconstructed[oxide], rel_tol=0.0, abs_tol=1.0e-7
+        )
+        for oxide in oxides
+    )
+
+
+def _tier_a_reaction_sides(row: Mapping[str, Any]) -> list[list[str]] | None:
+    reaction = row.get("phase_reaction_as_printed")
+    if not isinstance(reaction, str) or not reaction.strip():
+        return None
+    try:
+        sides, _phases = _reaction_parts(
+            reaction,
+            str(row.get("source_id", "tier-a")),
+            str(row.get("observation_id", "invariant")),
+        )
+    except LinerCorrosionDataError:
+        return None
+    return sides
+
+
 def _tier_a_pure_phase_melting_reference(
     invariant_table: Mapping[str, Any] | None,
     liner_composition_wt_pct: Mapping[str, Any],
@@ -1170,9 +1330,20 @@ def _tier_a_pure_phase_melting_reference(
             liquid = validate_oxide_composition(liquid_composition)
         except LinerCorrosionRefusal:
             continue
-        if set(liquid) != set(liner) or not all(
-            math.isclose(liquid[oxide], liner[oxide], rel_tol=0.0, abs_tol=1.0e-9)
-            for oxide in liner
+        reaction_sides = _tier_a_reaction_sides(row)
+        if reaction_sides is None:
+            continue
+        solid_phases = [
+            phase
+            for side in reaction_sides
+            for phase in side
+            if not _is_liquid_phase(phase)
+        ]
+        if len(solid_phases) != 1:
+            continue
+        phase_composition = _phase_oxide_composition(solid_phases[0], tuple(liner))
+        if phase_composition is None or not _source_precision_matches(
+            liner, liquid, row["liquid_composition"]
         ):
             continue
         temperature = _finite_real(row.get("T_invariant_C"), "T_invariant_C")
@@ -1212,18 +1383,24 @@ def first_liquid_tier_a(
 ) -> float:
     """Resolve first-liquid onset from declared bounds or exact cited points.
 
-    Source extracts provide invariant points, not interpolated phase fields.
-    Those points apply only when the supplied bulk matches their printed
-    liquid composition. Other compositions need explicit bounds and refuse
-    instead of acquiring inferred phase fields.
+    Source transition points define compatibility fields through their printed
+    solid phases. A bulk strictly inside a listed field first melts at that
+    field's invariant temperature; a pure phase uses its own congruent or
+    peritectic transition. A liquid composition by itself is not a bulk field.
     """
 
     composition = validate_oxide_composition(composition_wt_pct)
+    input_precision = {
+        str(oxide).strip(): raw_value
+        for oxide, raw_value in composition_wt_pct.items()
+    }
     _raise_tier_a_acquisition_gap(invariant_table, composition)
     rows = invariant_table.get("invariants") if isinstance(invariant_table, Mapping) else None
     if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)) or not rows:
         raise LinerCorrosionRefusal("liner_invariant_table_missing")
     matches: list[float] = []
+    pure_phase_matches: list[float] = []
+    unresolved_phase_rows: list[str] = []
     for row in rows:
         if not isinstance(row, Mapping):
             continue
@@ -1254,32 +1431,115 @@ def first_liquid_tier_a(
                 )
             continue
 
-        liquid_composition = row.get("liquid_composition")
         subsystem = row.get("subsystem")
-        if not isinstance(liquid_composition, Mapping) or not isinstance(subsystem, str):
+        if not isinstance(subsystem, str):
             continue
         if _first_liquid_exclusion_reason(row) is not None:
             continue
         components = set(subsystem.split("-"))
-        if set(composition) != components or set(liquid_composition) != components:
+        if set(composition) != components:
             continue
-        if all(
-            math.isclose(
-                composition[oxide],
-                _finite_real(liquid_composition[oxide], f"{oxide}.liquid_wt_pct"),
-                rel_tol=0.0,
-                abs_tol=1.0e-9,
-            )
-            for oxide in components
+        invariant_type = str(row.get("invariant_type", "")).lower()
+        phases = row.get("phases")
+        has_liquid_phase = (
+            isinstance(phases, Sequence)
+            and not isinstance(phases, (str, bytes))
+            and any(_is_liquid_phase(phase) for phase in phases)
+        )
+        if not has_liquid_phase and invariant_type not in {
+            "congruent melting",
+            "eutectic",
+            "peritectic",
+            "liquid-bearing invariant",
+        }:
+            # A reported fusion temperature without a stated melting mode does
+            # not identify a compatibility field.
+            continue
+        reaction_sides = _tier_a_reaction_sides(row)
+        if reaction_sides is None:
+            unresolved_phase_rows.append(str(row.get("observation_id", "unknown")))
+            continue
+        if sum(
+            _is_liquid_phase(phase)
+            for side in reaction_sides
+            for phase in side
+        ) != 1:
+            unresolved_phase_rows.append(str(row.get("observation_id", "unknown")))
+            continue
+        solid_sides = [
+            [phase for phase in side if not _is_liquid_phase(phase)]
+            for side in reaction_sides
+        ]
+        solid_phases = list(dict.fromkeys(phase for side in solid_sides for phase in side))
+        phase_compositions = [
+            _phase_oxide_composition(phase, tuple(sorted(components)))
+            for phase in solid_phases
+        ]
+        if any(phase is None for phase in phase_compositions):
+            unresolved_phase_rows.append(str(row.get("observation_id", "unknown")))
+            continue
+        phases_by_name = dict(zip(solid_phases, phase_compositions))
+        liquid_composition = row.get("liquid_composition")
+        if len(solid_phases) == 1 and invariant_type == "congruent melting":
+            phase = solid_phases[0]
+            phase_composition = phases_by_name[phase]
+            if not isinstance(liquid_composition, Mapping):
+                continue
+            try:
+                liquid = validate_oxide_composition(liquid_composition)
+            except LinerCorrosionRefusal:
+                continue
+            # The single parsed solid formula establishes phase identity; the
+            # source's printed liquid composition gives the composition match.
+            # This avoids replacing source atomic-weight rounding with ours.
+            if _source_precision_matches(
+                composition, liquid, liquid_composition
+            ):
+                pure_phase_matches.append(
+                    _finite_real(row.get("T_invariant_C"), "T_invariant_C")
+                )
+            continue
+        if invariant_type == "peritectic":
+            for side_index, solid_side in enumerate(solid_sides):
+                if (
+                    len(solid_side) != 1
+                    or any(_is_liquid_phase(phase) for phase in reaction_sides[side_index])
+                ):
+                    continue
+                phase_composition = phases_by_name[solid_side[0]]
+                if set(composition) == set(phase_composition) and all(
+                    abs(composition[oxide] - phase_composition[oxide])
+                    <= _printed_half_digit(
+                        input_precision.get(oxide, composition[oxide])
+                    )
+                    for oxide in composition
+                ):
+                    # A peritectic row applies at its single solid reactant;
+                    # the adjacent compatibility segment is tested below.
+                    pure_phase_matches.append(
+                        _finite_real(row.get("T_invariant_C"), "T_invariant_C")
+                    )
+        if len(solid_phases) in {2, 3} and _bulk_inside_open_compatibility_field(
+            composition,
+            [phases_by_name[phase] for phase in solid_phases],
         ):
             matches.append(
-                _finite_real(
-                    row.get("T_invariant_C"),
-                    "T_invariant_C",
-                )
+                _finite_real(row.get("T_invariant_C"), "T_invariant_C")
             )
+    if pure_phase_matches:
+        # A cited pure phase is a compatibility-field endpoint even when its
+        # rounded printed composition falls numerically just inside that field.
+        return min(pure_phase_matches)
     if not matches:
-        raise LinerCorrosionRefusal("tier_a_invariant_field_missing")
+        if unresolved_phase_rows:
+            raise LinerCorrosionRefusal(
+                "tier_a_compatibility_phases_missing",
+                ", ".join(sorted(set(unresolved_phase_rows))),
+            )
+        raise LinerCorrosionRefusal(
+            "tier_a_compatibility_field_missing",
+            "no cited compatibility segment or pure-phase transition covers the bulk",
+        )
     return min(matches)
 
 
@@ -1706,16 +1966,15 @@ def build_liner_state_segment(
         flags.append(ENAMEL_GLASS_STATE_FLAG)
 
     raw_porosity = interface_chemistry.get("porosity_fraction")
-    if raw_porosity is None:
-        refusals.append(
-            LinerCorrosionRefusal("liner_porosity_missing").as_dict()
-        )
-    else:
-        porosity = _finite_real(raw_porosity, "porosity_fraction")
-        if not 0.0 <= porosity <= 1.0:
-            refusals.append(
-                LinerCorrosionRefusal("liner_porosity_invalid").as_dict()
-            )
+    from simulator.furnace_materials import (
+        InterfaceChemistryRefusal,
+        require_interface_porosity,
+    )
+
+    try:
+        require_interface_porosity(interface_chemistry)
+    except InterfaceChemistryRefusal as exc:
+        refusals.append({"reason": exc.reason, "detail": exc.detail})
 
     first_melt_C = interface_state["first_melt_T_C"]
     liquid_fraction = interface_state["liquid_fraction"]
@@ -2181,6 +2440,9 @@ def build_liner_state_for_run(
     initial_deposit_kg_by_segment_species: Mapping[
         str, Mapping[str, Any]
     ] | None = None,
+    run_deposit_kg_by_segment_species: Mapping[
+        str, Mapping[str, Any]
+    ] | None = None,
 ) -> dict[str, Any] | None:
     """Build terminal liner metadata in the physics owner module."""
 
@@ -2202,7 +2464,24 @@ def build_liner_state_for_run(
 
     model = getattr(simulator, "condensation_model", None)
     pipe_segments = tuple(getattr(model, "pipe_segments", ()) or ())
-    inert_by_segment = _trace_deposits_by_segment(trace)
+    if run_deposit_kg_by_segment_species is None:
+        inert_by_segment = _trace_deposits_by_segment(trace)
+    else:
+        if not isinstance(run_deposit_kg_by_segment_species, Mapping) or any(
+            not isinstance(name, str)
+            or not isinstance(masses, Mapping)
+            for name, masses in run_deposit_kg_by_segment_species.items()
+        ):
+            raise LinerCorrosionRefusal("inert_deposit_trace_invalid")
+        try:
+            inert_by_segment = {
+                str(name): _checked_deposit(masses)
+                for name, masses in run_deposit_kg_by_segment_species.items()
+            }
+        except LinerCorrosionRefusal as exc:
+            raise LinerCorrosionRefusal(
+                "inert_deposit_trace_invalid", exc.detail
+            ) from exc
     initial_by_segment = (
         {}
         if initial_deposit_kg_by_segment_species is None

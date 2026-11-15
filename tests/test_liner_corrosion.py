@@ -874,7 +874,7 @@ def test_tier_a_uses_invariant_table_and_refuses_uncovered_fields():
     assert refused.value.reason == "liner_invariant_table_missing"
 
 
-def test_tier_a_loader_rows_are_consumed_without_interpolating_source_points():
+def test_tier_a_uses_bulk_compatibility_invariant_and_congruent_compound():
     table = load_interface_invariant_table(
         "source-backed",
         catalog={
@@ -890,10 +890,33 @@ def test_tier_a_loader_rows_are_consumed_without_interpolating_source_points():
             }
         },
     )
+    # Source pin: Morey 1964, physical p. 25 (L14), Table 6 row 2 (1395 C).
     assert first_liquid_tier_a(
         table,
         {"CaO": 59.0, "Al2O3": 41.0},
-    ) == 1535.0
+    ) == 1395.0
+    assert tier_a_first_liquid_onset(
+        table,
+        {"CaO": 59.0, "Al2O3": 41.0},
+        service_temperature_C=1500.0,
+        margin_C=0.0,
+    )["onset"]
+
+    # Source pin: Morey 1964, physical p. 25 (L14), Table 6 row 5 (1600 C).
+    assert first_liquid_tier_a(
+        table,
+        {"CaO": 35.49, "Al2O3": 64.51},
+    ) == 1600.0
+
+    # Source pin: Morey 1964, physical p. 25 (L14), Table 6 row 1 (1535 C).
+    cao_mass = parse_formula("CaO").molar_mass_g_per_mol()
+    alumina_mass = parse_formula("Al2O3").molar_mass_g_per_mol()
+    c3a_total = 3.0 * cao_mass + alumina_mass
+    c3a = {
+        "CaO": 100.0 * 3.0 * cao_mass / c3a_total,
+        "Al2O3": 100.0 * alumina_mass / c3a_total,
+    }
+    assert first_liquid_tier_a(table, c3a) == 1535.0
 
 
 def test_tier_a_anorthite_row_supplies_cited_pure_melting_temperature():
@@ -918,17 +941,46 @@ def test_tier_a_anorthite_row_supplies_cited_pure_melting_temperature():
         },
     )
 
-    reference = liner_corrosion._tier_a_pure_phase_melting_reference(
-        table,
-        {"CaO": 20.16, "Al2O3": 36.65, "SiO2": 43.19},
-    )
+    # Formula-derived CaO.Al2O3.2SiO2 matches Morey Table 26 row 6's printed
+    # oxide values to their half-digit precision (physical p. 82 / L71).
+    cao = parse_formula("CaO").molar_mass_g_per_mol()
+    alumina = parse_formula("Al2O3").molar_mass_g_per_mol()
+    silica = parse_formula("SiO2").molar_mass_g_per_mol()
+    total = cao + alumina + 2.0 * silica
+    anorthite = {
+        "CaO": 100.0 * cao / total,
+        "Al2O3": 100.0 * alumina / total,
+        "SiO2": 200.0 * silica / total,
+    }
+    reference = liner_corrosion._tier_a_pure_phase_melting_reference(table, anorthite)
 
     assert reference["temperature_C"] == 1553.0
+    assert first_liquid_tier_a(table, anorthite) == 1553.0
     assert reference["citation"]["source_id"] == (
         "morey-1964-usgs-pp440l-phase-equilibria"
     )
     assert reference["citation"]["observation_id"] == "morey1964_t26_r6"
     assert reference["citation"]["locator"]["published_page"] == "L71"
+
+
+def test_tier_a_refuses_when_cited_transition_lacks_solid_phase_data():
+    with pytest.raises(LinerCorrosionRefusal) as refused:
+        first_liquid_tier_a(
+            {
+                "invariants": [
+                    {
+                        "subsystem": "CaO-Al2O3",
+                        "phases": ["liquid"],
+                        "liquid_composition": {"CaO": 50.0, "Al2O3": 50.0},
+                        "invariant_type": "eutectic",
+                        "T_invariant_C": 1400.0,
+                    }
+                ]
+            },
+            {"CaO": 55.0, "Al2O3": 45.0},
+        )
+
+    assert refused.value.reason == "tier_a_compatibility_phases_missing"
 
 
 def test_tier_a_fe_aluminate_gap_is_a_typed_refusal_that_names_the_gap():
@@ -1252,6 +1304,11 @@ def test_tier_a_dissolution_uses_the_matched_source_liquid_composition():
                 "phases": ["liquid"],
                 "liquid_composition": mixed["composition_wt_pct"],
                 "invariant_type": "liquidus",
+                "composition_bounds_wt_pct": {
+                    oxide: [wt_pct - 0.1, wt_pct + 0.1]
+                    for oxide, wt_pct in mixed["composition_wt_pct"].items()
+                },
+                "first_liquid_temperature_C": 1400.0,
             }
         ]
     }
@@ -1323,6 +1380,11 @@ def test_tier_a_liquid_composition_at_other_temperature_refuses_x_star():
                         "phases": ["liquid"],
                         "liquid_composition": mixed["composition_wt_pct"],
                         "invariant_type": "liquidus",
+                        "composition_bounds_wt_pct": {
+                            oxide: [wt_pct - 0.1, wt_pct + 0.1]
+                            for oxide, wt_pct in mixed["composition_wt_pct"].items()
+                        },
+                        "first_liquid_temperature_C": 1400.0,
                     }
                 ]
             },
@@ -1492,6 +1554,44 @@ def test_missing_composition_porosity_and_rump_artifact_are_typed():
             },
         )
     assert missing_table.value.reason == "liner_invariant_table_missing"
+
+
+def test_segment_porosity_refusal_uses_furnace_material_validator():
+    chemistry = {
+        "composition": {"CaO": 50.0, "Al2O3": 50.0},
+        "citation": "test source",
+        "criterion_tier": "A",
+        "invariant_table": {
+            "invariants": [
+                {
+                    "composition_bounds_wt_pct": {
+                        "CaO": [0.0, 100.0],
+                        "Al2O3": [0.0, 100.0],
+                    },
+                    "first_liquid_temperature_C": 1600.0,
+                }
+            ]
+        },
+        "density_kg_m3": 1.0,
+        "reacted_layer_depth_m": 1.0,
+        "margin_C": 0.0,
+        "horizon_campaigns": 1,
+        "porosity_fraction": "not numeric",
+    }
+
+    state = build_liner_state_segment(
+        chemistry,
+        {},
+        area_m2=1.0,
+        service_temperature_C=1500.0,
+        pressure_bar=None,
+        sampler=None,
+    )
+
+    assert any(
+        refusal["reason"] == "liner_porosity_invalid"
+        for refusal in state["refusals"]
+    )
 
 
 def test_siO2_free_liner_refuses_before_magemin_returns_ok():

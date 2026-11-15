@@ -189,6 +189,7 @@ class FoulingLifecycleHarness:
                             initial_deposit_kg_by_segment_species=(
                                 carried.deposit_plain() if carried is not None else {}
                             ),
+                            run_deposit_kg_by_segment_species=per_run_net,
                         )
                     except Exception as exc:  # noqa: BLE001 - diagnostic cannot gate lifecycle
                         reason = str(
