@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 import pytest
 
+from engines.domain_reason import OutOfDomainReason
 from engines.magemin import MAGEMinShadowProvider
 from simulator.chemistry.kernel import normalize_chemistry_kernel_config
 from simulator.evaporation import EvaporationFluxRefusal
@@ -54,6 +55,130 @@ def _sim(provider, vapor_pressure_data, feedstocks_data, setpoints_data):
     return _build_sim(
         'lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints,
     )
+
+
+def _projected_gate_provider_diagnostic():
+    return {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': OutOfDomainReason.COMPOSITION_PROJECTED.value,
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+        'kernel_fallback_used': 'magemin-shadow',
+        'backend_diagnostics': {
+            'backend_status_reason': (
+                OutOfDomainReason.COMPOSITION_PROJECTED.value
+            ),
+            'input_composition_projection': {
+                'reason': OutOfDomainReason.INPUT_COMPOSITION_PROJECTED.value,
+                'magemin_database': 'ig',
+                'magemin_bulk_order': ['SiO2', 'MgO'],
+                'composition_projected': {
+                    'dropped_components': ['MnO'],
+                    'dropped_component_mass_fractions': {'MnO': 0.01},
+                },
+            },
+            'projected_liquidus_status': 'ok',
+            'projected_liquidus_diagnostics': {},
+        },
+    }
+
+
+def test_projected_gate_dispatch_admits_projection_only_refusal(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    diagnostic = _projected_gate_provider_diagnostic()
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *args, **kwargs: SimpleNamespace(
+            status='out_of_domain', diagnostic=diagnostic, warnings=(),
+        ),
+    )
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch(
+        [], fO2_log=-9.0, repair_notices=[],
+    )
+
+    assert curve['source'] == (
+        'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
+    )
+    assert curve['composition_projected_notice']['dropped_components'] == [
+        {'component': 'MnO', 'mass_fraction': 0.01},
+    ]
+    assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
+
+
+def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.melt.temperature_C = 1800.0 - 273.15
+    diagnostic = _projected_gate_provider_diagnostic()
+    diagnostic['backend_failure_reason_code'] = (
+        OutOfDomainReason.SILICATE_WINDOW.value
+    )
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *args, **kwargs: SimpleNamespace(
+            status='out_of_domain', diagnostic=diagnostic, warnings=(),
+        ),
+    )
+
+    phase = sim._vapor_pressure_freeze_gate_phase_fraction()
+    assert phase[0] is None
+    assert phase[1] == 'freeze_gate_authority_refused'
+
+    vapor_result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={'process.cleaned_melt': {
+                    'SiO2': 5.0, 'FeO': 1.0, 'MgO': 1.0,
+                }},
+                species_formula_registry={},
+            ),
+            temperature_C=sim.melt.temperature_C,
+            pressure_bar=1e-6,
+            control_inputs={
+                'pO2_bar': 1e-9,
+                'intrinsic_fO2_log': -9.0,
+                'phase_basis_source': phase[1],
+            },
+        )
+    )
+    authority = vapor_result.diagnostic['high_t_melt_activity']
+    assert authority['vapour_channel_phase_basis'] == 'missing'
+    assert authority['phase_basis_source'] == phase[1]
+    assert any(
+        notice['code'] == 'openimcc_vapour_phase_signal_missing'
+        and notice['type'] == 'typed_notice'
+        for notice in authority['notices']
+    )
+
+
+def test_projected_gate_dispatch_requires_projection_refusal_status(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    diagnostic = _projected_gate_provider_diagnostic()
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *args, **kwargs: SimpleNamespace(
+            status='refused', diagnostic=diagnostic, warnings=(),
+        ),
+    )
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch(
+        [], fO2_log=-9.0, repair_notices=[],
+    )
+
+    assert curve is None
 
 
 def _injected_launch_exception(name):
