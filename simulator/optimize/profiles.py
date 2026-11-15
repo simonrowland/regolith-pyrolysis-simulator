@@ -28,8 +28,8 @@ from simulator.optimize.objective import (
     LEGACY_ENERGY_KWH_METRIC,
     ObjectiveProfileError,
     canonical_objective_metric,
+    declared_objective_definitions,
     normalize_composition_target_objective,
-    objective_definitions,
     objective_importance_evidence,
     objective_type,
 )
@@ -304,6 +304,7 @@ def validate_profile(
     expected_feedstock: str | None = None,
     source: str | Path = "<profile>",
     schema: RecipeSchema | None = None,
+    scoring_fidelity: str | None = None,
 ) -> Mapping[str, Any]:
     if not isinstance(raw, Mapping):
         raise ProfileValidationError(f"{source}: profile must be a mapping")
@@ -331,6 +332,12 @@ def validate_profile(
             f"{source}: feedstock {profile['feedstock']!r} does not match {expected_feedstock!r}"
         )
 
+    # Remaining-weight admission is admit_executed_objective_weight, after
+    # the candidate rewrite. The name is still resolved here so a fidelity
+    # token is folded the same way as before. It does not withhold products
+    # before a candidate exists.
+    if scoring_fidelity is not None:
+        canonical_backend_name(scoring_fidelity)
     _validate_objectives(profile, source=source)
     _validate_constraints(profile["constraints"], source=source)
     _validate_pool_scoped_constraints(profile, source=source)
@@ -551,7 +558,11 @@ def _profile_paths(data_dir: Path) -> tuple[Path, ...]:
     return tuple(sorted(profile_dir.glob("*.yaml")))
 
 
-def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> None:
+def _validate_objectives(
+    profile: Mapping[str, Any],
+    *,
+    source: str | Path,
+) -> None:
     raw_objectives = profile["objectives"]
     if not isinstance(raw_objectives, list) or not raw_objectives:
         raise ProfileValidationError(f"{source}: objectives must be a non-empty list")
@@ -598,9 +609,13 @@ def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> N
             raise ProfileValidationError(f"{source}: {where}.rationale must be a string")
     if isinstance(profile, dict):
         profile["objectives"] = normalized_objectives
+    # Structure of every declared row, including products a campaign will
+    # withhold. Remaining weight is not a structural check: a voltage cap
+    # can restore a product this fidelity would withhold. Admission is
+    # admit_executed_objective_weight on the candidate's resolved triple.
     try:
         objective_importance_evidence(profile)
-        objective_definitions(profile)
+        declared_objective_definitions(profile)
     except ObjectiveProfileError as exc:
         raise ProfileValidationError(f"{source}: {exc}") from exc
 

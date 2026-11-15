@@ -204,7 +204,7 @@ def test_composition_target_scoring_uses_normalized_feedstock_input_mol(
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
-        "run": {"campaign": "C0", "hours": 1, "mass_kg": MASS_KG, "backend_name": "internal-analytical"},
+        "run": {"campaign": "C2A_continuous", "hours": 1, "mass_kg": MASS_KG, "backend_name": "internal-analytical"},
         "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
         "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
     }

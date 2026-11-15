@@ -23,7 +23,7 @@ PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # Current production token count after removing two local-alias tokens from
-# scripts/grind_home.py; its actual ``os.environ`` read remains counted once.
+# scripts/grind_home.py; shared cache-setting reads use one ``os.environ`` token.
 ENV_ACCESS_TOKEN_CEILING = 94
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 

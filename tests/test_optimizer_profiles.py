@@ -10,7 +10,12 @@ import yaml
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
-from simulator.optimize.objective import composition_target_eval_metadata
+from simulator.optimize.objective import (
+    ObjectiveProfileError,
+    composition_target_eval_metadata,
+    objective_definitions,
+    profile_scored_at_fidelity,
+)
 from simulator.optimize import profiles
 from simulator.optimize import study
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet
@@ -991,6 +996,11 @@ def _composition_profile() -> dict:
         if gate not in {"delivered_stream_purity", "knudsen_viscous"}
     ]
     profile["profile_id"] = "composition-target-profile-test"
+    # C0 claims no ceramic product, so a composition-only vector would be
+    # withheld and validation would stop before these target checks. C2B
+    # claims CMAS_glass, which authorizes this residual melt pool. Fe does
+    # not. C2B does not pick up the copied C2A thermal-window seed.
+    profile["run"]["campaign"] = "C2B"
     profile["objectives"] = [
         {
             "type": "composition_target",
@@ -1056,3 +1066,39 @@ def _composition_profile() -> dict:
         }
     ]
     return profile
+
+
+def test_validate_profile_weight_check_uses_the_fidelity_campaign() -> None:
+    """Authored C2B keeps the melt target. A C0 fidelity overlay withholds it.
+
+    Structural validation does not refuse remaining weight: a candidate cap
+    can restore the product. The pre-candidate stamp still withholds the
+    composition row. The returned profile keeps the authored campaign, so
+    the digest does not absorb the overlay.
+    """
+
+    authored = _composition_profile()
+    ok = validate_profile(authored, expected_feedstock="lunar_mare_low_ti")
+    assert ok["run"]["campaign"] == "C2B"
+
+    overlaid = _composition_profile()
+    fidelities = {
+        name: {**dict(options), "campaign": "C0"}
+        for name, options in overlaid["fidelities"].items()
+    }
+    fidelities["internal-analytical"] = {
+        **dict(fidelities.get("internal-analytical", {})),
+        "campaign": "C0",
+    }
+    overlaid["fidelities"] = fidelities
+    checked = validate_profile(
+        overlaid,
+        expected_feedstock="lunar_mare_low_ti",
+        scoring_fidelity="internal-analytical",
+    )
+    assert checked["run"]["campaign"] == "C2B"
+    stamped = profile_scored_at_fidelity(checked, "internal-analytical")
+    with pytest.raises(ObjectiveProfileError, match="no remaining objective weight"):
+        objective_definitions(stamped)
+    kept = validate_profile(overlaid, expected_feedstock="lunar_mare_low_ti")
+    assert kept["run"]["campaign"] == "C2B"
