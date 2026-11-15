@@ -743,34 +743,60 @@ def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> 
     from simulator.battery.compilation_tier import _compilation_engines_for_pair
     from simulator.battery.score import SCORE_ENGINE_SET
 
+    gas_cp = _gas_thermo("H2O", Quantity.CP, Decimal("298.15"))
+    liquid_cp = replace(gas_cp, species=Species("H2O", Phase.L))
+    crystal_cp = _pure_phase_identity()
+    liquid_delta_fg = _na2o_liquid()
+    fusion = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    unknown_phase_cp = replace(
+        gas_cp,
+        species=Species("H2O", State.unknown("phase unresolved")),
+    )
+    unsupported_ellingham = replace(gas_cp, quantity=Quantity.DELTA_FG)
+
     assert _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.DELTA_FH, Phase.G
+        SCORE_ENGINE_SET,
+        replace(gas_cp, quantity=Quantity.DELTA_FH),
     ) == (Engine.NASA_CEA_9,)
     assert _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.CP, Phase.G
+        SCORE_ENGINE_SET, gas_cp
     ) == (Engine.VAPOROCK, Engine.NASA_CEA_9)
     assert _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.CP, Phase.CR
+        SCORE_ENGINE_SET, crystal_cp
     ) == (Engine.THERMOENGINE, Engine.MAGEMIN)
     assert _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.CP, Phase.L
-    ) == ()
+        SCORE_ENGINE_SET, liquid_cp
+    ) == (Engine.NASA_CEA_9,)
+    assert Engine.INTERNAL_ANALYTICAL in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, liquid_delta_fg
+    )
+    assert Engine.INTERNAL_ANALYTICAL not in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, unsupported_ellingham
+    )
     assert _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.EQUILIBRIUM_PHASE_COMPOSITION, Phase.L
+        SCORE_ENGINE_SET, fusion
+    ) == (Engine.INTERNAL_ANALYTICAL,)
+    assert Engine.NASA_CEA_9 in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, unknown_phase_cp
+    )
+    assert _compilation_engines_for_pair(
+        SCORE_ENGINE_SET,
+        replace(liquid_cp, quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION),
     ) == (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN)
     assert _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.P_PARTIAL, Phase.G
+        SCORE_ENGINE_SET,
+        replace(gas_cp, quantity=Quantity.P_PARTIAL),
     ) == tuple(engine for engine in SCORE_ENGINE_SET if engine is not Engine.MAGEMIN)
     assert Engine.MAGEMIN not in _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.FE3_FE2_RATIO, Phase.CR
+        SCORE_ENGINE_SET, replace(liquid_delta_fg, quantity=Quantity.FE3_FE2_RATIO)
     )
     assert Engine.VAPOROCK not in _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.FE3_FE2_RATIO, Phase.G
+        SCORE_ENGINE_SET, replace(gas_cp, quantity=Quantity.FE3_FE2_RATIO)
     )
 
 
-def test_compilation_routing_reduces_refusals_without_changing_routed_residuals() -> None:
-    from simulator.battery.score import SCORE_ENGINE_SET, flagged_strata, score_store
+def _assert_compilation_routing_retains_numeric_residuals() -> None:
+    from simulator.battery.score import flagged_strata, score_store
 
     experiment = F.tabulation_experiment()
     na2o = F.observation(
@@ -862,6 +888,22 @@ def test_compilation_routing_reduces_refusals_without_changing_routed_residuals(
     assert numeric_pairs == expected_pairs
 
 
+def test_compilation_routing_reduces_refusals_without_changing_routed_residuals() -> None:
+    _assert_compilation_routing_retains_numeric_residuals()
+
+
+def test_compilation_routing_numeric_pin_detects_suppression_mutation(monkeypatch) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+
+    monkeypatch.setattr(
+        compilation_tier,
+        "_compilation_engines_for_pair",
+        lambda _engines, _identity: (),
+    )
+    with pytest.raises(AssertionError, match="route-na2o-liquid-delta-fg"):
+        _assert_compilation_routing_retains_numeric_residuals()
+
+
 def test_compilation_scoring_keeps_typed_refusal_for_unresolved_nasa_phase() -> None:
     from simulator.battery.score import score_store
 
@@ -901,7 +943,7 @@ def test_nasa9_delta_fh_residual_uses_glenn_fit_and_janaf_cell() -> None:
     )
     from simulator.battery.generators.janaf import generate_table
     from simulator.reference_data.janaf import TABLES_DIR, load_table_document
-    from simulator.battery.score import compile_residual
+    from simulator.battery.score import compile_residual, score_store
 
     table_path = TABLES_DIR / "H-064.yaml"
     source = generate_table(
@@ -963,6 +1005,48 @@ def test_nasa9_delta_fh_residual_uses_glenn_fit_and_janaf_cell() -> None:
     assert residual.numeric.operation is MetricOperation.ABSOLUTE
     assert residual.numeric.value == Decimal("0.00137776629973")
     assert residual.numeric.unit == QUANTITY_UNITS[Quantity.DELTA_FH]
+
+    routed_residuals, _ = score_store(context, engines=(Engine.NASA_CEA_9,))
+    routed = next(
+        row for row in routed_residuals if row.reference == observation.observation_id
+    )
+    assert routed.numeric is not None, routed.refusal
+    assert routed.numeric.value == residual.numeric.value
+    assert routed.numeric.unit == residual.numeric.unit
+
+
+@pytest.mark.parametrize(
+    ("phase", "temperature"),
+    (
+        (Phase.G, Decimal("298.15")),
+        (Phase.L, Decimal("298.15")),
+        (Phase.CR, Decimal("250")),
+    ),
+)
+def test_nasa9_cp_evaluator_and_router_follow_gas_liquid_crystal_records(
+    phase: Phase, temperature: Decimal
+) -> None:
+    from simulator.battery.compilation_tier import _compilation_engines_for_pair
+
+    identity = replace(
+        _gas_thermo("H2O", Quantity.CP, temperature),
+        species=Species("H2O", phase),
+    )
+    observation = F.observation(
+        f"nasa9-h2o-{phase.value}-cp-{temperature}",
+        "exp-1",
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+
+    attempt = predict_thermo_attempt(Engine.NASA_CEA_9, observation)
+    assert attempt.value is not None, attempt.refusal_detail
+    assert attempt.unit == QUANTITY_UNITS[Quantity.CP]
+    assert Engine.NASA_CEA_9 in _compilation_engines_for_pair(
+        (Engine.NASA_CEA_9,), identity
+    )
 
 
 def test_nasa9_fit_writer_serializes_typed_refusal_fields(tmp_path, monkeypatch) -> None:
@@ -3785,8 +3869,7 @@ def _assert_vaporock_census_fixture_parity(
 
     routed_engines = _compilation_engines_for_pair(
         score_module.SCORE_ENGINE_SET,
-        Quantity.CP,
-        Phase.G,
+        reference.identity,
     )
     for engine in routed_engines:
         predict = None if memo_enabled else fixture_predict
@@ -7711,11 +7794,24 @@ def test_magemin_lunar_unset_tio2_entropy_matches_janaf_o045() -> None:
         pytest.skip("no MAGEMin binary")
     try:
         attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
+        from simulator.battery.score import score_store
+
+        routed_residuals, _ = score_store(
+            _context(observation), engines=(Engine.MAGEMIN,)
+        )
     finally:
         _close_cached_backend(Engine.MAGEMIN)
     assert attempt.refusal_reason is None
     assert attempt.unit == "J_per_declared_mol_basis_per_K"
     assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+    routed = next(
+        row for row in routed_residuals if row.reference == observation.observation_id
+    )
+    assert routed.numeric is not None, routed.refusal
+    assert routed.numeric.unit == attempt.unit
+    assert float(routed.numeric.value) == pytest.approx(
+        float(attempt.value - expected), rel=0.02
+    )
 
 
 def test_thermoengine_lunar_rutile_entropy_matches_janaf_o043() -> None:
@@ -7743,11 +7839,24 @@ def test_thermoengine_lunar_rutile_entropy_matches_janaf_o043() -> None:
         pytest.skip("ThermoEngine package unavailable")
     try:
         attempt = predict_thermo_attempt(Engine.THERMOENGINE, observation)
+        from simulator.battery.score import score_store
+
+        routed_residuals, _ = score_store(
+            _context(observation), engines=(Engine.THERMOENGINE,)
+        )
     finally:
         _close_cached_backend(Engine.THERMOENGINE)
     assert attempt.refusal_reason is None
     assert attempt.unit == "J_per_declared_mol_basis_per_K"
     assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+    routed = next(
+        row for row in routed_residuals if row.reference == observation.observation_id
+    )
+    assert routed.numeric is not None, routed.refusal
+    assert routed.numeric.unit == attempt.unit
+    assert float(routed.numeric.value) == pytest.approx(
+        float(attempt.value - expected), rel=0.02
+    )
 
 
 def test_ambiguous_pure_phase_cases_stay_refused() -> None:

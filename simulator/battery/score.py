@@ -18531,12 +18531,6 @@ def _score_store_with_decisions(
                     derived_band = source_band
                     derived_band_reason = source_band_reason
                     experiment = context.experiments.get(point.experiment_id)
-                    compilation_phase = (
-                        phase_token(point.identity.species)
-                        if isinstance(point.identity, Identity)
-                        and point.identity.species is not None
-                        else None
-                    )
                     if (
                         derived_band is None
                         and quantity is Quantity.P_PARTIAL
@@ -18562,7 +18556,7 @@ def _score_store_with_decisions(
                             and compilation_source
                             and isinstance(point.identity, Identity)
                             and engine not in _compilation_engines_for_pair(
-                                (engine,), quantity, compilation_phase
+                                (engine,), point.identity
                             )
                         ):
                             continue

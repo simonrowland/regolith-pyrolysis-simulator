@@ -198,12 +198,15 @@ def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
 
 
 def _compilation_engines_for_pair(
-    engines: Sequence[Engine], quantity: Quantity, phase: Phase | None
+    engines: Sequence[Engine], identity: Identity
 ) -> tuple[Engine, ...]:
-    """Route compilation thermo cells to engines with a matching phase path."""
+    """Keep engines whose owners declare a capability for this identity."""
 
     from simulator.battery.score import MELTS_ENGINES
 
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return tuple(engines)
     if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
         return tuple(engine for engine in engines if engine in MELTS_ENGINES)
     if quantity is Quantity.P_PARTIAL:
@@ -216,18 +219,55 @@ def _compilation_engines_for_pair(
         )
     if quantity not in _THERMO_QUANTITIES:
         return tuple(engines)
-    if phase is Phase.G:
-        phase_engines = {Engine.VAPOROCK, Engine.NASA_CEA_9}
-    elif phase is Phase.CR:
-        phase_engines = {Engine.THERMOENGINE, Engine.MAGEMIN}
-    else:
-        return ()
-    return tuple(
-        engine
-        for engine in engines
-        if engine in phase_engines
-        and quantity in _engine_thermo_quantities(engine)
-    )
+    species = identity.species
+    phase = phase_token(species) if species is not None else None
+    routed: list[Engine] = []
+    for engine in engines:
+        if quantity not in _engine_thermo_quantities(engine):
+            continue
+        # An unresolved phase is missing input, not evidence of no engine
+        # capability. Keep it so the scorer can emit its typed refusal.
+        if species is None or phase is None:
+            routed.append(engine)
+            continue
+        if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
+            symbol, reason = _resolve_symbol(engine, identity)
+            if symbol is not None or reason not in {
+                "pure-phase-is-crystal-only",
+                "pure-phase-symbol-unmapped",
+            }:
+                routed.append(engine)
+            continue
+        if engine is Engine.NASA_CEA_9:
+            record, reason = _nasa_cea_9_record_for_species(species)
+            if record is not None or reason not in {
+                "nasa-cea-formula-not-covered",
+                "nasa-cea-phase-not-covered",
+            }:
+                routed.append(engine)
+            continue
+        if engine is Engine.VAPOROCK:
+            if _vaporock_gas_phase_capability(identity) is not False:
+                routed.append(engine)
+            continue
+        if engine is Engine.INTERNAL_ANALYTICAL and quantity in _ENGINE_ELLINGHAM_QUANTITIES:
+            temperature = _state_value(identity.temperature_K)
+            if temperature is not None and as_decimal(temperature) > 0:
+                attempt = _ellingham_attempt(
+                    identity,
+                    quantity,
+                    as_decimal(temperature),
+                    origin="compilation-routing",
+                )
+                if attempt.refusal_detail.get("reason") in {
+                    "engine-thermo-does-not-emit",
+                    "ellingham-phase-or-polymorph-not-in-fit",
+                }:
+                    continue
+        # Internal Analytical's fusion evaluator remains the capability
+        # owner; only its declared fusion quantities are routed here.
+        routed.append(engine)
+    return tuple(routed)
 
 
 def unrouted_compilation_summary_lines(
@@ -265,7 +305,7 @@ def unrouted_compilation_summary_lines(
                 routed = (
                     ()
                     if is_internal_consistency(origin)
-                    else _compilation_engines_for_pair(engines, quantity, phase)
+                    else _compilation_engines_for_pair(engines, point.identity)
                 )
                 if engine not in routed:
                     phase_name = "unknown" if phase is None else phase.value
@@ -3039,6 +3079,15 @@ def _vaporock_tabulated_gas_attempt(
     )
 
 
+def _vaporock_gas_phase_capability(identity: Identity) -> bool | None:
+    """VapoRock's gas-only branch; None means the phase is unresolved."""
+
+    if identity.species is None:
+        return None
+    phase = phase_token(identity.species)
+    return None if phase is None else phase is Phase.G
+
+
 def _vaporock_gas_attempt(
     observation: Observation,
     identity: Identity,
@@ -3058,17 +3107,12 @@ def _vaporock_gas_attempt(
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value},
         )
-    phase = identity.species.phase
     phase_refusal = _b1259_element_reference_phase_refusal(
         observation, identity, quantity, origin=origin
     )
     if phase_refusal is not None:
         return phase_refusal
-    if (
-        not isinstance(phase, State)
-        or not phase.is_value
-        or phase.value is not Phase.G
-    ):
+    if _vaporock_gas_phase_capability(identity) is not True:
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "engine-thermo-does-not-emit",
@@ -4595,9 +4639,6 @@ def _nasa9_fit_comparisons_with_bound_lineage(
         table_id = str(record.get("source_record_id") or "")
         formula = str(record.get("formula") or "")
         phase = str(record.get("phase") or "")
-        phase_value = _REFERENCE_PHASE_TOKEN.get(
-            phase.strip().casefold().split(":", 1)[0]
-        )
         table_points = source_cells.get(table_id, {})
         h_anchor_points = [
             point
@@ -4727,9 +4768,7 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                     identity=point.identity,
                     value=Value.point_of(as_decimal(fit_value)),
                 )
-                for engine in _compilation_engines_for_pair(
-                    engines, quantity, phase_value
-                ):
+                for engine in _compilation_engines_for_pair(engines, point.identity):
                     attempt = predict_thermo_attempt(
                         engine,
                         fit_reference,

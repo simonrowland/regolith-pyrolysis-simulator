@@ -96,13 +96,7 @@ def _expected_fixture_certified_counts() -> tuple[
         ):
             return True
         identity = observation.identity
-        quantity = identity.quantity.value if identity.quantity.is_value else None
-        phase = identity.species.phase.value if identity.species.phase.is_value else None
-        return (
-            quantity is not None
-            and phase is not None
-            and engine in _compilation_engines_for_pair((engine,), quantity, phase)
-        )
+        return engine in _compilation_engines_for_pair((engine,), identity)
 
     certified = {
         residual.reference

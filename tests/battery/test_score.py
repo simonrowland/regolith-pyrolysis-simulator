@@ -13134,7 +13134,7 @@ def test_static_thermo_refusal_matches_compile_on_all_score_engines(
     from simulator.battery.compilation_tier import _compilation_engines_for_pair
 
     routed_engines = _compilation_engines_for_pair(
-        SCORE_ENGINE_SET, Quantity.H_MINUS_H298, Phase.G
+        SCORE_ENGINE_SET, identity
     )
     compiled_rows = _assert_score_store_matches_compile_jsonl(
         context,
