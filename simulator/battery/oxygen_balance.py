@@ -11,7 +11,6 @@ from scipy.optimize import brentq
 
 from simulator.battery.enums import CellMaterial, Engine, NoticeKind
 from simulator.battery.records import Located, Notice
-from simulator.physical_constants import GAS_CONSTANT
 
 IMCC_ENGINES: frozenset[Engine] = frozenset({Engine.OPENIMCC})
 OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
@@ -213,8 +212,14 @@ def _solve_vacuum_oxygen_balance(
         # untouched for the power-law validation and thermodynamic root axis.
         drive = (_net_evaporation_pressure_Pa(pressure, background_pressure_Pa)
                  if background_pressure_Pa else pressure)
-        return channel.alpha * drive / math.sqrt(
-            2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
+        from simulator.chemistry.langmuir_knudsen import langmuir_molar_flux
+
+        return langmuir_molar_flux(
+            temperature,
+            drive,
+            0.0,
+            channel.alpha,
+            molar_mass_kg_mol=channel.molar_mass_kg_per_mol,
         )
 
     def evaluate(

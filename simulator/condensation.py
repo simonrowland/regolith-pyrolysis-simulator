@@ -108,7 +108,6 @@ from simulator.transport_regime import (
 )
 from simulator.physical_constants import (
     AVOGADRO,
-    BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT_10SIG,
     STANDARD_ATMOSPHERE_PA,
@@ -153,9 +152,6 @@ from simulator.state import (
 )
 
 
-# Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
-# to the prior local literals (1.380649e-23 / 6.02214076e23).
-BOLTZMANN_CONSTANT_J_K = BOLTZMANN
 AVOGADRO_MOL = AVOGADRO
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
@@ -6448,12 +6444,15 @@ def _hkl_impingement_flux_mol_m2_s(
         species,
         vapor_pressure_data=vapor_pressure_data,
     )
-    denominator = math.sqrt(
-        2.0 * math.pi * molecule_kg * BOLTZMANN_CONSTANT_J_K * T_K
+    from simulator.chemistry.langmuir_knudsen import langmuir_molar_flux
+
+    return langmuir_molar_flux(
+        T_K,
+        pressure_pa,
+        0.0,
+        1.0,
+        molar_mass_kg_mol=molecule_kg * AVOGADRO_MOL,
     )
-    if denominator <= 0.0:
-        return 0.0
-    return pressure_pa / denominator / AVOGADRO_MOL
 
 
 class WallSaturationPressureRefusal(RuntimeError):

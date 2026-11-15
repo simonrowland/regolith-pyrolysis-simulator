@@ -177,10 +177,13 @@ def langmuir_molar_flux(
     """Free-evaporation flux in mol/(m^2*s).
 
     Premise: only fraction ``alpha`` of equilibrium surface crossings escapes.
-    Algebra: ``J_L=alpha*J_K`` gives the requested
-    ``alpha*(p_eq-p_bulk)/sqrt(2*pi*M*R*T)``. Units remain mol/(m^2*s).
-    Limiting cases: ``alpha -> 1`` recovers equilibrium effusion and
-    ``alpha -> 0`` stops free evaporation.
+    Molecular kinetic theory gives
+    ``J = alpha * (P_eq - P) / sqrt(2*pi*m*k*T)`` molecules/(m^2*s),
+    where ``m`` is kg/molecule and ``k`` is J/K. With ``M = N_A*m`` and
+    ``R = N_A*k``, dividing by Avogadro's constant gives the molar form
+    ``alpha * (P_eq - P) / sqrt(2*pi*M*R*T)`` in mol/(m^2*s). Limiting
+    cases: ``alpha -> 0`` stops evaporation, equal pressures give zero net
+    flux, and ``alpha -> 1`` recovers ideal equilibrium effusion.
     """
     if alpha <= 0.0:
         return 0.0

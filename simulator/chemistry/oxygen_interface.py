@@ -57,7 +57,7 @@ from typing import Literal
 from scipy.optimize import brentq
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+from simulator.physical_constants import PA_PER_BAR
 
 
 _LOWER_LOG10_PO2_BAR = -30.0
@@ -237,10 +237,16 @@ def solve_interface_oxygen(
         active_channels.append(channel)
 
     # Same algebra as langmuir_knudsen.hertz_knudsen_k_kg_s_m2_pa.
-    oxygen_r_interface = 1.0 / (
-        oxygen_alpha_value
-        * math.sqrt(_M_O2_KG_PER_MOL / (2.0 * math.pi * GAS_CONSTANT * temperature))
+    from simulator.chemistry.langmuir_knudsen import langmuir_molar_flux
+
+    oxygen_flux_per_pa = langmuir_molar_flux(
+        temperature,
+        1.0,
+        0.0,
+        oxygen_alpha_value,
+        molar_mass_kg_mol=_M_O2_KG_PER_MOL,
     )
+    oxygen_r_interface = 1.0 / (oxygen_flux_per_pa * _M_O2_KG_PER_MOL)
     oxygen_r_total = oxygen_r_interface + oxygen_gas_resistance
     if not math.isfinite(oxygen_r_total) or oxygen_r_total <= 0.0:
         raise ValueError("oxygen series resistance must be finite and positive")
@@ -274,13 +280,14 @@ def solve_interface_oxygen(
                     f"pressure model returned invalid {channel.species!r} pressure"
                 )
             pressures[channel.species] = pressure
-            r_interface = 1.0 / (
-                channel.alpha
-                * math.sqrt(
-                    channel.molar_mass_kg_per_mol
-                    / (2.0 * math.pi * GAS_CONSTANT * temperature)
-                )
+            flux_per_pa = langmuir_molar_flux(
+                temperature,
+                1.0,
+                0.0,
+                channel.alpha,
+                molar_mass_kg_mol=channel.molar_mass_kg_per_mol,
             )
+            r_interface = 1.0 / (flux_per_pa * channel.molar_mass_kg_per_mol)
             resistance = r_interface + channel.r_gas_m_s
             if not math.isfinite(resistance) or resistance <= 0.0:
                 raise ValueError(f"invalid series resistance for {channel.species!r}")
