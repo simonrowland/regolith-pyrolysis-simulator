@@ -4393,6 +4393,45 @@ def test_every_extract_has_fidelity_sample():
             assert doc.get("fidelity_samples"), f"{path.name} missing fidelity_samples"
 
 
+def test_audit_mapping_fidelity_samples_match_canonical_extracts():
+    """Keep every mapped printed pin bound to its canonical observation value."""
+    audit_dir = EXTRACTS / "audits"
+    mapping_paths = sorted(audit_dir.glob("*.mapping.yaml"))
+    checked = 0
+    for mapping_path in mapping_paths:
+        source = mapping_path.read_text(encoding="utf-8")
+        if not re.search(r"^fidelity_samples\s*:", source, flags=re.MULTILINE):
+            continue
+        mapping = load_cached_safe_yaml(source)
+        samples = mapping.get("fidelity_samples") or []
+        if not samples:
+            continue
+        source_id = mapping.get("source_id")
+        assert isinstance(source_id, str) and source_id
+        extract_path = EXTRACTS / f"{source_id}.yaml"
+        assert extract_path.is_file(), f"missing canonical extract for {mapping_path.name}"
+        extract = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+        candidate = copy.deepcopy(extract)
+        candidate["fidelity_samples"] = [
+            (
+                {
+                    key: value
+                    for key, value in sample.items()
+                    if key not in {"species", "observable", "observation_id"}
+                }
+                if sample.get("path")
+                else sample
+            )
+            for sample in samples
+        ]
+        errors = vle.check_all_fidelity_samples_match(
+            candidate, label=f"{mapping_path.name} -> {extract_path.name}"
+        )
+        assert errors == [], errors
+        checked += 1
+    assert checked > 0, "no audit mapping fidelity samples were checked"
+
+
 def test_costa_jacobson_retained_sio_has_fidelity_sample(monkeypatch):
     """Run the landed-pilot sample-presence guard against this extract alone."""
     path = EXTRACTS / "costa-jacobson-2015.yaml"

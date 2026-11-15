@@ -106,7 +106,7 @@ def _find_untyped_exponents(node: yaml.Node, path: tuple[str, ...]):
     if isinstance(node, yaml.ScalarNode):
         if (
             node.tag == "tag:yaml.org,2002:str"
-            and node.style is None
+            and node.style in (None, "")
             and _DOTLESS_EXPONENT_RE.fullmatch(node.value)
         ):
             yield (
@@ -276,6 +276,35 @@ def test_precision_guard_rejects_a_new_lossy_float_mutation():
     assert mutated_signatures - prior_signatures == {
         (("value",), "0.0027299999999999997879474022965951007790863513946533203125")
     }
+
+
+@pytest.mark.parametrize(
+    ("source", "expected_path"),
+    [
+        ("value: 3e-8\n", "value"),
+        ("values: [3e-8]\n", "values.0"),
+        ("values: {sample: 3e-8}\n", "values.sample"),
+    ],
+    ids=["block-mapping", "flow-sequence", "flow-mapping"],
+)
+def test_production_loader_detects_plain_dotless_exponents(source, expected_path):
+    """Null-hypothesis: libyaml's empty plain style lets strings evade the guard."""
+    root = _source_node(source)
+    assert root is not None
+    loaded = yaml.load(source, Loader=YAML12SafeLoader)
+    assert loaded is not None
+    value = loaded["value"] if expected_path == "value" else (
+        loaded["values"][0]
+        if expected_path == "values.0"
+        else loaded["values"]["sample"]
+    )
+    assert value == "3e-8"
+    assert isinstance(value, str)
+
+    findings = list(_find_untyped_exponents(root, ()))
+    assert [(path, token) for path, _line, token, _start, _end in findings] == [
+        (expected_path, "3e-8")
+    ]
 
 
 def test_oneill_identity_pressure_keeps_its_exact_decimal_lexeme():
