@@ -10394,6 +10394,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         phase_basis_source = 'equilibrium_result.liquid_fraction'
         phase_basis_continuation = None
         phase_basis_notice = None
+        phase_basis_detail = None
         if vapour_phase_liquid_fraction is None:
             phase_signal = getattr(
                 self, '_vapor_pressure_freeze_gate_phase_fraction', None,
@@ -10404,9 +10405,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     phase_basis_source,
                     phase_basis_continuation,
                     phase_basis_notice,
+                    phase_basis_detail,
                 ) = phase_signal()
             else:
                 phase_basis_source = 'missing'
+                phase_basis_detail = {'code': 'gate_phase_resolver_missing'}
         regime_diagnostic: dict[str, Any] = {}
         # H1 permits None only for vapor-only results with no phase
         # assemblage.  That is not proof of a no-liquid rump, so the
@@ -10534,6 +10537,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             **dispatch_kwargs,
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        diagnostic['phase_basis_detail'] = (
+            dict(phase_basis_detail)
+            if isinstance(phase_basis_detail, Mapping)
+            else None
+        )
 
         def append_kernel_warnings(
             messages: tuple[str, ...] | str,

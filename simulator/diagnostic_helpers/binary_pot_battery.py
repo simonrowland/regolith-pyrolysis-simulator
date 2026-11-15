@@ -1670,6 +1670,27 @@ def engine_flags_from_result(
     ):
         certified_band = _plain_data(diagnostics["certified_band"])
 
+    vapor_diagnostic = diagnostics.get("vapor_pressure_diagnostic")
+    d207_notices = (
+        vapor_diagnostic.get("d207_notices")
+        if isinstance(vapor_diagnostic, Mapping)
+        else None
+    )
+    for row in d207_notices or ():
+        if not isinstance(row, Mapping):
+            continue
+        code = row.get("code")
+        message = row.get("message")
+        if not isinstance(code, str) or not code or not isinstance(message, str):
+            continue
+        notices.append(
+            {
+                "kind": "openimcc_notice",
+                "authority": row.get("authority"),
+                "reason": f"{code}: {message}",
+            }
+        )
+
     if diagnostics.get("imcc_notices"):
         imcc_rows = diagnostics["imcc_notices"]
     else:
@@ -3834,6 +3855,7 @@ def _internal_analytical_vapor_pressure_adapter(
         "vapor_pressures_source": dict(equilibrium.vapor_pressures_source),
         "phase_basis": core_diagnostic.get("phase_basis"),
         "phase_basis_source": core_diagnostic.get("phase_basis_source"),
+        "phase_basis_detail": core_diagnostic.get("phase_basis_detail"),
         "applied_vapour_switch_K": core_diagnostic.get(
             "applied_vapour_switch_K"
         ),
