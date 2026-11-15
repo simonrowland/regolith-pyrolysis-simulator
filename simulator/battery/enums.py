@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 from enum import StrEnum
+from types import MappingProxyType
 
 from simulator.backend_names import (
     PROPRIETARY_ENGINE_NAME,
@@ -570,6 +571,33 @@ class MethodToken(StrEnum):
     QUENCH_EQUILIBRATION = "quench_equilibration"
     TABULATION = "tabulation"
     ENGINE_EVALUATION = "engine_evaluation"
+
+
+# Source-written labels resolve through this closed legacy vocabulary. New
+# source labels belong here alongside their canonical MethodToken values.
+METHOD_TOKEN_ALIASES = MappingProxyType(
+    {
+        **{token.value: token for token in MethodToken},
+        "static_capsule_vapor_pressure": MethodToken.STATIC_EQUILIBRIUM,
+        "kems_effusion": MethodToken.KNUDSEN_EFFUSION,
+        "kems_effusion_compiled_experiment": MethodToken.KNUDSEN_EFFUSION,
+        "kems_effusion_method_context": MethodToken.KNUDSEN_EFFUSION,
+        "kems_effusion_review_compilation": MethodToken.KNUDSEN_EFFUSION,
+        "kems_effusion_ion_comparison": MethodToken.KNUDSEN_EFFUSION,
+        "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
+        "Knudsen-cell mass-spectrometric ion currents converted to partial pressures using the thesis calibration.": MethodToken.KNUDSEN_EFFUSION,
+        "KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).": MethodToken.KNUDSEN_EFFUSION,
+        "free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
+        "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
+        "solar_furnace": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "solar_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "solar_vacuum_pyrolysis_free_evaporation": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "solar_fresnel_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "solar_fresnel_continuously_pumped_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "melt_equilibration_quench": MethodToken.QUENCH_EQUILIBRATION,
+        "gas_standard_state_thermo": MethodToken.TABULATION,
+    }
+)
 
 
 class ExperimentKind(StrEnum):
