@@ -13609,7 +13609,7 @@ def test_d424_every_source_reaction_carrier_uses_the_existing_supply_owner(
     outcomes = {}
     for species, compiled in source_species.items():
         snapshot = SimpleNamespace(
-            hour=1, duration_h=1.0, temperature_C=temperature_K - 273.15,
+            hour=1, duration_h=1.0, temperature_C=temperature_K - physics_module.CELSIUS_TO_KELVIN_OFFSET,
             transport_pO2_bar=oxygen_bar,
             evap_flux=SimpleNamespace(
                 published_species_kg_hr={}, melt_surface_area_m2=1.0,

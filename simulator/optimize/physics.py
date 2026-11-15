@@ -837,6 +837,16 @@ def _catalog_activity_one_ceiling_pa(
 ) -> tuple[float | None, str]:
     """Ceiling pressure at ``source_activity``, or ``(None, evidence)``.
 
+    d-424: this is a source-reaction ceiling for every carrier, including
+    elemental and suboxide gases; it is not restricted to congruent oxide
+    saturation. The catalog compiles the declared reaction/thermochemistry:
+    for Na2O(l) <-> 2 Na(g) + 1/2 O2(g), K(T) = exp(-dG_rxn/(R*T))
+    and P_Na/P_std = (K * a_Na2O / (pO2/P_std)**0.5)**0.5. The catalog's
+    NaO0.5 basis is the same reaction divided by two. At activity 1 this
+    returns the maximum reaction pressure, in Pa after multiplying the
+    dimensionless pressure ratio by P_std. Reuse that compiled owner;
+    a pure-metal saturation pressure is a different physical quantity.
+
     ``P = P_unit(T) * a^n * (pO2 / p_ref)^e``. ``source_activity`` is 1
     unless the interval still has a computed activity (d-401 amendment
     2). For ``n >= 0`` that activity is at most 1, so it cannot raise
@@ -1011,7 +1021,15 @@ def _activity_one_bound_rate_kg_hr(
         J_max_kg_hr = alpha_ub * P_sat * k_HK * area_m2 * 3600.
 
     Unit check. ``k_HK`` is kg/(m^2 Pa s) because Pa = kg/(m s^2).
-    Times Pa * m^2 * s/h gives kg/h.
+    Times Pa * m^2 * s/h gives kg/h. The integral multiplies by hours,
+    and the existing parent-oxide allocator caps that mass by the shared
+    element inventory, flagging inventory_capped. No second booking path.
+
+    Limits (d-424). At 313 K the source-reaction pressures give negligible
+    supply, rather than an assumed zero. Congruent oxide reactions (e=0)
+    need no pO2. Reductive elemental/suboxide reactions (e<0) grow as pO2
+    tends to zero and require a committed positive pO2; missing oxygen
+    remains missing_recorded_pO2, never a reference-pressure substitute.
 
     Sanity value, not a lunar fit. At 1500 K, M = 0.068 kg/mol,
     P_sat = 1e-3 Pa, alpha = 1, area = 0.2 m^2, and R = 8.314462618
