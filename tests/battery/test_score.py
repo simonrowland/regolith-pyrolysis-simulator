@@ -12120,7 +12120,10 @@ def test_calibration_membership_decides_only_cited_engine_source_overlap() -> No
         ENGINE_COEFFICIENT_SOURCES[engine]
         for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
     )
-    assert melts_aliases[0] == melts_aliases[1]
+    assert tuple(map(expand_coefficient_sources, melts_aliases)) == (
+        (melts_work.work_id,),
+        (melts_work.work_id,),
+    )
     for aliases in melts_aliases:
         assert relation(
             "berman-1988-internally-consistent-mineral-thermodynamic-data",
