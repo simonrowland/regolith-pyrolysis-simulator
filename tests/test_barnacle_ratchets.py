@@ -29,6 +29,74 @@ def _git_grep(pattern: str, *paths: str) -> list[str]:
     return completed.stdout.splitlines()
 
 
+def _source_id_expression(node: ast.AST) -> bool:
+    return (isinstance(node, ast.Name) and node.id == "source_id") or (
+        isinstance(node, ast.Attribute) and node.attr == "source_id"
+    )
+
+
+def _declared_source_id_value(
+    node: ast.AST, imported_source_ids: set[str]
+) -> bool:
+    if isinstance(node, ast.Constant):
+        return isinstance(node.value, str)
+    if isinstance(node, ast.Name):
+        return node.id.endswith("_SOURCE_ID") or node.id in imported_source_ids
+    if isinstance(node, (ast.Set, ast.Tuple, ast.List)):
+        return bool(node.elts) and all(
+            _declared_source_id_value(item, imported_source_ids)
+            for item in node.elts
+        )
+    return False
+
+
+def _source_id_comparison_sites_in_source(source: str, path: str) -> list[str]:
+    tree = ast.parse(source, filename=path)
+    imported_source_ids = {
+        alias.asname or alias.name
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+        if alias.name == "SOURCE_ID"
+    }
+    sites = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Compare):
+            continue
+        operands = [node.left, *node.comparators]
+        if any(
+            isinstance(operator, (ast.Eq, ast.NotEq, ast.In, ast.NotIn))
+            and (
+                _source_id_expression(left)
+                and _declared_source_id_value(right, imported_source_ids)
+                or _source_id_expression(right)
+                and _declared_source_id_value(left, imported_source_ids)
+            )
+            for left, right, operator in zip(
+                operands, operands[1:], node.ops
+            )
+        ):
+            sites.append(f"{path}:{node.lineno}: {ast.unparse(node)}")
+    return sites
+
+
+def _source_id_comparison_sites(*paths: str) -> list[str]:
+    tracked = subprocess.run(
+        ["git", "ls-files", "--", *paths],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    sites = []
+    for relpath in tracked.stdout.splitlines():
+        if not relpath.endswith(".py"):
+            continue
+        source = (REPO_ROOT / relpath).read_text(encoding="utf-8")
+        sites.extend(_source_id_comparison_sites_in_source(source, relpath))
+    return sites
+
+
 def _assert_count_at_most(
     label: str, matches: list[str], ceiling: int
 ) -> None:
@@ -187,12 +255,8 @@ def _has_except_return(path: str, function: str, value: str) -> bool:
 
 
 def test_source_id_comparisons_are_decrease_only() -> None:
-    simulator = _git_grep(
-        r"""source_id[[:space:]]*(==|!=)[[:space:]]*['"]""", "simulator"
-    )
-    tools_scripts = _git_grep(
-        r"""source_id[[:space:]]*(==|!=)[[:space:]]*['"]""", "tools", "scripts"
-    )
+    simulator = _source_id_comparison_sites("simulator")
+    tools_scripts = _source_id_comparison_sites("tools", "scripts")
 
     _assert_count_at_most(
         "source_id comparisons in simulator", simulator, SOURCE_ID_SIMULATOR_CEILING
@@ -202,6 +266,23 @@ def test_source_id_comparisons_are_decrease_only() -> None:
         tools_scripts,
         SOURCE_ID_TOOLS_SCRIPTS_CEILING,
     )
+
+
+def test_source_id_comparison_ratchet_catches_literals_constants_and_membership() -> None:
+    source = """
+from simulator.battery.generators.sample import SOURCE_ID as sample_source
+_SAMPLE_SOURCE_ID = "sample-source"
+def matches(source_id, observation):
+    return (
+        source_id == "literal-source"
+        or observation.source_id == _SAMPLE_SOURCE_ID
+        or source_id in {"first-source", "second-source"}
+        or source_id == sample_source
+    )
+"""
+    sites = _source_id_comparison_sites_in_source(source, "synthetic.py")
+
+    assert len(sites) == 4, "all source-id comparison forms must enter the ratchet"
 
 
 def test_finite_numeric_helpers_are_frozen() -> None:
