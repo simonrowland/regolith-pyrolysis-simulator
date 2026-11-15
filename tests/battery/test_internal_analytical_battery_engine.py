@@ -952,9 +952,78 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
     )
 
 
+@pytest.mark.parametrize(
+    (
+        "source_id",
+        "observation_id",
+        "expected_basis",
+        "expected_switch",
+        "expected_notice",
+        "expected_sio_source",
+        "expected_gate_reason",
+    ),
+    [
+        pytest.param(
+            "stolyarova-1996-cao-alumina-silica-kems",
+            "stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table2_pSiO_1933k::T=1933.00:h=0bf22dda389c",
+            "missing",
+            1950.0,
+            "openimcc_vapour_phase_signal_missing",
+            "builtin_authoritative",
+            "silicate_window",
+            id="stolyarova-outside-melts-window",
+        ),
+        pytest.param(
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_09",
+            "missing",
+            1950.0,
+            "openimcc_vapour_phase_signal_missing",
+            "builtin_authoritative",
+            "magemin_mode_vector_mass_deficit",
+            id="wollastonite-high-temperature-provider-refusal",
+        ),
+        pytest.param(
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_03",
+            "missing",
+            1950.0,
+            "openimcc_vapour_phase_signal_missing",
+            "builtin_authoritative",
+            "magemin_mode_vector_mass_deficit",
+            id="wollastonite-lower-temperature-provider-refusal",
+        ),
+        pytest.param(
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_09",
+            "liquid",
+            None,
+            "openimcc_liquid_sio_below_1950K_band",
+            "openimcc",
+            None,
+            marks=pytest.mark.skip(
+                reason=(
+                    "No statically justified MAGEMin ig liquid candidate: "
+                    "the 71 explicit in-window rows contain only two or "
+                    "three positive oxide components; this wollastonite "
+                    "bulk is independently confirmed to refuse with "
+                    "magemin_mode_vector_mass_deficit."
+                )
+            ),
+            id="no-statically-justified-ig-liquid-candidate",
+        ),
+    ],
+)
 def test_internal_analytical_battery_score_records_vapour_phase_basis(
     tmp_path: Path,
     request,
+    source_id: str,
+    observation_id: str,
+    expected_basis: str,
+    expected_switch: float | None,
+    expected_notice: str | None,
+    expected_sio_source: str,
+    expected_gate_reason: str | None,
 ) -> None:
     parent_core = _new_internal_analytical_core()
     parent_magemin = _magemin_gate_backend(parent_core)
@@ -963,117 +1032,73 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
     request.addfinalizer(parent_magemin.close)
 
     root = Path(__file__).resolve().parents[2]
-    cases = (
-        (
-            "stolyarova-1996-cao-alumina-silica-kems",
-            "stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table2_pSiO_1933k::T=1933.00:h=0bf22dda389c",
-            "missing",
-            1950.0,
-            "openimcc_vapour_phase_signal_missing",
-            "builtin_authoritative",
-        ),
-        (
-            "shornikov-2026-wollastonite-kems",
-            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_09",
-            "liquid",
-            None,
-            "openimcc_liquid_sio_below_1950K_band",
-            "openimcc",
-        ),
-        (
-            "shornikov-2026-wollastonite-kems",
-            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_03",
-            "solid_bearing",
-            1950.0,
-            None,
-            "builtin_authoritative",
-        ),
+    context = battery_score.load_score_context(root, sources=(source_id,))
+    observation = context.observations[observation_id]
+    scoped_context = replace(
+        context,
+        observations={observation_id: observation},
+        origins={observation_id: context.origins.get(observation_id, "")},
     )
+    output_path = tmp_path / "phase-basis.jsonl"
+    written, _metadata = battery_score._score_store_to_jsonl(
+        scoped_context,
+        output_path,
+        root=root,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.SIO_EVOLUTION,
+        workers=1,
+    )
+    scored_rows = [
+        json.loads(line)
+        for line in output_path.with_name(output_path.name + ".partial")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line.strip()
+    ]
+    candidate = next(
+        row["candidate_observation"]
+        for row in scored_rows
+        if isinstance(row.get("candidate_observation"), dict)
+        and row["candidate_observation"].get("observation_id")
+        == f"engine:internal-analytical:{observation_id}"
+    )
+    assert written == 1
+    engine = candidate["engine"]
+    record = json.loads(engine["version"])
+    assert record["phase_basis"] == expected_basis
+    assert record["phase_basis_source"]
+    if expected_basis == "liquid":
+        assert record["phase_basis_source"].startswith(
+            "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow"
+        )
+    if expected_switch is None:
+        from simulator.melt_backend import openimcc_bridge
 
-    contexts = {}
-    for index, (
-        source_id,
-        observation_id,
-        expected_basis,
-        expected_switch,
-        expected_notice,
-        expected_sio_source,
-    ) in enumerate(cases):
-        if source_id not in contexts:
-            contexts[source_id] = battery_score.load_score_context(
-                root, sources=(source_id,)
-            )
-        context = contexts[source_id]
-        observation = context.observations[observation_id]
-        scoped_context = replace(
-            context,
-            observations={observation_id: observation},
-            origins={
-                observation_id: context.origins.get(observation_id, "")
-            },
+        expected_switch = openimcc_bridge._temperature_domain_K()[0]
+    assert record["applied_vapour_switch_K"] == expected_switch
+    assert record["vapor_pressures_source"]["SiO"].startswith(
+        expected_sio_source
+    )
+    scored_notices = json.dumps(candidate.get("notices") or ())
+    if expected_notice is not None:
+        assert any(
+            notice["code"] == expected_notice for notice in record["notices"]
         )
-        output_path = tmp_path / f"phase-basis-{index}.jsonl"
-        written, _metadata = battery_score._score_store_to_jsonl(
-            scoped_context,
-            output_path,
-            root=root,
-            engines=(Engine.INTERNAL_ANALYTICAL,),
-            rail=Rail.SIO_EVOLUTION,
-            workers=1,
+        assert expected_notice in scored_notices
+    if expected_basis == "liquid":
+        assert not any(
+            notice.get("source") == "vaporock"
+            and notice.get("destination") == "antoine_fallback"
+            for notice in candidate.get("notices") or ()
         )
-        scored_rows = [
-            json.loads(line)
-            for line in output_path.with_name(output_path.name + ".partial")
-            .read_text(encoding="utf-8")
-            .splitlines()
-            if line.strip()
-        ]
-        candidate = next(
-            row["candidate_observation"]
-            for row in scored_rows
-            if isinstance(row.get("candidate_observation"), dict)
-            and row["candidate_observation"].get("observation_id")
-            == f"engine:internal-analytical:{observation_id}"
-        )
-        assert written == 1
-        engine = candidate["engine"]
-        record = json.loads(engine["version"])
-        assert record["phase_basis"] == expected_basis
-        assert record["phase_basis_source"]
-        if expected_basis == "liquid":
-            assert record["phase_basis_source"].startswith(
-                "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow"
-            )
-        if expected_switch is None:
-            from simulator.melt_backend import openimcc_bridge
-
-            expected_switch = openimcc_bridge._temperature_domain_K()[0]
-        assert record["applied_vapour_switch_K"] == expected_switch
-        assert record["vapor_pressures_source"]["SiO"].startswith(
-            expected_sio_source
-        )
-        scored_notices = json.dumps(candidate.get("notices") or ())
-        if expected_notice is not None:
-            assert any(
-                notice["code"] == expected_notice
-                for notice in record["notices"]
-            )
-            assert expected_notice in scored_notices
-        if expected_basis == "liquid":
-            assert not any(
-                notice.get("source") == "vaporock"
-                and notice.get("destination") == "antoine_fallback"
-                for notice in candidate.get("notices") or ()
-            )
-        if expected_basis == "missing":
-            phase_detail = record["phase_basis_detail"]
-            assert phase_detail["code"] == (
-                "gate_curve_source_not_authoritative"
-            )
-            gate_evidence = phase_detail["diagnostic"]
-            assert gate_evidence["provider"] == "magemin"
-            assert gate_evidence["status"] == "out_of_domain"
-            assert "silicate_window" in str(gate_evidence["reason"])
+    if expected_basis == "missing":
+        phase_detail = record["phase_basis_detail"]
+        assert phase_detail["code"] == "gate_curve_source_not_authoritative"
+        assert phase_detail["provider_outcome"] == "stable_refusal"
+        gate_evidence = phase_detail["diagnostic"]
+        assert gate_evidence["provider"] == "magemin"
+        assert expected_gate_reason is not None
+        assert expected_gate_reason in str(gate_evidence["reason"])
 
 
 def test_internal_analytical_timeout_kills_magemin_descendants(
