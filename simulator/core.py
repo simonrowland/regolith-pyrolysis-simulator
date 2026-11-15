@@ -256,6 +256,8 @@ _TERMINAL_REFUSAL_SNAPSHOT_SEPARATE_ROOT_NAMES = (
 # _scale_c0_joint_release and _commit_pending_subsolidus_release mutate the
 # saved bakeout map through local aliases; the freeze-gate writer adds keys to
 # its map in place. Keep all three entry values independently copied on refusal.
+# The freeze-gate diagnostic write sequence is an immutable scalar retained
+# with its diagnostic so terminal-hour rollback restores the evidence baseline.
 _TERMINAL_REFUSAL_RETAINED_ROOT_NAMES = frozenset({
     'setpoints',
     'feedstocks',
@@ -286,6 +288,7 @@ _TERMINAL_REFUSAL_RETAINED_ROOT_NAMES = frozenset({
     '_last_impurity_delta',
     '_last_melt_redox_liquid_fraction_diagnostic',
     '_last_melt_redox_liquidus_gate_diagnostic',
+    '_melt_redox_liquidus_gate_diagnostic_seq',
     '_last_melt_regime_diagnostic',
     '_last_metal_phase_stratification_diagnostic',
     '_last_native_fe_partition_diagnostic',
@@ -1409,6 +1412,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._freeze_gate_curve_in_progress: bool = False
         self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
         self._last_melt_redox_liquidus_gate_diagnostic: Dict[str, Any] = {}
+        self._melt_redox_liquidus_gate_diagnostic_seq = 0
         self._last_melt_redox_liquid_fraction_diagnostic: Dict[str, Any] = {}
         self._melt_redox_liquidus_gate_fallback_diagnostics: deque[
             Dict[str, Any]
@@ -4810,9 +4814,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'campaign_hour': int(self.melt.campaign_hour),
             'campaign': self.melt.campaign.name,
         }
-        self._last_melt_redox_liquidus_gate_diagnostic = dict(diagnostic)
+        self._record_melt_redox_liquidus_gate_diagnostic(diagnostic)
         self._last_melt_redox_liquid_fraction_diagnostic = dict(diagnostic)
         raise EvaporationFluxRefusal(reason, diagnostic)
+
+    def _record_melt_redox_liquidus_gate_diagnostic(
+        self,
+        diagnostic: Mapping[str, Any],
+    ) -> None:
+        """Store current gate evidence and advance its request-write sequence."""
+        self._last_melt_redox_liquidus_gate_diagnostic = dict(diagnostic)
+        self._melt_redox_liquidus_gate_diagnostic_seq += 1
 
     def _validated_melt_redox_liquidus_curve(
         self,
@@ -4926,7 +4938,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'campaign_hour': int(self.melt.campaign_hour),
             'campaign': self.melt.campaign.name,
         }
-        self._last_melt_redox_liquidus_gate_diagnostic = dict(diagnostic)
+        self._record_melt_redox_liquidus_gate_diagnostic(diagnostic)
         fallback_diagnostics = getattr(
             self,
             '_melt_redox_liquidus_gate_fallback_diagnostics',
@@ -5392,10 +5404,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # During curve construction this redox capacity read is bootstrap
             # context, not ledger authority; the outer stored curve serves later
             # redox reads after the in-progress provider call finishes.
-            self._last_melt_redox_liquidus_gate_diagnostic = {
+            self._record_melt_redox_liquidus_gate_diagnostic({
                 'status': 'unavailable',
                 'source': 'none:liquidus_gate_in_progress',
-            }
+            })
             return None
         if curve is None:
             from simulator.melt_backend.liquidus import LiquidusSampleError
@@ -5539,7 +5551,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if isinstance(notice, Mapping):
                 gate_diagnostic[notice_key] = dict(notice)
         self._stamp_kress_floor_diagnostic(gate_diagnostic)
-        self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
+        self._record_melt_redox_liquidus_gate_diagnostic(gate_diagnostic)
         return normalized_record
 
     def _melt_redox_liquid_fraction_factor(

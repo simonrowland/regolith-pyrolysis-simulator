@@ -539,66 +539,6 @@ def test_freeze_gate_phase_fraction_without_resolver_marks_evidence_absent() -> 
     }
 
 
-def test_reused_core_does_not_carry_gate_diagnostic_between_cells() -> None:
-    sim, calls = _sim_with_vapor_dispatch({'Na': 12.5})
-    sim.melt.temperature_C = 1300.0
-    evidence = {
-        'provider': 'magemin',
-        'status': 'out_of_domain',
-        'reason': 'silicate_window',
-    }
-    sim._vapor_pressure_freeze_gate_phase_fraction = types.MethodType(
-        EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction,
-        sim,
-    )
-    sim._register_freeze_gate_liquid_fraction_providers = lambda: None
-
-    def first_cell_gate_record():
-        sim._last_melt_redox_liquidus_gate_diagnostic = dict(evidence)
-        return {
-            'curve': {
-                'source': 'kress91_liquid_calibration_floor',
-                'path': ((1390.0, 0.0), (1391.0, 1.0)),
-                'gate_provider_refusal': dict(evidence),
-            },
-            'origin': {},
-            'repair_notices': [],
-            'disposition': 'live',
-            'provider_outcome': 'stable_refusal',
-        }
-
-    sim._melt_redox_liquidus_gate_record = first_cell_gate_record
-    sim._melt_redox_gate_record_is_admitted = lambda _record: True
-
-    first_result = EquilibriumResult(
-        temperature_C=sim.melt.temperature_C,
-        pressure_bar=1e-6,
-        liquid_fraction=None,
-        vapor_pressures_Pa={},
-    )
-    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, first_result)
-    first_detail = sim._last_vapor_pressure_diagnostic['phase_basis_detail']
-    assert first_detail['diagnostic'] == evidence
-
-    def missing_provider_registration():
-        raise ImportError('gate provider unavailable')
-
-    sim._register_freeze_gate_liquid_fraction_providers = (
-        missing_provider_registration
-    )
-    second_result = EquilibriumResult(
-        temperature_C=sim.melt.temperature_C,
-        pressure_bar=1e-6,
-        liquid_fraction=None,
-        vapor_pressures_Pa={},
-    )
-    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, second_result)
-    second_detail = sim._last_vapor_pressure_diagnostic['phase_basis_detail']
-    assert second_detail['code'] == 'freeze_gate_provider_import_failed'
-    assert 'diagnostic' not in second_detail
-    assert len(calls) == 2
-
-
 def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> None:
     projected_source = (
         'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
@@ -791,6 +731,7 @@ def test_internal_analytical_adapter_uses_real_magemin_gate_fallback(
 
 
 def test_internal_analytical_runner_uses_real_equilibrium_phase_result(
+    monkeypatch,
     request,
 ) -> None:
     from pathlib import Path
@@ -835,6 +776,7 @@ def test_internal_analytical_runner_uses_real_equilibrium_phase_result(
         pytest.skip('MAGEMin backend unavailable after initialization')
     request.addfinalizer(magemin.close)
 
+    sequence_before_first_cell = sim._melt_redox_liquidus_gate_diagnostic_seq
     result = sim._get_equilibrium(run_post_equilibrium_sulfsat=False)
 
     assert isinstance(result, EquilibriumResult)
@@ -871,6 +813,48 @@ def test_internal_analytical_runner_uses_real_equilibrium_phase_result(
         controls={},
         quantity_class='vapour',
         phase_basis=authority['vapour_channel_phase_basis'],
+    )
+
+    first_cell_gate_diagnostic = dict(
+        sim._last_melt_redox_liquidus_gate_diagnostic
+    )
+    first_cell_sequence = sim._melt_redox_liquidus_gate_diagnostic_seq
+    assert first_cell_sequence > sequence_before_first_cell
+    assert first_cell_gate_diagnostic
+
+    def refuse_second_cell_registration():
+        raise ImportError('gate provider unavailable for second cell')
+
+    monkeypatch.setattr(
+        sim,
+        '_register_freeze_gate_liquid_fraction_providers',
+        refuse_second_cell_registration,
+    )
+    second_result = EquilibriumResult(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=1.0e-6,
+        liquid_fraction=None,
+        phase_assemblage_available=False,
+        vapor_pressures_Pa={},
+    )
+    sim._refresh_vapor_pressures_from_kernel(second_result)
+
+    second_phase_detail = sim._last_vapor_pressure_diagnostic[
+        'phase_basis_detail'
+    ]
+    assert second_phase_detail['code'] == 'freeze_gate_provider_import_failed'
+    assert 'diagnostic' not in second_phase_detail
+    assert (
+        sim._melt_redox_liquidus_gate_diagnostic_seq == first_cell_sequence
+    )
+    assert (
+        sim._last_melt_redox_liquidus_gate_diagnostic
+        == first_cell_gate_diagnostic
+    )
+    snapshot = sim._make_snapshot()
+    assert (
+        snapshot.oxygen_reservoir['liquid_fraction_gate']['redox']
+        == first_cell_gate_diagnostic
     )
 
 
