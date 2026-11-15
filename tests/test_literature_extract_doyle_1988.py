@@ -235,7 +235,18 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
             assert raw["values"]["standard_state_as_printed"] == "molten Fe0.947O (COUGHLIN, 1954)"
             assert raw["values"]["fO2_log_uncertainty"] == FO2_UNCERTAINTY
             assert raw["values"]["fO2_log_uncertainty_as_printed"] == "+0.02"
-            assert row.identity.reference_state.is_unknown
+            reference_state = row.identity.reference_state
+            assert reference_state.is_value
+            assert reference_state.value.endmember.formula == "Fe(1-x)O"
+            composition = reference_state.value.iron_saturation_composition
+            assert composition is not None
+            assert composition.method == "cited_standard"
+            assert composition.composition_as_printed == "Fe0.947O"
+            assert composition.quote == (
+                "The standard state is molten Fe $_{0.947}$ O (COUGHLIN, 1954)."
+            )
+            assert composition.locator.published_page == 1828
+            assert composition.locator.section == "Control of the Activity of FeO"
             assert row.point_conditions["temperature_K"].state.value == Decimal("1600")
             assert row.point_conditions["fO2_log"].state.value == Decimal(FO2_BY_ACTIVITY[raw["values"]["activity"]])
             assert row.identity.temperature_K.value == Decimal("1600")

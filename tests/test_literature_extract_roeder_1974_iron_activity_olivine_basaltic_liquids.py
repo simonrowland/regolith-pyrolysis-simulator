@@ -12,6 +12,7 @@ import yaml
 from simulator.battery.enums import EvidenceClass, Phase, Quantity
 from simulator.battery.migrate import convert_temperature_to_k, wt_pct_to_mole_fraction
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.battery.records import StandardState
 from tests.battery.test_migrate import _migrate_real_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -31,8 +32,8 @@ ACTIVITY_EQUATION_ID = (
     f"{SOURCE_ID}::context::roeder_1974_activity_equation_and_gamma_fit"
 )
 OXIDES = ("SiO2", "Al2O3", "FeO", "MgO", "CaO", "Na2O", "K2O", "TiO2", "MnO")
-STANDARD_STATE = (
-    "The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron."
+STANDARD_STATE_QUOTE = (
+    "In this paper all iron oxide values including the activity, are those in equilibrium with metallic iron."
 )
 
 
@@ -101,8 +102,16 @@ def _assert_source_cells_match_audit(document: dict, audit: dict[int, dict[str, 
             assert obs["values"]["method_class"] == "measured_reduced"
             assert obs["values"]["evidence_class"] == "measured_reduced"
             assert obs["phase"] == "l"
-            assert obs["standard_state"] == STANDARD_STATE
-            assert obs["values"]["standard_state_as_printed"] == STANDARD_STATE
+            standard_state = obs["standard_state"]
+            assert standard_state["state"]["value"]["convention"] == (
+                "raoultian_pure_endmember"
+            )
+            assert standard_state["state"]["value"]["endmember"]["formula"] == (
+                "Fe(1-x)O"
+            )
+            assert standard_state["locator"]["published_page"] == 398
+            assert standard_state["locator"]["section"] == "Experimental details"
+            assert obs["values"]["standard_state_as_printed"] == STANDARD_STATE_QUOTE
             assert obs["locator"]["page"] == source_row["page"]
             assert obs["locator"]["published_page"] == source_row["published_page"]
             assert obs["locator"]["table"] == "1"
@@ -238,8 +247,12 @@ def _assert_migrated_cells_match_audit(result, audit: dict[int, dict[str, object
 
             assert row.identity.total_pressure_Pa.is_unknown
             assert "total_pressure_Pa" not in row.point_conditions
-            assert row.identity.reference_state.is_unknown
-            assert row.identity.reference_state.reason
+            # Mutation: reverting the typed iron-saturated FeO state breaks this.
+            assert row.identity.reference_state.is_value
+            standard_state = row.identity.reference_state.value
+            assert isinstance(standard_state, StandardState)
+            assert standard_state.endmember.formula == "Fe(1-x)O"
+            assert standard_state.iron_saturation_composition is None
 
             composition = row.point_conditions["composition"]
             if cells["MnO"] is None:
@@ -316,4 +329,8 @@ def test_render_audit_binds_every_table1_value_and_condition_with_mutation_check
         assert row.identity.temperature_K.is_value
         assert row.identity.fO2_Pa.is_value
         assert row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.reference_state.is_unknown
+        assert row.identity.reference_state.is_value
+        standard_state = row.identity.reference_state.value
+        assert isinstance(standard_state, StandardState)
+        assert standard_state.endmember.formula == "Fe(1-x)O"
+        assert standard_state.iron_saturation_composition is None

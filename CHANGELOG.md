@@ -4,6 +4,44 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [0.6.8] — 2026-11-12
+
+- Every campaign-scoped C6 refusal is priced unavailable. The executor
+  leaves batch status ok and keeps the diagnostic, and the pricing
+  chokepoint does not whitelist one reason string. That includes CI's
+  `c6_joint_thermodynamic_liquid_fraction_window_empty`. EvalSpec keys
+  follow this VERSION bump. `data/corpus_version.yaml` is unchanged.
+  Glass mass on the measured profiles remains an open finding: glass = 0
+  is the current classifier's route gate (b-1185) plus 96% SiO offgas
+  loss (b-1184); not a physics yield.
+
+## [0.6.7] — 2026-11-12
+
+- Objective claims, gates, and study-scalar weights use the resolved
+  execution options `(campaign, track, c5_enabled)`, including a fidelity
+  overlay and the MRE voltage-cap rewrite. A pyrolysis C0 start still
+  scores the AUTO_APPLY sequence. A track that does not run that sequence
+  does not keep its later pyrolysis objectives. Ranking traces keep each
+  completed step's stop reason (`endpoint_met`, `time_cap`, or `refused`)
+  and the cap name. `check_endpoint` is the only phase-end list. EvalSpec
+  keys follow this VERSION bump. `data/corpus_version.yaml` is unchanged.
+  Glass mass on the measured profiles remains an open finding under the
+  physics trace; this change does not treat a zero glass total as a
+  physics result.
+
+## [0.6.6] — 2026-11-11
+
+- Optimizer evaluations that start at C0 on the pyrolysis track drive the
+  campaign controller through the AUTO_APPLY sequence. A C0 thermal window
+  may rewrite the first step's hour count and does not stop that sequence.
+  Each later step ends by `campaigns.py` `check_endpoint` and the caps that
+  module already reads from setpoints. C4 and C6 stay end-criterion phases. Glass, metals, and
+  O2 are scored when a step of that sequence claims them. A product no step
+  claims stays withheld with `campaign_does_not_claim_product`, with no
+  renormalisation and no zero in place of a withheld objective. A C6
+  `c6_hold_target_not_acquired` refusal is priced unavailable. EvalSpec keys
+  follow this VERSION bump. `data/corpus_version.yaml` is unchanged.
+
 ## [0.6.5] — 2026-11-08
 
 About 8,400 commits since v0.6.4 (2026-08-28).

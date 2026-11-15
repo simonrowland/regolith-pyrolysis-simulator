@@ -102,7 +102,7 @@ PROFILE = {
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {
-        "campaign": "C0",
+        "campaign": "C2A_continuous",
         "hours": 1,
         "mass_kg": 1000.0,
         "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -184,6 +184,11 @@ def _run_reference(**kwargs: Any) -> RunReference:
 def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
     profile = copy.deepcopy(PROFILE)
     profile["profile_id"] = "cli-physics-smoke"
+    # Stay on the profile's one-hour campaign. A C0 pyrolysis start follows
+    # the campaign controller through later steps, and a staged beam of
+    # those sequences does not fit this wiring smoke's wall guard.
+    # The live continuation pin is
+    # test_lunar_highland_c0_horizon_changes_extracted_metals.
     # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
     profile["run"]["allow_unmeasured_alpha_fallback"] = True
     profile["constraints"] = {
@@ -1864,7 +1869,10 @@ def test_strategy_ask_paths_emit_pressure_feasible_candidates(
 
 
 def _stale_melt_target_profile() -> dict[str, Any]:
-    return {
+    # C2A does not claim this residual melt. C2B's CMAS_glass does. The stale
+    # refusal under test is the purity gate, which runs only if the objective
+    # is still eligible. Copy run so the shared PROFILE stays C2A.
+    profile = {
         **PROFILE,
         "profile_id": "stale-melt-target-profile",
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -1893,6 +1901,8 @@ def _stale_melt_target_profile() -> dict[str, Any]:
             }
         ],
     }
+    profile["run"] = {**PROFILE["run"], "campaign": "C2B"}
+    return profile
 
 
 def _stored_rows(out_dir: Path) -> list[ScoredResult]:
@@ -2952,6 +2962,7 @@ def test_default_profile_leaderboard_uses_scoped_energy_metric_and_legacy_alias(
         expected_feedstock=FEEDSTOCK,
     )
     definitions = study.objective_definitions(profile)
+    # C0 claims oxygen because its evaporation route credits terminal O2.
     assert [definition.metric for definition in definitions] == [
         "oxygen_kg",
         ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
@@ -2986,8 +2997,10 @@ def test_default_profile_leaderboard_uses_scoped_energy_metric_and_legacy_alias(
         reader = csv.DictReader(handle)
         row = next(reader)
         assert reader.fieldnames is not None
+        assert "oxygen_kg" in reader.fieldnames
         assert ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC in reader.fieldnames
         assert LEGACY_ENERGY_KWH_METRIC not in reader.fieldnames
+    assert float(row["oxygen_kg"]) == pytest.approx(1.0)
     assert float(row[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC]) == pytest.approx(2.0)
 
 
@@ -3674,7 +3687,19 @@ def test_study_hands_knob_saturation_to_next_bayesian_ask(
         assert knob.path in result.records[2].patch.values
 
 
-def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(tmp_path) -> None:
+def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # C0b's duration bound is what this tap replay pins. C0b does not claim a
+    # ceramic product, so claim the glass the composition target is scoring.
+    from simulator.optimize import objective as objective_module
+
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        lambda _campaign_id: frozenset({"CMAS_glass", "Fe"}),
+    )
     profile = _closed_loop_best_tap_profile()
     executor = _ClosedLoopTapExecutor()
 
@@ -6130,9 +6155,10 @@ def _all_slow_evaluator(
 
 
 @pytest.mark.cpu_budget(25)
-# 6x the CPU budget, the project wall guard. An explicit 25s mark fires while
-# the eval-timeout process pool is still waiting on a loaded studio. Two 30s
-# sleeps still cannot pass: the rows must record timeout, not ok.
+# The eval timeout is 2s. Wall stretches past 25s when the studio is
+# busy with campaign-length neighbors. The eval-timeout process pool can
+# still be waiting on a loaded studio after two 30s sleeps, so leave the
+# project wall guard enough room to record the timeout outcome.
 @pytest.mark.timeout(150)
 def test_parallel_all_timeouts_is_a_designed_no_winner_outcome(tmp_path) -> None:
     """Every candidate timing out is a DESIGNED outcome, not a crash.
@@ -7294,39 +7320,37 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
         text=True,
         capture_output=True,
         check=False,
-        timeout=120,
+        # One-hour smoke. 120s of wall is not enough when campaign-length
+        # tests share the studio.
+        timeout=600,
     )
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
-    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
-    # 20 C. Seed 7's liner is now about 822 C; the same unit coordinate on
-    # the old 1400-2200 C map was about 1694 C. At 822 C the CrO2 wall
-    # saturation pressure is refused, furnace amortization is
-    # batch_cost_unavailable, and the objective scores are empty. The
-    # candidate stays feasible on furnace temperature, but there is no
-    # priced winner. The honest study status is completed-no-feasible-winner,
-    # and the writer omits winner.recipe.yaml. A status of completed with
-    # no winner file would be a bug; this run is not that status.
-    assert not (out_dir / "winner.recipe.yaml").exists()
+    # This profile evaluates its one-hour C2A_continuous campaign. It does
+    # not enter the C0 AUTO_APPLY sequence or encounter a C6 refusal. The
+    # returned priced objective makes the single feasible candidate rankable.
+    assert (out_dir / "winner.recipe.yaml").is_file()
     status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
-    assert status["status"] == "completed-no-feasible-winner"
-    assert status["study_status"] == "completed-no-feasible-winner"
+    assert status["status"] == "SUCCEEDED"
+    assert status["study_status"] == "completed"
     assert status["success"] is True
-    assert "winner_candidate_id" not in status
+    assert status["winner_candidate_id"] == "random-7-000000"
     pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
-    assert pareto["status"] == "completed-no-feasible-winner"
-    assert pareto["winner_candidate_id"] is None
+    assert pareto["status"] == "completed"
+    assert pareto["winner_candidate_id"] == "random-7-000000"
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
+    assert provenance[0]["candidate_id"] == "random-7-000000"
     assert provenance[0]["feasible"] is True
     assert provenance[0]["failing_gates"] == []
-    summary = provenance[0]["product_summary"]
-    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
-    refused = summary["wall_deposit_refusal"]["authority"][
-        "wall_saturation_pressure_refused_species"
-    ]
-    assert refused == ["CrO2"]
+    assert (
+        provenance[0]["product_summary"]["furnace_amortization_status"]
+        == "available"
+    )
+    assert any(
+        isinstance(value, (int, float)) and not isinstance(value, bool)
+        for value in provenance[0]["objectives"].values()
+    )
 
 
 def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> None:
@@ -7457,6 +7481,10 @@ def test_cli_rejects_incoherent_constrained_max_args(
 
 
 def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> None:
+    # One-hour C2A_continuous smoke. It qualifies wall deposit, and the
+    # resinter threshold is null, so lifespan is unpriced rather than a
+    # number. A C0 start would continue through later steps. The live
+    # continuation pin is test_lunar_highland_c0_horizon_changes_extracted_metals.
     out_dir = tmp_path / "constrained-max"
     cli_profile = _write_cli_physics_smoke_profile(tmp_path)
 
