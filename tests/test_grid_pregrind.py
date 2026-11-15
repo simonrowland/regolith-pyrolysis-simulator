@@ -752,11 +752,25 @@ def test_grind_positive_subthreshold_component_is_not_refused(monkeypatch):
 
 
 def test_grid_worker_bootstrap_marks_process_group_inheriting(monkeypatch):
-    monkeypatch.delenv(INHERIT_PROCESS_GROUP_ENV, raising=False)
+    monkeypatch.setenv(INHERIT_PROCESS_GROUP_ENV, "0")
+    monkeypatch.delenv(INHERIT_PROCESS_GROUP_ENV)
     monkeypatch.setattr(grid_pregrind, "_worker_initialize", lambda *_args: None)
+    helper_calls = []
+    original_helper = grid_pregrind._inherit_process_group_for_worker_children
+
+    def recording_helper():
+        helper_calls.append(None)
+        original_helper()
+
+    monkeypatch.setattr(
+        grid_pregrind,
+        "_inherit_process_group_for_worker_children",
+        recording_helper,
+    )
 
     grid_pregrind._bootstrap_grid_worker({}, None)
 
+    assert helper_calls == [None]
     assert grid_pregrind.os.environ.get(INHERIT_PROCESS_GROUP_ENV) == "1"
 
 

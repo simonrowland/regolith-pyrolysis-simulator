@@ -1092,9 +1092,8 @@ def test_internal_analytical_timeout_kills_magemin_descendants(
         pytest.skip("MAGEMin subprocess backend unavailable in the parent")
     request.addfinalizer(parent_magemin.close)
 
-    monkeypatch.delenv(
-        "REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP", raising=False
-    )
+    monkeypatch.setenv("REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP", "0")
+    monkeypatch.delenv("REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP")
     trace_path = tmp_path / "magemin-processes.jsonl"
     sitecustomize_path = tmp_path / "sitecustomize.py"
     sitecustomize_path.write_text(
