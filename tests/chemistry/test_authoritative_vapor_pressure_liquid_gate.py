@@ -132,6 +132,7 @@ def test_kernel_warning_survives_core_refresh_in_retained_diagnostic():
     PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
 
     assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
+    assert calls[0][1]["control_inputs"]["liquid_fraction"] == 1.0
     assert result.vapor_pressures_Pa == {'Na': 12.5}
     assert sim._last_vapor_pressure_diagnostic[
         'kernel_vapor_pressure_warnings'

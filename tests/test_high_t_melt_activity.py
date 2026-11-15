@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import copy
 from dataclasses import replace
 import hashlib
@@ -220,11 +221,14 @@ def _request(
     pressure_bar: float = 1.0e-6,
     pO2_bar: float = 1.0e-9,
     intrinsic_fO2_log: float | None = -10.0,
+    liquid_fraction: float | None = None,
 ) -> IntentRequest:
     controls: dict[str, object] = {
         "pO2_bar": pO2_bar,
         "intrinsic_fO2_log": intrinsic_fO2_log,
     }
+    if liquid_fraction is not None:
+        controls["liquid_fraction"] = liquid_fraction
     if high_t_melt_activity is not None:
         controls["high_t_melt_activity"] = high_t_melt_activity
     if previous_temperature_K is not None:
@@ -596,13 +600,27 @@ def test_binding_reads_lower_edge_from_default_pack(monkeypatch) -> None:
     selected = vapor_pressure_module.openimcc_binding_selected_by_inputs
     assert not selected(temperature_K=1800.0, controls={})
     assert selected(temperature_K=1850.0, controls={})
-    assert not selected(temperature_K=1800.0, controls={}, quantity_class="vapour")
-    assert not selected(temperature_K=1950.0, controls={}, quantity_class="vapour")
+    assert not selected(
+        temperature_K=1800.0, controls={}, quantity_class="vapour",
+        phase_basis="missing",
+    )
+    assert not selected(
+        temperature_K=1950.0, controls={}, quantity_class="vapour",
+        phase_basis="missing",
+    )
     assert selected(
         temperature_K=(
             vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 0.1
         ),
-        controls={}, quantity_class="vapour",
+        controls={}, quantity_class="vapour", phase_basis="solid_bearing",
+    )
+    assert not selected(
+        temperature_K=1800.0, controls={}, quantity_class="vapour",
+        phase_basis="liquid",
+    )
+    assert selected(
+        temperature_K=1850.0, controls={}, quantity_class="vapour",
+        phase_basis="liquid",
     )
     shifted = _provider().dispatch(_request(BASE_MELT_MOL, 1800.0))
     assert "high_t_melt_activity" not in shifted.diagnostic
@@ -611,15 +629,187 @@ def test_binding_reads_lower_edge_from_default_pack(monkeypatch) -> None:
     )))
     monkeypatch.setattr(openimcc_bridge_module, "_load_pack", lambda _: pack)
     assert selected(temperature_K=1800.0, controls={})
-    assert not selected(temperature_K=1800.0, controls={}, quantity_class="vapour")
+    assert not selected(
+        temperature_K=1800.0, controls={}, quantity_class="vapour",
+        phase_basis="missing",
+    )
+    assert selected(
+        temperature_K=1800.0, controls={}, quantity_class="vapour",
+        phase_basis="liquid",
+    )
     assert selected(
         temperature_K=(
             vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 0.1
         ),
-        controls={}, quantity_class="vapour",
+        controls={}, quantity_class="vapour", phase_basis="solid_bearing",
     )
     assert selected(
         temperature_K=openimcc_bridge_module._temperature_domain_K()[0], controls={},
+    )
+
+
+def test_vapour_binding_uses_liquid_phase_only_below_1950_k() -> None:
+    selected = vapor_pressure_module.openimcc_binding_selected_by_inputs
+    for temperature_K, expected in ((1800.0, True), (1950.1, True)):
+        assert selected(
+            temperature_K=temperature_K,
+            controls={},
+            quantity_class="vapour",
+            phase_basis="liquid",
+        ) is expected
+    for temperature_K, expected in ((1800.0, False), (1950.1, True)):
+        assert selected(
+            temperature_K=temperature_K,
+            controls={},
+            quantity_class="vapour",
+            phase_basis="solid_bearing",
+        ) is expected
+    solid_result = _provider().dispatch(
+        _request(BASE_MELT_MOL, 1800.0, liquid_fraction=0.5)
+    )
+    solid_high_t = solid_result.diagnostic["high_t_melt_activity"]
+    assert solid_high_t["vapour_channel_phase_basis"] == "solid_bearing"
+    assert solid_high_t["vapour_channel_switch_K"] == 1950.0
+    assert solid_high_t["above_vaporock_cap"] is False
+
+
+def test_liquid_vapour_selection_carries_published_sio_band_notice() -> None:
+    result = _provider().dispatch(
+        _request(BASE_MELT_MOL, 1800.0, liquid_fraction=1.0)
+    )
+    high_t = result.diagnostic["high_t_melt_activity"]
+    notice = next(
+        n for n in high_t["notices"]
+        if n["code"] == "openimcc_liquid_sio_below_1950K_band"
+    )
+
+    assert high_t["provider"] == "openimcc"
+    assert high_t["vapour_channel_phase_basis"] == "liquid"
+    assert high_t["vapour_channel_switch_K"] == (
+        openimcc_bridge_module._temperature_domain_K()[0]
+    )
+    assert high_t["vaporock_cap_K"] == high_t["vapour_channel_switch_K"]
+    assert high_t["above_vaporock_cap"] is True
+    assert notice["authority"] == (
+        "openimcc 9c327c2 at green fb3333092; SiO_evolution rail"
+    )
+    assert notice["band"] == {
+        "temperature_K": [1700.0, 1950.0],
+        "error_dex_p10_p90": [-0.283, 0.566],
+        "n": 45,
+    }
+    assert "no mare-composition SiO evidence below 1950 K" in notice["message"]
+    assert notice["revisit_seekq"] == "mare-basalt-liquid-sio-pressure-1700-1950k"
+
+
+def test_liquid_sio_band_notice_marks_1700_k_lower_measurement_limit() -> None:
+    result = _provider().dispatch(
+        _request(BASE_MELT_MOL, 1600.0, liquid_fraction=1.0)
+    )
+    notices = result.diagnostic["high_t_melt_activity"]["notices"]
+    notice = next(
+        n for n in notices
+        if n["code"] == "openimcc_liquid_sio_below_1950K_band"
+    )
+    assert "band was measured only from 1700 K" in notice["message"]
+
+
+def test_missing_liquid_fraction_keeps_1950_k_switch_and_emits_notice() -> None:
+    result = _provider().dispatch(_request(BASE_MELT_MOL, 1800.0))
+    high_t = result.diagnostic["high_t_melt_activity"]
+    assert high_t["vapour_channel_phase_basis"] == "missing"
+    assert high_t["vapour_channel_switch_K"] == 1950.0
+    assert high_t["above_vaporock_cap"] is False
+    assert any(
+        n["code"] == "openimcc_vapour_phase_signal_missing"
+        and n["type"] == "typed_notice"
+        for n in high_t["notices"]
+    )
+    assert not any(
+        n["code"] == "openimcc_liquid_sio_below_1950K_band"
+        for n in high_t["notices"]
+    )
+
+
+def test_vapour_binding_below_openimcc_domain_floor_is_builtin() -> None:
+    floor_K = openimcc_bridge_module._temperature_domain_K()[0]
+    assert vapor_pressure_module.openimcc_binding_selected_by_inputs(
+        temperature_K=floor_K,
+        controls={},
+        quantity_class="vapour",
+        phase_basis="liquid",
+    )
+    for phase_basis in ("liquid", "solid_bearing"):
+        assert not vapor_pressure_module.openimcc_binding_selected_by_inputs(
+            temperature_K=floor_K - 0.1,
+            controls={},
+            quantity_class="vapour",
+            phase_basis=phase_basis,
+        )
+
+
+@pytest.mark.parametrize(
+    ("phase_basis", "liquid_fraction"),
+    (("liquid", 1.0), ("solid_bearing", 0.5)),
+    ids=("liquid", "solid-bearing"),
+)
+def test_vapour_seam_notice_uses_applied_phase_switch(
+    monkeypatch, phase_basis, liquid_fraction,
+) -> None:
+    switch_K = (
+        openimcc_bridge_module._temperature_domain_K()[0]
+        if phase_basis == "liquid"
+        else vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K
+    )
+    monkeypatch.setattr(
+        vapor_pressure_module, "_HIGH_T_ACTIVITY_SEAM_LIMIT_DEX", -1.0,
+    )
+    result = _provider().dispatch(_request(
+        BASE_MELT_MOL,
+        switch_K + 0.1,
+        previous_temperature_K=switch_K - 0.1,
+        liquid_fraction=liquid_fraction,
+    ))
+    high_t = result.diagnostic["high_t_melt_activity"]
+    notice = next(
+        n for n in high_t["notices"]
+        if n["code"] == "openimcc_activity_cap_step_exceeds_0_1_dex"
+    )
+
+    assert high_t["vapour_channel_phase_basis"] == phase_basis
+    assert high_t["vapour_channel_switch_K"] == switch_K
+    assert notice["cap_K"] == switch_K
+
+
+def test_every_vapour_binding_caller_passes_phase_basis() -> None:
+    tracked_python = subprocess.run(
+        ["git", "ls-files", "--", "*.py"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        check=True,
+        text=True,
+    ).stdout.splitlines()
+    calls = []
+    for relative_path in tracked_python:
+        source_path = REPO_ROOT / relative_path
+        tree = ast.parse(source_path.read_text(), filename=str(source_path))
+        calls.extend(
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "openimcc_binding_selected_by_inputs"
+            and any(
+                keyword.arg == "quantity_class"
+                and isinstance(keyword.value, ast.Constant)
+                and keyword.value.value == "vapour"
+                for keyword in node.keywords
+            )
+        )
+    assert calls
+    assert all(
+        any(keyword.arg == "phase_basis" for keyword in call.keywords)
+        for call in calls
     )
 
 
@@ -638,6 +828,7 @@ def test_vaporock_band_move_does_not_move_vapour_channel_switch(monkeypatch) -> 
     ) is True
     assert vapor_pressure_module.openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K, controls={}, quantity_class="vapour",
+        phase_basis="solid_bearing",
     ) is True
 
 
@@ -650,6 +841,7 @@ def test_vapour_channel_switch_move_does_not_move_vaporock_band(monkeypatch) -> 
     temperature_K = vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K - 50.0
     assert vapor_pressure_module.openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K, controls={}, quantity_class="vapour",
+        phase_basis="solid_bearing",
     ) is False
     notice = engine_commissioning_module.vaporock_temperature_notice(temperature_K)
     assert notice is not None
