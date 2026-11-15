@@ -160,7 +160,7 @@ def test_internal_analytical_zero_offset_preserves_residual_bytes() -> None:
     ("temperature_K", "expected_delta_g_j_mol", "expected_log10_shift"),
     (
         (Decimal("1600"), Decimal("10240.5"), Decimal("0.3343")),
-        (Decimal("1650"), Decimal("9700"), Decimal("0.3068")),
+        (Decimal("1650"), Decimal("9692.4"), Decimal("0.3068")),
     ),
 )
 def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
@@ -183,13 +183,11 @@ def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
     assert refusal is None
     assert standard is not None
     assert standard.name == "DG46-MASSON65"
-    assert float(standard.offset_j_mol) == pytest.approx(
-        float(expected_delta_g_j_mol), abs=10
-    )
+    assert standard.offset_j_mol == expected_delta_g_j_mol
     shift = score_module._canonical_log10_feo_activity(
         Decimal(0), temperature_K, standard.offset_j_mol
     )
-    assert float(shift) == pytest.approx(float(expected_log10_shift), abs=0.001)
+    assert float(shift) == pytest.approx(float(expected_log10_shift), abs=0.0001)
 
 
 def test_melt_pack_shift_matches_condensate_gibbs_rows_as_crosscheck() -> None:
@@ -379,11 +377,13 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
     }
     assert candidate.provenance["feo_standard_normalisation"][
         "from_standard"
-    ] == "Fe-019"
+    ] == "DG46-MASSON65"
     assert candidate.provenance["feo_standard_normalisation"][
         "to_standard"
     ] == "Fe-019"
-    assert candidate.provenance["feo_standard_normalisation"]["log10_shift"] == "0"
+    assert float(
+        candidate.provenance["feo_standard_normalisation"]["log10_shift"]
+    ) > 0
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
     assert sha256(serialized).hexdigest() == _DISTIN_1880_RESIDUAL_SHA256
 
