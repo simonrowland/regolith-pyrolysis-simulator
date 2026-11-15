@@ -103,6 +103,53 @@ def test_sossi_and_doyle_real_rows_reach_bare_log_admission_with_pins() -> None:
     assert Decimal(str(doyle_band)).quantize(Decimal("0.0001")) == Decimal("0.0004")
 
 
+def test_inherited_sossi_log_uses_gas_evaluation_temperature() -> None:
+    from simulator.battery.migrate import (
+        PrintedOxygenFacts,
+        _scoped_oxygen_decision,
+        printed_oxygen_decision,
+    )
+    from simulator.battery.records import Located, Locator, Value
+    from simulator.state_types import State
+
+    log_locator = Locator(page=14, table="S4")
+    facts = PrintedOxygenFacts(
+        log_fO2=Located(State.of(Decimal("-2.53")), locator=log_locator),
+        bare_log=True,
+    )
+    evaluation_temperature = Located(
+        State.of(Value.point_of("2173.15")),
+        locator=log_locator,
+    )
+    run_temperature = Decimal("2134.15")
+    atmosphere = "99CO2:1H2"
+    shared = {
+        "run_temperature_K": run_temperature,
+        "total_pressure_pa": Decimal("100000"),
+        "printed_atmospheres": (atmosphere,),
+        "gas_fO2_evaluation_temperature_K": evaluation_temperature,
+    }
+
+    row_decision = printed_oxygen_decision(
+        facts,
+        raw_item={},
+        point_conditions={},
+        scope="row",
+        **shared,
+    )
+    inherited_decision, used_fallback = _scoped_oxygen_decision(
+        facts=facts,
+        from_fallback=True,
+        raw_item={},
+        row_point_conditions={},
+        **shared,
+    )
+
+    assert used_fallback
+    assert row_decision is not None
+    assert inherited_decision == row_decision
+
+
 def test_real_sossi_and_doyle_migrations_preserve_gas_fugacity_identity() -> None:
     sossi = _source_doc("sossi-2020-magma-ocean-redox.yaml")
     doyle = _source_doc("doyle-1989-tio2-feo-activity-magma.yaml")

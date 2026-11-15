@@ -21881,6 +21881,7 @@ def _scoped_oxygen_decision(
             source_id=source_id,
             total_pressure_pa=resolved_pressure,
             printed_atmospheres=printed_atmospheres,
+            gas_fO2_evaluation_temperature_K=gas_fO2_evaluation_temperature_K,
         ),
         True,
     )
