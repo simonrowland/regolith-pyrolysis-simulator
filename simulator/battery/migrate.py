@@ -25113,8 +25113,11 @@ class Migrator:
                 and isinstance(
                     item["sample"]["printed_composition"].get("locator"), Mapping
                 )
-                and item["sample"]["printed_composition"]["locator"].get("row")
-                == "Starting material"
+                and "row: Starting material"
+                in str(
+                    item["sample"]["printed_composition"]["locator"].get("note")
+                    or ""
+                )
             ),
             None,
         )

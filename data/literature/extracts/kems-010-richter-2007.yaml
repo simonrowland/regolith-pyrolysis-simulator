@@ -43,7 +43,7 @@ experiments:
       state:
         tag: value
         value: {MgO: '11.48', SiO2: '46', Al2O3: '19.39', CaO: '23.12'}
-      locator: {page: 6, published_page: 5549, table: '1', row: 'Starting material', note: Starting Type B CAI-like composition for vacuum evaporation experiments (Richter et al. 2007)}
+      locator: {page: 6, published_page: 5549, table: '1', note: 'Table 1 row: Starting material. Starting Type B CAI-like composition for vacuum evaporation experiments (Richter et al. 2007)'}
     initial_composition:
       state:
         tag: value
@@ -59,8 +59,7 @@ experiments:
         page: 6
         published_page: 5549
         table: '1'
-        row: 'Starting material'
-        note: 'Printed Type B CAI-like starting composition; mole-fraction values are stored on the linked run experiments.'
+        note: 'Table 1 row: Starting material; Printed Type B CAI-like starting composition; mole-fraction values are stored on the linked run experiments.'
   apparatus:
     cell_material_and_liner:
       state:

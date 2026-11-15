@@ -585,7 +585,8 @@ def test_richter_declared_sample_survives_fresh_migration() -> None:
         assert printed.locator is not None
         assert printed.locator.published_page == 5549
         assert printed.locator.table == "1"
-        assert printed.locator.row == "Starting material"
+        assert printed.locator.note is not None
+        assert "row: Starting material" in printed.locator.note
         expected_printed = {
             str(name): as_decimal(value)
             for name, value in starting_sample["printed_composition"]["state"][
