@@ -853,7 +853,9 @@ def _measure_stage(
     }
 
 
-def _measure_optimizer_60h_eval_stage() -> dict[str, Any]:
+def _measure_optimizer_60h_eval_stage(
+    trial_count: int = OPTIMIZER_STAGE_TRIALS,
+) -> dict[str, Any]:
     from datetime import datetime, timezone
     from unittest.mock import patch
 
@@ -884,7 +886,7 @@ def _measure_optimizer_60h_eval_stage() -> dict[str, Any]:
             + children.ru_stime
         )
 
-    for trial_index in range(OPTIMIZER_STAGE_TRIALS):
+    for trial_index in range(trial_count):
         trial_time = datetime.now(timezone.utc)
         step_calls = {"count": 0}
         original_step = PyrolysisSimulator.step
