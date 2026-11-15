@@ -1,5 +1,6 @@
 """Table 1 residue-composition pins for Mendybaev et al. (2017)."""
 
+import csv
 import re
 from copy import deepcopy
 from decimal import Decimal
@@ -9,10 +10,12 @@ import yaml
 
 from simulator.battery.enums import Quantity
 from simulator.battery.migrate import Migrator
+from tools.locator_page_audit import collect_locator_records
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/mendybaev-2017-fun-cai-lab-evaporation.yaml"
+LOCATOR_AUDIT = ROOT / "data/literature/extracts/audits/mendybaev-2017-fun-cai-lab-evaporation.locator-page-audit.csv"
 OXIDES = {"MgO", "Al2O3", "SiO2", "CaO"}
 FUNC_STARTING_COMPOSITION = {
     "MgO": Decimal("37.9"),
@@ -21,22 +24,7 @@ FUNC_STARTING_COMPOSITION = {
     "CaO": Decimal("7.6"),
 }
 SOURCE_PAGE_PINS = {
-    8: "mixture loaded onto 2.5 mm diameter iridium wire loops",
-    9: "15 keV accelerating voltage and a 0.4 nA beam current",
-    11: "relatively slow quenching (~1000˚C/min) of the molten Mg2SiO4-rich droplets",
-    13: "CaO and Al2O3 do not evaporate from the melt",
-    16: "α25,24= 0.98383±0.00033, which within error",
-    17: "silicon isotopic compositions plot along a line with slope",
-    20: "γMg = 2.1 which was the value used in Fig. 3",
-    38: "Table 1. Measured chemical bulk composition and magnesium, silicon",
-}
-SOURCE_LOCATOR_INDEX_PINS = {
-    "sample_load_locator": 8,
-    "quench_rate_locator": 11,
-    "alpha_25_24_locator": 16,
-    "alpha_29_28_locator": 17,
-    "alpha_18_16_forsterite_field_locator": 17,
-    "alpha_18_16_melilite_field_locator": 17,
+    12: "Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments",
 }
 
 
@@ -70,28 +58,26 @@ def _named_values(value: object, name: str) -> list[object]:
 
 
 def _assert_source_page_index_pins(document: dict) -> None:
-    indexes: set[int] = set()
+    with LOCATOR_AUDIT.open(encoding="utf-8", newline="") as stream:
+        receipt = list(csv.DictReader(stream))
+    assert receipt
+    assert all(
+        row["result"] in {"PASS", "SKIP_NO_PHRASE_OR_PIN"}
+        for row in receipt
+    )
+    expected_pairs = [
+        (row["path"], int(row["pdf_page_index"]), row["phrase"])
+        for row in receipt
+    ]
+    actual_pairs = [
+        (row["path"], row["pdf_page_index"], row["phrase"])
+        for row in collect_locator_records(document)
+    ]
+    assert actual_pairs == expected_pairs
 
-    def collect_indexes(value: object) -> None:
-        if isinstance(value, dict):
-            if "pdf_page_index" in value:
-                indexes.add(value["pdf_page_index"])
-            for child in value.values():
-                collect_indexes(child)
-        elif isinstance(value, list):
-            for child in value:
-                collect_indexes(child)
-
-    collect_indexes(document)
-    assert indexes == set(SOURCE_PAGE_PINS)
-    for locator_name, expected_index in SOURCE_LOCATOR_INDEX_PINS.items():
-        locators = _named_values(document, locator_name)
-        assert locators
-        assert all(locator["pdf_page_index"] == expected_index for locator in locators)
-    gamma = _named_values(document, "gamma_SiO_over_gamma_Mg")
-    assert gamma and all(item["locator"]["pdf_page_index"] == 20 for item in gamma)
-    detector = _named_values(document["benches"], "detector")
-    assert detector and all(item["locator"]["pdf_page_index"] == 9 for item in detector)
+    source_pairs = {(index, phrase) for index, phrase in SOURCE_PAGE_PINS.items()}
+    audited_pairs = {(index, phrase) for _, index, phrase in actual_pairs}
+    assert source_pairs <= audited_pairs
 
 
 def test_source_page_index_pins_and_plus_one_mutation() -> None:
@@ -107,6 +93,15 @@ def test_source_page_index_pins_and_plus_one_mutation() -> None:
         pass
     else:
         raise AssertionError("a +1 source-page mutation must fail the independent pin guard")
+
+    mutated_ca = deepcopy(document)
+    mutated_ca["species"]["Ca"]["observations"][0]["locator"]["pdf_page_index"] = 13
+    try:
+        _assert_source_page_index_pins(mutated_ca)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("moving the Ca quotation to index 13 must fail its page/phrase pair")
 
 
 def test_table_1_first_last_and_largest_two_sigma_cells_match_page() -> None:
