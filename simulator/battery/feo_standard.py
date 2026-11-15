@@ -49,7 +49,9 @@ _OPENIMCC_REDOX_DG46_FEO_ROW_VALUES = {
     "dH298_R": Decimal("-26.668958359186785"),
     "dG_A": Decimal("8.03837194242113"),
 }
-# Existing Fe-019 FeO(l) row paired with DG46 in the condensate standard check.
+# JANAF Fe-019 FeO(l), the published pre-v2 OpenIMCC condensate row:
+# dH298_R=-30.01, dG_A=6.72, dG_B=6.588, dG_C=-1.248, dG_D=0.150,
+# dG_E=-0.007697.
 _OPENIMCC_FE019_FEO_REFERENCE_ROW = {
     "dH298_R": Decimal("-30.01"),
     "dG_A": Decimal("6.72"),
