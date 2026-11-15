@@ -40,7 +40,10 @@ from scripts.grid_pregrind_writer import (
     canonical_input_vector,
     expedited_key,
 )
-from simulator.engine_pool import EngineWorkerTimeout
+from simulator.engine_pool import (
+    INHERIT_PROCESS_GROUP_ENV,
+    EngineWorkerTimeout,
+)
 from simulator.config import ENGINE_MODEL_UNAVAILABLE
 from scripts.grind_harvest import harvest_snapshot
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
@@ -745,6 +748,15 @@ def test_grind_positive_subthreshold_component_is_not_refused(monkeypatch):
 
     assert output["status_kind"] == "failure"
     assert "positive boundary reached backend" in output["raw_payload"]
+
+
+def test_grid_worker_bootstrap_marks_process_group_inheriting(monkeypatch):
+    monkeypatch.delenv(INHERIT_PROCESS_GROUP_ENV, raising=False)
+    monkeypatch.setattr(grid_pregrind, "_worker_initialize", lambda *_args: None)
+
+    grid_pregrind._bootstrap_grid_worker({}, None)
+
+    assert grid_pregrind.os.environ.get(INHERIT_PROCESS_GROUP_ENV) == "1"
 
 
 def test_worker_failure_output_records_positive_wall_time(monkeypatch):

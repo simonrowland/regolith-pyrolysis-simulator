@@ -24,7 +24,7 @@ PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # Current production token count after removing two local-alias tokens from
 # scripts/grind_home.py; shared cache-setting reads use one ``os.environ`` token.
-ENV_ACCESS_TOKEN_CEILING = 94
+ENV_ACCESS_TOKEN_CEILING = 93
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep
