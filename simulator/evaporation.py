@@ -3090,10 +3090,12 @@ class EvaporationMixin:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
+            gate_curve_provider_diagnostic_reasons,
             gate_curve_provider_timeout_reason,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
         )
+        from engines.domain_reason import OutOfDomainReason
 
         fO2_log, redox_state = normalize_redox_state(
             fO2_log,
@@ -3220,11 +3222,24 @@ class EvaporationMixin:
             raise EvaporationFluxRefusal('liquid_fraction_provider_failed', failure)
         if status_outcome is GateCurveProviderOutcome.STABLE_REFUSAL:
             self._freeze_gate_held_curve_record = None
-            projected = self._composition_projected_freeze_gate_curve(
-                diagnostic,
-                source=source,
-                reasons=reasons,
-                repair_notices=repair_notices,
+            refusal_reasons = gate_curve_provider_diagnostic_reasons(
+                diagnostic
+            )
+            projection_reason = OutOfDomainReason.COMPOSITION_PROJECTED.value
+            projection_refusal = (
+                str(status).strip().lower() == 'out_of_domain'
+                and bool(refusal_reasons)
+                and set(refusal_reasons) <= {projection_reason}
+            )
+            projected = (
+                self._composition_projected_freeze_gate_curve(
+                    diagnostic,
+                    source=source,
+                    reasons=reasons,
+                    repair_notices=repair_notices,
+                )
+                if projection_refusal
+                else None
             )
             if projected is not None:
                 return self._remember_freeze_gate_provider_curve(projected)

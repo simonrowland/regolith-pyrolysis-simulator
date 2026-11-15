@@ -912,7 +912,7 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
         kato_1993_table4_system=None,
         why='real freeze-gate phase basis through equilibrate_cell',
         composition_wt_pct={
-            'SiO2': 49.0,
+            'SiO2': 47.0,
             'Al2O3': 14.0,
             'FeO': 10.0,
             'MgO': 9.0,
@@ -921,6 +921,8 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             'K2O': 1.0,
             'TiO2': 2.0,
             'Cr2O3': 1.0,
+            'MnO': 1.0,
+            'P2O5': 1.0,
         },
     )
     cell = equilibrate_cell(
@@ -936,8 +938,14 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
     assert cell.status == 'ok'
     assert authority["vapour_channel_phase_basis"] == "liquid"
     assert authority["phase_basis_source"] == (
-        "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow"
+        "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow:"
+        "composition_projected"
     )
+    phase_notice = authority['phase_basis_notice']
+    assert phase_notice['authority'] == 'extrapolated'
+    assert {
+        row['component'] for row in phase_notice['dropped_components']
+    } == {'MnO', 'P2O5'}
     assert authority["vapour_channel_switch_K"] == (
         openimcc_bridge._temperature_domain_K()[0]
     )
