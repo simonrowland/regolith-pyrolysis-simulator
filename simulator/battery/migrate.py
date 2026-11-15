@@ -26631,6 +26631,7 @@ class Migrator:
             and value.kind is ValueKind.UNAVAILABLE
             and admission.status is AdmissionStatus.ADMITTED
         ):
+            # A schema-gap row has no representable quantity, so it must not remain admitted.
             admission = admission_for(
                 "typed_refusal",
                 superseded_by=None,

@@ -2697,6 +2697,7 @@ def _assert_stack_shornikov_rows(document, hit_rows):
 def test_increment_and_frame_repairs_migrate_unavailable():
     assert migrate_module._SC475_SCHEMA_GAP_SOURCE_IDS == SC475_SOURCE_IDS
     reason_mismatches = []
+    checked_sources = set()
     for source_id, expected in HIT_ROWS.items():
         path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
         document = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -2712,12 +2713,11 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 assert values["value_as_printed"] == printed_value
             if observation_id == "bennington_1982_table6_log10_Kf":
                 assert values["quantity"] == "log10_formation_from_oxides_as_printed"
-        if source_id not in SC475_SOURCE_IDS:
-            continue
         migrator = Migrator(root=ROOT, index={}, aliases={})
         migrator._migrate_extract(path)
         migrator.finalize()
-        for observation_id, (_, _, reference, _) in expected.items():
+        migrated_by_id = {}
+        for observation_id in expected:
             source_row = rows[observation_id]
             values = source_row["values"]
             migrated = [
@@ -2726,6 +2726,7 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 if key == f"{source_id}::{observation_id}"
                 or key.startswith(f"{source_id}::{observation_id}::")
             ]
+            migrated_by_id[observation_id] = migrated
             if not migrated:
                 assert (
                     source_row.get("type") in {"figure_record", "figure"}
@@ -2735,6 +2736,15 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 continue
             assert all(not row.identity.quantity.is_value for row in migrated)
             assert all(row.value.kind.value == "unavailable" for row in migrated)
+        checked_sources.add(source_id)
+        if source_id not in SC475_SOURCE_IDS:
+            continue
+        for observation_id in expected:
+            source_row = rows[observation_id]
+            values = rows[observation_id]["values"]
+            migrated = migrated_by_id[observation_id]
+            if not migrated:
+                continue
             if observation_id == "bey80_k2si2o5_reference_glass_S_table6":
                 assert source_row["type"] == "heat_capacity_and_heat_content_series"
                 assert values["reference_state_as_printed"] == (
@@ -2755,6 +2765,10 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 reason_mismatches.append(
                     f"{observation_id}: a typed refusal was admitted"
                 )
+    assert checked_sources == set(HIT_ROWS), (
+        "legacy unavailable migration checks skipped HIT sources: "
+        f"{sorted(set(HIT_ROWS) - checked_sources)}"
+    )
     assert not reason_mismatches, "SC-475 reason mismatches:\n" + "\n".join(
         reason_mismatches
     )
