@@ -728,9 +728,20 @@ def _normalize_openimcc_feo_activity_prediction(
             refusal_detail=dict(refusal.detail),
         )
     assert value is not None and record is not None and notice is not None
+    authority = prediction.authority
+    certified_band = prediction.certified_band
+    if record.get("authority") == Authority.EXTRAPOLATED.value:
+        band = record["certified_band"]["temperature_K"]
+        assert isinstance(band, (list, tuple)) and len(band) == 2
+        authority = Authority.EXTRAPOLATED
+        certified_band = {
+            "temperature_K": (Decimal(str(band[0])), Decimal(str(band[1])))
+        }
     return replace(
         prediction,
         value=value,
+        authority=authority,
+        certified_band=certified_band,
         notices=union_notices(prediction.notices, (notice,)),
         provenance={
             **prediction.provenance,

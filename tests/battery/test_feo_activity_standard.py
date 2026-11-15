@@ -44,7 +44,11 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = (
 _DISTIN_1880_RESIDUAL_SHA256 = (
     "db630fbbbf4b810f60a09b2e37ee4e9c5be53fc4ff2cd94fb0df4f195cb7cf3a"
 )
-_DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10531292782444457")
+# At 2153.15 K, the pinned MELT expression gives
+# 27778.965828 - 10.961554232*2153.15 = 4177.0953 J/mol.
+# Dividing by R*T*ln(10) gives +0.1013328 dex; adding this to the prior
+# -0.10531292782444457 residual yields -0.0039800848499234 dex.
+_DISTIN_1880_RESIDUAL_DEX = Decimal("-0.003980084849923409")
 
 
 def _openimcc_sources(
@@ -330,9 +334,10 @@ def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> No
 
 
 def test_redox_feo_row_matches_dg46_and_mutations_refuse() -> None:
-    row = feo_standard_module._openimcc_redox_pack_feo_row(
+    entry = feo_standard_module._openimcc_redox_pack_feo_entry(
         _default_redox_pack_digest()
     )
+    row = entry["row"]
     assert feo_standard_module._redox_pack_feo_row_refusal(row) is None
 
     mutated_row = dict(row)
@@ -361,6 +366,44 @@ def test_openimcc_redox_refuses_a_v1_melt_standard_with_dg46_redox_row() -> None
     assert refusal is not None
     assert refusal.reason is RefusalReason.METRIC_DOMAIN
     assert refusal.detail["reason"] == "openimcc_feo_redox_melt_standard_mismatch"
+
+
+def test_openimcc_redox_feo_normalisation_flags_extrapolation() -> None:
+    from openimcc.redox_pack import load_redox_pack
+
+    temperature_K = Decimal("2153.15")
+    identity = _melt_pack_identity("default")
+    sources = (
+        *_openimcc_sources(
+            pack_version=identity["pack_version"],
+            pack_digest=identity["binding_digest"],
+            condensate_digest="e" * 64,
+        ),
+        f"openimcc-redox-pack:sha256:{_default_redox_pack_digest()}",
+    )
+    _context, _experiment, _reference, prediction = _case(
+        Engine.OPENIMCC,
+        sources,
+        temperature_K=temperature_K,
+        provenance={"melt_pack_identity": identity},
+    )
+
+    normalized = score_module._normalize_openimcc_feo_activity_prediction(
+        prediction
+    )
+    redox_entry = load_redox_pack().content["thermo_species"]["FeO(l)"]
+    expected_band = redox_entry["fit_residual"]["temperature_range"]
+
+    assert normalized.authority is Authority.EXTRAPOLATED
+    assert normalized.certified_band == {
+        "temperature_K": (Decimal("1649.15"), Decimal("1766.15"))
+    }
+    normalisation = normalized.provenance["feo_standard_normalisation"]
+    assert normalisation["authority"] == "extrapolated"
+    assert normalisation["certified_band"] == {
+        "temperature_K": list(expected_band)
+    }
+    assert normalisation["range_flags"] == list(redox_entry["range_flags"])
 
 
 @pytest.fixture(scope="module")
@@ -403,6 +446,7 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
     assert residual.numeric is not None
     assert residual.numeric.value == _DISTIN_1880_RESIDUAL_DEX
     assert candidate is not None
+    assert candidate.authority is Authority.EXTRAPOLATED
     assert (
         residual.numeric.operation.value,
         residual.numeric.unit,
@@ -434,6 +478,10 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
     normalisation = candidate.provenance["feo_standard_normalisation"]
     assert normalisation["melt_pack_identity"] == _melt_pack_identity("default")
     assert Decimal(normalisation["log10_shift"]) > 0
+    assert normalisation["authority"] == "extrapolated"
+    assert normalisation["certified_band"] == {
+        "temperature_K": [1649.15, 1766.15]
+    }
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
     assert sha256(serialized).hexdigest() == _DISTIN_1880_RESIDUAL_SHA256
 
