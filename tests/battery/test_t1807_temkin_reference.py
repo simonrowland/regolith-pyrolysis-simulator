@@ -1,12 +1,35 @@
 """Regression pins for Distin's typed Temkin reference frame."""
 
-import ast
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
-from simulator.battery.enums import ReferenceStateConvention
-from simulator.battery.records import StandardState
-from simulator.battery.score import fusion_comparison_reference
+import pytest
+
+from simulator.battery.enums import (
+    Authority,
+    Engine,
+    ExecutionState,
+    Fo2Mode,
+    Quantity,
+    RefusalReason,
+    ReferenceStateConvention,
+)
+from simulator.battery.generators.bench import (
+    _ENGINE_REPORTED_ACTIVITY,
+    _reference_matches,
+)
+from simulator.battery.migrate import load_yaml, reference_state_from_extract
+from simulator.battery.records import Execution, StandardState, State
+from simulator.battery.score import (
+    EnginePrediction,
+    SINGLE_CATION_COEFFICIENT_BASIS,
+    _catalog_reference_identity_reason,
+    _implied_alpha_coefficient_basis_matches,
+    _predict_with_engine,
+    fusion_comparison_reference,
+)
 from tests.battery.test_t1243_feo_reference import (
     _DISTIN,
     _conversion_notice,
@@ -14,26 +37,7 @@ from tests.battery.test_t1243_feo_reference import (
     _independent_factor,
     migration,
 )
-
-
-_CONSUMER_MODULES = (
-    "simulator/battery/migrate.py",
-    "simulator/battery/score.py",
-    "simulator/battery/generators/bench.py",
-    "simulator/battery/fo2_ladder.py",
-    "simulator/battery/records.py",
-)
-
-
-def _has_temkin_arm(path: Path) -> bool:
-    tree = ast.parse(path.read_text())
-    return any(
-        isinstance(node, ast.Attribute)
-        and node.attr == "TEMKIN"
-        and isinstance(node.value, ast.Name)
-        and node.value.id == "ReferenceStateConvention"
-        for node in ast.walk(tree)
-    )
+from tests.battery import factories as F
 
 
 def test_distin_migrates_as_temkin_and_keeps_baseline_conversion_and_band(
@@ -86,16 +90,192 @@ def test_distin_migrates_as_temkin_and_keeps_baseline_conversion_and_band(
     assert saturation_notice.band == "0.007436620909554859980899190015 dex"
 
 
-def test_every_reference_state_consumer_has_a_temkin_arm() -> None:
+def test_structured_temkin_migrates_but_prose_remains_unknown() -> None:
     root = Path(__file__).resolve().parents[2]
-    for convention in ReferenceStateConvention:
-        assert convention.value
-    for relative_path in _CONSUMER_MODULES:
-        assert _has_temkin_arm(root / relative_path), relative_path
+    extract = load_yaml(
+        root / "data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml"
+    )
+    raw = extract["species"]["FeO"]["observations"][0]["standard_state"]
+    structured = reference_state_from_extract(
+        raw, species_formula="FeO", values={}
+    )
+    prose = reference_state_from_extract(
+        "Temkin ideal ionic-solution activity of FeO(l)",
+        species_formula="FeO",
+        values={},
+    )
+    assert structured is not None and structured.is_value
+    assert structured.value.convention is ReferenceStateConvention.TEMKIN
+    assert prose is not None and prose.is_unknown
+    assert "structured standard_state" in prose.reason
 
-    # __init__.py is the public export boundary; exposing the enum exposes its
-    # closed member set without adding a second token-level export.
-    from simulator.battery import ReferenceStateConvention as PublicConvention
 
-    assert PublicConvention is ReferenceStateConvention
-    assert PublicConvention.TEMKIN is ReferenceStateConvention.TEMKIN
+def test_unsupported_temkin_shape_is_refused_by_comparison_owner(migration) -> None:
+    row = next(item for item in _feo_rows(migration) if item.source_id == _DISTIN)
+    identity = row.identity
+    standard = identity.reference_state.value
+    unsupported = replace(
+        standard,
+        endmember=replace(standard.endmember, formula="FeO"),
+        component_basis="FeO",
+        iron_saturation_composition=None,
+    )
+    invalid_shape = replace(
+        row,
+        identity=replace(identity, reference_state=State.of(unsupported)),
+    )
+    result = fusion_comparison_reference(invalid_shape)
+    notice = next(
+        item
+        for item in result.notices
+        if "Temkin reference conversion requires" in item.reason
+    )
+    assert result.value.point == row.value.point
+    assert notice.affected_quantities == (Quantity.ACTIVITY,)
+
+
+def test_engine_request_preserves_and_rejects_temkin_coefficient_basis(
+    monkeypatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+    import simulator.battery.score as score_module
+    from tests.battery.test_melt_activity_requirements import _case
+
+    composition = F.Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("FeO", Decimal("0.5")), ("SiO2", Decimal("0.5"))),
+        amount_basis=F.AmountBasis.MOLE_FRACTION,
+    )
+    experiment, bench, row = _case(
+        composition=composition,
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        formula="FeO",
+        basis="FeO",
+        convention=ReferenceStateConvention.TEMKIN,
+    )
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+    monkeypatch.setattr(
+        score_module,
+        "_activity_request_or_contract_refusal",
+        lambda *_args, **_kwargs: (
+            SimpleNamespace(
+                payload={"composition_mol": {"FeO": 0.5, "SiO2": 0.5}}
+            ),
+            None,
+        ),
+    )
+
+    def matching_engine_cell(engine_handle, pot, *, temperature_K, po2, **_kwargs):
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=engine_handle.name,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+            melt_activity_coefficients={"FeO": 0.5},
+            melt_activity_coefficient_details={
+                "FeO": {
+                    "coefficient_basis": SINGLE_CATION_COEFFICIENT_BASIS,
+                    "standard_state": {
+                        "convention": ReferenceStateConvention.TEMKIN.value,
+                        "phase": "l",
+                        "component_basis": "FeO",
+                    },
+                }
+            },
+        )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", matching_engine_cell)
+    prediction = _predict_with_engine(
+        Engine.THERMOENGINE,
+        row,
+        handles={Engine.THERMOENGINE.value: handle},
+        experiment=experiment,
+        bench=bench,
+        fo2_mode=Fo2Mode.SHARED_LADDER,
+    )
+    # Engine dispatch must keep the requested source identity; its activity
+    # coefficient cannot be silently compared just because it names the same
+    # Temkin frame the request supplied.
+    assert prediction.identity == row.identity
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+
+
+@pytest.mark.parametrize("consumer", ("fo2", "coefficient", "catalog", "bench"))
+def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
+    from simulator.battery.fo2_ladder import _metal_saturation_fo2
+    from simulator.battery.score import _CatalogScoreRow
+
+    row = next(item for item in _feo_rows(migration) if item.source_id == _DISTIN)
+    standard = row.identity.reference_state.value
+    fo2_identity = F.activity_identity(
+        formula="FeO",
+        T_K=Decimal("2153.15"),
+        component_basis="FeO",
+        convention=ReferenceStateConvention.TEMKIN,
+    )
+    activity = F.observation(
+        "temkin-fo2", "exp-feo", fo2_identity, Decimal("0.8")
+    )
+    if consumer == "fo2":
+        assert _metal_saturation_fo2(activity, 2153.15, Quantity.ACTIVITY) is None
+        return
+    if consumer == "bench":
+        assert _reference_matches(
+            standard, _ENGINE_REPORTED_ACTIVITY["openimcc"], "openimcc"
+        ) == (False, _ENGINE_REPORTED_ACTIVITY["openimcc"].reported)
+        return
+
+    if consumer == "coefficient":
+        prediction = EnginePrediction(
+            engine=Engine.INTERNAL_ANALYTICAL,
+            channel=Engine.INTERNAL_ANALYTICAL.value,
+            execution=Execution(state=ExecutionState.PRODUCED),
+            value=Decimal("1"),
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("test",),
+            lineage_complete=True,
+            identity=row.identity,
+            coefficient_basis=SINGLE_CATION_COEFFICIENT_BASIS,
+        )
+        assert not _implied_alpha_coefficient_basis_matches(row, prediction)
+        return
+
+    declaration = SimpleNamespace(
+        standard_state=SimpleNamespace(phase="l"), component_id="FeO"
+    )
+    catalog_row = _CatalogScoreRow(
+        species_id="feo",
+        formula="FeO",
+        species=SimpleNamespace(source_reaction_activity=declaration),
+        pure_phase_token="l",
+        source_reaction=None,
+        duplicate=False,
+    )
+    assert consumer == "catalog"
+    assert (
+        _catalog_reference_identity_reason(catalog_row, row.identity)
+        == "catalog_reference_convention_mismatch"
+    )

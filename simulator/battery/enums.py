@@ -395,8 +395,11 @@ class NoticeKind(StrEnum):
 class ReferenceStateConvention(StrEnum):
     """Reference frames used by activity and formation records.
 
-    ``TEMKIN`` means ideal mixing of cations and anions on separate
-    sublattices; the reported activity is that of the Fe(2+) ion fraction.
+    Premise: FeO follows the Temkin ideal-ionic-solution model. Its expression
+    is ``a_FeO = (N_Fe2+)(N_O2-)``: the first factor counts Fe2+ over the
+    cation sublattice; the second counts O2- over the anion sublattice,
+    including silicate anions. Pure FeO has both fractions equal to one, so
+    its activity is one.
     """
 
     RAOULTIAN_PURE_ENDMEMBER = "raoultian_pure_endmember"

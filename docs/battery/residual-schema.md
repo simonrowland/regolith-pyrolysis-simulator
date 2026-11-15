@@ -16,12 +16,18 @@ Mode-labeled residual keys include that token so records from distinct
 conditions remain separate. Residuals without a resolved or requested fO2
 mode omit the field.
 
-Activity `reference_state.convention` may be `temkin` for ideal mixing of
-cations and anions on separate sublattices, where the activity is that of the
-Fe(2+) ion fraction. Distin's recorded Temkin activity is converted for
-comparison by the iron-saturation reference owner using the Darken & Gurry
-factor; its N₀ payload describes the saturation composition and comparison
-band and is not an additional activity divisor.
+Activity `reference_state.convention` may be `temkin` for the ideal-ionic
+solution interpretation of FeO activity: the Fe²⁺ fraction on the cation
+sublattice multiplied by the O²⁻ fraction on the anion sublattice, including
+silicate anions. For pure FeO both fractions are one, so `a_FeO = 1`.
+
+For Distin, keep the measured reference distinct from that model
+interpretation. The measured activity is the oxygen ratio against the
+nonstoichiometric oxide saturated with liquid iron; the source then converts
+it to a stoichiometric standard. The scorer's iron-saturation reference owner
+uses the Darken & Gurry factor for that conversion. Its N₀ payload describes
+the saturation composition and comparison band and is not an additional
+activity divisor.
 
 The `composition_binary_complement` notice records a binary composition
 derived as the complement of a printed caption mole percent. Such residuals
