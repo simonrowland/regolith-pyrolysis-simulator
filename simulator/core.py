@@ -5179,16 +5179,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             return False
         from simulator.engine_binding_admission import (
-            gate_curve_memo_origin_matches,
+            gate_curve_memo_reuse_eligible,
         )
 
-        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
-        return gate_curve_memo_origin_matches(
+        return gate_curve_memo_reuse_eligible(
             self,
             value['curve'],
             value.get('origin'),
-            fresh_evidence=True,
-            **redox_state_kwargs,
+            redox_state=redox_state,
         )
 
     def _establish_melt_redox_gate_authority_for_current_hour(
@@ -5288,7 +5286,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         redox_state: RedoxState | None = None,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
         from simulator.engine_binding_admission import (
-            gate_curve_memo_origin_matches,
+            gate_curve_memo_reuse_eligible,
         )
         from simulator.reduced_real_determinism import (
             GATE_CURVE_NOTICE_KEYS,
@@ -5340,12 +5338,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 disposition=cache.get('disposition', 'live'),
             )
             and isinstance(cache_notices, list)
-            and gate_curve_memo_origin_matches(
+            and gate_curve_memo_reuse_eligible(
                 self,
                 curve,
                 cache.get('origin'),
-                fresh_evidence=True,
-                **redox_state_kwargs,
+                redox_state=redox_state,
             )
         )
         published_cache = None
@@ -5390,12 +5387,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     memoized_record.get('provider_outcome'),
                     disposition=memoized_record.get('disposition', 'live'),
                 )
-                and gate_curve_memo_origin_matches(
+                and gate_curve_memo_reuse_eligible(
                     self,
                     memoized_record['curve'],
                     memoized_record.get('origin'),
-                    fresh_evidence=True,
-                    **redox_state_kwargs,
+                    redox_state=redox_state,
                 )
             ):
                 published_memo = accept_stored_memo(
@@ -5519,13 +5515,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 disposition=normalized_record.get('disposition', 'live'),
             )
         )
-        if cache_eligible and isinstance(normalized_record.get('origin'), Mapping):
-            cache_eligible = gate_curve_memo_origin_matches(
+        if cache_eligible:
+            cache_eligible = gate_curve_memo_reuse_eligible(
                 self,
                 normalized_curve,
                 normalized_record.get('origin'),
-                fresh_evidence=True,
-                **redox_state_kwargs,
+                redox_state=redox_state,
             )
         validated_curve = (
             validated_cache.get('curve')
@@ -5537,12 +5532,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and validated_cache.get('key') == key
             and isinstance(validated_curve, Mapping)
             and dict(validated_curve) == normalized_curve
-            and gate_curve_memo_origin_matches(
+            and gate_curve_memo_reuse_eligible(
                 self,
                 normalized_curve,
                 validated_cache.get('origin'),
-                fresh_evidence=True,
-                **redox_state_kwargs,
+                redox_state=redox_state,
             )
             and isinstance(validated_cache.get('repair_notices'), list)
         ):

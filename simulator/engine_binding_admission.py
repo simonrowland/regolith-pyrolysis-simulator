@@ -21,6 +21,7 @@ from simulator.state_types import State
 RECEIPT_SCHEMA_VERSION = 1
 RECEIPT_FILENAME = "engines.local.binding-admission.json"
 REAL_BINDING_PIN_DIRECTORY = "reduced_real_binding_pins"
+_FILE_DIGEST_CACHE: dict[tuple[str, int, int, int], str] = {}
 
 
 @dataclass(frozen=True)
@@ -1054,6 +1055,57 @@ def gate_curve_memo_origin_matches(
     return current.producer_evidence == producer_evidence
 
 
+def gate_curve_memo_reuse_eligible(
+    sim: Any,
+    curve: Mapping[str, Any],
+    origin: Mapping[str, Any] | None,
+    *,
+    evidence: GateCurveEvidence | None = None,
+    redox_state: Any | None = None,
+) -> bool:
+    """Decide whether this curve may be reused by an in-process memo."""
+    from simulator.reduced_real_determinism import (
+        _gate_curve_provider_role,
+        _is_cacheable_gate_curve,
+    )
+
+    if not _is_cacheable_gate_curve(curve):
+        return False
+    current = evidence or gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+    if not _gate_curve_evidence_has_known_magemin_version(current):
+        return False
+
+    local_evidence_reusable = _gate_curve_memo_evidence_can_support_reuse(
+        sim,
+        current.producer_evidence,
+        provider_role=_gate_curve_provider_role(curve),
+    )
+    # `eligible` covers receipt-backed persistence. A receipt-only refusal can
+    # still permit local reuse when this producer's evidence is reusable.
+    memo_eligible = current.eligible or local_evidence_reusable
+    if not memo_eligible or not local_evidence_reusable:
+        return False
+    if origin is None:
+        origin = write_gate_curve_memo_origin(
+            sim,
+            curve,
+            current,
+            redox_state=redox_state,
+        )
+    return gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        origin,
+        fresh_evidence=True,
+        evidence=current,
+        redox_state=redox_state,
+    )
+
+
 def _gate_curve_memo_evidence_can_support_reuse(
     sim: Any,
     producer_evidence: Any,
@@ -1086,18 +1138,7 @@ def _gate_curve_memo_evidence_can_support_reuse(
 
 
 def gate_curve_memo_eligibility(sim: Any, curve: Mapping[str, Any]) -> bool:
-    from simulator.reduced_real_determinism import (
-        _is_cacheable_gate_curve,
-    )
-
-    if not _is_cacheable_gate_curve(curve):
-        return False
-    evidence = gate_curve_memo_evidence(
-        sim,
-        curve,
-        include_selected_bindings=True,
-    )
-    return _gate_curve_evidence_has_known_magemin_version(evidence)
+    return gate_curve_memo_reuse_eligible(sim, curve, None)
 
 
 def authorize_cached_real_replay(
@@ -1912,7 +1953,7 @@ def install_provenance(
             return {"path": str(resolved), "sha256": None}
         return {
             "path": str(resolved),
-            "sha256": hashlib.sha256(resolved.read_bytes()).hexdigest(),
+            "sha256": _cached_file_sha256(resolved),
         }
 
     local_path = config_path()
@@ -2179,16 +2220,31 @@ def _required_runtime_artifacts(
 def _artifact_digest(path: Path) -> str | None:
     resolved = path.expanduser().resolve()
     if resolved.is_file():
-        return hashlib.sha256(resolved.read_bytes()).hexdigest()
+        return _cached_file_sha256(resolved)
     if resolved.is_dir():
         parts = [
-            (child.name, hashlib.sha256(child.read_bytes()).hexdigest())
+            (child.name, _cached_file_sha256(child))
             for child in sorted(resolved.iterdir())
             if child.is_file()
         ]
         if parts:
             return hashlib.sha256(canonical_json_bytes(parts)).hexdigest()
     return None
+
+
+def _cached_file_sha256(path: Path) -> str:
+    resolved = path.expanduser().resolve()
+    stat = resolved.stat()
+    key = (str(resolved), stat.st_ino, stat.st_size, stat.st_mtime_ns)
+    digest = _FILE_DIGEST_CACHE.get(key)
+    if digest is not None:
+        return digest
+    # Local engine artifacts/packs change inode, size, or mtime_ns on normal
+    # rewrites. A same-size in-place rewrite preserving all three is not
+    # detected; that limit is acceptable for these local install artifacts.
+    digest = hashlib.sha256(resolved.read_bytes()).hexdigest()
+    _FILE_DIGEST_CACHE[key] = digest
+    return digest
 
 
 def _runtime_environment_fingerprint(

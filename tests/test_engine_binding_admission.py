@@ -1289,7 +1289,7 @@ def test_selected_binding_refusal_notice_preserves_primary_memo_scope(
     )
 
 
-def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(
+def test_gate_curve_memo_is_ineligible_without_producer_evidence_and_records_notice_once(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1319,8 +1319,8 @@ def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(
     )
     sim = SimpleNamespace()
 
-    assert admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
-    assert admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
+    assert not admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
+    assert not admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
 
     notice = binding_admission_run_notice(sim)
     assert notice is not None
