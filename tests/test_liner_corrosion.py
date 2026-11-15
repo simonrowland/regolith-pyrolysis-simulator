@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+import math
 from pathlib import Path
 from types import SimpleNamespace
 import warnings
@@ -37,6 +38,20 @@ from simulator.melt_backend.liquidus import (
     LIQUIDUS_LIQUID_EPSILON,
     LIQUIDUS_SOLID_EPSILON,
 )
+
+
+def _formula_derived_anorthite() -> dict[str, float]:
+    """Return CaAl2Si2O8's oxide mass percentages via the formula owner."""
+
+    cao = parse_formula("CaO").molar_mass_g_per_mol()
+    alumina = parse_formula("Al2O3").molar_mass_g_per_mol()
+    silica = parse_formula("SiO2").molar_mass_g_per_mol()
+    total = cao + alumina + 2.0 * silica
+    return {
+        "CaO": 100.0 * cao / total,
+        "Al2O3": 100.0 * alumina / total,
+        "SiO2": 200.0 * silica / total,
+    }
 
 
 def test_magemin_request_cache_key_covers_every_equilibrium_input():
@@ -304,15 +319,7 @@ def test_magemin_phi_curve_brackets_valid_request_near_silica_domain_edge():
 def test_anorthite_first_liquid_anchor_requires_live_magemin():
     # CaAl2Si2O8 = CaO + Al2O3 + 2 SiO2. The literature melting point is
     # 1553 C at about 1 bar. The formula owner derives the oxide-basis bulk.
-    cao = parse_formula("CaO").molar_mass_g_per_mol()
-    alumina = parse_formula("Al2O3").molar_mass_g_per_mol()
-    silica = parse_formula("SiO2").molar_mass_g_per_mol()
-    total = cao + alumina + 2 * silica
-    formula_derived_anorthite = {
-        "CaO": 100.0 * cao / total,
-        "Al2O3": 100.0 * alumina / total,
-        "SiO2": 200.0 * silica / total,
-    }
+    formula_derived_anorthite = _formula_derived_anorthite()
     assert formula_derived_anorthite["CaO"] == pytest.approx(20.16, abs=0.01)
     assert formula_derived_anorthite["Al2O3"] == pytest.approx(36.65, abs=0.01)
     assert formula_derived_anorthite["SiO2"] == pytest.approx(43.19, abs=0.01)
@@ -344,9 +351,29 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                     f"{sampled_liquid_fraction} vs {direct.liquid_fraction}"
                 )
                 assert direct.liquid_fraction == pytest.approx(0.0, abs=1e-12)
+                # b-1231 certification pin: formula-exact CaAl2Si2O8 and the
+                # cited rounded anorthite request agree with direct MAGEMin;
+                # neither may acquire a low-temperature liquid floor.
+                exact_direct = direct_backend.equilibrate(
+                    temperature_C,
+                    composition_kg=dict(formula_derived_anorthite),
+                    fO2_log=liner_corrosion.MAGEMIN_FO2_LOG,
+                    pressure_bar=1.0,
+                )
+                exact_sampled = sampler(
+                    formula_derived_anorthite,
+                    temperature_C,
+                    1.0,
+                )
+                assert exact_direct.status == "ok", exact_direct.warnings
+                assert exact_direct.liquid_fraction == pytest.approx(0.0, abs=1e-12)
+                assert exact_sampled == pytest.approx(
+                    exact_direct.liquid_fraction,
+                    abs=1e-12,
+                )
             profile = liner_corrosion._tier_b_reference_profile(
                 sampler,
-                anorthite,
+                formula_derived_anorthite,
                 pressure_bar=1.0,
                 literature_melting_temperature_C=1553.0,
             )
@@ -354,11 +381,15 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
             if exc.reason == "engine_unavailable":
                 pytest.skip("MAGEMin is required for the anorthite anchor")
             raise
+        assert profile["liquid_fraction_by_temperature_C"][500.0] == 0.0
         assert profile["liquid_fraction_by_temperature_C"][800.0] == 0.0
         assert profile["liquid_fraction_by_temperature_C"][1000.0] == 0.0
+        assert profile["first_liquid_bracket_C"] == [1000.0, 1025.0]
         assert profile["bulk_melt_bracket_C"] == [1550.0, 1575.0]
         assert profile["bulk_melt_residual_vs_literature_C"] == [-3.0, 22.0]
         assert profile["bulk_melt_residual_ticket"] == "b-1231"
+        assert profile["composition_continuity"]["status"] == "passed"
+        assert profile["engine_version"] == backend.get_engine_version()
         assert profile["engine_minor_phase_eutectic"]["temperature_bracket_C"] == [
             1000.0,
             1025.0,
@@ -387,6 +418,186 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
     finally:
         sampler.close()
         direct_backend.close()
+
+
+def test_tier_b_reference_uses_neighbours_when_exact_anorthite_is_an_outlier():
+    exact_anorthite = _formula_derived_anorthite()
+    samples: set[tuple[tuple[str, float], ...]] = set()
+
+    class EndmemberDiscontinuity:
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            normalized = tuple(
+                sorted((oxide, round(float(wt_pct), 8)) for oxide, wt_pct in composition.items())
+            )
+            samples.add(normalized)
+            is_exact = all(
+                math.isclose(
+                    float(composition.get(oxide, 0.0)), value,
+                    rel_tol=0.0, abs_tol=1.0e-8,
+                )
+                for oxide, value in exact_anorthite.items()
+            )
+            if is_exact and temperature_C < 1550.0:
+                return 0.008
+            if temperature_C <= 1000.0:
+                return 0.0
+            if temperature_C < 1025.0:
+                return 0.0
+            if temperature_C < 1550.0:
+                return 0.0026
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+    reference = liner_corrosion._tier_b_reference_profile(
+        EndmemberDiscontinuity(),
+        exact_anorthite,
+        pressure_bar=1.0,
+        literature_melting_temperature_C=1553.0,
+    )
+
+    assert reference["liquid_fraction_by_temperature_C"][500.0] == 0.0
+    assert reference["first_liquid_bracket_C"] == [1000.0, 1025.0]
+    assert reference["bulk_melt_bracket_C"] == [1550.0, 1575.0]
+    assert "engine_composition_sensitive" in reference["flags"]
+    sensitivity = reference["engine_composition_sensitive"]
+    assert sensitivity["nominal_bracket_C"] == [None, 500.0]
+    assert sensitivity["neighbour_bracket_C"] == [1000.0, 1025.0]
+    assert sensitivity["delta_wt_pct"] == 0.01
+    assert len(samples) == 3
+
+
+def test_tier_b_contaminated_profile_checks_composition_continuity():
+    liner = {"CaO": 20.0, "Al2O3": 30.0, "SiO2": 50.0}
+    contaminated = {"CaO": 18.0, "Al2O3": 27.0, "SiO2": 45.0, "Na2O": 10.0}
+    samples: set[tuple[tuple[str, float], ...]] = set()
+
+    class ContaminatedEndmemberDiscontinuity:
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            normalized = tuple(
+                sorted((oxide, round(float(wt_pct), 8)) for oxide, wt_pct in composition.items())
+            )
+            samples.add(normalized)
+            is_nominal_contaminated = all(
+                math.isclose(
+                    float(composition.get(oxide, 0.0)), wt_pct,
+                    rel_tol=0.0, abs_tol=1.0e-8,
+                )
+                for oxide, wt_pct in contaminated.items()
+            )
+            if is_nominal_contaminated and temperature_C == 500.0:
+                return 0.01
+            if temperature_C < 1025.0:
+                return 0.0
+            if temperature_C < 1550.0:
+                return 0.0026 + (
+                    0.01 if composition.get("Na2O", 0.0) > 5.0 else 0.0
+                )
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+    sampler = ContaminatedEndmemberDiscontinuity()
+    pure_reference = liner_corrosion._tier_b_reference_profile(
+        sampler, liner, pressure_bar=1.0, literature_melting_temperature_C=1553.0
+    )
+    activity = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        contaminated,
+        {"Na": 1.0},
+        sampler=sampler,
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=1553.0,
+        pure_reference=pure_reference,
+    )
+
+    assert activity["contaminated_melt_bracket_C"] == [1000.0, 1025.0]
+    assert "engine_composition_sensitive" in activity["flags"]
+    assert activity["engine_composition_sensitive"]["nominal_bracket_C"] == [None, 500.0]
+    assert activity["engine_composition_sensitive"]["neighbour_bracket_C"] == [
+        1000.0,
+        1025.0,
+    ]
+    assert len(samples) > 3
+
+
+def test_tier_b_neighbour_disagreement_uses_tier_a_or_refuses():
+    liner = {"CaO": 20.0, "Al2O3": 30.0, "SiO2": 50.0}
+    first_neighbour, second_neighbour, _ = (
+        liner_corrosion._tier_b_composition_neighbours(liner)
+    )
+
+    class NeighboursDisagree:
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            if all(
+                math.isclose(
+                    composition.get(oxide, 0.0), value,
+                    rel_tol=0.0, abs_tol=1.0e-8,
+                )
+                for oxide, value in first_neighbour.items()
+            ):
+                bulk_low = 1550.0
+            elif all(
+                math.isclose(
+                    composition.get(oxide, 0.0), value,
+                    rel_tol=0.0, abs_tol=1.0e-8,
+                )
+                for oxide, value in second_neighbour.items()
+            ):
+                bulk_low = 1600.0
+            else:
+                bulk_low = 1575.0
+            if temperature_C < bulk_low:
+                return 0.0026 if temperature_C > 1000.0 else 0.0
+            if temperature_C < bulk_low + 25.0:
+                return 0.044
+            return 1.0
+
+    table = {
+        "invariants": [
+            {
+                "composition_bounds_wt_pct": {
+                    "CaO": [0.0, 100.0],
+                    "Al2O3": [0.0, 100.0],
+                    "SiO2": [0.0, 100.0],
+                    "Na2O": [0.0, 100.0],
+                },
+                "invariant_type": "congruent melting",
+                "first_liquid_temperature_C": 1450.0,
+            }
+        ]
+    }
+    with pytest.raises(LinerCorrosionRefusal) as refused:
+        liner_corrosion._tier_b_reference_profile(
+            NeighboursDisagree(), liner, pressure_bar=1.0
+        )
+    assert refused.value.reason == "tier_b_composition_continuity_unresolved"
+
+    fallback = liner_corrosion._tier_b_reference_profile(
+        NeighboursDisagree(),
+        liner,
+        pressure_bar=1.0,
+        invariant_table=table,
+    )
+    assert fallback["tier_a_fallback"] is True
+    assert fallback["tier_a_first_liquid_T_C"] == 1450.0
+    assert "engine_composition_sensitive" in fallback["flags"]
+    fallback_activity = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        {"CaO": 19.8, "Al2O3": 29.7, "SiO2": 49.5, "Na2O": 1.0},
+        {"Na": 1.0},
+        sampler=NeighboursDisagree(),
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=None,
+        pure_reference=fallback,
+        service_temperature_C=1500.0,
+        invariant_table=table,
+    )
+    assert fallback_activity["tier_a_fallback"] is True
+    assert fallback_activity["rating_temperature_C"] == 1475.0
+    assert fallback_activity["criterion_signal_at_service_temperature"] == 1.0
 
 
 def test_tier_b_reference_refuses_a_scan_that_stops_at_minor_phase_melting():
@@ -425,6 +636,8 @@ def test_tier_b_reference_extends_until_bulk_melt_reaches_liquid_threshold():
 
     assert reference["scan_temperature_C"][-1] == 1675.0
     assert reference["bulk_melt_bracket_C"] == [1650.0, 1675.0]
+    assert reference["composition_continuity"]["status"] == "passed"
+    assert "engine_composition_sensitive" not in reference["flags"]
 
 
 def test_liquidus_search_defaults_pin_the_existing_2200_c_ceiling():
@@ -508,6 +721,8 @@ def test_tier_b_rating_uses_excess_melt_and_the_lower_temperature_bracket():
     assert rated["excess_liquid_fraction_at_upper_bracket"] == pytest.approx(
         0.01
     )
+    assert rated["composition_continuity"]["status"] == "passed"
+    assert "engine_composition_sensitive" not in rated["flags"]
     assert "deposit_melt_below_resolution" not in rated["flags"]
 
 
@@ -1049,15 +1264,7 @@ def test_tier_a_anorthite_row_supplies_cited_pure_melting_temperature():
 
     # Formula-derived CaO.Al2O3.2SiO2 matches Morey Table 26 row 6's printed
     # oxide values to their half-digit precision (physical p. 82 / L71).
-    cao = parse_formula("CaO").molar_mass_g_per_mol()
-    alumina = parse_formula("Al2O3").molar_mass_g_per_mol()
-    silica = parse_formula("SiO2").molar_mass_g_per_mol()
-    total = cao + alumina + 2.0 * silica
-    anorthite = {
-        "CaO": 100.0 * cao / total,
-        "Al2O3": 100.0 * alumina / total,
-        "SiO2": 200.0 * silica / total,
-    }
+    anorthite = _formula_derived_anorthite()
     reference = liner_corrosion._tier_a_pure_phase_melting_reference(table, anorthite)
 
     assert reference["temperature_C"] == 1553.0
