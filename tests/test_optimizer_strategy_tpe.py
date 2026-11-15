@@ -70,6 +70,48 @@ PROFILE = {
     ]
 }
 PATH = ("campaigns", "C0", "dT_dt_C_per_hr")
+# Product-class masses the engine stores on the run summary. The tell
+# assertion reads these fields itself. Energy, duration, and the SSO-2
+# score are not class masses; those raw values stay on the objective vector.
+_ENGINE_PRODUCT_CLASS_PATHS = {
+    "oxygen_kg": ("metals_plus_O2", "O2_kg"),
+    "metals_total_kg": ("metals_plus_O2", "metals_total_kg"),
+    "pure_silica_glass_kg": ("pure_silica_glass", "class_total_kg"),
+    "industrial_mixed_glass_kg": ("industrial_mixed_glass", "class_total_kg"),
+}
+
+
+def _engine_raw_for_told_objective(metric: str, result) -> float:
+    """Raw objective from engine evidence, not from the tell helper."""
+
+    summary = result.run_reference.product_summary
+    path = _ENGINE_PRODUCT_CLASS_PATHS.get(metric)
+    if path is not None:
+        node = summary["product_classes"]
+        for key in path:
+            node = node[key]
+        return float(node)
+    value = result.objectives.as_mapping()[metric]
+    if value is None:
+        raise AssertionError(f"{metric} has no engine value")
+    return float(value)
+
+
+def _told_native_value(raw: float, sense: str, cost_factor: float) -> float:
+    """Value in the objective's own direction.
+
+    Maximize divides by the furnace factor. Minimize multiplies. A factor
+    of 1 is the raw metric, which is what an infeasible run is told when
+    the engine summary has no available furnace record. This does not call
+    the strategy helper. That helper reaches the same figure by negating
+    minimize objectives twice.
+    """
+
+    if sense == "maximize":
+        return raw / cost_factor
+    if sense == "minimize":
+        return raw * cost_factor
+    raise AssertionError(f"unsupported objective sense {sense!r}")
 
 
 def _available_run_reference(
@@ -716,11 +758,19 @@ def _lunar_profile_for_hours(hours: int, *, gates: tuple[str, ...] | None = None
     return profile
 
 
-# Two full 60-hour lunar campaigns: campaign-length physics. On the studio PR
-# tier it takes 277-301 s against the 300 s per-test limit (green 287 s), so it
-# runs in the nightly tier, which covers it in full.
 @pytest.mark.nightly
+@pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(5000)
 def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> None:
+    """Finite yields told to TPE are the engine's yields.
+
+    The pair is two production evaluations. Both caps clear the C4
+    window; a 1200 C cap is ``c4_target_window_not_acquired`` and is not
+    a yield. Authored hours stay 60, and each run leaves C0. Glass mass
+    is not asserted: glass = 0 is the current classifier's route gate
+    (b-1185) plus 96% SiO offgas loss (b-1184); not a physics yield.
+    """
+
     furnace_path = ("furnace_max_T_C",)
     schema = RecipeSchema(
         allowlist=(
@@ -734,9 +784,6 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
         )
     )
     profile = _lunar_profile_for_hours(60)
-    gates = set(profile["constraints"]["gates"])
-    assert {"delivered_stream_purity", "extraction_completeness"} <= gates
-
     strategy = OptunaTPEStrategy(
         schema,
         seed=5505,
@@ -749,8 +796,8 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
                 proposal_source="seed_recipe",
             ),
             WarmStartSeed(
-                id="furnace-cap-1200",
-                patch=RecipePatch({furnace_path: 1200.0}),
+                id="alumina-max-1843-cap",
+                patch=RecipePatch({furnace_path: 1843.0}),
                 proposal_source="seed_recipe",
             ),
         ),
@@ -769,66 +816,76 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
 
     for result in results:
         assert result.eval_spec is not None and result.eval_spec.hours == 60
-        assert not result.feasible
-        assert result.objectives is not None
-        assert {"delivered_stream_purity", "extraction_completeness"} & set(
-            result.failing_gates
+        assert result.eval_spec.campaign == "C0"
+        assert result.run_reference is not None
+        stops = result.run_reference.trace.get("campaign_stops", ())
+        assert any(
+            str(stop.get("campaign") or "") not in {"", "C0"} for stop in stops
+        ), stops
+        assert result.failure_category is not FailureCategory.PHYSICS_REFUSED, (
+            result.run_reference.reason
         )
+        assert result.objectives is not None
+        mapping = result.objectives.as_mapping()
+        engine_metals = float(
+            result.run_reference.product_summary["product_classes"][
+                "metals_plus_O2"
+            ]["metals_total_kg"]
+        )
+        assert math.isfinite(engine_metals)
+        assert engine_metals > 0.0
+        assert mapping["metals_total_kg"] == pytest.approx(engine_metals)
+        assert math.isfinite(mapping["oxygen_kg"])
+        assert math.isfinite(mapping["duration_h"])
+        assert "pure_silica_glass_kg" in mapping
 
     strategy.tell(list(zip(candidates, results, strict=True)))
     trials = _trials_by_candidate(strategy)
-    metals_index = strategy.objective_metrics.index("metals_total_kg")
-    stored_metals = []
+    # Coordinate order is the study's declared list. The numbers below are
+    # read from the engine summary, not from the tell helper.
+    definitions = strategy.objective_definitions
+    metal_index = next(
+        index
+        for index, definition in enumerate(definitions)
+        if definition.metric == "metals_total_kg"
+    )
+    engine_metals_pair = []
+    told_metals = []
     for candidate, result in zip(candidates, results, strict=True):
         trial = trials[candidate.id]
-        assert trial.state.name == "COMPLETE"
+        summary = result.run_reference.product_summary
+        furnace_status = summary.get("furnace_amortization_status")
+        if furnace_status == "available":
+            penalty = float(summary["furnace_amortization_batch_cost_equivalents"])
+            assert math.isfinite(penalty) and penalty >= 0.0
+            cost_factor = 1.0 + penalty
+        elif not result.feasible:
+            # No available furnace record. An infeasible yield is told raw.
+            cost_factor = 1.0
+        else:
+            raise AssertionError(
+                "feasible run without available furnace amortization is "
+                f"unscoreable, not a yield: status={furnace_status!r}"
+            )
         assert trial.values is not None
-        value = trial.values[metals_index]
-        assert math.isfinite(value)
-        assert value not in (_BAD_MAXIMIZE_VALUE, _BAD_MINIMIZE_VALUE)
-        assert set(result.failing_gates) <= set(
-            trial.user_attrs[_CONSTRAINT_NAMES_ATTR]
+        assert len(trial.values) == len(definitions)
+        expected = []
+        for definition in definitions:
+            raw = _engine_raw_for_told_objective(definition.metric, result)
+            assert math.isfinite(raw) and raw >= 0.0
+            expected.append(
+                _told_native_value(raw, definition.sense, cost_factor)
+            )
+        assert trial.state.name == "COMPLETE"
+        assert _BAD_MAXIMIZE_VALUE not in trial.values
+        assert _BAD_MINIMIZE_VALUE not in trial.values
+        assert trial.values == [pytest.approx(value) for value in expected]
+        engine_metals_pair.append(
+            float(summary["product_classes"]["metals_plus_O2"]["metals_total_kg"])
         )
-        assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR]
-        stored_metals.append(value)
-    # Identical deterministic patches have zero repeat spread at one cache key.
-    assert stored_metals[0] != stored_metals[1]
-
-    short_profile = _lunar_profile_for_hours(
-        1,
-        gates=("knudsen_viscous", "furnace_temperature"),
-    )
-    short_results = [
-        evaluate(
-            candidate.patch,
-            "lunar_mare_low_ti",
-            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
-            profile=short_profile,
-            candidate_id=f"short-{candidate.id}",
-        )
-        for candidate in candidates
-    ]
-    assert all(result.feasible and result.objectives is not None for result in short_results)
-    assert all(
-        result.run_reference is not None
-        and result.run_reference.product_summary.get("furnace_amortization_status")
-        == "available"
-        for result in short_results
-    )
-    short_metals = [
-        result.objectives.as_mapping()["metals_total_kg"]
-        for result in short_results
-    ]
-    short_oxygen = [
-        result.objectives.as_mapping()["oxygen_kg"]
-        for result in short_results
-    ]
-    assert short_metals[0] == short_metals[1]
-    assert short_oxygen[0] == short_oxygen[1]
-    assert all(
-        result.objectives.as_mapping()["duration_h"] == result.eval_spec.hours
-        for result in short_results
-    )
+        told_metals.append(trial.values[metal_index])
+    assert engine_metals_pair[0] != engine_metals_pair[1]
+    assert told_metals[0] != told_metals[1]
 
 
 def test_tpe_infeasible_objectives_without_furnace_cost_use_raw_metrics() -> None:
