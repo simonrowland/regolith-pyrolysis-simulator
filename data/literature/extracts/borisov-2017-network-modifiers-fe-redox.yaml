@@ -15,10 +15,11 @@ extraction:
     text layer and all 702 Table 1 cells were checked against 600 dpi renders of physical PDF pages 4 and 5. Ditto
     condition cells and the printed same-run note bind rows 19–36 to one run despite the sample suffix changing
     from -93 to -94. Tables 2 and 3 model coefficients were checked against 600 dpi renders of physical PDF pages
-    11 and 12. Figures 1–8 were inspected on 600 dpi renders and recorded without numeric points. Table 1 omits
-    one or both alkali oxide values in every row; those incomplete glass compositions remain unknown. Air is recorded
-    as the atmosphere and numeric fO2 remains unknown because no log fO2 is printed. Figure 2 composition and Figure
-    6 residual quantities have no matching store tokens and remain context-only.
+    11 and 12. Figures 1–8 were inspected on 600 dpi renders and recorded without numeric points. Table 1 reports
+    alkali oxide means with standard deviations or em dashes; numeric means are projected as calculated mass
+    percentages, while dash cells remain typed absent. Air is recorded as the atmosphere and numeric fO2 remains
+    unknown because no log fO2 is printed. Figure 2 composition and Figure 6 residual quantities have no matching
+    store tokens and remain context-only.
   date: '2026-10-19'
   worker: fam16-1019
   audit_files:
@@ -337,7 +338,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -394,8 +395,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '56.16'
+                Al2O3: '16.08'
+                Fe2O3: '9.93'
+                MgO: '18.55'
+                CaO: '0.01'
           locator:
             page: 4
             pdf_page_index: 3
@@ -464,7 +473,7 @@ species:
           CaO: '16.37'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -524,8 +533,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.84'
+                Al2O3: '13.12'
+                Fe2O3: '10.11'
+                MgO: '15.06'
+                CaO: '16.37'
           locator:
             page: 4
             pdf_page_index: 3
@@ -594,7 +611,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -651,8 +668,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '56.18'
+                Al2O3: '16.19'
+                Fe2O3: '10.10'
+                MgO: '18.61'
+                CaO: '0.01'
           locator:
             page: 4
             pdf_page_index: 3
@@ -721,7 +746,7 @@ species:
           CaO: '5.39'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -781,8 +806,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '52.56'
+                Al2O3: '15.10'
+                Fe2O3: '10.56'
+                MgO: '17.33'
+                CaO: '5.39'
           locator:
             page: 4
             pdf_page_index: 3
@@ -851,7 +884,7 @@ species:
           CaO: '10.87'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -911,8 +944,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '49.16'
+                Al2O3: '14.13'
+                Fe2O3: '9.95'
+                MgO: '16.22'
+                CaO: '10.87'
           locator:
             page: 4
             pdf_page_index: 3
@@ -981,7 +1022,7 @@ species:
           CaO: '16.43'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -1041,8 +1082,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.75'
+                Al2O3: '13.18'
+                Fe2O3: '10.03'
+                MgO: '15.1'
+                CaO: '16.43'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1111,7 +1160,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -1171,8 +1220,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '64.10'
+                Al2O3: '12.41'
+                Fe2O3: '10.20'
+                MgO: '14.27'
+                CaO: '0.01'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1241,7 +1298,7 @@ species:
           CaO: '3.90'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -1301,8 +1358,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '63.23'
+                Al2O3: '10.95'
+                Fe2O3: '10.03'
+                MgO: '12.59'
+                CaO: '3.90'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1371,7 +1436,7 @@ species:
           CaO: '7.73'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -1431,8 +1496,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '61.49'
+                Al2O3: '10.11'
+                Fe2O3: '9.65'
+                MgO: '11.59'
+                CaO: '7.73'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1501,7 +1574,7 @@ species:
           CaO: '11.08'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -1561,8 +1634,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '60.08'
+                Al2O3: '8.96'
+                Fe2O3: '9.95'
+                MgO: '10.26'
+                CaO: '11.08'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1631,7 +1712,7 @@ species:
           CaO: '0.00'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -1688,8 +1769,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '56.07'
+                Al2O3: '16.14'
+                Fe2O3: '10.09'
+                MgO: '18.6'
+                CaO: '0.00'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1758,7 +1847,7 @@ species:
           CaO: '5.43'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -1818,8 +1907,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '52.52'
+                Al2O3: '15.08'
+                Fe2O3: '10.61'
+                MgO: '17.29'
+                CaO: '5.43'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1888,7 +1985,7 @@ species:
           CaO: '10.9'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -1948,8 +2045,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '49.43'
+                Al2O3: '14.16'
+                Fe2O3: '9.92'
+                MgO: '16.32'
+                CaO: '10.9'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2018,7 +2123,7 @@ species:
           CaO: '16.41'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -2078,8 +2183,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '46.17'
+                Al2O3: '13.17'
+                Fe2O3: '10.02'
+                MgO: '15.14'
+                CaO: '16.41'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2148,7 +2261,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -2208,8 +2321,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '64.53'
+                Al2O3: '12.24'
+                Fe2O3: '9.96'
+                MgO: '14.14'
+                CaO: '0.01'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2278,7 +2399,7 @@ species:
           CaO: '3.91'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -2338,8 +2459,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '63.20'
+                Al2O3: '10.94'
+                Fe2O3: '10.06'
+                MgO: '12.65'
+                CaO: '3.91'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2408,7 +2537,7 @@ species:
           CaO: '7.72'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -2468,8 +2597,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '61.46'
+                Al2O3: '10.08'
+                Fe2O3: '9.62'
+                MgO: '11.56'
+                CaO: '7.72'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2538,7 +2675,7 @@ species:
           CaO: '11.06'
           Na2O: –
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         - K2O
@@ -2598,8 +2735,16 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '60.39'
+                Al2O3: '8.96'
+                Fe2O3: '9.89'
+                MgO: '10.25'
+                CaO: '11.06'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2668,7 +2813,7 @@ species:
           CaO: '21.24'
           Na2O: 1.06 (0.04)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.28'
@@ -2724,8 +2869,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.25'
+                Al2O3: '14.04'
+                Fe2O3: '9.44'
+                MgO: '9.25'
+                CaO: '21.24'
+                Na2O: '1.06'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2794,7 +2948,7 @@ species:
           CaO: '20.26'
           Na2O: 5.57 (0.12)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.31'
@@ -2853,8 +3007,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '43.26'
+                Al2O3: '13.45'
+                Fe2O3: '8.98'
+                MgO: '8.78'
+                CaO: '20.26'
+                Na2O: '5.57'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2923,7 +3086,7 @@ species:
           CaO: '19.89'
           Na2O: 7.28 (0.14)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.34'
@@ -2982,8 +3145,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '42.44'
+                Al2O3: '13.27'
+                Fe2O3: '8.89'
+                MgO: '8.57'
+                CaO: '19.89'
+                Na2O: '7.28'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3052,7 +3224,7 @@ species:
           CaO: '11.36'
           Na2O: 1.49 (0.04)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.63'
@@ -3111,8 +3283,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '65.34'
+                Al2O3: '7.58'
+                Fe2O3: '9.91'
+                MgO: '4.96'
+                CaO: '11.36'
+                Na2O: '1.49'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3181,7 +3362,7 @@ species:
           CaO: '10.83'
           Na2O: 7.28 (0.10)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.47'
@@ -3240,8 +3421,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '61.36'
+                Al2O3: '7.14'
+                Fe2O3: '9.19'
+                MgO: '4.67'
+                CaO: '10.83'
+                Na2O: '7.28'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3310,7 +3500,7 @@ species:
           CaO: '10.19'
           Na2O: 11.47 (0.20)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.65'
@@ -3369,8 +3559,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '58.98'
+                Al2O3: '6.84'
+                Fe2O3: '8.73'
+                MgO: '4.45'
+                CaO: '10.19'
+                Na2O: '11.47'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3439,7 +3638,7 @@ species:
           CaO: '17.96'
           Na2O: 1.32 (0.05)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.51'
@@ -3498,8 +3697,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '38.71'
+                Al2O3: '24.91'
+                Fe2O3: '9.83'
+                MgO: '7.79'
+                CaO: '17.96'
+                Na2O: '1.32'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3568,7 +3776,7 @@ species:
           CaO: '17.08'
           Na2O: 6.21 (0.15)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.43'
@@ -3627,8 +3835,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '36.93'
+                Al2O3: '23.64'
+                Fe2O3: '9.18'
+                MgO: '7.37'
+                CaO: '17.08'
+                Na2O: '6.21'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3697,7 +3914,7 @@ species:
           CaO: '16.84'
           Na2O: 7.62 (0.10)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.33'
@@ -3756,8 +3973,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '36.23'
+                Al2O3: '23.23'
+                Fe2O3: '9.14'
+                MgO: '7.27'
+                CaO: '16.84'
+                Na2O: '7.62'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3826,7 +4052,7 @@ species:
           CaO: '21.08'
           Na2O: 2.32 (0.06)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.61'
@@ -3885,8 +4111,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.79'
+                Al2O3: '13.94'
+                Fe2O3: '9.36'
+                MgO: '9.13'
+                CaO: '21.08'
+                Na2O: '2.32'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3955,7 +4190,7 @@ species:
           CaO: '20.85'
           Na2O: 3.62 (0.09)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.73'
@@ -4014,8 +4249,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.4'
+                Al2O3: '13.80'
+                Fe2O3: '9.09'
+                MgO: '8.97'
+                CaO: '20.85'
+                Na2O: '3.62'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4084,7 +4328,7 @@ species:
           CaO: '20.71'
           Na2O: 3.88 (0.08)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.55'
@@ -4143,8 +4387,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.21'
+                Al2O3: '13.80'
+                Fe2O3: '8.94'
+                MgO: '9.01'
+                CaO: '20.71'
+                Na2O: '3.88'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4213,7 +4466,7 @@ species:
           CaO: '11.29'
           Na2O: 2.34 (0.06)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.63'
@@ -4272,8 +4525,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '64.95'
+                Al2O3: '7.50'
+                Fe2O3: '9.66'
+                MgO: '4.90'
+                CaO: '11.29'
+                Na2O: '2.34'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4342,7 +4604,7 @@ species:
           CaO: '10.82'
           Na2O: 6.33 (0.14)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.65'
@@ -4401,8 +4663,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '62.44'
+                Al2O3: '7.18'
+                Fe2O3: '9.21'
+                MgO: '4.68'
+                CaO: '10.82'
+                Na2O: '6.33'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4471,7 +4742,7 @@ species:
           CaO: '10.53'
           Na2O: 8.93 (0.12)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.87'
@@ -4530,8 +4801,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '60.71'
+                Al2O3: '7.04'
+                Fe2O3: '9.06'
+                MgO: '4.59'
+                CaO: '10.53'
+                Na2O: '8.93'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4600,7 +4880,7 @@ species:
           CaO: '17.88'
           Na2O: 1.85 (0.06)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.69'
@@ -4659,8 +4939,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '38.57'
+                Al2O3: '24.89'
+                Fe2O3: '9.79'
+                MgO: '7.72'
+                CaO: '17.88'
+                Na2O: '1.85'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4729,7 +5018,7 @@ species:
           CaO: '17.53'
           Na2O: 3.92 (0.09)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.39'
@@ -4788,8 +5077,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '37.79'
+                Al2O3: '24.19'
+                Fe2O3: '9.40'
+                MgO: '7.57'
+                CaO: '17.53'
+                Na2O: '3.92'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4858,7 +5156,7 @@ species:
           CaO: '17.44'
           Na2O: 4.23 (0.12)
           K2O: –
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - K2O
         Total_wt_pct_as_published: '100.45'
@@ -4917,8 +5215,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '37.77'
+                Al2O3: '24.13'
+                Fe2O3: '9.31'
+                MgO: '7.57'
+                CaO: '17.44'
+                Na2O: '4.23'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4987,7 +5294,7 @@ species:
           CaO: '11.42'
           Na2O: –
           K2O: 1.22 (0.06)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.61'
@@ -5043,8 +5350,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '64.8'
+                Al2O3: '7.70'
+                Fe2O3: '10.43'
+                MgO: '5.05'
+                CaO: '11.42'
+                K2O: '1.22'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5113,7 +5429,7 @@ species:
           CaO: '10.13'
           Na2O: –
           K2O: 10.49 (0.10)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.30'
@@ -5172,8 +5488,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '59.41'
+                Al2O3: '6.81'
+                Fe2O3: '9.00'
+                MgO: '4.46'
+                CaO: '10.13'
+                K2O: '10.49'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5242,7 +5567,7 @@ species:
           CaO: '9.51'
           Na2O: –
           K2O: 14.52 (0.09)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '99.97'
@@ -5301,8 +5626,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '56.65'
+                Al2O3: '6.46'
+                Fe2O3: '8.63'
+                MgO: '4.21'
+                CaO: '9.51'
+                K2O: '14.52'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5371,7 +5705,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: 4.36 (0.35)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.70'
@@ -5430,8 +5764,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '61.41'
+                Al2O3: '11.81'
+                Fe2O3: '9.64'
+                MgO: '13.46'
+                CaO: '0.01'
+                K2O: '4.36'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5500,7 +5843,7 @@ species:
           CaO: '0.02'
           Na2O: –
           K2O: 12.1 (0.07)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.15'
@@ -5559,8 +5902,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '56.05'
+                Al2O3: '10.90'
+                Fe2O3: '8.79'
+                MgO: '12.29'
+                CaO: '0.02'
+                K2O: '12.1'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5629,7 +5981,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: 16.06 (0.14)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.31'
@@ -5688,8 +6040,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '53.45'
+                Al2O3: '10.33'
+                Fe2O3: '8.49'
+                MgO: '11.97'
+                CaO: '0.01'
+                K2O: '16.06'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5758,7 +6119,7 @@ species:
           CaO: '11.21'
           Na2O: –
           K2O: 1.69 (0.08)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.19'
@@ -5814,8 +6175,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '64.91'
+                Al2O3: '7.52'
+                Fe2O3: '9.96'
+                MgO: '4.9'
+                CaO: '11.21'
+                K2O: '1.69'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5884,7 +6254,7 @@ species:
           CaO: '10.31'
           Na2O: –
           K2O: 9.21 (0.08)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '99.80'
@@ -5943,8 +6313,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '59.75'
+                Al2O3: '6.84'
+                Fe2O3: '9.20'
+                MgO: '4.49'
+                CaO: '10.31'
+                K2O: '9.21'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6013,7 +6392,7 @@ species:
           CaO: '10.01'
           Na2O: –
           K2O: 11.30 (0.15)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '99.97'
@@ -6072,8 +6451,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '58.57'
+                Al2O3: '6.69'
+                Fe2O3: '8.97'
+                MgO: '4.42'
+                CaO: '10.01'
+                K2O: '11.30'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6142,7 +6530,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: 3.43 (0.14)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.67'
@@ -6201,8 +6589,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '62.51'
+                Al2O3: '11.81'
+                Fe2O3: '9.47'
+                MgO: '13.44'
+                CaO: '0.01'
+                K2O: '3.43'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6271,7 +6668,7 @@ species:
           CaO: '0.02'
           Na2O: –
           K2O: 11.15 (0.06)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.33'
@@ -6330,8 +6727,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '56.88'
+                Al2O3: '11.01'
+                Fe2O3: '8.85'
+                MgO: '12.42'
+                CaO: '0.02'
+                K2O: '11.15'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6400,7 +6806,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: 13.12 (0.05)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.38'
@@ -6459,8 +6865,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '55.54'
+                Al2O3: '10.75'
+                Fe2O3: '8.69'
+                MgO: '12.26'
+                CaO: '0.01'
+                K2O: '13.12'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6529,7 +6944,7 @@ species:
           CaO: '10.66'
           Na2O: –
           K2O: 2.8 (0.05)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.04'
@@ -6585,8 +7000,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '65.22'
+                Al2O3: '7.16'
+                Fe2O3: '9.53'
+                MgO: '4.67'
+                CaO: '10.66'
+                K2O: '2.8'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6655,7 +7079,7 @@ species:
           CaO: '10.35'
           Na2O: –
           K2O: 8.61 (0.05)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '99.94'
@@ -6714,8 +7138,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '60.22'
+                Al2O3: '6.97'
+                Fe2O3: '9.23'
+                MgO: '4.55'
+                CaO: '10.35'
+                K2O: '8.61'
           locator:
             page: 5
             pdf_page_index: 4
@@ -6784,7 +7217,7 @@ species:
           CaO: '10.28'
           Na2O: –
           K2O: 10.14 (0.07)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.05'
@@ -6843,8 +7276,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '59.16'
+                Al2O3: '6.76'
+                Fe2O3: '9.20'
+                MgO: '4.52'
+                CaO: '10.28'
+                K2O: '10.14'
           locator:
             page: 5
             pdf_page_index: 4
@@ -6913,7 +7355,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: 2.64 (0.04)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.99'
@@ -6972,8 +7414,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '62.73'
+                Al2O3: '12.22'
+                Fe2O3: '9.62'
+                MgO: '13.77'
+                CaO: '0.01'
+                K2O: '2.64'
           locator:
             page: 5
             pdf_page_index: 4
@@ -7042,7 +7493,7 @@ species:
           CaO: '0.01'
           Na2O: –
           K2O: 10.75 (0.09)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.55'
@@ -7101,8 +7552,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '57.29'
+                Al2O3: '11.07'
+                Fe2O3: '8.90'
+                MgO: '12.53'
+                CaO: '0.01'
+                K2O: '10.75'
           locator:
             page: 5
             pdf_page_index: 4
@@ -7171,7 +7631,7 @@ species:
           CaO: '0.00'
           Na2O: –
           K2O: 12.41 (0.12)
-        composition_status: unknown_incomplete_as_published
+        composition_status: calculated
         composition_missing_components:
         - Na2O
         Total_wt_pct_as_published: '100.46'
@@ -7230,8 +7690,17 @@ species:
             note: Experiments were conducted at one-atmosphere total pressure.
         composition:
           state:
-            tag: unknown
-            reason: At least one Na2O or K2O cell is an em dash; the incomplete analyzed composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '56.00'
+                Al2O3: '10.88'
+                Fe2O3: '8.77'
+                MgO: '12.41'
+                CaO: '0.00'
+                K2O: '12.41'
           locator:
             page: 5
             pdf_page_index: 4
