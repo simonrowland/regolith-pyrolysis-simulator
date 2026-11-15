@@ -112,6 +112,7 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
             for row in migration.observations.values()
             if row.identity.quantity.is_value
             and row.identity.quantity.value is Quantity.ACTIVITY
+            and row.identity.species.formula == "FeO"
         ]
         assert len(rows) == expected_count
         total_rows += len(rows)
