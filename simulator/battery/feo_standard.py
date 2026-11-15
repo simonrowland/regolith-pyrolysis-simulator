@@ -10,6 +10,7 @@ from functools import lru_cache
 from importlib import resources
 from typing import Mapping, Sequence
 
+from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.enums import Engine, NoticeKind, Quantity, RefusalReason
 from simulator.battery.records import Notice, ResidualRefusal
 from simulator.physical_constants import GAS_CONSTANT
@@ -37,12 +38,71 @@ _OPENIMCC_DEFAULT_PACK_DIGEST = (
 _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
     "b927cf95fe788016d37ccfac87a9c80bbb15ec519aa624d929e3106c1759adf0"
 )
+_OPENIMCC_REDOX_DG46_FEO_COEFFICIENTS = {
+    "dH298_R": Decimal("-26.668958359186785"),
+    "dG_A": Decimal("8.03837194242113"),
+    "dG_B": Decimal("6.588"),
+    "dG_C": Decimal("-1.248"),
+    "dG_D": Decimal("0.15"),
+    "dG_E": Decimal("-0.007697"),
+}
 
 
 def _source_value(sources: Sequence[str], prefix: str) -> str | None:
     return next(
         (source[len(prefix):] for source in sources if source.startswith(prefix)),
         None,
+    )
+
+
+def _openimcc_redox_pack_feo_row() -> Mapping[str, object]:
+    import openimcc
+
+    payload = json.loads(
+        resources.files(openimcc)
+        .joinpath("data", "packs", "openimcc-redox-v1.json")
+        .read_text(encoding="utf-8")
+    )
+    species = payload.get("thermo_species") if isinstance(payload, Mapping) else None
+    row = species.get("FeO(l)") if isinstance(species, Mapping) else None
+    if not isinstance(row, Mapping):
+        raise ValueError("OpenIMCC redox FeO(l) row is missing")
+    return row
+
+
+def _redox_pack_feo_row_refusal(
+    row: Mapping[str, object],
+) -> ResidualRefusal | None:
+    for key, expected in _OPENIMCC_REDOX_DG46_FEO_COEFFICIENTS.items():
+        try:
+            actual = Decimal(str(row[key]))
+        except (InvalidOperation, KeyError, TypeError, ValueError):
+            actual = None
+        if actual != expected:
+            return ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_redox_standard_row_mismatch",
+                    "field": key,
+                    "expected": str(expected),
+                    "actual": None if actual is None else str(actual),
+                },
+            )
+    return None
+
+
+def _redox_melt_standard_refusal(
+    standard: _FeOActivityStandard,
+) -> ResidualRefusal | None:
+    if standard.name == "DG46-MASSON65":
+        return None
+    return ResidualRefusal(
+        RefusalReason.METRIC_DOMAIN,
+        {
+            "reason": "openimcc_feo_redox_melt_standard_mismatch",
+            "melt_standard": standard.name,
+            "redox_standard": "DG46-MASSON65",
+        },
     )
 
 
@@ -68,77 +128,129 @@ def _resolve_feo_activity_standard(
         coefficient_sources,
         "openimcc-redox-pack:sha256:",
     )
-    if (
-        redox_pack_digest is not None
-        and redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
-    ):
-        return None, ResidualRefusal(
-            RefusalReason.METRIC_DOMAIN,
-            {
-                "reason": "openimcc_feo_redox_pack_digest_mismatch",
-                "expected_redox_pack_digest": _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST,
-                "actual_redox_pack_digest": redox_pack_digest,
-            },
-        )
+    if redox_pack_digest is not None:
+        if redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_redox_pack_digest_mismatch",
+                    "expected_redox_pack_digest": _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST,
+                    "actual_redox_pack_digest": redox_pack_digest,
+                },
+            )
+        try:
+            redox_row = _openimcc_redox_pack_feo_row()
+        except (ImportError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_redox_standard_row_unavailable",
+                    "detail": str(exc),
+                },
+            )
+        redox_row_refusal = _redox_pack_feo_row_refusal(redox_row)
+        if redox_row_refusal is not None:
+            return None, redox_row_refusal
 
     if temperature_K is None or temperature_K <= 0:
         return None, ResidualRefusal(
             RefusalReason.METRIC_DOMAIN,
             {"reason": "feo_activity_standard_temperature_missing"},
         )
-    identity, identity_refusal = _validate_openimcc_melt_pack_identity(
-        melt_pack_identity
+
+    melt_binding_digest = _source_value(
+        coefficient_sources,
+        "openimcc-melt-binding:sha256:",
     )
-    if identity_refusal is not None:
-        return None, identity_refusal
-    assert identity is not None
-    try:
-        pack_name, pack_payload = _openimcc_melt_pack_payload(identity)
-    except (ImportError, OSError, ValueError, TypeError, KeyError) as exc:
-        reason = (
-            "openimcc_feo_standard_melt_pack_identity_unknown"
-            if str(exc) == "melt pack identity is not a pinned OpenIMCC pack"
-            else "openimcc_feo_standard_pack_data_unavailable"
+    if melt_pack_identity is not None:
+        identity, identity_refusal = _validate_openimcc_melt_pack_identity(
+            melt_pack_identity
         )
-        return None, ResidualRefusal(
-            RefusalReason.METRIC_DOMAIN,
-            {
-                "reason": reason,
-                "melt_pack_identity": identity,
-                "detail": str(exc),
-            },
-        )
+        if identity_refusal is not None:
+            return None, identity_refusal
+        assert identity is not None
+        if (
+            melt_binding_digest is not None
+            and melt_binding_digest != identity["binding_digest"]
+        ):
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_standard_melt_pack_identity_mismatch",
+                    "identity_digest": identity["binding_digest"],
+                    "coefficient_source_digest": melt_binding_digest,
+                },
+            )
+        try:
+            pack_name, pack_payload = _openimcc_melt_pack_payload(identity)
+        except (ImportError, OSError, ValueError, TypeError, KeyError) as exc:
+            reason = (
+                "openimcc_feo_standard_melt_pack_identity_unknown"
+                if str(exc) == "melt pack identity is not a pinned OpenIMCC pack"
+                else "openimcc_feo_standard_pack_data_unavailable"
+            )
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": reason, "melt_pack_identity": identity, "detail": str(exc)},
+            )
+    else:
+        if melt_binding_digest is None:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "openimcc_feo_standard_melt_pack_identity_missing"},
+            )
+        try:
+            pack_name, identity, pack_payload = (
+                _openimcc_melt_pack_payload_for_digest(melt_binding_digest)
+            )
+        except (ImportError, OSError, ValueError, TypeError, KeyError) as exc:
+            reason = (
+                "openimcc_feo_standard_melt_pack_identity_unknown"
+                if str(exc) == "melt pack identity is not a pinned OpenIMCC pack"
+                else "openimcc_feo_standard_pack_data_unavailable"
+            )
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": reason, "melt_pack_binding_digest": melt_binding_digest, "detail": str(exc)},
+            )
 
     candidate = pack_payload.get("feo_liquid_candidate")
     if pack_name == "published-core" and candidate is None:
-        return _FeOActivityStandard(
+        standard = _FeOActivityStandard(
             name=_FEO_ACTIVITY_CANONICAL_STANDARD,
             offset_j_mol=Decimal(0),
             melt_pack_identity=identity,
-        ), None
-    if not isinstance(candidate, Mapping):
-        return None, ResidualRefusal(
-            RefusalReason.METRIC_DOMAIN,
-            {
-                "reason": "openimcc_feo_standard_pack_candidate_missing",
-                "melt_pack_identity": identity,
-            },
         )
-    offset, detail = _feo_liquid_candidate_delta_g(candidate, temperature_K)
-    if offset is None:
-        return None, ResidualRefusal(
-            RefusalReason.METRIC_DOMAIN,
-            {
-                "reason": "openimcc_feo_standard_delta_g_unreadable",
-                "melt_pack_identity": identity,
-                "detail": detail,
-            },
+    else:
+        if not isinstance(candidate, Mapping):
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_standard_pack_candidate_missing",
+                    "melt_pack_identity": identity,
+                },
+            )
+        offset, detail = _feo_liquid_candidate_delta_g(candidate, temperature_K)
+        if offset is None:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_standard_delta_g_unreadable",
+                    "melt_pack_identity": identity,
+                    "detail": detail,
+                },
+            )
+        standard = _FeOActivityStandard(
+            name="DG46-MASSON65",
+            offset_j_mol=offset,
+            melt_pack_identity=identity,
         )
-    return _FeOActivityStandard(
-        name="DG46-MASSON65",
-        offset_j_mol=offset,
-        melt_pack_identity=identity,
-    ), None
+
+    if redox_pack_digest is not None:
+        refusal = _redox_melt_standard_refusal(standard)
+        if refusal is not None:
+            return None, refusal
+    return standard, None
 
 
 def _validated_openimcc_melt_pack_identity(
@@ -197,26 +309,36 @@ def _openimcc_pack_identity_and_payload(
     return identity, payload
 
 
-def _openimcc_melt_pack_payload(
-    identity: Mapping[str, str],
-) -> tuple[str, dict[str, object]]:
+def _openimcc_melt_pack_payload_for_digest(
+    binding_digest: str,
+) -> tuple[str, Mapping[str, str], dict[str, object]]:
     for pack_name in ("default", "published-core"):
-        pack_identity, payload = _openimcc_pack_identity_and_payload(pack_name)
-        if pack_identity != dict(identity):
+        identity, payload = _openimcc_pack_identity_and_payload(pack_name)
+        if identity["binding_digest"] != binding_digest:
             continue
         if pack_name == "default" and (
             identity["pack_version"] != _OPENIMCC_DEFAULT_PACK_VERSION
-            or identity["binding_digest"] != _OPENIMCC_DEFAULT_PACK_DIGEST
+            or binding_digest != _OPENIMCC_DEFAULT_PACK_DIGEST
         ):
             continue
         if (
             pack_name == "published-core"
-            and identity["binding_digest"]
-            != _OPENIMCC_PUBLISHED_CORE_PACK_DIGEST
+            and binding_digest != _OPENIMCC_PUBLISHED_CORE_PACK_DIGEST
         ):
             continue
-        return pack_name, payload
+        return pack_name, identity, payload
     raise ValueError("melt pack identity is not a pinned OpenIMCC pack")
+
+
+def _openimcc_melt_pack_payload(
+    identity: Mapping[str, str],
+) -> tuple[str, dict[str, object]]:
+    pack_name, pinned_identity, payload = _openimcc_melt_pack_payload_for_digest(
+        identity["binding_digest"]
+    )
+    if dict(identity) != dict(pinned_identity):
+        raise ValueError("melt pack identity is not a pinned OpenIMCC pack")
+    return pack_name, payload
 
 
 def _feo_liquid_candidate_delta_g(
@@ -249,6 +371,10 @@ def _canonical_log10_feo_activity(
     """Convert FeO(l) activity from its engine standard to Fe-019."""
     if offset_j_mol == 0:
         return log10_engine_activity
+    # For one FeO chemical potential, equating μ = μ° + RT ln(a) gives
+    # log10(a_Fe-019) = log10(a_engine) + delta_G°/(RT ln(10)). The MELT
+    # pack's candidate supplies delta_G° in J/mol; the denominator has the
+    # same units, leaving a dimensionless activity shift.
     denominator = (
         Decimal(str(GAS_CONSTANT))
         * temperature_K
@@ -289,9 +415,9 @@ def normalize_openimcc_feo_activity_value(
         "from_standard": standard.name,
         "to_standard": _FEO_ACTIVITY_CANONICAL_STANDARD,
         "melt_pack_identity": dict(standard.melt_pack_identity),
-        "delta_g_j_mol": str(standard.offset_j_mol.normalize()),
-        "log10_shift": str(shift.normalize()),
-        "temperature_K": str(temperature_K.normalize()),
+        "delta_g_j_mol": decimal_token(standard.offset_j_mol),
+        "log10_shift": decimal_token(shift),
+        "temperature_K": decimal_token(temperature_K),
     }
     notice = Notice(
         kind=NoticeKind.ENGINE_MODEL_CAVEAT,

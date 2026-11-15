@@ -434,6 +434,7 @@ class OpenImccRedoxResult:
     extrapolated_redox_rows: tuple[str, ...]
     active_row_band_intersection_K: tuple[float, float]
     redox_pack_digest: str
+    melt_pack_binding_digest: str | None = None
 
     def lean(self) -> dict[str, Any]:
         return {
@@ -448,6 +449,7 @@ class OpenImccRedoxResult:
             "extrapolated_redox_rows": self.extrapolated_redox_rows,
             "active_row_band_intersection_K": self.active_row_band_intersection_K,
             "redox_pack_digest": self.redox_pack_digest,
+            "melt_pack_binding_digest": self.melt_pack_binding_digest,
         }
 
     def to_hot(self) -> Any:
@@ -491,10 +493,31 @@ class OpenImccRedoxResult:
                 float(value) for value in payload["active_row_band_intersection_K"]
             ),
             redox_pack_digest=str(payload["redox_pack_digest"]),
+            melt_pack_binding_digest=(
+                str(payload["melt_pack_binding_digest"])
+                if isinstance(payload.get("melt_pack_binding_digest"), str)
+                and payload["melt_pack_binding_digest"]
+                else None
+            ),
         )
 
     @classmethod
     def from_engine_result(cls, result: Any) -> OpenImccRedoxResult:
+        melt_pack_binding_digest = getattr(
+            result, "melt_pack_binding_digest", None
+        )
+        if not isinstance(melt_pack_binding_digest, str) or not melt_pack_binding_digest:
+            receipt = getattr(result, "receipt", None)
+            data_digests = (
+                receipt.get("data_digests")
+                if isinstance(receipt, Mapping)
+                else getattr(receipt, "data_digests", None)
+            )
+            melt_pack_binding_digest = (
+                data_digests.get("melt")
+                if isinstance(data_digests, Mapping)
+                else None
+            )
         return cls(
             temperature_K=float(result.temperature_K),
             mode=str(result.mode),
@@ -513,6 +536,12 @@ class OpenImccRedoxResult:
                 float(value) for value in result.active_row_band_intersection_K
             ),
             redox_pack_digest=str(result.redox_pack_digest),
+            melt_pack_binding_digest=(
+                melt_pack_binding_digest
+                if isinstance(melt_pack_binding_digest, str)
+                and melt_pack_binding_digest
+                else None
+            ),
         )
 
 
@@ -1351,6 +1380,7 @@ def evaluate_redox(
     from simulator.engine_cache import cached_engine_call, record_engine_open
 
     record_engine_open("openimcc")
+    melt_pack_binding_digest = _pack_digest(_load_pack("default"))
 
     request = {
         "call": entry,
@@ -1358,6 +1388,7 @@ def evaluate_redox(
         "temperature_K": temperature_K,
         "mode": mode,
         "lambda_imposed": lambda_imposed,
+        "melt_pack_binding_digest": melt_pack_binding_digest,
     }
 
     def solve() -> Any:
