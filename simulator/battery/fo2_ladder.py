@@ -5,7 +5,8 @@ The general ladder is the seeding order from d-160/d-163:
 1. printed fO2;
 2. printed Fe3+/ΣFe through the Kress91 inverse;
 3. the experiment's controlled atmosphere or buffer, including the
-   effusion oxygen-mass-balance closure and metal/slag saturation;
+   effusion oxygen-mass-balance closure; unsupported FeO(l) metal-saturation
+   activity targets are refused under d-305;
 4. the melt's intrinsic fO2, flagged borrowed.
 
 Knudsen vapour rows keep printed fO2 and explicit atmosphere/buffer routes
@@ -28,7 +29,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 
 from simulator.battery.enums import (
@@ -57,6 +58,7 @@ from simulator.battery.records import (
     Value,
     nominal_pressure_pa,
 )
+from simulator.battery.source_oxygen import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
     Waypoint,
     WaypointAuthority,
@@ -65,7 +67,6 @@ from simulator.battery.waypoints import (
 )
 from simulator.chemistry.graphite_c_co import carbon_delta_g_co_kj_per_mol_o2
 from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
-from simulator.state import MOLAR_MASS
 
 _TIER1_DIRECT_ROUTES = frozenset({
     "oxygen_partial_pressure_to_log_fO2",
@@ -120,12 +121,20 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
     reason += f"; route={resolved.route}"
     if resolved.borrowed:
         reason += "; borrowed"
-    return Notice(
-        kind=(
+    if resolved.route.endswith("rys_pO2_calculated_from_pNa_not_independent"):
+        reason += "; source-calculated pO2 from observed pNa omitted as a circular condition"
+        kind = NoticeKind.INPUT_OMITTED
+    elif resolved.route.endswith("rys_pO2_provenance_unknown"):
+        reason += "; row-level pO2 provenance unknown; treated as non-independent"
+        kind = NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+    else:
+        kind = (
             NoticeKind.OUT_OF_CERTIFIED_BAND
             if resolved.borrowed
             else NoticeKind.SOURCE_DISAGREEMENT
-        ),
+        )
+    return Notice(
+        kind=kind,
         affected_quantities=(quantity,),
         reason=reason,
         origin="fo2_ladder",
@@ -185,6 +194,11 @@ def derived_fo2_condition(observation: Observation) -> bool:
 def has_printed_fo2(observation: Observation, identity: Identity) -> bool:
     from simulator.battery.source_oxygen import printed_source_pressure
 
+    if _rys_oxygen_measurement_status(observation, None) not in {
+        None,
+        "measured_independent",
+    }:
+        return False
     if derived_fo2_condition(observation):
         return False
     fo2 = identity.fO2_Pa
@@ -225,7 +239,19 @@ def resolve_row_fo2(
         temperature = None
     routes = _oxygen_routes(experiment, bench, observation, oxygen)
     knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
+    rys_row_oxygen_unverified = (
+        _rys_oxygen_measurement_status(observation, quantity)
+        not in {None, "measured_independent"}
+    )
     for route in routes:
+        if (
+            rys_row_oxygen_unverified
+            and route.route in {
+                "observation_fO2_log",
+                "observation_fO2_Pa_to_log_fO2",
+            }
+        ):
+            continue
         if _is_tier1(route, observation):
             log = _log_point(route.value)
             if log is not None:
@@ -233,7 +259,11 @@ def resolve_row_fo2(
                     log, 1, route.route, False,
                     physics_rung=1 if knudsen_vapour else None,
                 )
-    printed = _printed_identity_bar(observation, identity)
+    printed = (
+        None
+        if rys_row_oxygen_unverified
+        else _printed_identity_bar(observation, identity)
+    )
     if printed is not None:
         bar, log = printed
         return ResolvedFo2(
@@ -331,42 +361,6 @@ def resolve_row_fo2(
                     False,
                     physics_rung=1,
                 )
-    if (
-        observation is not None
-        and observation.source_id == "rys-2007-alkali-oxide-thermodynamics"
-        and identity is not None
-        and getattr(identity.species, "formula", None) == "Na"
-        and quantity is Quantity.P_PARTIAL
-        and _is_knudsen(experiment)
-        and temperature is not None
-        and math.isfinite(temperature)
-        and temperature > 0.0
-    ):
-        p_na_bar = _pascal_point_to_bar(observation.value)
-        if p_na_bar is not None:
-            # d-367: predict the missing oxygen condition from congruent Na2O
-            # vaporisation; this route is explicitly flagged as predicted.
-            # Premise: Na2O -> 2 Na + 1/2 O2, so J_Na = 4 J_O2; Knudsen
-            # effusion has J_i proportional to p_i/sqrt(M_i).
-            # Algebra: p_Na/sqrt(M_Na) = 4*p_O2/sqrt(M_O2), hence
-            # p_O2 = (1/4)*p_Na*sqrt(M_O2/M_Na).
-            # Units: both pressures use bar and the molar-mass ratio is
-            # dimensionless (MOLAR_MASS is consistently g/mol).
-            # Sanity: row 8 p_Na=0.01475 Pa gives p_O2≈0.00435037 Pa,
-            # below p_Na; the factor 1/4 follows the 2:1/2 flux stoichiometry.
-            p_o2_bar = (
-                0.25
-                * p_na_bar
-                * math.sqrt(MOLAR_MASS["O2"] / MOLAR_MASS["Na"])
-            )
-            return ResolvedFo2(
-                math.log10(p_o2_bar),
-                3,
-                "rys_congruent_vaporization_predicted",
-                False,
-                po2_bar=p_o2_bar,
-                physics_rung=3,
-            )
     if knudsen_vapour and (temperature is None or not weights):
         return None
     closure = _effusion_closure(
@@ -378,9 +372,12 @@ def resolve_row_fo2(
         weights=weights,
     )
     if closure is not None:
+        provenance = _rys_pO2_provenance(observation, quantity)
+        if provenance is not None:
+            return replace(closure, route=f"{closure.route}; {provenance}")
         return closure
-    if _metal_saturation_declared(experiment):
-        return _metal_saturation_fo2(observation, temperature, quantity)
+    if metal_saturation_activity_refusal(experiment, observation, quantity) is not None:
+        return None
     for route in routes:
         if route.route == _VACUUM_ROUTE:
             log = _log_point(route.value)
@@ -404,11 +401,15 @@ def _metal_saturation_declared(experiment: Experiment | None) -> bool:
     )
 
 
-def _metal_saturation_fo2(
+def metal_saturation_activity_refusal(
+    experiment: Experiment | None,
     observation: Observation | None,
-    temperature_K: float | None,
-    quantity: Quantity | None,
-) -> ResolvedFo2 | None:
+    quantity: Quantity | None = None,
+) -> Notice | None:
+    """Typed d-305 refusal for an FeO(l) activity that would seed its own fO2."""
+
+    if not _metal_saturation_declared(experiment):
+        return None
     identity = _identity(observation)
     resolved_quantity = quantity or (
         None if identity is None else quantity_token(identity)
@@ -416,7 +417,6 @@ def _metal_saturation_fo2(
     if (
         observation is None
         or identity is None
-        or temperature_K is None
         or resolved_quantity is not Quantity.ACTIVITY
         or identity.species.formula.strip().casefold() != "feo"
         or identity.species.phase is None
@@ -436,43 +436,47 @@ def _metal_saturation_fo2(
         or reference_state.value.endmember.phase.value is not Phase.L
     ):
         return None
-    value = observation.value
-    if value.kind is not ValueKind.POINT or value.point is None:
-        return None
-    try:
-        activity_feo = float(value.point)
-    except (TypeError, ValueError, ArithmeticError):
-        return None
-    if not math.isfinite(activity_feo) or activity_feo <= 0.0:
-        return None
-
-    # Premise: coexisting pure Fe fixes a_Fe=1 in 2 Fe + O2 = 2 FeO.
-    # Algebra: 0=ΔG°+RT ln(a_FeO²/(a_Fe² fO2)), hence
-    #          log10(fO2)=2 log10(a_FeO)+ΔG°/(RT ln 10).
-    # Unit check: JANAF ΔG° is kJ/mol-O2; (R/1000)·T is kJ/mol-O2.
-    # Sanity: at 1873 K with printed a_FeO=0.306, the owner gives -9.6861.
-    from simulator.chemistry.ellingham_thermo import (
-        ellingham_delta_g_kj_per_mol_o2,
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason=(
+            "d-305: metal-saturation FeO(l) activity target cannot supply its "
+            "own fO2; fO2 and a_FeO must be solved jointly from bulk composition"
+        ),
+        origin="fo2_ladder",
     )
-    from simulator.physical_constants import GAS_CONSTANT
 
-    try:
-        delta_g_kj_per_mol_o2 = ellingham_delta_g_kj_per_mol_o2(
-            "Fe", temperature_K
-        )
-    except (TypeError, ValueError, ArithmeticError):
+
+def _rys_oxygen_measurement_status(
+    observation: Observation | None, quantity: Quantity | None,
+) -> str | None:
+    identity = _identity(observation)
+    if (
+        observation is None
+        or observation.source_id != RYS_SOURCE_ID
+        or identity is None
+        or getattr(identity.species, "formula", None) != "Na"
+        or (quantity or quantity_token(identity)) is not Quantity.P_PARTIAL
+    ):
         return None
-    log10_fo2 = (
-        2.0 * math.log10(activity_feo)
-        + delta_g_kj_per_mol_o2
-        / ((GAS_CONSTANT / 1000.0) * temperature_K * math.log(10.0))
+    status = (observation.provenance or {}).get(
+        "oxygen_measurement_status", "unknown"
     )
-    if not math.isfinite(log10_fo2):
+    return status if isinstance(status, str) else "unknown"
+
+
+def _rys_pO2_provenance(
+    observation: Observation | None, quantity: Quantity | None,
+) -> str | None:
+    status = _rys_oxygen_measurement_status(observation, quantity)
+    if status is None:
         return None
-    route = "metal_saturation"
-    if resolved_quantity is Quantity.ACTIVITY:
-        route += "; fo2 from printed a_FeO (circular for a_FeO rows)"
-    return ResolvedFo2(log10_fo2, 3, route, False)
+    if (
+        status == "calculated_from_pNa"
+        or derived_fo2_condition(observation)
+    ):
+        return "rys_pO2_calculated_from_pNa_not_independent"
+    return "rys_pO2_provenance_unknown"
 
 
 def _identity(observation: Observation | None) -> Identity | None:

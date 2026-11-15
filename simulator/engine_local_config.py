@@ -1145,7 +1145,7 @@ def setup_thermoengine_dylib_path() -> Path:
     return dylib_dir
 
 
-def _load_thermoengine_phaseobjc_library() -> Path:
+def _thermoengine_phaseobjc_library_path() -> Path:
     dylib_dir = setup_thermoengine_dylib_path()
     library_name = next(
         (
@@ -1159,7 +1159,11 @@ def _load_thermoengine_phaseobjc_library() -> Path:
         raise ImportError(
             "ThermoEngine engine lock does not declare its phaseobjc library"
         )
-    library_path = dylib_dir / library_name
+    return dylib_dir / library_name
+
+
+def _load_thermoengine_phaseobjc_library() -> Path:
+    library_path = _thermoengine_phaseobjc_library_path()
     try:
         ctypes.CDLL(str(library_path))
     except OSError as exc:

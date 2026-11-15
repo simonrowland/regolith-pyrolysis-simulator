@@ -64,6 +64,31 @@ def format_store_stamp_report_lines(
     return lines
 
 
+def _score_shard_failure_report_lines(
+    failures: Sequence[Mapping[str, object]],
+) -> list[str]:
+    lines = [
+        "## Score shard failures",
+        "",
+        "Failed shards were completed with typed refusals for rows that had no output.",
+        "",
+        "| chunk | engine | refused rows | reason |",
+        "|---:|---|---:|---|",
+    ]
+    for failure in failures:
+        reason = (
+            str(failure.get("reason", ""))
+            .replace("|", "\\|")
+            .replace("`", "\\`")
+            .replace("\n", " ")
+        )
+        lines.append(
+            f"| {failure.get('chunk', '—')} | {failure.get('engine', '—')} | "
+            f"{failure.get('refused_rows', 0)} | `{reason}` |"
+        )
+    return lines
+
+
 def _e15_number(value: Decimal | None, *, places: int = 3, signed: bool = False) -> str:
     if value is None:
         return "—"
