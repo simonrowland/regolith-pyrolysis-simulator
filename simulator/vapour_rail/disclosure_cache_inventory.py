@@ -1134,6 +1134,14 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Caches compiled species and phase/reaction annotations for scoring eligibility; it does not call evaluate() or produce pressures.',
     },
+    'lru:simulator/engine_cache.py:runtime_identity': {
+        "path": 'simulator/engine_cache.py',
+        "line": 428,
+        "kind": 'lru',
+        "name": 'runtime_identity',
+        "carries_disclosure": False,
+        "how": 'Caches backend binary, source, or distribution identity by engine_id. It reads runtime metadata and never evaluates a vapour law or stores a thermodynamic value.',
+    },
     'lru:simulator/reference_data/janaf.py:_compiled_table_by_id': {
         "path": 'simulator/reference_data/janaf.py',
         "line": 1238,

@@ -4631,17 +4631,29 @@ def _exercise_core_memo(_tmp_path, monkeypatch) -> None:
 
 
 def _openimcc_activity_state() -> object:
-    from types import SimpleNamespace
+    from simulator.melt_backend.imcc_adapter_labels import ImccAdapterLabels
+    from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
 
-    return SimpleNamespace(
+    labels = ImccAdapterLabels(
+        identity={"model_id": "b119-disclosure"},
+        coverage={"FeO": "covered"},
+        trust="diagnostic",
+        envelope_status="in_domain",
+    )
+    return OpenImccBridgeResult(
         parent_oxide_activities={"FeO": 1.0},
         parent_oxides=("FeO",),
         flags=(),
-        extrapolated=False,
+        notices=(),
+        acid_sink_ratio=None,
         pack_model_id="b119-disclosure",
         pack_version="b119-disclosure",
         pack_digest="b119-disclosure",
         openimcc_version="b119-disclosure",
+        envelope_status="in_domain",
+        extrapolated=False,
+        labels=labels,
+        coverage={"FeO": "covered"},
     )
 
 
@@ -4714,7 +4726,10 @@ def _exercise_pressure_cache(_tmp_path, monkeypatch) -> None:
     cache: dict = {}
     bridge = SimpleNamespace(
         _cleaned_melt_policy=lambda composition: (dict(composition), {"policy": "test"}),
-        evaluate=lambda **_kwargs: None,
+        _evaluate_request_vector=lambda **kwargs: kwargs,
+        _evaluate_uncached=lambda **_kwargs: None,
+        evaluate_gas=lambda *_args, **_kwargs: {"Fe": 1.0},
+        DEFAULT_GAS_PACK_SELECTION="default",
     )
     model = _sossi_openimcc_pressure_model(
         cache,
@@ -4727,7 +4742,6 @@ def _exercise_pressure_cache(_tmp_path, monkeypatch) -> None:
         melt_activity_input_policy={},
         melt_activity_extensions={},
         openimcc_bridge=bridge,
-        evaluate_gas=lambda *_args, **_kwargs: {"Fe": 1.0},
         nonconvergence_error=RuntimeError,
     )
     _replay_pressure_closure(model, {"FeO": 1.0}, cache, calls)
@@ -4820,7 +4834,6 @@ def _one_internal_analytical_sossi_row(monkeypatch):
         catalog,
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="b-119-disclosure",
         engine="internal-analytical",
     )[0]
 
