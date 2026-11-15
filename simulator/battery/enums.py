@@ -343,6 +343,7 @@ class NoticeKind(StrEnum):
     ADMISSION_FROM_LEGACY_TOKEN = "admission_from_legacy_token"
     VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
+    EVALUATED_FROM_FIT_ON_DECLARED_GRID = "evaluated_from_fit_on_declared_grid"
     APPROXIMATE_VALUE = "approximate_value"
     # The identity pressure is a band. Distinct from APPROXIMATE_VALUE, which
     # is the measured observable. An exact residue wt% must not take that stratum.

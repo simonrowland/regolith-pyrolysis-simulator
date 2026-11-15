@@ -651,6 +651,22 @@ def _nasa9_fit_test_case():
     return record, context, point
 
 
+def test_nasa9_fit_grid_uses_declared_endpoints_and_density_cap() -> None:
+    from simulator.battery.compilation_tier import _nasa9_fit_temperature_grid
+
+    sparse = _nasa9_fit_temperature_grid(Decimal("200"), Decimal("1000"))
+    assert sparse == tuple(Decimal(value) for value in range(200, 1001, 100))
+
+    dense = _nasa9_fit_temperature_grid(Decimal("200"), Decimal("2000"))
+    assert len(dense) == 11
+    assert dense[0] == Decimal("200")
+    assert dense[-1] == Decimal("2000")
+    assert len(set(b - a for a, b in zip(dense, dense[1:]))) == 1
+    assert all(
+        Decimal("200") <= temperature <= Decimal("2000") for temperature in dense
+    )
+
+
 def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
     tmp_path, monkeypatch
 ) -> None:
@@ -660,6 +676,7 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
     from simulator.battery.compilation_tier import (
         ThermoAttempt,
         _nasa9_fit_comparisons,
+        _nasa9_fit_temperature_grid,
         iter_compilation_comparisons_jsonl,
         write_compilation_comparisons_jsonl,
     )
@@ -699,13 +716,38 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
         invoke_pure_phase=False,
         fit_records=(record,),
     )
-    scored = next(
-        item
-        for item in comparisons
-        if item.quantity is Quantity.CP and item.temperature_K == temperature
+    cp_comparisons = [
+        item for item in comparisons if item.quantity is Quantity.CP
+    ]
+    expected_grid = _nasa9_fit_temperature_grid(
+        Decimal(str(record["validity"]["T_min_K"])),
+        Decimal(str(record["validity"]["T_max_K"])),
     )
+    assert [item.temperature_K for item in cp_comparisons] == list(expected_grid)
+    assert all(
+        item.reference.observation_id.rsplit("#", 1)[0]
+        == f"nasa9-fit::{record['record_id']}::{Quantity.CP.value}"
+        for item in cp_comparisons
+    )
+    scored = cp_comparisons[0]
     assert scored.residual.numeric is not None
     assert scored.residual.numeric.value == 0
+    fit_notices = [
+        next(
+            notice
+            for notice in item.residual.notices
+            if notice.kind is NoticeKind.EVALUATED_FROM_FIT_ON_DECLARED_GRID
+        )
+        for item in cp_comparisons
+    ]
+    assert all(record["record_id"] in notice.reason for notice in fit_notices)
+    assert all("validity_range_K=" in notice.reason for notice in fit_notices)
+    assert all("grid_rule=" in notice.reason for notice in fit_notices)
+    assert all(
+        record["validity"]["T_min_K"] <= float(item.temperature_K)
+        <= record["validity"]["T_max_K"]
+        for item in cp_comparisons
+    )
 
     monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
     monkeypatch.setattr(score, "SCORE_ENGINE_SET", (Engine.THERMOENGINE,))
@@ -732,9 +774,14 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
         "band",
         "refusal_reason",
         "refusal_detail",
+        "notices",
     }
     assert fit_row["refusal_reason"] is None
     assert fit_row["refusal_detail"] == {}
+    assert any(
+        notice["kind"] == NoticeKind.EVALUATED_FROM_FIT_ON_DECLARED_GRID.value
+        for notice in fit_row["notices"]
+    )
 
 
 def test_nasa9_fit_writer_serializes_typed_refusal_fields(tmp_path, monkeypatch) -> None:
@@ -860,7 +907,10 @@ def test_nasa9_fit_mutations_produce_no_comparison(mutation, monkeypatch) -> Non
 
 
 def test_al091_h_minus_h298_fit_restores_all_qualified_comparisons() -> None:
-    from simulator.battery.compilation_tier import _nasa9_fit_comparisons
+    from simulator.battery.compilation_tier import (
+        _nasa9_fit_comparisons,
+        _nasa9_fit_temperature_grid,
+    )
     from simulator.battery.generators.compilation_thermo_fits import load_sidecar
     from simulator.battery.generators.janaf import generate_table
     from simulator.reference_data.janaf import TABLES_DIR, load_table_document
@@ -903,7 +953,12 @@ def test_al091_h_minus_h298_fit_restores_all_qualified_comparisons() -> None:
         for comparison in comparisons
         if comparison.quantity is Quantity.H_MINUS_H298
     ]
-    assert len(h_comparisons) == 16
+    assert len(h_comparisons) == len(
+        _nasa9_fit_temperature_grid(
+            Decimal(str(record["validity"]["T_min_K"])),
+            Decimal(str(record["validity"]["T_max_K"])),
+        )
+    )
 
 
 def test_nasa9_fit_census_is_separate_and_lists_regolith_species() -> None:
