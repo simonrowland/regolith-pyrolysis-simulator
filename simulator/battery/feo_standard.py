@@ -64,7 +64,8 @@ def _openimcc_redox_pack_feo_row() -> Mapping[str, object]:
         .read_text(encoding="utf-8")
     )
     species = payload.get("thermo_species") if isinstance(payload, Mapping) else None
-    row = species.get("FeO(l)") if isinstance(species, Mapping) else None
+    species_entry = species.get("FeO(l)") if isinstance(species, Mapping) else None
+    row = species_entry.get("row") if isinstance(species_entry, Mapping) else None
     if not isinstance(row, Mapping):
         raise ValueError("OpenIMCC redox FeO(l) row is missing")
     return row
