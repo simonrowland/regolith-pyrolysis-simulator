@@ -59,6 +59,7 @@ from simulator.battery.migrate import (
     REPO_ROOT,
     _notice_from_plain,
     DuplicateContextIdError,
+    DuplicateObservationIdError,
     QUEUE_SCHEMA_VERSION,
     _convert_compilation_amount,
     FE3_FE2_RATIO_PRINTED_FIELDS,
@@ -7268,6 +7269,50 @@ def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
 
 
 
+
+
+def test_g05_identical_duplicate_keys_are_aliased(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    source = "data/literature/extracts/fixture-source.yaml"
+    migrator = Migrator(root)
+    count = migrator._count(source)
+    count.rows_in = 2
+    observation = F.observation(
+        "duplicate-probe", "fixture-source", F.o2_identity(), "1"
+    )
+    migrator._add_observation(observation, source, source_row_index=0)
+    migrator._add_observation(observation, source, source_row_index=1)
+
+    result = migrator.result
+    oid = observation.observation_id
+    assert oid in result.observations
+    assert len(result.observations) == 1
+    aliases = [a for a in result.dedupe_aliases if a.observation_id == oid]
+    assert aliases
+    assert aliases[0].row_indices == (0, 1)
+    source_count = result.source_counts[source]
+    assert source_count.rows_in == 2
+    assert source_count.observations_out == 1
+    store_obs = sum(c.observations_out for c in result.source_counts.values())
+    assert store_obs == len(result.observations)
+
+
+def test_g05_conflicting_duplicate_key_is_hard_error(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    source = "data/literature/extracts/fixture-source.yaml"
+    migrator = Migrator(root)
+    observation = F.observation(
+        "conflict-key", "fixture-source", F.o2_identity(), "1"
+    )
+    migrator._add_observation(observation, source, source_row_index=0)
+    conflicting = replace(
+        observation,
+        value=replace(observation.value, point=observation.value.point + 1),
+    )
+    with pytest.raises(
+        DuplicateObservationIdError, match="different payload"
+    ):
+        migrator._add_observation(conflicting, source, source_row_index=1)
 
 
 def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
