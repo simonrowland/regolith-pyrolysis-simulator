@@ -26625,20 +26625,6 @@ class Migrator:
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
         )
-        if (
-            q_token is None
-            and declared_schema_gap is not None
-            and value.kind is ValueKind.UNAVAILABLE
-            and admission.status is AdmissionStatus.ADMITTED
-        ):
-            # A schema-gap row has no representable quantity, so it must not remain admitted.
-            admission = admission_for(
-                "typed_refusal",
-                superseded_by=None,
-                extraction=extraction,
-                locator=locator,
-                refusal_reason=declared_schema_gap,
-            )
         observation_provenance = _printed_scalar_provenance(
             observation_provenance, values, value_sel
         )
@@ -26668,6 +26654,20 @@ class Migrator:
                 else f"source admission_status={raw_source_admission}"
             )
             admission = Admission(status=AdmissionStatus.PENDING, reason=reason)
+        if (
+            q_token is None
+            and declared_schema_gap is not None
+            and value.kind is ValueKind.UNAVAILABLE
+            and admission.status is AdmissionStatus.ADMITTED
+        ):
+            # A schema-gap row has no representable quantity, so it must not remain admitted.
+            admission = admission_for(
+                "typed_refusal",
+                superseded_by=None,
+                extraction=extraction,
+                locator=locator,
+                refusal_reason=declared_schema_gap,
+            )
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (

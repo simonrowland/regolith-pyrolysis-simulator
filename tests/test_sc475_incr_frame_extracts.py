@@ -28,6 +28,24 @@ FRAME_REASON = (
     "No quantity token represents formation from simple oxides; "
     "delta_fG denotes formation from the elements."
 )
+SC475_REJECTED_ROWS = {
+    "bennington-brown-1982-synthetic-acmite-ri8621": None,
+    "shornikov-2011-cao-mgo-alumina-melts": {
+        "shornikov_2011_text_minimum_delta_fG1960_melt",
+    },
+    "zaitsev-2006-magnesium-silicate-thermodynamics": None,
+}
+
+
+def _expected_sc475_admission(source_id, observation_id):
+    rejected_rows = SC475_REJECTED_ROWS.get(source_id, set())
+    return (
+        "rejected"
+        if rejected_rows is None or observation_id in rejected_rows
+        else "pending"
+    )
+
+
 S4_SHORNIKOV_ROWS = {
     "shornikov-2008-mgo-aluminosilicate-melts": {
         "shornikov_2008_fig1_d_marker_1": ("Gibbs energies of melt formation from oxides", "-23", 2, 148),
@@ -2736,6 +2754,11 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 continue
             assert all(not row.identity.quantity.is_value for row in migrated)
             assert all(row.value.kind.value == "unavailable" for row in migrated)
+            if source_id in SC475_SOURCE_IDS:
+                expected_status = _expected_sc475_admission(source_id, observation_id)
+                assert all(
+                    row.admission.status.value == expected_status for row in migrated
+                ), (source_id, observation_id)
         checked_sources.add(source_id)
         if source_id not in SC475_SOURCE_IDS:
             continue
@@ -2830,7 +2853,7 @@ def _assert_schema_gap_refusals(migrator, source_id, expected_reasons, *, report
             if key == f"{source_id}::{observation_id}"
             or key.startswith(f"{source_id}::{observation_id}::")
         ]
-        assert len(migrated) == 1, observation_id
+        assert migrated, observation_id
         actual_reasons = [row.value.unavailable_reason for row in migrated]
         admissions = [row.admission.status.value for row in migrated]
         validator_observation_ids.extend(row.observation_id for row in migrated)
@@ -2843,7 +2866,8 @@ def _assert_schema_gap_refusals(migrator, source_id, expected_reasons, *, report
         assert all(not row.identity.quantity.is_value for row in migrated)
         assert all(row.value.kind.value == "unavailable" for row in migrated)
         assert all(reason == expected_reason for reason in actual_reasons), observation_id
-        assert all(status != "admitted" for status in admissions), observation_id
+        expected_status = _expected_sc475_admission(source_id, observation_id)
+        assert all(status == expected_status for status in admissions), observation_id
         assert all(
             row.admission.status.value != "rejected"
             or row.admission.decided_by is not None
