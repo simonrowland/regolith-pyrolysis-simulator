@@ -504,14 +504,27 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
             HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
             * (edge_points[1][1] - edge_points[0][1])
         )
-        sigma_band = max(
-            central - scaled_low,
-            scaled_high - central,
-            edge_segment_spread,
+        # Premise: ln(gamma(T)) = ln(gamma_edge) * T_edge / T, so a band in
+        # ln(gamma_edge) scales by T_edge / T. For positive transported bounds,
+        # d_low = (T_edge/T) * log10(edge_gamma/(edge_gamma-edge_sigma))
+        #       = log10(central/scaled_low), and
+        # d_high = (T_edge/T) * log10((edge_gamma+edge_sigma)/edge_gamma)
+        #        = log10(scaled_high/central); keep them separate when
+        # asymmetric.
+        # Preserve the adjacent-point spread as a floor by converting its
+        # positive central +/- spread bounds to the same one-sided distances.
+        # Each side retains the reviewed quadrature with model scatter below.
+        # Unit check: T_edge/T is K/K and all logarithm arguments are ratios.
+        # At 273.15 K, central is 1218.510097 and transported bounds are
+        # 548.521396 / 2455.957715: both bounds stay positive while their
+        # lower/upper log distances remain distinct.
+        sigma_band_low_log10 = max(
+            math.log10(central / scaled_low),
+            math.log10(central / (central - edge_segment_spread)),
         )
-        sigma_band_log10 = max(
-            math.log10(central / (central - sigma_band)),
-            math.log10((central + sigma_band) / central),
+        sigma_band_high_log10 = max(
+            math.log10(scaled_high / central),
+            math.log10((central + edge_segment_spread) / central),
         )
 
         # The printed 1400 C point is scatter around the constant-W curve, not
@@ -537,14 +550,21 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
                 model_scatter_log10,
                 abs(math.log10(printed_1400_multiplier / curve_1400_multiplier)),
             )
-        uncertainty_band_log10 = math.sqrt(
-            sigma_band_log10**2 + model_scatter_log10**2
+        uncertainty_band_low_log10 = math.sqrt(
+            sigma_band_low_log10**2 + model_scatter_log10**2
+        )
+        uncertainty_band_high_log10 = math.sqrt(
+            sigma_band_high_log10**2 + model_scatter_log10**2
+        )
+        uncertainty_band_log10 = max(
+            uncertainty_band_low_log10,
+            uncertainty_band_high_log10,
         )
         measurement_low = 10.0 ** (
-            math.log10(central) - uncertainty_band_log10
+            math.log10(central) - uncertainty_band_low_log10
         )
         measurement_high = 10.0 ** (
-            math.log10(central) + uncertainty_band_log10
+            math.log10(central) + uncertainty_band_high_log10
         )
         sigma = max(central - measurement_low, measurement_high - central)
         excess_enthalpy_J_mol = GAS_CONSTANT * edge_T_K * math.log(edge_gamma)
@@ -570,7 +590,10 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
             },
             'W_J_mol': excess_enthalpy_J_mol,
             'distance_outside_span_widths': distance_outside_span_widths,
-            'sigma_band_log10': sigma_band_log10,
+            'sigma_band_log10': max(
+                sigma_band_low_log10,
+                sigma_band_high_log10,
+            ),
             'model_scatter_log10': model_scatter_log10,
             'uncertainty_band_log10': uncertainty_band_log10,
             'uncertainty_band': sigma,

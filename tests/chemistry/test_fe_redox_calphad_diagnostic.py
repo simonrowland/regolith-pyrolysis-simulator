@@ -101,20 +101,26 @@ def test_holzheid_low_edge_predicts_printed_1600_gamma():
 
 
 @pytest.mark.parametrize(
-    ("temperature_C", "printed_gamma", "expected_sigma_ext_log10"),
+    (
+        "temperature_C",
+        "printed_gamma",
+        "expected_sigma_ext_low_log10",
+        "expected_sigma_ext_high_log10",
+    ),
     [
-        (1670.0, 2.718, 0.084841284),
-        (1750.0, 2.613, 0.088523374),
-        (1900.0, 2.445, 0.095121568),
-        (2200.0, 2.194, 0.107191610),
-        (950.0, 4.888, 0.081914830),
-        (225.0, 49.2, 0.274968621),
+        (1670.0, 2.718, 0.084841284, 0.071553202),
+        (1750.0, 2.613, 0.088523374, 0.074103816),
+        (1900.0, 2.445, 0.095121568, 0.078584157),
+        (2200.0, 2.194, 0.107191610, 0.086492009),
+        (950.0, 4.888, 0.078751070, 0.069499650),
+        (225.0, 49.2, 0.190620558, 0.167533163),
     ],
 )
 def test_holzheid_regular_solution_extrapolation_and_notice(
     temperature_C: float,
     printed_gamma: float,
-    expected_sigma_ext_log10: float,
+    expected_sigma_ext_low_log10: float,
+    expected_sigma_ext_high_log10: float,
 ) -> None:
     band = holzheid_stoich_feo_gamma_band(temperature_C + 273.15)
     notice = band["notice"]
@@ -153,13 +159,59 @@ def test_holzheid_regular_solution_extrapolation_and_notice(
     )
     assert notice["model_scatter_log10"] == pytest.approx(0.0145, abs=0.0002)
     assert 10.0 ** notice["model_scatter_log10"] - 1.0 < 0.05
+    lower_uncertainty_log10 = math.log10(
+        band["central"] / band["measurement_low"]
+    )
+    upper_uncertainty_log10 = math.log10(
+        band["measurement_high"] / band["central"]
+    )
+    assert lower_uncertainty_log10 == pytest.approx(
+        expected_sigma_ext_low_log10, abs=5e-10
+    )
+    assert upper_uncertainty_log10 == pytest.approx(
+        expected_sigma_ext_high_log10, abs=5e-10
+    )
     assert notice["uncertainty_band_log10"] == pytest.approx(
-        expected_sigma_ext_log10, abs=5e-10
+        max(expected_sigma_ext_low_log10, expected_sigma_ext_high_log10),
+        abs=5e-10,
     )
     assert notice["uncertainty_band"] == band["measurement_sigma"]
     assert band["measurement_low"] < band["central"] < band["measurement_high"]
-    assert band["measurement_high"] / band["central"] == pytest.approx(
+
+
+@pytest.mark.parametrize(
+    "temperature_K",
+    [273.15, 276.19, 276.21, 225.0 + 273.15],
+)
+def test_holzheid_cold_extrapolation_keeps_finite_positive_asymmetric_band(
+    temperature_K: float,
+) -> None:
+    band = holzheid_stoich_feo_gamma_band(temperature_K)
+    notice = band["notice"]
+    assert isinstance(notice, dict)
+
+    values = (
+        band["central"],
+        band["measurement_low"],
+        band["measurement_high"],
+        band["measurement_sigma"],
+    )
+    assert all(math.isfinite(float(value)) for value in values)
+    assert 0.0 < band["measurement_low"] < band["central"]
+    assert band["measurement_high"] > band["central"]
+    assert band["measurement_sigma"] > 0.0
+    assert notice["kind"] == "out_of_certified_band"
+    assert notice["uncertainty_band"] == band["measurement_sigma"]
+
+    lower_log_distance = math.log10(
         band["central"] / band["measurement_low"]
+    )
+    upper_log_distance = math.log10(
+        band["measurement_high"] / band["central"]
+    )
+    assert abs(lower_log_distance - upper_log_distance) > 1e-6
+    assert notice["uncertainty_band_log10"] == pytest.approx(
+        max(lower_log_distance, upper_log_distance)
     )
 
 
