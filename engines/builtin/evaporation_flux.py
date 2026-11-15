@@ -388,9 +388,19 @@ def publisher_effective_alpha(
     value, evaluation = _evaluate_alpha_control(
         species, temperature_K, spec
     )
+    evaluation = dict(evaluation)
+    provenance_status = evaluation.get(ALPHA_AUTHORITY_STATUS_FIELD)
+    # d-426 / d-019: policy changes authority, never the emitting set or
+    # the retained proxy coefficient. Keep coefficient provenance separate
+    # from the policy's authority so an opt-in cannot invent a measurement.
+    evaluation["authority_status"] = (
+        ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+        if unmeasured or (provenance_status and not permitted)
+        else provenance_status or "measured"
+    )
     return PublisherAlphaDecision(
         alpha=float(value),
-        evaluation=evaluation if isinstance(evaluation, Mapping) else {},
+        evaluation=evaluation,
         unmeasured=unmeasured,
         fallback_permitted=permitted,
     )
@@ -1937,6 +1947,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             J_kg_s_m2 = series_flux.flux_kg_s_m2
 
             series_diagnostic = series_flux.as_diagnostic()
+            series_diagnostic["authority_status"] = alpha_evaluation["authority_status"]
             if continuum_extrapolation is not None and uses_gas_resistance:
                 series_diagnostic["continuum_extrapolation_notice"] = dict(continuum_extrapolation)
             if alpha_authority_status is not None:

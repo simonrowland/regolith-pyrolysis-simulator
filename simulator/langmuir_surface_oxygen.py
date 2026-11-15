@@ -243,6 +243,7 @@ class LangmuirSurfaceOxygen:
     # Species whose published pressure is the IEEE floor, not a computed
     # power. Empty when every published log-pressure was representable.
     pressure_continuations: Mapping[str, str] = field(default_factory=dict)
+    alpha_authority_status_by_species: Mapping[str, str] = field(default_factory=dict)
 
     def as_diagnostic(self) -> dict[str, Any]:
         return {
@@ -261,6 +262,9 @@ class LangmuirSurfaceOxygen:
             ),
             "overhead_bounded": self.overhead_bounded,
             "pressure_continuations": dict(self.pressure_continuations),
+            "alpha_authority_status_by_species": dict(
+                self.alpha_authority_status_by_species
+            ),
         }
 
 
@@ -862,7 +866,7 @@ def _flux_alpha(
     *,
     allow_unmeasured_alpha_fallback: bool = False,
     unmeasured_alpha_fallback_species_allowlist: set[str] | None = None,
-) -> tuple[float | None, str]:
+) -> tuple[float | None, str, str]:
     """Use the publisher's tagged coefficient or flagged alpha=1 ceiling.
 
     A zero coefficient contributes no flux. Invalid coefficients refuse;
@@ -882,18 +886,13 @@ def _flux_alpha(
             ),
         )
     except (TypeError, ValueError):
-        return None, ""
+        return None, "", ""
+    status = str(decision.evaluation["authority_status"])
     if decision.alpha == 0.0:
-        return 0.0, ""
+        return 0.0, "", status
     if not decision.policy_emits():
-        return None, ""
-    status = ""
-    if isinstance(decision.evaluation, Mapping):
-        status = str(decision.evaluation.get("authority_status") or "")
-    if decision.unmeasured:
-        status = status or "unmeasured_alpha_fallback"
-    source = status or "catalog evaporation_alpha"
-    return float(decision.alpha), f"evaporation_flux_alpha:{source}"
+        return None, "", status
+    return float(decision.alpha), f"evaporation_flux_alpha:{status}", status
 
 
 def _parent_oxygen_demand(oxygen_atoms: float, exponent: float) -> float:
@@ -1349,6 +1348,7 @@ def _solve_or_refuse(
     # Measured alpha of 0. Not a residual term (J = 0). Still an n != 0
     # pressure, rewritten onto the solved surface after the root.
     zero_alpha: list[_Carrier] = []
+    alpha_authorities: dict[str, str] = {}
     for carrier in carriers:
         # Transport and n == 0 stay at the published pressure. They are
         # not in this residual. Every other carrier is a term in the
@@ -1369,7 +1369,7 @@ def _solve_or_refuse(
                 "formula unresolved; surface pressure omitted"
             )
             continue
-        alpha, alpha_source = _flux_alpha(
+        alpha, alpha_source, authority_status = _flux_alpha(
             carrier.species,
             alphas,
             temperature_K,
@@ -1386,6 +1386,7 @@ def _solve_or_refuse(
                 "surface pressure omitted"
             )
             continue
+        alpha_authorities[carrier.species] = authority_status
         if alpha == 0.0:
             zero_alpha.append(carrier)
             continue
@@ -1606,6 +1607,10 @@ def _solve_or_refuse(
         eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         overhead_bounded=overhead_bounded,
         pressure_continuations=dict(continuations),
+        alpha_authority_status_by_species={
+            species: status for species, status in alpha_authorities.items()
+            if species in adjusted
+        },
     )
 
 

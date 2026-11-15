@@ -118,6 +118,31 @@ def test_measured_alpha_witness_unchanged():
     assert "unmeasured_alpha_fallback_species" not in result.diagnostic
 
 
+@pytest.mark.parametrize("species,alpha,status", [
+    ("K", {"K": 0.13}, "measured"),
+    ("CrO2", {}, "analytical_upper_bound"),
+    ("CrO2", {"CrO2": {
+        "form": "scalar", "value": 0.9,
+        "alpha_authority_status": "proxy/bridge",
+    }}, "analytical_upper_bound"),
+])
+def test_publisher_rows_carry_the_decision_authority(species, alpha, status):
+    from engines.builtin.evaporation_flux import publisher_effective_alpha
+
+    decision = publisher_effective_alpha(
+        species, 1773.15, alpha,
+        allow_unmeasured_alpha_fallback=False,
+        unmeasured_alpha_fallback_species_allowlist=None,
+    )
+    result = _alpha_witness(species, alpha)
+    evaluation = result.diagnostic["alpha_s_evaluation_by_species"][species]
+    assert evaluation["authority_status"] == status
+    assert evaluation["authority_status"] == decision.evaluation["authority_status"]
+    assert result.diagnostic["evaporation_series_resistance"][species][
+        "authority_status"
+    ] == status
+
+
 def _raw_data() -> dict:
     return yaml.safe_load(VAPOR_PRESSURES_PATH.read_text())
 
