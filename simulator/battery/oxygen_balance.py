@@ -214,6 +214,7 @@ def _solve_vacuum_oxygen_balance(
                  if background_pressure_Pa else pressure)
         from simulator.chemistry.langmuir_knudsen import langmuir_molar_flux
 
+        # Free melt-surface evaporation uses each channel's sourced alpha_i.
         return langmuir_molar_flux(
             temperature,
             drive,

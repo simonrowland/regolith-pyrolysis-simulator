@@ -42,8 +42,9 @@ from engines.builtin.vapor_pressure import (
     VaporPressureComputationError,
     vapor_pressure_antoine_coefficients,
 )
-from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
+from simulator.condensation import alpha_s
 from simulator.evaporation import _load_evaporation_alpha_by_species
+from simulator.physical_constants import GAS_CONSTANT_10SIG
 from simulator.yaml_cache import load_cached_safe_yaml
 _VAPOR_PRESSURE_GROUPS = ("metals", "oxide_vapors")
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -113,7 +114,7 @@ def hertz_knudsen_k_kg_s_m2_pa(T_surface_K: float, molar_mass_kg_mol: float) -> 
     """
     return math.sqrt(
         molar_mass_kg_mol
-        / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * T_surface_K)
+        / (2.0 * math.pi * GAS_CONSTANT_10SIG * T_surface_K)
     )
 
 
@@ -135,14 +136,14 @@ def knudsen_effusion_molar_flux(
     measurement reduction, not this surface-flux model.
     """
     delta_p = max(0.0, float(p_eq_pa) - float(p_bulk_pa))
-    denominator = math.sqrt(
-        2.0
-        * math.pi
-        * molar_mass_kg_mol
-        * GAS_CONSTANT_J_MOL_K
-        * T_surface_K
+    # Evaluate through the owned mass coefficient, then convert to molar
+    # flux. This is algebraically delta_p/sqrt(2*pi*M*R*T) and preserves the
+    # established floating-point operation order for refractory fluxes.
+    return (
+        delta_p
+        * hertz_knudsen_k_kg_s_m2_pa(T_surface_K, molar_mass_kg_mol)
+        / molar_mass_kg_mol
     )
-    return delta_p / denominator
 
 
 def knudsen_effusion_relative_weight(
@@ -174,16 +175,17 @@ def langmuir_molar_flux(
     *,
     molar_mass_kg_mol: float,
 ) -> float:
-    """Free-evaporation flux in mol/(m^2*s).
+    """Hertz-Knudsen molar flux with a transmission factor, in mol/(m^2*s).
 
-    Premise: only fraction ``alpha`` of equilibrium surface crossings escapes.
-    Molecular kinetic theory gives
+    For free evaporation, ``alpha`` is the fraction of equilibrium surface
+    crossings that escape. An ideal effusion route uses ``alpha=1``. Molecular
+    kinetic theory gives
     ``J = alpha * (P_eq - P) / sqrt(2*pi*m*k*T)`` molecules/(m^2*s),
     where ``m`` is kg/molecule and ``k`` is J/K. With ``M = N_A*m`` and
     ``R = N_A*k``, dividing by Avogadro's constant gives the molar form
     ``alpha * (P_eq - P) / sqrt(2*pi*M*R*T)`` in mol/(m^2*s). Limiting
-    cases: ``alpha -> 0`` stops evaporation, equal pressures give zero net
-    flux, and ``alpha -> 1`` recovers ideal equilibrium effusion.
+    cases: ``alpha -> 0`` stops transmission, equal pressures give zero net
+    flux, and ``alpha -> 1`` gives ideal equilibrium effusion.
     """
     if alpha <= 0.0:
         return 0.0

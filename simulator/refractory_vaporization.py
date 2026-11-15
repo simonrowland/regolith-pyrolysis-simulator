@@ -9,7 +9,7 @@ from typing import Mapping
 from scipy.optimize import brentq
 
 from simulator.accounting.formulas import parse_formula
-from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+from simulator.chemistry.langmuir_knudsen import langmuir_molar_flux
 from simulator.physical_constants import PA_PER_BAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -343,13 +343,17 @@ def solve_congruent_vaporization(
                 else 0.0
             )
             molar_mass = formula.molar_mass_kg_per_mol()
-            mass_coefficient = hertz_knudsen_k_kg_s_m2_pa(
+            # This route assumes ideal effusion, so its transmission factor is 1;
+            # free-surface kinetic alpha values do not apply to this boundary.
+            transmission_factor = 1.0
+            fluxes[name] = langmuir_molar_flux(
                 temperature,
-                molar_mass,
+                pressure,
+                bulk_pressure,
+                transmission_factor,
+                molar_mass_kg_mol=molar_mass,
             )
-            net_pressure = max(pressure - bulk_pressure, 0.0)
             pressures[name] = pressure
-            fluxes[name] = net_pressure * mass_coefficient / molar_mass
 
         cation_flux = sum(
             float(formula.elements.get(metal_element, 0.0)) * fluxes[name]
