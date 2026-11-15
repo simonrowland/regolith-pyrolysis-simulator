@@ -278,6 +278,7 @@ from simulator.battery.validate import (
     ValidationIssue,
     _BOUND_WORK_INPUTS,
     _asset_ids,
+    _canonical_doi_source,
     _observation_lineage,
     observation_issue_location,
     _pressure_blocking_notices,
@@ -524,7 +525,8 @@ def _attempt_coefficient_sources(
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
-# IMCC consumes the SF04 magma companion workbook.
+# OpenIMCC row refs resolve through its packaged source declarations. Older
+# packs without those declarations retain their explicit version aliases.
 COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "vaporock": ("janaf-4th",),
     "nasa-glenn": ("nasa-glenn",),
@@ -542,10 +544,34 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    "openimcc-source-ref:DarkenGurry1946": ("doi:10.1021/ja01209a030",),
+    "openimcc-source-ref:FC87": ("doi:10.1016/j.icarus.2003.08.023",),
+    "openimcc-source-ref:Masson1965": ("doi:10.1098/rspa.1965.0176",),
+    "openimcc-source-ref:SF04": ("doi:10.1016/j.icarus.2003.08.023",),
+    "openimcc-source-ref:Shornikov2017": (
+        "doi:10.1134/s0036024417020303",
+    ),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
 )
+
+
+def _unmapped_coefficient_source_aliases(
+    sources: Sequence[str],
+) -> tuple[str, ...]:
+    """Name known source-alias shapes whose store mapping is missing."""
+
+    return tuple(
+        source
+        for source in coefficient_lineage_sources(sources)
+        if source not in COEFFICIENT_SOURCE_STORE_IDS
+        and (
+            source in _ENGINE_SOURCE_ALIASES
+            or source.startswith("openimcc-v")
+            or source.startswith("openimcc-source-ref:")
+        )
+    )
 
 # score_eligible conjuncts (v2.1 YAML score_eligible). Tests mutate each.
 SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
@@ -619,15 +645,18 @@ _INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
     name="JANAF-type",
     offset_j_mol=Decimal(0),
 )
-_OPENIMCC_DEFAULT_PACK_VERSION = "1.0.3-d066-v1"
+_OPENIMCC_DEFAULT_PACK_VERSION = "1.0.6-d066-v4"
 _OPENIMCC_DEFAULT_PACK_DIGEST = (
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+    "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
+)
+_OPENIMCC_DEFAULT_GAS_TABLE_DIGEST = (
+    "4d069a8951cd11e0d2edb37420e3aa04e4927c51c6eee00bbc53368b20d6c492"
 )
 _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST = (
-    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+    "493c67d5ba23b75767cc3ce4bd6e571bd2400162b3affdbbc581a7b0ae75362e"
 )
 _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
-    "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
+    "b927cf95fe788016d37ccfac87a9c80bbb15ec519aa624d929e3106c1759adf0"
 )
 _OPENIMCC_DEFAULT_FEO_STANDARD = _FeOActivityStandard(
     name="JANAF-type",
@@ -672,6 +701,22 @@ def _resolve_feo_activity_standard(
                     _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
                 ),
                 "actual_condensate_table_digest": condensate_digest,
+            },
+        )
+
+    gas_table_digest = _source_value(
+        coefficient_sources,
+        "openimcc-gas-table:sha256:",
+    )
+    if gas_table_digest is not None and gas_table_digest != (
+        _OPENIMCC_DEFAULT_GAS_TABLE_DIGEST
+    ):
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_feo_gas_table_digest_mismatch",
+                "expected_gas_table_digest": _OPENIMCC_DEFAULT_GAS_TABLE_DIGEST,
+                "actual_gas_table_digest": gas_table_digest,
             },
         )
 
@@ -5228,12 +5273,11 @@ def _candidate_lineage_for_sources(
         if indexes is not None:
             indexes.candidate_lineages[source_key] = result
         return result
-    for src in lineage_sources:
-        if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
-            result = (False, None)
-            if indexes is not None:
-                indexes.candidate_lineages[source_key] = result
-            return result
+    if _unmapped_coefficient_source_aliases(lineage_sources):
+        result = (False, None)
+        if indexes is not None:
+            indexes.candidate_lineages[source_key] = result
+        return result
     expanded = expand_coefficient_sources(lineage_sources)
     if works is None or observations is None:
         return True, None
@@ -5293,6 +5337,32 @@ def resolve_source_relation(
     )
 
 
+def _reference_lineage_with_work_doi(
+    reference: Observation, indexes: _ValidationIndexes
+) -> Ancestry:
+    lineage = _observation_lineage(
+        reference.observation_id,
+        indexes.observations,
+        indexes.table_ids,
+        asset_ids=indexes.asset_ids,
+        _cache=indexes.observation_lineages,
+    )
+    if not lineage.complete or lineage.ids is None:
+        return lineage
+    if indexes.works is None or indexes.experiments is None:
+        return lineage
+    experiment = indexes.experiments.get(reference.experiment_id)
+    work = None if experiment is None else indexes.works.get(experiment.work_id)
+    if work is None:
+        return lineage
+    ids = set(lineage.ids) | {work.work_id}
+    if work.doi:
+        doi_source = _canonical_doi_source(f"doi:{work.doi}".lower())
+        if doi_source is not None:
+            ids.add(doi_source)
+    return Ancestry.of(ids)
+
+
 def _resolve_source_relation_with_indexes(
     reference: Observation,
     coefficient_sources: Sequence[str],
@@ -5308,20 +5378,16 @@ def _resolve_source_relation_with_indexes(
     indexes = _indexes
     if indexes is None or not indexes.matches(works, observations, experiments):
         indexes = _build_validation_indexes(works, observations, experiments)
-    reference_lineage = _observation_lineage(
-        reference.observation_id,
-        observations,
-        indexes.table_ids,
-        asset_ids=indexes.asset_ids,
-        _cache=indexes.observation_lineages,
-    )
-    candidate_lineage = _resolve_coefficient_sources(
-        coefficient_lineage_sources(coefficient_sources),
-        observations,
-        works,
-        experiments,
+    reference_lineage = _reference_lineage_with_work_doi(reference, indexes)
+    candidate_complete, candidate_lineage = _candidate_lineage_for_sources(
+        coefficient_sources,
+        works=works,
+        observations=observations,
+        experiments=experiments,
         _indexes=indexes,
     )
+    if not candidate_complete or candidate_lineage is None:
+        return SourceRelation.UNKNOWN
     return _source_relation_from_lineages(reference_lineage, candidate_lineage)
 
 
@@ -5381,17 +5447,9 @@ class _ScoringLineageResolver:
         if not complete or candidate_lineage is None:
             return complete, SourceRelation.UNKNOWN
 
-        reference_lineage = self.indexes.observation_lineages.get(
-            reference.observation_id
+        reference_lineage = _reference_lineage_with_work_doi(
+            reference, self.indexes
         )
-        if reference_lineage is None:
-            reference_lineage = _observation_lineage(
-                reference.observation_id,
-                self.context.observations,
-                self.indexes.table_ids,
-                asset_ids=self.indexes.asset_ids,
-                _cache=self.indexes.observation_lineages,
-            )
 
         if (
             not reference_lineage.complete
@@ -7549,6 +7607,42 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
     )
 
 
+def _hashimoto_channel_omission_notices(
+    omissions: object, quantity: Quantity, *, origin: str
+) -> tuple[Notice, ...]:
+    """Keep each Hashimoto channel omission visible on its scored row."""
+
+    if not omissions:
+        return ()
+    if isinstance(omissions, Sequence) and not isinstance(omissions, (str, bytes)):
+        records = omissions
+    else:
+        records = ({"reason": "hashimoto_channel_omission_payload_invalid"},)
+    notices: list[Notice] = []
+    for record in records:
+        if isinstance(record, Mapping):
+            channel = record.get("channel")
+            reason = record.get("reason")
+            kind = record.get("kind")
+            if not isinstance(reason, str) or not reason:
+                reason = "hashimoto_channel_omission_reason_missing"
+            if kind not in {None, NoticeKind.INPUT_OMITTED.value}:
+                reason = f"untyped omission record ({kind!r}): {reason}"
+            if isinstance(channel, str) and channel:
+                reason = f"{channel}: {reason}"
+        else:
+            reason = f"hashimoto_channel_omission_record_invalid: {record!r}"
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(quantity,),
+                reason=reason,
+                origin=origin,
+            )
+        )
+    return tuple(notices)
+
+
 def _cell_oxygen_not_modelled_notice(
     quantity: Quantity,
     materials: Sequence[Located[CellMaterial]] | None,
@@ -9486,7 +9580,7 @@ def _oxygen_input_request(
     temperature_K: float | None = None,
     composition_wt: Mapping[str, float] | None = None,
     source_oxygen_bar: float | None = None,
-) -> "Po2Request | EnginePrediction":
+) -> Any:
     """The scorer's one oxygen-input decision.
 
     A printed identity fO2 is commanded as float(fO2_Pa)/1e5, the same
@@ -9639,7 +9733,7 @@ def _borrow_internal_analytical_effusion(
     handles: Mapping[str, object] | None,
     isolated: bool | None,
     notices: list[Notice],
-) -> "Po2Request | EnginePrediction":
+) -> Any:
     """Command the internal-analytical closure for an engine that cannot solve it.
 
     The solver stays in the internal-analytical adapter. This function reads
@@ -14117,7 +14211,8 @@ def _predict_with_engine(
                     [
                         *sources,
                         *openimcc_pack_coefficient_sources(
-                            identity_block.get("pack_version")
+                            identity_block.get("pack_version"),
+                            identity_block.get("pack_digest"),
                         ),
                         *openimcc_engine_identity_sources(
                             identity_block.get("engine_binding_identity")
@@ -15594,7 +15689,10 @@ def _hashimoto_residue_prediction(
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
-                primary_provenance.get("datapack_version")
+                primary_provenance.get("datapack_version"),
+                primary_provenance.get("pack_digest", {}).get("melt_datapack")
+                if isinstance(primary_provenance.get("pack_digest"), Mapping)
+                else None,
             ),
             *openimcc_engine_identity_sources(
                 primary_provenance.get("engine_binding_identity")
@@ -15712,6 +15810,20 @@ def _hashimoto_residue_prediction(
             _hashimoto_engine_floor_inversion_notices(
                 engine,
                 primary_provenance.get("engine_floor_inversion_diagnostics"),
+            )
+        )
+        notices.extend(
+            _hashimoto_channel_omission_notices(
+                primary_provenance.get("gas_channel_omissions"),
+                reported_quantity,
+                origin="hashimoto-openimcc-gas-channel",
+            )
+        )
+        notices.extend(
+            _hashimoto_channel_omission_notices(
+                production.provenance.get("runtime_catalog_omissions"),
+                reported_quantity,
+                origin="hashimoto-runtime-catalog",
             )
         )
         surface_floor = primary_provenance.get("surface_pO2_balance_floor")
@@ -16185,10 +16297,14 @@ def _sossi_residue_prediction(
                 f"no positive Sossi {formula} prediction",
             )
         provenance = dict(prediction.provenance)
+        melt_pack_identity = provenance.get("melt_pack_identity")
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
-                provenance.get("datapack_version")
+                provenance.get("datapack_version"),
+                melt_pack_identity.get("pack_digest")
+                if isinstance(melt_pack_identity, Mapping)
+                else None,
             ),
             *openimcc_engine_identity_sources(
                 provenance.get("engine_binding_identity")
@@ -17303,6 +17419,17 @@ def _compile_residual_with_lineage(
             (_pressure_independent_comparison_notice(quantity, prediction),),
         )
     prediction_sources = tuple(prediction.coefficient_sources)
+    unmapped_aliases = _unmapped_coefficient_source_aliases(prediction_sources)
+    if engine is Engine.OPENIMCC and unmapped_aliases:
+        return _refused(
+            RefusalReason.LINEAGE_UNKNOWN,
+            {
+                "reason": "openimcc_pack_coefficient_source_alias_missing",
+                "coefficient_source_aliases": unmapped_aliases,
+            },
+            execution=prediction.execution,
+            extra_notices=prediction.notices,
+        )
     expanded_sources = expand_coefficient_sources(prediction_sources)
     lineage_complete = (
         _candidate_lineage_for_sources(

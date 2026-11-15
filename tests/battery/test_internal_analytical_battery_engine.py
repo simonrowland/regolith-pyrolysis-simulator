@@ -26,6 +26,7 @@ from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Species, State, Value
 from simulator.battery import score as battery_score
 from simulator.battery.score import predict_with_engine
+from simulator.chemistry.kernel import ChemistryIntent
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BinaryPot,
     PO2_COMMANDED,
@@ -33,6 +34,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     _InternalAnalyticalInputRefusal,
     _new_internal_analytical_core,
     _internal_analytical_vapor_pressure_adapter,
+    close_battery_engine_handle,
     composition_kg_and_mol,
     equilibrate_cell,
     open_battery_engine,
@@ -880,3 +882,70 @@ def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
     assert shadow_calls == shadow_call_count
     assert catalog_compiles == catalog_compile_count
     assert residue_prediction.vapor_pressures_Pa == with_shadow.vapor_pressures_Pa
+
+
+def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
+    request,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+    from tests.engine_availability import magemin_binary_available
+
+    if not magemin_binary_available():
+        pytest.skip('MAGEMin binary unavailable for the real battery contract')
+
+    handle = open_battery_engine('internal-analytical')
+    request.addfinalizer(lambda: close_battery_engine_handle(handle))
+    core = handle.backend._core
+    assert core._liquid_fraction_provider == 'magemin'
+    core._register_freeze_gate_liquid_fraction_providers()
+    gate_provider = core._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert gate_provider is not None
+    magemin = gate_provider._ensure_backend()
+    if magemin is None or not magemin.is_available():
+        pytest.skip('MAGEMin backend unavailable after initialization')
+    request.addfinalizer(magemin.close)
+
+    pot = BinaryPot(
+        pot_id='internal-analytical-liquid-phase-contract',
+        kato_1993_table4_system=None,
+        why='real freeze-gate phase basis through equilibrate_cell',
+        composition_wt_pct={
+            'SiO2': 47.0,
+            'Al2O3': 14.0,
+            'FeO': 10.0,
+            'MgO': 9.0,
+            'CaO': 11.0,
+            'Na2O': 3.0,
+            'K2O': 1.0,
+            'TiO2': 2.0,
+            'Cr2O3': 1.0,
+            'MnO': 1.0,
+            'P2O5': 1.0,
+        },
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1800.0,
+        po2=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+        timeout_s=60.0,
+        isolated=False,
+    )
+
+    authority = core._last_high_t_melt_activity
+    assert cell.status == 'ok'
+    assert authority["vapour_channel_phase_basis"] == "liquid"
+    assert authority["phase_basis_source"] == (
+        "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow:"
+        "composition_projected"
+    )
+    phase_notice = authority['phase_basis_notice']
+    assert phase_notice['authority'] == 'extrapolated'
+    assert {
+        row['component'] for row in phase_notice['dropped_components']
+    } == {'MnO', 'P2O5'}
+    assert authority["vapour_channel_switch_K"] == (
+        openimcc_bridge._temperature_domain_K()[0]
+    )

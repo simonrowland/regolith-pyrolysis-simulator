@@ -30,8 +30,8 @@ from typing import Any
 from urllib.parse import quote
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 1,
-    "internal-analytical": 1,
+    "openimcc": 2,
+    "internal-analytical": 2,
     "vaporock": 1,
     "magemin": 2,
     "alphamelts": 2,
@@ -48,11 +48,13 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
+# internal-analytical v2: 2026-11-15 d-207 - phase-basis liquidus authority can lower the adapter vapour switch
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
+# openimcc v2: 2026-11-14 OpenIMCC 9c327c2; binary-pot oxygen balance and residue, Knudsen, mass-loss, and Hashimoto runtimes - consume AlSiO/Si2O2 and use corrected multi-parent oxygen metadata
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
-        "identity": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84",
-        "date": "2026-11-08",
+        "identity": "commit:9c327c2991fcc07b902019d26a8fe7cd25deb075",
+        "date": "2026-11-14",
     },
     "internal-analytical": {
         "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
@@ -76,7 +78,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
 }
 
-OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
+OPENIMCC_CANONICAL_OUTPUT_SHA256 = "b83169938cb792f4e778d8f7ce1a11d9de5aaa7dac8a94da997987ce1cb078e2"
 
 _TABLE = "engine_outputs"
 _TIMEOUT_MS = 60_000

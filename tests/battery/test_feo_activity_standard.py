@@ -29,22 +29,12 @@ import simulator.battery.score as score_module
 from tests.battery import factories as F
 
 
-_JANAF_FE019_CONDENSATE_DIGEST = (
-    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
-)
-_OPENIMCC_DEFAULT_VERSION = "1.0.3-d066-v1"
-_OPENIMCC_DEFAULT_PACK_DIGEST = (
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
-)
-_OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
-    "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
-)
 _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
     Engine.INTERNAL_ANALYTICAL: (
         "eb6b8cce0b5487f44c7f6a0705d92a3f4ffc4a0248af489784610026544f624d"
     ),
     Engine.OPENIMCC: (
-        "803a03d510720e9d63f7644f9e91546eee250b35d286fadaea69c48bfcd74a24"
+        "6cbcd772127fa159c6cdf8476bf72713b767dd45d853522fd1f62cb2b88ca559"
     ),
 }
 # b217 pinned the N_Fe2+^0 multiply:
@@ -53,9 +43,9 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # The offer frame is a_D * f from the Darken & Gurry factor.
 # The numeric pin is green; the digest captures the current JANAF and d-333 notices.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "6ca537f3aebbf954650edbfa6a1c2cac43c4daef05def1348711beccf0123a9a"
+    "0fff59993ae0152972c7b42731fe2cbc82cbfe5eee25b06bdf1b7f497085a658"
 )
-_DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
+_DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10531292782444457")
 
 
 def _openimcc_sources(
@@ -132,9 +122,11 @@ def _case(
         (
             Engine.OPENIMCC,
             _openimcc_sources(
-                pack_version=_OPENIMCC_DEFAULT_VERSION,
-                pack_digest=_OPENIMCC_DEFAULT_PACK_DIGEST,
-                condensate_digest=_JANAF_FE019_CONDENSATE_DIGEST,
+                pack_version=score_module._OPENIMCC_DEFAULT_PACK_VERSION,
+                pack_digest=score_module._OPENIMCC_DEFAULT_PACK_DIGEST,
+                condensate_digest=(
+                    score_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+                ),
             ),
             _RESIDUAL_SHA256_BEFORE_STANDARD_STEP[Engine.OPENIMCC],
         ),
@@ -178,8 +170,8 @@ def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
 def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
     actual_digest = "a" * 64
     sources = _openimcc_sources(
-        pack_version=_OPENIMCC_DEFAULT_VERSION,
-        pack_digest=_OPENIMCC_DEFAULT_PACK_DIGEST,
+        pack_version=score_module._OPENIMCC_DEFAULT_PACK_VERSION,
+        pack_digest=score_module._OPENIMCC_DEFAULT_PACK_DIGEST,
         condensate_digest=actual_digest,
     )
     context, _experiment, reference, prediction = _case(Engine.OPENIMCC, sources)
@@ -193,8 +185,38 @@ def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
     assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
     assert residual.refusal.detail == {
         "reason": "openimcc_feo_condensate_table_digest_mismatch",
-        "expected_condensate_table_digest": _JANAF_FE019_CONDENSATE_DIGEST,
+        "expected_condensate_table_digest": (
+            score_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+        ),
         "actual_condensate_table_digest": actual_digest,
+    }
+
+
+def test_openimcc_feo_row_refuses_a_changed_gas_table_digest() -> None:
+    actual_digest = "d" * 64
+    sources = (
+        *_openimcc_sources(
+            pack_version=score_module._OPENIMCC_DEFAULT_PACK_VERSION,
+            pack_digest=score_module._OPENIMCC_DEFAULT_PACK_DIGEST,
+            condensate_digest=(
+                score_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+            ),
+        ),
+        f"openimcc-gas-table:sha256:{actual_digest}",
+    )
+    context, _experiment, reference, prediction = _case(Engine.OPENIMCC, sources)
+
+    residual, _candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context, prediction=prediction
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert residual.refusal.detail == {
+        "reason": "openimcc_feo_gas_table_digest_mismatch",
+        "expected_gas_table_digest": score_module._OPENIMCC_DEFAULT_GAS_TABLE_DIGEST,
+        "actual_gas_table_digest": actual_digest,
     }
 
 
@@ -214,7 +236,9 @@ def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> No
     assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
     assert residual.refusal.detail == {
         "reason": "openimcc_feo_redox_pack_digest_mismatch",
-        "expected_redox_pack_digest": _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST,
+        "expected_redox_pack_digest": (
+            score_module._OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
+        ),
         "actual_redox_pack_digest": actual_digest,
     }
 
@@ -319,7 +343,7 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
             "fo2_tier": 3,
             "physics_rung": None,
             "route": "openimcc_closed_fe_metal_saturation",
-            "value_Pa": "0.01295993251002745564044143855",
+            "value_Pa": "0.02022084627693526699090953590",
         }
     }
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
@@ -330,7 +354,7 @@ def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> Non
     sources = _openimcc_sources(
         pack_version="1.0.3-d066-ext-v1",
         pack_digest="b" * 64,
-        condensate_digest=_JANAF_FE019_CONDENSATE_DIGEST,
+        condensate_digest=score_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST,
     )
     context, _experiment, reference, prediction = _case(Engine.OPENIMCC, sources)
 
