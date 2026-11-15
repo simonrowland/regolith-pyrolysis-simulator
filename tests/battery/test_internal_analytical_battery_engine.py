@@ -961,21 +961,17 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
         "expected_notice",
         "expected_sio_source",
         "expected_gate_reason",
-        "expected_refusal_reason",
-        "expected_refusal_detail_reason",
     ),
     [
         pytest.param(
             "stolyarova-1996-cao-alumina-silica-kems",
             "stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table2_pSiO_1933k::T=1933.00:h=0bf22dda389c",
-            None,
-            None,
-            None,
-            None,
-            None,
-            "identity_incomplete",
-            "internal_analytical_oxygen_balance_unavailable",
-            id="stolyarova-outside-melts-window",
+            "missing",
+            1950.0,
+            "openimcc_vapour_phase_signal_missing",
+            "builtin_authoritative",
+            "magemin_mode_vector_mass_deficit",
+            id="stolyarova-magemin-mode-vector-refusal",
         ),
         pytest.param(
             "shornikov-2026-wollastonite-kems",
@@ -985,8 +981,6 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             "openimcc_vapour_phase_signal_missing",
             "builtin_authoritative",
             "magemin_mode_vector_mass_deficit",
-            None,
-            None,
             id="wollastonite-high-temperature-provider-refusal",
         ),
         pytest.param(
@@ -997,9 +991,23 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             "openimcc_vapour_phase_signal_missing",
             "builtin_authoritative",
             "magemin_mode_vector_mass_deficit",
-            None,
-            None,
             id="wollastonite-lower-temperature-provider-refusal",
+        ),
+        pytest.param(
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_09",
+            "liquid",
+            None,
+            "openimcc_liquid_sio_below_1950K_band",
+            "openimcc",
+            None,
+            marks=pytest.mark.skip(
+                reason=(
+                    "0 of 55 measured in-window composition groups yield a "
+                    "MAGEMin ig liquid curve (studio probe 2026-11-15)"
+                ),
+            ),
+            id="no-measured-magemin-liquid-group",
         ),
     ],
 )
@@ -1008,13 +1016,11 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
     request,
     source_id: str,
     observation_id: str,
-    expected_basis: str | None,
+    expected_basis: str,
     expected_switch: float | None,
     expected_notice: str | None,
-    expected_sio_source: str | None,
+    expected_sio_source: str,
     expected_gate_reason: str | None,
-    expected_refusal_reason: str | None,
-    expected_refusal_detail_reason: str | None,
 ) -> None:
     parent_core = _new_internal_analytical_core()
     parent_magemin = _magemin_gate_backend(parent_core)
@@ -1052,16 +1058,7 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
         None,
     )
     assert scored_row is not None
-    if expected_refusal_reason is not None:
-        assert scored_row["status"] == "refused"
-        assert scored_row["candidate_observation"] is None
-        assert scored_row["refusal"]["reason"] == expected_refusal_reason
-        assert (
-            scored_row["refusal"]["detail"]["engine_reason"]
-            == expected_refusal_detail_reason
-        )
-        return
-
+    assert scored_row["status"] == "no_band"
     candidate = scored_row["candidate_observation"]
     assert isinstance(candidate, dict)
     engine = candidate["engine"]
@@ -1093,11 +1090,16 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
             for notice in candidate.get("notices") or ()
         )
     if expected_basis == "missing":
+        assert (
+            record["phase_basis_source"]
+            == "freeze_gate_authority_fallback_or_projected"
+        )
         phase_detail = record["phase_basis_detail"]
         assert phase_detail["code"] == "gate_curve_source_not_authoritative"
         assert phase_detail["provider_outcome"] == "stable_refusal"
         gate_evidence = phase_detail["diagnostic"]
         assert gate_evidence["provider"] == "magemin"
+        assert gate_evidence["status"] == "out_of_domain"
         assert expected_gate_reason is not None
         assert expected_gate_reason in str(gate_evidence["reason"])
 
