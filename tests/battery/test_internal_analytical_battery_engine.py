@@ -1066,8 +1066,14 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
                 for notice in candidate.get("notices") or ()
             )
         if expected_basis == "missing":
-            assert record["phase_basis_detail"]["code"]
-            assert record["phase_basis_detail"]["diagnostic"]
+            phase_detail = record["phase_basis_detail"]
+            assert phase_detail["code"] == (
+                "gate_curve_source_not_authoritative"
+            )
+            gate_evidence = phase_detail["diagnostic"]
+            assert gate_evidence["provider"] == "magemin"
+            assert gate_evidence["status"] == "out_of_domain"
+            assert "silicate_window" in str(gate_evidence["reason"])
 
 
 def test_internal_analytical_timeout_kills_magemin_descendants(

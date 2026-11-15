@@ -785,24 +785,17 @@ class EvaporationMixin:
             code: str,
             *,
             diagnostic: object = None,
-            use_latest_gate_diagnostic: bool = False,
             **detail: Any,
         ) -> dict[str, Any]:
             payload = {"code": code, **detail}
             if not isinstance(diagnostic, Mapping) or not diagnostic:
-                diagnostic = (
-                    getattr(
-                        self,
-                        "_last_melt_redox_liquidus_gate_diagnostic",
-                        None,
-                    )
-                    if use_latest_gate_diagnostic
-                    else None
+                diagnostic = getattr(
+                    self,
+                    "_last_melt_redox_liquidus_gate_diagnostic",
+                    None,
                 )
             if isinstance(diagnostic, Mapping) and diagnostic:
                 payload["diagnostic"] = copy.deepcopy(dict(diagnostic))
-            else:
-                payload["diagnostic"] = copy.deepcopy(payload)
             return payload
 
         def refused(exc: BaseException) -> tuple[
@@ -833,10 +826,13 @@ class EvaporationMixin:
                 None,
                 phase_detail_payload(
                     code,
-                    use_latest_gate_diagnostic=True,
                     **detail,
                 ),
             )
+
+        # The core instance is reused across cells. A resolver diagnostic is
+        # evidence for this lookup only when this call writes it.
+        self._last_melt_redox_liquidus_gate_diagnostic = {}
 
         register = getattr(
             self, '_register_freeze_gate_liquid_fraction_providers', None,
@@ -972,7 +968,6 @@ class EvaporationMixin:
                 phase_detail_payload(
                     "gate_curve_source_not_authoritative",
                     diagnostic=curve.get("gate_provider_refusal"),
-                    use_latest_gate_diagnostic=True,
                     source=source,
                     provider_outcome=provider_outcome,
                     gate_provider_refusal=curve.get("gate_provider_refusal"),
@@ -1012,7 +1007,6 @@ class EvaporationMixin:
                 phase_detail_payload(
                     "gate_curve_fallback_or_projection_rejected",
                     diagnostic=curve.get("gate_provider_refusal"),
-                    use_latest_gate_diagnostic=True,
                     composition_derived=bool(
                         curve.get("composition_derived")
                     ),
