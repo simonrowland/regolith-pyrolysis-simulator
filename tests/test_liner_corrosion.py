@@ -296,9 +296,31 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
     assert anorthite["CaO"] == pytest.approx(20.16, abs=0.01)
     assert anorthite["Al2O3"] == pytest.approx(36.65, abs=0.01)
     assert anorthite["SiO2"] == pytest.approx(43.19, abs=0.01)
-    sampler = MageminLinerSampler()
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    direct_backend = MAGEMinBackend()
+    sampler = MageminLinerSampler(backend)
     try:
         try:
+            if not direct_backend.initialize({"database": "ig"}):
+                pytest.skip("MAGEMin is required for the anorthite anchor")
+            for temperature_C in (800.0, 1000.0):
+                direct = direct_backend.equilibrate(
+                    temperature_C,
+                    composition_kg=dict(anorthite),
+                    fO2_log=liner_corrosion.MAGEMIN_FO2_LOG,
+                    pressure_bar=1.0,
+                )
+                assert direct.status == "ok", direct.warnings
+                assert direct.liquid_fraction == pytest.approx(0.0, abs=1e-12)
+                sampled_liquid_fraction = sampler(anorthite, temperature_C, 1.0)
+                assert sampled_liquid_fraction == pytest.approx(
+                    direct.liquid_fraction
+                ), (
+                    f"sampler/direct mismatch at {temperature_C} C: "
+                    f"{sampled_liquid_fraction} vs {direct.liquid_fraction}"
+                )
             solid = sampler(anorthite, 1500.0, 1.0)
             liquid = sampler(anorthite, 1600.0, 1.0)
         except LinerCorrosionRefusal as exc:
@@ -309,6 +331,7 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
         assert liquid >= 1.0 - LIQUIDUS_LIQUID_EPSILON
     finally:
         sampler.close()
+        direct_backend.close()
 
 
 def test_rankin_end_member_melting_points_are_excluded_from_compound_rows():
