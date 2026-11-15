@@ -280,14 +280,7 @@ def _unmeasured_alpha_fallback_permitted(
 
 @dataclass(frozen=True)
 class PublisherAlphaDecision:
-    """Alpha the flux publisher evaluates for one species.
-
-    ``policy_emits`` is the carrier the surface residual must include:
-    a positive measured coefficient (a species row or a ``*`` wildcard),
-    or a permitted unmeasured fallback. A non-positive alpha emits no
-    flux. An unmeasured species the fallback does not permit is a
-    refusal when a parent mass is present, not a second alpha.
-    """
+    """Publisher coefficient and provenance, including flagged alpha=1 bounds."""
 
     alpha: float
     evaluation: Mapping[str, Any]
@@ -295,11 +288,10 @@ class PublisherAlphaDecision:
     fallback_permitted: bool
 
     def policy_emits(self) -> bool:
-        return (
-            math.isfinite(self.alpha)
-            and self.alpha > 0.0
-            and (not self.unmeasured or self.fallback_permitted)
-        )
+        # b-1195: an unknown alpha emits the flagged alpha=1 ceiling.
+        # The surface residual must include the same coefficient as the
+        # publisher; legacy fallback settings do not withhold that flux.
+        return math.isfinite(self.alpha) and self.alpha > 0.0
 
 
 def fallback_species_allowlist(raw: Any) -> set[str] | None:
@@ -376,9 +368,9 @@ def publisher_effective_alpha(
     Order is the kernel's: the species row, else a ``*`` wildcard row,
     else ``_DEFAULT_EVAPORATION_ALPHA`` (1). A species missing from the
     map is unmeasured only when ``*`` is missing too. Broad-proxy rows
-    are already stripped from ``alpha_by_species``, so a permitted
-    fallback is alpha = 1 for those carriers. The surface closure calls
-    this same function; it does not keep a second alpha table.
+    retain their tagged coefficient; an absent row uses the flagged
+    alpha=1 ceiling (b-1195). The surface closure calls this same
+    function; it does not keep a second alpha table.
     """
 
     unmeasured = _alpha_is_unmeasured(species, alpha_by_species)
@@ -477,51 +469,6 @@ def species_drive_bulk_Pa(
     if gas_resistance_enabled and not hkl_upper_bound:
         return partial
     return 0.0
-
-
-def _missing_alpha_record(
-    *,
-    P_eq_Pa: float,
-    P_bulk_Pa: float,
-    baseline_alpha_1_rate_kg_hr: float,
-) -> dict[str, float | str]:
-    return {
-        "policy": "fail_loud_missing_alpha",
-        "fallback_control": "chemistry_kernel.allow_unmeasured_alpha_fallback",
-        "P_eq_Pa": P_eq_Pa,
-        "P_bulk_Pa": P_bulk_Pa,
-        "baseline_alpha_1_rate_kg_hr": baseline_alpha_1_rate_kg_hr,
-    }
-
-
-def _attach_missing_alpha_records(
-    diagnostic: dict[str, Any],
-    missing_alpha: Mapping[str, Mapping[str, float | str]],
-    stoich_by_species: Mapping[str, Any],
-) -> None:
-    if not missing_alpha:
-        return
-    species_refusals: dict[str, dict[str, float | str]] = {
-        str(species): dict(refusal)
-        for species, refusal in (
-            diagnostic.get("species_refusals") or {}
-        ).items()
-        if isinstance(refusal, Mapping)
-    }
-    for species, refusal in missing_alpha.items():
-        species_refusals[str(species)] = {
-            **dict(refusal),
-            "status": "refused",
-            "reason": "missing_evaporation_alpha",
-            "disposition": "retained_in_condensed_parent_oxide",
-            "parent_oxide": str(
-                (stoich_by_species.get(species) or {}).get(
-                    "parent_oxide", "unknown"
-                )
-            ),
-        }
-    diagnostic["missing_alpha"] = dict(missing_alpha)
-    diagnostic["species_refusals"] = species_refusals
 
 
 def _coerce_alpha_envelope_by_species(alpha_envelope_control) -> dict[str, tuple[float, float]]:
@@ -1664,7 +1611,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             allow_unmeasured_alpha_fallback,
             unmeasured_alpha_fallback_species_allowlist,
         ) = publisher_alpha_policy(controls)
-        missing_alpha: dict[str, dict[str, float | str]] = {}
         active_gas_transport_species: list[str] = []
         if (
             gas_resistance_enabled
@@ -1678,8 +1624,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     continue
                 if species in hkl_upper_bound_transport_species:
                     continue
-                # α=1 is the Hertz-Knudsen ceiling used only as a marked
-                # screening bound; record the same missing_alpha payload.
                 decision = publisher_effective_alpha(
                     species,
                     T_K,
@@ -1692,7 +1636,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     ),
                 )
                 alpha = decision.alpha
-                alpha_is_unmeasured = decision.unmeasured
                 if alpha <= 0.0:
                     continue
                 P_bulk_Pa = species_drive_bulk_Pa(
@@ -1731,18 +1674,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 )
                 if hkl_upper_bound_rate_kg_hr <= _NONTRIVIAL_FLUX_KG_HR:
                     continue
-                if (
-                    alpha_is_unmeasured
-                    and not decision.fallback_permitted
-                    and available_parent_kg > 1.0e-12
-                ):
-                    missing_alpha[species] = _missing_alpha_record(
-                        P_eq_Pa=P_eq_Pa,
-                        P_bulk_Pa=P_bulk_Pa,
-                        baseline_alpha_1_rate_kg_hr=(
-                            hkl_upper_bound_rate_kg_hr
-                        ),
-                    )
                 active_gas_transport_species.append(species)
         melt_surface_renewal_raw = series_config.get(
             "melt_surface_renewal_base_kg_s_m2_pa",
@@ -1944,7 +1875,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 ),
             )
             alpha_is_unmeasured = decision.unmeasured
-            alpha_fallback_permitted = decision.fallback_permitted
             alpha = decision.alpha
             alpha_evaluation = dict(decision.evaluation)
             if alpha_evaluation:

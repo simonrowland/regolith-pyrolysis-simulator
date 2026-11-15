@@ -863,18 +863,10 @@ def _flux_alpha(
     allow_unmeasured_alpha_fallback: bool = False,
     unmeasured_alpha_fallback_species_allowlist: set[str] | None = None,
 ) -> tuple[float | None, str]:
-    """Publisher alpha for the residual, or None when that publisher will not emit.
+    """Use the publisher's tagged coefficient or flagged alpha=1 ceiling.
 
-    ``publisher_effective_alpha`` is the kernel's order: species row,
-    ``*`` wildcard, else the permitted fallback of 1. A broad-proxy row
-    has already been stripped, so the fallback is what publishes Al2.
-    A zero alpha emits no flux and stays out of the sum. The caller
-    still rewrites that pressure onto the solved surface. An unmeasured
-    species the fallback does not permit returns None. The caller
-    refuses that carrier. The publisher's missing-alpha check is not
-    that refusal: it fires only when the parent mass and the alpha-1
-    baseline are both above their thresholds, and otherwise emits
-    alpha 1 with no fallback flag.
+    A zero coefficient contributes no flux. Invalid coefficients refuse;
+    unmeasured coefficients remain status-bearing predictions (b-1195).
     """
 
     from engines.builtin.evaporation_flux import publisher_effective_alpha
@@ -898,7 +890,7 @@ def _flux_alpha(
     status = ""
     if isinstance(decision.evaluation, Mapping):
         status = str(decision.evaluation.get("authority_status") or "")
-    if decision.unmeasured and decision.fallback_permitted:
+    if decision.unmeasured:
         status = status or "unmeasured_alpha_fallback"
     source = status or "catalog evaporation_alpha"
     return float(decision.alpha), f"evaporation_flux_alpha:{source}"
@@ -1341,12 +1333,9 @@ def _solve_or_refuse(
     registry = _formula_registry(rows)
     from simulator.evaporation import (
         _load_evaporation_alpha_by_species,
-        _measured_alpha_control_view,
     )
 
-    alphas = _measured_alpha_control_view(
-        _load_evaporation_alpha_by_species(dict(legacy_catalog or {}))
-    )
+    alphas = _load_evaporation_alpha_by_species(dict(legacy_catalog or {}))
     from simulator.vacuum_oxygen_balance import (
         _OXYGEN_GAS_ALPHA,
         _OXYGEN_GAS_ALPHA_SOURCE,
@@ -1390,15 +1379,8 @@ def _solve_or_refuse(
             ),
         )
         if alpha is None:
-            # Not in the sum: there is no emitting coefficient to weight.
-            # Do not keep the persisted pressure. The flux publisher
-            # refuses an unmeasured alpha only when the parent mass is
-            # above 1e-12 kg AND the alpha-1 baseline exceeds the
-            # nontrivial-flux threshold. Below either threshold, and
-            # whenever the viscous-domain diagnostic is unset (vacuum
-            # overhead), it emits that alpha of 1 with no fallback flag.
-            # A subthreshold or dust-parent carrier would then reach
-            # wall-supply accounting at this unclosed pO2.
+            # Invalid coefficient: retaining the persisted pressure would
+            # let the publisher emit an unclosed surface prediction.
             refused[carrier.species] = (
                 "evaporation alpha does not enter the balance; "
                 "surface pressure omitted"
