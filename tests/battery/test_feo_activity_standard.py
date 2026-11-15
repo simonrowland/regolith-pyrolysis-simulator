@@ -159,8 +159,8 @@ def test_internal_analytical_zero_offset_preserves_residual_bytes() -> None:
 @pytest.mark.parametrize(
     ("temperature_K", "expected_delta_g_j_mol", "expected_log10_shift"),
     (
-        (Decimal("1600"), Decimal("10240.5"), Decimal("0.3343")),
-        (Decimal("1650"), Decimal("9692.4"), Decimal("0.3068")),
+        (Decimal("1600"), Decimal("10240.4790568"), Decimal("0.3343")),
+        (Decimal("1650"), Decimal("9692.4013452"), Decimal("0.3068")),
     ),
 )
 def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
@@ -168,6 +168,9 @@ def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
     expected_delta_g_j_mol: Decimal,
     expected_log10_shift: Decimal,
 ) -> None:
+    # Independent closed form from the pinned v4 MELT pack: c0 - c1*T.
+    # At 1600 K this is 27778.965828 - 10.961554232*1600 =
+    # 10240.4790568 J/mol; at 1650 K it is 9692.4013452 J/mol.
     identity = _melt_pack_identity("default")
     standard, refusal = score_module._resolve_feo_activity_standard(
         Engine.OPENIMCC,
@@ -187,7 +190,9 @@ def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
     shift = score_module._canonical_log10_feo_activity(
         Decimal(0), temperature_K, standard.offset_j_mol
     )
-    assert float(shift) == pytest.approx(float(expected_log10_shift), abs=0.0001)
+    # The source quotes these shifts rounded to four decimals, hence half of
+    # the last quoted digit is the complete tolerance.
+    assert float(shift) == pytest.approx(float(expected_log10_shift), abs=0.00005)
 
 
 def test_melt_pack_shift_matches_condensate_gibbs_rows_as_crosscheck() -> None:
@@ -203,6 +208,7 @@ def test_melt_pack_shift_matches_condensate_gibbs_rows_as_crosscheck() -> None:
             row for row in csv.DictReader(handle) if "FeO(l)" in row.values()
         )
     old_janaf_row = {
+        "species_name": "FeO(l)",
         "dH298_R": "-30.01",
         "dG_A": "6.72",
         "dG_B": "6.588",
@@ -229,8 +235,8 @@ def test_melt_pack_shift_matches_condensate_gibbs_rows_as_crosscheck() -> None:
         assert refusal is None
         assert standard is not None
         condensate_difference = _lamor_gibbs(
-            current_row, float(temperature_K)
-        ) - _lamor_gibbs(old_janaf_row, float(temperature_K))
+            float(temperature_K), current_row
+        ) - _lamor_gibbs(float(temperature_K), old_janaf_row)
         assert condensate_difference == pytest.approx(float(expected), abs=1)
         assert condensate_difference == pytest.approx(
             float(standard.offset_j_mol), abs=1
@@ -485,6 +491,7 @@ def test_openimcc_feo_prediction_is_normalized_and_carries_notice_and_provenance
     assert record["from_standard"] == "DG46-MASSON65"
     assert record["to_standard"] == "Fe-019"
     assert record["melt_pack_identity"] == identity
+    assert record["temperature_K"] == "1600"
     assert residual.numeric is not None
     assert float(residual.numeric.value) == pytest.approx(
         float(record["log10_shift"]), abs=1e-12
