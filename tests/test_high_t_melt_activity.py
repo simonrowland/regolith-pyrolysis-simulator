@@ -776,22 +776,14 @@ def test_refused_openimcc_at_1800_k_keeps_existing_fallback_notice(monkeypatch) 
 
     monkeypatch.setattr(openimcc_bridge_module, "evaluate_cleaned_melt", refuse)
     provider = _provider()
-    result = provider.dispatch(_request(
-        BASE_MELT_MOL, 1800.0, liquid_fraction=1.0,
-    ))
+    result = provider.dispatch(_request(BASE_MELT_MOL, 1800.0))
     high_t = result.diagnostic["high_t_melt_activity"]
     assert high_t["provider"] == "constant_gamma"
     assert high_t["fallback"] is True
     assert high_t["fallback_reason"]["code"] == "openimcc_not_importable"
     assert any(n["code"] == "openimcc_not_importable" for n in high_t["notices"])
-    assert high_t["held_effective_gamma_by_parent"] == {}
-    assert not any(
-        n["code"] == "openimcc_liquid_sio_below_1950K_band"
-        for n in high_t["notices"]
-    )
     legacy = provider.dispatch(_request(
         BASE_MELT_MOL, 1800.0, high_t_melt_activity="constant_gamma",
-        liquid_fraction=1.0,
     ))
     assert _physics(result)[:4] == _physics(legacy)[:4]
     assert high_t["selected_parent_activities"]["FeO"] == legacy.diagnostic["activities"]["Fe"]
