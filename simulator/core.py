@@ -5186,6 +5186,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self,
             value['curve'],
             value.get('origin'),
+            fresh_evidence=False,
             redox_state=redox_state,
         )
 
@@ -5342,6 +5343,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self,
                 curve,
                 cache.get('origin'),
+                fresh_evidence=False,
                 redox_state=redox_state,
             )
         )
@@ -5391,6 +5393,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     self,
                     memoized_record['curve'],
                     memoized_record.get('origin'),
+                    fresh_evidence=False,
                     redox_state=redox_state,
                 )
             ):
@@ -5520,6 +5523,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self,
                 normalized_curve,
                 normalized_record.get('origin'),
+                fresh_evidence=False,
                 redox_state=redox_state,
             )
         validated_curve = (
@@ -5536,6 +5540,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self,
                 normalized_curve,
                 validated_cache.get('origin'),
+                fresh_evidence=False,
                 redox_state=redox_state,
             )
             and isinstance(validated_cache.get('repair_notices'), list)

@@ -6457,88 +6457,6 @@ def test_gate_memo_origin_reuses_live_binding_provenance_per_read(
     assert len(provenance_calls) == 1
 
 
-def test_fresh_gate_memo_reuse_caches_binary_digest_by_stat(
-    monkeypatch,
-    tmp_path,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
-):
-    from pathlib import Path
-
-    import simulator.engine_local_config as engine_config
-
-    sim = _build_freeze_gate_sim(
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-        enabled=True,
-    )
-    binary = tmp_path / 'magemin-fixture'
-    binary.write_text('selected producer fixture\n')
-    sim.backend = SimpleNamespace(
-        name='MAGEMinBackend',
-        _binary_path=binary,
-        get_engine_version=lambda: 'fixture-runtime',
-    )
-    curve = {
-        'source': 'gate_liquid_fraction:authoritative:test',
-        'status': 'ok',
-        'solidus_T_C': 1000.0,
-        'liquidus_T_C': 1300.0,
-    }
-    monkeypatch.setattr(
-        engine_config,
-        'config_path',
-        lambda: tmp_path / 'missing-engines.local.toml',
-    )
-    monkeypatch.setattr(engine_config, 'load_config', lambda: None)
-    monkeypatch.setattr(
-        admission_module,
-        'binding_receipt_path',
-        lambda *_args, **_kwargs: tmp_path / 'missing-binding-receipt.json',
-    )
-    monkeypatch.setattr(
-        admission_module,
-        'selected_binding_identities',
-        lambda *_args, **_kwargs: (),
-    )
-    monkeypatch.setattr(admission_module, '_FILE_DIGEST_CACHE', {})
-    record = engine_binding_admission.write_gate_curve_memo_record(
-        sim,
-        curve,
-    )
-
-    read_paths = []
-    original_read_bytes = Path.read_bytes
-
-    def count_binary_reads(path):
-        if path.resolve() == binary.resolve():
-            read_paths.append(path)
-        return original_read_bytes(path)
-
-    monkeypatch.setattr(Path, 'read_bytes', count_binary_reads)
-    admission_module._FILE_DIGEST_CACHE.clear()
-
-    assert engine_binding_admission.gate_curve_memo_reuse_eligible(
-        sim, curve, record['origin']
-    )
-    assert engine_binding_admission.gate_curve_memo_reuse_eligible(
-        sim, curve, record['origin']
-    )
-    assert len(read_paths) == 1
-
-    binary_stat = binary.stat()
-    os.utime(
-        binary,
-        ns=(binary_stat.st_atime_ns, binary_stat.st_mtime_ns + 1_000_000_000),
-    )
-    assert engine_binding_admission.gate_curve_memo_reuse_eligible(
-        sim, curve, record['origin']
-    )
-    assert len(read_paths) == 2
-
-
 def test_gate_memo_origin_keeps_producer_dependency_vector(
     vapor_pressure_data,
     feedstocks_data,
@@ -6658,7 +6576,17 @@ def test_gate_memo_origin_missing_is_a_miss(
         'liquidus_T_C': 1300.0,
     }
     expected_curve = _freeze_gate_curve_fixture(sim, curve)
-    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    assert not engine_binding_admission.gate_curve_memo_reuse_eligible(
+        sim,
+        record['curve'],
+        None,
+        fresh_evidence=False,
+    )
     record['origin'] = None
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),

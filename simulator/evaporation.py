@@ -3453,6 +3453,7 @@ class EvaporationMixin:
                 self,
                 cached_curve,
                 cache.get('origin'),
+                fresh_evidence=True,
                 redox_state=redox_state,
             )
         ):
@@ -3526,6 +3527,7 @@ class EvaporationMixin:
                     self,
                     shared_value,
                     shared_origin,
+                    fresh_evidence=True,
                     redox_state=redox_state,
                 )
             ):
@@ -3727,6 +3729,7 @@ class EvaporationMixin:
                     self,
                     curve,
                     origin,
+                    fresh_evidence=True,
                     evidence=evidence,
                     redox_state=redox_state,
                 )
