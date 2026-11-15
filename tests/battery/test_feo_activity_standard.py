@@ -39,10 +39,10 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = (
 # sha 3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0
 # dex -0.013180332034779389
 # The offer frame is a_D * f from the Darken & Gurry factor.
-# The byte pin includes the active OpenIMCC redox-pack identity and current
-# JANAF/d-333 lineage. Updating the pack requires updating this digest.
+# The byte pin includes the active OpenIMCC redox-pack identity and FeO
+# standard-normalization provenance as well as the residual value.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "db630fbbbf4b810f60a09b2e37ee4e9c5be53fc4ff2cd94fb0df4f195cb7cf3a"
+    "6e99778d67e8e4ac5ea34d58c72eab0e56e538968ffe6f9cb4b69c4208af83c6"
 )
 # At 2153.15 K, the pinned MELT expression gives
 # 27778.965828 - 10.961554232*2153.15 = 4177.0953 J/mol.
@@ -482,6 +482,9 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
     assert normalisation["certified_band"] == {
         "temperature_K": [1649.15, 1766.15]
     }
+    # The serialized line includes the shifted residual above and the
+    # feo_standard_normalisation provenance, including its extrapolated
+    # authority, certified band, and pack range flags.
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
     assert sha256(serialized).hexdigest() == _DISTIN_1880_RESIDUAL_SHA256
 
