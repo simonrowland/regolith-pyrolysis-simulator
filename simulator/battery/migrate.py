@@ -20730,6 +20730,18 @@ def _pressure_bar_from_identity(value: object) -> Decimal | None:
     return pressure_pa / _BAR_PA
 
 
+def _delta_iw_ideal_ratio_notice(quoted_definition: str) -> str | None:
+    """Recognize only a source-quoted ideal FeO/Fe definition of ΔIW."""
+    normalized = quoted_definition.casefold().replace("δiw", "delta iw")
+    normalized = re.sub(r"[^a-z0-9]+", "", normalized)
+    if all(token in normalized for token in ("deltaiw", "2log", "xfeo", "xfe")):
+        return (
+            "delta_iw_from_ideal_feo_fe_ratio; source definition: "
+            f"{quoted_definition}"
+        )
+    return None
+
+
 def _relative_method_notice(source_id: str | None, buffer: str) -> str | None:
     if buffer != "IW":
         return None
