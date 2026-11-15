@@ -7821,7 +7821,7 @@ def test_b704_waypoint_guard_keeps_green_composition_for_real_rows(
     row_token: str,
     expected: dict[str, Decimal] | None,
 ) -> None:
-    from simulator.battery.waypoints import normalized_composition
+    from simulator.battery.waypoints import GapReason, normalized_composition
 
     result = _migrate_real_extract(tmp_path, source, write=False)
     observation = next(
@@ -7831,26 +7831,23 @@ def test_b704_waypoint_guard_keeps_green_composition_for_real_rows(
     )
     experiment = result.experiments[observation.experiment_id]
 
-    source_derived_expected = expected is None
-
     waypoint = normalized_composition(experiment, _bench(), observation)
+
+    if expected is None:
+        assert experiment.sample.initial_composition is None
+        assert observation.point_conditions["composition"].state.is_unknown
+        assert waypoint.selected is None
+        assert waypoint.absence is not None
+        assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        assert any(
+            path.endswith(".point_conditions.composition")
+            for path in waypoint.absence.missing
+        )
+        return
 
     assert waypoint.absence is None
     assert waypoint.selected is not None
-    if source_derived_expected:
-        initial = experiment.sample.initial_composition
-        assert initial is not None and initial.state.is_value
-        assert waypoint.selected.route == "normalized_printed_composition"
-        selected = Composition(
-            basis=initial.state.value.basis,
-            components=tuple(waypoint.selected.value.items()),
-            amount_basis=AmountBasis.MOLE_FRACTION,
-        )
-        assert not migrate_module._initial_compositions_conflict(
-            initial, Located(State.of(selected))
-        )
-    else:
-        assert waypoint.selected.value == expected
+    assert waypoint.selected.value == expected
 
 
 def test_burnham_redox_engine_point_keeps_green_composition_payload(

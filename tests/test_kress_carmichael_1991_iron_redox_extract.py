@@ -2,6 +2,7 @@
 
 from collections import Counter
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -9,7 +10,12 @@ import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, Phase, PhaseRole, Quantity
-from simulator.battery.input_provenance import PRINTED_STARTING_BULK
+from simulator.battery.input_provenance import (
+    PRINTED_STARTING_BULK,
+    SCORED_PHASE_ANALYSIS,
+    composition_with_provenance,
+    input_composition_echo_detail,
+)
 from simulator.battery.migrate import (
     Migrator,
     fe3_fe2_ratio_from_oxide_wt_pct,
@@ -19,6 +25,7 @@ from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
     validate_extract_document,
 )
+from simulator.state_types import State
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +46,22 @@ TABLE4_METHOD_TEXT = (
     "In order to account for the effect of Al2O3 contamination in the NAFS and CAFS experiments, and the high iron "
     "contents considered in the natural compositions, 33 additional Pt-loop drop-quench experiments were "
     "performed on compositions and conditions spanning those explored in the ultrasonic experiments."
+)
+TABLE4_COMPOSITION_UNKNOWN_REASON = (
+    'Table 4 caption: "Temperatures and compositions for quench experiments (wt%)"; '
+    "no starting/bulk composition is printed for run Q01."
+)
+TABLE4_COMPOSITION_UNKNOWN_NOTE = (
+    'The Table 4 caption states "Temperatures and compositions for quench experiments (wt%)"; '
+    "it does not report a starting/bulk composition for the run."
+)
+TABLE5_COMPOSITION_UNKNOWN_REASON = (
+    'Table 5 caption: "Re-analysis of experiments from Kress and Carmichael (1988) (wt%)"; '
+    "no starting/bulk composition is printed for run B27."
+)
+TABLE5_COMPOSITION_UNKNOWN_NOTE = (
+    'The Table 5 caption states "Re-analysis of experiments from Kress and Carmichael (1988) (wt%)"; '
+    "it does not report a starting/bulk composition for the run."
 )
 TABLE5_QUENCH_UNKNOWN_REASON = "no_run_specific_quench_statement_printed"
 TABLE3_OXIDES = (
@@ -171,12 +194,22 @@ def _expected_table45_compositions() -> dict[str, dict[str, str]]:
     return expected
 
 
-def _actual_table45_compositions(document: dict) -> dict[str, dict | None]:
-    return {
-        observation["observation_id"]: observation.get("values", {}).get("composition_wt_pct")
-        for observation in document["species"]["Fe"]["observations"]
-        if observation["observation_id"].startswith("kc91_fe3_t")
-    }
+def _actual_table45_compositions(document: dict) -> dict[str, dict[str, str]]:
+    actual: dict[str, dict[str, str]] = {}
+    for formula, body in document["species"].items():
+        for observation in body.get("observations", []):
+            locator = observation.get("locator", {})
+            table = str(locator.get("table", ""))
+            if table not in {"4", "5"}:
+                continue
+            observation_id = observation["observation_id"]
+            if not observation_id.startswith(f"kc91_t{table}_"):
+                continue
+            values = observation["values"]
+            actual.setdefault(
+                f"kc91_fe3_t{table}_{locator['row']}", {}
+            )[formula] = str(values.get("value_as_published", values["value"]))
+    return actual
 
 
 def _assert_table45_compositions_match(document: dict, expected: dict) -> None:
@@ -196,17 +229,27 @@ def _assert_table45_compositions_match(document: dict, expected: dict) -> None:
         assert locator["page"] == 5
         assert locator["table"] == table
         assert locator["row"] == row
+        assert "composition_wt_pct" not in observations[observation_id]["values"]
+        composition = observations[observation_id]["point_conditions"]["composition"]
+        assert composition["state"]["tag"] == "unknown"
+        if table == "4":
+            assert composition["state"]["reason"] == (
+                TABLE4_COMPOSITION_UNKNOWN_REASON.replace("Q01", row)
+            )
+            assert composition["locator"]["note"] == TABLE4_COMPOSITION_UNKNOWN_NOTE
+        else:
+            assert composition["state"]["reason"] == (
+                TABLE5_COMPOSITION_UNKNOWN_REASON.replace("B27", row)
+            )
+            assert composition["locator"]["note"] == TABLE5_COMPOSITION_UNKNOWN_NOTE
+        assert composition["locator"]["page"] == 5
+        assert composition["locator"]["pdf_page_index"] == 4
+        assert composition["locator"]["published_page"] == 86
+        assert composition["locator"]["table"] == table
+        assert composition["locator"]["row"] == row
 
         run = experiments[f"kc91_t{table}_{row}"]
-        initial = run["sample"]["initial_composition"]
-        assert initial["state"]["tag"] == "value"
-        assert initial["state"]["value"]["amount_basis"] == "mass_percent"
-        assert dict(initial["state"]["value"]["components"]) == expected[observation_id]
-        assert initial["locator"]["page"] == 5
-        assert initial["locator"]["pdf_page_index"] == 4
-        assert initial["locator"]["published_page"] == 86
-        assert initial["locator"]["table"] == table
-        assert initial["locator"]["row"] == row
+        assert "initial_composition" not in run.get("sample", {})
 
 
 def _document(path: Path = EXTRACT) -> dict:
@@ -310,7 +353,7 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     migrated_temperature_count = 0
     expected_table45 = _expected_table45_compositions()
     expected_table3_runs = _expected_table3_initial_compositions()
-    for observation_id, (_formula, observation) in target.items():
+    for observation_id, (formula, observation) in target.items():
         values = observation["values"]
         assert values["phase_label"] == "melt"
         assert values["basis"] == "wt_percent"
@@ -326,11 +369,37 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
         table = str(observation["locator"]["table"])
         row = str(observation["locator"]["row"])
         table3_initial = table == "3" and row.endswith(" initial")
+        if table in {"4", "5"}:
+            expected_amount = expected_table45[f"kc91_fe3_t{table}_{row}"][formula]
+            assert values["value_as_published"] == expected_amount
+            assert values["value"] == expected_amount
         if table3_initial:
             assert conditions["composition"]["state"]["tag"] == "unknown"
             assert conditions["composition"].get("locator")
+        elif table in {"4", "5"}:
+            state = conditions["composition"]["state"]
+            assert state["tag"] == "unknown"
+            if table == "4":
+                assert state["reason"] == TABLE4_COMPOSITION_UNKNOWN_REASON.replace(
+                    "Q01", row
+                )
+                assert conditions["composition"]["locator"]["note"] == (
+                    TABLE4_COMPOSITION_UNKNOWN_NOTE
+                )
+            else:
+                assert state["reason"] == TABLE5_COMPOSITION_UNKNOWN_REASON.replace(
+                    "B27", row
+                )
+                assert conditions["composition"]["locator"]["note"] == (
+                    TABLE5_COMPOSITION_UNKNOWN_NOTE
+                )
+            assert conditions["composition"]["locator"]["page"] == 5
+            assert conditions["composition"]["locator"]["pdf_page_index"] == 4
+            assert conditions["composition"]["locator"]["published_page"] == 86
+            assert conditions["composition"]["locator"]["table"] == table
+            assert conditions["composition"]["locator"]["row"] == row
         else:
-            assert table in {"3", "4", "5"}
+            assert table == "3" and row.endswith(" final")
             assert "composition" not in conditions
         assert "fO2_log" in conditions
         assert "state" in conditions["fO2_log"]
@@ -385,18 +454,26 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
                 )
                 assert record.identity.composition.value.input_provenance == PRINTED_STARTING_BULK
         else:
-            assert composition.state.is_value
-            assert record.identity.composition.is_value
+            assert table in {"4", "5"}
+            assert composition.state.is_unknown
+            assert record.identity.composition is None or record.identity.composition.is_unknown
+            assert input_composition_echo_detail(record.identity) is None
             expected_wt_pct = expected_table45[f"kc91_fe3_t{table}_{row}"]
-            expected_composition = wt_pct_to_mole_fraction(
+            scored_product = wt_pct_to_mole_fraction(
                 {oxide: Decimal(amount) for oxide, amount in expected_wt_pct.items()}
             )
-            assert record.identity.composition.value.as_map() == expected_composition.as_map()
-            assert composition.state.value.as_map() == expected_composition.as_map()
-            assert composition.locator.page == 5
-            assert composition.locator.table == table
-            assert f"row {row}" in (composition.locator.note or "")
-            assert record.identity.composition.value.input_provenance == PRINTED_STARTING_BULK
+            product_as_input = replace(
+                record.identity,
+                composition=State.of(
+                    composition_with_provenance(
+                        scored_product, SCORED_PHASE_ANALYSIS
+                    )
+                ),
+            )
+            echo = input_composition_echo_detail(product_as_input)
+            assert echo is not None
+            assert echo["reason"] == "input_composition_is_scored_phase_analysis"
+            assert echo["input_provenance"] == SCORED_PHASE_ANALYSIS
         assert record.point_conditions["fO2_log"].state.is_value or record.point_conditions["fO2_log"].state.is_unknown
         migrated_composition_count += bool(
             record.identity.composition and record.identity.composition.is_value
@@ -407,8 +484,9 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
 
     assert composition_count == 0
     assert fo2_count == 130
-    # 16 complete Table 3 starts feed 9 final oxide rows; Table 4 has 33 × 11 and Table 5 has 13 × 10.
-    assert migrated_composition_count == 144 + 363 + 130
+    assert sum(str(observation["locator"]["table"]) in {"4", "5"} for _, observation in target.values()) == 493
+    # Only 16 complete Table 3 starts feed their 9 final oxide rows.
+    assert migrated_composition_count == 144
     assert migrated_fo2_count == 130
     assert migrated_temperature_count == 835
 
@@ -468,10 +546,14 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     assert "MnO=N.A." in na_final_record.point_conditions["composition"].locator.note
 
     table4 = observations["kc91_t4_Q01_SiO2"]["point_conditions"]
-    assert "composition" not in table4
+    assert table4["composition"]["state"]["tag"] == "unknown"
+    assert table4["composition"]["state"]["reason"] == (
+        TABLE4_COMPOSITION_UNKNOWN_REASON
+    )
+    assert table4["composition"]["locator"]["note"] == TABLE4_COMPOSITION_UNKNOWN_NOTE
     table4_record = records[f"{SOURCE_ID}::kc91_t4_Q01_SiO2"]
-    assert table4_record.identity.composition.is_value
-    assert table4_record.point_conditions["composition"].state.is_value
+    assert table4_record.identity.composition is None or table4_record.identity.composition.is_unknown
+    assert table4_record.point_conditions["composition"].state.is_unknown
     assert table4["fO2_log"]["state"]["tag"] == "unknown"
     assert "neither a numeric fO2 nor a method" in table4["fO2_log"]["state"]["reason"]
     assert "air" not in table4["fO2_log"]["state"]["reason"].casefold()
@@ -491,10 +573,14 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     assert table5_quench["locator"]["pdf_page_index"] == 3
     assert table5_quench["locator"]["published_page"] == 85
     table5 = table5_observation["point_conditions"]
-    assert "composition" not in table5
+    assert table5["composition"]["state"]["tag"] == "unknown"
+    assert table5["composition"]["state"]["reason"] == (
+        TABLE5_COMPOSITION_UNKNOWN_REASON
+    )
+    assert table5["composition"]["locator"]["note"] == TABLE5_COMPOSITION_UNKNOWN_NOTE
     table5_record = records[f"{SOURCE_ID}::kc91_t5_B27_SiO2"]
-    assert table5_record.identity.composition.is_value
-    assert table5_record.point_conditions["composition"].state.is_value
+    assert table5_record.identity.composition is None or table5_record.identity.composition.is_unknown
+    assert table5_record.point_conditions["composition"].state.is_unknown
     assert table5["fO2_log"]["state"]["tag"] == "value"
     assert table5["fO2_log"]["state"]["value"] == "-0.68"
     assert table5["fO2_log"]["locator"]["table"] == "5"
@@ -659,10 +745,10 @@ def test_table45_composition_cell_map_and_locator_mutations_fail() -> None:
     mutated_extract = deepcopy(document)
     q01 = next(
         observation
-        for observation in mutated_extract["species"]["Fe"]["observations"]
-        if observation["observation_id"] == "kc91_fe3_t4_Q01"
+        for observation in mutated_extract["species"]["SiO2"]["observations"]
+        if observation["observation_id"] == "kc91_t4_Q01_SiO2"
     )
-    q01["values"]["composition_wt_pct"]["SiO2"] = "38.87"
+    q01["values"]["value_as_published"] = "38.87"
     with pytest.raises(AssertionError):
         _assert_table45_compositions_match(mutated_extract, expected)
 
@@ -672,7 +758,9 @@ def test_table45_composition_cell_map_and_locator_mutations_fail() -> None:
         for experiment in mutated_extract["experiments"]
         if experiment["experiment_id"] == "kc91_t4_Q01"
     )
-    q01_run["sample"]["initial_composition"]["state"]["value"]["components"][0][1] = "38.87"
+    q01_run["sample"]["initial_composition"] = {
+        "state": {"tag": "value", "value": {"amount_basis": "mass_percent"}}
+    }
     with pytest.raises(AssertionError):
         _assert_table45_compositions_match(mutated_extract, expected)
 
@@ -682,7 +770,10 @@ def test_table45_composition_cell_map_and_locator_mutations_fail() -> None:
         for experiment in mutated_extract["experiments"]
         if experiment["experiment_id"] == "kc91_t5_B34"
     )
-    b34_run["sample"]["initial_composition"]["locator"]["row"] = "B27"
+    b34_run["sample"]["initial_composition"] = {
+        "state": {"tag": "value", "value": {"amount_basis": "mass_percent"}},
+        "locator": {"page": 5, "table": "5", "row": "B27"},
+    }
     with pytest.raises(AssertionError):
         _assert_table45_compositions_match(mutated_extract, expected)
 
@@ -692,7 +783,7 @@ def test_table45_composition_cell_map_and_locator_mutations_fail() -> None:
         for observation in mutated_extract["species"]["Fe"]["observations"]
         if observation["observation_id"] == "kc91_fe3_t5_B34"
     )
-    b34["values"].pop("composition_wt_pct")
+    b34["values"]["composition_wt_pct"] = expected["kc91_fe3_t5_B34"]
     with pytest.raises(AssertionError):
         _assert_table45_compositions_match(mutated_extract, expected)
 
@@ -707,54 +798,60 @@ def test_table45_composition_cell_map_and_locator_mutations_fail() -> None:
         _assert_table45_compositions_match(mutated_extract, expected)
 
 
-def test_missing_run_composition_remains_typed_and_does_not_spread(tmp_path: Path) -> None:
+def test_missing_run_composition_remains_typed_and_does_not_spread() -> None:
     from simulator.battery.waypoints import GapReason, normalized_composition
     from tests.battery.test_waypoints import _bench
 
-    document = _document()
-    q01_run = next(
-        experiment
-        for experiment in document["experiments"]
-        if experiment["experiment_id"] == "kc91_t4_Q01"
-    )
-    q01_run["sample"].pop("initial_composition")
-    mutated_extract = tmp_path / EXTRACT.name
-    mutated_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
-
-    _mutated_document, migrator = _migrated(mutated_extract)
+    _document, migrator = _migrated()
     records = migrator.result.observations
-    refused = [
+    phase_rows = [
         record
         for key, record in records.items()
-        if key.startswith(f"{SOURCE_ID}::kc91_t4_Q01_")
+        if key.startswith((f"{SOURCE_ID}::kc91_t4_", f"{SOURCE_ID}::kc91_t5_"))
         and record.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
     ]
-    still_linked = [
+    assert len(phase_rows) == 493
+    table45_experiments = [
+        experiment
+        for experiment in migrator.result.experiments.values()
+        if experiment.experiment_id.rsplit("::", 1)[-1].startswith(
+            ("kc91_t4_", "kc91_t5_")
+        )
+    ]
+    assert len(table45_experiments) == 46
+    assert all(
+        experiment.sample.initial_composition is None
+        for experiment in table45_experiments
+    )
+    assert sum(
+        experiment.experiment_id.rsplit("::", 1)[-1].startswith("kc91_t4_")
+        for experiment in table45_experiments
+    ) == 33
+    assert sum(
+        experiment.experiment_id.rsplit("::", 1)[-1].startswith("kc91_t5_")
+        for experiment in table45_experiments
+    ) == 13
+    assert all(
+        record.point_conditions["composition"].state.is_unknown
+        and (record.identity.composition is None or record.identity.composition.is_unknown)
+        for record in phase_rows
+    )
+    redox_rows = [
         record
         for key, record in records.items()
-        if key.startswith(f"{SOURCE_ID}::kc91_t4_Q02_")
-        and record.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        if key.startswith((f"{SOURCE_ID}::kc91_fe3_t4_", f"{SOURCE_ID}::kc91_fe3_t5_"))
+        and record.identity.quantity.value is Quantity.FE3_FE2_RATIO
     ]
-    assert len(refused) == len(still_linked) == 11
-    refused_waypoints = [
-        normalized_composition(
+    assert len(redox_rows) == 46
+    for record in redox_rows:
+        composition = record.point_conditions["composition"]
+        assert composition.state.is_unknown
+        waypoint = normalized_composition(
             migrator.result.experiments[record.experiment_id], _bench(), record
         )
-        for record in refused
-    ]
-    assert all(result.selected is None for result in refused_waypoints)
-    assert all(result.absence is not None for result in refused_waypoints)
-    assert all(
-        result.absence.reason is GapReason.MISSING_EVIDENCE
-        and "experiment.sample.initial_composition" in result.absence.missing
-        for result in refused_waypoints
-    )
-    assert all(
-        record.identity.composition is None or record.identity.composition.is_unknown
-        for record in refused
-    )
-    assert all(record.point_conditions["composition"].state.is_value for record in still_linked)
-    assert all(record.identity.composition.is_value for record in still_linked)
+        assert waypoint.selected is None
+        assert waypoint.absence is not None
+        assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() -> None:
     document, migrator = _migrated()
@@ -842,7 +939,7 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         fe2o3 = expected_composition["Fe2O3"]
         feo = expected_composition["FeO"]
         source = rows_by_id[observation_id]
-        assert source["values"]["composition_wt_pct"] == expected_composition
+        assert "composition_wt_pct" not in source["values"]
         printed_sum = sum(
             (Decimal(amount) for amount in expected_composition.values()),
             Decimal("0"),
@@ -861,15 +958,15 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         )
         assert expected_ratio is not None
         assert record.value.point == expected_ratio
-        expected_mole_fractions = wt_pct_to_mole_fraction(
-            {oxide: Decimal(amount) for oxide, amount in expected_composition.items()}
-        )
-        assert record.identity.composition.is_value
-        assert record.identity.composition.value.as_map() == expected_mole_fractions.as_map()
+        assert record.identity.composition is not None
+        assert record.identity.composition.is_unknown
         row_composition = record.point_conditions["composition"]
-        assert row_composition.state.is_value
-        assert row_composition.state.value.as_map() == expected_mole_fractions.as_map()
-    assert all(record.identity.composition.is_value for record in reduced)
+        assert row_composition.state.is_unknown
+    assert all(
+        record.identity.composition is not None
+        and record.identity.composition.is_unknown
+        for record in reduced
+    )
     assert all(
         record.identity.total_pressure_Pa.is_value
         and record.identity.total_pressure_Pa.value == Decimal("101325")
