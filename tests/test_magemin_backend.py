@@ -34,6 +34,7 @@ import pytest
 from tests._plugins.time_isolation import patch_module_time
 
 import simulator.engine_pool as engine_pool
+import simulator.melt_backend.magemin as magemin_module
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerPoolLifecycleError,
@@ -1583,9 +1584,8 @@ def test_magemin_bridge_fallback_subtracts_elapsed_aggregate_budget(monkeypatch)
         seen.append(kwargs['call_timeout_s'])
         return {'phases': {'liq': {'mass_kg': 1.0}}}
 
-    monkeypatch.setattr(
-        'simulator.melt_backend.magemin.time.monotonic',
-        lambda: clock['t'],
+    patch_module_time(
+        monkeypatch, magemin_module, monotonic=lambda: clock['t']
     )
     monkeypatch.setattr(backend, '_call_magemin_subprocess', fake_subprocess)
 
@@ -2681,6 +2681,9 @@ def test_magemin_liquidus_subprocess_path_preserves_sample_timeout_diagnostics(
     )
     patch_module_time(
         monkeypatch, liquidus_module, monotonic=lambda: clock["t"]
+    )
+    patch_module_time(
+        monkeypatch, magemin_module, monotonic=lambda: clock["t"]
     )
 
     backend = MAGEMinBackend()

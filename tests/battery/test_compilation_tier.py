@@ -16,6 +16,7 @@ from fractions import Fraction
 from pathlib import Path
 
 import pytest
+from tests._plugins.time_isolation import patch_module_time
 
 from simulator.battery.compilation_tier import (
     _parse_product,
@@ -6759,6 +6760,8 @@ def test_score_store_pairs_tables_from_one_index(monkeypatch) -> None:
 
 
 def test_score_progress_total_is_series_cells(monkeypatch, capsys) -> None:
+    import simulator.battery.score as score_module
+
     from simulator.battery.records import Execution
     from simulator.battery.score import score_store
 
@@ -6772,9 +6775,8 @@ def test_score_progress_total_is_series_cells(monkeypatch, capsys) -> None:
         current_time += 61.0
         return current_time
 
-    monkeypatch.setattr(
-        "simulator.battery.score.time.monotonic",
-        advance_monotonic,
+    patch_module_time(
+        monkeypatch, score_module, monotonic=advance_monotonic
     )
     identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
     series = F.observation(
