@@ -225,6 +225,16 @@ def _make_fake_magemin_cli_liquidus(monkeypatch):
     return backend, calls
 
 
+def _expected_magemin_bulk_arg(backend, bulk_projection):
+    args = backend._build_magemin_subprocess_args(
+        bulk_projection=bulk_projection,
+        temperature_C=1200.0,
+        pressure_kbar=0.001,
+        fO2_log=-9.0,
+    )[0]
+    return next(arg for arg in args if arg.startswith('--Bulk='))
+
+
 def _assert_magemin_cli_absolute_targets(calls, expected_fO2_log):
     assert len(calls) > 10, "expected coarse samples and refinement probes"
     for args in calls:
@@ -2565,9 +2575,7 @@ def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
         'MgO': 29.0,
         'FeO': 10.0,
     })
-    expected_bulk = '--Bulk=' + ','.join(
-        f'{value:.8g}' for value in expected_projection.vector
-    )
+    expected_bulk = _expected_magemin_bulk_arg(backend, expected_projection)
     submitted_bulks = {
         next(arg for arg in args if arg.startswith('--Bulk='))
         for args in calls
@@ -2594,9 +2602,13 @@ def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(monkeypatch):
     )
 
     assert result.status == 'ok'
-    expected_bulk = '--Bulk=' + ','.join(
-        f'{value:.8g}' for value in projected.vector
-    )
+    assert projected.composition_wt_pct['SiO2'] == pytest.approx(50.0)
+    assert projected.composition_wt_pct['MgO'] == pytest.approx(30.0)
+    assert (
+        projected.composition_wt_pct['FeOt']
+        + projected.composition_wt_pct['O']
+    ) == pytest.approx(20.0)
+    expected_bulk = _expected_magemin_bulk_arg(backend, projected)
     assert {
         next(arg for arg in args if arg.startswith('--Bulk='))
         for args in calls

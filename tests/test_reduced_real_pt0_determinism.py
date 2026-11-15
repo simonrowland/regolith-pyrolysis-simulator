@@ -1257,20 +1257,35 @@ def test_magemin_freeze_gate_memo_key_preserves_domain_boundary_identity() -> No
             material_origin="feedstock",
         )
         sim.atom_ledger = ledger
-        return sim._freeze_gate_cache_key_and_domain(
+        key, reason = sim._freeze_gate_cache_key_and_domain(
             pressure_bar=1.0,
             fO2_log=-9.0,
         )
+        return key, reason, composition_wt_pct
 
-    inside, inside_reason = key_for(30.0)
+    inside, inside_reason, _inside_composition = key_for(30.0)
     # PT-0 capture uses six significant figures before the live provider and
-    # gate see this input. 29.9999 remains below the inclusive 30.0 boundary
+    # gate see this input. 29.999 remains below the inclusive 30.0 boundary
     # at that precision while sharing the quantized cache composition key.
-    outside, outside_reason = key_for(29.9999)
+    outside, outside_reason, outside_composition = key_for(29.999)
+
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    live_gate = MAGEMinBackend().equilibrate(
+        1500.0,
+        composition_kg=outside_composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        species_formula_registry=sim.species_formula_registry,
+    )
 
     assert inside.composition_mol_fractions == outside.composition_mol_fractions
     assert inside_reason is None
     assert outside_reason == "magemin_domain_sio2_below_min"
+    assert live_gate.status == "out_of_domain"
+    assert (
+        live_gate.diagnostics["backend_status_reason"] == outside_reason
+    )
     assert inside == outside
 
 
