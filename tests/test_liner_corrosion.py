@@ -2159,6 +2159,38 @@ def test_tier_a_margin_triggers_anorthite_onset_at_1550_c():
         "coupled": 1.0,
     }
 
+    segment = build_liner_state_segment(
+        {
+            "composition": anorthite,
+            "citation": "Morey 1964, Table 26 row 6",
+            "criterion_tier": "A",
+            "invariant_table": table,
+            "density_kg_m3": 1.0,
+            "reacted_layer_depth_m": 1.0,
+            "margin_C": 25.0,
+            "horizon_campaigns": 0,
+            "porosity_fraction": 0.0,
+        },
+        {},
+        area_m2=1.0,
+        service_temperature_C=1550.0,
+        pressure_bar=None,
+        sampler=None,
+        deposit_inert_kg_by_species={},
+        deposit_reactive_kg_by_species={},
+    )
+    assert segment["rating_temperature_C"] == 1528.0
+    assert segment["rating_temperature_C"] < segment["service_T_C"]
+    assert segment["onset"] is True
+    ratings_by_depth = [
+        entry["rating_temperature_C"] for entry in segment["depth_sensitivity"]
+    ]
+    assert ratings_by_depth == [
+        1528.0,
+        1528.0,
+        1528.0,
+    ]
+
 
 def test_tier_a_dissolution_uses_the_matched_source_liquid_composition():
     liner = {"CaO": 60.0, "Al2O3": 40.0}

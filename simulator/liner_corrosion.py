@@ -126,6 +126,32 @@ def _positive(value: Any, field: str) -> float:
     return result
 
 
+def _rated_temperature_with_margin(
+    unadjusted_temperature_C: float | None,
+    pure_literature_temperature_C: float | None,
+    margin_C: float,
+) -> tuple[float | None, float | None]:
+    """Return the d-419 rating and its pure-liner cap after the safety margin."""
+
+    margin = _finite_real(margin_C, "margin_C")
+    if margin < 0.0:
+        raise LinerCorrosionRefusal("temperature_margin_invalid")
+    cap = (
+        _finite_real(pure_literature_temperature_C, "pure_literature_temperature_C")
+        - margin
+        if pure_literature_temperature_C is not None
+        else None
+    )
+    rating = (
+        _finite_real(unadjusted_temperature_C, "unadjusted_temperature_C") - margin
+        if unadjusted_temperature_C is not None
+        else None
+    )
+    if rating is not None and cap is not None:
+        rating = min(rating, cap)
+    return rating, cap
+
+
 def validate_oxide_composition(composition_wt_pct: Mapping[str, Any]) -> dict[str, float]:
     """Return a checked 100 wt% oxide map without silently normalizing it."""
 
@@ -1290,23 +1316,17 @@ def _tier_a_fallback_melt_activity(
         contaminated_first,
         "tier_a_contaminated_first_liquid_T_C",
     )
-    margin = _finite_real(margin_C, "margin_C")
     literature_temperature = (
         _finite_real(literature_melting_temperature_C, "literature_melting_temperature_C")
         if literature_melting_temperature_C is not None
         else None
     )
     literature_source = "cited_literature" if literature_temperature is not None else None
-    # A positive safety margin lowers the usable temperature: the rating is
-    # T_first - margin, capped at the pure-liner T_lit - margin.
-    rating_cap = (
-        literature_temperature - margin
-        if literature_temperature is not None
-        else None
+    rating, rating_cap = _rated_temperature_with_margin(
+        contaminated_temperature,
+        literature_temperature,
+        margin_C,
     )
-    rating = contaminated_temperature - margin
-    if rating_cap is not None:
-        rating = min(rating, rating_cap)
     service_excess = 0.0
     onset_at_service = False
     if service_temperature_C is not None and deposits:
@@ -1427,7 +1447,7 @@ def _tier_b_melt_activity_rating(
             "literature_melting_temperature_C",
         )
         literature_source = "cited_literature"
-    cap = literature_temperature - margin
+    rating_candidate: float | None = literature_temperature
     onset_bracket: list[float | None] | None = None
     excess_at_upper: float | None = None
     service_excess = 0.0
@@ -1485,23 +1505,24 @@ def _tier_b_melt_activity_rating(
                 "excess_liquid_fraction_by_temperature_C"
             ][onset_bracket[1]]
     if onset_below_scan_range:
-        rating = None
+        rating_candidate = None
         flags = [*reference_flags, ONSET_BELOW_SCAN_RANGE_FLAG]
     elif onset_bracket is None:
-        rating = cap
         flags = [*reference_flags, DEPOSIT_MELT_BELOW_RESOLUTION_FLAG]
     else:
         # Use the lower endpoint of both engine brackets. The engine contributes
         # only a temperature shift; the pure literature temperature supplies
         # the rated reference. The upper cap keeps contamination from improving
         # that rating even when the engine predicts a negative shift.
-        rating = min(
-            literature_temperature
-            + (onset_bracket[0] - bulk_low)
-            - margin,
-            cap,
+        rating_candidate = literature_temperature + (
+            onset_bracket[0] - bulk_low
         )
         flags = list(reference_flags)
+    rating, cap = _rated_temperature_with_margin(
+        rating_candidate,
+        literature_temperature,
+        margin,
+    )
     if service_temperature_C is not None and deposits and selected_contaminated is not None:
         service_temperature = _finite_real(service_temperature_C, "service_temperature_C")
         service_fraction = selected_contaminated.get("service_liquid_fraction")
@@ -2302,8 +2323,9 @@ def tier_a_first_liquid_onset(
     margin_C: float,
 ) -> dict[str, Any]:
     first_liquid_C = first_liquid_tier_a(invariant_table, composition_wt_pct)
-    service_limit_C = _finite_real(service_temperature_C, "service_temperature_C") + _finite_real(
-        margin_C, "margin_C"
+    service_limit_C = (
+        _finite_real(service_temperature_C, "service_temperature_C")
+        + _finite_real(margin_C, "margin_C")
     )
     return {
         "first_melt_T_C": first_liquid_C,
@@ -2436,13 +2458,23 @@ def _interface_state_at_depth(
             invariant_table,
             mixed["composition_wt_pct"],
         )
+        pure_literature_temperature_C = first_liquid_tier_a(
+            invariant_table,
+            liner_composition_wt_pct,
+        )
+        rating_temperature_C, _ = (
+            _rated_temperature_with_margin(
+                first_melt_C,
+                pure_literature_temperature_C,
+                margin_C,
+            )
+        )
         return {
             "mixed": mixed,
             "first_melt_T_C": first_melt_C,
+            "rating_temperature_C": rating_temperature_C,
             "liquid_fraction": None,
-            # The service rating is T_first - margin, so the equivalent
-            # first-liquid lookup is at T_service + margin.
-            "onset": first_melt_C <= service_temperature_C + margin_C,
+            "onset": rating_temperature_C <= service_temperature_C,
         }
     if criterion_tier != "B":
         raise LinerCorrosionRefusal("liner_criterion_tier_invalid", criterion_tier)
@@ -2495,6 +2527,7 @@ def _interface_state_at_depth(
             else None
         ),
         "liquid_fraction": liquid_fraction,
+        "rating_temperature_C": melt_activity.get("rating_temperature_C"),
         "onset": _tier_b_onset_at_service_temperature(
             melt_activity,
             service_temperature_C,
@@ -2962,11 +2995,9 @@ def build_liner_state_segment(
                     "first_melt_T_C": sensitivity_state["first_melt_T_C"],
                     "liquid_fraction": sensitivity_state["liquid_fraction"],
                     "onset": sensitivity_state["onset"],
-                    "rating_temperature_C": (
-                        sensitivity_state.get("melt_activity", {}).get(
-                            "rating_temperature_C"
-                        )
-                    ),
+                    "rating_temperature_C": sensitivity_state[
+                        "rating_temperature_C"
+                    ],
                     "melt_activity": sensitivity_state.get("melt_activity"),
                     "campaigns_to_runaway": (
                         sensitivity_recurrence["campaigns_to_runaway"]
@@ -3006,11 +3037,7 @@ def build_liner_state_segment(
         "porosity_fraction": raw_porosity,
         "deposit_kg_by_species": deposits,
         "first_melt_T_C": first_melt_C,
-        "rating_temperature_C": (
-            melt_activity.get("rating_temperature_C")
-            if isinstance(melt_activity, Mapping)
-            else first_melt_C
-        ),
+        "rating_temperature_C": interface_state["rating_temperature_C"],
         "melt_activity": melt_activity,
         "service_T_C": service_C,
         "service_pressure_bar": pressure,
