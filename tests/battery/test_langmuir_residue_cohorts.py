@@ -78,6 +78,34 @@ def richter_2007_context():
     return replace(context, experiments=experiments)
 
 
+def test_richter_2007_table1_migration_pins_r3_10_source_inputs(
+    richter_2007_context,
+) -> None:
+    source_path = (
+        richter_2007_context.root
+        / "data/literature/extracts/kems-010-richter-2007.yaml"
+    )
+    migrated = Migrator._richter_table1_sample_inputs(load_yaml(source_path))
+    experiment = next(
+        row
+        for row in migrated["experiments"]
+        if row.get("experiment_id") == "cai-r3-10"
+    )
+
+    assert (
+        experiment["sample"]["mass_kg"]["state"]["value"]["point"]
+        == "0.0000284"
+    )
+    assert (
+        experiment["apparatus"]["geometry"]["exposed_area_m2"]["state"]["value"]["point"]
+        == "0.000024"
+    )
+    assert (
+        "row: Starting material"
+        in experiment["sample"]["printed_composition"]["locator"]["note"]
+    )
+
+
 @pytest.fixture(scope="module")
 def richter_2011_context():
     return load_score_context(sources=(RICHTER_2011,))
