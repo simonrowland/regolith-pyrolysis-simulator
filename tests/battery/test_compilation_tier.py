@@ -873,8 +873,6 @@ def _assert_compilation_routing_retains_numeric_residuals() -> None:
                 row
                 for row in routed_residuals
                 if row.reference == observation.observation_id
-                and row.candidate_request is not None
-                and row.candidate_request.engine is engine
             ),
             None,
         )
@@ -884,7 +882,7 @@ def _assert_compilation_routing_retains_numeric_residuals() -> None:
         assert routed.numeric.unit == unit
         assert routed.status is ResidualStatus.NO_BAND
         assert flagged_strata(routed.notices) == ()
-        numeric_pairs.add((routed.reference, routed.candidate_request.engine))
+        numeric_pairs.add((routed.reference, engine))
     assert numeric_pairs == expected_pairs
 
 
@@ -7794,24 +7792,40 @@ def test_magemin_lunar_unset_tio2_entropy_matches_janaf_o045() -> None:
         pytest.skip("no MAGEMin binary")
     try:
         attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
-        from simulator.battery.score import score_store
-
-        routed_residuals, _ = score_store(
-            _context(observation), engines=(Engine.MAGEMIN,)
-        )
     finally:
         _close_cached_backend(Engine.MAGEMIN)
     assert attempt.refusal_reason is None
     assert attempt.unit == "J_per_declared_mol_basis_per_K"
     assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+
+
+def test_magemin_crystal_compilation_routes_numeric_periclase_residual() -> None:
+    from simulator.battery.score import score_store
+
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    observation = F.observation(
+        "mgo-periclase-s-1000",
+        "exp-1",
+        _pure_phase_identity(Quantity.S),
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    try:
+        attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
+        assert attempt.refusal_reason is None
+        routed_residuals, _ = score_store(
+            _context(observation), engines=(Engine.MAGEMIN,)
+        )
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
     routed = next(
         row for row in routed_residuals if row.reference == observation.observation_id
     )
     assert routed.numeric is not None, routed.refusal
     assert routed.numeric.unit == attempt.unit
-    assert float(routed.numeric.value) == pytest.approx(
-        float(attempt.value - expected), rel=0.02
-    )
+    assert routed.numeric.value == attempt.value
 
 
 def test_thermoengine_lunar_rutile_entropy_matches_janaf_o043() -> None:
