@@ -2516,6 +2516,67 @@ def _probe_session(*, use_fe: bool):
     return session
 
 
+def test_session_per_hour_disclosures_are_first_raised_this_step(monkeypatch) -> None:
+    from simulator.session import SimSession
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    summary_hour = 0
+    step_number = 0
+
+    def build_summary(_sim, _snapshot):
+        nonlocal summary_hour
+        summary_hour += 1
+        return {"hour": summary_hour}
+
+    monkeypatch.setattr(
+        SimSession,
+        "_build_per_hour_summary",
+        staticmethod(build_summary),
+    )
+    session = _probe_session(use_fe=True)
+    original_step = session.simulator.step
+
+    def step_with_antoine_on_hour_two():
+        nonlocal step_number
+        result = original_step()
+        step_number += 1
+        if step_number == 2:
+            provider = BuiltinVaporPressureProvider(_live_vapor())
+            evaluator = provider._vapour_rail_catalog.species["Fe"].evaluator
+            assert evaluator is not None
+            evaluation = evaluator.evaluate(1750.0)
+            assert math.isfinite(evaluation.pressure_pa)
+        return result
+
+    session.simulator.step = step_with_antoine_on_hour_two
+
+    first = session.advance()
+    second = session.advance()
+
+    assert first.per_hour_summary["hour"] == 1
+    assert second.per_hour_summary["hour"] == 2
+    first_disclosures = first.per_hour_summary["law_disclosures"]
+    second_disclosures = second.per_hour_summary["law_disclosures"]
+    assert [item["law_id"] for item in first_disclosures] == [
+        _FE_ASSOCIATION_LAW_ID
+    ]
+    assert [item["law_id"] for item in second_disclosures] == [_FE_ANTOINE_LAW_ID]
+    _assert_fe_disclosure(
+        first_disclosures[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1
+    )
+    _assert_fe_disclosure(
+        second_disclosures[0], law_id=_FE_ANTOINE_LAW_ID, count=1
+    )
+    terminal_disclosures = {
+        item["law_id"]: item["evaluation_count"]
+        for item in session.law_disclosures
+    }
+    assert terminal_disclosures == {
+        _FE_ASSOCIATION_LAW_ID: 2,
+        _FE_ANTOINE_LAW_ID: 1,
+    }
+
+
 def test_disclosure_survives_every_publication_point(
     monkeypatch, tmp_path: Path
 ) -> None:

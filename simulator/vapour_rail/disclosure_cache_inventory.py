@@ -926,6 +926,22 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'In-progress freeze-gate placeholder. It is replaced before a hit is published.',
     },
+    'store:simulator/liner_corrosion.py:_point_cache': {
+        "path": 'simulator/liner_corrosion.py',
+        "line": 4060,
+        "kind": 'store',
+        "name": '_point_cache',
+        "carries_disclosure": False,
+        "how": 'MAGEMin request key includes engine/version, oxide composition, temperature, pressure, and fO2; the value is a liquid-fraction sample, not a vapour-law result.',
+    },
+    'store:simulator/liner_corrosion.py:_curve_cache': {
+        "path": 'simulator/liner_corrosion.py',
+        "line": 4062,
+        "kind": 'store',
+        "name": '_curve_cache',
+        "carries_disclosure": False,
+        "how": 'Keyed by MAGEMin engine/version, liner and deposit compositions, temperature, pressure, and fO2; the value is an interpolated liquid-fraction curve, not a vapour-law result.',
+    },
     'store:simulator/liner_life.py:monotonicity_evidence_cache': {
         "path": 'simulator/liner_life.py',
         "line": 736,
@@ -1233,6 +1249,15 @@ def _extra_cache_line(
         return (
             "inert",
             "Recession-rate scratch for one liner-life call. Not a vapour-law result.",
+            None,
+        )
+    if path == "simulator/liner_corrosion.py" and (
+        "MAGEMIN_CACHE_" in stripped
+        or "MAGEMIN_REQUEST_CACHE_VERSION" in stripped
+    ):
+        return (
+            "inert",
+            "MAGEMin request version or precision configuration used by the liquid-fraction cache keys, not cached vapour-law data.",
             None,
         )
     if path == "simulator/core.py" and "published_memo = accept_stored_memo(" in stripped:

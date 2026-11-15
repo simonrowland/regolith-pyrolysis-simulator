@@ -598,6 +598,7 @@ class SimSession:
         if sim.is_complete():
             raise RuntimeError("cannot advance a complete session")
         with self._bound_law_disclosure():
+            disclosures_before_step = self.law_disclosures
             snapshot = sim.step()
             campaign_summary = getattr(sim, "_last_campaign_summary", None)
             backend_error = str(getattr(sim, "_last_backend_error", "") or "")
@@ -614,7 +615,22 @@ class SimSession:
                 # block left _poisoned_error unset and the next advance skipped
                 # the hour.
                 summary = dict(self._build_per_hour_summary(sim, snapshot))
-                disclosures = self.law_disclosures
+                from simulator.vapour_rail.run_disclosure import disclosure_delta
+
+                disclosures = disclosure_delta(
+                    disclosures_before_step,
+                    self.law_disclosures,
+                )
+                previously_disclosed_laws = {
+                    str(item.get("law_id") or "")
+                    for item in disclosures_before_step
+                }
+                disclosures = tuple(
+                    item
+                    for item in disclosures
+                    if str(item.get("law_id") or "")
+                    not in previously_disclosed_laws
+                )
                 if disclosures:
                     summary["law_disclosures"] = [
                         dict(item) for item in disclosures

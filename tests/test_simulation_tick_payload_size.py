@@ -270,10 +270,10 @@ def test_hourly_payload_gate_rejects_smallest_sustained_growth_and_allows_jitter
 
 
 def test_simulation_tick_omits_cumulative_law_disclosures() -> None:
-    """The stored per-hour row keeps the registry. The tick does not.
+    """The stored row keeps this hour's disclosure. The tick does not.
 
-    Re-sending the cumulative registry on every simulation_tick grew the
-    socket payload by about 212 bytes/hour.
+    The run-wide cumulative registry belongs in run metadata, not each hourly
+    row or simulation_tick payload.
     """
 
     disclosure = [
@@ -656,8 +656,8 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             for history_entry in history["per_hour_summary"]
         )
         deltas = [tick["per_hour_summary_delta"] for tick in tick_payloads]
-        # The socket tick omits law_disclosures, including inside the
-        # delta. The stored row and the per_hour_summary event keep it.
+        # The socket tick omits hourly disclosures, including inside the
+        # delta. The per_hour_summary event keeps them.
         assert deltas == [
             _without_socket_law_disclosures(row)
             for row in history["per_hour_summary"]

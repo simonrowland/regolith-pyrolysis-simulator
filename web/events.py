@@ -810,9 +810,10 @@ def _browser_socket_payload(event: str, payload):
         # This whole-train report is also included in simulation_complete. It
         # is not consumed from hourly ticks and grows as product is captured.
         emitted.pop('stage_purity_report', None)
-        # The cumulative law registry is stored on the per-hour row and on
-        # run_metadata. Re-sending it on every tick grows the socket payload
-        # past the 100 bytes/hour bound. The per_hour_summary event keeps it.
+        # The run-wide law registry is stored on run_metadata. Re-sending it,
+        # or the step's disclosures, on every tick grows the socket payload
+        # past the 100 bytes/hour bound. The per_hour_summary event keeps the
+        # step's disclosures.
         emitted.pop('law_disclosures', None)
         delta = emitted.get('per_hour_summary_delta')
         if isinstance(delta, Mapping):
