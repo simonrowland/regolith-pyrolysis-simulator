@@ -45,6 +45,7 @@ two identical runs must produce a bit-identical completion payload; any
 divergence under pause/resume churn is a real regression, surfaced loudly here.
 """
 
+import shutil
 import time
 from collections import Counter
 
@@ -68,7 +69,8 @@ pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
 @pytest.fixture(autouse=True)
 def _deterministic_liquidus_gate(monkeypatch, tmp_path):
     """Keep web state-machine tests independent of external liquidus latency."""
-    run_store = RunArtifactStore(tmp_path / 'runs')
+    run_dir = tmp_path / 'runs'
+    run_store = RunArtifactStore(run_dir)
     monkeypatch.setattr(events_module, 'get_run_store', lambda: run_store)
     curve = {
         'source': 'test_decision_pause_liquidus',
@@ -108,6 +110,8 @@ def _deterministic_liquidus_gate(monkeypatch, tmp_path):
         return payload
 
     monkeypatch.setattr(events_module, '_load_yaml', load_yaml_with_alpha_fallback)
+    yield
+    shutil.rmtree(run_dir, ignore_errors=True)
 
 # InternalAnalyticalBackend = deterministic baseline: no AlphaMELTS dependence (opt-in + slow
 # here) and no float drift between runs. The decision-gate state machine is

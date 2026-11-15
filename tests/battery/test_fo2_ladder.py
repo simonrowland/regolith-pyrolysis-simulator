@@ -30,7 +30,13 @@ from simulator.battery.fo2_ladder import (
     fo2_tier_notice,
     resolve_row_fo2,
 )
-from simulator.battery.records import FO2Control, State, Value
+from simulator.battery.records import (
+    ApproxPressure,
+    BandBasis,
+    FO2Control,
+    State,
+    Value,
+)
 from simulator.battery.score import (
     FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND,
     ScoreContext,
@@ -196,6 +202,47 @@ def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
         pressure_bar=1.0,
     )
     assert payload["fO2_log"] == expected
+
+
+def test_tier2_kress_inverse_uses_banded_identity_nominal_pressure() -> None:
+    experiment, bench, observation = _feo_case()
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
+        },
+    )
+    exact_identity = replace(
+        observation.identity,
+        total_pressure_Pa=State.of(Decimal("1000000")),
+    )
+    exact = resolve_row_fo2(
+        experiment,
+        bench,
+        replace(observation, identity=exact_identity),
+    )
+    banded_identity = replace(
+        exact_identity,
+        total_pressure_Pa=State.of(
+            ApproxPressure(
+                Decimal("1000000"),
+                Decimal("900000"),
+                Decimal("1100000"),
+                BandBasis.PRINTED,
+            )
+        ),
+    )
+    banded = resolve_row_fo2(
+        experiment,
+        bench,
+        replace(observation, identity=banded_identity),
+    )
+
+    assert exact is not None and banded is not None
+    assert exact.route.startswith("kress_inverse:Fe3_over_sum_Fe;")
+    assert banded.route == exact.route
+    assert banded.log10_fO2_bar == exact.log10_fO2_bar
 
 
 def test_tier3_buffer_matches_the_oxygen_condition_point() -> None:

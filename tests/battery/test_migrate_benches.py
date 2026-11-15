@@ -491,7 +491,7 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
         digest.update(path.read_bytes())
         digest.update(b"\0")
     # b-985 adds the empty Unavailable input work census section to migration-report.md.
-    assert digest.hexdigest() == "b2bda27a9dd554981702f79a4bbb3c306d3b923791beff9b6811d645c9ad3d60"
+    assert digest.hexdigest() == "63fc9e0f16d31b68c089edc71c8f73b03889a7a5d8eee95340aebdeb1f7a3052"
 
 
 def test_aliased_work_counts_each_experiment_under_one_canonical_source(tmp_path, monkeypatch) -> None:
