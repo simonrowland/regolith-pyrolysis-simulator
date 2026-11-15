@@ -880,3 +880,52 @@ def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
     assert shadow_calls == shadow_call_count
     assert catalog_compiles == catalog_compile_count
     assert residue_prediction.vapor_pressures_Pa == with_shadow.vapor_pressures_Pa
+
+
+def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
+    monkeypatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    core = _new_internal_analytical_core()
+    curve = {
+        "source": "gate_liquid_fraction",
+        "solidus_T_C": 1200.0,
+        "liquidus_T_C": 1400.0,
+        "path": ((1200.0, 0.0), (1400.0, 1.0)),
+    }
+    record = {
+        "curve": curve,
+        "origin": {},
+        "repair_notices": [],
+        "disposition": "live",
+    }
+    monkeypatch.setattr(
+        core, "_register_freeze_gate_liquid_fraction_providers", lambda: None,
+    )
+    monkeypatch.setattr(
+        core, "_melt_redox_liquidus_gate_record", lambda: record,
+    )
+    monkeypatch.setattr(
+        core, "_melt_redox_gate_record_is_admitted", lambda _record: True,
+    )
+
+    _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        temperature_C=1800.0 - 273.15,
+        pressure_bar=1.0e-6,
+        composition_kg=None,
+        composition_mol={"SiO2": 0.5, "FeO": 0.3, "MgO": 0.2},
+        fO2_log=-9.0,
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+        include_diagnostic_shadows=False,
+    )
+
+    authority = core._last_high_t_melt_activity
+    assert authority["vapour_channel_phase_basis"] == "liquid"
+    assert authority["phase_basis_source"] == (
+        "freeze_gate_authority:gate_liquid_fraction"
+    )
+    assert authority["vapour_channel_switch_K"] == (
+        openimcc_bridge._temperature_domain_K()[0]
+    )

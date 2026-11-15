@@ -7,7 +7,7 @@ import pytest
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentResult
 from simulator.core import PyrolysisSimulator
-from simulator.evaporation import EvaporationFluxRefusal
+from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
@@ -268,6 +268,110 @@ def test_authoritative_vapor_pressure_no_liquid_gate_zeroes_evaporation():
     assert sim._last_vapour_batch_report is None
     assert sim._last_vapour_batch_flux_overlay == {}
     assert sim._last_vapour_batch_resolve_error == {}
+
+
+def test_internal_analytical_refresh_uses_admitted_freeze_gate_curve() -> None:
+    from engines.builtin.vapor_pressure import (
+        _openimcc_vapour_phase_basis,
+        openimcc_binding_selected_by_inputs,
+    )
+
+    sim, calls = _sim_with_vapor_dispatch({'Na': 12.5})
+    sim.melt.temperature_C = 1800.0 - 273.15
+    curve = {
+        'source': 'gate_liquid_fraction',
+        'solidus_T_C': 1200.0,
+        'liquidus_T_C': 1400.0,
+        'path': ((1200.0, 0.0), (1400.0, 1.0)),
+    }
+    record = {
+        'curve': curve,
+        'origin': {},
+        'repair_notices': [],
+        'disposition': 'live',
+    }
+    sim._vapor_pressure_freeze_gate_phase_fraction = types.MethodType(
+        EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction,
+        sim,
+    )
+    sim._register_freeze_gate_liquid_fraction_providers = lambda: None
+    sim._melt_redox_liquidus_gate_record = lambda: record
+    sim._melt_redox_gate_record_is_admitted = lambda _record: True
+    sim._interpolate_freeze_gate_curve = (
+        EvaporationMixin._interpolate_freeze_gate_curve
+    )
+    result = EquilibriumResult(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=1e-6,
+        liquid_fraction=None,
+        vapor_pressures_Pa={},
+    )
+
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+
+    controls = calls[0][1]['control_inputs']
+    assert controls['liquid_fraction'] == 1.0
+    assert controls['phase_basis_source'] == (
+        'freeze_gate_authority:gate_liquid_fraction'
+    )
+    phase_basis = _openimcc_vapour_phase_basis(controls['liquid_fraction'])
+    assert phase_basis == 'liquid'
+    assert openimcc_binding_selected_by_inputs(
+        temperature_K=1800.0,
+        controls=controls,
+        quantity_class='vapour',
+        phase_basis=phase_basis,
+    ) is True
+
+
+def test_internal_analytical_refresh_treats_freeze_gate_fallback_as_missing() -> None:
+    from engines.builtin.vapor_pressure import (
+        _openimcc_vapour_phase_basis,
+        openimcc_binding_selected_by_inputs,
+    )
+
+    sim, calls = _sim_with_vapor_dispatch({'Na': 12.5})
+    sim.melt.temperature_C = 1800.0 - 273.15
+    fallback_record = {
+        'curve': {
+            'source': 'kress91_liquid_calibration_floor',
+            'solidus_T_C': 1390.0,
+            'liquidus_T_C': 1391.0,
+            'path': ((1390.0, 0.0), (1391.0, 1.0)),
+        },
+        'origin': {},
+        'repair_notices': [],
+        'disposition': 'live',
+    }
+    sim._vapor_pressure_freeze_gate_phase_fraction = types.MethodType(
+        EvaporationMixin._vapor_pressure_freeze_gate_phase_fraction,
+        sim,
+    )
+    sim._register_freeze_gate_liquid_fraction_providers = lambda: None
+    sim._melt_redox_liquidus_gate_record = lambda: fallback_record
+    sim._melt_redox_gate_record_is_admitted = lambda _record: True
+    result = EquilibriumResult(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=1e-6,
+        liquid_fraction=None,
+        vapor_pressures_Pa={},
+    )
+
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+
+    controls = calls[0][1]['control_inputs']
+    assert controls['liquid_fraction'] is None
+    assert controls['phase_basis_source'] == (
+        'freeze_gate_authority_fallback_or_projected'
+    )
+    phase_basis = _openimcc_vapour_phase_basis(controls['liquid_fraction'])
+    assert phase_basis == 'missing'
+    assert openimcc_binding_selected_by_inputs(
+        temperature_K=1800.0,
+        controls=controls,
+        quantity_class='vapour',
+        phase_basis=phase_basis,
+    ) is False
 
 
 @pytest.mark.parametrize('temperature_C', [0.0, 1000.0, 1600.0])
