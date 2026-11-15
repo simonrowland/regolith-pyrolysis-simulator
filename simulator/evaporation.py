@@ -781,13 +781,33 @@ class EvaporationMixin:
         """
         from engines.domain_reason import OutOfDomainReason
 
+        def phase_detail_payload(
+            code: str,
+            *,
+            diagnostic: object = None,
+            use_latest_gate_diagnostic: bool = False,
+            **detail: Any,
+        ) -> dict[str, Any]:
+            payload = {"code": code, **detail}
+            if not isinstance(diagnostic, Mapping) or not diagnostic:
+                diagnostic = (
+                    getattr(
+                        self,
+                        "_last_melt_redox_liquidus_gate_diagnostic",
+                        None,
+                    )
+                    if use_latest_gate_diagnostic
+                    else None
+                )
+            if isinstance(diagnostic, Mapping) and diagnostic:
+                payload["diagnostic"] = copy.deepcopy(dict(diagnostic))
+            else:
+                payload["diagnostic"] = copy.deepcopy(payload)
+            return payload
+
         def refused(exc: BaseException) -> tuple[
             None, str, None, None, Mapping[str, Any]
         ]:
-            detail: dict[str, Any] = {
-                "exception": type(exc).__name__,
-                "message": str(exc),
-            }
             code = getattr(exc, "reason", None) or getattr(exc, "status", None)
             if code is None:
                 code = (
@@ -795,30 +815,27 @@ class EvaporationMixin:
                     if isinstance(exc, ImportError)
                     else "freeze_gate_provider_unavailable"
                 )
-            detail["code"] = str(code)
-            diagnostic = getattr(exc, "diagnostic", None)
-            if isinstance(diagnostic, Mapping):
-                detail["diagnostic"] = copy.deepcopy(dict(diagnostic))
+            detail = phase_detail_payload(
+                str(code),
+                diagnostic=getattr(exc, "diagnostic", None),
+                exception=type(exc).__name__,
+                message=str(exc),
+            )
             return None, "freeze_gate_authority_refused", None, None, detail
 
         def unavailable(code: str, **detail: Any) -> tuple[
             None, str, None, None, Mapping[str, Any]
         ]:
-            phase_detail = {"code": code, **detail}
-            gate_diagnostic = getattr(
-                self, "_last_melt_redox_liquidus_gate_diagnostic", None
-            )
-            diagnostic = (
-                copy.deepcopy(dict(gate_diagnostic))
-                if isinstance(gate_diagnostic, Mapping) and gate_diagnostic
-                else copy.deepcopy(phase_detail)
-            )
             return (
                 None,
                 "freeze_gate_authority_missing_or_invalid",
                 None,
                 None,
-                {**phase_detail, "diagnostic": diagnostic},
+                phase_detail_payload(
+                    code,
+                    use_latest_gate_diagnostic=True,
+                    **detail,
+                ),
             )
 
         register = getattr(
@@ -832,7 +849,13 @@ class EvaporationMixin:
         resolve = getattr(self, '_melt_redox_liquidus_gate_record', None)
         admitted = getattr(self, '_melt_redox_gate_record_is_admitted', None)
         if not callable(resolve) or not callable(admitted):
-            return None, 'missing', None, None, {"code": "gate_resolver_missing"}
+            return (
+                None,
+                'missing',
+                None,
+                None,
+                phase_detail_payload("gate_resolver_missing"),
+            )
         try:
             record = resolve()
         except (EvaporationFluxRefusal, ProviderUnavailableError) as exc:
@@ -946,12 +969,14 @@ class EvaporationMixin:
                 'freeze_gate_authority_fallback_or_projected',
                 None,
                 None,
-                {
-                    "code": "gate_curve_source_not_authoritative",
-                    "source": source,
-                    "provider_outcome": provider_outcome,
-                    "gate_provider_refusal": curve.get("gate_provider_refusal"),
-                },
+                phase_detail_payload(
+                    "gate_curve_source_not_authoritative",
+                    diagnostic=curve.get("gate_provider_refusal"),
+                    use_latest_gate_diagnostic=True,
+                    source=source,
+                    provider_outcome=provider_outcome,
+                    gate_provider_refusal=curve.get("gate_provider_refusal"),
+                ),
             )
         source_label_repair_only = (
             len(repair_notices) == 1
@@ -984,14 +1009,18 @@ class EvaporationMixin:
                 'freeze_gate_authority_fallback_or_projected',
                 None,
                 None,
-                {
-                    "code": "gate_curve_fallback_or_projection_rejected",
-                    "composition_derived": bool(curve.get("composition_derived")),
-                    "gate_provider_refusal": curve.get("gate_provider_refusal"),
-                    "composition_projected_notice": curve.get(
+                phase_detail_payload(
+                    "gate_curve_fallback_or_projection_rejected",
+                    diagnostic=curve.get("gate_provider_refusal"),
+                    use_latest_gate_diagnostic=True,
+                    composition_derived=bool(
+                        curve.get("composition_derived")
+                    ),
+                    gate_provider_refusal=curve.get("gate_provider_refusal"),
+                    composition_projected_notice=curve.get(
                         "composition_projected_notice"
                     ),
-                },
+                ),
             )
         path = curve.get('path')
         try:
