@@ -1695,7 +1695,26 @@ def test_tier_b_onset_at_first_scan_point_is_an_unresolved_lower_boundary():
     assert activity["rating_temperature_C"] is None
     assert "onset_below_scan_range" in activity["flags"]
     assert liner_corrosion._tier_b_onset_at_service_temperature(activity, 750.0)
-    assert liner_corrosion._tier_b_onset_at_service_temperature(activity, 450.0)
+
+    below_scan_activity = liner_corrosion._tier_b_melt_activity_rating(
+        liner,
+        {"SiO2": 49.0, "Al2O3": 30.0, "CaO": 20.0, "Na2O": 1.0},
+        {"Na": 1.0},
+        sampler=sampler,
+        pressure_bar=1.0,
+        margin_C=25.0,
+        literature_melting_temperature_C=1553.0,
+        pure_reference=reference,
+        service_temperature_C=450.0,
+    )
+    # The sampled onset is unresolved below 500 C, but the actual 450 C
+    # service sample has no excess melt. The pure cap is 1553 - 25 = 1528 C,
+    # so d-419 rates NO-ONSET at this service point.
+    assert below_scan_activity["rating_temperature_C"] == 1528.0
+    assert below_scan_activity["onset_at_service_temperature"] is False
+    assert liner_corrosion._tier_b_onset_at_service_temperature(
+        below_scan_activity, 450.0
+    ) is False
 
 
 def test_tier_b_scans_the_pure_bulk_lower_boundary_for_contaminated_onset():

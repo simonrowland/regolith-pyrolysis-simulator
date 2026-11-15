@@ -1581,13 +1581,6 @@ def _tier_b_melt_activity_rating(
             onset_bracket[0] - bulk_low
         )
         flags = list(reference_flags)
-    resolution = _resolve_rating_and_onset(
-        literature_temperature,
-        contaminated_first_liquid_C,
-        margin,
-        service_temperature_C,
-        onset_below_scan_range=onset_below_scan_range,
-    )
     if service_temperature_C is not None and deposits and selected_contaminated is not None:
         service_temperature = _finite_real(service_temperature_C, "service_temperature_C")
         service_fraction = selected_contaminated.get("service_liquid_fraction")
@@ -1600,6 +1593,26 @@ def _tier_b_melt_activity_rating(
             context="pure-liner service baseline",
         )
         service_excess = float(service_fraction) - baseline_service
+    service_onset_below_scan_range = onset_below_scan_range
+    if (
+        service_onset_below_scan_range
+        and service_temperature_C is not None
+        and _finite_real(service_temperature_C, "service_temperature_C")
+        < TIER_B_MELT_SCAN_MIN_C
+        and service_excess <= LIQUIDUS_SOLID_EPSILON
+    ):
+        # The profile's first sampled excess may be at 500 C, but the service
+        # point is sampled directly too. Under d-419, no excess melt at a
+        # below-grid service point is NO-ONSET there; keep the unresolved scan
+        # flag while using the pure cap for the service rating.
+        service_onset_below_scan_range = False
+    resolution = _resolve_rating_and_onset(
+        literature_temperature,
+        contaminated_first_liquid_C,
+        margin,
+        service_temperature_C,
+        onset_below_scan_range=service_onset_below_scan_range,
+    )
     result = {
         "pure_bulk_melt_bracket_C": list(pure_reference["bulk_melt_bracket_C"]),
         "bulk_melt_residual_vs_literature_C": pure_reference.get(
