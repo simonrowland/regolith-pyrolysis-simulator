@@ -363,7 +363,7 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
                 ),
                 "morey_rounded": (
                     anorthite,
-                    (0.0, 0.0, 0.0, 0.00257, 0.00275, 0.00875, 0.04385, 1.0),
+                    (0.00227, 0.0, 0.0, 0.00257, 0.00275, 0.00875, 0.04385, 1.0),
                 ),
             }
             raw_profiles: dict[str, dict[float, float]] = {}
@@ -501,6 +501,8 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
 
 def test_tier_b_reference_uses_neighbours_when_exact_anorthite_is_an_outlier():
     exact_anorthite = _formula_derived_anorthite()
+    perturbed_anorthite = {oxide: value * 0.99 for oxide, value in exact_anorthite.items()}
+    perturbed_anorthite["Na2O"] = 1.0
     samples: set[tuple[tuple[str, float], ...]] = set()
 
     class EndmemberDiscontinuity:
@@ -516,6 +518,15 @@ def test_tier_b_reference_uses_neighbours_when_exact_anorthite_is_an_outlier():
                 )
                 for oxide, value in exact_anorthite.items()
             )
+            is_perturbed_nominal = all(
+                math.isclose(
+                    float(composition.get(oxide, 0.0)), value,
+                    rel_tol=0.0, abs_tol=1.0e-8,
+                )
+                for oxide, value in perturbed_anorthite.items()
+            )
+            if is_perturbed_nominal and temperature_C < 1025.0:
+                return 0.008
             if is_exact and temperature_C < 1550.0:
                 return 0.008
             if (
@@ -570,6 +581,167 @@ def test_tier_b_reference_uses_neighbours_when_exact_anorthite_is_an_outlier():
     assert positive_at_service["delta_liquid_fraction_per_wt_pct"] == pytest.approx(
         0.0054
     )
+    assert liner_corrosion.ENGINE_COMPOSITION_SENSITIVE_FLAG in positive_at_service[
+        "flags"
+    ]
+    perturbed_evidence = positive_at_service["engine_composition_sensitive"][
+        "perturbed_profile"
+    ]
+    assert perturbed_evidence["nominal_bracket_C"] == [None, 500.0]
+    assert perturbed_evidence["neighbour_brackets_C"] == [
+        [1000.0, 1025.0],
+        [1000.0, 1025.0],
+    ]
+    segment = liner_corrosion.build_liner_state_segment(
+        {
+            "composition": exact_anorthite,
+            "criterion_tier": "B",
+            "density_kg_m3": 1000.0,
+            "reacted_layer_depth_m": 0.001,
+            "margin_C": 0.0,
+            "horizon_campaigns": 0,
+            "porosity_fraction": 0.0,
+        },
+        {"Na": 1e-5},
+        area_m2=1.0,
+        service_temperature_C=1200.0,
+        pressure_bar=1.0,
+        sampler=aggressiveness_sampler,
+        deposit_inert_kg_by_species={"Na": 0.0},
+        deposit_reactive_kg_by_species={"Na": 0.0},
+        x_star=0.5,
+    )
+    segment_aggressiveness = segment["species_aggressiveness"]["Na"]
+    assert segment_aggressiveness["delta_liquid_fraction_per_wt_pct"] == pytest.approx(
+        0.0054
+    )
+    assert segment_aggressiveness["engine_composition_sensitive"][
+        "perturbed_profile"
+    ]["nominal_bracket_C"] == [None, 500.0]
+    assert liner_corrosion.ENGINE_COMPOSITION_SENSITIVE_FLAG in segment["flags"]
+
+
+def test_tier_b_saturation_uses_continuity_corrected_curve_for_x_star():
+    liner = {"CaO": 20.0, "Al2O3": 30.0, "SiO2": 50.0}
+    deposit = {"Na2O": 100.0}
+    unstable_nominal = liner_corrosion._composition_at_fraction(
+        liner, deposit, 0.5
+    )
+
+    class UnstableSaturationSampler(liner_corrosion.CurveLiquidFractionSampler):
+        def __call__(self, composition, temperature_C, _pressure_bar):
+            fraction = float(composition.get("Na2O", 0.0)) / 100.0
+            is_unstable_nominal = all(
+                math.isclose(
+                    float(composition.get(oxide, 0.0)), value,
+                    rel_tol=0.0, abs_tol=1.0e-8,
+                )
+                for oxide, value in unstable_nominal.items()
+            )
+            if is_unstable_nominal and temperature_C == 1400.0:
+                return 1.0
+            if temperature_C < 1400.0:
+                return 0.0
+            if temperature_C < 1425.0:
+                return fraction if fraction >= 0.9 else 0.0
+            if temperature_C < 1550.0:
+                return fraction
+            if temperature_C < 1575.0:
+                return 0.044
+            return 1.0
+
+        def curve(
+            self,
+            liner_composition_wt_pct,
+            deposit_kg_by_species,
+            *,
+            temperature_C,
+            pressure_bar,
+        ):
+            # The raw table's f=0.5 sample is the isolated engine outlier.
+            # d-421's two neighbours instead give phi=0 there; the stable
+            # endpoint at f=0.9995 reaches the 0.999 liquid target.
+            return TabulatedLiquidFractionCurve(
+                liner_composition_wt_pct=liner_composition_wt_pct,
+                deposit_composition_wt_pct=deposit,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                points=((0.0, 0.0), (0.5, 1.0), (0.9995, 0.9995)),
+            )
+
+    sampler = UnstableSaturationSampler()
+    pure_reference = liner_corrosion._tier_b_reference_profile(
+        sampler, liner, pressure_bar=1.0
+    )
+    middle_reference = liner_corrosion._tier_b_reference_profile(
+        sampler, unstable_nominal, pressure_bar=1.0
+    )
+    assert middle_reference["composition_continuity"]["status"] == "sensitive"
+    assert middle_reference["engine_composition_sensitive"][
+        "nominal_bracket_C"
+    ] == [1375.0, 1400.0]
+    assert middle_reference["engine_composition_sensitive"][
+        "neighbour_brackets_C"
+    ] == [[1400.0, 1425.0], [1400.0, 1425.0]]
+    x_star = liner_corrosion._tier_b_saturated_deposit_fraction(
+        sampler,
+        liner,
+        {"Na": 1.0},
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        pure_reference_profile=pure_reference,
+        invariant_table=None,
+    )
+    # Corrected interpolation is between (0.5, 0.0) and (0.9995, 0.9995):
+    # x*=0.5+(0.999-0.0)*(0.9995-0.5)/(0.9995-0.0)~=0.9992501.
+    # Using the unchecked raw point (0.5, 1.0) would put x* near 0.4995.
+    assert x_star == pytest.approx(0.99925)
+
+    first_neighbour, second_neighbour, _ = (
+        liner_corrosion._tier_b_composition_neighbours(unstable_nominal)
+    )
+
+    class UnresolvedSaturationSampler(UnstableSaturationSampler):
+        def __call__(self, composition, temperature_C, pressure_bar):
+            if all(
+                math.isclose(
+                    float(composition.get(oxide, 0.0)), value,
+                    rel_tol=0.0, abs_tol=1.0e-8,
+                )
+                for oxide, value in first_neighbour.items()
+            ):
+                bulk_low = 1550.0
+            elif all(
+                math.isclose(
+                    float(composition.get(oxide, 0.0)), value,
+                    rel_tol=0.0, abs_tol=1.0e-8,
+                )
+                for oxide, value in second_neighbour.items()
+            ):
+                bulk_low = 1600.0
+            else:
+                return super().__call__(composition, temperature_C, pressure_bar)
+            if temperature_C < bulk_low:
+                return 0.0
+            if temperature_C < bulk_low + 25.0:
+                return 0.044
+            return 1.0
+
+    unresolved_sampler = UnresolvedSaturationSampler()
+    unresolved_reference = liner_corrosion._tier_b_reference_profile(
+        unresolved_sampler, liner, pressure_bar=1.0
+    )
+    with pytest.raises(LinerCorrosionRefusal) as refused:
+        liner_corrosion._tier_b_saturated_deposit_fraction(
+            unresolved_sampler,
+            liner,
+            {"Na": 1.0},
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            pure_reference_profile=unresolved_reference,
+            invariant_table=None,
+        )
+    assert refused.value.reason == "tier_b_saturation_continuity_unresolved"
 
 
 def test_tier_b_contaminated_profile_checks_composition_continuity():

@@ -394,7 +394,7 @@ def species_aggressiveness_finite_difference(
     sampler: LiquidFractionSampler,
     temperature_C: float,
     pressure_bar: float,
-) -> dict[str, float | str]:
+) -> dict[str, Any]:
     """Estimate d(liquid fraction)/d(deposit wt%) through Tier B continuity."""
 
     return _species_aggressiveness_finite_difference_with_reference(
@@ -415,7 +415,7 @@ def _species_aggressiveness_finite_difference_with_reference(
     temperature_C: float,
     pressure_bar: float,
     base_reference_profile: Mapping[str, Any] | None,
-) -> dict[str, float | str]:
+) -> dict[str, Any]:
     """Use corrected pure profiles for both sides of the one-point difference."""
 
     species = str(deposit_species).strip()
@@ -472,11 +472,23 @@ def _species_aggressiveness_finite_difference_with_reference(
         perturbed_reference_profile,
         context=f"{species} aggressiveness perturbed composition",
     )
-    return {
+    result: dict[str, Any] = {
         "species": species,
         "oxide": oxide,
         "delta_liquid_fraction_per_wt_pct": one_point_state - zero_state,
     }
+    continuity_evidence: dict[str, dict[str, Any]] = {}
+    for name, profile in (
+        ("baseline_profile", base_reference_profile),
+        ("perturbed_profile", perturbed_reference_profile),
+    ):
+        evidence = profile.get("engine_composition_sensitive")
+        if isinstance(evidence, Mapping):
+            continuity_evidence[name] = dict(evidence)
+    if continuity_evidence:
+        result["engine_composition_sensitive"] = continuity_evidence
+        result["flags"] = [ENGINE_COMPOSITION_SENSITIVE_FLAG]
+    return result
 
 
 def sticking_deposit_interval(
@@ -2508,6 +2520,8 @@ def _tier_b_saturated_deposit_fraction(
     *,
     temperature_C: float,
     pressure_bar: float | None,
+    pure_reference_profile: Mapping[str, Any],
+    invariant_table: Mapping[str, Any] | None,
 ) -> float:
     if not isinstance(sampler, CurveLiquidFractionSampler):
         raise LinerCorrosionRefusal("tier_b_phi_curve_sampler_missing")
@@ -2523,36 +2537,64 @@ def _tier_b_saturated_deposit_fraction(
     points = tuple(curve.points)
     if len(points) < 2:
         raise LinerCorrosionRefusal("tier_b_saturated_liquid_fraction_not_reached")
-    for (low_fraction, low_signal), (high_fraction, high_signal) in zip(
-        points, points[1:]
-    ):
-        if low_signal >= target:
-            if low_fraction <= 0.0:
+    corrected_points: list[tuple[float, float]] = []
+    for raw_fraction, _raw_liquid_fraction in points:
+        fraction = _finite_real(raw_fraction, "deposit_fraction")
+        if (
+            fraction < 0.0
+            or fraction > 1.0
+            or (corrected_points and fraction <= corrected_points[-1][0])
+        ):
+            raise LinerCorrosionRefusal("magemin_curve_fraction_invalid")
+        composition = _composition_at_fraction(
+            liner, curve.deposit_composition_wt_pct, fraction
+        )
+        try:
+            if math.isclose(fraction, 0.0, rel_tol=0.0, abs_tol=1e-12):
+                reference_profile = pure_reference_profile
+            else:
+                reference_profile = _tier_b_reference_profile(
+                    sampler,
+                    composition,
+                    pressure_bar=pressure_bar,
+                    invariant_table=invariant_table,
+                )
+            corrected_fraction = _tier_b_sample_at_temperature_with_reference(
+                sampler,
+                composition,
+                temperature_C,
+                pressure_bar,
+                reference_profile,
+                context=f"saturation curve at deposit fraction {fraction:g}",
+            )
+        except LinerCorrosionRefusal as exc:
+            raise LinerCorrosionRefusal(
+                "tier_b_saturation_continuity_unresolved",
+                f"deposit fraction {fraction:g}: {exc.reason}: {exc.detail}",
+            ) from exc
+        corrected_points.append((fraction, corrected_fraction))
+        if corrected_fraction >= target:
+            if fraction <= 0.0:
                 raise LinerCorrosionRefusal(
                     "tier_b_saturated_liquid_deposit_fraction_invalid"
                 )
-            return float(low_fraction)
-        if high_signal < target:
-            continue
-        low = float(low_fraction)
-        high = float(high_fraction)
-        for _ in range(52):
-            midpoint = (low + high) / 2.0
-            composition = _composition_at_fraction(
-                liner, curve.deposit_composition_wt_pct, midpoint
-            )
-            signal = _checked_liquid_fraction(
-                curve(composition, temperature_C, pressure_bar)
-            )
-            if signal >= target:
-                high = midpoint
-            else:
-                low = midpoint
-        if high <= 0.0:
-            raise LinerCorrosionRefusal(
-                "tier_b_saturated_liquid_deposit_fraction_invalid"
-            )
-        return high
+            if len(corrected_points) == 1:
+                return fraction
+            low_fraction, low_signal = corrected_points[-2]
+            if low_signal >= target:
+                return low_fraction
+            low = low_fraction
+            high = fraction
+            for _ in range(52):
+                midpoint = (low + high) / 2.0
+                signal = interpolate_liquid_fraction_curve(
+                    corrected_points, midpoint
+                )
+                if signal >= target:
+                    high = midpoint
+                else:
+                    low = midpoint
+            return high
     raise LinerCorrosionRefusal("tier_b_saturated_liquid_fraction_not_reached")
 
 
@@ -2706,6 +2748,12 @@ def build_liner_state_segment(
                 )
             except LinerCorrosionRefusal as exc:
                 refusals.append(exc.as_dict())
+    if any(
+        ENGINE_COMPOSITION_SENSITIVE_FLAG in result.get("flags", ())
+        for result in species_aggressiveness.values()
+        if isinstance(result, Mapping)
+    ):
+        flags.append(ENGINE_COMPOSITION_SENSITIVE_FLAG)
 
     dissolution_ratio: float | None = None
     if x_star is None and deposits:
@@ -2731,6 +2779,8 @@ def build_liner_state_segment(
                     deposits,
                     temperature_C=service_C,
                     pressure_bar=pressure,
+                    pure_reference_profile=interface_state["pure_reference"],
+                    invariant_table=table,
                 )
         except LinerCorrosionRefusal as exc:
             refusals.append(exc.as_dict())
