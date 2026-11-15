@@ -162,6 +162,14 @@ def test_richter_2007_scores_through_score_store_with_area_and_pressure_flags(
         and row.alpha_arm == "alpha_common_unity_sensitivity"
     )
     assert primary.provenance["sample_mass_kg"] == pytest.approx(0.0000284)
+    measured_mass_kg = float(
+        richter_2007_context.experiments[target.experiment_id]
+        .sample.mass_kg.state.value.point
+    )
+    assert measured_mass_kg == pytest.approx(28.4e-6)
+    assert residue._inventory_mass_kg(primary.initial_inventory_mol) == pytest.approx(
+        measured_mass_kg, rel=0.0, abs=1e-15
+    )
     assert primary.provenance["area_m2_initial"] == pytest.approx(0.000024)
     assert primary.provenance["initial_area_mm2"] == pytest.approx(24.0)
     assert primary.provenance["thermal_schedule_duration_s"] == pytest.approx(5100.0)

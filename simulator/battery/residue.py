@@ -442,7 +442,6 @@ class _HashimotoResiduePrediction:
     initial_inventory_mol: Mapping[str, float]
     primary_inventory_mol: Mapping[str, float] | None
     provenance: Mapping[str, object]
-    notices: tuple[Notice, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -499,6 +498,30 @@ def _inventory_mass_kg(inventory_mol: Mapping[str, float]) -> float:
         float(amount) * _formula_terms(str(formula))[1]
         for formula, amount in inventory_mol.items()
     )
+
+
+def _initial_oxide_inventory_mol(
+    wt_pct: Mapping[str, Any], sample_mass_kg: float
+) -> dict[str, float]:
+    total_wt_pct = math.fsum(float(amount) for amount in wt_pct.values())
+    if (
+        not math.isfinite(total_wt_pct)
+        or total_wt_pct <= 0.0
+        or any(
+            not math.isfinite(float(amount)) or float(amount) < 0.0
+            for amount in wt_pct.values()
+        )
+    ):
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    # Printed oxide wt% can round to a total other than 100. Each oxide mass is
+    # m0*w_i/Σw, so Σm_i=m0 exactly. Dividing kg by kg mol^-1 gives mol. R3-10's
+    # 99.99 wt% total therefore gives its measured 28.4 mg exactly; using /100
+    # would give 28.39716 mg.
+    return {
+        str(oxide): sample_mass_kg * (float(amount) / total_wt_pct)
+        / _formula_terms(str(oxide))[1]
+        for oxide, amount in wt_pct.items()
+    }
 
 
 def _channel_terms(
@@ -2275,20 +2298,7 @@ def predict_mass_loss_fraction(
     if engine == "internal-analytical" and total_pressure_Pa is None:
         raise ResidueInventoryRefusal("total_pressure_not_stated")
 
-    total_wt_pct = math.fsum(wt_pct.values())
-    if (
-        not math.isfinite(total_wt_pct)
-        or total_wt_pct <= 0.0
-        or any(not math.isfinite(value) or value < 0.0 for value in wt_pct.values())
-    ):
-        raise ResidueInventoryRefusal("initial_composition_invalid")
-    # Printed oxide wt% are normalized only for source rounding: each m_i is
-    # m0*w_i/Σw. Dividing kg by kg mol^-1 yields mol on the sample-mass basis.
-    initial_inventory_mol = {
-        oxide: sample_mass_kg * (amount / total_wt_pct)
-        / _formula_terms(oxide)[1]
-        for oxide, amount in wt_pct.items()
-    }
+    initial_inventory_mol = _initial_oxide_inventory_mol(wt_pct, sample_mass_kg)
     try:
         from openimcc import load_gas_datapack
     except ImportError as exc:
@@ -3042,11 +3052,9 @@ def _langmuir_run_setup(
             else "langmuir_printed_composition_changed",
             experiment_id,
         )
-    initial_inventory_mol = {
-        str(oxide): float(wt_pct) * sample_mass_kg / 100.0
-        / _formula_terms(str(oxide))[1]
-        for oxide, wt_pct in run_wt_pct.items()
-    }
+    initial_inventory_mol = _initial_oxide_inventory_mol(
+        run_wt_pct, sample_mass_kg
+    )
     gas_channels, channel_omissions = _openimcc_gas_channels_and_omission_notices(
         tuple(initial_inventory_mol), gas_pack
     )
@@ -3471,15 +3479,6 @@ def _predict_langmuir_residue_cohort(
         common_alpha_records = setup.common_alpha_records
         pressure_model = setup.pressure_model
         engine_floor_inversion_diagnostics = setup.engine_floor_inversion_diagnostics
-        schedule_notices = tuple(
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                reason=reason,
-                origin=f"{source_id}:thermal-schedule",
-            )
-            for reason in cohort_spec.thermal_schedule_notice_reasons
-        )
         integration_kwargs = (
             {"initial_sample_mass_kg": sample_mass_kg}
             if not is_hashimoto_mode
@@ -4160,7 +4159,6 @@ def _predict_langmuir_residue_cohort(
                         else dict(geometry_inventory_mol[primary_geometry])
                     ),
                     provenance=provenance,
-                    notices=schedule_notices,
                 )
             )
 
@@ -4292,7 +4290,15 @@ def _langmuir_cohort_notices(
                 ),
             )
         )
-    notices.extend(primary.notices)
+    notices.extend(
+        Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=reason,
+            origin=f"{source_id}:thermal-schedule",
+        )
+        for reason in cohort_spec.thermal_schedule_notice_reasons
+    )
     if primary.provenance.get("total_pressure_is_upper_bound"):
         notices.append(
             Notice(
