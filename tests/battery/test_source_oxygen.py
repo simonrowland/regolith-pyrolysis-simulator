@@ -1184,6 +1184,73 @@ def test_atomic_oxygen_conversion_is_bit_identical(pressure_atm, expected_pa):
     assert "pO2_Pa=100000*(pO_Pa/100000/K_O)^2" in selected.observation.derivation.relation
 
 
+def test_atomic_oxygen_target_is_refused_before_engine_gets_derived_po2(
+    source_context, monkeypatch,
+):
+    sample = next(
+        row
+        for row in source_context.observations.values()
+        if row.source_id == "kems-053-stolyarova-1991"
+        and row.identity.species.formula == "O"
+        and row.identity.temperature_K.is_value
+        and row.identity.temperature_K.value == Decimal("1933")
+        and dict(row.identity.composition.value.components).get("CaO")
+        == Decimal("0.6")
+    )
+    point_rows = tuple(
+        row
+        for row in source_context.observations.values()
+        if row.experiment_id == sample.experiment_id
+    )
+    selected = resolve_source_oxygen(
+        sample,
+        point_rows,
+        _bench_for_score(
+            source_context.experiments[sample.experiment_id],
+            source_context.benches,
+        ),
+    )
+    assert isinstance(selected, SourceOxygenCondition)
+    assert sample.observation_id in selected.used_observations
+
+    requests, handles = _capture_engine(monkeypatch, sample)
+    residual, candidate = compile_residual(
+        sample,
+        Engine.OPENIMCC,
+        context=source_context,
+        handles=handles,
+        point_observations=point_rows,
+    )
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "used_as_scoring_condition"
+    assert residual.numeric is None and candidate is None
+    assert requests == []
+
+    changed = replace(
+        sample,
+        value=Value.point_of(sample.value.point * Decimal("1.7")),
+    )
+    changed_context = replace(
+        source_context,
+        observations={**source_context.observations, changed.observation_id: changed},
+    )
+    changed_rows = tuple(
+        changed if row.observation_id == changed.observation_id else row
+        for row in point_rows
+    )
+    changed_residual, changed_candidate = compile_residual(
+        changed,
+        Engine.OPENIMCC,
+        context=changed_context,
+        handles=handles,
+        point_observations=changed_rows,
+    )
+    assert changed_residual.refusal is not None
+    assert changed_residual.refusal.detail["reason"] == "used_as_scoring_condition"
+    assert changed_residual.numeric is None and changed_candidate is None
+    assert requests == []
+
+
 def test_printed_fo2_condition_input_is_not_scored(source_context):
     row = _row(source_context, "shornikov-1994-mullite-kems", "MoO2")
     stamped = replace(row, identity=replace(row.identity, fO2_Pa=State.of(Decimal("1e-5"))))

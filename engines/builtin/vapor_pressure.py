@@ -1205,6 +1205,36 @@ def _same_composition_temperature_bridge(
     }
 
 
+def _openimcc_parent_activity_fallback_notice(
+    parent_oxide: str,
+    *,
+    missing: bool,
+    reason: str,
+    number_authority: str,
+) -> dict[str, Any]:
+    code = (
+        "openimcc_parent_activity_missing_table_fallback"
+        if missing
+        else "openimcc_parent_activity_zero_table_fallback"
+    )
+    message = (
+        f"{code}: parent_oxide={parent_oxide}; reason={reason}; "
+        f"number_authority={number_authority}"
+    )
+    return {
+        "kind": "high_t_melt_activity_parent_activity_fallback",
+        "type": "typed_notice",
+        "code": code,
+        "flag": code,
+        "authority": "extrapolated",
+        "parent": parent_oxide,
+        "reason": reason,
+        "number_authority": number_authority,
+        "evidence_tier": "PREDICT_AND_FLAG",
+        "message": message,
+    }
+
+
 def _build_high_t_melt_activity_authority(
     *,
     composition_mol: Mapping[str, float],
@@ -1544,6 +1574,7 @@ def _build_high_t_melt_activity_authority(
         if oxide == "FeO":
             legacy_activity = float(below_cap_fe_activity)
             legacy_basis = below_cap_fe_activity_basis
+            legacy_activity_model = legacy_basis
         else:
             legacy = melt_oxide_activity(
                 oxide,
@@ -1552,6 +1583,9 @@ def _build_high_t_melt_activity_authority(
             )
             legacy_activity = None if legacy is None else float(legacy.activity)
             legacy_basis = "constant_gamma" if legacy_activity is not None else None
+            legacy_activity_model = (
+                legacy.activity_model if legacy is not None else legacy_basis
+            )
         has_openimcc_activity = oxide in cleaned.single_cation_activities
         openimcc_activity = (
             float(cleaned.single_cation_activities[oxide])
@@ -1596,7 +1630,49 @@ def _build_high_t_melt_activity_authority(
                     "openimcc has no activity for this parent"
                 ),
             }
+            if legacy_activity is not None and legacy_activity > 0.0:
+                notice = _openimcc_parent_activity_fallback_notice(
+                    oxide,
+                    missing=True,
+                    reason=exclusion["reason"],
+                    number_authority=str(
+                        legacy_activity_model or selected_activity_basis
+                    ),
+                )
+                exclusion["activity_fallback_code"] = notice["code"]
+                base["notices"].append(notice)
             base["authority_exclusions"][oxide] = dict(exclusion)
+        # The cleaned bridge refuses nonpositive activity for a present
+        # parent; retain a typed fallback for a successful payload that
+        # nevertheless carries zero.
+        elif (
+            openimcc_activity is not None
+            and openimcc_activity <= 0.0
+            and legacy_activity is not None
+            and legacy_activity > 0.0
+        ):
+            reason = (
+                "openimcc returned 0.0 for a parent with positive table "
+                "composition; the table activity is used"
+            )
+            selected_activity = legacy_activity
+            selected_activity_basis = legacy_basis or "constant_gamma"
+            selected_ratio_dex = 0.0
+            notice = _openimcc_parent_activity_fallback_notice(
+                oxide,
+                missing=False,
+                reason=reason,
+                number_authority=str(
+                    legacy_activity_model or selected_activity_basis
+                ),
+            )
+            base["authority_exclusions"][oxide] = {
+                "authority": selected_activity_basis,
+                "code": notice["code"],
+                "activity_fallback_code": notice["code"],
+                "reason": reason,
+            }
+            base["notices"].append(notice)
         if selected_ratio_dex is not None:
             max_abs_dex = max(max_abs_dex, abs(selected_ratio_dex))
         base["seam"][oxide] = {
@@ -1698,9 +1774,53 @@ def _high_t_activity_for_parent(
         )
     if authority.get("provider") != "openimcc":
         return legacy
-    activity = float(authority.get("activities_by_oxide", {}).get(parent_oxide, 0.0) or 0.0)
+    activities_by_oxide = authority.get("activities_by_oxide", {}) or {}
+    missing = parent_oxide not in activities_by_oxide
+    activity = float(activities_by_oxide.get(parent_oxide, 0.0) or 0.0)
     if activity <= 0.0:
-        return legacy
+        # A missing key is normal for zero-composition parents. The cleaned
+        # bridge omits those, and requires positive activity for present ones.
+        if legacy.x_single_cation <= 0.0:
+            return legacy
+        authority_exclusions = authority.get("authority_exclusions", {}) or {}
+        exclusion = authority_exclusions.get(parent_oxide, {})
+        if missing:
+            reason = str(
+                exclusion.get("reason")
+                or "successful openimcc result omitted this parent activity"
+            )
+        else:
+            reason = str(
+                exclusion.get("reason")
+                or (
+                    "openimcc returned 0.0 for a parent with positive table "
+                    "composition; the table activity is used"
+                )
+            )
+        notice = _openimcc_parent_activity_fallback_notice(
+            parent_oxide,
+            missing=missing,
+            reason=reason,
+            number_authority=str(
+                exclusion.get("authority") or legacy.activity_model
+            ),
+        )
+        for existing_notice in authority.get("notices", ()):
+            if (
+                isinstance(existing_notice, Mapping)
+                and existing_notice.get("parent") == parent_oxide
+                and existing_notice.get("code") == notice["code"]
+            ):
+                notice = dict(existing_notice)
+                break
+        warning = notice["message"]
+        if legacy.warning:
+            warning = f"{legacy.warning}; {warning}"
+        return replace(
+            legacy,
+            warning=warning,
+            evidence_tier="PREDICT_AND_FLAG",
+        )
     x_single_cation = max(float(legacy.x_single_cation), 0.0)
     effective_gamma = activity / x_single_cation if x_single_cation > 0.0 else 1.0
     return replace(
@@ -1752,8 +1872,6 @@ def _attach_high_t_activity_provenance(
         fallback_applied = bool(authority.get("fallback")) and (
             parent_oxide not in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS
         )
-        if fallback_applied:
-            provenance["melt_activity_parent_oxide"] = parent_oxide
         provenance["high_t_melt_activity_mode"] = str(
             authority.get("requested") or "openimcc"
         )
@@ -1766,6 +1884,19 @@ def _attach_high_t_activity_provenance(
             if provider == "openimcc" and isinstance(seam, Mapping)
             else None
         )
+        if (
+            exclusion is None
+            and provider == "openimcc"
+            and isinstance(authority.get("authority_exclusions"), Mapping)
+        ):
+            candidate_exclusion = authority["authority_exclusions"].get(
+                parent_oxide
+            )
+            if (
+                isinstance(candidate_exclusion, Mapping)
+                and candidate_exclusion.get("activity_fallback_code")
+            ):
+                exclusion = candidate_exclusion
         if exclusion is None and provider == "openimcc":
             if parent_oxide == "K2O":
                 exclusion = _k2o_authority_exclusion_for_pack_digest(
@@ -1782,9 +1913,19 @@ def _attach_high_t_activity_provenance(
                 )
         elif authority.get("fallback"):
             exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(parent_oxide)
+        activity_fallback_code = (
+            exclusion.get("activity_fallback_code")
+            if isinstance(exclusion, Mapping)
+            else None
+        )
+        fallback_applied = fallback_applied or bool(activity_fallback_code)
+        if fallback_applied:
+            provenance["melt_activity_parent_oxide"] = parent_oxide
         if exclusion is not None:
             provenance["melt_activity_authority"] = exclusion["authority"]
             exclusion_payload = dict(exclusion)
+            if activity_fallback_code:
+                exclusion_payload["code"] = activity_fallback_code
             provenance["openimcc_authority_exclusion"] = exclusion_payload
             if exclusion_payload.get("code"):
                 provenance["melt_activity_fallback"] = True
@@ -1792,6 +1933,8 @@ def _attach_high_t_activity_provenance(
                     "code": exclusion_payload["code"],
                     "reason": exclusion_payload.get("reason"),
                 }
+                if activity_fallback_code:
+                    provenance["melt_activity_flag"] = activity_fallback_code
             if parent_oxide == "K2O":
                 provenance["openimcc_authority_excluded_K2O"] = {
                     "authority": exclusion["authority"],
@@ -1804,11 +1947,14 @@ def _attach_high_t_activity_provenance(
                     ),
                     "citation": exclusion["citation"],
                 }
-            token = (
-                "openimcc_authority_excluded_K2O"
-                if parent_oxide == "K2O"
-                else "openimcc_authority_excluded_parent"
-            )
+            if activity_fallback_code:
+                token = str(activity_fallback_code)
+            else:
+                token = (
+                    "openimcc_authority_excluded_K2O"
+                    if parent_oxide == "K2O"
+                    else "openimcc_authority_excluded_parent"
+                )
         elif provider == "openimcc":
             provenance["melt_activity_authority"] = provider
             provenance.update(

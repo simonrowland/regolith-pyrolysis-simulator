@@ -5,7 +5,12 @@ from decimal import Decimal
 from collections.abc import Mapping
 
 from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
-from simulator.battery.enums import Fo2Mode, Phase, ReferenceStateConvention, ValueKind
+from simulator.battery.enums import (
+    Fo2Mode,
+    Phase,
+    ReferenceStateConvention,
+    ValueKind,
+)
 from simulator.battery.records import (
     StandardState,
     Value,
@@ -213,7 +218,13 @@ def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
 def _imcc_reports_parent_oxide(formula: str) -> tuple[bool, str]:
     """IMCC ``parent_activity`` is x* on ``IMCC_PARENT_OXIDES``. Pure limit is 1."""
 
-    from openimcc import IMCC_PARENT_OXIDES
+    try:
+        from openimcc import IMCC_PARENT_OXIDES
+    except (ImportError, OSError, RuntimeError) as exc:
+        return False, (
+            "typed-skip:openimcc_not_importable:"
+            f"{type(exc).__name__}: {exc}"
+        )
 
     if formula in IMCC_PARENT_OXIDES:
         return True, "raoultian_pure_liquid_oxide_parent"
@@ -495,24 +506,42 @@ def melt_activity_requests(
     if composition.selected is not None and isinstance(composition.selected.value, Mapping):
         moles = composition.selected.value
     resolved = None
-    if fo2_mode is Fo2Mode.SHARED_LADDER:
-        from simulator.battery.fo2_ladder import resolve_row_fo2
-
-        resolved = resolve_row_fo2(
-            experiment,
-            bench,
-            observation,
-            composition_moles=moles,
-            temperature_K=temperature_K,
-            oxygen=inputs.waypoints["oxygen_condition"],
+    ladder_candidate = None
+    metal_refusal = None
+    if inputs.melt_activity:
+        from simulator.battery.fo2_ladder import (
+            metal_saturation_activity_refusal,
+            resolve_row_fo2,
         )
+
+        metal_refusal = metal_saturation_activity_refusal(experiment, observation)
+        if fo2_mode is Fo2Mode.SHARED_LADDER or metal_refusal is not None:
+            ladder_candidate = resolve_row_fo2(
+                experiment,
+                bench,
+                observation,
+                composition_moles=moles,
+                temperature_K=temperature_K,
+                oxygen=inputs.waypoints["oxygen_condition"],
+            )
+            if fo2_mode is Fo2Mode.SHARED_LADDER:
+                resolved = ladder_candidate
     # Tier 1 is the printed fO2 and is shared even when oxygen is not
     # otherwise an input. Tiers 2-4 fill only a multivalent row.
     # A vapour effusion closure is not an activity fO2.
     if resolved is not None and resolved.closure:
         resolved = None
     shared = resolved if resolved is not None and (resolved.tier == 1 or redox) else None
-    if redox and shared is None:
+    if metal_refusal is not None and ladder_candidate is None:
+        gaps.insert(
+            0,
+            ReadinessGap(
+                "metal_saturation_condition",
+                GapReason.MISSING_EVIDENCE,
+                (metal_refusal.reason,),
+            ),
+        )
+    elif redox and shared is None:
         oxygen = inputs.waypoints["oxygen_condition"]
         absence = oxygen.absence
         gaps.append(ReadinessGap(
