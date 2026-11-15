@@ -27,6 +27,8 @@ from __future__ import annotations
 
 import ast
 import inspect
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -52,6 +54,18 @@ from simulator.melt_backend.magemin import MAGEMinBackend
 # ----------------------------------------------------------------------
 # Domain gate
 # ----------------------------------------------------------------------
+
+
+def test_magemin_import_first_in_a_fresh_interpreter() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-c", "import engines.magemin"],
+        cwd=Path(__file__).resolve().parents[1],
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=30,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def _basalt_wt_pct() -> dict:

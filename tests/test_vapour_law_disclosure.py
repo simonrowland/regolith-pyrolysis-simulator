@@ -3046,7 +3046,6 @@ def _memo_host(calls: list[str]):
     host.melt = SimpleNamespace(hour=1, p_total_mbar=1000.0)
     host._current_melt_redox_fO2_log = lambda: -8.0
     host._freeze_gate_redox_key_fO2_log = lambda **_kwargs: _kwargs["fO2_log"]
-    host._freeze_gate_cache_key = lambda **_kwargs: "memo-key"
     host._freeze_gate_curve_in_progress = False
     host._invalid_projected_liquidus_notice = None
     host._freeze_gate_last_good_curve = None
@@ -3063,6 +3062,25 @@ def _memo_host(calls: list[str]):
 
     host._freeze_gate_curve_from_gate_dispatch = dispatch
     return host
+
+
+def _production_freeze_gate_memo_key(host):
+    """Use the live key owner for pre-seeded cache rows in these fixtures."""
+
+    from simulator.fe_redox import (
+        _non_absolute_redox_state_kwargs,
+        normalize_redox_state,
+    )
+
+    fO2_log = host._freeze_gate_liquidus_fO2_log(
+        float(host._current_melt_redox_fO2_log())
+    )
+    fO2_log, redox_state = normalize_redox_state(fO2_log)
+    return host._freeze_gate_cache_key(
+        pressure_bar=float(host.melt.p_total_mbar) / 1000.0,
+        fO2_log=host._freeze_gate_redox_key_fO2_log(fO2_log=fO2_log),
+        **_non_absolute_redox_state_kwargs(redox_state),
+    )
 
 
 def _in_domain_freeze_gate_ledger():
@@ -3084,9 +3102,9 @@ def _in_domain_freeze_gate_ledger():
     return ledger
 
 
-def _memo_record(*, disclosures):
+def _memo_record(host, *, disclosures):
     record = {
-        "key": "memo-key",
+        "key": _production_freeze_gate_memo_key(host),
         "curve": {"tag": "cached", "status": "in_range"},
         "repair_notices": [],
         "disposition": "live",
@@ -3137,7 +3155,10 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
             record = EvaporationMixin._freeze_gate_curve_record(host)
         return session, record
 
-    host._freeze_gate_liquid_fraction_cache = _memo_record(disclosures=None)
+    host._freeze_gate_liquid_fraction_cache = _memo_record(
+        host,
+        disclosures=None,
+    )
     missed, missed_record = _call()
     assert calls == ["recompute"]
     assert missed_record["curve"]["tag"] == "recomputed"
@@ -3145,7 +3166,10 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
 
     calls.clear()
     host = _memo_host(calls)
-    host._freeze_gate_liquid_fraction_cache = _memo_record(disclosures=stored)
+    host._freeze_gate_liquid_fraction_cache = _memo_record(
+        host,
+        disclosures=stored,
+    )
     hit, hit_record = _call()
     assert calls == []
     assert hit_record["curve"]["tag"] == "cached"
@@ -3157,7 +3181,10 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
 
     calls.clear()
     host = _memo_host(calls)
-    host._freeze_gate_liquid_fraction_cache = _memo_record(disclosures=[])
+    host._freeze_gate_liquid_fraction_cache = _memo_record(
+        host,
+        disclosures=[],
+    )
     zero, zero_record = _call()
     assert calls == []
     assert zero_record["curve"]["tag"] == "cached"
@@ -3166,8 +3193,9 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
     calls.clear()
     host = _memo_host(calls)
     host._freeze_gate_liquid_fraction_cache = None
+    key = _production_freeze_gate_memo_key(host)
     host._freeze_gate_shared_curve_cache = {
-        "memo-key": _memo_record(disclosures=None),
+        key: _memo_record(host, disclosures=None),
     }
     shared_miss, shared_miss_record = _call()
     assert calls == ["recompute"]
@@ -3177,8 +3205,9 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
     calls.clear()
     host = _memo_host(calls)
     host._freeze_gate_liquid_fraction_cache = None
+    key = _production_freeze_gate_memo_key(host)
     host._freeze_gate_shared_curve_cache = {
-        "memo-key": _memo_record(disclosures=stored),
+        key: _memo_record(host, disclosures=stored),
     }
     shared_hit, shared_hit_record = _call()
     assert calls == []
@@ -3194,7 +3223,7 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
     host._freeze_gate_held_curve_record = {
         "hour": 1,
         "provider": "declared",
-        "record": _memo_record(disclosures=None),
+        "record": _memo_record(host, disclosures=None),
     }
     held_miss, held_miss_record = _call()
     assert calls == ["recompute"]
@@ -3207,7 +3236,7 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
     host._freeze_gate_held_curve_record = {
         "hour": 1,
         "provider": "declared",
-        "record": _memo_record(disclosures=stored),
+        "record": _memo_record(host, disclosures=stored),
     }
     held_hit, held_hit_record = _call()
     assert calls == []
@@ -3224,7 +3253,7 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
     host._freeze_gate_held_curve_record = {
         "hour": 1,
         "provider": "declared",
-        "record": _memo_record(disclosures=[]),
+        "record": _memo_record(host, disclosures=[]),
     }
     held_zero, held_zero_record = _call()
     assert calls == []
@@ -3242,9 +3271,9 @@ def _core_gate_curve(tag: str) -> dict:
     }
 
 
-def _core_memo_record(*, disclosures, tag: str = "cached") -> dict:
+def _core_memo_record(host, *, disclosures, tag: str = "cached") -> dict:
     record = {
-        "key": "memo-key",
+        "key": _production_freeze_gate_memo_key(host),
         "curve": _core_gate_curve(tag),
         "repair_notices": [],
         "disposition": "live",
@@ -3274,7 +3303,6 @@ def _core_gate_host(calls: list[str], recomputed_disclosures):
     )
     host._current_melt_redox_fO2_log = lambda: -8.0
     host._freeze_gate_redox_key_fO2_log = lambda **kwargs: kwargs["fO2_log"]
-    host._freeze_gate_cache_key = lambda **_kwargs: "memo-key"
     host._freeze_gate_curve_in_progress = False
     host._freeze_gate_liquid_fraction_cache = None
     host._freeze_gate_liquid_fraction_curve_memo = {}
@@ -3283,6 +3311,7 @@ def _core_gate_host(calls: list[str], recomputed_disclosures):
     def _recompute(**_kwargs):
         calls.append("recompute")
         return _core_memo_record(
+            host,
             disclosures=recomputed_disclosures,
             tag="recomputed",
         )
@@ -3323,20 +3352,27 @@ def test_core_liquidus_memo_misses_without_disclosure_and_replays_known(
 
     calls: list[str] = []
     host = _core_gate_host(calls, [])
-    host._freeze_gate_liquid_fraction_cache = _core_memo_record(disclosures=None)
+    key = _production_freeze_gate_memo_key(host)
+    host._freeze_gate_liquid_fraction_cache = _core_memo_record(
+        host,
+        disclosures=None,
+    )
     missed, missed_record = _call(host)
     assert calls == ["recompute"]
     assert missed_record["curve"]["tag"] == "recomputed"
     assert missed.law_disclosures == ()
     assert (
-        host._freeze_gate_liquid_fraction_curve_memo["memo-key"]["law_disclosures"]
+        host._freeze_gate_liquid_fraction_curve_memo[key]["law_disclosures"]
         == []
     )
     assert "law_disclosures" in host._freeze_gate_liquid_fraction_cache
 
     calls = []
     host = _core_gate_host(calls, [])
-    host._freeze_gate_liquid_fraction_cache = _core_memo_record(disclosures=stored)
+    host._freeze_gate_liquid_fraction_cache = _core_memo_record(
+        host,
+        disclosures=stored,
+    )
     hit, hit_record = _call(host)
     assert calls == []
     assert hit_record["curve"]["tag"] == "cached"
@@ -3349,7 +3385,10 @@ def test_core_liquidus_memo_misses_without_disclosure_and_replays_known(
 
     calls = []
     host = _core_gate_host(calls, [])
-    host._freeze_gate_liquid_fraction_cache = _core_memo_record(disclosures=[])
+    host._freeze_gate_liquid_fraction_cache = _core_memo_record(
+        host,
+        disclosures=[],
+    )
     zero, zero_record = _call(host)
     assert calls == []
     assert zero_record["curve"]["tag"] == "cached"
@@ -3357,7 +3396,9 @@ def test_core_liquidus_memo_misses_without_disclosure_and_replays_known(
 
     calls = []
     host = _core_gate_host(calls, stored)
-    host._freeze_gate_liquid_fraction_curve_memo["memo-key"] = _core_memo_record(
+    key = _production_freeze_gate_memo_key(host)
+    host._freeze_gate_liquid_fraction_curve_memo[key] = _core_memo_record(
+        host,
         disclosures=None,
         tag="stale",
     )
@@ -3365,13 +3406,14 @@ def test_core_liquidus_memo_misses_without_disclosure_and_replays_known(
     assert calls == ["recompute"]
     assert memo_miss_record["curve"]["tag"] == "recomputed"
     assert memo_miss.law_disclosures == ()
-    written = host._freeze_gate_liquid_fraction_curve_memo["memo-key"]
+    written = host._freeze_gate_liquid_fraction_curve_memo[key]
     assert written["curve"]["tag"] == "recomputed"
     assert written["law_disclosures"][0]["law_id"] == _FE_ASSOCIATION_LAW_ID
 
     calls = []
     reader = _core_gate_host(calls, [])
-    reader._freeze_gate_liquid_fraction_curve_memo["memo-key"] = written
+    reader_key = _production_freeze_gate_memo_key(reader)
+    reader._freeze_gate_liquid_fraction_curve_memo[reader_key] = written
     memo_hit, memo_hit_record = _call(reader)
     assert calls == []
     assert memo_hit_record["curve"]["tag"] == "recomputed"
@@ -3391,8 +3433,9 @@ def test_core_liquidus_memo_misses_without_disclosure_and_replays_known(
 
     calls = []
     host = _core_gate_host(calls, stored)
-    host._freeze_gate_liquid_fraction_curve_memo["memo-key"] = _core_memo_record(
-        disclosures=[]
+    key = _production_freeze_gate_memo_key(host)
+    host._freeze_gate_liquid_fraction_curve_memo[key] = _core_memo_record(
+        host, disclosures=[]
     )
     memo_zero, memo_zero_record = _call(host)
     assert calls == []
@@ -3507,13 +3550,14 @@ def _standalone_hit(kind: str, disclosures, monkeypatch):
         host._freeze_gate_held_curve_record = {
             "hour": 1,
             "provider": "declared",
-            "record": _memo_record(disclosures=disclosures),
+            "record": _memo_record(host, disclosures=disclosures),
         }
         return host, calls, EvaporationMixin._freeze_gate_curve_record(host)
     if kind == "local_memo":
         calls = []
         host = _memo_host(calls)
         host._freeze_gate_liquid_fraction_cache = _memo_record(
+            host,
             disclosures=disclosures
         )
         return host, calls, EvaporationMixin._freeze_gate_curve_record(host)
@@ -3521,8 +3565,9 @@ def _standalone_hit(kind: str, disclosures, monkeypatch):
         calls = []
         host = _memo_host(calls)
         host._freeze_gate_liquid_fraction_cache = None
+        key = _production_freeze_gate_memo_key(host)
         host._freeze_gate_shared_curve_cache = {
-            "memo-key": _memo_record(disclosures=disclosures),
+            key: _memo_record(host, disclosures=disclosures),
         }
         return host, calls, EvaporationMixin._freeze_gate_curve_record(host)
     store = PT0DeterminismStore("capture")
@@ -4636,9 +4681,10 @@ def _exercise_core_slot(monkeypatch, *, memo: bool) -> None:
     )
     stored = [dict(item) for item in _fe_disclosure_rows()]
     host = _core_gate_host([], [])
-    record = _core_memo_record(disclosures=stored)
+    key = _production_freeze_gate_memo_key(host)
+    record = _core_memo_record(host, disclosures=stored)
     if memo:
-        host._freeze_gate_liquid_fraction_curve_memo["memo-key"] = record
+        host._freeze_gate_liquid_fraction_curve_memo[key] = record
     else:
         host._freeze_gate_liquid_fraction_cache = record
     session = SimSession()
