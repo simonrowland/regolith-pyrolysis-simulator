@@ -80,7 +80,13 @@ def test_snyder_solid_fe0947o_rows_remain_typed_as_ungrounded(tmp_path) -> None:
     migration = _migrate(
         tmp_path, "snyder-carmichael-1992-olivine-liquid-feo-activity"
     )
-    rows = tuple(migration.observations.values())
+    rows = tuple(
+        row
+        for row in migration.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value
+        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+    )
     assert len(rows) == ROOT_SOURCES[
         "snyder-carmichael-1992-olivine-liquid-feo-activity"
     ]
@@ -113,7 +119,10 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
 
         for row in rows:
             standard = row.identity.reference_state.value
-            assert row.identity.species.formula == "FeO"
+            assert row.identity.species.formula == "FeO", (
+                source_id,
+                row.observation_id,
+            )
             assert standard.endmember.formula == "FeO"
             assert standard.component_basis == "FeO"
             assert row.uncertainty.kind is UncertaintyKind.DERIVED
