@@ -32,15 +32,15 @@ RICHTER_2011 = (
 # A(t)=A0*(m/m0)^(2/3) law, then normalizes the surviving oxide masses.
 R3_10_PRIMARY_OXIDE_WT_PCT = {
     "MgO": 0.0,
-    "SiO2": 12.276359002424687,
-    "Al2O3": 42.54254585598273,
-    "CaO": 45.18109514159258,
+    "SiO2": 12.276715140305132,
+    "Al2O3": 42.542214188532355,
+    "CaO": 45.18107067116251,
 }
 R3_10_FINAL_HOLD_ONLY_OXIDE_WT_PCT = {
     "MgO": 0.0,
-    "SiO2": 14.484288918340996,
-    "Al2O3": 40.566177631203445,
-    "CaO": 44.94953345045556,
+    "SiO2": 14.484592538454342,
+    "Al2O3": 40.56591927788461,
+    "CaO": 44.94948818366105,
 }  # final 900 s hold only; the test mutation removes both ramps and mid-hold
 
 
