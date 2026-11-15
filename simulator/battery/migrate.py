@@ -24547,11 +24547,11 @@ class Migrator:
         *,
         source_row_index: int | None = None,
     ) -> None:
-        notice_id = observation.observation_id
-        if "::point:" in notice_id:
-            notice_id = notice_id.split("::point:", 1)[0]
-        if notice_id.endswith("::mass_loss_fraction"):
-            notice_id = notice_id.removesuffix("::mass_loss_fraction")
+        notice_id = re.split(
+            r"::(?:T=|field:|point:|mass_loss_fraction|points:|rows:)",
+            observation.observation_id,
+            maxsplit=1,
+        )[0]
         extract_notices = tuple(
             _notice_from_plain(notice)
             for notice in (self._extract_notices.get(notice_id) or ())
