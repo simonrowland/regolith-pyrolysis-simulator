@@ -212,6 +212,7 @@ def _store_difference_details(
     return "\n".join(details)
 
 
+@pytest.mark.xdist_group("serial")
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
     actual = {}
     for row in _EXTRACT_ROWS:
