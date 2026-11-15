@@ -885,25 +885,25 @@ def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
     assert residue_prediction.vapor_pressures_Pa == with_shadow.vapor_pressures_Pa
 
 
-def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
-    request,
-) -> None:
-    from simulator.melt_backend import openimcc_bridge
-    from tests.engine_availability import magemin_binary_available
-
-    if not magemin_binary_available():
-        pytest.skip('MAGEMin binary unavailable for the real battery contract')
-
-    handle = open_battery_engine('internal-analytical')
-    request.addfinalizer(lambda: close_battery_engine_handle(handle))
-    core = handle.backend._core
+def _magemin_gate_backend(core):
     assert core._liquid_fraction_provider == 'magemin'
     core._register_freeze_gate_liquid_fraction_providers()
     gate_provider = core._chem_registry.fallback_for(
         ChemistryIntent.GATE_LIQUID_FRACTION
     )
     assert gate_provider is not None
-    magemin = gate_provider._ensure_backend()
+    return gate_provider._ensure_backend()
+
+
+def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
+    request,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    handle = open_battery_engine('internal-analytical')
+    request.addfinalizer(lambda: close_battery_engine_handle(handle))
+    core = handle.backend._core
+    magemin = _magemin_gate_backend(core)
     if magemin is None or not magemin.is_available():
         pytest.skip('MAGEMin backend unavailable after initialization')
     request.addfinalizer(magemin.close)
@@ -954,11 +954,13 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
 
 def test_internal_analytical_battery_score_records_vapour_phase_basis(
     tmp_path: Path,
+    request,
 ) -> None:
-    from tests.engine_availability import magemin_binary_available
-
-    if not magemin_binary_available():
-        pytest.skip("MAGEMin binary unavailable for the real scorer contract")
+    parent_core = _new_internal_analytical_core()
+    parent_magemin = _magemin_gate_backend(parent_core)
+    if parent_magemin is None or not parent_magemin.is_available():
+        pytest.skip("MAGEMin backend unavailable in the scorer parent")
+    request.addfinalizer(parent_magemin.close)
 
     root = Path(__file__).resolve().parents[2]
     cases = (
@@ -1038,6 +1040,10 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
         record = json.loads(engine["version"])
         assert record["phase_basis"] == expected_basis
         assert record["phase_basis_source"]
+        if expected_basis == "liquid":
+            assert record["phase_basis_source"].startswith(
+                "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow"
+            )
         if expected_switch is None:
             from simulator.melt_backend import openimcc_bridge
 
