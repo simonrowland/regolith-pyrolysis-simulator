@@ -13514,3 +13514,29 @@ def test_skipping_the_publication_cap_books_the_computed_overdraw(
     assert bounds["K2O_gas"] == _approx_kg(1.5)
     assert bounds["K2O_gas"] > 1.0
     assert bounds.computed_exceeds_inventory == {}
+
+
+@pytest.mark.parametrize("deposit_kg, expected_fraction_hex", [
+    (0.0, "0x0.0p+0"),
+    (1.0, "0x1.0000000000000p-2"),
+])
+def test_booked_wall_availability_numeric_refactor_pin(
+    monkeypatch, deposit_kg, expected_fraction_hex,
+) -> None:
+    """Pin the numeric consumer before moving the booking/refusal rule."""
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.0)
+    authority = {
+        "code": "wall_deposit_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["SiO"],
+        "wall_saturation_pressure_refusals_by_species": {
+            "SiO": {"hot_wall": {"reason": "missing wall pressure"}},
+        },
+        "status_bearing_refusal_count": 1,
+    }
+    authority = objective_module._authority_without_booked_refusals(authority, {"SiO"})
+    summary = objective_module._furnace_lifespan_cost_summary_from_raw(
+        {("hot_wall", "SiO"): deposit_kg}, authority=authority,
+    )
+    assert summary["lifespan_cost_status"] == "available"
+    # 1 kg/campaign / 4 kg/resinter = 0.25 resinter/campaign; zero stays zero.
+    assert summary["furnace_lifespan_consumed_fraction"].hex() == expected_fraction_hex
