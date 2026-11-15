@@ -689,29 +689,20 @@ def _resolve_feo_activity_standard(
         coefficient_sources,
         "openimcc-redox-pack:sha256:",
     )
-    if redox_pack_digest is not None:
-        if redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "openimcc_feo_redox_pack_digest_mismatch",
-                    "expected_redox_pack_digest": (
-                        _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
-                    ),
-                    "actual_redox_pack_digest": redox_pack_digest,
-                },
-            )
-        identity, identity_refusal = _validate_openimcc_melt_pack_identity(
-            melt_pack_identity
+    if (
+        redox_pack_digest is not None
+        and redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
+    ):
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_feo_redox_pack_digest_mismatch",
+                "expected_redox_pack_digest": (
+                    _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
+                ),
+                "actual_redox_pack_digest": redox_pack_digest,
+            },
         )
-        if identity_refusal is not None:
-            return None, identity_refusal
-        assert identity is not None
-        return _FeOActivityStandard(
-            name=_FEO_ACTIVITY_CANONICAL_STANDARD,
-            offset_j_mol=Decimal(0),
-            melt_pack_identity=identity,
-        ), None
 
     if temperature_K is None or temperature_K <= 0:
         return None, ResidualRefusal(
@@ -1022,22 +1013,6 @@ def _normalize_openimcc_feo_activity_prediction(
             refusal_detail={"reason": "feo_activity_standard_temperature_missing"},
         )
     melt_pack_identity = prediction.provenance.get("melt_pack_identity")
-    if not isinstance(melt_pack_identity, Mapping) and _source_value(
-        prediction.coefficient_sources,
-        "openimcc-redox-pack:sha256:",
-    ) is not None:
-        try:
-            melt_pack_identity = _openimcc_pack_identity_and_payload("default")[0]
-        except (ImportError, OSError, ValueError, TypeError, KeyError) as exc:
-            melt_pack_identity = None
-            refusal_detail = {
-                "reason": "openimcc_feo_standard_pack_data_unavailable",
-                "detail": str(exc),
-            }
-        else:
-            refusal_detail = None
-    else:
-        refusal_detail = None
     standard, refusal = _resolve_feo_activity_standard(
         prediction.engine,
         prediction.coefficient_sources,
@@ -1050,9 +1025,7 @@ def _normalize_openimcc_feo_activity_prediction(
             value=None,
             authority=Authority.REFUSED,
             refusal_reason=refusal.reason,
-            refusal_detail=(
-                dict(refusal.detail) if refusal_detail is None else refusal_detail
-            ),
+            refusal_detail=dict(refusal.detail),
         )
     assert standard is not None
     assert standard.melt_pack_identity is not None
