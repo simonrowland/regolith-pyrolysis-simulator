@@ -219,6 +219,10 @@ class SimSessionConfig:
     imcc_activity_shadow: bool = False
     high_t_melt_activity: str | None = None
     dt_hr: float = 1.0
+    # When true, drive_session follows the campaign controller until
+    # is_complete() instead of stopping at ``hours``. ``hours`` stays the
+    # authored budget for the cache key and for runs that leave this false.
+    until_campaign_complete: bool = False
 
     def __post_init__(self) -> None:
         coerce_nonnegative_hours(self.hours)
@@ -870,6 +874,18 @@ def drive_auto_apply(
     )
 
 
+def _refuse_phase_without_an_end(session: SimSession) -> None:
+    """Stop rather than invent a duration for a phase the endpoint does not own."""
+
+    from simulator.campaigns import CampaignEndCapMissing, CampaignManager
+
+    phase = session.simulator.melt.campaign
+    if CampaignManager.endpoint_can_end(phase):
+        return
+    name = getattr(phase, "name", None) or str(phase)
+    raise CampaignEndCapMissing(name)
+
+
 def drive_session(
     session: SimSession,
     hours: float,
@@ -877,19 +893,28 @@ def drive_session(
     *,
     operator_decisions: list[dict[str, Any]] | None = None,
     stop_at_stage0_exit: bool = False,
+    until_campaign_complete: bool = False,
 ) -> Iterable[StepResult]:
-    """Drive a session under a policy outside ``advance()``."""
+    """Drive a session under a policy outside ``advance()``.
+
+    ``until_campaign_complete`` ignores ``hours`` as a stop. Each phase
+    ends by ``campaigns.py`` ``check_endpoint`` and the caps that module
+    already reads from setpoints. C4 and C6 are end-criterion phases:
+    this loop does not give them an hour budget.
+    """
 
     remaining = coerce_nonnegative_hours(hours)
     target_hour = session.simulator.melt.hour + remaining
     dt_hr = coerce_nonnegative_hours(getattr(getattr(session, "_config", None), "dt_hr", 1.0))
     if dt_hr <= 0:
         raise ValueError("dt_hr must be positive")
-    while remaining > 0:
+    while until_campaign_complete or remaining > 0:
         if stop_at_stage0_exit and _at_stage0_exit(session):
             return
         if session.is_complete():
             return
+        if until_campaign_complete:
+            _refuse_phase_without_an_end(session)
         decision = session.pending_decision()
         if stop_at_stage0_exit and _stage0_exit_decision(session):
             return
@@ -910,7 +935,7 @@ def drive_session(
                 return
         elif decision is not None:
             raise ValueError(f"unsupported decision policy {policy!r}")
-        interval = min(dt_hr, remaining)
+        interval = dt_hr if until_campaign_complete else min(dt_hr, remaining)
         sim = session.simulator
         schedule = sim.campaign_mgr._lab_schedule(sim.melt.campaign)
         if schedule is not None:

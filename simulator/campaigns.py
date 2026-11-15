@@ -54,6 +54,7 @@ from simulator.state import (
     Atmosphere,
     BatchRecord,
     CampaignPhase,
+    TERMINAL_OXYGEN_ROUTE_PHASES,
     CondensationTrain,
     DecisionPoint,
     DecisionType,
@@ -64,6 +65,26 @@ from simulator.state import (
     clamp_stir_state,
     partial_pressure_exceeds_total,
 )
+
+def campaign_evolves_terminal_oxygen(campaign_id: str) -> bool:
+    """True when this campaign's hour-step routes credit O2 to a terminal account.
+
+    Evaporation campaigns credit the oxide-reduction O2 coproduct, and
+    OVERHEAD_BLEED moves it into the melt-offgas terminal bins. C5 and
+    every MRE spelling credit anode O2 to
+    ``terminal.oxygen_mre_anode_stored``. Phase membership is
+    ``TERMINAL_OXYGEN_ROUTE_PHASES``, the same sets ``core._step_one_hour``
+    runs. Identity is ``CampaignManager.campaign_phases_for_id``: a phase
+    name, a setpoint key, an override key, and the ``MRE`` routing label
+    of one route share that answer. C6 thermite and C7 aluminothermy keep
+    the oxygen in the oxide product and return false.
+    """
+
+    if not isinstance(campaign_id, str) or not campaign_id.strip():
+        return False
+    phases = CampaignManager.campaign_phases_for_id(campaign_id)
+    return any(phase in TERMINAL_OXYGEN_ROUTE_PHASES for phase in phases)
+
 
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
 C2A_STAGED_DEPLETION_YIELD_FLOOR_MOL = 1.0e-12
@@ -137,6 +158,22 @@ class CampaignPressureSetpointRefusal(ValueError):
         )
 
 
+class CampaignEndCapMissing(ValueError):
+    """A phase has neither an endpoint nor a setpoint cap.
+
+    The optimizer must not invent an hour budget for that phase. The
+    message names the phase so a physics ruling can supply the missing
+    end criterion.
+    """
+
+    def __init__(self, phase_name: str):
+        self.phase_name = str(phase_name)
+        super().__init__(
+            f"campaign {self.phase_name} has neither an end criterion "
+            "nor a cap; refusing to invent a duration"
+        )
+
+
 class CampaignSetpointMissingRefusal(ValueError):
     """Typed refusal when a campaign is missing a required setpoint row."""
 
@@ -151,6 +188,63 @@ class CampaignSetpointMissingRefusal(ValueError):
         super().__init__(
             f'{self.reason}: {detail}' if detail else self.reason
         )
+
+
+def decision_successor(
+    decision_type: DecisionType,
+    choice: str,
+    *,
+    c5_enabled: bool,
+) -> tuple[Optional[CampaignPhase], dict[str, str], bool]:
+    """Next phase, record-field updates, and completion for one decision.
+
+    ``PyrolysisSimulator.apply_decision`` and the AUTO_APPLY claim walk
+    both use this table. Hour caps are not part of it: ``check_endpoint``
+    ends each phase.
+    """
+
+    choice = str(choice)
+    record_updates: dict[str, str] = {}
+    next_campaign: Optional[CampaignPhase] = None
+    complete = False
+    if decision_type == DecisionType.ROOT_BRANCH:
+        if choice == 'mre_baseline':
+            record_updates['track'] = 'mre_baseline'
+            next_campaign = CampaignPhase.MRE_BASELINE
+        else:
+            record_updates['track'] = 'pyrolysis'
+            next_campaign = CampaignPhase.C0
+    elif decision_type == DecisionType.PATH_AB:
+        record_updates['path'] = choice
+        if choice == 'A':
+            next_campaign = CampaignPhase.C2A
+        elif choice == 'A_staged':
+            next_campaign = CampaignPhase.C2A_STAGED
+        else:
+            next_campaign = CampaignPhase.C2B
+    elif decision_type == DecisionType.BRANCH_ONE_TWO:
+        record_updates['branch'] = choice
+        if choice == 'two':
+            next_campaign = CampaignPhase.C4
+        elif c5_enabled:
+            next_campaign = CampaignPhase.C5
+        else:
+            complete = True
+    elif decision_type == DecisionType.TI_RETENTION:
+        pass
+    elif decision_type == DecisionType.C6_PROCEED:
+        if choice == 'yes':
+            next_campaign = CampaignPhase.C6
+        else:
+            complete = True
+    elif decision_type == DecisionType.C7_PROCEED:
+        if choice == 'yes':
+            next_campaign = CampaignPhase.C7_CA_ALUMINOTHERMIC
+        else:
+            complete = True
+    else:
+        raise ValueError(f"unsupported decision type {decision_type.name}")
+    return next_campaign, record_updates, complete
 
 
 def _runtime_pressure_override_refusal(
@@ -516,6 +610,7 @@ class CampaignManager:
         self._active_post_mg_c2a_overrides: dict | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
+        self.last_campaign_stop: dict[str, object] | None = None
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -530,6 +625,27 @@ class CampaignManager:
     _EXTRA_OVERRIDE_KEY_PHASES = {
         'C0b': (CampaignPhase.C0B,),
     }
+    # Execution labels that are not a phase name, a setpoint key, or an
+    # override key. Bare ``MRE`` is the electrolysis routing campaign
+    # (condensation PRODUCT_DESTINATIONS and the extraction metal credit).
+    # The hour step that earns it is MRE_BASELINE, which stores anode O2 at
+    # terminal.oxygen_mre_anode_stored; the setpoint row is mre_baseline.
+    # This is not an override key: accepting ``MRE`` there would validate a
+    # store ``_campaign_overrides`` never reads.
+    _ROUTE_LABEL_PHASES = {
+        'MRE': (CampaignPhase.MRE_BASELINE,),
+    }
+    @classmethod
+    def endpoint_can_end(cls, phase: CampaignPhase) -> bool:
+        """True when ``check_endpoint`` owns termination for ``phase``.
+
+        IDLE and COMPLETE are not processing phases. Every other phase
+        ends inside ``check_endpoint``. There is no second phase list.
+        C4 and C6 are end-criterion phases: they do not take an optimizer
+        hour budget.
+        """
+
+        return phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE)
     _OVERRIDE_CONSUMER_NAMES = frozenset({
         'campaign_overrides',
         'override',
@@ -673,6 +789,43 @@ class CampaignManager:
             if phase not in unique:
                 unique.append(phase)
         return tuple(unique)
+
+    @classmethod
+    def campaign_phases_for_id(cls, campaign_id: str) -> Tuple[CampaignPhase, ...]:
+        """Phases whose hour-step route this campaign id executes.
+
+        One resolver for every spelling execution uses: a ``CampaignPhase``
+        name, a setpoint config key, an extra override key, and a route
+        label in ``_ROUTE_LABEL_PHASES``. Unknown ids return no phases.
+        Product claims and the terminal-oxygen predicate both read this
+        and do not keep a second alias table.
+        """
+
+        token = str(campaign_id).strip()
+        if not token:
+            return ()
+        phases = cls._campaign_phases_for_override_key(token)
+        if phases:
+            return phases
+        return cls._ROUTE_LABEL_PHASES.get(token, ())
+
+    @classmethod
+    def setpoint_keys_for_campaign_id(cls, campaign_id: str) -> Tuple[str, ...]:
+        """Setpoint rows ``_campaign_config_key`` loads for this id.
+
+        A phase is rewritten through ``_CONFIG_KEY_BY_PHASE`` before the
+        products map is read, the same rewrite the hour step uses.
+        ``C0B``, ``C0b``, and ``C0b_p_cleanup`` all load
+        ``C0b_p_cleanup``. ``MRE``, ``MRE_BASELINE``, and ``mre_baseline``
+        all load ``mre_baseline``.
+        """
+
+        keys: list[str] = []
+        for phase in cls.campaign_phases_for_id(campaign_id):
+            key = cls._CONFIG_KEY_BY_PHASE.get(phase, phase.name)
+            if key not in keys:
+                keys.append(key)
+        return tuple(keys)
 
     @classmethod
     def known_override_fields(cls, campaign_name: str) -> Tuple[str, ...]:
@@ -1867,6 +2020,8 @@ class CampaignManager:
 
         Called when starting a new campaign phase.
         """
+        # The previous campaign's summary was captured before this start.
+        self.last_campaign_stop = None
         self._reset_stage_background_gas(melt)
         self._materialized_target_T_C_by_phase.pop(campaign, None)
         materialized_target = self._materialize_target_from_delta(campaign)
@@ -2572,6 +2727,25 @@ class CampaignManager:
             })
         return number
 
+    def _end_at(self, stop_reason: str, *, detail: str | None = None) -> bool:
+        """Record why this phase ended and tell the hour step to advance.
+
+        ``endpoint_met`` is the phase's own criterion, including a duration
+        that is the only criterion. ``time_cap`` is a cap that cut the phase
+        before that criterion. Refusals are not recorded here; they raise.
+        """
+
+        if stop_reason not in ("endpoint_met", "time_cap"):
+            raise ValueError(
+                "campaign stop_reason must be endpoint_met or time_cap, "
+                f"not {stop_reason!r}"
+            )
+        record: dict[str, object] = {"stop_reason": stop_reason}
+        if detail:
+            record["detail"] = detail
+        self.last_campaign_stop = record
+        return True
+
     def check_endpoint(self, melt: MeltState,
                        evap_flux: EvaporationFlux,
                        train: CondensationTrain,
@@ -2609,7 +2783,10 @@ class CampaignManager:
         - MRE_BASELINE: armed current below configured threshold after
           min voltage, else max_hold
 
-        Returns True if the campaign should end.
+        Returns True if the campaign should end. Each True records
+        ``endpoint_met`` or ``time_cap`` on ``last_campaign_stop``. A typed
+        refusal still raises. A phase this function does not handle raises
+        ``CampaignEndCapMissing`` rather than ending or continuing silently.
         """
         campaign = melt.campaign
         completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt, dt_hr)
@@ -2632,7 +2809,7 @@ class CampaignManager:
                 raise ValueError("max_hours override must be numeric")
             max_h = float(raw_max_hours)
             if max_h > 0 and completed_campaign_hour >= max_h:
-                return True
+                return self._end_at("time_cap", detail="max_hours")
 
         if campaign == CampaignPhase.C0:
             from simulator.accounting.stage0_inventory import (
@@ -2666,7 +2843,7 @@ class CampaignManager:
                         self.c0_forecast_adjustment_notices
                     ),
                 )
-                return True
+                return self._end_at("endpoint_met", detail="first_melt")
 
             if self.c0_remaining_budget_exit is not None:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
@@ -2682,7 +2859,7 @@ class CampaignManager:
                     ),
                     remaining_budget_exit=self.c0_remaining_budget_exit,
                 )
-                return True
+                return self._end_at("endpoint_met", detail="remaining_budget")
 
             if isinstance(prediction, Mapping):
                 exit_temperature_C = prediction.get('T_exit_C')
@@ -2709,7 +2886,7 @@ class CampaignManager:
                             self.c0_forecast_adjustment_notices
                         ),
                     )
-                    return True
+                    return self._end_at("endpoint_met", detail="computed_exit")
 
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
@@ -2725,13 +2902,14 @@ class CampaignManager:
                         self.c0_forecast_adjustment_notices
                     ),
                 )
-                return True
+                return self._end_at("time_cap", detail="maximum_hold")
             return False
 
         elif campaign == CampaignPhase.C0B:
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("endpoint_met", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C2A:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -2761,9 +2939,10 @@ class CampaignManager:
                     unit='kg/hr',
                 )
                 if total_rate < threshold_kg_hr:
-                    return True
+                    return self._end_at("endpoint_met", detail="signal_depleted")
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C2A_STAGED:
             max_hold_hr = self._configured_staged_max_hold_hr(campaign)
@@ -2781,7 +2960,7 @@ class CampaignManager:
                         'reason': 'fixed_duration',
                         'campaign_hour': coerce_nonnegative_hours(melt.campaign_hour),
                     }
-                    return True
+                    return self._end_at("endpoint_met", detail="fixed_duration")
                 return False
 
             if not stages:
@@ -2790,7 +2969,7 @@ class CampaignManager:
                         'reason': 'fixed_duration',
                         'campaign_hour': coerce_nonnegative_hours(melt.campaign_hour),
                     }
-                    return True
+                    return self._end_at("endpoint_met", detail="fixed_duration")
                 return False
             stage_idx = min(
                 max(0, int(self._c2a_staged_stage_idx)),
@@ -2877,7 +3056,10 @@ class CampaignManager:
                     ),
                 }
                 if final_stage:
-                    return True
+                    return self._end_at(
+                        "endpoint_met" if depletion_complete else "time_cap",
+                        detail=reason,
+                    )
                 self._c2a_staged_stage_idx = stage_idx + 1
                 self._c2a_staged_stage_start_hour = melt.campaign_hour + (
                     1 if dt_hr == 1.0 else dt_hr
@@ -2893,7 +3075,8 @@ class CampaignManager:
                     'stage_idx': stage_idx,
                     'campaign_hour': coerce_nonnegative_hours(melt.campaign_hour),
                 }
-                return True
+                return self._end_at("time_cap", detail="max_hold_ceiling")
+            return False
 
         elif campaign == CampaignPhase.C2B:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -2927,9 +3110,10 @@ class CampaignManager:
                     unit='kg/hr',
                 )
                 if rate < threshold_kg_hr:
-                    return True
+                    return self._end_at("endpoint_met", detail="signal_depleted")
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C3_K:
             if record.path == 'A_staged':
@@ -2938,12 +3122,13 @@ class CampaignManager:
                     self._configured_max_hold_hr(campaign, 'C3_K', 'A_staged'),
                 ))
                 if completed_campaign_hour >= max(1, staged_hours):
-                    return True
+                    return self._end_at("endpoint_met", detail="staged_duration")
             path_key = 'A' if record.path == 'A' else 'default'
             max_hold_hr = self._configured_max_hold_hr(
                 campaign, 'C3_K', path_key)
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("endpoint_met", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C3_NA:
             # Autoreview r6 P2 (2026-05-27): the V1c-recipe-retune
@@ -2964,12 +3149,13 @@ class CampaignManager:
                     self._configured_max_hold_hr(campaign, 'C3_NA', 'A_staged'),
                 ))
                 if completed_campaign_hour >= max(1, staged_hours):
-                    return True
+                    return self._end_at("endpoint_met", detail="staged_duration")
             path_key = 'A' if record.path == 'A' else 'default'
             max_hold_hr = self._configured_max_hold_hr(
                 campaign, 'C3_NA', path_key)
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("endpoint_met", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C4:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -3133,21 +3319,22 @@ class CampaignManager:
                         'completed_window_hr': completed_window_hr,
                         'process_elapsed_hr': process_elapsed_hr,
                     }
-                    return True
+                    return self._end_at("endpoint_met", detail="mg_signal_depleted")
             if current_in_window and completed_window_hr >= max_hold_hr:
+                outcome = (
+                    'max_hold_signal_not_depleted'
+                    if signal_armed
+                    else 'max_hold_no_signal'
+                )
                 self.last_c4_termination = {
-                    'outcome': (
-                        'max_hold_signal_not_depleted'
-                        if signal_armed
-                        else 'max_hold_no_signal'
-                    ),
+                    'outcome': outcome,
                     'species': species,
                     'rate_kg_hr': float(rate),
                     'threshold_kg_hr': threshold_kg_hr,
                     'completed_window_hr': completed_window_hr,
                     'process_elapsed_hr': process_elapsed_hr,
                 }
-                return True
+                return self._end_at("time_cap", detail=outcome)
 
             if process_elapsed_hr >= process_limit_hr:
                 # Truthful typed outcomes:
@@ -3176,6 +3363,7 @@ class CampaignManager:
                         transport_state
                     )
                 raise CampaignC4EndpointRefusal(diagnostic)
+            return False
 
         elif campaign == CampaignPhase.C5:
             endpoint = self._configured_endpoint(campaign, 'endpoint')
@@ -3213,7 +3401,7 @@ class CampaignManager:
                 )
             )
             if getattr(melt, 'mre_c5_ladder_complete', False):
-                return True
+                return self._end_at("endpoint_met", detail="ladder_complete")
             # The cell dispatches at the stage cap for every ladder hold, so
             # at-cap alone no longer discriminates; low-current only counts
             # as an endpoint signal on the FINAL declared rung (earlier
@@ -3245,9 +3433,10 @@ class CampaignManager:
             else:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:
-                return True
+                return self._end_at("endpoint_met", detail="low_current")
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C6:
             hold_target_C, _ = self.get_temp_target(
@@ -3278,7 +3467,7 @@ class CampaignManager:
                     # The current at-target tick dispatched the provider before
                     # endpoint evaluation, so the operator wall clock can end
                     # C6 without misclassifying preheat as reaction hold.
-                    return True
+                    return self._end_at("time_cap", detail="operator_wall")
             if not at_hold_target:
                 return False
             completed_hold_hr = dt_hr + sum(
@@ -3300,14 +3489,16 @@ class CampaignManager:
             comp = melt.composition_wt_pct()
             refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
             if completed_hold_hr >= min_hold_hr and refractory_pct < threshold_wt_pct:
-                return True
+                return self._end_at("endpoint_met", detail="composition_endpoint")
             if completed_hold_hr >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("endpoint_met", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.MRE_BASELINE:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -3333,11 +3524,16 @@ class CampaignManager:
             else:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:
-                return True
+                return self._end_at("endpoint_met", detail="low_current")
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
-        return False
+        if campaign in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
+            return False
+        raise CampaignEndCapMissing(
+            getattr(campaign, "name", None) or str(campaign)
+        )
 
     # ------------------------------------------------------------------
     # Campaign transitions
@@ -3578,3 +3774,45 @@ class CampaignManager:
             recommendation='pyrolysis',
             context='Select processing track.',
         )
+
+    def auto_apply_sequence(
+        self,
+        start: CampaignPhase,
+        record: BatchRecord,
+    ) -> tuple[CampaignPhase, ...]:
+        """Phases AUTO_APPLY will enter, using this manager's transitions.
+
+        The walk calls ``get_next_campaign``, ``get_decision``, and
+        ``decision_successor``. It does not copy caps or end criteria.
+        A real evaluation drives ``check_endpoint`` through the session.
+        """
+
+        phases: list[CampaignPhase] = []
+        current: Optional[CampaignPhase] = start
+        seen: set[CampaignPhase] = set()
+        for _ in range(len(CampaignPhase) + 1):
+            if current is None or current == CampaignPhase.COMPLETE:
+                break
+            if current in seen:
+                break
+            seen.add(current)
+            phases.append(current)
+            nxt = self.get_next_campaign(current, record)
+            if nxt is None:
+                decision = self.get_decision(current, record)
+                choice = decision.recommendation or (
+                    decision.options[0] if decision.options else ''
+                )
+                nxt, updates, complete = decision_successor(
+                    decision.decision_type,
+                    choice,
+                    c5_enabled=bool(self.c5_enabled),
+                )
+                for field_name, field_value in updates.items():
+                    setattr(record, field_name, field_value)
+                if complete or nxt is None or nxt == CampaignPhase.COMPLETE:
+                    break
+            elif nxt == CampaignPhase.COMPLETE:
+                break
+            current = nxt
+        return tuple(phases)

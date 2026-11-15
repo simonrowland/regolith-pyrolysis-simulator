@@ -1029,6 +1029,11 @@ class PyrolysisRun:
     imcc_activity_shadow: bool = False
     high_t_melt_activity: str | None = None
     dt_hr: float = 1.0
+    # Plain C0 pyrolysis evaluations set this so the session follows the
+    # campaign controller through later steps. Default false keeps an
+    # authored hour budget. Not an EvalSpec field: the cache key stays
+    # engine VERSION plus the request, and this branch bumps VERSION.
+    until_campaign_complete: bool = False
     strict_result_contract: bool = field(init=False, default=True)
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
@@ -1060,6 +1065,8 @@ class PyrolysisRun:
         self.setpoints_overrides = overrides
         if not isinstance(self.imcc_activity_shadow, bool):
             raise TypeError("imcc_activity_shadow must be bool")
+        if not isinstance(self.until_campaign_complete, bool):
+            raise TypeError("until_campaign_complete must be bool")
         if self.high_t_melt_activity is not None:
             try:
                 self.high_t_melt_activity = normalize_high_t_melt_activity(
@@ -1308,6 +1315,7 @@ class PyrolysisRun:
             ),
             imcc_activity_shadow=self.imcc_activity_shadow,
             high_t_melt_activity=high_t_melt_activity,
+            until_campaign_complete=bool(self.until_campaign_complete),
         )
 
     def _load_config_bundle(self) -> ConfigBundle:

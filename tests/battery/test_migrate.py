@@ -52,6 +52,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.score import (
     liquid_model_subsolidus_sample_notice,
+    parse_migration_headline,
     predict_with_engine,
 )
 from simulator.battery.migrate import (
@@ -65,6 +66,7 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     MigrationResult,
+    QueueEntry,
     Migrator,
     UnknownRailSpellingError,
     UnresolvedEquipmentContextError,
@@ -93,7 +95,6 @@ from simulator.battery.migrate import (
     parse_quantity_suffix,
     split_qualified_quantity,
     QUANTITY_ALIASES,
-    QUANTITY_SOURCE_FIELDS,
     _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
@@ -103,6 +104,7 @@ from simulator.battery.migrate import (
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
     _named_fraction_bound_selection,
+    _queue_work_counts,
     _initial_oxide_map_from_values,
     _located_printed_and_initial,
     load_migrated_store,
@@ -117,9 +119,7 @@ from simulator.battery.migrate import (
     lift_vaporization_reaction_from_ledger_note,
     pressure_from_equipment,
     resolve_equipment_context,
-    select_declared_source,
     to_plain,
-    observation_from_plain,
     work_id_for,
     write_outputs,
 
@@ -4196,7 +4196,7 @@ def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
         for p in (root / "data").rglob("*")
         if p.is_file() and "extracts/fixture-source.yaml" not in p.as_posix()
     }
-    second = migrate(root, write=True)
+    migrate(root, write=True)
     second_bytes = {
         p.relative_to(root): p.read_bytes()
         for p in (root / "data").rglob("*")
@@ -15966,6 +15966,78 @@ def test_committed_migration_queue_is_canonical_grouped_form() -> None:
     assert len(expanded) == sum(len(group["observations"]) for group in entries)
 
 
+def test_queue_accounting_uses_manifest_eligibility_and_tracks_mutation(
+    tmp_path: Path,
+) -> None:
+    compilations = tmp_path / "data" / "literature" / "compilations"
+
+    def source(source_id: str, manifest: dict | None, record: str) -> str:
+        folder = compilations / source_id
+        (folder / "records").mkdir(parents=True, exist_ok=True)
+        if manifest is not None:
+            (folder / "manifest.yaml").write_text(
+                yaml.safe_dump(manifest), encoding="utf-8"
+            )
+        return (
+            folder / "records" / f"{record}.yaml"
+        ).relative_to(tmp_path).as_posix()
+
+    false_manifest = {
+        "source_id": "fixture-reference",
+        "compilation_role": {"scoring_eligible": False},
+    }
+    false_source_a = source("fixture-reference", false_manifest, "a")
+    false_source_b = source("fixture-reference", false_manifest, "b")
+    true_source = source(
+        "fixture-eligible",
+        {
+            "source_id": "fixture-eligible",
+            "compilation_role": {"scoring_eligible": True},
+        },
+        "c",
+    )
+    missing_source = source("fixture-unmarked", {"source_id": "fixture-unmarked"}, "d")
+    queue = [
+        QueueEntry("w", {}, ["value"], "why", false_source_a, "obs-a"),
+        QueueEntry("w", {}, ["value"], "why", false_source_b, "obs-b"),
+        QueueEntry("w", {}, ["value"], "why", true_source, "obs-c"),
+        QueueEntry("w", {}, ["value"], "why", missing_source, "obs-d"),
+    ]
+
+    counts = _queue_work_counts(queue, tmp_path)
+    assert counts.backlog_by_source == {
+        "fixture-eligible": 1,
+        "fixture-unmarked": 1,
+    }
+    assert counts.reference_by_source == {"fixture-reference": 2}
+    assert sum(counts.backlog_by_path.values()) == 2
+    assert sum(counts.reference_by_path.values()) == 2
+
+    manifest_path = compilations / "fixture-reference" / "manifest.yaml"
+    false_manifest["compilation_role"]["scoring_eligible"] = True
+    manifest_path.write_text(yaml.safe_dump(false_manifest), encoding="utf-8")
+    counts = _queue_work_counts(queue, tmp_path)
+    assert counts.backlog_by_source == {
+        "fixture-eligible": 1,
+        "fixture-reference": 2,
+        "fixture-unmarked": 1,
+    }
+    assert counts.reference_by_source == {}
+
+
+def test_migration_report_headline_is_accepted_by_scorer(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path / "repo")
+    result = migrate(root, write=True)
+    report = (root / "data" / "battery" / "migration-report.md").read_text(
+        encoding="utf-8"
+    )
+
+    headline = parse_migration_headline(report)
+    assert f"queue size: {len(result.queue)}\n" in report
+    assert headline["queue"] == len(result.queue)
+    assert f"queue backlog: {len(result.queue)}\n" in report
+
+
 def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="delta_fG",
@@ -19386,20 +19458,107 @@ def test_bare_log_direct_couple_outside_cea_domain_carries_extrapolated_authorit
     assert decision.notice_authority is Authority.EXTRAPOLATED
 
 
-def test_bare_log_wgs_dependent_mix_remains_typed_refusal() -> None:
-    from simulator.battery.migrate import _bare_log_frame_decision
-
-    decision = _bare_log_frame_decision(
-        Decimal("-0.30"),
-        Decimal("1682.15"),
-        printed_atmospheres=(
-            "CO2 20.0 × 10 SCCM + H2 50.0 × 200 SCCM",
-        ),
+def _printed_wgs_sccm_mix_at_cea_log_fO2(
+    log10_fO2: float,
+) -> tuple[dict[str, float], str]:
+    from simulator.chemistry.offgas_fo2 import (
+        _log10_K_couple,
+        load_buffer_polynomials,
     )
 
+    temperature_K = 1682.15
+    polynomials = load_buffer_polynomials()
+    log10_k_h2 = _log10_K_couple(polynomials, "H2", temperature_K)
+    log10_k_co = _log10_K_couple(polynomials, "CO", temperature_K)
+
+    # Set H2O/H2 to the requested CEA fO2, then set Q=K_CO/K_H2 so the CEA
+    # water-gas-shift extent is zero and the source prediction is independently
+    # fixed by the production couple resolver.
+    amounts = {
+        "CO2": 10.0 ** (log10_k_co - log10_k_h2) * 10.0 ** (
+            log10_k_h2 + log10_fO2 / 2.0
+        ),
+        "CO": 1.0,
+        "H2O": 10.0 ** (log10_k_h2 + log10_fO2 / 2.0),
+        "H2": 1.0,
+    }
+    atmosphere = " + ".join(
+        f"{species} 1.000000000000 × {amount:.12f} SCCM"
+        for species, amount in amounts.items()
+    )
+    return amounts, atmosphere
+
+
+def _imposed_wgs_result_with_janaf_band(gas: dict[str, float]):
+    from decimal import Decimal
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
+    )
+    from simulator.chemistry.offgas_fo2 import imposed_fo2, load_buffer_polynomials
+
+    temperature_K = 1682.15
+    gibbs = {
+        formula: float(
+            _janaf_gas_formation_gibbs_J_per_mol(
+                formula, Decimal(str(temperature_K))
+            )
+        )
+        for formula in ("CO", "CO2", "H2", "H2O", "O2")
+    }
+    return imposed_fo2(
+        gas,
+        temperature_K,
+        load_buffer_polynomials(),
+        janaf_formation_gibbs_J_per_mol=gibbs,
+        janaf_gas_constant_J_per_mol_K=float(JANAF_R_J_PER_MOL_K),
+    )
+
+
+def test_bare_log_accepts_wgs_dependent_mix_with_source_band() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    gas, atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
+    result = _imposed_wgs_result_with_janaf_band(
+        {species: float(amount) for species, amount in gas.items()}
+    )
+    assert result.uncertainty_band_dex is not None
+    tolerance = Decimal("0.01")
+    band = Decimal(str(result.uncertainty_band_dex))
+    reported = Decimal(str(result.log10_fO2)) + tolerance + band / 2
+    decision = _bare_log_frame_decision(
+        reported,
+        Decimal("1682.15"),
+        printed_atmospheres=(atmosphere,),
+    )
+
+    # Mutation: remove the WGS allowance; this just-outside-tolerance value is refused.
+    difference = reported - Decimal(str(result.log10_fO2))
+    assert tolerance < difference < tolerance + band
+    assert decision.state.is_value
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert atmosphere in decision.notice_reason
+    assert "expected CEA log10(fO2/bar)=-0.3000" in decision.notice_reason
+    assert "wgs_uncertainty_band=" in decision.notice_band
+
+
+def test_bare_log_wgs_mismatch_keeps_the_possible_misprint_notice() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    _, atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
+    decision = _bare_log_frame_decision(
+        Decimal("-1.00"),
+        Decimal("1682.15"),
+        printed_atmospheres=(atmosphere,),
+    )
+
+    # Mutation: omit the WGS candidate from checked results and this notice assertion fails.
     assert decision.state.is_unknown
-    assert "gas_mix_fo2_band_unavailable" in decision.state.reason
-    assert "WGS-dependent" in decision.state.reason
+    assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
+    assert "possible source misprint" in decision.notices[0].reason
 
 
 def test_direct_gas_couple_without_janaf_uses_mix_band_and_notices(monkeypatch) -> None:

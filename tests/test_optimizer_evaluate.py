@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import ast
 import copy
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 import inspect
 import math
+import textwrap
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 from engines.alphamelts import AlphaMELTSProvider
 from engines.alphamelts.parser import diagnostics_to_equilibrium
@@ -22,9 +26,17 @@ import simulator.optimize.study as study_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
-from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_ALIASES,
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+)
+from simulator.campaigns import (
+    CampaignEndCapMissing,
+    CampaignManager,
+    CampaignPressureSetpointRefusal,
+    campaign_evolves_terminal_oxygen,
+)
 from simulator.battery.enums import Engine, ProprietaryEngineRefusal
-from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
@@ -32,7 +44,7 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
 )
 from simulator.condensation import KnudsenRegimeRefusal
-from simulator.config import load_config_bundle
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.core import PoisonedHourError, PoisonedHourState
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.recipe_errors import MalformedRecipeError
@@ -61,12 +73,27 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.evalspec import DEFAULT_VAPOR_PRESSURE_PROVIDER_ID, cache_key
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    ObjectiveProfileError,
+    candidate_rank_key,
+    cost_adjusted_objective_scores,
+    declared_objective_definitions,
     objective_definitions,
+    objective_importance_evidence,
+    profile_scored_at_fidelity,
+    resolved_execution_identity,
+    scoring_profile_for_executed_spec,
+    unrenormalized_study_scalar_weights,
 )
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError, load_profile
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    RecipePatch,
+    RecipeSchema,
+    c5_sampler_context,
+    conditional_context_metadata,
+)
 from simulator.optimize.results_store import (
     ResultStore,
     _deserialize_run_reference,
@@ -76,12 +103,23 @@ from simulator.optimize.results_store import (
 )
 from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
 from simulator.reduced_real_determinism import PT0NonFinitePayload
-from simulator.run_executor import RunExecutor
+from simulator.run_executor import RunExecutor, campaign_stop_record
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
-from simulator.session import SimSession, SimSessionConfig
-from simulator.state import CampaignPhase, EvaporationFlux, HourSnapshot
+from simulator.session import DecisionPolicy, SimSession, SimSessionConfig, drive_session
+from simulator.state import (
+    BatchRecord,
+    CampaignPhase,
+    EvaporationFlux,
+    HourSnapshot,
+    TERMINAL_OXYGEN_ROUTE_PHASES,
+)
 from simulator.transport_regime import TransportRegimeRefusal
 from optimizer_fixtures import StubSmokeConstraintSet
+
+# The ceramic-rump autouse wraps campaign_product_claim_keys at test time.
+# Capture the shipped function at import so the gate pin can put it back.
+# A C0 terminal-rump objective stays unclaimed only on this function.
+_SHIPPED_CAMPAIGN_PRODUCT_CLAIM_KEYS = objective_module.campaign_product_claim_keys
 
 
 def test_optimizer_trace_preserves_high_t_melt_activity_notice() -> None:
@@ -157,6 +195,14 @@ PROFILE = {
         }
     ],
 }
+
+
+def _product_claiming_profile() -> dict:
+    """C2A claims SiO2 glass and O2, so those rows stay on the score."""
+
+    profile = copy.deepcopy(PROFILE)
+    profile["run"] = {**profile["run"], "campaign": "C2A_continuous"}
+    return profile
 
 
 @dataclass
@@ -1034,6 +1080,11 @@ def _with_prototype_crmn_alpha_fallback(config):
 
 class AlphaFallbackRunExecutor(RunExecutor):
     def execute(self, config):
+        # This fixture asserts a one-window extraction report. A C0 start
+        # now drives the later steps; bound this executor to the authored
+        # hours so the report stays the window under test.
+        if getattr(config, "until_campaign_complete", False):
+            config = replace(config, until_campaign_complete=False)
         return super().execute(_with_prototype_crmn_alpha_fallback(config))
 
 
@@ -1048,6 +1099,10 @@ class ProductionMassBalanceReplayExecutor:
 
     def execute(self, config: object) -> object:
         self.calls += 1
+        # Mass-balance replay patches the first snapshot of one authored
+        # window. A C0 start would otherwise drive every later step.
+        if getattr(config, "until_campaign_complete", False):
+            config = replace(config, until_campaign_complete=False)
         execution = RunExecutor().execute(_with_prototype_crmn_alpha_fallback(config))
         snapshots = tuple(getattr(execution, "snapshots", ()))
         assert snapshots
@@ -1079,6 +1134,11 @@ class ProductionMassBalanceRealPathExecutor:
 
     def execute(self, config: object) -> object:
         self.calls += 1
+        # The breach is marked on the first snapshot of the authored window.
+        # A C0 start would otherwise drive every later step, same as the
+        # replay executor above.
+        if getattr(config, "until_campaign_complete", False):
+            config = replace(config, until_campaign_complete=False)
         config = _with_prototype_crmn_alpha_fallback(config)
         session = SimSession()
         session.start(config)
@@ -1995,6 +2055,28 @@ def _kernel_curve(
     }
 
 
+@pytest.fixture(autouse=True)
+def _claim_ceramic_rump_for_scorer_mechanics(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Terminal ceramic-rump rows have no shipped product claim.
+
+    These tests exercise the scorer. Eligibility is pinned in
+    test_optimizer_profile_smoke_labels, which does not use this patch.
+    A test that replaces campaign_product_claim_keys still wins: its
+    monkeypatch runs after this fixture.
+    """
+
+    real = objective_module.campaign_product_claim_keys
+
+    def _with_ceramic(campaign_id: object) -> frozenset[str]:
+        return frozenset(real(campaign_id)) | frozenset({"refractory_ceramic_rump"})
+
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        _with_ceramic,
+    )
+
+
 def _composition_eval_profile(
     pool: str,
     *,
@@ -2041,6 +2123,17 @@ def _composition_eval_profile(
             }
         ],
     }
+    # A composition-only vector needs a campaign that claims this pool's product.
+    # Melt pools are the glass body (C2B's CMAS_glass). Silica and captured
+    # products use C2A. Terminal ceramic rump has no shipped claim; the
+    # module autouse adds that key so these tests can reach the scorer.
+    # Copy run so the shared PROFILE stays C0.
+    campaign = (
+        "C2B"
+        if pool in {"residual_rump_at_stop", "cleaned_melt_at_stage0_exit"}
+        else "C2A_continuous"
+    )
+    profile["run"] = {**PROFILE["run"], "campaign": campaign}
     return profile
 
 
@@ -2724,11 +2817,12 @@ def test_failed_runtime_backend_prefixed_message_is_engine_bug() -> None:
 
 
 def test_completed_infeasible_run_retains_derived_objectives() -> None:
+    profile = _product_claiming_profile()
     feasible = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(_execution()),
     )
 
@@ -2750,7 +2844,7 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(mixed_stream_execution),
         constraints=PhysicsConstraintSet(
             active_gates=("delivered_stream_purity",),
@@ -2761,7 +2855,7 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(mixed_stream_execution),
         constraints=PhysicsConstraintSet(
             active_gates=("delivered_stream_purity",),
@@ -2782,6 +2876,824 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
     assert diagnostic_purity.feasibility_margins["delivered_stream_purity"].margin == (
         enforced_purity.feasibility_margins["delivered_stream_purity"].margin
     )
+
+
+# INVARIANT: a scored result's unclaimed-product notice is the notice of the
+# campaign that produced that result's objective vector (EvalSpec.campaign).
+# It is never the authored profile's notice when a fidelity overlay changes
+# the campaign. Every path that publishes a vector goes through one scorer,
+# which builds the vector and the notice from the same profile.
+_SCORED_RESULT_BRANCHES = (
+    "feasible",
+    "infeasible",
+    "out_of_domain_scored",
+)
+# Claim-distinct setpoint campaigns this stub run admits. Claims below are
+# the setpoints ``products`` keys plus ``O2`` when the hour-step route
+# credits a terminal oxygen account. The production claim helper is not read.
+_OVERLAY_CAMPAIGNS = ("C0", "C2A_continuous", "C2B")
+_GLASS_CLAIM_KEY = "SiO2_glass"
+_OXYGEN_CLAIM_KEY = "O2"
+_DECLARED_OBJECTIVE_ROWS = (
+    ("pure_silica_glass_kg", 0.4, _GLASS_CLAIM_KEY),
+    ("oxygen_kg", 0.3, _OXYGEN_CLAIM_KEY),
+    (ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC, 0.15, None),
+    ("duration_h", 0.15, None),
+)
+
+
+def _setpoint_product_keys(campaign: str) -> frozenset[str]:
+    loaded = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
+    products = loaded["campaigns"][campaign].get("products") or {}
+    keys = frozenset(str(key) for key in products)
+    if campaign_evolves_terminal_oxygen(campaign):
+        return keys | frozenset({"O2"})
+    return keys
+
+
+_C0_AUTO_APPLY_SEQUENCE = (
+    "C0",
+    "C0B",
+    "C2A_STAGED",
+    "C3_NA",
+    "C4",
+    "C2A",
+    "C6",
+)
+
+
+def _evaluated_claim_keys(evaluated: str) -> frozenset[str]:
+    """YAML products for the campaign that produced the vector.
+
+    Evaluated C0 scores the AUTO_APPLY sequence. Any other campaign stays
+    one route. This does not call ``campaign_product_claim_keys``.
+    """
+
+    if evaluated != "C0":
+        return _setpoint_product_keys(evaluated)
+    loaded = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
+    manager = CampaignManager(loaded)
+    phases = manager.auto_apply_sequence(
+        CampaignPhase.C0,
+        BatchRecord(track="pyrolysis"),
+    )
+    assert tuple(phase.name for phase in phases) == _C0_AUTO_APPLY_SEQUENCE
+    keys: set[str] = set()
+    campaigns = loaded["campaigns"]
+    for phase in phases:
+        yaml_key = CampaignManager._CONFIG_KEY_BY_PHASE.get(phase, phase.name)
+        products = (campaigns.get(yaml_key) or {}).get("products") or {}
+        keys.update(str(key) for key in products)
+        if phase in TERMINAL_OXYGEN_ROUTE_PHASES:
+            keys.add("O2")
+    return frozenset(keys)
+
+
+def _literal_scored_metrics_and_note(
+    evaluated: str,
+) -> tuple[tuple[str, ...], str | None]:
+    """Vector membership and notice text from the declared rows and the YAML.
+
+    withheld_weight_fraction = sum(withheld weights) / sum(all declared weights).
+    Retained weights stay at the declared values. Operational rows have no
+    product key and are always scored. Evaluated C0 includes later-step
+    products, so glass is scored and the withhold note is absent.
+    """
+
+    claim_keys = _evaluated_claim_keys(evaluated)
+    scored: list[str] = []
+    withheld: list[tuple[str, float]] = []
+    for metric, weight, product_key in _DECLARED_OBJECTIVE_ROWS:
+        if product_key is None or product_key in claim_keys:
+            scored.append(metric)
+            continue
+        withheld.append((metric, weight))
+    if not withheld:
+        return tuple(scored), None
+    total = math.fsum(weight for _metric, weight, _key in _DECLARED_OBJECTIVE_ROWS)
+    withheld_weight = math.fsum(weight for _metric, weight in withheld)
+    fraction = withheld_weight / total
+    parts = [
+        (
+            f"{metric} weight={format(weight, '.12g')} "
+            "reason=campaign_does_not_claim_product"
+        )
+        for metric, weight in withheld
+    ]
+    note = (
+        "campaign_does_not_claim_product: "
+        + "; ".join(parts)
+        + f"; withheld_weight_fraction={format(fraction, '.12g')}"
+    )
+    return tuple(scored), note
+
+
+def _fidelity_overlay_profile(authored: str, evaluated: str) -> dict:
+    profile = copy.deepcopy(PROFILE)
+    profile["run"] = {**profile["run"], "campaign": authored}
+    profile["fidelities"] = {
+        "fast": {
+            "backend_name": "internal-analytical",
+            "hours": 1,
+            "campaign": evaluated,
+        }
+    }
+    return profile
+
+
+def _scored_branch_execution(branch: str) -> SimpleNamespace:
+    if branch == "feasible":
+        return _execution()
+    if branch == "infeasible":
+        return _execution(trace=_trace(mixed_stream=True))
+    if branch == "out_of_domain_scored":
+        return _execution(
+            backend_status="out_of_domain",
+            backend_diagnostics=_crash_diagnostics(),
+            freeze_curve=_kernel_curve(),
+        )
+    raise AssertionError(branch)
+
+
+@pytest.mark.parametrize("branch", _SCORED_RESULT_BRANCHES)
+@pytest.mark.parametrize("authored", _OVERLAY_CAMPAIGNS)
+@pytest.mark.parametrize("evaluated", _OVERLAY_CAMPAIGNS)
+def test_scored_withhold_notice_follows_evaluated_campaign(
+    branch: str,
+    authored: str,
+    evaluated: str,
+) -> None:
+    """Every scored evaluate path, every authored/fidelity campaign pair.
+
+    The three branches are the only evaluate results that publish an
+    objective vector: the feasible return, the completed physics-gate
+    failure, and the earned out-of-domain score.
+    """
+
+    profile = _fidelity_overlay_profile(authored, evaluated)
+    if branch == "infeasible":
+        # b2f520812: listing delivered_stream_purity reports a provisional
+        # diagnostic. This branch is the completed hard-gate failure, so the
+        # profile opts into the 95% threshold. A mixed stream then fails.
+        profile["constraints"] = {
+            **profile["constraints"],
+            "enforce_delivered_stream_purity": True,
+        }
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(_scored_branch_execution(branch)),
+    )
+
+    assert profile["run"]["campaign"] == authored
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == evaluated
+    assert result.objectives is not None
+    if branch == "infeasible":
+        assert result.feasible is False
+        assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+        assert result.failing_gates == ("delivered_stream_purity",)
+    else:
+        assert result.feasible is True
+        assert result.failure_category is None
+
+    expected_metrics, expected_note = _literal_scored_metrics_and_note(evaluated)
+    assert tuple(result.objectives.as_mapping()) == expected_metrics
+    withhold_notes = [
+        note
+        for note in result.notes
+        if note.startswith("campaign_does_not_claim_product:")
+    ]
+    if expected_note is None:
+        assert withhold_notes == []
+    else:
+        assert withhold_notes == [expected_note]
+    for metric, _weight, product_key in _DECLARED_OBJECTIVE_ROWS:
+        if product_key is None or product_key in _evaluated_claim_keys(evaluated):
+            continue
+        assert metric not in result.objectives.as_mapping()
+
+
+def test_withhold_notice_is_built_only_inside_the_scoring_chokepoint() -> None:
+    """A new scoring call cannot attach a notice from a different profile.
+
+    ``compute_objectives`` and the withhold-note helper are called together
+    in ``_score_executed_campaign`` and nowhere else in the evaluator.
+    """
+
+    source = inspect.getsource(evaluate_module)
+    assert source.count("compute_objectives(") == 1
+    assert source.count("unclaimed_product_withheld_objective_note(") == 1
+    assert "_notes_with_unclaimed_product_withhold" not in source
+    score_source = inspect.getsource(evaluate_module._score_executed_campaign)
+    assert "compute_objectives(" in score_source
+    assert "unclaimed_product_withheld_objective_note(" in score_source
+    # The feasible return, the infeasible publisher, and the earned
+    # out-of-domain return. The definition itself is the fourth hit.
+    assert source.count("_notes_for_executed_campaign_score(") == 4
+
+
+# INVARIANT: an objective the executed campaign does not claim never imposes
+# an evaluation gate. These pairs are the claim-distinct campaigns for the
+# pools those gates read. C2B's products include CMAS_glass, which authorizes
+# residual_rump_at_stop and cleaned_melt_at_stage0_exit. No shipped campaign
+# claims refractory_ceramic_rump, so a terminal-rump row never gates. The
+# expects_gate flag is that table, not a call back into composition_target_specs.
+_GLASS_GATE_PAIRS = (
+    ("C0", "C0", False),
+    ("C2B", "C2B", True),
+    ("C2B", "C0", False),
+    ("C0", "C2B", True),
+)
+_CERAMIC_GATE_PAIRS = (
+    ("C0", "C0", False),
+    ("C2B", "C0", False),
+    ("C0", "C2B", False),
+)
+_EXECUTED_GATE_KINDS = (
+    ("rump_terminal", _CERAMIC_GATE_PAIRS),
+    ("stage0_exit", _GLASS_GATE_PAIRS),
+    ("coating", _GLASS_GATE_PAIRS),
+    ("composition_target_order", _GLASS_GATE_PAIRS),
+    ("extraction_thresholds", _GLASS_GATE_PAIRS),
+)
+_GATE_OBJECTIVE_WEIGHT = 0.5
+_GATE_ENERGY_WEIGHT = 0.3
+_GATE_DURATION_WEIGHT = 0.2
+_ORDER_GATE_DETAIL = (
+    "order: Mg extract with Na/K retain requires explicit C3 re-dose route"
+)
+
+
+def _executed_gate_cases() -> list[tuple[str, str, str, bool]]:
+    cases: list[tuple[str, str, str, bool]] = []
+    for kind, pairs in _EXECUTED_GATE_KINDS:
+        for authored, evaluated, expects_gate in pairs:
+            cases.append((kind, authored, evaluated, expects_gate))
+    return cases
+
+
+def _executed_gate_case_id(
+    kind: str,
+    authored: str,
+    evaluated: str,
+    expects_gate: bool,
+) -> str:
+    flag = "gates" if expects_gate else "withheld"
+    return f"{kind}-{authored}-executed-{evaluated}-{flag}"
+
+
+@pytest.fixture
+def shipped_product_claims(
+    monkeypatch: pytest.MonkeyPatch,
+    _claim_ceramic_rump_for_scorer_mechanics: None,
+) -> None:
+    """Score with the shipped claim table.
+
+    The module autouse adds refractory_ceramic_rump so the scorer tests can
+    reach a terminal-rump row. This pin is the campaign that does not claim
+    that product. Depending on the autouse forces its patch to land first;
+    the setattr here is the one the test runs under.
+    """
+
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        _SHIPPED_CAMPAIGN_PRODUCT_CLAIM_KEYS,
+    )
+
+
+def _gate_target(kind: str) -> dict:
+    """One composition objective built to impose ``kind`` when it is claimed."""
+
+    if kind == "rump_terminal":
+        pool = "terminal_rump_earned"
+        target_id = "gate-rump"
+        species_vector = {"Ca": "retain"}
+        extraction = None
+        require_coating_gate = None
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    elif kind == "stage0_exit":
+        pool = "cleaned_melt_at_stage0_exit"
+        target_id = "gate-stage0"
+        species_vector = {"Ca": "retain"}
+        extraction = None
+        require_coating_gate = None
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    elif kind == "coating":
+        pool = "residual_rump_at_stop"
+        target_id = "gate-coating"
+        species_vector = {"Ca": "retain"}
+        extraction = None
+        require_coating_gate = None
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    elif kind == "composition_target_order":
+        pool = "residual_rump_at_stop"
+        target_id = "order-gate"
+        species_vector = {"Mg": "extract", "Na": "retain"}
+        extraction = {
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Mg": 0.5},
+        }
+        require_coating_gate = False
+        # Maturity names C2B, not C3, and the id has no "c3", so an eligible
+        # row refuses on the order gate.
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    elif kind == "extraction_thresholds":
+        pool = "residual_rump_at_stop"
+        target_id = "gate-extraction"
+        species_vector = {"Fe": "extract"}
+        extraction = {
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Fe": 0.5},
+        }
+        require_coating_gate = None
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    else:
+        raise AssertionError(kind)
+    target = {
+        "pool": pool,
+        "species_vector": species_vector,
+        "composition_window": {
+            "pool": pool,
+            "basis": "oxide_wt_pct",
+            "mode": "hard_window",
+            "oxides": {"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        },
+        "maturity": maturity,
+        "score_weights": {"extraction": 0.0, "composition": 1.0},
+    }
+    if extraction is not None:
+        target["extraction"] = extraction
+    if require_coating_gate is not None:
+        target["require_coating_gate"] = require_coating_gate
+    return {
+        "type": "composition_target",
+        "id": target_id,
+        "metric": f"composition_target:{target_id}",
+        "sense": "maximize",
+        "units": "score_0_1",
+        "weight": _GATE_OBJECTIVE_WEIGHT,
+        "rationale": f"test {kind} gate",
+        "target": target,
+    }
+
+
+def _gate_eval_profile(kind: str, authored: str, evaluated: str) -> dict:
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = f"unclaimed-gate-{kind}"
+    profile["constraints"] = {"gates": ["furnace_temperature"]}
+    profile["run"] = {**profile["run"], "campaign": authored}
+    profile["fidelities"] = {
+        "fast": {
+            "backend_name": "internal-analytical",
+            "hours": 1,
+            "campaign": evaluated,
+        }
+    }
+    profile["objectives"] = [
+        _gate_target(kind),
+        {
+            "metric": ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+            "sense": "min",
+            "units": "kWh",
+            "weight": _GATE_ENERGY_WEIGHT,
+            "rationale": "test energy objective evidence",
+        },
+        {
+            "metric": "duration_h",
+            "sense": "min",
+            "units": "h",
+            "weight": _GATE_DURATION_WEIGHT,
+            "rationale": "test duration objective evidence",
+        },
+    ]
+    return profile
+
+
+def _withhold_note_for(target_id: str) -> str:
+    # Weights 0.5, 0.3, 0.2. One withheld row of 0.5 over a declared total
+    # of 1, so the fraction formats as 0.5. Retained weights are not rescaled.
+    metric = f"composition_target:{target_id}"
+    return (
+        "campaign_does_not_claim_product: "
+        f"{metric} weight=0.5 reason=campaign_does_not_claim_product; "
+        "withheld_weight_fraction=0.5"
+    )
+
+
+@pytest.mark.parametrize(
+    ("kind", "authored", "evaluated", "expects_gate"),
+    _executed_gate_cases(),
+    ids=[
+        _executed_gate_case_id(*case)
+        for case in _executed_gate_cases()
+    ],
+)
+def test_unclaimed_composition_objective_does_not_gate_the_run(
+    kind: str,
+    authored: str,
+    evaluated: str,
+    expects_gate: bool,
+    shipped_product_claims: None,
+) -> None:
+    """Every objective-derived gate, on the campaign that does and does not claim it.
+
+    The reviewer case is in this matrix: authored C0, executed C0, a
+    terminal_rump_earned objective beside energy and duration. That run
+    scores the retained objectives and names the withheld row. It does not
+    return rump_terminal_completion_unknown. The ceramic-claim autouse is
+    not in force.
+    """
+
+    profile = _gate_eval_profile(kind, authored, evaluated)
+    target_id = str(profile["objectives"][0]["id"])
+    if kind == "extraction_thresholds":
+        # A missing extraction trace fail-closes whether or not the threshold
+        # is installed. The composer is the path that installs it.
+        constraints = _composition_target_constraints(
+            profile,
+            PhysicsConstraintSet(
+                active_gates=("extraction_completeness", "furnace_temperature"),
+                target_species=("Fe",),
+            ),
+            campaign=evaluated,
+            track="pyrolysis",
+            c5_enabled=False,
+        )
+        assert profile["run"]["campaign"] == authored
+        assert constraints is not None
+        installed = constraints.extraction_min_fraction_by_species
+        if expects_gate:
+            assert set(installed) == {"Fe"}
+            assert installed["Fe"].value == pytest.approx(0.5)
+            assert "completeness_min.Fe" in installed["Fe"].source_ref
+        else:
+            assert installed == {}
+        return
+
+    executor = FakeExecutor(_execution())
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=executor,
+    )
+
+    assert profile["run"]["campaign"] == authored
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == evaluated
+    expect_stop = kind == "stage0_exit" and expects_gate
+    assert result.eval_spec.stop_at_stage0_exit is expect_stop
+    assert executor.config.stop_at_stage0_exit is expect_stop
+    if expects_gate:
+        assert result.eval_spec.target_spec_id == target_id
+    else:
+        assert result.eval_spec.target_spec_id == ""
+    joined_notes = " ".join(result.notes)
+    assert "rump_terminal_completion_unknown" not in joined_notes
+    assert "rump_terminal_unproven" not in joined_notes
+
+    if kind == "composition_target_order" and expects_gate:
+        assert result.feasible is False
+        assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+        assert result.objectives is None
+        assert result.failing_gates == ("composition_target_order",)
+        assert _ORDER_GATE_DETAIL in result.notes
+        assert not any(
+            note.startswith("campaign_does_not_claim_product:")
+            for note in result.notes
+        )
+        return
+
+    assert result.feasible is True
+    assert result.failure_category is None
+    assert result.objectives is not None
+    mapping = result.objectives.as_mapping()
+    assert mapping[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC] == pytest.approx(44.0)
+    assert mapping["duration_h"] == pytest.approx(1.0)
+    composition_metric = f"composition_target:{target_id}"
+    if expects_gate:
+        assert composition_metric in mapping
+        assert result.notes == ()
+    else:
+        assert composition_metric not in mapping
+        assert 0.0 not in mapping.values()
+        assert result.notes == (_withhold_note_for(target_id),)
+    if kind != "composition_target_order":
+        assert ("coating" in result.feasibility_margins) is (
+            expects_gate and kind in {"coating", "stage0_exit"}
+        )
+
+
+# INVARIANT: one fidelity has one executed campaign. Analytical alias
+# spellings, on the request and on the profile key, cannot install gates
+# from a campaign the run does not execute. The matrix is every alias token
+# crossed with every other, plus case and surrounding whitespace crossed
+# with the canonical token in both directions. C2B claims the residual-melt
+# glass, so its overlay keeps coating and the Fe extraction threshold. C0
+# does not, so those gates stay off and the row is withheld.
+def _analytical_fidelity_tokens() -> tuple[str, ...]:
+    return (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        *sorted(ANALYTICAL_BACKEND_ALIASES),
+    )
+
+
+def _alias_gate_cases() -> list[tuple[str, str, str, str]]:
+    tokens = _analytical_fidelity_tokens()
+    canonical = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    pairs = (("C2B", "C0"), ("C0", "C2B"))
+    cases: list[tuple[str, str, str, str]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+
+    def add(request: str, key: str, authored: str, evaluated: str) -> None:
+        row = (request, key, authored, evaluated)
+        if row in seen:
+            return
+        seen.add(row)
+        cases.append(row)
+
+    for request in tokens:
+        for key in tokens:
+            for authored, evaluated in pairs:
+                add(request, key, authored, evaluated)
+    for token in tokens:
+        for surface in (token.upper(), f" {token} "):
+            if surface == token:
+                continue
+            for authored, evaluated in pairs:
+                add(surface, canonical, authored, evaluated)
+                add(canonical, surface, authored, evaluated)
+    return cases
+
+
+def _alias_gate_case_id(
+    request: str,
+    key: str,
+    authored: str,
+    evaluated: str,
+) -> str:
+    def show(value: str) -> str:
+        if value != value.strip():
+            return "pad-" + value.strip()
+        return value
+
+    return f"req-{show(request)}__key-{show(key)}__{authored}-executed-{evaluated}"
+
+
+def _alias_gate_trace() -> SimpleNamespace:
+    """Coating rejects when installed. Fe extraction passes either threshold.
+
+    The gate scores the yield-disposition melt boundary (b2f520812), not the
+    product ledger. 50 mol-atoms of Fe in product_condensed against 0.01
+    retained leaves the melt at 50/50.01, above the code default 0.95 and
+    above the objective threshold 0.5. A trace with no disposition rows is
+    unavailable and fails closed. The ledger numbers stay as the captured
+    diagnostic. The wall report is the unavailable empty deposit the coating
+    gate refuses.
+    """
+
+    trace = _trace()
+    trace.product_ledger_kg = {"SiO": 95.0, "Fe": 50.0}
+    trace.terminal_rump_by_species_kg = {"CaO": 2.0, "FeO": 0.01}
+    trace.yield_disposition_fraction_table_rows = (
+        {
+            "element": "Fe",
+            "destination_mol_atoms": {
+                "product_condensed": 50.0,
+                "melt_retained": 0.01,
+            },
+        },
+    )
+    delattr(trace, "wall_deposit_by_segment_species_delta")
+    delattr(trace, "wall_deposit_sticking_authority")
+    trace.wall_deposit_by_segment_species_kg = {}
+    return trace
+
+
+def _alias_gate_profile(profile_key: str, authored: str, evaluated: str) -> dict:
+    profile = _gate_eval_profile("extraction_thresholds", authored, evaluated)
+    profile["profile_id"] = "alias-gate"
+    profile["constraints"] = {
+        "gates": ["furnace_temperature", "extraction_completeness"],
+        "target_species": ["Fe"],
+    }
+    profile["fidelities"] = {
+        profile_key: {
+            "backend_name": "internal-analytical",
+            "hours": 1,
+            "campaign": evaluated,
+        }
+    }
+    return profile
+
+
+@pytest.mark.parametrize(
+    ("request_fidelity", "profile_key", "authored", "evaluated"),
+    _alias_gate_cases(),
+    ids=[_alias_gate_case_id(*case) for case in _alias_gate_cases()],
+)
+def test_fidelity_alias_gates_follow_the_executed_campaign(
+    request_fidelity: str,
+    profile_key: str,
+    authored: str,
+    evaluated: str,
+    shipped_product_claims: None,
+) -> None:
+    """Both alias directions, every analytical spelling.
+
+    Authored C2B, overlay C0, fidelity ``stub`` against a profile key
+    ``internal-analytical`` is the reviewer case, and the swap of those two
+    spellings is the other direction. A residual-melt target sits beside
+    energy and duration. C0 withholds it: no coating gate, the Fe threshold
+    stays the code default 0.95, and the run scores. C2B keeps the target:
+    coating rejects the empty wall report, and the Fe threshold is 0.5.
+    """
+
+    expects_gates = evaluated == "C2B"
+    profile = _alias_gate_profile(profile_key, authored, evaluated)
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        request_fidelity,
+        profile=profile,
+        executor=FakeExecutor(_execution(trace=_alias_gate_trace())),
+    )
+
+    assert profile["run"]["campaign"] == authored
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == evaluated
+    assert result.eval_spec.fidelity == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    assert ("coating" in result.feasibility_margins) is expects_gates
+    extraction = result.feasibility_margins["extraction_completeness"]
+    if expects_gates:
+        assert result.feasible is False
+        assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+        assert result.failing_gates == ("coating",)
+        assert extraction.threshold.value == pytest.approx(0.5)
+        assert extraction.threshold.source == "profile"
+        assert extraction.threshold.source_ref.endswith(
+            "target.extraction.completeness_min.Fe"
+        )
+        assert result.eval_spec.target_spec_id == "gate-extraction"
+        assert not any(
+            note.startswith("campaign_does_not_claim_product:")
+            for note in result.notes
+        )
+        return
+
+    assert result.feasible is True
+    assert result.failure_category is None
+    assert result.failing_gates == ()
+    assert extraction.threshold.value == pytest.approx(0.95)
+    assert extraction.threshold.source == "code_default"
+    assert extraction.threshold.id == "extraction_completeness_min"
+    assert result.eval_spec.target_spec_id == ""
+    assert result.objectives is not None
+    mapping = result.objectives.as_mapping()
+    assert "composition_target:gate-extraction" not in mapping
+    assert mapping[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC] == pytest.approx(44.0)
+    assert mapping["duration_h"] == pytest.approx(1.0)
+    assert 0.0 not in mapping.values()
+    assert result.notes == (_withhold_note_for("gate-extraction"),)
+
+
+@pytest.mark.parametrize("request_fidelity", ("fast", "high"))
+def test_non_analytical_fidelity_does_not_inherit_an_analytical_overlay(
+    request_fidelity: str,
+    shipped_product_claims: None,
+) -> None:
+    """``fast`` and ``high`` are not aliases of ``internal-analytical``.
+
+    The analytical overlay selects C0. ``fast`` has its own C2B block.
+    ``high`` has none, so the authored C2B run stands. Neither withholds
+    the residual-melt target.
+    """
+
+    profile = _alias_gate_profile("internal-analytical", "C2B", "C0")
+    profile["fidelities"]["fast"] = {
+        "backend_name": "internal-analytical",
+        "hours": 1,
+        "campaign": "C2B",
+    }
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        request_fidelity,
+        profile=profile,
+        executor=FakeExecutor(_execution(trace=_alias_gate_trace())),
+    )
+
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == "C2B"
+    assert result.eval_spec.fidelity == request_fidelity
+    assert result.feasible is False
+    assert result.failing_gates == ("coating",)
+    extraction = result.feasibility_margins["extraction_completeness"]
+    assert extraction.threshold.value == pytest.approx(0.5)
+
+
+@pytest.mark.parametrize("request_fidelity", ("stub", "internal-analytical"))
+def test_duplicate_analytical_fidelity_keys_refuse_before_the_run(
+    request_fidelity: str,
+) -> None:
+    """Two keys that fold to one fidelity are not a silent choice of campaign."""
+
+    profile = _alias_gate_profile("internal-analytical", "C2B", "C0")
+    profile["fidelities"]["stub"] = {
+        "backend_name": "internal-analytical",
+        "hours": 1,
+        "campaign": "C2B",
+    }
+    executor = FakeExecutor(_execution(trace=_alias_gate_trace()))
+
+    with pytest.raises(
+        ProfileValidationError,
+        match="duplicate fidelity after alias normalization 'internal-analytical'",
+    ):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            request_fidelity,
+            profile=profile,
+            executor=executor,
+        )
+
+    assert executor.calls == 0
+
+
+@pytest.mark.parametrize(
+    ("request_fidelity", "profile_key"),
+    (
+        ("stub", "internal-analytical"),
+        ("internal-analytical", "stub"),
+    ),
+)
+def test_invalid_alias_overlay_mass_is_refused(
+    request_fidelity: str,
+    profile_key: str,
+) -> None:
+    """A zero mass on the overlay is the mass that refuses, not the authored mass."""
+
+    profile = copy.deepcopy(PROFILE)
+    profile["run"] = {**profile["run"], "mass_kg": 1000.0}
+    profile["fidelities"] = {
+        profile_key: {
+            "backend_name": "internal-analytical",
+            "hours": 1,
+            "mass_kg": 0.0,
+        }
+    }
+    executor = FakeExecutor(_execution())
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        request_fidelity,
+        profile=profile,
+        executor=executor,
+    )
+
+    assert executor.calls == 0
+    assert result.eval_spec is None
+    assert result.failure_category is FailureCategory.ZERO_INPUT_BASIS_BREACH
+    assert ZERO_INPUT_BASIS_BREACH in result.notes[0]
+
+
+def test_unearned_out_of_domain_does_not_become_an_unclaimed_rump_gate(
+    shipped_product_claims: None,
+) -> None:
+    """An out-of-domain C0 run stays out of domain.
+
+    The unevaluated terminal-rump row used to replace that verdict with
+    rump_terminal_unproven. The campaign does not claim the ceramic, so the
+    row imposes no gate. This path does not publish a vector.
+    """
+
+    profile = _gate_eval_profile("rump_terminal", "C0", "C0")
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(_execution(backend_status="out_of_domain")),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.failing_gates == ("backend_domain",)
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == "C0"
+    assert result.eval_spec.target_spec_id == ""
+    joined_notes = " ".join(result.notes)
+    assert "rump_terminal_completion_unknown" not in joined_notes
+    assert "rump_terminal_unproven" not in joined_notes
 
 
 def _authoritative_sio_carrier() -> dict[str, object]:
@@ -2849,11 +3761,12 @@ def _switched_silica_snapshots(
 
 
 def test_silica_objective_separates_route_from_authority_and_refuses_unavailable() -> None:
+    profile = _product_claiming_profile()
     unqualified = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(_execution()),
     )
     assert unqualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
@@ -2868,7 +3781,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(qualified_execution),
     )
     assert qualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2885,7 +3798,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(flagged_execution),
     )
     assert flagged.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2908,7 +3821,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(refused_execution),
     )
     assert refused.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2967,7 +3880,7 @@ def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:
 
 
 def test_objective_definitions_keep_profile_order_as_ordinal() -> None:
-    definitions = objective_definitions(PROFILE)
+    definitions = objective_definitions(_product_claiming_profile())
 
     assert [(definition.metric, definition.sense, definition.ordinal) for definition in definitions] == [
         ("pure_silica_glass_kg", "maximize", 0),
@@ -5149,7 +6062,7 @@ def test_out_of_domain_earned_rump_with_wall_deposit_is_excluded_by_coating_gate
         "completeness_min": {"Si": 1.0e-12},
     }
     target["score_weights"] = {"extraction": 0.5, "composition": 0.5}
-    profile["run"] = {**PROFILE["run"], "backend_name": "alphamelts"}
+    profile["run"] = {**profile["run"], "backend_name": "alphamelts"}
     profile["fidelities"] = {"high": {"backend_name": "alphamelts", "hours": 1}}
     execution = _execution(
         trace=trace,
@@ -6487,46 +7400,1352 @@ def test_the_run_execution_authority_reader_also_refuses_a_string():
     assert f(SimpleNamespace(backend_authoritative=False)) is False
 
 
-def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
+def test_plain_c0_evaluation_drives_later_steps_and_keeps_authored_hours() -> None:
+    """A C0 pyrolysis start follows the controller through later steps.
+
+    Authored hours stay on EvalSpec when nothing rewrites them. A C0
+    temperature-range seed may rewrite the first step's hour count and
+    still continues: the bakeout is not the whole evaluation. A non-C0
+    campaign stays on its own hour budget.
+    """
+
+    plain = copy.deepcopy(PROFILE)
+    # A seed is required. This one does not set C0 temp_range_C, so the
+    # run is not a thermal window and the authored hour count stays.
+    plain["seed_recipes"] = [
+        {
+            "id": "plain-c0-seed",
+            "source_campaign": "C0",
+            "patch": {
+                # Nominal ramp. Not temp_range_C, so this is not a thermal
+                # window and the authored hour count stays.
+                "campaigns": {"C0": {"dT_dt_C_per_hr": 50}},
+            },
+        }
+    ]
+    plain_executor = FakeExecutor(_execution())
+    plain_result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=plain,
+        executor=plain_executor,
+    )
+    assert plain_result.eval_spec is not None
+    assert plain_result.eval_spec.campaign == "C0"
+    assert plain_result.eval_spec.hours == 1
+    assert plain_executor.config.until_campaign_complete is True
+    assert plain_executor.config.hours == 1
+
+    thermal_executor = FakeExecutor(_execution())
+    thermal_result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=thermal_executor,
+    )
+    assert thermal_result.eval_spec is not None
+    assert thermal_result.eval_spec.campaign == "C0"
+    assert thermal_executor.config.until_campaign_complete is True
+    assert thermal_executor.config.hours == thermal_result.eval_spec.hours
+
+    c2a_executor = FakeExecutor(_execution())
+    c2a_result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_product_claiming_profile(),
+        executor=c2a_executor,
+    )
+    assert c2a_result.eval_spec is not None
+    assert c2a_result.eval_spec.campaign == "C2A_continuous"
+    assert c2a_result.eval_spec.hours == 1
+    assert c2a_executor.config.until_campaign_complete is False
+
+
+def _c6_refusal_reasons_the_engine_can_record() -> tuple[str, ...]:
+    """Every reason a stored C6 refusal diagnostic can carry.
+
+    Sources are the campaign constants, the C6 thermite dispatch methods,
+    and feedstock static windows. A new reason in those sources joins this
+    tuple without a hand-written case.
+    """
+
+    from engines.builtin.metallothermic_step import BuiltinMetallothermicStepProvider
+    import simulator.campaigns as campaigns
+
+    reasons: set[str] = set()
+    for name, value in vars(campaigns).items():
+        if (
+            name.startswith("C6_")
+            and name.endswith("_REFUSAL_REASON")
+            and isinstance(value, str)
+            and value
+        ):
+            reasons.add(value)
+    crossover = BuiltinMetallothermicStepProvider.C6_ABOVE_CROSSOVER_REFUSAL
+    if isinstance(crossover, str) and crossover:
+        reasons.add(crossover)
+    for method_name in (
+        "_dispatch_c6_mg_primary",
+        "_dispatch_c6_back_reduction",
+    ):
+        source = textwrap.dedent(
+            inspect.getsource(
+                getattr(BuiltinMetallothermicStepProvider, method_name)
+            )
+        )
+        tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Dict):
+                continue
+            for key, value in zip(node.keys, node.values, strict=True):
+                if (
+                    isinstance(key, ast.Constant)
+                    and key.value == "reason_refused"
+                    and isinstance(value, ast.Constant)
+                    and isinstance(value.value, str)
+                    and value.value
+                ):
+                    reasons.add(value.value)
+    windows = (
+        load_config_bundle(DEFAULT_DATA_DIR)
+        .setpoints["campaigns"]["C6"]
+        .get("static_window_by_feedstock", {})
+    )
+    for window in windows.values():
+        if not isinstance(window, Mapping):
+            continue
+        if str(window.get("status") or "") != "refused":
+            continue
+        reason = window.get("reason_refused")
+        if isinstance(reason, str) and reason:
+            reasons.add(reason)
+    return tuple(sorted(reasons))
+
+
+def _c6_priced_unavailable_cases() -> tuple[tuple[str, str], ...]:
+    reasons = _c6_refusal_reasons_the_engine_can_record()
+    cases = [
+        (reason, carrier)
+        for reason in reasons
+        for carrier in ("execution", "simulator")
+    ]
+    # A reason that is not in the engine list still refuses. The chokepoint
+    # is not a whitelist.
+    cases.append(("c6_unlisted_campaign_refusal", "execution"))
+    cases.append(("c6_unlisted_campaign_refusal", "simulator"))
+    cases.append(("", "execution"))
+    return tuple(cases)
+
+
+def _c6_ok_execution(reason: str, carrier: str):
+    """Batch status stays ok. That is the executor's C6 behaviour."""
+
+    diagnostic = {
+        "status": "refused",
+        "reaction_family": "c6_mg_thermite",
+        "campaign": "C6",
+        "diagnostic": {"reason_refused": reason} if reason else {},
+    }
+    if carrier == "execution":
+        return _execution(status="ok", refusal_diagnostic=diagnostic)
+    execution = _execution(status="ok", refusal_diagnostic={})
+    execution.simulator._last_c6_refusal_diagnostic = diagnostic
+    return execution
+
+
+def test_c6_refusal_reason_discovery_includes_every_recorded_class() -> None:
+    """The generative grid is the engine's reasons, not one counterexample."""
+
+    reasons = set(_c6_refusal_reasons_the_engine_can_record())
+    assert C6_WINDOW_REFUSAL in reasons
+    assert "c6_hold_target_not_acquired" in reasons
+    assert "c6_hold_target_nonfinite" in reasons
+    assert "no_liquid_phase" in reasons
+    assert "c6_mg_thermite_above_crossover_requires_local_support" in reasons
+    assert "c6_unlisted_campaign_refusal" not in reasons
+
+
+@pytest.mark.parametrize(
+    ("reason", "carrier"),
+    _c6_priced_unavailable_cases(),
+    ids=lambda value: value or "missing-reason",
+)
+def test_every_c6_campaign_refusal_is_priced_unavailable(
+    reason: str,
+    carrier: str,
+) -> None:
+    """A C6 refusal with batch status ok is never a numeric score.
+
+    The executor preserves the diagnostic and leaves status ok. Pricing
+    uses the recorded reason, including CI's empty static window.
+    """
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_c6_ok_execution(reason, carrier)),
+    )
+    expected = reason or "c6_campaign_refused"
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.objectives is None
+    assert result.run_reference is not None
+    assert result.run_reference.reason == expected
+    assert f"priced_unavailable:{expected}" in result.run_reference.error_message
+    assert f"priced_unavailable:{expected}" in result.notes
+
+
+def test_ok_execution_without_c6_refusal_keeps_a_numeric_score() -> None:
+    """The refusal gate does not unscored an ordinary ok batch."""
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_execution(status="ok")),
+    )
+
+    assert result.objectives is not None
+    assert result.failure_category is not FailureCategory.PHYSICS_REFUSED
+
+
+def test_c4_refusal_diagnostic_is_not_priced_as_a_c6_refusal() -> None:
+    """C4 already stops the batch. This gate is the C6 status-ok hole."""
+
+    execution = _execution(
+        status="ok",
+        refusal_diagnostic={
+            "status": "refused",
+            "campaign": "C4",
+            "reaction_family": "c4_mg_selective_pyrolysis",
+            "diagnostic": {
+                "reason_refused": "c4_target_window_not_acquired",
+            },
+        },
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(execution),
+    )
+
+    assert result.objectives is not None
+    assert result.failure_category is not FailureCategory.PHYSICS_REFUSED
+    assert "priced_unavailable:" not in " ".join(result.notes)
+
+
+def _score_producing_functions(tree: ast.AST) -> set[str]:
+    """Functions that can return a numeric objective vector."""
+
+    producers: set[str] = set()
+    for node in getattr(tree, "body", ()):
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        for call in ast.walk(node):
+            if not isinstance(call, ast.Call):
+                continue
+            func = call.func
+            if not isinstance(func, ast.Name) or func.id != "ScoredResult":
+                continue
+            for keyword in call.keywords:
+                if (
+                    keyword.arg == "feasible"
+                    and isinstance(keyword.value, ast.Constant)
+                    and keyword.value.value is True
+                ):
+                    producers.add(node.name)
+                if keyword.arg == "objectives" and not (
+                    isinstance(keyword.value, ast.Constant)
+                    and keyword.value.value is None
+                ):
+                    producers.add(node.name)
+    return producers
+
+
+def _function_callees(node: ast.AST) -> set[str]:
+    names: set[str] = set()
+    for call in ast.walk(node):
+        if isinstance(call, ast.Call) and isinstance(call.func, ast.Name):
+            names.add(call.func.id)
+    return names
+
+
+def _reaches_score_producer(
+    name: str,
+    producers: set[str],
+    graph: dict[str, set[str]],
+    seen: set[str],
+) -> bool:
+    if name in seen:
+        return False
+    seen.add(name)
+    if name in producers:
+        return True
+    return any(
+        _reaches_score_producer(callee, producers, graph, seen)
+        for callee in graph.get(name, ())
+    )
+
+
+def test_c6_refusal_chokepoint_dominates_every_score_producer() -> None:
+    """A stored C6 refusal is priced before any numeric score.
+
+    The grid is every function that builds a feasible vector or attaches
+    objectives. The single ``_stored_c6_campaign_refusal_result`` call in
+    ``evaluate`` dominates each of them. Environment-failure aborts stay
+    ahead of that call.
+    """
+
+    tree = ast.parse(inspect.getsource(evaluate_module))
+    functions = {
+        node.name: node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+    }
+    producers = _score_producing_functions(tree)
+    assert {"evaluate", "_out_of_domain_result", "_infeasible_result"} <= producers
+    graph = {name: _function_callees(node) for name, node in functions.items()}
+    evaluate_fn = functions["evaluate"]
+    post_execution: list[ast.stmt] = []
+    saw_execute = False
+    for statement in evaluate_fn.body:
+        if saw_execute:
+            post_execution.append(statement)
+            continue
+        if _function_callees(statement) & {"_execute_run"}:
+            saw_execute = True
+    assert saw_execute
+
+    gate_at = None
+    for index, statement in enumerate(post_execution):
+        if "_stored_c6_campaign_refusal_result" in _function_callees(statement):
+            gate_at = index
+            break
+    assert gate_at is not None
+    gate_calls = [
+        node
+        for node in ast.walk(evaluate_fn)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_stored_c6_campaign_refusal_result"
+    ]
+    assert len(gate_calls) == 1
+
+    before = post_execution[:gate_at]
+    assert any(
+        "_run_execution_has_environment_failure_disposition" in _function_callees(statement)
+        for statement in before
+    )
+    reached = sorted(
+        callee
+        for statement in before
+        for callee in _function_callees(statement)
+        if _reaches_score_producer(callee, producers, graph, set())
+    )
+    assert reached == []
+
+    after_callees = set().union(
+        *(_function_callees(statement) for statement in post_execution[gate_at + 1 :])
+    )
+    assert "_out_of_domain_result" in after_callees
+    assert "_infeasible_result" in after_callees
+    gate_line = gate_calls[0].lineno
+    scored_returns = [
+        call
+        for call in ast.walk(evaluate_fn)
+        if isinstance(call, ast.Call)
+        and isinstance(call.func, ast.Name)
+        and call.func.id == "ScoredResult"
+        and any(
+            keyword.arg == "feasible"
+            and isinstance(keyword.value, ast.Constant)
+            and keyword.value.value is True
+            for keyword in call.keywords
+        )
+    ]
+    assert scored_returns
+    assert all(call.lineno > gate_line for call in scored_returns)
+
+
+def _attach_stored_c6(execution, reason: str = "c6_hold_target_not_acquired"):
+    execution.refusal_diagnostic = {
+        "status": "refused",
+        "reaction_family": "c6_mg_thermite",
+        "campaign": "C6",
+        "diagnostic": {"reason_refused": reason},
+    }
+    return execution
+
+
+def _feasible_score_envelope():
+    return PROFILE, _execution(), "fast", {}
+
+
+def _ood_status_earned_rump_envelope():
+    execution = _execution(
+        backend_status="out_of_domain",
+        backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+        freeze_curve=_kernel_curve(),
+    )
+    profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+    return profile, execution, "high", {}
+
+
+def _ood_trace_earned_rump_envelope():
+    trace = _trace()
+    trace.backend_status = "out_of_domain"
+    trace.backend_diagnostics = _crash_diagnostics(temperature_C=1100.0)
+    execution = _execution(trace=trace, freeze_curve=_kernel_curve())
+    profile = _composition_eval_profile(
+        "terminal_rump_earned",
+        target_id="pc-ceramic-test",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+    )
+    return profile, execution, "fast", {}
+
+
+def _infeasible_retained_vector_envelope():
+    return (
+        _product_claiming_profile(),
+        _execution(trace=_trace(mixed_stream=True)),
+        "fast",
+        {
+            "constraints": PhysicsConstraintSet(
+                active_gates=("delivered_stream_purity",),
+                enforce_delivered_stream_purity=True,
+            )
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "envelope",
+    (
+        _feasible_score_envelope,
+        _ood_status_earned_rump_envelope,
+        _ood_trace_earned_rump_envelope,
+        _infeasible_retained_vector_envelope,
+    ),
+)
+def test_stored_c6_refusal_prices_every_score_producing_envelope(envelope) -> None:
+    """Each envelope scores without a C6 refusal and is unavailable with one.
+
+    The out-of-domain earned rump is the combined case: batch status stays
+    ok, the domain signal is present, and the refusal is still not a score.
+    """
+
+    profile, execution, fidelity, kwargs = envelope()
+    scored = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        fidelity,
+        profile=profile,
+        executor=FakeExecutor(execution),
+        **kwargs,
+    )
+    assert scored.objectives is not None
+
+    profile, execution, fidelity, kwargs = envelope()
+    refused = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        fidelity,
+        profile=profile,
+        executor=FakeExecutor(_attach_stored_c6(execution)),
+        **kwargs,
+    )
+    assert refused.feasible is False
+    assert refused.objectives is None
+    assert refused.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert refused.run_reference is not None
+    assert refused.run_reference.reason == "c6_hold_target_not_acquired"
+    assert "priced_unavailable:c6_hold_target_not_acquired" in refused.notes
+
+
+def test_environment_failure_aborts_before_c6_pricing() -> None:
+    """An environment disposition stays an abort when a C6 refusal is also stored."""
+
+    diagnostic = {
+        "status": "refused",
+        "campaign": "C6",
+        "reaction_family": "c6_mg_thermite",
+        "diagnostic": {"reason_refused": "c6_hold_target_not_acquired"},
+        "provider_diagnostic": {
+            "backend_diagnostics": {
+                "projected_liquidus_diagnostics": {
+                    "backend_failure_disposition": "environment",
+                },
+            },
+        },
+    }
+    with pytest.raises(EngineBugAbort, match="environment"):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(
+                _execution(
+                    status="refused",
+                    error_message="MAGEMin worker could not be restarted",
+                    refusal_diagnostic=diagnostic,
+                )
+            ),
+        )
+
+
+def continuation_metal_delta(
+    baseline_kg: float | None,
+    capped_kg: float | None,
+) -> float:
+    """Both extracted-metal totals must be finite and unequal.
+
+    A missing total, a non-finite total, or an unchanged total fails.
+    There is no branch that passes without a numeric change.
+    """
+
+    if baseline_kg is None or capped_kg is None:
+        raise AssertionError(
+            "continuation pin requires both extracted-metal totals"
+        )
+    if not math.isfinite(baseline_kg) or not math.isfinite(capped_kg):
+        raise AssertionError(
+            "continuation pin requires finite extracted-metal totals"
+        )
+    if baseline_kg == capped_kg:
+        raise AssertionError(
+            "C4_HORIZON_RELATION: cap must change extracted metals "
+            f"({baseline_kg} vs {capped_kg})"
+        )
+    return baseline_kg - capped_kg
+
+
+@pytest.mark.parametrize(
+    ("baseline_kg", "capped_kg", "message"),
+    (
+        (None, None, "both extracted-metal totals"),
+        (1.0, None, "both extracted-metal totals"),
+        (None, 1.0, "both extracted-metal totals"),
+        (float("nan"), 1.0, "finite"),
+        (1.0, float("inf"), "finite"),
+        (3.0, 3.0, "C4_HORIZON_RELATION"),
+    ),
+)
+def test_continuation_metal_delta_fails_closed(
+    baseline_kg: float | None,
+    capped_kg: float | None,
+    message: str,
+) -> None:
+    with pytest.raises(AssertionError, match=message):
+        continuation_metal_delta(baseline_kg, capped_kg)
+
+
+def test_continuation_metal_delta_requires_a_numeric_change() -> None:
+    assert continuation_metal_delta(4.0, 1.5) == pytest.approx(2.5)
+
+
+def _later_campaign_names(result) -> list[str]:
+    trace = result.run_reference.trace
+    stops = trace["campaign_stops"] if "campaign_stops" in trace else ()
+    return [
+        str(stop["campaign"])
+        for stop in stops
+        if str(stop.get("campaign") or "") not in {"", "C0"}
+    ]
+
+
+def _engine_metals_kg(result) -> float:
+    """Extracted metals from this evaluate() result, or a failed assertion.
+
+    A physics refusal, a missing summary, or a non-finite total is not a
+    yield. There is no branch that substitutes a synthetic number.
+    """
+
+    assert result.failure_category is not FailureCategory.PHYSICS_REFUSED, (
+        getattr(result.run_reference, "reason", None)
+    )
+    assert result.run_reference is not None
+    summary = result.run_reference.product_summary
+    metals = float(
+        summary["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+    )
+    assert math.isfinite(metals)
+    return metals
+
+
+def _highland_profile_at_mass(mass_kg: float) -> dict:
     profile = copy.deepcopy(dict(load_profile("lunar_highland")))
-    # C0's extraction ends by hour 19, so 24 hours exercises the cap-derived
-    # metal difference without simulating the unused remainder of the 60-hour profile.
     profile["run"]["hours"] = 24
+    profile["run"]["mass_kg"] = mass_kg
     for fidelity_options in profile["fidelities"].values():
         fidelity_options["hours"] = 24
+        fidelity_options["mass_kg"] = mass_kg
+    return profile
 
-    def product_summary(patch: RecipePatch):
+
+@pytest.mark.nightly
+@pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(5000)
+def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
+    """Authored hours stay 24. Later steps run, and metals come from them.
+
+    Both totals are ``evaluate()`` with the production executor, on two
+    charge masses of the same campaign. A 1200 C furnace cap cannot enter
+    the C4 window and is ``c4_target_window_not_acquired``, so it is not a
+    yield pair. Glass mass is not asserted: glass = 0 is the current
+    classifier's route gate (b-1185) plus 96% SiO offgas loss (b-1184);
+    not a physics yield.
+    """
+
+    def one(mass_kg: float):
         result = evaluate(
-            patch,
+            RecipePatch({}),
             "lunar_highland",
             "fast",
-            profile=profile,
+            profile=_highland_profile_at_mass(mass_kg),
         )
+        assert result.eval_spec is not None
+        assert result.eval_spec.hours == 24
+        assert result.eval_spec.mass_kg == pytest.approx(mass_kg)
+        assert result.eval_spec.campaign == "C0"
         assert result.run_reference is not None
-        return result.run_reference.product_summary
+        names = _later_campaign_names(result)
+        assert names, (
+            f"did not leave C0; reason={result.run_reference.reason!r} "
+            f"stops={list(result.run_reference.trace.get('campaign_stops', ()))}"
+        )
+        for stop in result.run_reference.trace["campaign_stops"]:
+            assert stop["stop_reason"] in {
+                "endpoint_met",
+                "time_cap",
+                "refused",
+                "stop_reason_unrecorded",
+            }
+        return result
 
-    baseline_patch = RecipePatch({})
-    baseline = product_summary(baseline_patch)
-    repeated = product_summary(baseline_patch)
-    capped = product_summary(RecipePatch({("furnace_max_T_C",): 1200.0}))
+    full = one(1000.0)
+    half = one(500.0)
+    full_metals = _engine_metals_kg(full)
+    half_metals = _engine_metals_kg(half)
+    assert full_metals > 0.0, full_metals
+    assert half_metals > 0.0, half_metals
+    assert continuation_metal_delta(full_metals, half_metals) != 0.0
 
-    assert baseline == repeated
-    baseline_metals = float(
-        baseline["product_classes"]["metals_plus_O2"]["metals_total_kg"]
-    )
-    repeated_metals = float(
-        repeated["product_classes"]["metals_plus_O2"]["metals_total_kg"]
-    )
-    capped_metals = float(
-        capped["product_classes"]["metals_plus_O2"]["metals_total_kg"]
-    )
-    assert all(
-        math.isfinite(value)
-        for value in (baseline_metals, repeated_metals, capped_metals)
-    )
 
-    # Same-patch repeat delta captures run variation; a larger cap delta proves
-    # the trajectory reaches extraction without pinning a copied output value.
-    assert abs(baseline_metals - capped_metals) > abs(
-        baseline_metals - repeated_metals
-    ), "C4_HORIZON_RELATION: cap must change extracted metals beyond repeat variation"
+_EXECUTION_TRACKS = ("pyrolysis", "mre_baseline")
+_EXECUTION_C5 = (False, True)
+
+
+def _profile_with_execution(track: str, c5_enabled: bool) -> dict:
+    profile = copy.deepcopy(PROFILE)
+    selected = {
+        **profile["fidelities"]["fast"],
+        "track": track,
+        "c5_enabled": c5_enabled,
+    }
+    if c5_enabled:
+        selected["mre_max_voltage_V"] = 2.5
+    profile["fidelities"]["fast"] = selected
+    return profile
+
+
+@pytest.mark.parametrize("track", _EXECUTION_TRACKS)
+@pytest.mark.parametrize("c5_enabled", _EXECUTION_C5)
+def test_claims_follow_resolved_execution_options(
+    track: str,
+    c5_enabled: bool,
+) -> None:
+    """Claims, gates, weights, and continuation are one execution triple.
+
+    The grid is every track this ticket distinguishes, with c5 on and off.
+    Study scoring, the spec stamp, and evaluate() agree. Glass stays only
+    when the pyrolysis sequence still includes post-mg C2A.
+    """
+
+    profile = _profile_with_execution(track, c5_enabled)
+    identity = resolved_execution_identity(profile, "fast")
+    assert dict(identity) == {
+        "campaign": "C0",
+        "track": track,
+        "c5_enabled": c5_enabled,
+    }
+    options = evaluate_module._run_options(profile, "fast")
+    assert options["campaign"] == identity["campaign"]
+    assert options["track"] == identity["track"]
+    assert options["c5_enabled"] is identity["c5_enabled"]
+    assert evaluate_module._c0_pyrolysis_continues_through_later_steps(
+        options,
+        stop_at_stage0_exit=False,
+    ) is (track == "pyrolysis")
+    stamped = profile_scored_at_fidelity(profile, "fast")
+    assert profile["run"].get("track") is None
+    assert profile["run"].get("c5_enabled") is None
+    defined = tuple(item.metric for item in objective_definitions(stamped))
+    assert len(unrenormalized_study_scalar_weights(stamped)) == len(defined)
+    via_spec = evaluate_module._objective_profile_for_spec(
+        profile,
+        SimpleNamespace(
+            campaign=identity["campaign"],
+            track=identity["track"],
+            c5_enabled=identity["c5_enabled"],
+            hours=1,
+            runtime_campaign_overrides={},
+            lab_schedule={},
+        ),
+    )
+    assert tuple(item.metric for item in objective_definitions(via_spec)) == defined
+    glass = track == "pyrolysis" and not c5_enabled
+    assert ("pure_silica_glass_kg" in defined) is glass
+    executor = FakeExecutor(_execution())
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=executor,
+    )
+    assert result.eval_spec is not None
+    assert result.eval_spec.track == track
+    assert result.eval_spec.c5_enabled is c5_enabled
+    assert executor.config.track == track
+    assert executor.config.c5_enabled is c5_enabled
+    assert executor.config.until_campaign_complete is (track == "pyrolysis")
+    assert result.objectives is not None
+    assert ("pure_silica_glass_kg" in result.objectives.as_mapping()) is glass
+    assert "oxygen_kg" in result.objectives.as_mapping()
+    assert tuple(result.objectives.as_mapping()) == defined
+
+
+def test_voltage_cap_c5_overrides_the_fidelity_for_scoring() -> None:
+    """The cap rewrite is part of the triple scoring reads."""
+
+    profile = _profile_with_execution("pyrolysis", False)
+    enabled = RecipePatch({
+        **_valid_patch().values,
+        C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 2.5,
+    })
+    disabled = RecipePatch({
+        **_valid_patch().values,
+        C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0,
+    })
+    on = evaluate(
+        enabled,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(profile),
+        executor=FakeExecutor(_execution()),
+    )
+    off = evaluate(
+        disabled,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(profile),
+        executor=FakeExecutor(_execution()),
+    )
+    assert on.eval_spec is not None and on.eval_spec.c5_enabled is True
+    assert off.eval_spec is not None and off.eval_spec.c5_enabled is False
+    assert on.objectives is not None
+    assert "pure_silica_glass_kg" not in on.objectives.as_mapping()
+    assert off.objectives is not None
+    assert "pure_silica_glass_kg" in off.objectives.as_mapping()
+
+    cleared = evaluate(
+        disabled,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_profile_with_execution("pyrolysis", True),
+        executor=FakeExecutor(_execution()),
+    )
+    assert cleared.eval_spec is not None and cleared.eval_spec.c5_enabled is False
+    assert cleared.objectives is not None
+    assert "pure_silica_glass_kg" in cleared.objectives.as_mapping()
+
+
+# Every rewrite that can change the execution triple, on every track this
+# ticket distinguishes. pin-off is the conditional-pin writer. It is legal
+# only when the parent state is already inactive; an active parent refuses
+# the mask instead of scoring the pre-cap profile.
+_EXECUTION_REWRITES = ("none", "cap-0", "cap-2.5", "pin-off")
+
+
+class _RewriteStrategy:
+    name = "rewrite"
+    seed = 0
+
+    def __init__(self, patch: RecipePatch, metadata: dict | None = None) -> None:
+        self._pending = [
+            study_module.Candidate(
+                id="rewrite-000000",
+                patch=patch,
+                metadata=metadata or {},
+            )
+        ]
+
+    def ask(self, n: int) -> list:
+        batch = self._pending[:n]
+        self._pending = self._pending[n:]
+        return batch
+
+    def tell(self, results) -> None:
+        return None
+
+
+def _rewrite_patch(rewrite: str) -> RecipePatch:
+    values = dict(_valid_patch().values)
+    if rewrite == "cap-0":
+        values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = 0.0
+    elif rewrite == "cap-2.5":
+        values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = 2.5
+    return RecipePatch(values)
+
+
+def _rewrite_context(rewrite: str):
+    if rewrite != "pin-off":
+        return None
+    return c5_sampler_context(RecipeSchema(), active=False)
+
+
+def _executed_c5(fidelity_c5: bool, rewrite: str) -> bool:
+    if rewrite in {"cap-0", "pin-off"}:
+        return False
+    if rewrite == "cap-2.5":
+        return True
+    return fidelity_c5
+
+
+def _with_available_furnace(result):
+    reference = result.run_reference
+    if reference is None:
+        return result
+    summary = dict(reference.product_summary or {})
+    summary["furnace_amortization_status"] = "available"
+    summary["furnace_amortization_batch_cost_equivalents"] = 0.0
+    return replace(result, run_reference=replace(reference, product_summary=summary))
+
+
+def _executed_scoring_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile,
+    candidate_id: str | None = None,
+    **kwargs,
+):
+    result = evaluate(
+        patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        executor=FakeExecutor(_execution()),
+        schema=kwargs.get("schema"),
+        constraints=kwargs.get("constraints"),
+        conditional_context=kwargs.get("conditional_context"),
+    )
+    return _with_available_furnace(result)
+
+
+def _ask_time_scoring(profile):
+    stamped = profile_scored_at_fidelity(profile, "fast")
+    try:
+        return (
+            objective_definitions(stamped),
+            unrenormalized_study_scalar_weights(stamped),
+            stamped,
+        )
+    except ObjectiveProfileError:
+        return (
+            declared_objective_definitions(stamped),
+            tuple(row.weight for row in objective_importance_evidence(stamped)),
+            stamped,
+        )
+
+
+@pytest.mark.parametrize("track", _EXECUTION_TRACKS)
+@pytest.mark.parametrize("c5_enabled", _EXECUTION_C5)
+@pytest.mark.parametrize("rewrite", _EXECUTION_REWRITES)
+def test_scoring_follows_the_executed_spec(
+    track: str,
+    c5_enabled: bool,
+    rewrite: str,
+    tmp_path,
+) -> None:
+    """Eligibility is the EvalSpec triple, for every track, c5, and rewrite.
+
+    Study scoring, honest-result checks, Optuna metric extraction, and the
+    staged score key read that triple. A missing withheld objective is not
+    an abort and not a zero. Its weight stays out of the scalar.
+    """
+
+    from simulator.optimize.strategy.bayesian import OptunaTPEStrategy
+    from simulator.optimize.strategy.genetic import OptunaNSGA2Strategy
+    from simulator.optimize.strategy.staged import _score_key
+
+    profile = _profile_with_execution(track, c5_enabled)
+    patch = _rewrite_patch(rewrite)
+    context = _rewrite_context(rewrite)
+    schema = RecipeSchema()
+    try:
+        spec, _run_config = evaluate_module._build_eval_inputs(
+            patch,
+            "lunar_mare_low_ti",
+            "fast",
+            profile,
+            schema,
+            conditional_context=context,
+        )
+    except EvaluationInputError as exc:
+        assert rewrite == "pin-off" and c5_enabled
+        assert "conditional_mask" in str(exc)
+        return
+    assert spec.track == track
+    assert spec.c5_enabled is _executed_c5(c5_enabled, rewrite)
+    executed_profile = scoring_profile_for_executed_spec(profile, spec)
+    executed_definitions = objective_definitions(executed_profile)
+    executed_weights = unrenormalized_study_scalar_weights(executed_profile)
+    executed_metrics = tuple(item.metric for item in executed_definitions)
+    glass = track == "pyrolysis" and not spec.c5_enabled
+    assert ("pure_silica_glass_kg" in executed_metrics) is glass
+    direct = _executed_scoring_evaluator(
+        patch,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        schema=schema,
+        conditional_context=context,
+    )
+    assert direct.eval_spec is not None
+    assert direct.objectives is not None
+    assert tuple(direct.objectives.as_mapping()) == executed_metrics
+    ask_definitions, ask_weights, stamped = _ask_time_scoring(profile)
+    study_module._assert_honest_result(
+        direct,
+        ask_definitions,
+        profile=profile,
+    )
+    for strategy_type in (OptunaTPEStrategy, OptunaNSGA2Strategy):
+        strategy = strategy_type(
+            schema,
+            seed=0,
+            objective_profile=stamped,
+            **({"budget": 4} if strategy_type is OptunaTPEStrategy else {}),
+        )
+        values = strategy._objective_values(direct)
+        assert values is not None
+        assert len(values) == len(executed_definitions)
+    score_key = _score_key(
+        study_module.Candidate(id="rewrite-000000", patch=patch),
+        direct,
+        ask_definitions,
+        profile=stamped,
+    )
+    declared_metrics = tuple(
+        item.metric for item in declared_objective_definitions(stamped)
+    )
+    executed_scores = cost_adjusted_objective_scores(
+        direct.objectives,
+        executed_definitions,
+        product_summary=(
+            direct.run_reference.product_summary if direct.run_reference else {}
+        ),
+    )
+    # Slots follow the declared axis. A withheld metric is an absent slot,
+    # not its name and not a dropped position.
+    assert score_key == candidate_rank_key(
+        declared_metrics,
+        executed_metrics,
+        executed_scores,
+        cache_key=direct.cache_key or "",
+        candidate_id="rewrite-000000",
+        feasible=direct.feasible,
+    )
+    assert all(isinstance(slot, tuple) for slot in score_key[1:-2])
+    assert not any(isinstance(item, str) for item in score_key[1:-2])
+    metadata = conditional_context_metadata(context) if context is not None else {}
+    result = study_module.run(
+        profile,
+        "lunar_mare_low_ti",
+        _RewriteStrategy(patch, metadata),
+        "fast",
+        1,
+        1,
+        tmp_path,
+        seed=0,
+        evaluator=_executed_scoring_evaluator,
+        schema=schema,
+    )
+    assert result.records
+    record = result.records[0]
+    assert tuple(record.objectives) == executed_metrics
+    scalar, _signature = study_module._study_progress(
+        result.records,
+        ask_definitions,
+        ask_weights,
+        profile=profile,
+    )
+    scores = cost_adjusted_objective_scores(
+        record.objectives,
+        executed_definitions,
+        product_summary=record.product_summary,
+    )
+    expected = math.fsum(
+        weight * score
+        for weight, score in zip(executed_weights, scores, strict=True)
+    )
+    assert scalar == expected
+    if record.feasible:
+        assert result.winner is not None
+
+
+def _glass_only_profile(c5_enabled: bool) -> dict:
+    profile = _profile_with_execution("pyrolysis", c5_enabled)
+    profile["objectives"] = [
+        row
+        for row in profile["objectives"]
+        if row["metric"] == "pure_silica_glass_kg"
+    ]
+    assert len(profile["objectives"]) == 1
+    return profile
+
+
+@pytest.mark.parametrize("c5_enabled", _EXECUTION_C5)
+@pytest.mark.parametrize("rewrite", _EXECUTION_REWRITES)
+def test_remaining_weight_follows_the_candidate_rewrite(
+    c5_enabled: bool,
+    rewrite: str,
+) -> None:
+    """A glass-only profile is admitted only after the candidate rewrite."""
+
+    profile = _glass_only_profile(c5_enabled)
+    from simulator.optimize.profiles import validate_profile
+
+    validate_profile(
+        copy.deepcopy(profile),
+        expected_feedstock="lunar_mare_low_ti",
+        scoring_fidelity="fast",
+    )
+    study_module.resolve_profile(
+        copy.deepcopy(profile),
+        expected_feedstock="lunar_mare_low_ti",
+        scoring_fidelity="fast",
+    )
+    patch = _rewrite_patch(rewrite)
+    context = _rewrite_context(rewrite)
+    try:
+        spec, _run_config = evaluate_module._build_eval_inputs(
+            patch,
+            "lunar_mare_low_ti",
+            "fast",
+            profile,
+            RecipeSchema(),
+            conditional_context=context,
+        )
+    except EvaluationInputError as exc:
+        assert rewrite == "pin-off" and c5_enabled
+        assert "conditional_mask" in str(exc)
+        return
+    except ProfileValidationError as exc:
+        assert "no remaining objective weight" in str(exc)
+        assert _executed_c5(c5_enabled, rewrite) is True
+        return
+    assert spec.c5_enabled is False
+    assert _executed_c5(c5_enabled, rewrite) is False
+    metrics = tuple(
+        item.metric
+        for item in objective_definitions(
+            scoring_profile_for_executed_spec(profile, spec)
+        )
+    )
+    assert metrics == ("pure_silica_glass_kg",)
+
+
+def test_glass_only_cap_restores_the_study_scalar(tmp_path) -> None:
+    """Cap 0 disables C5 and puts the restored glass weight back in the scalar."""
+
+    from simulator.optimize.strategy.bayesian import OptunaTPEStrategy
+    from simulator.optimize.strategy.genetic import OptunaNSGA2Strategy
+    from simulator.optimize.strategy.staged import StagedStrategy
+
+    profile = _glass_only_profile(True)
+    stamped = profile_scored_at_fidelity(profile, "fast")
+    with pytest.raises(ObjectiveProfileError, match="no remaining objective weight"):
+        objective_definitions(stamped)
+    schema = RecipeSchema()
+    OptunaTPEStrategy(schema, seed=0, objective_profile=stamped, budget=4)
+    OptunaNSGA2Strategy(schema, seed=0, objective_profile=stamped)
+    StagedStrategy(schema, seed=0, objective_profile=stamped)
+    patch = _rewrite_patch("cap-0")
+    result = study_module.run(
+        profile,
+        "lunar_mare_low_ti",
+        _RewriteStrategy(patch),
+        "fast",
+        1,
+        1,
+        tmp_path,
+        seed=0,
+        evaluator=_executed_scoring_evaluator,
+        schema=schema,
+    )
+    assert result.records
+    record = result.records[0]
+    assert "pure_silica_glass_kg" in record.objectives
+    _ask_definitions, ask_weights, _stamped = _ask_time_scoring(profile)
+    # The ask-time fallback is the declared glass row. The executed triple
+    # claims it, so the scalar uses that weight and no other.
+    assert ask_weights == (0.4,)
+    scalar, _signature = study_module._study_progress(
+        result.records,
+        _ask_definitions,
+        ask_weights,
+        profile=profile,
+    )
+    assert scalar is not None
+    scores = cost_adjusted_objective_scores(
+        record.objectives,
+        objective_definitions(scoring_profile_for_executed_spec(profile, record.eval_spec)),
+        product_summary=record.product_summary,
+    )
+    assert scalar == math.fsum(0.4 * score for score in scores)
+    if record.feasible:
+        assert result.winner is not None
+
+
+def test_composition_constraints_refuse_a_partial_execution_identity() -> None:
+    with pytest.raises(
+        EvaluationInputError,
+        match="campaign, track, and c5_enabled",
+    ):
+        _composition_target_constraints(PROFILE, None, campaign="C0")
+
+
+def test_ranking_trace_keeps_each_step_stop_reason() -> None:
+    execution = _execution()
+    execution.campaign_stops = (
+        {
+            "campaign": "C0",
+            "stop_reason": "endpoint_met",
+            "duration_h": 1,
+            "detail": "computed_exit",
+        },
+        {
+            "campaign": "C4",
+            "stop_reason": "time_cap",
+            "duration_h": 62,
+            "detail": "max_hold_no_signal",
+        },
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(PROFILE),
+        executor=FakeExecutor(execution),
+    )
+    assert result.run_reference is not None
+    stops = result.run_reference.trace["campaign_stops"]
+    assert [stop["stop_reason"] for stop in stops] == ["endpoint_met", "time_cap"]
+    assert stops[1]["detail"] == "max_hold_no_signal"
+    assert campaign_stop_record({"campaign": "C4", "duration_h": 1}) is None
+    refused = campaign_stop_record(
+        {
+            "campaign": "C6",
+            "stop_reason": "refused",
+            "duration_h": 4,
+            "stop_detail": "c6_hold_target_not_acquired",
+        }
+    )
+    assert refused is not None
+    assert refused["stop_reason"] == "refused"
+    assert refused["detail"] == "c6_hold_target_not_acquired"
+
+
+def _stop_reasons(stops) -> list[str]:
+    return [str(stop["stop_reason"]) for stop in stops]
+
+
+def test_every_rump_trace_projection_keeps_campaign_stops() -> None:
+    """Every study trace allowlist that keeps rump evidence keeps step stops."""
+
+    tree = ast.parse(inspect.getsource(study_module))
+    projections = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Tuple, ast.List)):
+            continue
+        strings = [
+            element.value
+            for element in node.elts
+            if isinstance(element, ast.Constant) and isinstance(element.value, str)
+        ]
+        starred = [
+            element.value.id
+            for element in node.elts
+            if isinstance(element, ast.Starred) and isinstance(element.value, ast.Name)
+        ]
+        if "rump_terminal" not in strings:
+            continue
+        projections.append((strings, starred))
+    assert len(projections) >= 2
+    for strings, starred in projections:
+        assert (
+            "campaign_stops" in strings or "_CAMPAIGN_STOP_TRACE_KEYS" in starred
+        )
+
+
+def test_ranking_artifact_keeps_time_cap_after_continuation() -> None:
+    """A C4 time_cap followed by a later step survives ranking serialization.
+
+    Both study trace filters copy the stop records. The ranked record and
+    its payload are the artifact written beside the leaderboard.
+    """
+
+    execution = _execution()
+    execution.campaign_stops = (
+        {
+            "campaign": "C0",
+            "stop_reason": "endpoint_met",
+            "duration_h": 1,
+            "detail": "computed_exit",
+        },
+        {
+            "campaign": "C4",
+            "stop_reason": "time_cap",
+            "duration_h": 62,
+            "detail": "max_hold_no_signal",
+        },
+        {
+            "campaign": "C2A_continuous",
+            "stop_reason": "endpoint_met",
+            "duration_h": 82,
+            "detail": "min_hold",
+        },
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(PROFILE),
+        executor=FakeExecutor(execution),
+    )
+    assert result.run_reference is not None
+    expected_reasons = ["endpoint_met", "time_cap", "endpoint_met"]
+    light = study_module._strip_heavy_result(result)
+    assert light.run_reference is not None
+    stripped = light.run_reference.trace["campaign_stops"]
+    assert _stop_reasons(stripped) == expected_reasons
+    assert stripped[1]["detail"] == "max_hold_no_signal"
+    record = study_module._to_record(
+        study_module.Candidate("stop-000000", _valid_patch()),
+        result,
+        cache_hit=False,
+    )
+    definitions = objective_definitions(PROFILE)
+    leaderboard = tuple(
+        sorted(
+            (record,),
+            key=lambda row: study_module._rank_key(
+                row,
+                definitions,
+                profile=PROFILE,
+            ),
+        )
+    )
+    ranked = leaderboard[0]
+    payload = study_module._record_payload(ranked, RecipeSchema(), PROFILE)
+    for carrier in (
+        ranked.trace_summary["campaign_stops"],
+        payload["trace_summary"]["campaign_stops"],
+        ranked.result_blob["campaign_stops"],
+    ):
+        assert _stop_reasons(carrier) == expected_reasons
+        assert carrier[1]["campaign"] == "C4"
+        assert carrier[1]["detail"] == "max_hold_no_signal"
+        assert carrier[2]["campaign"] == "C2A_continuous"
+
+
+class _LoopSession:
+    def __init__(self, *, complete_after: int, phase: CampaignPhase) -> None:
+        self.advanced = 0
+        self.complete_after = complete_after
+        self.simulator = SimpleNamespace(melt=SimpleNamespace(campaign=phase))
+
+    def is_complete(self) -> bool:
+        return self.advanced >= self.complete_after
+
+    def pending_decision(self) -> None:
+        return None
+
+    def advance(self) -> SimpleNamespace:
+        self.advanced += 1
+        return SimpleNamespace(campaign_summary=None)
+
+
+def test_drive_session_continues_until_the_controller_ends() -> None:
+    """Authored hours are not the stop. A phase with no endpoint does not advance."""
+
+    continuing = _LoopSession(complete_after=3, phase=CampaignPhase.C0)
+    continued = list(
+        drive_session(
+            continuing,
+            1,
+            DecisionPolicy.AUTO_APPLY,
+            until_campaign_complete=True,
+        )
+    )
+    assert len(continued) == 3
+    assert continuing.advanced == 3
+
+    bounded = _LoopSession(complete_after=5, phase=CampaignPhase.C0)
+    one_hour = list(
+        drive_session(
+            bounded,
+            1,
+            DecisionPolicy.AUTO_APPLY,
+            until_campaign_complete=False,
+        )
+    )
+    assert len(one_hour) == 1
+    assert bounded.advanced == 1
+
+    idle = _LoopSession(complete_after=5, phase=CampaignPhase.IDLE)
+    with pytest.raises(CampaignEndCapMissing):
+        list(
+            drive_session(
+                idle,
+                1,
+                DecisionPolicy.AUTO_APPLY,
+                until_campaign_complete=True,
+            )
+        )
+    assert idle.advanced == 0
+
+
+def test_check_endpoint_is_the_only_phase_end_list() -> None:
+    source = inspect.getsource(CampaignManager.check_endpoint)
+    assert "return True" not in source
+    assert not hasattr(CampaignManager, "_ENDPOINT_OWNED_PHASES")
+    processing = [
+        phase
+        for phase in CampaignPhase
+        if phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE)
+    ]
+    for phase in processing:
+        assert f"campaign == CampaignPhase.{phase.name}" in source
+        assert CampaignManager.endpoint_can_end(phase) is True
+    assert CampaignManager.endpoint_can_end(CampaignPhase.IDLE) is False
+    assert CampaignManager.endpoint_can_end(CampaignPhase.COMPLETE) is False
+    assert "CampaignEndCapMissing" in source
