@@ -1044,6 +1044,10 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
             assert record["phase_basis_source"].startswith(
                 "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow"
             )
+            assert any(
+                notice["code"] == "liquidus_low_end_samples_excluded"
+                for notice in record["notices"]
+            )
         if expected_switch is None:
             from simulator.melt_backend import openimcc_bridge
 
@@ -1074,6 +1078,45 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
             assert gate_evidence["provider"] == "magemin"
             assert gate_evidence["status"] == "out_of_domain"
             assert "silicate_window" in str(gate_evidence["reason"])
+
+
+def test_internal_analytical_low_end_liquidus_notice_reaches_gate_diagnostic(
+    request,
+) -> None:
+    core = _new_internal_analytical_core()
+    magemin = _magemin_gate_backend(core)
+    if magemin is None or not magemin.is_available():
+        pytest.skip('MAGEMin backend unavailable after initialization')
+    request.addfinalizer(magemin.close)
+
+    output = _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        temperature_C=1659.85,
+        pressure_bar=1.0,
+        composition_kg={'CaO': 48.28, 'SiO2': 51.72},
+        composition_mol=None,
+        fO2_log=-9.0,
+        po2_request=Po2Request(
+            mode=PO2_COMMANDED,
+            po2_bar=1.0e-9,
+        ),
+        include_diagnostic_shadows=False,
+    )
+
+    assert output.status == 'ok'
+    notice = core._last_freeze_gate_diagnostic[
+        'liquidus_sample_exclusion_notice'
+    ]
+    assert notice['code'] == 'liquidus_low_end_samples_excluded'
+    assert notice['authority'] == 'extrapolated'
+    assert notice['solidus_qualification'] == (
+        'lowest_crossing_within_supported_range'
+    )
+    assert notice['excluded_samples'][0]['temperature_C'] == 400.0
+    assert any(
+        row['code'] == 'liquidus_low_end_samples_excluded'
+        for row in core._last_high_t_melt_activity['notices']
+    )
 
 
 def test_internal_analytical_timeout_kills_magemin_descendants(

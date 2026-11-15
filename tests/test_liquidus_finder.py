@@ -340,12 +340,28 @@ def test_liquidus_finder_no_failures_preserves_pinned_output_and_reuses_samples(
     )
 
     assert result.status == 'ok'
-    assert result.solidus_T_C == pytest.approx(1249.21875)
-    assert result.liquidus_T_C == pytest.approx(1250.0)
+    assert result.solidus_T_C.hex() == '0x1.384e000000000p+10'
+    assert result.liquidus_T_C.hex() == '0x1.3880000000000p+10'
     assert result.warnings == ()
     assert result.iterations == 14
     assert len(result.samples) == 22
-    assert len(sampled_temperatures) == 15
+    assert [temperature.hex() for temperature in sampled_temperatures] == [
+        '0x1.9000000000000p+9',
+        '0x1.c200000000000p+9',
+        '0x1.f400000000000p+9',
+        '0x1.1300000000000p+10',
+        '0x1.2c00000000000p+10',
+        '0x1.4500000000000p+10',
+        '0x1.5e00000000000p+10',
+        '0x1.7700000000000p+10',
+        '0x1.3880000000000p+10',
+        '0x1.3240000000000p+10',
+        '0x1.3560000000000p+10',
+        '0x1.36f0000000000p+10',
+        '0x1.37b8000000000p+10',
+        '0x1.381c000000000p+10',
+        '0x1.384e000000000p+10',
+    ]
     assert len(set(sampled_temperatures)) == 15
     assert remaining_seen == [None] * len(sampled_temperatures)
     assert result.diagnostics == {}
@@ -556,14 +572,17 @@ def test_liquidus_finder_rejects_out_of_range_sampler_fraction(fraction):
     assert any('outside [0, 1]' in warning for warning in result.warnings)
 
 
-def test_liquidus_finder_excludes_all_out_of_domain_samples_with_evidence():
+def test_liquidus_finder_all_out_of_domain_preserves_first_failure():
     diagnostics = {
         'backend_status': 'out_of_domain',
         'backend_status_reason': 'magemin_mode_vector_mass_deficit',
         'crash_point': 900.0,
     }
 
-    def sample(_temperature_C: float) -> float:
+    temperatures = []
+
+    def sample(temperature_C: float) -> float:
+        temperatures.append(temperature_C)
         raise LiquidusSampleError(
             'out_of_domain',
             ('engine rejected composition',),
@@ -578,36 +597,15 @@ def test_liquidus_finder_excludes_all_out_of_domain_samples_with_evidence():
     )
 
     assert result.status == 'out_of_domain'
-    assert result.diagnostics['excluded_samples'] == [
-        {
-            'temperature_C': temperature_C,
-            'status': 'out_of_domain',
-            'reason': 'magemin_mode_vector_mass_deficit',
-            'authority': 'out_of_domain_excluded',
-            'message': 'engine rejected composition',
-            'diagnostics': {
-                **diagnostics,
-                'exception_class': 'LiquidusSampleError',
-                'exception_message': 'engine rejected composition',
-            },
-        }
-        for temperature_C in (800.0, 900.0, 1000.0)
-    ]
-    assert result.diagnostics['notices'] == [
-        {
-            'kind': 'liquidus_sample_excluded',
-            'temperature_C': temperature_C,
-            'status': 'out_of_domain',
-            'reason': 'magemin_mode_vector_mass_deficit',
-            'authority': 'out_of_domain_excluded',
-        }
-        for temperature_C in (800.0, 900.0, 1000.0)
-    ]
-    assert any('solidus bracket absent' in warning for warning in result.warnings)
-    assert 'out_of_domain' in result.warnings[-1]
-    assert result.diagnostics['reason'] == (
-        'out_of_domain_liquidus_samples_prevented_bracketing'
-    )
+    assert temperatures == [800.0, 900.0, 1000.0]
+    assert result.samples == ()
+    assert result.iterations == 0
+    assert result.diagnostics == {
+        **diagnostics,
+        'exception_class': 'LiquidusSampleError',
+        'exception_message': 'engine rejected composition',
+    }
+    assert result.warnings == ('engine rejected composition',)
 
 
 def test_liquidus_finder_skips_far_subsolidus_out_of_domain_sample():
@@ -631,20 +629,28 @@ def test_liquidus_finder_skips_far_subsolidus_out_of_domain_sample():
     assert result.status == 'ok'
     assert result.solidus_T_C == pytest.approx(600.0, abs=1.0)
     assert result.liquidus_T_C == pytest.approx(800.0, abs=1.0)
+    assert result.diagnostics['supported_range_C'] == (500.0, 1000.0)
+    assert result.diagnostics['solidus_qualification'] == (
+        'lowest_crossing_within_supported_range'
+    )
     assert result.diagnostics['excluded_samples'][0]['temperature_C'] == 400.0
     assert result.diagnostics['excluded_samples'][0]['reason'] == (
         'magemin_mode_vector_mass_deficit'
     )
     assert result.diagnostics['excluded_samples'][0]['authority'] == (
-        'out_of_domain_excluded'
+        'out_of_domain'
     )
-    assert result.diagnostics['notices'][0]['kind'] == (
-        'liquidus_sample_excluded'
+    notice = result.diagnostics['liquidus_sample_exclusion_notice']
+    assert notice['code'] == 'liquidus_low_end_samples_excluded'
+    assert notice['authority'] == 'extrapolated'
+    assert notice['supported_range_C'] == (500.0, 1000.0)
+    assert notice['solidus_qualification'] == (
+        'lowest_crossing_within_supported_range'
     )
     assert any('400 C' in warning for warning in result.warnings)
 
 
-def test_liquidus_finder_does_not_smooth_across_excluded_grid_sample():
+def test_liquidus_finder_interior_grid_gap_keeps_typed_failure():
     def sample(temperature_C: float) -> float:
         if temperature_C == 500.0:
             raise LiquidusSampleError(
@@ -664,10 +670,47 @@ def test_liquidus_finder_does_not_smooth_across_excluded_grid_sample():
         tolerance_C=1.0,
     )
 
-    assert result.status == 'ok'
-    assert result.solidus_T_C == pytest.approx(700.0, abs=1.0)
-    assert result.liquidus_T_C == pytest.approx(900.0, abs=1.0)
-    assert result.diagnostics['excluded_samples'][0]['temperature_C'] == 500.0
+    assert result.status == 'out_of_domain'
+    assert result.solidus_T_C is None
+    assert result.liquidus_T_C is None
+    assert result.diagnostics == {
+        'backend_status_reason': 'magemin_mode_vector_mass_deficit',
+        'exception_class': 'LiquidusSampleError',
+        'exception_message': 'gap sample rejected',
+    }
+    assert result.warnings == ('gap sample rejected',)
+    assert not result.diagnostics.get('excluded_samples')
+
+
+def test_liquidus_finder_discards_low_end_exclusion_if_interior_sample_fails():
+    def sample(temperature_C: float) -> float:
+        if temperature_C in {400.0, 600.0}:
+            reason = (
+                'low-end sample rejected'
+                if temperature_C == 400.0
+                else 'interior sample rejected'
+            )
+            raise LiquidusSampleError(
+                'out_of_domain',
+                (reason,),
+                {'backend_status_reason': f'failure_at_{temperature_C:g}_C'},
+            )
+        return 0.0
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=400.0,
+        max_T_C=800.0,
+        scan_step_C=100.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics == {
+        'backend_status_reason': 'failure_at_400_C',
+        'exception_class': 'LiquidusSampleError',
+        'exception_message': 'low-end sample rejected',
+    }
+    assert result.warnings == ('low-end sample rejected',)
 
 
 def test_liquidus_finder_refuses_when_out_of_domain_sample_splits_crossing():
@@ -691,13 +734,37 @@ def test_liquidus_finder_refuses_when_out_of_domain_sample_splits_crossing():
     assert result.status == 'out_of_domain'
     assert result.solidus_T_C is None
     assert result.liquidus_T_C is None
-    assert result.diagnostics['excluded_samples'][0]['temperature_C'] == 1100.0
-    assert result.diagnostics['excluded_samples'][0]['reason'] == (
-        'magemin_mode_vector_mass_deficit'
+    assert result.diagnostics == {
+        'backend_status_reason': 'magemin_mode_vector_mass_deficit',
+        'exception_class': 'LiquidusSampleError',
+        'exception_message': 'bracket midpoint rejected',
+    }
+    assert result.warnings == ('bracket midpoint rejected',)
+    assert not result.diagnostics.get('excluded_samples')
+
+
+def test_liquidus_finder_refuses_when_solidus_is_below_supported_range():
+    def sample(temperature_C: float) -> float:
+        if temperature_C == 400.0:
+            raise LiquidusSampleError(
+                'out_of_domain',
+                ('400 C is outside the backend domain',),
+                {'backend_status_reason': 'magemin_mode_vector_mass_deficit'},
+            )
+        return 0.5
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=400.0,
+        max_T_C=800.0,
+        scan_step_C=100.0,
     )
-    assert result.diagnostics['excluded_samples'][0]['message'] == (
-        'bracket midpoint rejected'
-    )
+
+    assert result.status == 'out_of_domain'
+    assert result.solidus_T_C is None
+    assert result.liquidus_T_C is None
+    assert result.diagnostics['reason'] == 'solidus_below_supported_range'
+    assert result.diagnostics['supported_range_C'] == (500.0, 800.0)
 
 
 def test_liquidus_sample_error_rejects_noncanonical_status():
