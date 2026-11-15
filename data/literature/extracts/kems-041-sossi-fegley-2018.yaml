@@ -1252,7 +1252,7 @@ species:
             gamma_as_published: 10⁻³ᵃ
             melt_composition_as_published: CMASa $CMS^b$
             references_as_published: aMathieu et al. 2008bMathieu et al. 2011
-            gamma: '1e-3'
+            gamma: !!float 1e-3
           - oxide: NaO0.5
             method_class: measured_tabulated
             oxide_formula_as_published: $NaO_{0.5}$
@@ -1402,8 +1402,8 @@ species:
             melt_composition_as_published: CMFS
             references_as_published: Turkdogan (2000)
             range:
-            - '1e-10'
-            - '1e-6'
+            - !!float 1e-10
+            - !!float 1e-6
         oxide_formula_as_published: $PO_{2.5}$
         melt_composition_as_published: CMFS
         gamma_range_as_published: $10^{-6}$ – $10^{-10}$

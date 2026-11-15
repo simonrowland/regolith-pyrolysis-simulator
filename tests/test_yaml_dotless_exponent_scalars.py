@@ -82,7 +82,9 @@ def _deliberate_printed_string_reason(relative: str, key_path: str) -> str | Non
             return reason
     if "context" in parts:
         return "extract context is retained verbatim and is not migrated as observations"
-    if "printed_rows" in parts or "rows_as_printed" in parts:
+    if "printed_rows" in parts or "rows_as_printed" in parts or any(
+        part.endswith("_row_as_printed") for part in parts
+    ):
         return "raw printed table cells are retained as extract evidence"
     if len(parts) >= 2 and parts[-2:] == ["state", "value"]:
         return "scalar State values are serialized as exact decimal strings"
