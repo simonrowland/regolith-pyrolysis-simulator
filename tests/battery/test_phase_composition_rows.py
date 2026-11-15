@@ -2649,9 +2649,9 @@ def test_non_fe_valence_stays_refused_and_does_not_call_fe_redox(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def hook(*args, **kwargs):
-        raise AssertionError("_predict_fe_redox must not be called")
+        raise AssertionError("_predict_redox must not be called")
 
-    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    monkeypatch.setattr("simulator.battery.score._predict_redox", hook)
     identity = _valence_identity("Cr", _fe_fraction_basis())
     observation = F.observation(
         "cr-valence",
@@ -2668,13 +2668,96 @@ def test_non_fe_valence_stays_refused_and_does_not_call_fe_redox(
     assert prediction.refusal_detail["species"] == "Cr"
 
 
+def test_openimcc_reports_missing_non_fe_redox_couples() -> None:
+    missing_bases = (
+        (
+            "Cr",
+            ValenceBasis(
+                numerator_oxidation_states=(6,),
+                denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+                denominator_oxidation_state=None,
+                value_form=ValenceValueForm.FRACTION,
+            ),
+            "6+/total Cr",
+        ),
+        (
+            "V",
+            ValenceBasis(
+                numerator_oxidation_states=(4,),
+                denominator_kind=ValenceDenominatorKind.OXIDATION_STATE,
+                denominator_oxidation_state=5,
+                value_form=ValenceValueForm.RATIO,
+            ),
+            "4+/5+",
+        ),
+        (
+            "V",
+            ValenceBasis(
+                numerator_oxidation_states=(),
+                denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+                denominator_oxidation_state=None,
+                value_form=ValenceValueForm.AVERAGE_OXIDATION_STATE,
+            ),
+            "average oxidation state",
+        ),
+        (
+            "Eu",
+            ValenceBasis(
+                numerator_oxidation_states=(2,),
+                denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+                denominator_oxidation_state=None,
+                value_form=ValenceValueForm.FRACTION,
+            ),
+            "2+/total Eu",
+        ),
+        (
+            "Ce",
+            ValenceBasis(
+                numerator_oxidation_states=(4,),
+                denominator_kind=ValenceDenominatorKind.OXIDATION_STATE,
+                denominator_oxidation_state=3,
+                value_form=ValenceValueForm.LOG10_RATIO,
+            ),
+            "4+/3+",
+        ),
+        (
+            "Mn",
+            ValenceBasis(
+                numerator_oxidation_states=(3,),
+                denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+                denominator_oxidation_state=None,
+                value_form=ValenceValueForm.FRACTION,
+            ),
+            "3+/total Mn",
+        ),
+    )
+    for index, (formula, basis, expected_couple) in enumerate(missing_bases):
+        observation = F.observation(
+            f"missing-openimcc-couple-{index}",
+            "sample-1",
+            _valence_identity(formula, basis),
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-phase-source",
+        )
+
+        prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == (
+            "openimcc_redox_couple_not_in_pinned_pack"
+        )
+        assert expected_couple in prediction.refusal_detail["detail"]
+
+
 def test_other_fe_valence_forms_stay_refused(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def hook(*args, **kwargs):
-        raise AssertionError("_predict_fe_redox must not be called")
+        raise AssertionError("_predict_redox must not be called")
 
-    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    monkeypatch.setattr("simulator.battery.score._predict_redox", hook)
     average = ValenceBasis(
         numerator_oxidation_states=(),
         denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
@@ -2705,9 +2788,9 @@ def test_fe3_sumfe_outside_unit_interval_does_not_call_the_engine(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def hook(*args, **kwargs):
-        raise AssertionError("_predict_fe_redox must not be called")
+        raise AssertionError("_predict_redox must not be called")
 
-    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    monkeypatch.setattr("simulator.battery.score._predict_redox", hook)
     for point in (Decimal(0), Decimal(1), Decimal("-0.1")):
         observation = F.observation(
             "fe-fraction-undefined",
@@ -2740,7 +2823,7 @@ def test_fe3_sumfe_fraction_reference_becomes_one_third(
             identity=identity,
         )
 
-    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    monkeypatch.setattr("simulator.battery.score._predict_redox", hook)
     work = F.work()
     experiment = F.tabulation_experiment(work_id=work.work_id)
     identity = _valence_identity("Fe", _fe_fraction_basis())
@@ -2789,7 +2872,7 @@ def test_fe3_fe2_ratio_form_keeps_the_printed_ratio(
             identity=identity,
         )
 
-    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    monkeypatch.setattr("simulator.battery.score._predict_redox", hook)
     work = F.work()
     experiment = F.tabulation_experiment(work_id=work.work_id)
     identity = _valence_identity("Fe", _fe_ratio_basis())
