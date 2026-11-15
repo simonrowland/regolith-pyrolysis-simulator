@@ -5205,6 +5205,8 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
     # the CrO1.5 formula-unit amount because M(Cr2O3) = 2 M(CrO1.5).
     # The printed key remains CrO1.5; only its identity component is canonical.
     "CrO1.5": ("Cr2O3", "Cr2O3", True),
+    # FeO1.5 is likewise half of canonical Fe2O3 on a formula-unit basis.
+    "FeO1.5": ("Fe2O3", "Fe2O3", True),
     "CrO": ("CrO", "CrO", False),
     # Despite the map's historical oxide-oriented name, Liu prints CaF2 as a
     # slag component; retain it in the printed-composition identity.
@@ -13265,6 +13267,8 @@ def uncertainty_for(raw: object) -> Uncertainty:
         isinstance(raw, Mapping)
         and raw.get("kind") == UncertaintyKind.DERIVED.value
     ):
+        if "derivation" not in raw:
+            return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=raw)
         # Keep the existing typed uncertainty shape intact when an extract
         # carries a derived comparison band instead of author-printed prose.
         return _uncertainty_from_plain(raw)

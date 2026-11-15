@@ -7,8 +7,8 @@ source:
   year: 2021
 extraction:
   method: >-
-    Born-digital pdftotext-layout; Table 2 activities typed with printed solid and liquid standards. Mass-percent
-    composition cells remain in row locator notes; Figures 1–9 are recorded with digitisation deferred.
+    Born-digital pdftotext-layout; Table 2 activities and mass-percent compositions typed with printed solid and liquid
+    standards; Figures 1–9 are recorded with digitisation deferred.
   date: '2026-10-21'
   worker: fam38-1021
 fidelity_samples:
@@ -31,10 +31,11 @@ fidelity_samples:
 review_status: draft
 scope_assessment:
   document_type: electrochemical FexO activity measurement in ternary slag
-  scored_observations: 84
+  scored_observations: 42
   note: >-
-    The 42 Table 2 rows provide separate solid-reference and liquid-reference activities. Their mass-percent
-    compositions stay in row locator notes; Table 1 and Figures 1–9 remain context or deferred.
+    The 42 Table 2 liquid-reference activities have located analyzed slag compositions and executable comparison
+    inputs. The paired solid-reference activities retain their distinct pure-solid standards; Table 1 and Figures
+    1–9 remain context or deferred.
 experiments:
 - experiment_id: saito_2021_emf_activity_measurement
   method: emf_cell
@@ -97,6 +98,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '29.0'
+          FeO1.5: '3.3'
+          CaO: '33.9'
+          SiO2: '33.9'
+        composition_role:
+          value: datum_state
+          locator: *id001
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -175,6 +185,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '37.5'
+          FeO1.5: '5.2'
+          CaO: '28.6'
+          SiO2: '28.6'
+        composition_role:
+          value: datum_state
+          locator: *id002
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -253,6 +272,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '46.4'
+          FeO1.5: '6.4'
+          CaO: '23.6'
+          SiO2: '23.6'
+        composition_role:
+          value: datum_state
+          locator: *id003
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -331,6 +359,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '48.8'
+          FeO1.5: '7.4'
+          CaO: '21.9'
+          SiO2: '21.9'
+        composition_role:
+          value: datum_state
+          locator: *id004
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -409,6 +446,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '57.0'
+          FeO1.5: '4.2'
+          CaO: '7.8'
+          SiO2: '31.0'
+        composition_role:
+          value: datum_state
+          locator: *id005
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -487,6 +533,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '58.5'
+          FeO1.5: '3.9'
+          CaO: '7.5'
+          SiO2: '30.1'
+        composition_role:
+          value: datum_state
+          locator: *id006
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -565,6 +620,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '59.8'
+          FeO1.5: '6.2'
+          CaO: '6.8'
+          SiO2: '27.3'
+        composition_role:
+          value: datum_state
+          locator: *id007
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -643,6 +707,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '63.6'
+          FeO1.5: '7.1'
+          CaO: '5.9'
+          SiO2: '23.5'
+        composition_role:
+          value: datum_state
+          locator: *id008
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -721,6 +794,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '59.3'
+          FeO1.5: '0.8'
+          CaO: '0.0'
+          SiO2: '39.9'
+        composition_role:
+          value: datum_state
+          locator: *id009
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -799,6 +881,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '61.9'
+          FeO1.5: '1.3'
+          CaO: '0.0'
+          SiO2: '36.8'
+        composition_role:
+          value: datum_state
+          locator: *id010
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -877,6 +968,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '64.1'
+          FeO1.5: '3.4'
+          CaO: '0.0'
+          SiO2: '32.5'
+        composition_role:
+          value: datum_state
+          locator: *id011
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -955,6 +1055,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '64.4'
+          FeO1.5: '6.9'
+          CaO: '0.0'
+          SiO2: '28.7'
+        composition_role:
+          value: datum_state
+          locator: *id012
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1033,6 +1142,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '54.7'
+          FeO1.5: '6.7'
+          CaO: '11.6'
+          SiO2: '27.0'
+        composition_role:
+          value: datum_state
+          locator: *id013
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1111,6 +1229,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '56.7'
+          FeO1.5: '6.0'
+          CaO: '11.2'
+          SiO2: '26.1'
+        composition_role:
+          value: datum_state
+          locator: *id014
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1189,6 +1316,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '57.5'
+          FeO1.5: '7.6'
+          CaO: '10.5'
+          SiO2: '24.4'
+        composition_role:
+          value: datum_state
+          locator: *id015
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1267,6 +1403,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '60.5'
+          FeO1.5: '8.3'
+          CaO: '9.4'
+          SiO2: '21.9'
+        composition_role:
+          value: datum_state
+          locator: *id016
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1345,6 +1490,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '60.2'
+          FeO1.5: '8.6'
+          CaO: '9.3'
+          SiO2: '21.8'
+        composition_role:
+          value: datum_state
+          locator: *id017
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1423,6 +1577,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '63.4'
+          FeO1.5: '9.6'
+          CaO: '8.1'
+          SiO2: '18.9'
+        composition_role:
+          value: datum_state
+          locator: *id018
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1501,6 +1664,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '56.7'
+          FeO1.5: '3.0'
+          CaO: '0.0'
+          SiO2: '40.2'
+        composition_role:
+          value: datum_state
+          locator: *id019
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1579,6 +1751,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '58.8'
+          FeO1.5: '5.2'
+          CaO: '0.0'
+          SiO2: '36.0'
+        composition_role:
+          value: datum_state
+          locator: *id020
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1657,6 +1838,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '62.6'
+          FeO1.5: '6.3'
+          CaO: '0.0'
+          SiO2: '31.1'
+        composition_role:
+          value: datum_state
+          locator: *id021
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1735,6 +1925,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '64.8'
+          FeO1.5: '7.3'
+          CaO: '0.0'
+          SiO2: '27.8'
+        composition_role:
+          value: datum_state
+          locator: *id022
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1813,6 +2012,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '66.4'
+          FeO1.5: '7.5'
+          CaO: '0.0'
+          SiO2: '26.2'
+        composition_role:
+          value: datum_state
+          locator: *id023
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1891,6 +2099,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '65.3'
+          FeO1.5: '11.8'
+          CaO: '0.0'
+          SiO2: '22.9'
+        composition_role:
+          value: datum_state
+          locator: *id024
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -1969,6 +2186,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '71.3'
+          FeO1.5: '11.2'
+          CaO: '0.0'
+          SiO2: '17.5'
+        composition_role:
+          value: datum_state
+          locator: *id025
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2047,6 +2273,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '29.7'
+          FeO1.5: '2.5'
+          CaO: '27.1'
+          SiO2: '40.7'
+        composition_role:
+          value: datum_state
+          locator: *id026
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2125,6 +2360,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '39.5'
+          FeO1.5: '4.4'
+          CaO: '22.4'
+          SiO2: '33.6'
+        composition_role:
+          value: datum_state
+          locator: *id027
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2203,6 +2447,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '46.0'
+          FeO1.5: '5.9'
+          CaO: '19.3'
+          SiO2: '28.9'
+        composition_role:
+          value: datum_state
+          locator: *id028
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2281,6 +2534,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '48.4'
+          FeO1.5: '9.0'
+          CaO: '17.0'
+          SiO2: '25.6'
+        composition_role:
+          value: datum_state
+          locator: *id029
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2359,6 +2621,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '56.4'
+          FeO1.5: '12.0'
+          CaO: '12.6'
+          SiO2: '18.9'
+        composition_role:
+          value: datum_state
+          locator: *id030
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2437,6 +2708,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '46.5'
+          FeO1.5: '21.9'
+          CaO: '30.4'
+          SiO2: '1.3'
+        composition_role:
+          value: datum_state
+          locator: *id031
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2515,6 +2795,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '51.9'
+          FeO1.5: '21.2'
+          CaO: '25.8'
+          SiO2: '1.1'
+        composition_role:
+          value: datum_state
+          locator: *id032
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2593,6 +2882,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '61.1'
+          FeO1.5: '21.3'
+          CaO: '16.9'
+          SiO2: '0.7'
+        composition_role:
+          value: datum_state
+          locator: *id033
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2671,6 +2969,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '33.4'
+          FeO1.5: '6.4'
+          CaO: '24.1'
+          SiO2: '36.1'
+        composition_role:
+          value: datum_state
+          locator: *id034
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2749,6 +3056,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '41.8'
+          FeO1.5: '6.0'
+          CaO: '20.9'
+          SiO2: '31.4'
+        composition_role:
+          value: datum_state
+          locator: *id035
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2827,6 +3143,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '51.3'
+          FeO1.5: '6.2'
+          CaO: '2.1'
+          SiO2: '40.4'
+        composition_role:
+          value: datum_state
+          locator: *id036
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2905,6 +3230,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '57.5'
+          FeO1.5: '4.9'
+          CaO: '1.9'
+          SiO2: '35.8'
+        composition_role:
+          value: datum_state
+          locator: *id037
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -2983,6 +3317,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '59.8'
+          FeO1.5: '6.7'
+          CaO: '1.7'
+          SiO2: '31.8'
+        composition_role:
+          value: datum_state
+          locator: *id038
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -3061,6 +3404,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '60.4'
+          FeO1.5: '9.6'
+          CaO: '1.5'
+          SiO2: '28.6'
+        composition_role:
+          value: datum_state
+          locator: *id039
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -3139,6 +3491,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '61.6'
+          FeO1.5: '8.4'
+          CaO: '1.5'
+          SiO2: '28.5'
+        composition_role:
+          value: datum_state
+          locator: *id040
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -3217,6 +3578,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '63.6'
+          FeO1.5: '12.1'
+          CaO: '1.2'
+          SiO2: '23.1'
+        composition_role:
+          value: datum_state
+          locator: *id041
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
@@ -3295,6 +3665,15 @@ species:
       phase: l
       units: dimensionless activity as printed
       values:
+        composition_wt_pct:
+          FeO: '64.7'
+          FeO1.5: '13.1'
+          CaO: '1.1'
+          SiO2: '21.1'
+        composition_role:
+          value: datum_state
+          locator: *id042
+          quote: "Table 2 reports the analyzed slag composition in mass percent."
         quantity: activity
         method_class: measured_tabulated
         formula: FeO
