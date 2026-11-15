@@ -5721,7 +5721,7 @@ class CondensationModel:
         if area == 0.0:
             return _mint_zero('no_configured_capture_area')
 
-        lo_C, hi_C = _stage_temp_band_C(stage)
+        lo_C, hi_C = _ordered_stage_band_C(stage)
         width_C = hi_C - lo_C
         sample_count = 1 if width_C == 0.0 else HKL_BAND_SAMPLES
         reactive_backstop_authorized = _reactive_product_backstop_authorized(species)
