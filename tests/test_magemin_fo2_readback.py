@@ -85,6 +85,147 @@ def test_live_c5_buffer_loss_is_numerical_failure(live_backend, requested):
     assert result.diagnostics['backend_failure_disposition'] == 'numerical'
 
 
+def test_fe_free_native_fo2_is_indeterminate_and_cacheable(
+    tmp_path, monkeypatch,
+):
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        _call_cached_backend_equilibrate,
+        load_binary_pots,
+        normalize_engine_settings,
+    )
+    from simulator.engine_cache import _is_refusal
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {}
+    pots, _metadata = load_binary_pots()
+    pot = next(item for item in pots if item.pot_id == 'mgo_sio2_40_60')
+    projection = backend._build_db_bulk_projection(pot.composition_wt_pct)
+    redox_carriers = backend._DB_FO2_REDOX_CARRIERS[projection.database]
+    assert not any(
+        projection.composition_wt_pct.get(name, 0.0) > 0.0
+        for name in redox_carriers
+    )
+    native_readback = 12.25
+
+    def run(_args, *, cwd, **kwargs):
+        output = Path(cwd) / 'output'
+        output.mkdir(exist_ok=True)
+        (output / '_matlab_output.txt').write_text(
+            f'log10(fO2) {native_readback}\n'
+        )
+        return SimpleNamespace(returncode=0, stderr='', stdout=(
+            'Status : 0 [success]\nPhase : liq\nMode : 1.0\n'
+        ))
+
+    monkeypatch.setattr(magemin_module.subprocess, 'run', run)
+    monkeypatch.setenv('REGOLITH_ENGINE_CACHE', str(tmp_path / 'magemin.sqlite'))
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+    handle = EngineHandle(
+        name='magemin', backend=backend, available=True,
+        unavailable_reason=None, takes_fo2=True,
+        supports_intrinsic_fo2=False,
+        engine_settings=normalize_engine_settings('magemin', None),
+    )
+    temperature_C = 1426.85
+    requested = -9.0
+    kwargs = {
+        'temperature_C': temperature_C,
+        'composition_kg': dict(pot.composition_wt_pct),
+        'projected_oxide_wt_pct': projection.composition_wt_pct,
+        'fO2_log': requested,
+        'pressure_bar': 0.05,
+    }
+
+    raw_results = []
+
+    def solve():
+        result = backend.equilibrate(**kwargs)
+        raw_results.append(result)
+        return result
+
+    cold = _call_cached_backend_equilibrate(handle, kwargs, solve)
+    raw = raw_results[0]
+    assert raw.status == 'ok'
+    assert raw.fO2_log is None
+    assert 'solved_fO2_log' not in raw.diagnostics
+    assert raw.diagnostics['qfm_reference_notice']['kind'] == 'out_of_certified_band'
+    assert cold.status == 'ok'
+    assert not _is_refusal(cold)
+    notice = raw.diagnostics['fo2_indeterminate_no_redox_carrier']
+    assert notice == {
+        'database': projection.database,
+        'requested_fO2_log': requested,
+        'native_readback_fO2_log': native_readback,
+        'buffer_phase_present': False,
+    }
+    assert cold.diagnostics['fo2_indeterminate_no_redox_carrier'] == notice
+    assert engine_cache.engine_cache_counters(reset=True)['magemin'] == {
+        'hits': 0,
+        'misses': 1,
+        'stores': 1,
+        'store_error': 0,
+        'read_error': 0,
+        'conflicts': 0,
+    }
+
+    engine_cache._MEMORY_CACHE.clear()
+    warm = _call_cached_backend_equilibrate(
+        handle, kwargs, lambda: pytest.fail('expected SQLite cache hit')
+    )
+    assert warm.status == 'ok'
+    assert warm.diagnostics['fo2_indeterminate_no_redox_carrier'] == notice
+    assert 'solved_fO2_log' not in warm.diagnostics
+    assert engine_cache.engine_cache_counters(reset=True)['magemin'] == {
+        'hits': 1,
+        'misses': 0,
+        'stores': 0,
+        'store_error': 0,
+        'read_error': 0,
+        'conflicts': 0,
+    }
+
+
+def test_fe_bearing_native_fo2_control_failure_remains_not_converged(
+    monkeypatch,
+):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {}
+    projection = backend._build_db_bulk_projection(_BASALT)
+    redox_carriers = backend._DB_FO2_REDOX_CARRIERS[projection.database]
+    assert any(
+        projection.composition_wt_pct.get(name, 0.0) > 0.0
+        for name in redox_carriers
+    )
+    native_readback = 12.25
+
+    def run(_args, *, cwd, **kwargs):
+        output = Path(cwd) / 'output'
+        output.mkdir(exist_ok=True)
+        (output / '_matlab_output.txt').write_text(
+            f'log10(fO2) {native_readback}\n'
+        )
+        return SimpleNamespace(returncode=0, stderr='', stdout=(
+            'Status : 0 [success]\nPhase : liq\nMode : 1.0\n'
+        ))
+
+    monkeypatch.setattr(magemin_module.subprocess, 'run', run)
+    result = _solve(backend, projection.composition_wt_pct, -9.0, 1426.85)
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_disposition'] == 'numerical'
+    assert result.diagnostics['buffer_phase_present'] is False
+
+
 def test_live_liquid_control_keeps_finite_native_value(live_backend):
     result = _solve(live_backend, _C5, -2.0)
     assert result.diagnostics['solved_fO2_log'] == pytest.approx(-5.467, abs=0.01)

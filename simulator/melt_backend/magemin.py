@@ -2078,6 +2078,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 phase_names is not None and any(
                     name in self._BUFFER_CHOICES for name in phase_names
                 ),
+                database=bulk_projection.database,
+                bulk_components=bulk_projection.composition_wt_pct,
             )
         else:
             operating_point = raw['operating_point_diagnostics']
@@ -2087,8 +2089,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 if line not in all_warnings:
                     all_warnings.append(line)
         result_diagnostics.update(operating_point)
-        result_fO2_log = operating_point['solved_fO2_log']
-        if operating_point['authoritative_for_requested_conditions'] is False:
+        result_fO2_log = operating_point.get('solved_fO2_log')
+        if operating_point.get('authoritative_for_requested_conditions') is False:
             result_status = operating_point['backend_status']
             all_warnings.append(str(operating_point['fO2_control_notice']))
         if isinstance(raw, Mapping):
@@ -2807,6 +2809,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'Na2O',
         ),
         'mtl': ('SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'Na2O'),
+    }
+    # Only the ig database's fO2 carriers have been established here. Other
+    # databases retain conservative native-control validation until their
+    # redox carriers are known.
+    _DB_FO2_REDOX_CARRIERS: Dict[str, Tuple[str, ...]] = {
+        'ig': ('FeOt', 'O'),
     }
     _IG_BULK_ORDER: Tuple[str, ...] = _DB_BULK_ORDERS['ig']
     _MAGEMIN_INPUT_BASIS: Tuple[str, ...] = tuple(dict.fromkeys((
@@ -3584,6 +3592,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         operating_point_diagnostics = self._fo2_operating_point(
             fO2_log, native_log, buffer_present,
+            database=bulk_projection.database,
+            bulk_components=bulk_projection.composition_wt_pct,
         )
         operating_point_diagnostics.update({
             'applied_fO2_buffer': buffer_name,
@@ -3891,11 +3901,42 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         return 'qfm', buffer_n, warnings_out
 
-    @staticmethod
     def _fo2_operating_point(
-        requested: float, native: Any, buffer_present: bool,
+        self,
+        requested: float,
+        native: Any,
+        buffer_present: bool,
+        *,
+        database: str | None = None,
+        bulk_components: Mapping[str, float] | None = None,
     ) -> Dict[str, Any]:
         solved = finite_float(native)
+        database_name = (
+            str(database or self._effective_database()).lower().strip()
+        )
+        carriers = self._DB_FO2_REDOX_CARRIERS.get(database_name)
+        if carriers is not None and bulk_components is not None:
+            carrier_amounts = [
+                finite_float(bulk_components.get(name, 0.0))
+                for name in carriers
+            ]
+            # d-422: Oxygen chemical potential is undefined without an
+            # active-database redox carrier, so phase equilibrium is
+            # independent of fO2. The Fe-free MgO-SiO2 binary is the sanity
+            # case: no FeOt or O means its absent QFM phase and arbitrary
+            # native readback cannot show that the solve failed or used
+            # another fO2.
+            if all(amount == 0.0 for amount in carrier_amounts):
+                return {
+                    'requested_fO2_log': requested,
+                    'buffer_phase_present': buffer_present,
+                    'fo2_indeterminate_no_redox_carrier': {
+                        'database': database_name,
+                        'requested_fO2_log': requested,
+                        'native_readback_fO2_log': solved,
+                        'buffer_phase_present': buffer_present,
+                    },
+                }
         delta = None if solved is None else solved - requested
         honoured = (
             buffer_present and delta is not None

@@ -4703,8 +4703,10 @@ def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree(request):
         fO2_log=-8.0,
         pressure_bar=2000.0,
     )
-    assert result.status == "not_converged", result.warnings
+    assert result.status == "ok", result.warnings
     assert result.diagnostics["buffer_phase_present"] is False
+    assert "fo2_indeterminate_no_redox_carrier" in result.diagnostics
+    assert "solved_fO2_log" not in result.diagnostics
 
     size_after = dump_path.stat().st_size if dump_path.exists() else 0
     assert size_after == size_before
@@ -4851,7 +4853,7 @@ def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
     )
 
 
-def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
+def test_magemin_configured_named_buffer_is_indeterminate_without_redox_carrier(
     monkeypatch,
 ):
     captured: dict = {}
@@ -4897,14 +4899,17 @@ def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
 
     assert any(arg == "--buffer=mw" for arg in captured["args"])
     assert any(arg == "--buffer_n=0.000000" for arg in captured["args"])
-    assert result.status == "out_of_domain"
-    assert result.fO2_log == -7.0
-    assert result.diagnostics["operating_point_clamped"] is True
-    assert result.diagnostics["fO2_clamped"] is True
+    assert result.status == "ok"
+    assert result.fO2_log is None
+    assert result.diagnostics["fo2_indeterminate_no_redox_carrier"] == {
+        "database": "ig",
+        "requested_fO2_log": -12.0,
+        "native_readback_fO2_log": -7.0,
+        "buffer_phase_present": True,
+    }
     assert result.diagnostics["requested_fO2_log"] == -12.0
-    assert result.diagnostics["solved_fO2_log"] == -7.0
+    assert "solved_fO2_log" not in result.diagnostics
     assert result.diagnostics["applied_fO2_buffer"] == "mw"
-    assert result.diagnostics["authoritative_for_requested_conditions"] is False
 
 
 def test_magemin_resolve_buffer_qfm_calibration_at_1450C():
