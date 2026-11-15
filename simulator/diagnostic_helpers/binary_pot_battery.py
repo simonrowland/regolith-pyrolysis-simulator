@@ -3832,6 +3832,13 @@ def _internal_analytical_vapor_pressure_adapter(
         "code_path": _INTERNAL_ANALYTICAL_VAPOR_PRESSURE_PATH,
         "authority": authority_status,
         "vapor_pressures_source": dict(equilibrium.vapor_pressures_source),
+        "phase_basis": core_diagnostic.get("phase_basis"),
+        "phase_basis_source": core_diagnostic.get("phase_basis_source"),
+        "applied_vapour_switch_K": core_diagnostic.get(
+            "applied_vapour_switch_K"
+        ),
+        "phase_basis_notice": core_diagnostic.get("phase_basis_notice"),
+        "notices": list(core_diagnostic.get("d207_notices") or ()),
         "core_flags": core_flags,
         "oxygen_condition_source": oxygen_source,
         "oxygen_balance": oxygen_notices,
