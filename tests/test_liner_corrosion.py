@@ -17,7 +17,9 @@ from simulator.liner_corrosion import (
     LinerCorrosionRefusal,
     MageminLinerSampler,
     TierAInvariantSampler,
+    TabulatedLiquidFractionCurve,
     attach_liner_state_metadata,
+    build_liner_state_segment,
     contaminated_interface_composition,
     contamination_mixing_fractions,
     corrosion_campaign_recurrence,
@@ -113,11 +115,15 @@ class _FakeMageminBackend:
         self.calls.append(
             (temperature_C, pressure_bar, fO2_log, dict(projected_oxide_wt_pct))
         )
+        liquid_fraction = self.liquid_fraction(projected_oxide_wt_pct)
         return SimpleNamespace(
             status="ok",
-            liquid_fraction=self.liquid_fraction(projected_oxide_wt_pct),
-            phase_masses_kg={"liq": 1.0},
-            phase_compositions={"liq": dict(projected_oxide_wt_pct)},
+            liquid_fraction=liquid_fraction,
+            phase_masses_kg={"liq": liquid_fraction, "solid": 1.0 - liquid_fraction},
+            phase_compositions={
+                "liq": dict(projected_oxide_wt_pct),
+                "solid": dict(projected_oxide_wt_pct),
+            },
             warnings=[],
         )
 
@@ -155,6 +161,56 @@ def test_magemin_adapter_gates_before_engine_and_checks_phase_closure():
     with pytest.raises(LinerCorrosionRefusal) as closure:
         MageminLinerSampler(bad_closure)(composition, 1500.0, 1.0e-6)
     assert closure.value.reason == "engine_phase_closure_failed"
+
+
+def test_magemin_closure_uses_reported_phase_mass_and_liquid_composition():
+    composition = {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0}
+
+    class ReportedPhaseBackend(_FakeMageminBackend):
+        def equilibrate(
+            self,
+            temperature_C,
+            *,
+            pressure_bar,
+            fO2_log,
+            projected_oxide_wt_pct,
+        ):
+            if temperature_C < 1553.0:
+                return SimpleNamespace(
+                    status="ok",
+                    liquid_fraction=0.0,
+                    phase_masses_kg={"anorthite": 1.0},
+                    phase_compositions={},
+                    liquid_composition_wt_pct={},
+                    warnings=[],
+                )
+            return SimpleNamespace(
+                status="ok",
+                liquid_fraction=1.0,
+                phase_masses_kg={"liq": 1.0},
+                phase_compositions={},
+                liquid_composition_wt_pct=dict(projected_oxide_wt_pct),
+                warnings=[],
+            )
+
+    sampler = MageminLinerSampler(ReportedPhaseBackend())
+    assert sampler(composition, 1500.0, 1.0e-6) == 0.0
+    assert sampler(composition, 1600.0, 1.0e-6) == 1.0
+
+    class UnclosedBackend(_FakeMageminBackend):
+        def equilibrate(self, *_args, **_kwargs):
+            return SimpleNamespace(
+                status="ok",
+                liquid_fraction=0.0,
+                phase_masses_kg={"solid-a": 0.5, "solid-b": 0.5},
+                phase_compositions={},
+                liquid_composition_wt_pct={},
+                warnings=[],
+            )
+
+    with pytest.raises(LinerCorrosionRefusal) as unclosed:
+        MageminLinerSampler(UnclosedBackend())(composition, 1500.0, 1.0e-6)
+    assert unclosed.value.reason == "engine_phase_closure_failed"
 
 
 def test_magemin_phi_curve_is_cached_and_interpolated():
@@ -402,6 +458,113 @@ def test_reactive_sampling_refusal_keeps_completed_inert_bound():
     assert result["branch_end_deposit_kg_by_species"]["inert"] == {"Na": 0.2}
 
 
+def test_campaign_interval_orders_onset_counts_not_deposit_rates():
+    def sodium_liquid_signal(composition, _temperature_C, _pressure_bar):
+        return 1.0 if composition.get("Na2O", 0.0) >= 15.0 else 0.0
+
+    result = corrosion_campaign_recurrence(
+        {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+        {},
+        {"Na": 0.2},
+        {"Na": 0.2, "Fe": 2.0},
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+        temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+        margin_C=0.0,
+        horizon=100,
+        sampler=sodium_liquid_signal,
+    )
+
+    # Inert Na reaches 15 wt% Na2O after one campaign. The reactive mix keeps
+    # Na at the same rate but adds FeO, so Na2O stays below 15 wt% through the
+    # horizon. The campaign interval must follow onset, not total deposit mass.
+    assert result["onset_campaigns_by_branch"] == {
+        "inert_onset_campaign": 1,
+        "reactive_onset_campaign": "> 100",
+    }
+    assert result["campaigns_to_runaway"] == [1, "> 100"]
+    assert result["campaign_interval_branch_labels"] == {
+        "lower": "inert",
+        "upper": "reactive_upper_bound",
+    }
+
+
+def test_multispecies_campaign_interval_matches_each_branch_projection():
+    def sodium_liquid_signal(composition, _temperature_C, _pressure_bar):
+        return 1.0 if composition.get("Na2O", 0.0) >= 15.0 else 0.0
+
+    pairs = (
+        ({"Na": 0.2}, {"Na": 0.2, "Fe": 2.0}),
+        ({"Na": 0.2, "Fe": 0.3}, {"Na": 0.4, "Fe": 2.0}),
+        ({"Na": 0.1, "K": 0.2}, {"Na": 0.2, "K": 0.7, "Mg": 0.4}),
+    )
+    for inert, reactive in pairs:
+        combined = corrosion_campaign_recurrence(
+            {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+            {},
+            inert,
+            reactive,
+            density_kg_m3=1.0,
+            area_m2=1.0,
+            reacted_layer_depth_m=1.0,
+            temperature_C=1500.0,
+            pressure_bar=1.0e-6,
+            margin_C=0.0,
+            horizon=8,
+            sampler=sodium_liquid_signal,
+        )
+        inert_only = corrosion_campaign_recurrence(
+            {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+            {},
+            inert,
+            inert,
+            density_kg_m3=1.0,
+            area_m2=1.0,
+            reacted_layer_depth_m=1.0,
+            temperature_C=1500.0,
+            pressure_bar=1.0e-6,
+            margin_C=0.0,
+            horizon=8,
+            sampler=sodium_liquid_signal,
+        )
+        reactive_only = corrosion_campaign_recurrence(
+            {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+            {},
+            reactive,
+            reactive,
+            density_kg_m3=1.0,
+            area_m2=1.0,
+            reacted_layer_depth_m=1.0,
+            temperature_C=1500.0,
+            pressure_bar=1.0e-6,
+            margin_C=0.0,
+            horizon=8,
+            sampler=sodium_liquid_signal,
+        )
+
+        branch_counts = combined["onset_campaigns_by_branch"]
+        assert branch_counts["inert_onset_campaign"] == (
+            inert_only["onset_campaigns_by_branch"]["inert_onset_campaign"]
+        )
+        assert branch_counts["reactive_onset_campaign"] == (
+            reactive_only["onset_campaigns_by_branch"]["inert_onset_campaign"]
+        )
+        order_key = lambda count: 9 if count == "> 8" else count
+        low = min(
+            branch_counts["inert_onset_campaign"],
+            branch_counts["reactive_onset_campaign"],
+            key=order_key,
+        )
+        high = max(
+            branch_counts["inert_onset_campaign"],
+            branch_counts["reactive_onset_campaign"],
+            key=order_key,
+        )
+        assert combined["campaigns_to_runaway"] == [low, high]
+
+
 def test_zero_campaign_deposition_reports_beyond_horizon_not_infinity():
     result = _recurrence(inert_na=0.0, reactive_na=0.0)
 
@@ -499,13 +662,39 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
     }
     monkeypatch.setattr(furnace_materials, "load_furnace_materials", lambda: catalog)
 
-    class FixtureSampler:
+    class FixtureSampler(liner_corrosion.CurveLiquidFractionSampler):
+        saturates = True
+
         def __call__(self, composition, _temperature_C, _pressure_bar):
             return 1.0 if composition.get("Na2O", 0.0) >= 0.1 else 0.0
+
+        def curve(
+            self,
+            liner_composition_wt_pct,
+            deposit_kg_by_species,
+            *,
+            temperature_C,
+            pressure_bar,
+        ):
+            points = (
+                ((0.0, 0.0), (0.001, 0.0), (0.01, 1.0), (1.0, 1.0))
+                if self.saturates
+                else ((0.0, 0.0), (0.001, 0.0), (0.5, 0.5))
+            )
+            return TabulatedLiquidFractionCurve(
+                liner_composition_wt_pct=liner_composition_wt_pct,
+                deposit_composition_wt_pct=liner_corrosion.deposit_oxide_composition(
+                    deposit_kg_by_species
+                ),
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                points=points,
+            )
 
         def close(self):
             pass
 
+    assert isinstance(FixtureSampler(), liner_corrosion.CurveLiquidFractionSampler)
     monkeypatch.setattr(liner_corrosion, "MageminLinerSampler", FixtureSampler)
     segment = PipeSegment(
         name="liner-wall",
@@ -564,6 +753,25 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
     assert run_metadata["liner_state"] == state
     assert segment_state["deposit_inert_kg_by_species"] == {"Na": 1.0e-4}
     assert segment_state["deposit_reactive_kg_by_species"]["Na"] >= 1.0e-4
+    x_star = 0.001 + 0.009 * (1.0 - LIQUIDUS_LIQUID_EPSILON)
+    assert segment_state["liner_consumed_kg_per_kg_deposit"] == pytest.approx(
+        (1.0 - x_star) / x_star
+    )
+
+    FixtureSampler.saturates = False
+    missing_saturation_metadata = {}
+    missing_saturation = attach_liner_state_metadata(
+        missing_saturation_metadata,
+        "fixture-liner",
+        simulator,
+        trace,
+    )
+    missing_segment = missing_saturation["segments"]["liner-wall"]
+    assert missing_segment["liner_consumed_kg_per_kg_deposit"] is None
+    assert any(
+        refusal["reason"] == "tier_b_saturated_liquid_fraction_not_reached"
+        for refusal in missing_segment["refusals"]
+    )
 
 
 def test_tier_a_invariant_signal_runs_the_campaign_recurrence_without_engine_pressure():
@@ -595,6 +803,97 @@ def test_tier_a_invariant_signal_runs_the_campaign_recurrence_without_engine_pre
     )
     assert result["campaigns_to_runaway"] == [1, 1]
     assert result["criterion_signal_at_horizon_or_onset"]["reactive_upper_bound"] == 1.0
+
+
+def test_tier_a_dissolution_uses_the_matched_source_liquid_composition():
+    liner = {"CaO": 60.0, "Al2O3": 40.0}
+    deposits = {"Na": 0.01}
+    mixed = contaminated_interface_composition(
+        liner,
+        deposits,
+        density_kg_m3=1.0,
+        area_m2=1.0,
+        reacted_layer_depth_m=1.0,
+    )
+    table = {
+        "invariants": [
+            {
+                "source_id": "test-source",
+                "subsystem": "Na2O-CaO-Al2O3",
+                "T_invariant_C": 1400.0,
+                "phases": ["liquid"],
+                "liquid_composition": mixed["composition_wt_pct"],
+                "invariant_type": "liquidus",
+            }
+        ]
+    }
+    chemistry = {
+        "composition": liner,
+        "citation": "test-source",
+        "criterion_tier": "A",
+        "invariant_table": table,
+        "density_kg_m3": 1.0,
+        "reacted_layer_depth_m": 1.0,
+        "margin_C": 0.0,
+        "horizon_campaigns": 2,
+        "porosity_fraction": 0.0,
+    }
+    state = build_liner_state_segment(
+        chemistry,
+        deposits,
+        area_m2=1.0,
+        service_temperature_C=1500.0,
+        pressure_bar=None,
+        sampler=None,
+        deposit_inert_kg_by_species=deposits,
+        deposit_reactive_kg_by_species=deposits,
+    )
+
+    x_star = mixed["mixing_fraction_by_species"]["Na"]
+    assert state["onset"]
+    assert state["liner_consumed_kg_per_kg_deposit"] == pytest.approx(
+        (1.0 - x_star) / x_star
+    )
+
+
+def test_tier_a_without_source_liquid_composition_refuses_dissolution_ratio():
+    chemistry = {
+        "composition": {"CaO": 60.0, "Al2O3": 40.0},
+        "citation": "bounds without liquid composition",
+        "criterion_tier": "A",
+        "invariant_table": {
+            "invariants": [
+                {
+                    "composition_bounds_wt_pct": {
+                        "CaO": [0.0, 100.0],
+                        "Al2O3": [0.0, 100.0],
+                    },
+                    "first_liquid_temperature_C": 1400.0,
+                }
+            ]
+        },
+        "density_kg_m3": 1.0,
+        "reacted_layer_depth_m": 1.0,
+        "margin_C": 0.0,
+        "horizon_campaigns": 2,
+        "porosity_fraction": 0.0,
+    }
+    state = build_liner_state_segment(
+        chemistry,
+        {"Na": 0.01},
+        area_m2=1.0,
+        service_temperature_C=1500.0,
+        pressure_bar=None,
+        sampler=None,
+        deposit_inert_kg_by_species={"Na": 0.01},
+        deposit_reactive_kg_by_species={"Na": 0.01},
+    )
+
+    assert state["liner_consumed_kg_per_kg_deposit"] is None
+    assert any(
+        refusal["reason"] == "tier_a_saturated_liquid_composition_missing"
+        for refusal in state["refusals"]
+    )
 
 
 def test_missing_composition_porosity_and_rump_artifact_are_typed():
@@ -677,6 +976,27 @@ def test_all_source_records_load_with_temperature_phases_and_locators() -> None:
         "shornikov-1997-cao-al2o3": 23,
     }
     assert len(records) == 126
+    source_ids = {
+        "rankin-wright-1915-ajs-cao-al2o3-sio2",
+        "morey-1964-usgs-pp440l-phase-equilibria",
+        "shults-1995-calcium-aluminate-thermodynamics",
+        "shornikov-1997-cao-al2o3",
+    }
+    excluded_counts = {source_id: 0 for source_id in source_ids}
+    for row in records:
+        if row.get("first_liquid_exclusion_reason"):
+            excluded_counts[row["source_id"]] += 1
+    assert excluded_counts == {
+        "rankin-wright-1915-ajs-cao-al2o3-sio2": 4,
+        "morey-1964-usgs-pp440l-phase-equilibria": 2,
+        "shults-1995-calcium-aluminate-thermodynamics": 1,
+        "shornikov-1997-cao-al2o3": 0,
+    }
+    morey_subsolidus = next(
+        row for row in records if row["observation_id"] == "morey1964_t26_r14"
+    )
+    assert morey_subsolidus["invariant_type"] == "subsolidus transition"
+    assert morey_subsolidus["first_liquid_exclusion_reason"] == "no_liquid_phase"
     for row in records:
         assert row["subsystem"]
         assert isinstance(row["T_invariant_C"], (int, float))
