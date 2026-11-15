@@ -18142,27 +18142,6 @@ def load_score_context(
     )
 
 
-def _is_compilation_thermo_reference(
-    observation: Observation, origin: str | None
-) -> bool:
-    evidence_class = observation.evidence.class_
-    quantity = (
-        quantity_token(observation.identity)
-        if isinstance(observation.identity, Identity)
-        else None
-    )
-    compilation = (
-        evidence_class.is_value
-        and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
-    ) or is_compilation_source(observation.source_id, origin)
-    return bool(
-        quantity in FORMATION_QUANTITIES | PURE_STANDARD_THERMO | FUSION_QUANTITIES
-        and compilation
-        and not is_internal_consistency(origin)
-        and not is_sf04_workbook(observation)
-    )
-
-
 def _has_duplicate_observation_link(observation: Observation) -> bool:
     provenance = observation.provenance
     return (
@@ -18226,6 +18205,8 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     Quoted valence ratios are on that route so unsupported engine attempts
     remain counted refusals while the quoted evidence class stays unchanged.
     """
+
+    from simulator.battery.compilation_tier import _is_compilation_thermo_reference
 
     out: list[Observation] = []
     for obs in context.observations.values():
@@ -18436,7 +18417,8 @@ def _score_store_with_decisions(
                 flush=True,
             )
     from simulator.battery.compilation_tier import (
-        _compilation_engine_selected,
+        _compilation_engines_for_scoring,
+        _is_compilation_thermo_reference,
         _compilation_series_point_count,
         _iter_compilation_series_cells,
         is_compilation_evidence,
@@ -18567,14 +18549,12 @@ def _score_store_with_decisions(
                     ):
                         derived_band = kems_partial_pressure_band
                         derived_band_reason = None
-                    for engine in engine_set:
-                        if not _compilation_engine_selected(
-                            engine,
-                            point,
-                            point_origin,
-                            production_scoring=predict is None,
-                        ):
-                            continue
+                    for engine in _compilation_engines_for_scoring(
+                        engine_set,
+                        point,
+                        point_origin,
+                        production_scoring=predict is None,
+                    ):
                         lineage_id = (
                             obs.observation_id
                             if point.observation_id != obs.observation_id
@@ -24557,19 +24537,15 @@ class _ScorePayloadAccumulator:
         self, *, engines: Sequence[Engine] | None = None
     ) -> list[str]:
         from simulator.battery.compilation_tier import (
-            _tier_markdown,
-            unrouted_compilation_summary_lines,
+            _compilation_tier_lines_from_accumulator,
         )
 
-        lines = _tier_markdown((), accumulator=self.tier_accumulator)
-        lines.extend(
-            unrouted_compilation_summary_lines(
-                self.context.observations,
-                self.context.origins,
-                self.engines if engines is None else engines,
-            )
+        return _compilation_tier_lines_from_accumulator(
+            self.tier_accumulator,
+            self.context.observations,
+            self.context.origins,
+            self.engines if engines is None else engines,
         )
-        return lines
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
         return headline_summary_payload(
@@ -24688,8 +24664,7 @@ def render_score_report_from_payloads(
     if observations is not None:
         from simulator.battery.compilation_tier import (
             compilation_row_observation,
-            compilation_tier_lines_from_payloads,
-            unrouted_compilation_summary_lines,
+            _compilation_tier_report_lines_from_payloads,
         )
 
         def is_compilation(row: Mapping[str, object]) -> bool:
@@ -24707,11 +24682,8 @@ def render_score_report_from_payloads(
         # _ScorePayloadAccumulator._add_headline(tier="compilation"):
         # unflagged rows whose reference is a compilation observation.
         compilation_rows = _FilteredPayloadRows(unflagged_rows, is_compilation)
-        compilation_lines = compilation_tier_lines_from_payloads(
-            unflagged_rows, observations, origins
-        )
-        compilation_lines.extend(
-            unrouted_compilation_summary_lines(observations, origins or {}, engines)
+        compilation_lines = _compilation_tier_report_lines_from_payloads(
+            unflagged_rows, observations, origins, engines
         )
     all_numeric_records = all_numeric_payload_records(
         rows, engines=engines, observations=observations, origins=origins

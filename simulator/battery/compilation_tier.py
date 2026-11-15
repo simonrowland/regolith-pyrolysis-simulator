@@ -270,29 +270,29 @@ def _compilation_engines_for_pair(
     return tuple(routed)
 
 
-def _compilation_engine_selected(
-    engine: Engine,
+def _compilation_engines_for_scoring(
+    engines: Sequence[Engine],
     observation: Observation,
     origin: str | None,
     *,
     production_scoring: bool,
-) -> bool:
-    """Apply production compilation filtering before building a residual."""
+) -> tuple[Engine, ...]:
+    """Apply production compilation filtering before building residuals."""
 
     if not production_scoring:
-        return True
+        return tuple(engines)
     from simulator.battery.score import is_compilation_source, is_internal_consistency
 
     if not (
         is_compilation_evidence(observation)
         or is_compilation_source(observation.source_id, origin)
     ):
-        return True
+        return tuple(engines)
     if is_internal_consistency(origin):
-        return False
+        return ()
     if not isinstance(observation.identity, Identity):
-        return True
-    return engine in _compilation_engines_for_pair((engine,), observation.identity)
+        return tuple(engines)
+    return _compilation_engines_for_pair(engines, observation.identity)
 
 
 def unrouted_compilation_summary_lines(
@@ -480,6 +480,28 @@ def is_compilation_evidence(observation: Observation) -> bool:
     evidence = observation.evidence.class_
     return bool(
         evidence.is_value and evidence.value is EvidenceClass.COMPILATION_ASSESSED
+    )
+
+
+def _is_compilation_thermo_reference(
+    observation: Observation, origin: str | None
+) -> bool:
+    is_compilation_source, is_internal_consistency, is_sf04_workbook, _parse = (
+        _score_predicates()
+    )
+    quantity = (
+        quantity_token(observation.identity)
+        if isinstance(observation.identity, Identity)
+        else None
+    )
+    compilation = is_compilation_evidence(observation) or is_compilation_source(
+        observation.source_id, origin
+    )
+    return bool(
+        quantity in FORMATION_QUANTITIES | PURE_STANDARD_THERMO | FUSION_QUANTITIES
+        and compilation
+        and not is_internal_consistency(origin)
+        and not is_sf04_workbook(observation)
     )
 
 
@@ -4251,6 +4273,28 @@ def compilation_tier_lines_from_payloads(
         cells(),
         typed_band_values=getattr(rows, "_typed_tier_band_values", None),
     )
+
+
+def _compilation_tier_lines_from_accumulator(
+    accumulator: _TierMarkdownAccumulator,
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str],
+    engines: Sequence[Engine],
+) -> list[str]:
+    lines = _tier_markdown((), accumulator=accumulator)
+    lines.extend(unrouted_compilation_summary_lines(observations, origins, engines))
+    return lines
+
+
+def _compilation_tier_report_lines_from_payloads(
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str] | None,
+    engines: Sequence[Engine],
+) -> list[str]:
+    lines = compilation_tier_lines_from_payloads(rows, observations, origins)
+    lines.extend(unrouted_compilation_summary_lines(observations, origins or {}, engines))
+    return lines
 
 
 def write_compilation_comparisons_jsonl(context, path: Path) -> int:
