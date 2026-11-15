@@ -574,6 +574,22 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Loaded catalogue or activity registry. It does not evaluate a law, so it has no disclosure to replay.',
     },
+    'lru:simulator/optimize/objective.py:_campaign_product_claims_by_id': {
+        "path": 'simulator/optimize/objective.py',
+        "line": 1735,
+        "kind": 'lru',
+        "name": '_campaign_product_claims_by_id',
+        "carries_disclosure": False,
+        "how": 'Caches campaign product-key claims loaded from setpoints; it stores no evaluated vapour-law result or disclosure.',
+    },
+    'lru:simulator/optimize/objective.py:_c0_auto_apply_phase_names': {
+        "path": 'simulator/optimize/objective.py',
+        "line": 1800,
+        "kind": 'lru',
+        "name": '_c0_auto_apply_phase_names',
+        "carries_disclosure": False,
+        "how": 'Caches the campaign controller phase-name tuple for C0 auto-apply; it stores no evaluated vapour-law result or disclosure.',
+    },
     'lru:simulator/optimize/pool.py:_default_feedstocks': {
         "path": 'simulator/optimize/pool.py',
         "line": 981,
@@ -709,6 +725,14 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": '_VOCAB_CACHE',
         "carries_disclosure": False,
         "how": 'Parsed lab-parameter vocabulary. A pure loader. It never evaluates a vapour law.',
+    },
+    'store:simulator/battery/migrate.py:manifest_cache': {
+        "path": 'simulator/battery/migrate.py',
+        "line": 34093,
+        "kind": 'store',
+        "name": 'manifest_cache',
+        "carries_disclosure": False,
+        "how": 'Caches parsed compilation manifests by path for intake role counts; it stores source metadata, not evaluated vapour-law results or disclosures.',
     },
     'store:simulator/battery/migrate.py:equality_fallback_entries': {
         "path": 'simulator/battery/migrate.py',
