@@ -57,6 +57,64 @@ def _series(row, unit="atm"):
     return row
 
 
+@pytest.mark.parametrize(
+    "method,expected",
+    [
+        ("measured_direct", AdmissionStatus.ADMITTED),
+        ("measured_tabulated", AdmissionStatus.ADMITTED),
+        ("quoted_attributed", AdmissionStatus.PENDING),
+        ("model_derived", AdmissionStatus.PENDING),
+        ("figure_only", AdmissionStatus.PENDING),
+    ],
+)
+def test_d413_batch_admission_is_scoped_to_measured_classes(
+    tmp_path, method, expected
+):
+    row = _row(method, method, relation=None)
+    row["values"]["admission_status"] = "parked"
+    observation = _child(_migrate(tmp_path, [row]), method)
+    assert observation.admission.status is expected
+    if expected is AdmissionStatus.ADMITTED:
+        assert observation.admission.decided_by.worker == "d-413-batch-literature"
+
+
+def test_d413_batch_admission_covers_measured_reduced_and_validator_mutation(tmp_path):
+    direct = _row("parent", "measured_direct", relation=None)
+    reduced = _row(
+        "reduced", "calculated", parents=["parent"], relation="author_mass_balance"
+    )
+    direct["values"]["admission_status"] = "admitted"
+    reduced["values"]["admission_status"] = "parked"
+    result = _migrate(tmp_path, [direct, reduced])
+    admitted = _child(result, "reduced")
+    assert admitted.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert admitted.admission.status is AdmissionStatus.ADMITTED
+    assert admitted.admission.decided_by.worker == "d-413-batch-literature"
+    assert result.validation.ok
+
+    from dataclasses import replace
+
+    mutated = replace(
+        admitted,
+        admission=replace(admitted.admission, decided_by=None),
+    )
+    observations = dict(result.observations)
+    observations[mutated.observation_id] = mutated
+    report = M.validate_corpus(
+        result.works,
+        result.experiments,
+        observations,
+        benches=result.benches,
+        context_rows={
+            str(row["context_id"]): row
+            for rows in result.context_by_work.values()
+            for row in rows
+        },
+    )
+    assert not report.ok
+    assert any("decided_by" in issue.detail for issue in report.issues)
+
+
 @pytest.mark.parametrize("method", ["calculated", "author_derived"])
 @pytest.mark.parametrize("shape", ["scalar", "atm_series", "Pa_series", "top_level", "regime", "spaced_regime"])
 def test_author_reduction_positive_controls(tmp_path, method, shape):
