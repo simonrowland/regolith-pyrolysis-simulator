@@ -1816,9 +1816,9 @@ def count_o2_dependent_compiled_evaluators(
 
 
 def is_dioxygen_formula(formula: str) -> bool:
-    """True for O2 / O2(g) / O2(g,ideal) etc."""
+    """Whether the whitespace-trimmed base formula before the first '(' is O2."""
 
-    bare = formula.strip().split("(", 1)[0]
+    bare = formula.split("(", 1)[0].strip()
     return bare == "O2"
 
 
