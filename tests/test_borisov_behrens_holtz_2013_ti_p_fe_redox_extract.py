@@ -9,7 +9,7 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
-from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.enums import AmountBasis, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -133,6 +133,10 @@ def _assert_table2_grid(document: dict, expected: tuple[tuple[str, ...], ...]) -
             **values["unreported_components_as_published"],
         }
         assert printed_composition == dict(zip(OXIDES, cells[:7], strict=True))
+        assert values["composition_missing_components"] == [
+            oxide for oxide, amount in zip(OXIDES, cells[:7], strict=True)
+            if amount in {"–", "—", "-"}
+        ]
 
 
 def test_table2_independent_render_grid_and_mutations() -> None:
@@ -153,6 +157,15 @@ def test_table2_independent_render_grid_and_mutations() -> None:
     first_row["values"]["composition_wt_pct_as_published"]["SiO2"] = "45.48"
     with pytest.raises(AssertionError):
         _assert_table2_grid(extract_mutation, expected)
+
+    dash_mutation = deepcopy(document)
+    first_row = next(
+        item for item in dash_mutation["species"]["Fe"]["observations"]
+        if item["observation_id"].endswith("_row_01_daf_5")
+    )
+    first_row["values"]["unreported_components_as_published"]["P2O5"] = "0"
+    with pytest.raises(AssertionError):
+        _assert_table2_grid(dash_mutation, expected)
 
     duration_mutation = deepcopy(document)
     blank_duration = next(
@@ -234,6 +247,11 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
         for formula, body in document["species"].items()
         for item in body.get("observations", [])
     }
+    source_observations = {
+        item["observation_id"]: item
+        for body in document["species"].values()
+        for item in body.get("observations", [])
+    }
     assert all(
         record.identity.species.formula == source_formula[
             record.observation_id.split("::", 1)[1]
@@ -259,7 +277,26 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
             assert conditions["duration_h"].state.is_value
         assert conditions["fO2_log"].state.is_unknown
         assert conditions["total_pressure_Pa"].state.value == Decimal("101325")
-        assert conditions["composition"].state.is_unknown
+        source = source_observations[record.observation_id.split("::", 1)[1]]
+        source_values = source["values"]
+        composition = conditions["composition"]
+        assert composition.state.is_value
+        assert record.identity.composition == composition.state
+        assert composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+        assert abs(
+            sum(dict(composition.state.value.components).values(), Decimal("0"))
+            - Decimal("1")
+        ) < Decimal("1e-24")
+        assert composition.inference is not None
+        assert composition.inference.relation == "wt_pct_to_mole_fraction"
+        assert "x_i = (w_i / M_i) / Σ_j (w_j / M_j)" in composition.inference.inputs
+        parameters = dict(composition.inference.parameters)
+        for oxide, amount in source_values["composition_wt_pct_as_published"].items():
+            assert parameters[f"original_{oxide}_wt_pct"].state.value == Decimal(amount)
+        projected = dict(composition.state.value.components)
+        for oxide in source_values["composition_missing_components"]:
+            assert oxide not in projected
+            assert f"original_{oxide}_wt_pct" not in parameters
         assert conditions["quench_state"].state.value.value == "not_stated"
         assert record.quench_state.value == "not_stated"
 
