@@ -759,6 +759,67 @@ def _load_evaporation_alpha_envelope_by_species(
 
 
 class EvaporationMixin:
+    def _vapor_pressure_freeze_gate_phase_fraction(
+        self,
+    ) -> tuple[float | None, str]:
+        """Read an admitted, unrepaired gate curve for vapour phase selection.
+
+        The evaporation multiplier may use floor or held curves. Vapour
+        binding needs a phase signal, so only a live, admitted gate curve with
+        its original source and no curve repairs is eligible here.
+        """
+
+        register = getattr(
+            self, '_register_freeze_gate_liquid_fraction_providers', None,
+        )
+        try:
+            if callable(register):
+                register()
+        except (ProviderUnavailableError, ImportError):
+            return None, 'freeze_gate_authority_refused'
+        resolve = getattr(self, '_melt_redox_liquidus_gate_record', None)
+        admitted = getattr(self, '_melt_redox_gate_record_is_admitted', None)
+        if not callable(resolve) or not callable(admitted):
+            return None, 'missing'
+        try:
+            record = resolve()
+        except ProviderUnavailableError:
+            return None, 'freeze_gate_authority_refused'
+        repair_notices = (
+            record.get('repair_notices')
+            if isinstance(record, Mapping)
+            else None
+        )
+        if not (
+            isinstance(record, Mapping)
+            and record.get('disposition') in {'live', 'memo-hit'}
+            and admitted(record)
+            and isinstance(repair_notices, list)
+            and not repair_notices
+        ):
+            return None, 'freeze_gate_authority_missing_or_invalid'
+        curve = record.get('curve')
+        if not isinstance(curve, Mapping):
+            return None, 'freeze_gate_authority_missing_or_invalid'
+        source = str(curve.get('source') or '')
+        if (
+            source != 'gate_liquid_fraction'
+            or curve.get('gate_provider_refusal')
+            or curve.get('composition_projected_notice')
+            or curve.get('composition_derived')
+        ):
+            return None, 'freeze_gate_authority_fallback_or_projected'
+        try:
+            fraction = self._interpolate_freeze_gate_curve(
+                curve,
+                float(self.melt.temperature_C),
+            )
+        except (KeyError, TypeError, ValueError):
+            return None, 'freeze_gate_authority_missing_or_invalid'
+        if liquid_fraction_invalidity(fraction) is not None:
+            return None, 'freeze_gate_authority_missing_or_invalid'
+        return float(fraction), 'freeze_gate_authority:gate_liquid_fraction'
+
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
 
