@@ -389,6 +389,43 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
         direct_backend.close()
 
 
+def test_tier_b_reference_refuses_a_scan_that_stops_at_minor_phase_melting():
+    class TruncatedMinorPhaseProfile:
+        def __call__(self, _composition, temperature_C, _pressure_bar):
+            return 0.0 if temperature_C <= 1000.0 else 0.0026
+
+    with pytest.raises(LinerCorrosionRefusal) as refused:
+        liner_corrosion._tier_b_reference_profile(
+            TruncatedMinorPhaseProfile(),
+            {"SiO2": 50.0, "Al2O3": 30.0, "CaO": 20.0},
+            pressure_bar=1.0,
+        )
+
+    assert refused.value.reason == "liner_reference_unresolved"
+    assert "500-2200 C" in refused.value.detail
+    assert "f_liq=0.0026" in refused.value.detail
+
+
+def test_liquidus_search_defaults_pin_the_existing_2200_c_ceiling():
+    from inspect import signature
+
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.liquidus import find_liquidus_solidus_by_fraction
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    defaults = (
+        signature(find_liquidus_solidus_by_fraction).parameters["max_T_C"].default,
+        signature(MAGEMinBackend.find_liquidus_solidus).parameters[
+            "max_T_C"
+        ].default,
+        signature(AlphaMELTSBackend.find_liquidus_solidus).parameters[
+            "max_T_C"
+        ].default,
+    )
+
+    assert defaults == (2200.0, 2200.0, 2200.0)
+
+
 def test_tier_b_rating_uses_excess_melt_and_the_lower_temperature_bracket():
     class ProfileSampler:
         flags = ["engine_phase_closure_unverified"]
