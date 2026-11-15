@@ -35,9 +35,6 @@ _OPENIMCC_DEFAULT_PACK_VERSION = "1.0.6-d066-v4"
 _OPENIMCC_DEFAULT_PACK_DIGEST = (
     "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
 )
-_OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
-    "b927cf95fe788016d37ccfac87a9c80bbb15ec519aa624d929e3106c1759adf0"
-)
 _OPENIMCC_REDOX_DG46_FEO_COEFFICIENTS = {
     "dH298_R": Decimal("-26.668958359186785"),
     "dG_A": Decimal("8.03837194242113"),
@@ -55,15 +52,35 @@ def _source_value(sources: Sequence[str], prefix: str) -> str | None:
     )
 
 
-def _openimcc_redox_pack_feo_row() -> Mapping[str, object]:
-    import openimcc
+def _openimcc_redox_pack_feo_row(redox_pack_digest: str) -> Mapping[str, object]:
+    from openimcc.redox_pack import RedoxInputError, load_redox_pack
 
-    payload = json.loads(
-        resources.files(openimcc)
-        .joinpath("data", "packs", "openimcc-redox-v1.json")
-        .read_text(encoding="utf-8")
-    )
-    species = payload.get("thermo_species") if isinstance(payload, Mapping) else None
+    try:
+        pack = load_redox_pack()
+    except RedoxInputError:
+        pack = None
+    if pack is None or pack.canonical_digest != redox_pack_digest:
+        pack_directory = resources.files("openimcc.data").joinpath("packs")
+        for resource in sorted(pack_directory.iterdir(), key=lambda item: item.name):
+            if not (
+                resource.name.startswith("openimcc-redox-")
+                and resource.name.endswith(".json")
+            ):
+                continue
+            try:
+                with resources.as_file(resource) as pack_path:
+                    candidate = load_redox_pack(pack_path)
+            except RedoxInputError:
+                continue
+            if candidate.canonical_digest == redox_pack_digest:
+                pack = candidate
+                break
+        else:
+            raise ValueError(
+                f"no installed OpenIMCC redox pack matches digest {redox_pack_digest}"
+            )
+
+    species = pack.content.get("thermo_species")
     species_entry = species.get("FeO(l)") if isinstance(species, Mapping) else None
     row = species_entry.get("row") if isinstance(species_entry, Mapping) else None
     if not isinstance(row, Mapping):
@@ -130,22 +147,14 @@ def _resolve_feo_activity_standard(
         "openimcc-redox-pack:sha256:",
     )
     if redox_pack_digest is not None:
-        if redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "openimcc_feo_redox_pack_digest_mismatch",
-                    "expected_redox_pack_digest": _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST,
-                    "actual_redox_pack_digest": redox_pack_digest,
-                },
-            )
         try:
-            redox_row = _openimcc_redox_pack_feo_row()
+            redox_row = _openimcc_redox_pack_feo_row(redox_pack_digest)
         except (ImportError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
             return None, ResidualRefusal(
                 RefusalReason.METRIC_DOMAIN,
                 {
-                    "reason": "openimcc_feo_redox_standard_row_unavailable",
+                    "reason": "openimcc_feo_redox_pack_unresolved",
+                    "redox_pack_digest": redox_pack_digest,
                     "detail": str(exc),
                 },
             )

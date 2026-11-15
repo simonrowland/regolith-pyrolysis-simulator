@@ -69,6 +69,12 @@ def _melt_pack_identity(pack_name: str) -> dict[str, str]:
     }
 
 
+def _default_redox_pack_digest() -> str:
+    from openimcc.redox_pack import load_redox_pack
+
+    return load_redox_pack().canonical_digest
+
+
 def _case(
     engine: Engine,
     coefficient_sources: tuple[str, ...],
@@ -314,16 +320,19 @@ def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> No
     assert refusal is not None
     assert refusal.reason is RefusalReason.METRIC_DOMAIN
     assert refusal.detail == {
-        "reason": "openimcc_feo_redox_pack_digest_mismatch",
-        "expected_redox_pack_digest": (
-            feo_standard_module._OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
+        "reason": "openimcc_feo_redox_pack_unresolved",
+        "redox_pack_digest": actual_digest,
+        "detail": (
+            "no installed OpenIMCC redox pack matches digest "
+            f"{actual_digest}"
         ),
-        "actual_redox_pack_digest": actual_digest,
     }
 
 
 def test_redox_feo_row_matches_dg46_and_mutations_refuse() -> None:
-    row = feo_standard_module._openimcc_redox_pack_feo_row()
+    row = feo_standard_module._openimcc_redox_pack_feo_row(
+        _default_redox_pack_digest()
+    )
     assert feo_standard_module._redox_pack_feo_row_refusal(row) is None
 
     mutated_row = dict(row)
@@ -341,7 +350,7 @@ def test_openimcc_redox_refuses_a_v1_melt_standard_with_dg46_redox_row() -> None
         Engine.OPENIMCC,
         (
             f"openimcc-redox-pack:sha256:"
-            f"{feo_standard_module._OPENIMCC_DEFAULT_REDOX_PACK_DIGEST}",
+            f"{_default_redox_pack_digest()}",
             f"openimcc-melt-binding:sha256:{identity['binding_digest']}",
         ),
         melt_pack_identity=identity,
