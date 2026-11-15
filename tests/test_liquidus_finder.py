@@ -765,6 +765,10 @@ def test_liquidus_finder_refuses_when_solidus_is_below_supported_range():
     assert result.liquidus_T_C is None
     assert result.diagnostics['reason'] == 'solidus_below_supported_range'
     assert result.diagnostics['supported_range_C'] == (500.0, 800.0)
+    assert 'solidus_qualification' not in result.diagnostics
+    assert 'solidus_qualification' not in result.diagnostics[
+        'liquidus_sample_exclusion_notice'
+    ]
 
 
 def test_liquidus_sample_error_rejects_noncanonical_status():
