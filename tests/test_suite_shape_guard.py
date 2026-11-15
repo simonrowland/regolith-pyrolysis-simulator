@@ -17,6 +17,22 @@ def test_load_sensitive_tests_are_marked_nightly() -> None:
     assert suite_shape_guard._tier_marker_violations() == []
 
 
+def test_tier_marker_inventory_detects_removed_nightly_mark(monkeypatch) -> None:
+    from tests import suite_shape_guard
+    from tests.perf import test_perf_ratchet
+
+    monkeypatch.setattr(
+        test_perf_ratchet.test_optimizer_60h_stage_records_real_cold_work,
+        "pytestmark",
+        (),
+    )
+
+    assert suite_shape_guard._tier_marker_violations() == [
+        "tests.perf.test_perf_ratchet::"
+        "test_optimizer_60h_stage_records_real_cold_work: expected nightly tier marker"
+    ]
+
+
 def _make_guard_suite(pytester, *, source: str, roster: tuple[tuple[str, str], ...]):
     tests_dir = pytester.path / "tests"
     tests_dir.mkdir()
