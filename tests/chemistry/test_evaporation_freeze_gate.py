@@ -5458,8 +5458,12 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     feedstocks_data,
     setpoints_data,
 ):
+    from contextlib import contextmanager
+    import subprocess
+
     from engines.magemin import MAGEMinShadowProvider
     from simulator.engine_binding_admission import gate_curve_memo_evidence
+    import simulator.melt_backend.magemin as magemin_module
     from simulator.melt_backend.magemin import MAGEMinBackend
 
     producer = _build_freeze_gate_sim(
@@ -5499,17 +5503,59 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
         'liquidus_T_C': 1300.0,
     }
 
+    resolved_version = producer_backend.get_engine_version()
+    assert resolved_version != 'unavailable'
     producer_evidence = gate_curve_memo_evidence(
         producer,
         curve,
         include_selected_bindings=False,
     )
+
+    def unavailable_slot(_timeout_s):
+        raise magemin_module._MAGEMinEngineLifecycleError(
+            'MAGEMinSubprocessSlotTimeout', 'slot timed out'
+        )
+
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot', unavailable_slot
+    )
+    slot_failure_evidence = gate_curve_memo_evidence(
+        producer,
+        curve,
+        include_selected_bindings=False,
+    )
+
+    @contextmanager
+    def available_slot(_timeout_s):
+        yield
+
+    def timed_out_probe(args, **_kwargs):
+        raise subprocess.TimeoutExpired(args, timeout=5)
+
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot', available_slot
+    )
+    monkeypatch.setattr(magemin_module.subprocess, 'run', timed_out_probe)
+    probe_timeout_evidence = gate_curve_memo_evidence(
+        producer,
+        curve,
+        include_selected_bindings=False,
+    )
+
     receiver_evidence = gate_curve_memo_evidence(
         receiver,
         curve,
         include_selected_bindings=False,
     )
 
+    for failure_evidence in (slot_failure_evidence, probe_timeout_evidence):
+        assert failure_evidence.identity == producer_evidence.identity
+        assert failure_evidence.provenance['runtime_version'] == (
+            producer_evidence.provenance['runtime_version']
+        )
+        assert failure_evidence.producer_evidence == (
+            producer_evidence.producer_evidence
+        )
     assert producer_evidence.identity == receiver_evidence.identity
     assert producer_evidence.provenance['runtime_version'] == (
         receiver_evidence.provenance['runtime_version']
