@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import ast
+from copy import deepcopy
 import importlib.util
 from pathlib import Path
 
@@ -42,3 +44,110 @@ def compilation_shard_observation_count(
         assert cached["size"] == path.stat().st_size, rel
         total += cached["observation_id_count"]
     return total
+
+
+def compilation_generator_dispatch(
+    source: str,
+    *,
+    predicate: str,
+    generator_module: str,
+    generator_name: str,
+    source_path_keyword: bool = False,
+) -> None:
+    """Guard a source's wiring to its generator-backed compilation lift."""
+    tree = ast.parse(source)
+
+    def dispatch_nodes(candidate: ast.Module) -> tuple[ast.If, ast.Call] | None:
+        migrator = next(
+            (
+                node
+                for node in candidate.body
+                if isinstance(node, ast.ClassDef) and node.name == "Migrator"
+            ),
+            None,
+        )
+        if migrator is None:
+            return None
+        migrate = next(
+            (
+                node
+                for node in migrator.body
+                if isinstance(node, ast.FunctionDef)
+                and node.name == "_migrate_compilation_file"
+            ),
+            None,
+        )
+        if migrate is None:
+            return None
+        branches = [
+            node
+            for node in ast.walk(migrate)
+            if isinstance(node, ast.If)
+            and isinstance(node.test, ast.Call)
+            and isinstance(node.test.func, ast.Name)
+            and node.test.func.id == predicate
+        ]
+        if len(branches) != 1:
+            return None
+        branch = branches[0]
+        imports = [
+            alias
+            for node in ast.walk(branch)
+            if isinstance(node, ast.ImportFrom) and node.module == generator_module
+            for alias in node.names
+            if alias.name == generator_name
+        ]
+        calls = [
+            node
+            for node in ast.walk(branch)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == "self"
+            and node.func.attr == "_lift_generator_backed_compilation"
+        ]
+        if len(imports) != 1 or len(calls) != 1:
+            return None
+        return branch, calls[0]
+
+    def matches(candidate: ast.Module) -> bool:
+        result = dispatch_nodes(candidate)
+        if result is None:
+            return False
+        _, call = result
+        expected_args = ("work", "rel", "count", "doc", generator_name)
+        if len(call.args) != len(expected_args) or any(
+            not isinstance(arg, ast.Name) or arg.id != expected
+            for arg, expected in zip(call.args, expected_args)
+        ):
+            return False
+        if source_path_keyword:
+            return (
+                len(call.keywords) == 1
+                and call.keywords[0].arg == "source_path"
+                and isinstance(call.keywords[0].value, ast.Name)
+                and call.keywords[0].value.id == "rel"
+            )
+        return not call.keywords
+
+    assert matches(tree), (
+        f"{predicate} must pass {generator_module}.{generator_name} and rel "
+        "to _lift_generator_backed_compilation"
+    )
+
+    # Exercise the two wiring failures this guard prevents against AST mutants.
+    wrong_generator = deepcopy(tree)
+    result = dispatch_nodes(wrong_generator)
+    assert result is not None
+    _, call = result
+    call.args[4] = ast.Name(id="wrong_generator", ctx=ast.Load())
+    assert not matches(wrong_generator), f"{predicate} accepted a wrong generator"
+
+    lost_path = deepcopy(tree)
+    result = dispatch_nodes(lost_path)
+    assert result is not None
+    _, call = result
+    call.args[1] = ast.Constant(value=None)
+    if source_path_keyword:
+        call.keywords.clear()
+    assert not matches(lost_path), f"{predicate} accepted a lost source path"

@@ -31,7 +31,10 @@ from simulator.battery.migrate import (
     make_species,
     observation_from_plain,
 )
-from tests.battery import compilation_shard_observation_count
+from tests.battery import (
+    compilation_generator_dispatch,
+    compilation_shard_observation_count,
+)
 from simulator.battery.polymorph_dictionary import coerce_polymorph_token
 from simulator.battery.validate import reaction_atom_balance
 from simulator.battery.records import State
@@ -872,8 +875,12 @@ def _load_b1544_store_observations() -> list[dict]:
 
 def test_b1544_lift_is_the_generator() -> None:
     src = (ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
-    assert "def _lift_b1544_from_generator" in src
-    assert "generate_record" in src
+    compilation_generator_dispatch(
+        src,
+        predicate="_is_usgs_b1544_record",
+        generator_module="simulator.battery.generators.usgs_b1544",
+        generator_name="generate_record",
+    )
     assert "def _is_usgs_b1544_record" in src
 
 

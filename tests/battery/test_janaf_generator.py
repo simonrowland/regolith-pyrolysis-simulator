@@ -23,7 +23,10 @@ from simulator.battery.enums import (
 )
 from simulator.battery.generators import janaf as generator
 from simulator.battery.migrate import iter_observation_store_paths
-from tests.battery import compilation_shard_observation_count
+from tests.battery import (
+    compilation_generator_dispatch,
+    compilation_shard_observation_count,
+)
 from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.identity import (
     Identity,
@@ -2027,8 +2030,13 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
 def test_janaf_lift_is_the_generator() -> None:
     src = (ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
     assert "def _lift_janaf_table" not in src
-    assert "def _lift_janaf_from_generator" in src
-    assert "generate_table" in src
+    compilation_generator_dispatch(
+        src,
+        predicate="_is_nist_janaf_table",
+        generator_module="simulator.battery.generators.janaf",
+        generator_name="generate_table",
+        source_path_keyword=True,
+    )
 
 
 @pytest.mark.parametrize(
