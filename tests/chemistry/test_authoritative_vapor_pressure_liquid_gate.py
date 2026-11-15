@@ -429,6 +429,7 @@ def test_freeze_gate_curve_interpolation_matches_parent_golden(
         'path',
         'expected_fraction',
         'expected_continuation',
+        'expected_detail',
     ),
     (
         (
@@ -436,24 +437,36 @@ def test_freeze_gate_curve_interpolation_matches_parent_golden(
             ((1200.0, 0.0), (1400.0, 1.0)),
             1.0,
             'above_sampled_liquidus',
+            None,
         ),
         (
             1526.85,
             ((1200.0, 0.0), (1400.0, 0.99)),
             None,
             None,
+            {
+                'code': 'above_range_liquid_fraction_invalid',
+                'temperature_C': 1526.85,
+                'last_knot': (1400.0, 0.99),
+            },
         ),
         (
             1100.0,
             ((1200.0, 0.0), (1400.0, 1.0)),
             0.0,
             'below_sampled_range_solid_bearing',
+            None,
         ),
         (
             1100.0,
             ((1200.0, 1.0), (1400.0, 1.0)),
             None,
             None,
+            {
+                'code': 'below_range_liquid_fraction_invalid',
+                'temperature_C': 1100.0,
+                'first_knot': (1200.0, 1.0),
+            },
         ),
     ),
     ids=(
@@ -468,6 +481,7 @@ def test_freeze_gate_phase_fraction_requires_sampled_curve_support(
     path,
     expected_fraction,
     expected_continuation,
+    expected_detail,
 ) -> None:
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(temperature_C=temperature_C),
@@ -497,7 +511,14 @@ def test_freeze_gate_phase_fraction_requires_sampled_curve_support(
     )
     assert continuation == expected_continuation
     assert projection_notice is None
-    assert phase_detail is None
+    if expected_detail is None:
+        assert phase_detail is None
+    else:
+        assert phase_detail is not None
+        assert phase_detail['code'] == expected_detail['code']
+        for field, value in expected_detail.items():
+            assert phase_detail[field] == value
+        assert phase_detail['diagnostic']['code'] == expected_detail['code']
 
 
 def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> None:
