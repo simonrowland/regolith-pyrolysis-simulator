@@ -7,6 +7,7 @@ import warnings
 
 import pytest
 
+from simulator.accounting.formulas import parse_formula
 import simulator.liner_corrosion as liner_corrosion
 from simulator.furnace_materials import (
     InterfaceChemistryRefusal,
@@ -282,21 +283,24 @@ def test_magemin_phi_curve_brackets_valid_request_near_silica_domain_edge():
 @pytest.mark.xdist_group("magemin_fullrun_a")
 def test_anorthite_first_liquid_anchor_requires_live_magemin():
     # CaAl2Si2O8 = CaO + Al2O3 + 2 SiO2. The literature melting point is
-    # 1553 C. Formula weights below independently derive the oxide-basis bulk.
-    cao = 40.078 + 15.999
-    alumina = 2 * 26.9815385 + 3 * 15.999
-    silica = 28.085 + 2 * 15.999
+    # 1553 C at about 1 bar. The formula owner derives the oxide-basis bulk.
+    cao = parse_formula("CaO").molar_mass_g_per_mol()
+    alumina = parse_formula("Al2O3").molar_mass_g_per_mol()
+    silica = parse_formula("SiO2").molar_mass_g_per_mol()
     total = cao + alumina + 2 * silica
     anorthite = {
         "CaO": 100.0 * cao / total,
         "Al2O3": 100.0 * alumina / total,
         "SiO2": 200.0 * silica / total,
     }
+    assert anorthite["CaO"] == pytest.approx(20.16, abs=0.01)
+    assert anorthite["Al2O3"] == pytest.approx(36.65, abs=0.01)
+    assert anorthite["SiO2"] == pytest.approx(43.19, abs=0.01)
     sampler = MageminLinerSampler()
     try:
         try:
-            solid = sampler(anorthite, 1500.0, 1.0e-6)
-            liquid = sampler(anorthite, 1600.0, 1.0e-6)
+            solid = sampler(anorthite, 1500.0, 1.0)
+            liquid = sampler(anorthite, 1600.0, 1.0)
         except LinerCorrosionRefusal as exc:
             if exc.reason == "engine_unavailable":
                 pytest.skip("MAGEMin is required for the anorthite anchor")
@@ -305,6 +309,30 @@ def test_anorthite_first_liquid_anchor_requires_live_magemin():
         assert liquid >= 1.0 - LIQUIDUS_LIQUID_EPSILON
     finally:
         sampler.close()
+
+
+def test_rankin_end_member_melting_points_are_excluded_from_compound_rows():
+    records = [
+        row
+        for row in load_liner_corrosion_invariants()
+        if row["source_id"] == "rankin-wright-1915-ajs-cao-al2o3-sio2"
+    ]
+    table_a_ids = {
+        row["observation_id"]
+        for row in records
+        if "_tA_" in row["observation_id"]
+    }
+
+    # Rankin & Wright Table A rows 1-3 are pure-component melting references
+    # (CaO, Al2O3, SiO2), not the 12 multicomponent compound transitions.
+    assert not table_a_ids.intersection(
+        {
+            "rankin_wright_1915_tA_r1",
+            "rankin_wright_1915_tA_r2",
+            "rankin_wright_1915_tA_r3",
+        }
+    )
+    assert len(table_a_ids) == 12
 
 
 def test_mixing_closed_form_and_reacted_depth_sensitivity():
