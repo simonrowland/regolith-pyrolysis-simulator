@@ -442,24 +442,22 @@ _LISTED_REDOX_ELEMENTS = ("Ti", "Mn", "Cr")
 @dataclass(frozen=True)
 class _CationOxide:
     element: str
-    oxide: str
-    cations_per_formula: int
     valence: int
 
 
 # Reference valences from t-1609. Oxygen atoms per cation = valence / 2.
 # Mn2+ and Cr3+ are the stated extras. No other valence is assigned here.
 _CATION_OXIDES = (
-    _CationOxide("Si", "SiO2", 1, 4),
-    _CationOxide("Ti", "TiO2", 1, 4),
-    _CationOxide("Al", "Al2O3", 2, 3),
-    _CationOxide("Fe", _OXIDE_FEO, 1, 2),
-    _CationOxide("Mg", "MgO", 1, 2),
-    _CationOxide("Ca", "CaO", 1, 2),
-    _CationOxide("Na", "Na2O", 2, 1),
-    _CationOxide("K", "K2O", 2, 1),
-    _CationOxide("Mn", "MnO", 1, 2),
-    _CationOxide("Cr", "Cr2O3", 2, 3),
+    _CationOxide("Si", 4),
+    _CationOxide("Ti", 4),
+    _CationOxide("Al", 3),
+    _CationOxide("Fe", 2),
+    _CationOxide("Mg", 2),
+    _CationOxide("Ca", 2),
+    _CationOxide("Na", 1),
+    _CationOxide("K", 1),
+    _CationOxide("Mn", 2),
+    _CationOxide("Cr", 3),
 )
 _CATION_BY_ELEMENT = {row.element: row for row in _CATION_OXIDES}
 
@@ -644,6 +642,40 @@ def _formula_molar_mass(formula: str) -> Decimal:
     return total
 
 
+def _oxide_formula_for_valence(element: str, valence: int) -> tuple[str, int]:
+    """Smallest neutral oxide formula and cations per formula unit."""
+
+    if isinstance(valence, bool) or not isinstance(valence, int) or valence <= 0:
+        raise ValueError(f"element_reference_valence_not_positive_integer: {element}")
+    divisor = math.gcd(valence, 2)
+    cations = 2 // divisor
+    oxygens = valence // divisor
+    cation_suffix = "" if cations == 1 else str(cations)
+    oxygen_suffix = "" if oxygens == 1 else str(oxygens)
+    return f"{element}{cation_suffix}O{oxygen_suffix}", cations
+
+
+def _element_wt_percent_to_oxide_moles(
+    element_wt_percent: Mapping[str, Decimal],
+    valence_by_element: Mapping[str, int],
+) -> tuple[dict[str, Decimal], Decimal, dict[str, Decimal]]:
+    """Shared cation-to-oxide formula-unit and oxygen-demand calculation."""
+
+    formula_moles: dict[str, Decimal] = {}
+    oxygen_demand = Decimal(0)
+    cation_moles_by_element: dict[str, Decimal] = {}
+    for element, valence in valence_by_element.items():
+        weight = element_wt_percent.get(element)
+        if weight is None or weight == 0:
+            continue
+        cation_moles = weight / _atomic_weight(element)
+        formula, cations_per_formula = _oxide_formula_for_valence(element, valence)
+        formula_moles[formula] = cation_moles / Decimal(cations_per_formula)
+        oxygen_demand += cation_moles * Decimal(valence) / Decimal(2)
+        cation_moles_by_element[element] = cation_moles
+    return formula_moles, oxygen_demand, cation_moles_by_element
+
+
 def _is_circular_observable(observable: object | None) -> bool:
     if observable is None:
         return False
@@ -805,18 +837,13 @@ def element_mass_fraction_redox(
         )
         notices.append(ElementWtNotice(NoticeKind.INPUT_OMITTED, reason, ("Cl",)))
 
-    formula_moles: dict[str, Decimal] = {}
-    oxygen_demand = Decimal(0)
-    n_fe = Decimal(0)
-    for row in _CATION_OXIDES:
-        weight = canonical.get(row.element)
-        if weight is None or weight == 0:
-            continue
-        cation_moles = weight / _atomic_weight(row.element)
-        formula_moles[row.oxide] = cation_moles / Decimal(row.cations_per_formula)
-        oxygen_demand += cation_moles * Decimal(row.valence) / Decimal(2)  # t-1609: z_i / 2
-        if row.element == "Fe":
-            n_fe = cation_moles
+    formula_moles, oxygen_demand, cation_moles_by_element = (
+        _element_wt_percent_to_oxide_moles(
+            canonical,
+            {row.element: row.valence for row in _CATION_OXIDES},
+        )
+    )
+    n_fe = cation_moles_by_element.get("Fe", Decimal(0))
 
     if include_chlorine and chloride_name is not None and chlorine is not None:
         parsed = parse_species_formula(chloride_name)
@@ -1071,7 +1098,8 @@ def element_wt_percent_of_oxide_phase(
     if row is None:
         return None
     weight = _atomic_weight(symbol)
-    oxides = {_OXIDE_FEO, _OXIDE_FE2O3} if symbol == "Fe" else {row.oxide}
+    oxide, _cations_per_formula = _oxide_formula_for_valence(symbol, row.valence)
+    oxides = {_OXIDE_FEO, _OXIDE_FE2O3} if symbol == "Fe" else {oxide}
     total = Decimal(0)
     found = False
     for name, amount, parsed in parsed_rows:
