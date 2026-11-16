@@ -461,16 +461,18 @@ class OpenImccRedoxResult:
             values["parent_activity"], values["ferric_fe_mol"], values["ferrous_fe_mol"],
             values["metal_buffered"], values["flags"], values["extrapolated_redox_rows"],
             values["active_row_band_intersection_K"], Provenance(values["redox_pack_digest"]),
+            Provenance(values["melt_pack_binding_digest"]),
         ])
 
     @classmethod
     def from_hot(cls, payload: Any) -> OpenImccRedoxResult:
-        if not isinstance(payload, list) or len(payload) != 11:
+        if not isinstance(payload, list) or len(payload) != 12:
             raise ValueError("invalid OpenIMCC redox HOT shape")
         return cls.from_lean(dict(zip((
             "temperature_K", "mode", "lambda_ln_f_o2", "parent_activity",
             "ferric_fe_mol", "ferrous_fe_mol", "metal_buffered", "flags",
             "extrapolated_redox_rows", "active_row_band_intersection_K", "redox_pack_digest",
+            "melt_pack_binding_digest",
         ), payload)))
 
     @classmethod
