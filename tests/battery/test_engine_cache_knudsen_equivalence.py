@@ -118,13 +118,13 @@ def test_scored_knudsen_residue_uses_the_cache_off_cold_and_warm(
             (),
         ),
     )
-    monkeypatch.setattr(battery, "_new_internal_analytical_core", lambda: object())
+    monkeypatch.setattr(battery, "_new_internal_analytical_core", lambda: SimpleNamespace(_high_t_melt_activity="openimcc"))
     calls = 0
 
     def evaluate_pressure(**_kwargs):
         nonlocal calls
         calls += 1
-        return SimpleNamespace(vapor_pressures_Pa={"Fe": 1.0e-8}, diagnostics={})
+        return SimpleNamespace(status="ok", phase_assemblage_available=False, vapor_pressures_Pa={"Fe": 1.0e-8}, diagnostics={})
 
     monkeypatch.setattr(
         battery, "_internal_analytical_vapor_pressure_adapter", evaluate_pressure
@@ -159,5 +159,7 @@ def test_scored_knudsen_residue_uses_the_cache_off_cold_and_warm(
     assert off
     assert cold == warm == off
     assert calls_after_cold > 0
-    assert calls > calls_after_cold
-    assert cold_counts == warm_counts == {}
+    assert calls == calls_after_cold
+    assert cold_counts["internal-analytical"]["misses"] == cold_counts["internal-analytical"]["stores"] > 0
+    assert warm_counts["internal-analytical"]["hits"] > 0
+    assert warm_counts["internal-analytical"]["misses"] == 0
