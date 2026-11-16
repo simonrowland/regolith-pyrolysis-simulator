@@ -22,25 +22,6 @@ class _TypedCacheProbe:
     ratio: Fraction
 
 
-def _decode_store_file(path: Path, *, work_file: bool) -> object:
-    document = migrate.load_yaml(path)
-    if work_file:
-        if not isinstance(document, Mapping) or "work" not in document:
-            return None
-        work = migrate.work_from_plain(document["work"])
-        experiments = tuple(
-            migrate.experiment_from_plain(raw)
-            for raw in (document.get("experiments") or ())
-        )
-        return work, experiments
-    if not isinstance(document, Mapping):
-        return ()
-    return tuple(
-        migrate.observation_from_plain(raw)
-        for raw in (document.get("observations") or ())
-    )
-
-
 def _sample_store_paths(root: Path) -> tuple[tuple[Path, bool, str], ...]:
     works = root / "data" / "literature" / "works"
     extracts = root / "data" / "literature" / "extracts-v2"
@@ -159,17 +140,13 @@ def test_decoded_record_cache_preserves_sample_record_types_and_serialization(
     for index, (store_path, work_file, _directory) in enumerate(
         _sample_store_paths(root)
     ):
-        payload = store_path.read_bytes()
-        cold = load_cached_decoded_record(
-            payload,
-            decoder_identity="test-record-decoder-v1",
-            decode=lambda: _decode_store_file(store_path, work_file=work_file),
+        decoder = (
+            migrate._decode_work_store_file
+            if work_file
+            else migrate._decode_observation_store_file
         )
-        warm = load_cached_decoded_record(
-            payload,
-            decoder_identity="test-record-decoder-v1",
-            decode=lambda: pytest.fail("warm decode unexpectedly ran"),
-        )
+        cold = migrate._load_decoded_store_file(store_path, decoder)
+        warm = migrate._load_decoded_store_file(store_path, decoder)
 
         _assert_typed_equal(cold, warm)
         assert cold == warm
