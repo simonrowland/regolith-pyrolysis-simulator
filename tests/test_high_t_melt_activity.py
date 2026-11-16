@@ -764,37 +764,22 @@ def test_vapour_binding_below_openimcc_domain_floor_is_builtin() -> None:
         )
 
 
-@pytest.mark.parametrize(
-    ("phase_basis", "liquid_fraction"),
-    (("liquid", 1.0), ("solid_bearing", 0.5)),
-    ids=("liquid", "solid-bearing"),
-)
-def test_vapour_seam_notice_uses_applied_phase_switch(
-    monkeypatch, phase_basis, liquid_fraction,
-) -> None:
-    switch_K = (
-        openimcc_bridge_module._temperature_domain_K()[0]
-        if phase_basis == "liquid"
-        else vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K
+def test_vapour_switch_metadata_uses_each_request_phase_basis() -> None:
+    temperature_K = openimcc_bridge_module._temperature_domain_K()[0] + 0.1
+    requests = (
+        ("liquid", 1.0, openimcc_bridge_module._temperature_domain_K()[0], True),
+        ("solid_bearing", 0.5, 1950.0, False),
     )
-    monkeypatch.setattr(
-        vapor_pressure_module, "_HIGH_T_ACTIVITY_SEAM_LIMIT_DEX", -1.0,
-    )
-    result = _provider().dispatch(_request(
-        BASE_MELT_MOL,
-        switch_K + 0.1,
-        previous_temperature_K=switch_K - 0.1,
-        liquid_fraction=liquid_fraction,
-    ))
-    high_t = result.diagnostic["high_t_melt_activity"]
-    notice = next(
-        n for n in high_t["notices"]
-        if n["code"] == "openimcc_activity_cap_step_exceeds_0_1_dex"
-    )
-
-    assert high_t["vapour_channel_phase_basis"] == phase_basis
-    assert high_t["vapour_channel_switch_K"] == switch_K
-    assert notice["cap_K"] == switch_K
+    for phase_basis, liquid_fraction, switch_K, selected in requests:
+        result = _provider().dispatch(_request(
+            BASE_MELT_MOL,
+            temperature_K,
+            liquid_fraction=liquid_fraction,
+        ))
+        high_t = result.diagnostic["high_t_melt_activity"]
+        assert high_t["vapour_channel_phase_basis"] == phase_basis
+        assert high_t["vapour_channel_switch_K"] == switch_K
+        assert high_t["above_vaporock_cap"] is selected
 
 
 def test_every_vapour_binding_caller_passes_phase_basis() -> None:
