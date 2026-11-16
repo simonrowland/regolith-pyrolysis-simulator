@@ -398,6 +398,19 @@ class _MAGEMinEngineLifecycleError(_MAGEMinEngineCallError):
     """A MAGEMin worker, budget, or subprocess slot lifecycle failure."""
 
 
+_MAGEMIN_LIFECYCLE_FAILURE_REASON_BY_EXCEPTION = {
+    'MAGEMinSubprocessSlotTimeout': 'magemin_subprocess_slot_timeout',
+    'MAGEMinSubprocessSlotUnavailable': 'magemin_subprocess_slot_unavailable',
+    # Existing gate and battery readers classify on the ``timeout`` token.
+    'MAGEMinAggregateBudgetExceeded': 'magemin_aggregate_budget_timeout',
+    'EngineWorkerDied': 'engine_crash',
+    'EngineWorkerPoolLifecycleError': (
+        'magemin_engine_worker_unavailable'
+    ),
+    'EngineWorkerUnavailable': 'magemin_engine_worker_unavailable',
+}
+
+
 def _admit_magemin_call_scalars(
     temperature_C: Any,
     pressure_bar: Any,
@@ -1998,11 +2011,26 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             # usable result.
             message = f'MAGEMin equilibrate failed: {exc}'
             self._last_error = message
+            failure_status = (
+                'refused'
+                if isinstance(exc, _MAGEMinDeclaredInputError)
+                else 'not_converged'
+            )
             failure_diagnostics = dict(result_diagnostics)
             failure_diagnostics.update({
                 'backend_failure_exception': exc.exception_type,
                 'backend_failure_message': exc.engine_message,
             })
+            if isinstance(exc, _MAGEMinEngineLifecycleError):
+                failure_diagnostics.update({
+                    'backend_status': failure_status,
+                    'backend_status_reason': (
+                        _MAGEMIN_LIFECYCLE_FAILURE_REASON_BY_EXCEPTION.get(
+                            exc.exception_type,
+                            'magemin_lifecycle_error',
+                        )
+                    ),
+                })
             if exc.failure_disposition is not None:
                 failure_diagnostics['backend_failure_disposition'] = (
                     exc.failure_disposition
@@ -2013,11 +2041,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
-                status=(
-                    'refused'
-                    if isinstance(exc, _MAGEMinDeclaredInputError)
-                    else 'not_converged'
-                ),
+                status=failure_status,
                 warnings=[*prior_warnings, *bulk_projection.warnings, message],
                 diagnostics=failure_diagnostics,
             )

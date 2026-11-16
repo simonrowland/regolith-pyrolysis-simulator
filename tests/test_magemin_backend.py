@@ -63,6 +63,7 @@ from simulator.melt_backend.magemin import (
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
     MAGEMinBackend,
+    _MAGEMIN_LIFECYCLE_FAILURE_REASON_BY_EXCEPTION,
     _magemin_subprocess_env,
     _magemin_subprocess_slot,
 )
@@ -1115,6 +1116,8 @@ def test_magemin_worker_exit_returns_typed_not_converged():
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == 'engine_crash'
     assert result.diagnostics['backend_failure_exception'] == (
         'EngineWorkerDied'
     )
@@ -1138,6 +1141,10 @@ def test_magemin_pool_unavailable_returns_typed_not_converged():
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_engine_worker_unavailable'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'EngineWorkerUnavailable'
     )
@@ -1162,6 +1169,10 @@ def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_engine_worker_unavailable'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'EngineWorkerPoolLifecycleError'
     )
@@ -1186,6 +1197,10 @@ def test_magemin_in_process_budget_exhaustion_returns_typed_status():
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_aggregate_budget_timeout'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinAggregateBudgetExceeded'
     )
@@ -1227,6 +1242,10 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_subprocess_slot_timeout'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinSubprocessSlotTimeout'
     )
@@ -1267,10 +1286,92 @@ def test_magemin_subprocess_slot_permission_error_returns_not_converged(
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_subprocess_slot_unavailable'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinSubprocessSlotUnavailable'
     )
     assert 'read-only filesystem' in result.diagnostics['backend_failure_message']
+
+
+@pytest.mark.parametrize(
+    ('exception_type', 'expected_reason'),
+    tuple(_MAGEMIN_LIFECYCLE_FAILURE_REASON_BY_EXCEPTION.items()),
+)
+def test_magemin_lifecycle_failures_always_return_typed_status_reason(
+    monkeypatch, exception_type, expected_reason,
+):
+    from simulator.melt_backend.magemin import (
+        _MAGEMinEngineLifecycleError,
+    )
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+
+    def fail_lifecycle_call(**_kwargs):
+        raise _MAGEMinEngineLifecycleError(
+            exception_type, 'injected lifecycle failure'
+        )
+
+    monkeypatch.setattr(backend, '_call_magemin', fail_lifecycle_call)
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == expected_reason
+
+
+@pytest.mark.parametrize(
+    ('exception_type', 'expected_refusal'),
+    (
+        ('MAGEMinSubprocessSlotTimeout', 'engine_timeout'),
+        ('MAGEMinSubprocessSlotUnavailable', 'unavailable'),
+        ('MAGEMinAggregateBudgetExceeded', 'engine_timeout'),
+        ('EngineWorkerDied', 'engine_crash'),
+        ('EngineWorkerPoolLifecycleError', 'unavailable'),
+        ('EngineWorkerUnavailable', 'unavailable'),
+    ),
+)
+def test_magemin_lifecycle_reasons_keep_existing_consumer_classification(
+    exception_type, expected_refusal,
+):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        REFUSAL_TIMEOUT,
+        classify_equilibrate_outcome,
+    )
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.reduced_real_determinism import (
+        gate_curve_provider_timeout_reason,
+    )
+
+    reason = _MAGEMIN_LIFECYCLE_FAILURE_REASON_BY_EXCEPTION[exception_type]
+    result = EquilibriumResult(
+        status='not_converged',
+        diagnostics={
+            'backend_status': 'not_converged',
+            'backend_status_reason': reason,
+        },
+    )
+
+    assert classify_equilibrate_outcome(result) == (
+        'refusal', expected_refusal, reason,
+    )
+    if expected_refusal == REFUSAL_TIMEOUT:
+        assert gate_curve_provider_timeout_reason(
+            {'backend_status_reason': reason}
+        ) == reason
+    else:
+        assert gate_curve_provider_timeout_reason(
+            {'backend_status_reason': reason}
+        ) is None
 
 
 @pytest.mark.parametrize(
@@ -1658,7 +1759,7 @@ _VERB0_MASS_RESIDUAL_1E5 = 'Mass residual      : +1.20000e-05\n'
 
 
 def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     """A lone liq token of 1.00003 is renormalised. Green refuses it."""
     monkeypatch.setattr(
@@ -1700,7 +1801,9 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
     )
 
 
-def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
+def test_magemin_hour156_mode_sum_is_renormalised_to_one(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     """Hour 156 prints 1.00003 + 0.00008, raw sum 1.00011.
 
     Physics re-ruling 2026-11-10: that sum excess is under the 1e-3 cap,
@@ -2196,7 +2299,9 @@ def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
     assert result.liquid_fraction == pytest.approx(0.7176672, abs=1e-7)
 
 
-def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
+def test_magemin_plante_mode_deficit_is_typed_out_of_domain(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     calls = []
 
     def fake_run(args, **kwargs):
@@ -2738,7 +2843,9 @@ def test_magemin_liquidus_finder_bisects_fake_bridge(monkeypatch):
     assert result.liquidus_T_K == pytest.approx(result.liquidus_T_C + 273.15)
 
 
-def test_magemin_liquidus_scan_records_absolute_fo2_per_sample(monkeypatch):
+def test_magemin_liquidus_scan_records_absolute_fo2_per_sample(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
 
     result = backend.find_liquidus_solidus(
@@ -2755,7 +2862,9 @@ def test_magemin_liquidus_scan_records_absolute_fo2_per_sample(monkeypatch):
     _assert_magemin_cli_absolute_targets(calls, -9.0)
 
 
-def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
+def test_magemin_projected_retry_records_absolute_fo2_per_sample(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
 
     result = backend.find_liquidus_solidus(
@@ -2774,7 +2883,7 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
 
 
 def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     source = {
@@ -2819,7 +2928,9 @@ def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
     assert submitted_bulks == {expected_bulk}
 
 
-def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(monkeypatch):
+def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     projected = backend._build_db_bulk_projection({
         'SiO2': 50.0,
@@ -2852,7 +2963,7 @@ def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(monkeypatch):
 
 
 def test_magemin_liquidus_evaluates_redox_state_at_each_sample_temperature(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     absolute = RedoxState.absolute(-9.0)
@@ -2889,7 +3000,9 @@ def test_magemin_liquidus_evaluates_redox_state_at_each_sample_temperature(
     assert state.temperatures_K == [REDOX_STATE_REFERENCE_T_K, *sample_temperatures_K]
 
 
-def test_magemin_buffer_offset_is_evaluated_for_each_liquidus_sample(monkeypatch):
+def test_magemin_buffer_offset_is_evaluated_for_each_liquidus_sample(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
 
@@ -2908,7 +3021,9 @@ def test_magemin_buffer_offset_is_evaluated_for_each_liquidus_sample(monkeypatch
     _assert_magemin_cli_redox_state_targets(calls, state)
 
 
-def test_magemin_projected_retry_preserves_buffer_offset_per_sample(monkeypatch):
+def test_magemin_projected_retry_preserves_buffer_offset_per_sample(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
 
@@ -3028,24 +3143,9 @@ def test_magemin_liquidus_finder_invalid_budget_is_refused(budget):
 
 
 def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
-    monkeypatch, tmp_path
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     """Per-call subprocess timeout must be min(configured, remaining)."""
-    import simulator.melt_backend.magemin as magemin_module
-
-    # 2026-07-25 t-419 load-robustness: isolate the machine-wide K-slot
-    # flock into a private namespace. With the shared lock dir, ANY
-    # concurrent test's MAGEMin slot traffic could eat into the 1.5 s
-    # budget during acquisition, surfacing 'cancelled while waiting for
-    # subprocess slot' instead of the clamped-timeout message this test
-    # pins — a flake that blamed the box instead of the shared lock.
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
-        tmp_path / 'magemin-subprocess.lock',
-    )
     seen_timeouts: list[float] = []
 
     def fake_run(*args, **kwargs):
@@ -3081,7 +3181,7 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
 
 
 def test_magemin_liquidus_subprocess_path_preserves_sample_timeout_diagnostics(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     """A per-sample timeout stays independent of the finder hang guard.
 
@@ -3896,7 +3996,7 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
     ),
 )
 def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
-    monkeypatch, stdout,
+    monkeypatch, magemin_subprocess_lock_dir, stdout,
 ):
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
@@ -3925,7 +4025,7 @@ def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
 
 @pytest.mark.parametrize('local_error', (KeyError, TypeError, ValueError))
 def test_magemin_equilibrate_parser_local_defect_propagates(
-    monkeypatch, local_error,
+    monkeypatch, magemin_subprocess_lock_dir, local_error,
 ):
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
@@ -3951,7 +4051,9 @@ def test_magemin_equilibrate_parser_local_defect_propagates(
         )
 
 
-def test_magemin_subprocess_parser_value_error_propagates(monkeypatch):
+def test_magemin_subprocess_parser_value_error_propagates(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     from simulator.melt_backend import magemin as magemin_module
 
     backend = MAGEMinBackend()
@@ -4024,6 +4126,10 @@ def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_subprocess_slot_timeout'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinSubprocessSlotTimeout'
     )
@@ -4444,7 +4550,7 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     backend = MAGEMinBackend()
     backend._available = True
@@ -4815,7 +4921,8 @@ def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
 
 
 def test_magemin_subprocess_runs_in_fresh_temp_cwd(
-    monkeypatch, tmp_path, magemin_openmpi_tmpdir, tmp_path_factory
+    monkeypatch, tmp_path, magemin_subprocess_lock_dir,
+    magemin_openmpi_tmpdir, tmp_path_factory,
 ):
     """MAGEMin appends _pseudosection_output.txt to its CWD; isolate per call."""
     captured: dict = {}
@@ -4885,7 +4992,7 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(
 
 
 def test_magemin_subprocess_launches_are_serialized_across_callers(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path, magemin_subprocess_lock_dir,
 ):
     """With REGOLITH_MAGEMIN_SLOTS=1 launches stay strictly serialized.
 
@@ -4897,13 +5004,6 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
     import simulator.melt_backend.magemin as magemin_module
 
     monkeypatch.setenv('REGOLITH_MAGEMIN_SLOTS', '1')
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
-        tmp_path / 'isolated-magemin.lock',
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
-    )
 
     first_entered = threading.Event()
     release_first = threading.Event()
@@ -5051,7 +5151,9 @@ def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree(request):
     assert size_after == size_before
 
 
-def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
+def test_magemin_subprocess_fo2_log_substitution_recorded(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     # MAGEMin's CLI only accepts a named buffer plus a numeric `buffer_n`
     # offset (see ``MAGEMin/examples/MAGEMin_C_single_point_with_buffer.jl``),
     # so the adapter must translate the caller's absolute log10(fO2) into
@@ -5140,7 +5242,9 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     assert any("-12.0" in w for w in substitution_warnings), substitution_warnings
 
 
-def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
+def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     # An unrecognised fO2_buffer config still drives the subprocess bridge,
     # but the adapter MUST surface the substitution as a warning rather
     # than silently swapping in 'qfm' (which would hide the requested fO2
@@ -5193,7 +5297,7 @@ def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
 
 
 def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     captured: dict = {}
 

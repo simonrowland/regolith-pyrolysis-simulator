@@ -210,7 +210,7 @@ def test_version_probe_slot_failure_and_timeout_share_typed_unknown(
 
 
 def test_version_probe_repeats_when_binary_changes_at_same_path(
-    monkeypatch, tmp_path,
+    monkeypatch, tmp_path, magemin_subprocess_lock_dir,
 ):
     import simulator.engine_local_config as local_config
 
