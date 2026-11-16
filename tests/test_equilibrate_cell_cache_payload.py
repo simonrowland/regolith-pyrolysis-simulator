@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from decimal import Decimal
+from functools import wraps
 
 import pytest
 
@@ -18,7 +19,11 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     load_binary_pots,
     open_battery_engine,
 )
-from simulator.melt_backend.base import vapor_pressure_source_code
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    equilibrium_to_hot,
+    vapor_pressure_source_code,
+)
 from tests.battery.cache_test_support import open_available_engine
 
 
@@ -54,12 +59,50 @@ def _hot_consumer_view(cell: EquilibrateCell) -> dict:
     return view
 
 
+def _equilibrium_consumer_view(result) -> dict:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        classify_equilibrate_outcome,
+        crash_floor_engine_annotation,
+        engine_flags_from_result,
+        extract_reported_quantities,
+        extract_vapor_authority,
+        reported_activity_coefficients,
+    )
+
+    diagnostics = getattr(result, "diagnostics", {}) or {}
+    vapor = diagnostics.get("vapor_pressure_diagnostic") or {}
+    return {
+        "classification": classify_equilibrate_outcome(result),
+        "quantities": extract_reported_quantities(result),
+        "coefficients": reported_activity_coefficients(result),
+        "vapor_authority": extract_vapor_authority(result),
+        "flags": engine_flags_from_result(result),
+        "crash_annotation": crash_floor_engine_annotation(diagnostics),
+        "returncode": (diagnostics.get("subprocess_failure") or {}).get("returncode"),
+        "activities_standard_state": vapor.get("activities_standard_state"),
+        "pressure_omissions": vapor.get("below_reporting_threshold_omissions"),
+        "floor_notices": vapor.get("pO2_floor_inversion_notices_by_species"),
+        "liquid_composition": getattr(result, "liquid_composition_wt_pct", {}),
+        "fe_redox_split": getattr(result, "fe_redox_split", {}),
+    }
+
+
 @pytest.mark.parametrize("engine_name", _ENGINE_NAMES)
 def test_hot_round_trip_preserves_real_engine_consumer_view(
     engine_name, tmp_path, monkeypatch, request
 ) -> None:
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     handle = open_available_engine(Engine(engine_name), nodeid=request.node.nodeid)
+    results = []
+    original = handle.backend.equilibrate
+
+    @wraps(original)
+    def record_result(*args, **kwargs):
+        result = original(*args, **kwargs)
+        results.append(result)
+        return result
+
+    monkeypatch.setattr(handle.backend, "equilibrate", record_result)
     try:
         cold = equilibrate_cell(
             handle, _REAL_POTS[0], temperature_K=2000.0,
@@ -91,6 +134,19 @@ def test_hot_round_trip_preserves_real_engine_consumer_view(
             assert json.loads(warm.vapor_pressure_backend_status_reason) == json.loads(
                 cold.vapor_pressure_backend_status_reason
             )
+
+        result = results[-1]
+        engine_cache.cached_engine_call(
+            engine_name, {"call": "equilibrium-consumer-view"},
+            lambda: equilibrium_to_hot(vars(result), engine_id=engine_name),
+        )
+        engine_cache._MEMORY_CACHE.clear()
+        decoded_result = EquilibriumResult.from_hot(
+            engine_cache.cached_engine_call(
+                engine_name, {"call": "equilibrium-consumer-view"}, unexpected_solve
+            ), engine_id=engine_name,
+        )
+        assert _equilibrium_consumer_view(decoded_result) == _equilibrium_consumer_view(result)
     finally:
         close_battery_engine_handle(handle)
 
