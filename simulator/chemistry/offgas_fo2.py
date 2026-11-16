@@ -93,7 +93,6 @@ from __future__ import annotations
 import math
 import pathlib
 from dataclasses import dataclass, field
-from decimal import Decimal
 from functools import lru_cache
 from typing import Any, Mapping, Sequence
 
@@ -131,25 +130,6 @@ UNMODELLED_REDOX_SPECIES: tuple[str, ...] = ("CH4", "H2S", "O2", "SO2", "COS", "
 
 class OffgasFO2Unavailable(Exception):
     """Raised when the offgas cannot impose an fO2 and no value may be invented."""
-
-
-def _janaf_gas_formation_inputs(
-    formulas: Sequence[str], temperature_K: Decimal
-) -> tuple[dict[str, float], float]:
-    """Read the requested JANAF gas records through their existing owner."""
-
-    from simulator.battery.generators.janaf import (
-        JANAF_R_J_PER_MOL_K,
-        _janaf_gas_formation_gibbs_J_per_mol,
-    )
-
-    gibbs = {
-        formula: float(
-            _janaf_gas_formation_gibbs_J_per_mol(formula, temperature_K)
-        )
-        for formula in formulas
-    }
-    return gibbs, float(JANAF_R_J_PER_MOL_K)
 
 
 @dataclass(frozen=True)

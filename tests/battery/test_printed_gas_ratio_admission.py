@@ -10,6 +10,7 @@ from simulator.battery.enums import Authority, NoticeKind
 from simulator.battery.migrate import (
     Migrator,
     _bare_log_frame_decision,
+    _janaf_gas_formation_inputs,
     _quoted_atmosphere_values,
 )
 from simulator.battery.oxygen_identity import (
@@ -20,7 +21,6 @@ from simulator.battery.oxygen_identity import (
 from simulator.chemistry.offgas_fo2 import (
     _full_balance_fo2_with_janaf_band,
     _full_element_balance_fo2,
-    _janaf_gas_formation_inputs,
     load_buffer_polynomials,
 )
 

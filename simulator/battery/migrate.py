@@ -20042,6 +20042,25 @@ class PrintedOxygenDecision:
     pressure_pa_used: Decimal | None = None
 
 
+def _janaf_gas_formation_inputs(
+    formulas: Sequence[str], temperature_K: Decimal
+) -> tuple[dict[str, float], float]:
+    """Resolve JANAF data in the battery caller before passing it to chemistry."""
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
+    )
+
+    gibbs = {
+        formula: float(
+            _janaf_gas_formation_gibbs_J_per_mol(formula, temperature_K)
+        )
+        for formula in formulas
+    }
+    return gibbs, float(JANAF_R_J_PER_MOL_K)
+
+
 def _oxygen_pressure_point(located: object) -> Decimal | None:
     if not isinstance(located, Located) or not located.state.is_value:
         return None
@@ -20187,7 +20206,6 @@ def _bare_log_frame_decision(
                 from simulator.chemistry.offgas_fo2 import (
                     OffgasFO2Unavailable,
                     _full_balance_fo2_with_janaf_band,
-                    _janaf_gas_formation_inputs,
                     load_buffer_polynomials,
                 )
 
