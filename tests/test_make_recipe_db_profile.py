@@ -657,12 +657,13 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
         if target_id == "pc-glass-retain-na-k-c3":
             from simulator.optimize.objective import UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT
             from simulator.state import PIPE_SEGMENT_NAMES
+            from simulator.trace import WALL_DEPOSIT_ZONE_NAMES
 
             summary = result.run_reference.product_summary
             flag = summary[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT]
             assert flag["bound_kg"] > 0.0
             assert flag["governing_segment"] in PIPE_SEGMENT_NAMES
-            assert flag["governing_zone"] in {"Hottest", "Hot", "Rest"}
+            assert flag["governing_zone"] in WALL_DEPOSIT_ZONE_NAMES
             assert "upstream" not in summary["wall_deposit_kg_by_segment_species"]
         return
 
