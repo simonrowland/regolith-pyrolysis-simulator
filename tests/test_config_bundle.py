@@ -7,6 +7,7 @@ import pickle
 import shutil
 import subprocess
 import sys
+import tempfile
 
 import pytest
 import yaml
@@ -68,6 +69,93 @@ def test_load_config_bundle_returns_all_required_data_and_digests() -> None:
     assert bundle.species_catalog
     assert set(bundle.source_paths) == set(REQUIRED_CONFIGS)
     assert set(bundle.digests) == set(REQUIRED_CONFIGS)
+
+
+def test_yaml_cache_root_resolves_tmpdir_symlink_and_reuses_cache(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    private_temp = tmp_path / "private-temp"
+    private_temp.mkdir()
+    private_temp.chmod(0o1777)
+    tmp_link = tmp_path / "tmp-link"
+    tmp_link.symlink_to(private_temp, target_is_directory=True)
+
+    monkeypatch.setenv("TMPDIR", str(tmp_link))
+    monkeypatch.setenv("XDG_CACHE_HOME", "ignored")
+    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", "ignored")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
+    monkeypatch.setattr(tempfile, "tempdir", None)
+
+    def unexpected_mkdtemp(*args: object, **kwargs: object) -> str:
+        pytest.fail("private resolved TMPDIR should not use a fresh cache")
+
+    monkeypatch.setattr(tempfile, "mkdtemp", unexpected_mkdtemp)
+
+    first = yaml_cache_module._cache_root()
+    assert first.is_relative_to(private_temp.resolve())
+
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", "ignored again")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
+    monkeypatch.setattr(tempfile, "tempdir", None)
+    second = yaml_cache_module._cache_root()
+
+    assert second == first
+
+
+def test_yaml_cache_root_resolves_xdg_cache_symlink(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    private_cache = tmp_path / "private-cache"
+    private_cache.mkdir(mode=0o700)
+    xdg_link = tmp_path / "xdg-cache-link"
+    xdg_link.symlink_to(private_cache, target_is_directory=True)
+
+    monkeypatch.setenv("XDG_CACHE_HOME", str(xdg_link))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", "ignored")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
+
+    def unexpected_mkdtemp(*args: object, **kwargs: object) -> str:
+        pytest.fail("private resolved XDG cache should not use a fresh cache")
+
+    monkeypatch.setattr(tempfile, "mkdtemp", unexpected_mkdtemp)
+
+    cache_root = yaml_cache_module._cache_root()
+
+    assert cache_root.is_relative_to(private_cache.resolve())
+
+
+def test_yaml_cache_root_rejects_symlink_to_group_writable_non_sticky_dir(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    unsafe_temp = tmp_path / "unsafe-temp"
+    unsafe_temp.mkdir()
+    unsafe_temp.chmod(0o770)
+    tmp_link = tmp_path / "tmp-link"
+    tmp_link.symlink_to(unsafe_temp, target_is_directory=True)
+    fallback = tmp_path / "private-fallback"
+
+    monkeypatch.setenv("TMPDIR", str(tmp_link))
+    monkeypatch.setenv("XDG_CACHE_HOME", "ignored")
+    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", "ignored")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
+    monkeypatch.setattr(tempfile, "tempdir", None)
+
+    def make_private_fallback(*, prefix: str) -> str:
+        assert prefix == "regolith-parsed-yaml-"
+        fallback.mkdir(mode=0o700)
+        return str(fallback)
+
+    monkeypatch.setattr(tempfile, "mkdtemp", make_private_fallback)
+
+    cache_root = yaml_cache_module._cache_root()
+
+    assert cache_root == fallback
+    assert not (unsafe_temp / "regolith-pyrolysis-simulator").exists()
 
 
 def test_load_config_bundle_digests_are_stable_and_scoped() -> None:
