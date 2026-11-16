@@ -115,6 +115,7 @@ from simulator.battery.composition import (
     unidentified_component_refusal,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
+from simulator.battery.non_observations import is_non_observation
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
@@ -33594,10 +33595,94 @@ class Migrator:
                 for row in rows
             },
         )
-        self.result.validation = ValidationReport(
+        initial_validation = ValidationReport(
             validation.issues + tuple(self.result.registry_issues),
             validation.notices,
         )
+        hard_issues = initial_validation.hard_issues
+        hard_issues_by_observation = initial_validation.hard_issues_by_observation
+        batch_admitted = False
+        for source_key, observation_ids in self.result.observations_by_source.items():
+            source_experiment_ids = {
+                self.result.observations[item].experiment_id for item in observation_ids
+            }
+            source_hard_issue = any(
+                issue.path.startswith(f"extract[{source_key}]")
+                or any(
+                    issue.path.startswith(f"experiment[{experiment_id}]")
+                    for experiment_id in source_experiment_ids
+                )
+                for issue in hard_issues
+            )
+            for observation_id in observation_ids:
+                observation = self.result.observations[observation_id]
+                experiment = self.result.experiments.get(observation.experiment_id)
+                if (
+                    experiment is None
+                    or experiment.kind is not ExperimentKind.LITERATURE
+                    or observation.admission.status is not AdmissionStatus.PENDING
+                    or observation.admission.decided_by is not None
+                    or observation.admission.reason not in _DEFAULTABLE_PENDING_REASONS
+                    or not observation.identity.quantity.is_value
+                    or not _value_has_numeric_value(observation.value)
+                    or not observation.evidence.class_.is_value
+                    or observation.evidence.class_.value not in MEASURED_EVIDENCE
+                    or observation.locator is None
+                ):
+                    continue
+                row_hard_issue = bool(
+                    hard_issues_by_observation.get(observation_id)
+                ) or any(
+                    issue.path.startswith(f"observation[{observation_id},")
+                    or issue.path.startswith(f"observations.{observation_id}.")
+                    for issue in hard_issues
+                )
+                if row_hard_issue or source_hard_issue:
+                    continue
+                rule = "d-413-batch-literature"
+                self.result.observations[observation_id] = replace(
+                    observation,
+                    admission=Admission(
+                        status=AdmissionStatus.ADMITTED,
+                        reason=f"batch admission {rule}",
+                        decided_by=AdmissionDecision(
+                            worker=rule,
+                            date="2026-11-15",
+                            evidence=observation.locator,
+                        ),
+                    ),
+                )
+                batch_admitted = True
+        if batch_admitted:
+            validation = validate_corpus(
+                self.result.works,
+                self.result.experiments,
+                self.result.observations,
+                residuals=None,
+                benches=self.result.benches,
+                context_rows={
+                    str(row["context_id"]): row
+                    for rows in self.result.context_by_work.values()
+                    for row in rows
+                },
+            )
+            self.result.validation = ValidationReport(
+                validation.issues + tuple(self.result.registry_issues),
+                validation.notices,
+            )
+        else:
+            self.result.validation = initial_validation
+        # Re-homed rows may still need source-link repair; that is not comparison work.
+        self.result.queue[:] = [
+            entry
+            for entry in self.result.queue
+            if entry.observation_id not in self.result.observations
+            or "read_from" in (entry.axes or ())
+            or not is_non_observation(
+                self.result.observations[entry.observation_id],
+                self._obs_source.get(entry.observation_id, entry.source),
+            )
+        ]
         self.result.queue_work_counts = _queue_work_counts(
             self.result.queue, self.root
         )
