@@ -623,13 +623,13 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
 def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> None:
     expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
     found = [row[1] for row in connection.execute(f"PRAGMA table_info({_TABLE})")]
-    if not found and allow_empty:
-        return
-    if found != expected:
-        raise EngineCacheSchemaMismatch(_TABLE, expected, found)
     namespace = connection.execute("PRAGMA user_version").fetchone()[0]
+    if not found and allow_empty and namespace == 0:
+        return
     if namespace != _CACHE_SCHEMA_VERSION:
         raise EngineCacheSchemaMismatch("user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),))
+    if found != expected:
+        raise EngineCacheSchemaMismatch(_TABLE, expected, found)
 
 
 def _initialize_cache(connection: sqlite3.Connection) -> None:
