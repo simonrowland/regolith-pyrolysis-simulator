@@ -1964,7 +1964,7 @@ def _inputs_for_work(
     assert experiments is not None
     grouped = obs_by_work.get(work.work_id, ())
     # Preserve Work and table identities when row extracts are not loaded.
-    ids = {work.work_id}
+    ids = {work.work_id} if not grouped else set()
     # The corpus registry, when the caller has one. A single-work caller
     # still has only that work's files. Unknown strings are not assets.
     registered = (
