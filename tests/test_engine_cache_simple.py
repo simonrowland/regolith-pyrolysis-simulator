@@ -1824,6 +1824,88 @@ def test_real_commissioning_notices_round_trip_for_every_emitting_engine() -> No
         assert decode_engine_notice_codes(engine, codes, values) == json.loads(json.dumps([notice]))
 
 
+def test_actual_notice_emitters_use_registered_codes_for_each_engine() -> None:
+    from engines.builtin.vapor_pressure import (
+        _openimcc_vapour_phase_signal_notice,
+    )
+    from engines.engine_commissioning import (
+        assess_engine_commissioning,
+        load_engine_commissioning,
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+    from simulator.melt_backend.base import (
+        decode_engine_notice_codes,
+        encode_engine_notice_codes,
+    )
+
+    for engine, specification in load_engine_commissioning().engines.items():
+        notice = assess_engine_commissioning(
+            engine,
+            sio2_wt_pct=specification.sio2_wt_pct.certified.minimum,
+            temperature_K=specification.temperature_K.certified.maximum + 1.0,
+        ).notice
+        assert notice is not None
+        codes, values = encode_engine_notice_codes(engine, [notice])
+        assert decode_engine_notice_codes(engine, codes, values) == [notice]
+
+    # The d-207 provider hands these notices through engine_flags_from_result
+    # on the internal-analytical route. Exercise both branches of that emitter.
+    for phase_basis in ("missing", "invalid"):
+        provider_notice = _openimcc_vapour_phase_signal_notice(phase_basis)
+        assert provider_notice is not None
+        result = SimpleNamespace(
+            diagnostics={
+                "vapor_pressure_diagnostic": {
+                    "d207_notices": [provider_notice],
+                },
+            },
+        )
+        notices, _authority, _band = engine_flags_from_result(result)
+        codes, values = encode_engine_notice_codes("internal-analytical", notices)
+        assert decode_engine_notice_codes(
+            "internal-analytical", codes, values
+        ) == notices
+
+
+def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip() -> None:
+    from engines.builtin.vapor_pressure import (
+        _openimcc_vapour_phase_signal_notice,
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+    from simulator.melt_backend.base import (
+        equilibrium_cache_from_value,
+        equilibrium_cache_value,
+    )
+
+    provider_notice = _openimcc_vapour_phase_signal_notice("missing")
+    assert provider_notice is not None
+    diagnostics = {
+        "vapor_pressure_diagnostic": {
+            "d207_notices": [provider_notice],
+        },
+    }
+    cold_result = SimpleNamespace(diagnostics=diagnostics)
+    cold_notices, _authority, _band = engine_flags_from_result(cold_result)
+
+    hot = equilibrium_cache_value(
+        {"status": "ok", "diagnostics": diagnostics},
+        engine_id="internal-analytical",
+    )
+    warm = equilibrium_cache_from_value(
+        hot,
+        engine_id="internal-analytical",
+    )
+    warm_notices, _authority, _band = engine_flags_from_result(
+        SimpleNamespace(diagnostics=warm["diagnostics"])
+    )
+
+    assert warm_notices == cold_notices
+
+
 def test_equilibrium_hot_uses_notice_and_warning_codes_with_parameters() -> None:
     from simulator.melt_backend.base import (
         equilibrium_cache_from_value,
