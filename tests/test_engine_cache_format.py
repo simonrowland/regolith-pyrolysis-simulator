@@ -8,6 +8,19 @@ import pytest
 from simulator import engine_cache
 
 
+def test_binary_scalar_wire_pin_before_leaf_consolidation() -> None:
+    from simulator.engine_cache_binary import pack, unpack
+
+    values = (None, False, True, -1, 1.25, -0.0, 0.0)
+    expected = bytes.fromhex("07070001020301043ff40000000000000c0b")
+    assert pack(values) == expected
+    restored = unpack(expected)
+    assert restored[:5] == values[:5]
+    assert tuple(value.hex() for value in restored[4:]) == (
+        "0x1.4000000000000p+0", "-0x0.0p+0", "0x0.0p+0",
+    )
+
+
 def test_natural_key_is_exact_canonical_and_local() -> None:
     request = {
         "composition_wt_pct": {"SiO2": 60.0, "MgO": 40.0},
