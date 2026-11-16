@@ -946,6 +946,11 @@ def snapshot_cache(live: Path, out: Path) -> dict:
 
 def merge_cache_files(into: Path, inputs: list[Path]) -> dict:
     """Insert the union without replacements, preserving bytes and provenance."""
+    for source in inputs:
+        if source.resolve() == into.resolve() or (
+            into.exists() and source.exists() and source.samefile(into)
+        ):
+            raise ValueError(f"source and destination are the same file: {source} -> {into}")
     by_engine: dict[str, dict[str, int]] = {}
     by_box: dict[str, dict[str, int]] = {}
     report_path = Path(str(into) + ".conflicts.jsonl")

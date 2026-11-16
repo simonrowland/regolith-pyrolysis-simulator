@@ -213,6 +213,40 @@ def test_stats_groups_by_engine_version_and_box(tmp_path, monkeypatch, capsys):
     assert report["bytes_per_row"] == report["file_bytes"] / 2
 
 
+@pytest.mark.parametrize("command", ["merge", "seed"])
+@pytest.mark.parametrize("alias", ["direct", "realpath", "symlink", "hardlink", "case"])
+def test_merge_and_seed_refuse_source_destination_aliases(
+    tmp_path, monkeypatch, capsys, command, alias,
+):
+    live = tmp_path / "live"
+    write_box(monkeypatch, live, "local", [("openimcc", {"T": 1000}, {"x": 0.5})])
+    engine_cache._close_connections()
+    source = tmp_path / "alias"
+    if alias == "direct":
+        source = live
+    elif alias == "realpath":
+        (tmp_path / "child").mkdir()
+        source = tmp_path / "child" / ".." / "live"
+    elif alias == "symlink":
+        source.symlink_to(live)
+    elif alias == "hardlink":
+        source.hardlink_to(live)
+    else:
+        source = tmp_path / "LIVE"
+        if not source.exists():
+            pytest.skip("filesystem is case sensitive")
+    before = live.read_bytes()
+    from scripts.engine_cache_sync import main
+
+    args = ["merge", "--into", str(live), str(source)] if command == "merge" else [
+        "seed", "--from", str(source), "--into", str(live),
+    ]
+    assert main(args) != 0
+    assert "same file" in capsys.readouterr().err
+    assert live.read_bytes() == before
+    assert not Path(str(live) + ".conflicts.jsonl").exists()
+
+
 def test_public_row_reader_preserves_committed_bytes(tmp_path, monkeypatch):
     live = tmp_path / "live"
     write_box(monkeypatch, live, "s1", [("openimcc", {"T": 1000}, {"x": 0.5})])
