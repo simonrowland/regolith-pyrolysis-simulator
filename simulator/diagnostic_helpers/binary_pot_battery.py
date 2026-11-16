@@ -787,10 +787,26 @@ class EquilibrateCell:
         payload = self.to_engine_cache_value()
         if self.model_id is not None:
             payload[11][8] = Provenance(self.model_id)
+        if self.status == "refusal":
+            return EngineCacheValue({
+                "status": self.status, "refusal_reason": self.refusal_reason,
+                "engine_status": self.engine_status, "reason": Provenance(self.engine_reason),
+                "exit_signal": self.exit_signal, "exit_code": self.exit_code,
+                "engine_annotation": self.engine_annotation,
+                "refusal_cell": payload,
+            })
         return EngineCacheValue(payload)
 
     @classmethod
     def from_hot(cls, payload: Any) -> "EquilibrateCell":
+        if isinstance(payload, Mapping) and "refusal_cell" in payload:
+            cell = cls.from_engine_cache_value(payload["refusal_cell"])
+            cell.refusal_reason = payload["refusal_reason"]
+            cell.engine_reason = payload["reason"]
+            cell.exit_signal = payload["exit_signal"]
+            cell.exit_code = payload["exit_code"]
+            cell.engine_annotation = payload["engine_annotation"]
+            return cell
         return cls.from_engine_cache_value(payload)
 
     @classmethod
@@ -4533,7 +4549,10 @@ class _IsolatedCellWorker:
                         detail="isolated worker response was not an object"
                     )
                 if result.get("status") == "refusal":
-                    return result
+                    from simulator.engine_refusals import cacheable_refusal
+
+                    if not cacheable_refusal(result):
+                        return result
             if self.engine == "internal-analytical":
                 return result
             return EquilibrateCell.from_payload(result).to_hot()
@@ -4565,7 +4584,7 @@ class _IsolatedCellWorker:
                 normalize_engine_settings(self.engine, self.engine_settings),
             )
             result = cached_engine_call(self.engine, request, solve)
-        if isinstance(result, list):
+        if isinstance(result, list) or (isinstance(result, Mapping) and "refusal_cell" in result):
             result = EquilibrateCell.from_hot(result).as_payload()
         if not isinstance(result, dict):
             raise _IsolatedCellWorkerFailure(

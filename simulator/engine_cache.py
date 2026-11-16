@@ -29,6 +29,7 @@ from typing import Any, cast
 from urllib.parse import quote
 
 from simulator.engine_cache_binary import EngineCacheValue, live_hot, pack, pack_hot, unpack_hot
+from simulator.engine_refusals import cacheable_refusal
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
@@ -784,7 +785,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
 
     solved = solve()
     hot = live_hot(solved)
-    if _is_refusal(hot) or readonly or connection is None:
+    if (_is_refusal(hot) and not cacheable_refusal(hot)) or readonly or connection is None:
         return hot
     try:
         if not isinstance(solved, EngineCacheValue) and (
@@ -857,6 +858,8 @@ def load_cache_rows(
         if engine not in ENGINE_CHEMISTRY_VERSION:
             raise ValueError(f"unknown engine {engine!r}")
         payload = hot.hot if isinstance(hot, EngineCacheValue) else hot
+        if _is_refusal(payload) and not cacheable_refusal(live_hot(payload)):
+            raise ValueError("refusal code is not cacheable")
         encoded, provenance = _encode_hot(payload)
         values.append(
             (
