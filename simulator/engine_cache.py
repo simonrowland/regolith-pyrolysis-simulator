@@ -314,7 +314,6 @@ def engine_cache_settings(
 ) -> dict[str, Any]:
     """Project prediction inputs from normalized opener settings."""
     if engine_name == "internal-analytical":
-        # Residue calls consume prior-call state and are deliberately uncached.
         return {}
     try:
         projection = _ENGINE_CACHE_SETTINGS_PROJECTIONS[engine_name]
@@ -825,10 +824,6 @@ def _store_cold(path: Path, key: bytes, values: Mapping[str, Any]) -> None:
 
 
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
-    if engine_id == "internal-analytical":
-        # The backend's core carries state across residue requests, so even a
-        # direct cache-helper caller must execute the live solve.
-        return solve()
     if _CACHE_BYPASSED.get():
         return live_hot(solve())
     path_value = _configured_engine_cache_path()

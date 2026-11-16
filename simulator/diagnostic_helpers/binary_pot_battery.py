@@ -311,18 +311,11 @@ def _call_cached_backend_equilibrate(
     *,
     cache: bool = True,
 ) -> Any:
-    if handle.name == "internal-analytical":
+    if not cache:
         from simulator.engine_cache import _without_engine_cache
 
         with _without_engine_cache():
             return solve()
-    if not cache:
-        if handle.name == "openimcc":
-            from simulator.engine_cache import _without_engine_cache
-
-            with _without_engine_cache():
-                return solve()
-        return solve()
     if handle.name == "openimcc":
         # The OpenIMCC bridge owns the engine cache seam for this path.
         return solve()
@@ -351,7 +344,10 @@ def _call_cached_backend_equilibrate(
     )
 
     def solve_cache_value() -> Any:
-        result = solve()
+        from simulator.engine_cache import _without_engine_cache
+
+        with _without_engine_cache():
+            result = solve()
         if _is_refusal(result):
             return result
         if isinstance(result, EquilibriumResult):
@@ -362,9 +358,10 @@ def _call_cached_backend_equilibrate(
             return equilibrium_to_hot(result, engine_id=handle.name)
         return result
 
-    adapter_settings = engine_cache_settings(
-        handle.name,
-        handle.engine_settings,
+    adapter_settings = (
+        _internal_analytical_cache_settings(handle.backend._core)
+        if handle.name == "internal-analytical"
+        else engine_cache_settings(handle.name, handle.engine_settings)
     )
 
     payload = cached_engine_call(
@@ -795,10 +792,16 @@ class EquilibrateCell:
                 "engine_annotation": self.engine_annotation,
                 "refusal_cell": payload,
             })
+        if self.activities_standard_state is not None:
+            return EngineCacheValue({"cell": payload, "activities_standard_state": self.activities_standard_state})
         return EngineCacheValue(payload)
 
     @classmethod
     def from_hot(cls, payload: Any) -> "EquilibrateCell":
+        if isinstance(payload, Mapping) and "cell" in payload:
+            cell = cls.from_engine_cache_value(payload["cell"])
+            cell.activities_standard_state = payload["activities_standard_state"]
+            return cell
         if isinstance(payload, Mapping) and "refusal_cell" in payload:
             cell = cls.from_engine_cache_value(payload["refusal_cell"])
             cell.refusal_reason = payload["refusal_reason"]
@@ -3877,21 +3880,51 @@ def internal_analytical_residue_vapor_pressure(
     include_diagnostic_shadows: bool,
 ) -> Any:
     """Run one direct internal-analytical residue pressure request."""
-    from simulator.engine_cache import _without_engine_cache, record_engine_open
+    from types import SimpleNamespace
+
+    from simulator.engine_cache import _configured_engine_cache_path, cached_engine_call, record_engine_open
+    from simulator.engine_cache_binary import EngineCacheValue, live_hot
+    from simulator.melt_backend.base import equilibrium_cache_from_value, equilibrium_to_hot
 
     record_engine_open("internal-analytical", core)
 
-    with _without_engine_cache():
-        return _internal_analytical_vapor_pressure_adapter(
-            core=core,
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            composition_kg=composition_kg,
-            composition_mol=composition_mol,
-            fO2_log=fO2_log,
-            po2_request=po2_request,
-            include_diagnostic_shadows=include_diagnostic_shadows,
-        )
+    def solve():
+        from simulator.engine_cache import _without_engine_cache
+
+        with _without_engine_cache():
+            result = _internal_analytical_vapor_pressure_adapter(
+                core=core, temperature_C=temperature_C, pressure_bar=pressure_bar,
+                composition_kg=composition_kg, composition_mol=composition_mol,
+                fO2_log=fO2_log, po2_request=po2_request,
+                include_diagnostic_shadows=include_diagnostic_shadows,
+            )
+        if getattr(result, "status", None) == "ok" and isinstance(getattr(result, "diagnostics", None), Mapping):
+            return equilibrium_to_hot(vars(result), engine_id="internal-analytical")
+        return result
+
+    if _configured_engine_cache_path() is None:
+        result = live_hot(solve())
+    else:
+        request = {
+            "call": "residue_pressure", "temperature_C": temperature_C,
+            "pressure_bar": pressure_bar, "composition_kg": composition_kg,
+            "composition_mol": composition_mol, "fO2_log": fO2_log,
+            "po2": po2_request.as_payload(),
+            "engine_settings": _internal_analytical_cache_settings(core),
+        }
+        result = cached_engine_call("internal-analytical", request, solve)
+    if isinstance(result, EngineCacheValue):
+        result = live_hot(result)
+    if isinstance(result, list):
+        return SimpleNamespace(**equilibrium_cache_from_value(result, engine_id="internal-analytical"))
+    return result
+
+
+def _internal_analytical_cache_settings(core: Any) -> dict[str, str]:
+    from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
+
+    # This existing construction switch changes the pressure law; no prior tick is read.
+    return {"high_t_melt_activity": normalize_high_t_melt_activity(core._high_t_melt_activity)}
 
 
 class _InternalAnalyticalBatteryBackend:
@@ -4553,38 +4586,24 @@ class _IsolatedCellWorker:
 
                     if not cacheable_refusal(result):
                         return result
-            if self.engine == "internal-analytical":
-                return result
             return EquilibrateCell.from_payload(result).to_hot()
 
-        if self.engine == "internal-analytical":
-            result = solve()
-        else:
-            from simulator.engine_cache import (
-                cached_engine_call,
-                engine_cache_settings,
-            )
+        from simulator.engine_cache import cached_engine_call, engine_cache_settings
 
-            request = {
-                key: payload[key]
-                for key in (
-                    "composition_wt_pct",
-                    "temperature_K",
-                    "physical_pressure_bar",
-                    "po2",
-                    "engine_settings",
-                    "native_activity_formula",
-                )
-                if key in payload
-            }
-            if payload.get("simulate_crash") is not None:
-                request["simulate_crash"] = payload["simulate_crash"]
-            request["engine_settings"] = engine_cache_settings(
-                self.engine,
-                normalize_engine_settings(self.engine, self.engine_settings),
-            )
-            result = cached_engine_call(self.engine, request, solve)
-        if isinstance(result, list) or (isinstance(result, Mapping) and "refusal_cell" in result):
+        request = {
+            key: payload[key]
+            for key in (
+                "composition_wt_pct", "temperature_K", "physical_pressure_bar",
+                "po2", "engine_settings", "native_activity_formula",
+            ) if key in payload
+        }
+        if payload.get("simulate_crash") is not None:
+            request["simulate_crash"] = payload["simulate_crash"]
+        request["engine_settings"] = engine_cache_settings(
+            self.engine, normalize_engine_settings(self.engine, self.engine_settings),
+        )
+        result = cached_engine_call(self.engine, request, solve)
+        if isinstance(result, list) or (isinstance(result, Mapping) and ("refusal_cell" in result or "cell" in result)):
             result = EquilibrateCell.from_hot(result).as_payload()
         if not isinstance(result, dict):
             raise _IsolatedCellWorkerFailure(

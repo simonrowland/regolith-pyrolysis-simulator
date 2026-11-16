@@ -216,7 +216,7 @@ def test_internal_analytical_backend_hits_before_its_nested_engine_call(
     counts = _engine_cache_counters(reset=True)
     assert counts["internal-analytical"]["hits"] == 1
     assert counts["internal-analytical"]["stores"] == 1
-    assert counts["openimcc"]["misses"] == 1
+    assert counts.get("openimcc", {}) == {}
 
 
 def test_concurrent_processes_can_write_the_same_cache_key(
@@ -1187,7 +1187,9 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
 
     with sqlite3.connect(database) as connection:
         hot_value = connection.execute("SELECT value FROM engine_outputs").fetchone()[0]
-    assert isinstance(_stored_hot(database), list)
+    stored = _stored_hot(database)
+    assert isinstance(stored["cell"], list)
+    assert stored["activities_standard_state"] == result["activities_standard_state"]
     assert b"verbose engine diagnostic" not in hot_value
     assert cold["pot_id"] == warm["pot_id"] == "caller-pot"
     assert cold["melt_activities"] == warm["melt_activities"] == {"SiO2": 0.5}
@@ -1195,6 +1197,7 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
         "SiO": 1.25
     }
     assert cold["engine_reason"] == warm["engine_reason"] == "liquid"
+    assert cold["activities_standard_state"] == warm["activities_standard_state"] == result["activities_standard_state"]
     assert isolated._worker.calls == 1
 
 

@@ -59,6 +59,7 @@ _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'backend_failure_disposition',
     'reported_activity_coefficients',
     'subprocess_failure',
+    'vapor_pressure_diagnostic',
 })
 
 # Append-only wire table for consumer-visible engine notices and warnings.
@@ -97,6 +98,10 @@ ENGINE_CACHE_NOTICE_CODE_TABLE = (
     ('alphamelts', 5, COMMISSIONING_NOTICE_KIND, 'AlphaMELTS commissioning assessment.'),
     ('thermoengine', 5, COMMISSIONING_NOTICE_KIND, 'ThermoEngine commissioning assessment.'),
     ('vaporock', 2, COMMISSIONING_NOTICE_KIND, 'VapoRock commissioning assessment.'),
+    ('internal-analytical', 1, 'out_of_certified_band', 'Analytical pressure is outside a certified band.'),
+    ('internal-analytical', 2, 'floor_inversion', 'Analytical pressure used a floor inversion.'),
+    ('internal-analytical', 3, 'fo2_oxygen_balance_effusion_solved', 'Analytical input used the solved effusion oxygen condition.'),
+    ('internal-analytical', 90, 'warning_text', 'Analytical warning used by cell classification.'),
 )
 _ENGINE_NOTICE_BY_CODE = {
     (engine, code): number
@@ -406,6 +411,14 @@ def _equilibrium_cache_consumer_metadata(
     if isinstance(failure, Mapping):
         selected_diagnostics['subprocess_failure'] = {
             'returncode': failure.get('returncode')
+        }
+    vapor = selected_diagnostics.get('vapor_pressure_diagnostic')
+    if isinstance(vapor, Mapping):
+        selected_diagnostics['vapor_pressure_diagnostic'] = {
+            name: vapor[name] for name in (
+                'activities_standard_state', 'below_reporting_threshold_omissions',
+                'pO2_floor_inversion_notices_by_species',
+            ) if name in vapor
         }
 
     metadata: dict[str, Any] = {}

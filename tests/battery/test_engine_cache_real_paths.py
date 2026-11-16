@@ -17,13 +17,6 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery.cache_test_support import CACHE_TEST_ENGINES
 
-CACHEABLE_TEST_ENGINES = tuple(
-    engine
-    for engine in CACHE_TEST_ENGINES
-    if engine is not Engine.INTERNAL_ANALYTICAL
-)
-
-
 @dataclass(frozen=True)
 class _SettingCase:
     label: str
@@ -694,6 +687,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27",
         ),
     )
+    mismatches = {}
     for label, engine, configuration, expected_hex in snapshots:
         normalized = normalize_engine_settings(engine, configuration)
         key = engine_cache_key(
@@ -701,7 +695,8 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             ENGINE_CHEMISTRY_VERSION[engine],
             {"engine_settings": engine_cache_settings(engine, normalized)},
         )
-        assert key.hex() == expected_hex, label
+        if key.hex() != expected_hex:
+            mismatches[label] = key.hex()
 
     case_key_hex = {
         "AlphaMELTS transport mode": (
@@ -770,7 +765,9 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
                 )
             },
         )
-        assert key.hex() == case_key_hex[case.label], case.label
+        if key.hex() != case_key_hex[case.label]:
+            mismatches[case.label] = key.hex()
+    assert not mismatches, repr(mismatches)
 
 
 def test_default_alphamelts_projection_matches_resolved_opener_settings(
@@ -912,13 +909,12 @@ def test_default_engine_cache_settings_match_across_call_paths(
     )
 
     expected_request_count = (
-        0 if engine == "internal-analytical" else 1 if engine == "openimcc" else 2
+        1 if engine in {"internal-analytical", "openimcc"} else 2
     )
     assert len(requests) == expected_request_count
     if engine == "internal-analytical":
         assert expected_projection == {}
-        assert projection_inputs == []
-        return
+        assert projection_inputs == [normalized]
 
     for request in requests:
         assert engine_cache_key(
@@ -927,7 +923,7 @@ def test_default_engine_cache_settings_match_across_call_paths(
             {"engine_settings": request["engine_settings"]},
         ) == expected_key
 
-    if engine != "openimcc":
+    if engine not in {"internal-analytical", "openimcc"}:
         assert projection_inputs[0] is normalized
         assert dict(projection_inputs[1]) == normalized
     else:
@@ -1698,7 +1694,7 @@ def test_alphamelts_runtime_metadata_is_outside_the_prediction_projection(
     assert after == before
 
 
-@pytest.mark.parametrize("engine", CACHEABLE_TEST_ENGINES, ids=lambda value: value.value)
+@pytest.mark.parametrize("engine", CACHE_TEST_ENGINES, ids=lambda value: value.value)
 def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
     engine: Engine,
     tmp_path: Path,
@@ -1721,6 +1717,9 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     handle = open_battery_engine(engine.value)
     using_recorded_result = not handle.available or handle.backend is None
+    if using_recorded_result and engine is Engine.INTERNAL_ANALYTICAL:
+        close_battery_engine_handle(handle)
+        pytest.skip(missing_engine_reason(handle, engine.value))
     expected_nonempty_scorer_fields = {
         Engine.ALPHAMELTS: (
             "status",
@@ -1734,6 +1733,7 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             "fe_redox_split",
         ),
         Engine.MAGEMIN: ("status", "engine_status"),
+        Engine.INTERNAL_ANALYTICAL: ("status", "engine_status", "gas_partial_pressures_Pa"),
         Engine.VAPOROCK: (
             "status",
             "engine_status",
@@ -1966,6 +1966,12 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             "timeout_s": 90.0,
             "isolated": False,
         }
+    elif engine is Engine.INTERNAL_ANALYTICAL:
+        pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
+        common = {
+            "temperature_K": 1700.0, "po2": Po2Request(mode="commanded", po2_bar=1e-8),
+            "timeout_s": 90.0, "isolated": False,
+        }
     else:
         pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
         common = {
@@ -2137,7 +2143,7 @@ def test_disabled_cache_does_not_walk_opaque_internal_analytical_core(
     assert result is expected
 
 
-def test_internal_analytical_equilibrate_bypasses_enabled_cache(
+def test_stateless_internal_analytical_equilibrate_hits_enabled_cache(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2150,16 +2156,16 @@ def test_internal_analytical_equilibrate_bypasses_enabled_cache(
     monkeypatch.setattr(
         engine_cache,
         "engine_cache_settings",
-        lambda *_args: pytest.fail("stateful internal analytical backend was projected"),
+        lambda *_args: pytest.fail("analytical settings must come from its named construction switch"),
     )
     engine_cache.engine_cache_counters(reset=True)
-    handle = SimpleNamespace(name="internal-analytical", backend=object())
+    handle = SimpleNamespace(name="internal-analytical", backend=SimpleNamespace(_core=SimpleNamespace(_high_t_melt_activity="openimcc")))
     result = EquilibriumResult(status="ok", liquid_fraction=0.75)
 
-    assert _call_cached_backend_equilibrate(handle, {"temperature_C": 1000.0}, lambda: result) is result
-    assert engine_cache.engine_cache_counters(reset=True).get(
-        "internal-analytical", {}
-    ) == {}
+    for _ in range(2):
+        assert _call_cached_backend_equilibrate(handle, {"temperature_C": 1000.0}, lambda: result).liquid_fraction == result.liquid_fraction
+    counts = engine_cache.engine_cache_counters(reset=True)["internal-analytical"]
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
 
 
 def test_openimcc_battery_adapter_does_not_add_an_outer_cache_entry(
@@ -2645,7 +2651,7 @@ def test_internal_analytical_residue_cache_round_trips_named_observation_request
     )
 
     request = {
-        "core": object(),
+        "core": SimpleNamespace(_high_t_melt_activity="openimcc"),
         "temperature_C": temperature_C,
         "pressure_bar": 1.0,
         "composition_kg": None,
@@ -2666,12 +2672,11 @@ def test_internal_analytical_residue_cache_round_trips_named_observation_request
     assert calls[0]["temperature_C"] == temperature_C
     assert calls[0]["composition_mol"] == composition_mol
     assert calls[1]["composition_mol"] == composition_mol
-    assert engine_cache.engine_cache_counters(reset=True).get(
-        "internal-analytical", {}
-    ) == {}
+    counts = engine_cache.engine_cache_counters(reset=True)["internal-analytical"]
+    assert counts["uncacheable:SimpleNamespace"] == 2
 
 
-def test_internal_analytical_residue_uses_each_current_high_t_activity_state(
+def test_internal_analytical_residue_key_ignores_previous_call_state(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2696,9 +2701,7 @@ def test_internal_analytical_residue_uses_each_current_high_t_activity_state(
     def solve(**kwargs: Any) -> Any:
         nonlocal calls
         calls += 1
-        current_core = kwargs["core"]
-        pressure = 2.0 if current_core._last_high_t_melt_activity else 1.0
-        return SimpleNamespace(vapor_pressures_Pa={"SiO(g)": pressure})
+        return SimpleNamespace(status="ok", phase_assemblage_available=False, diagnostics={}, vapor_pressures_Pa={"SiO(g)": 1.0})
 
     monkeypatch.setattr(battery, "_internal_analytical_vapor_pressure_adapter", solve)
     request = {
@@ -2726,14 +2729,12 @@ def test_internal_analytical_residue_uses_each_current_high_t_activity_state(
     second = internal_analytical_residue_vapor_pressure(core=core, **request)
 
     assert first.vapor_pressures_Pa == {"SiO(g)": 1.0}
-    assert second.vapor_pressures_Pa == {"SiO(g)": 2.0}
-    assert calls == 2
-    assert engine_cache.engine_cache_counters(reset=True).get(
-        "internal-analytical", {}
-    ) == {}
+    assert second.vapor_pressures_Pa == {"SiO(g)": 1.0}
+    assert calls == 1
+    assert engine_cache.engine_cache_counters(reset=True)["internal-analytical"]["hits"] == 1
 
 
-def test_internal_analytical_high_temperature_modes_are_uncached_and_equivalent(
+def test_internal_analytical_high_temperature_modes_cache_separately_and_exactly(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2791,16 +2792,17 @@ def test_internal_analytical_high_temperature_modes_are_uncached_and_equivalent(
     engine_cache.engine_cache_counters(reset=True)
     openimcc_off = evaluate("openimcc", cache=False)
     openimcc_on = evaluate("openimcc", cache=True)
+    openimcc_warm = evaluate("openimcc", cache=True)
     constant_gamma_off = evaluate("constant_gamma", cache=False)
     constant_gamma_on = evaluate("constant_gamma", cache=True)
+    constant_gamma_warm = evaluate("constant_gamma", cache=True)
 
-    assert openimcc_on == openimcc_off
-    assert constant_gamma_on == constant_gamma_off
+    assert openimcc_on == openimcc_off == openimcc_warm
+    assert constant_gamma_on == constant_gamma_off == constant_gamma_warm
     assert openimcc_off.vapor_pressures_Pa != constant_gamma_off.vapor_pressures_Pa
     assert calls == 4
-    assert engine_cache.engine_cache_counters(reset=True).get(
-        "internal-analytical", {}
-    ) == {}
+    counts = engine_cache.engine_cache_counters(reset=True)["internal-analytical"]
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 2
 
 
 def test_hashimoto_internal_residue_path_reads_diagnostics_without_cache(
@@ -2829,7 +2831,7 @@ def test_hashimoto_internal_residue_path_reads_diagnostics_without_cache(
             },
         )
 
-    monkeypatch.setattr(battery, "_new_internal_analytical_core", lambda: object())
+    monkeypatch.setattr(battery, "_new_internal_analytical_core", lambda: SimpleNamespace(_high_t_melt_activity="openimcc"))
     monkeypatch.setattr(
         battery, "_internal_analytical_vapor_pressure_adapter", fake_residue_pressure
     )

@@ -24,6 +24,7 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> N
     )
     cache = tmp_path / "engine-cache.sqlite"
     results = {}
+    counters = {}
     report = []
     requests = {}
     original_call = engine_cache.cached_engine_call
@@ -53,6 +54,7 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> N
         for engine in cache_smoke.ENGINE_ORDER:
             report.append(f"{label} {engine.value} {json.dumps(counts.get(engine.value, {}), sort_keys=True)}")
         results[label] = rows
+        counters[label] = counts
     report.extend(cache_smoke._cache_storage_report(cache))
     warnings.warn("\n".join(report), stacklevel=1)
     baseline = results["off"]
@@ -67,6 +69,12 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> N
     warnings.warn("rows identical: yes", stacklevel=1)
     for engine in cache_smoke.ENGINE_ORDER:
         assert engine.value in requests, f"{engine.value}: no cacheable cold request"
+        cold = counters["cold"][engine.value]
+        assert cold["misses"] == cold["stores"] > 0, (engine, cold)
+        for label in ("warm", "warm-workers-2"):
+            warm = counters[label][engine.value]
+            assert warm["hits"] == cold["stores"], (engine, label, warm)
+            assert warm["misses"] == warm["stores"] == warm["read_error"] == warm["store_error"] == 0
     def measure(call):
         batches = []
         for _ in range(5):
