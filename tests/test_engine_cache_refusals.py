@@ -70,3 +70,48 @@ def test_bulk_loader_rejects_transient_refusals(tmp_path):
             key, {"status": "refusal", "refusal_reason": "engine_timeout"},
             "alphamelts", 2, "laptop", 1,
         )])
+
+
+@pytest.mark.parametrize("engine", ["alphamelts", "vaporock"])
+def test_real_engine_basis_refusal_hits_before_the_worker_pipe(engine, tmp_path, monkeypatch):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot, Po2Request, _close_isolated_cell_workers,
+        close_battery_engine_handle, equilibrate_cell, open_battery_engine,
+    )
+    from simulator.engine_pool import WarmEngineWorker
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    _close_isolated_cell_workers()
+    handle = open_battery_engine(engine)
+    if not handle.available:
+        close_battery_engine_handle(handle)
+        pytest.skip(handle.unavailable_reason or f"{engine} is unavailable")
+    pot = BinaryPot("silica-free", None, "basis refusal", {"Al2O3": 100.0})
+    calls = []
+    original = WarmEngineWorker.call
+
+    def counted(worker, *args, **kwargs):
+        calls.append(1)
+        return original(worker, *args, **kwargs)
+
+    monkeypatch.setattr(WarmEngineWorker, "call", counted)
+    engine_cache.engine_cache_counters(reset=True)
+    try:
+        def evaluate():
+            return equilibrate_cell(
+                handle, pot, temperature_K=1700.0,
+                po2=Po2Request("engine_default", None), isolated=True, timeout_s=90.0,
+            )
+        cold = evaluate()
+        engine_cache._MEMORY_CACHE.clear()
+        warm = evaluate()
+        assert cold.status == warm.status == "refusal"
+        assert cold.refusal_reason == warm.refusal_reason == "out_of_basis"
+        assert cold.engine_reason == warm.engine_reason
+        assert len(calls) == 1
+        counts = engine_cache.engine_cache_counters()[engine]
+        assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+    finally:
+        _close_isolated_cell_workers()
+        close_battery_engine_handle(handle)
