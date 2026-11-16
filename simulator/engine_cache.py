@@ -925,10 +925,16 @@ ENGINE_CACHE_NO_DISCLOSURE_ENGINES = {
 _ENGINE_CACHE_VALUE_KEY = "_engine_cache_value"
 
 
+def _engine_carries_disclosures(engine_id: str) -> bool:
+    """Return whether cached values for this engine carry law disclosures."""
+
+    return engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES
+
+
 def _accept_cached_engine_disclosures(engine_id: str, value: Any) -> bool:
     """Replay a measured engine disclosure before returning a cache hit."""
 
-    if engine_id not in ENGINE_CACHE_DISCLOSURE_ENGINES:
+    if not _engine_carries_disclosures(engine_id):
         return True
     if not isinstance(value, Mapping) or _ENGINE_CACHE_VALUE_KEY not in value:
         return False
@@ -945,7 +951,7 @@ def _accept_cached_engine_disclosures(engine_id: str, value: Any) -> bool:
 
 def _unwrap_engine_cache_value(engine_id: str, value: Any) -> Any:
     if (
-        engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES
+        _engine_carries_disclosures(engine_id)
         and isinstance(value, Mapping)
         and _ENGINE_CACHE_VALUE_KEY in value
     ):
@@ -1201,7 +1207,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     memory_key = (path_value, cache_key, readonly)
     disclosure_registry = None
     disclosure_before: tuple[dict[str, Any], ...] = ()
-    if engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES:
+    if _engine_carries_disclosures(engine_id):
         from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot
 
         disclosure_registry = active_registry()
@@ -1246,7 +1252,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                     _remember_memory_value(memory_key, result)
                     return _unwrap_engine_cache_value(engine_id, result)
                 row = None
-                if engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES and not readonly:
+                if _engine_carries_disclosures(engine_id) and not readonly:
                     try:
                         connection.execute(
                             f"DELETE FROM {_TABLE} WHERE key=?", (cache_key,)
@@ -1264,7 +1270,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         return hot
     memory_value = hot
     storage_value = solved.hot if isinstance(solved, EngineCacheValue) else solved
-    if engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES:
+    if _engine_carries_disclosures(engine_id):
         from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot, disclosure_delta
 
         disclosures = None

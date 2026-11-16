@@ -4572,6 +4572,7 @@ class _IsolatedCellWorker:
         from simulator.engine_cache import (
             EngineCacheValue,
             cached_engine_call,
+            _engine_carries_disclosures,
             engine_cache_settings,
         )
 
@@ -4617,7 +4618,7 @@ class _IsolatedCellWorker:
                     if not cacheable_refusal(result):
                         return result
             hot = EquilibrateCell.from_payload(result).to_hot()
-            if self.engine == "internal-analytical" and scoped_run:
+            if _engine_carries_disclosures(self.engine) and scoped_run:
                 # The child process has no run-disclosure registry to attach to
                 # this value, so it cannot safely populate a scoped cache row.
                 if isinstance(hot, EngineCacheValue):

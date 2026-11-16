@@ -18,6 +18,7 @@ from typing import Any, Mapping
 
 import pytest
 
+from simulator.engine_cache import ENGINE_CACHE_DISCLOSURE_ENGINES
 from simulator.diagnostic_helpers.binary_pot_battery import (
     ARM_QUALIFICATION,
     AUTHORITY_EXTRAPOLATED,
@@ -2752,9 +2753,11 @@ def test_internal_analytical_wall_backstop_refuses_a_blocked_child(
     assert raised.value.timeout_reason is None
 
 
-def test_internal_analytical_isolated_worker_keeps_disclosures_unknown(
+@pytest.mark.parametrize("engine_id", sorted(ENGINE_CACHE_DISCLOSURE_ENGINES))
+def test_carrying_engine_isolated_worker_keeps_disclosures_unknown(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    engine_id: str,
 ) -> None:
     import simulator.diagnostic_helpers.binary_pot_battery as battery
     from simulator import engine_cache
@@ -2765,8 +2768,8 @@ def test_internal_analytical_isolated_worker_keeps_disclosures_unknown(
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
     engine_cache._MEMORY_CACHE.clear()
     engine_cache.engine_cache_counters(reset=True)
-    worker = battery._IsolatedCellWorker("internal-analytical")
-    response = _ok_cell(engine="internal-analytical", gas={}).as_payload()
+    worker = battery._IsolatedCellWorker(engine_id)
+    response = _ok_cell(engine=engine_id, gas={}).as_payload()
     calls = {"n": 0}
 
     def fake_call(_payload, *, timeout_s: float):
@@ -2786,9 +2789,7 @@ def test_internal_analytical_isolated_worker_keeps_disclosures_unknown(
                 second = worker.request(request, timeout_s=1.0)
                 third = worker.request(request, timeout_s=1.0)
                 assert disclosures.snapshot() == ()
-            counts = engine_cache.engine_cache_counters(reset=True)[
-                "internal-analytical"
-            ]
+            counts = engine_cache.engine_cache_counters(reset=True)[engine_id]
     finally:
         worker.close()
 
