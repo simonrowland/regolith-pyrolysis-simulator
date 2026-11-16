@@ -37,7 +37,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5505864499616470597301118492'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0'
+          - - Fe2O3
+            - '0.1272047715893626881369772278'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.3222087784489902521329109232'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.87'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '28.78'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '25.6'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '46.87'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '28.78'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '25.60'
+          Na2O: '0.00'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 0011-0014 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -71,7 +309,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.552704266991002019362942504'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0.01423392232410335030483281006'
+          - - Fe2O3
+            - '0.1167607116825976719150495625'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.3163010990022969584171751234'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.45'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '2.03'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '26.08'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '24.81'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '46.45'
+          TiO2: '0.00'
+          Al2O3: '2.03'
+          Fe2O3: '26.08'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '24.81'
+          Na2O: '0.00'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 0021-0025 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -105,7 +581,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4994394787363275915987540971'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0.08871637899111965695690730391'
+          - - Fe2O3
+            - '0.1121995767404209312042675719'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.2996445655321318202400710272'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.61'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.94'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '23.65'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '22.18'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 021-023 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '39.61'
+          TiO2: '0.00'
+          Al2O3: '11.94'
+          Fe2O3: '23.65'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '22.18'
+          Na2O: '0.00'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 021-023 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -139,7 +853,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4810129613841006072005588051'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0.1327463265353289578057700568'
+          - - Fe2O3
+            - '0.1068958275583305178405125777'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.2793448845222399171531585604'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '38.67'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '18.11'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.84'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20.96'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 031-036 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '38.67'
+          TiO2: '0.00'
+          Al2O3: '18.11'
+          Fe2O3: '22.84'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '20.96'
+          Na2O: '0.00'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 031-036 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -173,7 +1125,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4689487022238697562455331058'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0.1561579386837495934862399247'
+          - - Fe2O3
+            - '0.102112187058031310794215274'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.2727811720343493394740116958'
+          - - Na2O
+            - '0'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 041 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '37.41'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '21.14'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '21.65'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20.31'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 041 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '37.41'
+          TiO2: '0.00'
+          Al2O3: '21.14'
+          Fe2O3: '21.65'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '20.31'
+          Na2O: '0.00'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 041 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -207,7 +1397,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.7806157031323910141222757825'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0'
+          - - Fe2O3
+            - '0.09944490813340280508503216'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.1199393887342061807926920578'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '66.69'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.58'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '10.57'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 051-056 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '66.69'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '22.58'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '10.57'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 051-056 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -241,7 +1669,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.7789734436913724014635037569'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0.00007028528706252200851464173179'
+          - - Fe2O3
+            - '0.09989647775459788967183048223'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.1210597932669671868561511187'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '65.31'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.26'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '10.47'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 081-086 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '65.31'
+          TiO2: '0.00'
+          Al2O3: '0.01'
+          Fe2O3: '22.26'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '10.47'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 081-086 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -275,7 +1941,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4339624052575990771067009476'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0'
+          - - Fe2O3
+            - '0.1876729416812990767013297739'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.3783646530611018461919692787'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '32.8'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '37.7'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '29.5'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '32.80'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '37.70'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '29.50'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 091-0910 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -309,7 +2213,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4426390862188840053275991141'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0.00415805856621270459532476498'
+          - - Fe2O3
+            - '0.191715749859791387663590893'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.3614871053551119024134852277'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '32.62'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.52'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '37.55'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '27.48'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 101-107 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '32.62'
+          TiO2: '0.00'
+          Al2O3: '0.52'
+          Fe2O3: '37.55'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '27.48'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 101-107 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -343,7 +2485,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4339624052575990771067009476'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0'
+          - - Fe2O3
+            - '0.1876729416812990767013297739'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.3783646530611018461919692787'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '32.8'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '37.7'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '29.5'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 111-117 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '32.80'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '37.70'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '29.50'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 111-117 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -377,7 +2757,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.440631297471267204990424098'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0.009204788001775924228829487671'
+          - - Fe2O3
+            - '0.1885831601960343171015265176'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.3615807543309225536792198971'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '32.44'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '1.15'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '36.9'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '27.46'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 121-126 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '32.44'
+          TiO2: '0.00'
+          Al2O3: '1.15'
+          Fe2O3: '36.90'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '27.46'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 121-126 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -411,7 +3029,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5972370755382982630987075071'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0'
+          - - Fe2O3
+            - '0.09483797605387584329248453021'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.3079249484078258936088079627'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.18'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '21.6'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '27.22'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 131-137 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.18'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '21.60'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '27.22'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 131-137 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -445,7 +3301,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5718295128396392664030498894'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0'
+          - - Fe2O3
+            - '0.1023126896866429822412286258'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.325857797473717751355721485'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.82'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.74'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '28.11'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 141-147 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '47.82'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '22.74'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '28.11'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 141-147 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -479,7 +3573,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5972370755382982630987075071'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0'
+          - - Fe2O3
+            - '0.09483797605387584329248453021'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.3079249484078258936088079627'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.18'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '21.6'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '27.22'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 151-157 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '51.18'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '21.60'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '27.22'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 151-157 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -513,7 +3845,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5805915212157090365420754654'
+          - - TiO2
+            - '0'
+          - - Al2O3
+            - '0.001113525718540962165824513596'
+          - - Fe2O3
+            - '0.1012710207628542303677905701'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0'
+          - - Na2O
+            - '0.317023932302895770924309451'
+          - - K2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.16'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.16'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.79'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '27.69'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 161-167 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.16'
+          TiO2: '0.00'
+          Al2O3: '0.16'
+          Fe2O3: '22.79'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '27.69'
+          K2O: '0.00'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 161-167 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -547,7 +4117,17 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: missing major oxides: MnO'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 171-174 prints MnO=N.A.; final run composition remains typed unknown.
   conditions:
     temperature_K:
       state:
@@ -581,7 +4161,245 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5240802452118105896705764142'
+          - - TiO2
+            - '0.02413152774354780343158217365'
+          - - Al2O3
+            - '0.1277671506139790118103853205'
+          - - Fe2O3
+            - '0.09069908567878516193180628791'
+          - - MnO
+            - '0.001532067319782149653158834568'
+          - - MgO
+            - '0.09060289259076287525109062016'
+          - - CaO
+            - '0.1091771150487417979046892014'
+          - - Na2O
+            - '0.02747174254062940281594037794'
+          - - K2O
+            - '0.004538173251961207530770769349'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.46'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '2.66'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.98'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '19.99'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.15'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5.04'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '8.45'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.35'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.59'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 85
+              pdf_page_index: 3
+              table: '3'
+              note: Table 3 initial row 181-182 measured composition is the run input for final rows.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '43.46'
+          TiO2: '2.66'
+          Al2O3: '17.98'
+          Fe2O3: '19.99'
+          MnO: '0.15'
+          MgO: '5.04'
+          CaO: '8.45'
+          Na2O: '2.35'
+          K2O: '0.59'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 181-182 measured composition is the run input for final rows.
   conditions:
     temperature_K:
       state:
@@ -615,7 +4433,17 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: missing major oxides: MnO'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 201-206 prints MnO=N.A.; final run composition remains typed unknown.
   conditions:
     temperature_K:
       state:
@@ -649,7 +4477,17 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: missing major oxides: MnO'
+      locator:
+        page: 4
+        published_page: 85
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3 initial row 211-213 prints MnO=N.A.; final run composition remains typed unknown.
   conditions:
     temperature_K:
       state:

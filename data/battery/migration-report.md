@@ -3,9 +3,9 @@
 rows in: 93335
 records out (observations): 191609
 works: 852
-experiments: 8040
-queue size: 124457
-queue backlog: 97768
+experiments: 8041
+queue size: 124463
+queue backlog: 97774
 reference inputs: 26689
 identical-payload dedupe aliases: 342
 metadata files: 50
@@ -216,7 +216,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | formulas | 1625 | 23102 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
 | absent_admissions | 3511 | 17547 (mismatch) |
-| absent_classes | 2174 | 2097 (mismatch) |
+| absent_classes | 2174 | 2100 (mismatch) |
 | range_only_T | 3125 | 3048 (mismatch) |
 | system_like_phases | 1065 | 2875 (mismatch) |
 | missing_phases | 237 | 1356 (mismatch) |
@@ -226,7 +226,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | source method_class | count |
 |---|---:|
-| `absent` | 434 |
+| `absent` | 437 |
 | `method_only` | 34 |
 | `typed_refusal` | 14 |
 | `third_law_kems` | 10 |
@@ -19610,7 +19610,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/romero-serrano-1999-binary-ternary-silicates.yaml` | 4 | 4 | 8 | 0 |
 | `data/literature/extracts/rusiecka-2026-chlorine-data.yaml` | 1911 | 1911 | 3822 | 0 |
 | `data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml` | 11 | 13 | 46 | 0 |
-| `data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml` | 56 | 1004 | 62 | 0 |
+| `data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml` | 56 | 1004 | 68 | 0 |
 | `data/literature/extracts/rzehak-2021-ti-isotope-redox-lunar-melts.yaml` | 3 | 18 | 0 | 0 |
 | `data/literature/extracts/sack-2021-melilite-thermochemistry.yaml` | 0 | 0 | 1 | 0 |
 | `data/literature/extracts/sack-ghiorso-2017-fassaite-thermodynamics.yaml` | 0 | 0 | 1 | 0 |
@@ -19985,11 +19985,11 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 321483
+advisory issues: 318522
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 321483 |
+| `identity_incomplete` | 318522 |
 
 ## Notices
 
