@@ -41,6 +41,9 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path) -> None:
     for label in ("cold", "warm", "warm-workers-2"):
         assert len(results[label]) == len(baseline), label
         for actual, expected in zip(results[label], baseline):
-            assert json.loads(actual) == json.loads(expected), label
+            assert json.loads(actual) == json.loads(expected), (
+                label, json.loads(actual).get("refusal"),
+                json.loads(expected).get("refusal"),
+            )
         assert results[label] == baseline, label
     warnings.warn("rows identical: yes", stacklevel=1)

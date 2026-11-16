@@ -1791,6 +1791,23 @@ def test_unknown_engine_notice_code_requires_table_entry() -> None:
         encode_engine_notice_codes("openimcc", [{"kind": "future_notice"}])
 
 
+def test_real_commissioning_notices_round_trip_for_every_emitting_engine() -> None:
+    from engines.engine_commissioning import (
+        assess_engine_commissioning, load_engine_commissioning,
+    )
+    from simulator.melt_backend.base import decode_engine_notice_codes, encode_engine_notice_codes
+
+    for engine, specification in load_engine_commissioning().engines.items():
+        notice = assess_engine_commissioning(
+            engine,
+            sio2_wt_pct=specification.sio2_wt_pct.certified.minimum,
+            temperature_K=specification.temperature_K.certified.maximum + 1.0,
+        ).notice
+        assert notice is not None
+        codes, values = encode_engine_notice_codes(engine, [notice])
+        assert decode_engine_notice_codes(engine, codes, values) == json.loads(json.dumps([notice]))
+
+
 def test_equilibrium_hot_uses_notice_and_warning_codes_with_parameters() -> None:
     from simulator.melt_backend.base import (
         equilibrium_cache_from_value,
