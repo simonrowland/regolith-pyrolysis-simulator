@@ -10369,6 +10369,29 @@ def test_comparison_candidates_rehome_context_and_reference_rows() -> None:
             output_unit="Pa",
         ),
     )
+    reported_unknown_identity = replace(
+        F.psat_identity("Ca"),
+        quantity=State.unknown("unsupported quantity 'fixture_observable'"),
+    )
+    reported_unknown = F.observation(
+        "reported-unknown-quantity",
+        experiment.experiment_id,
+        reported_unknown_identity,
+        Decimal("7"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="measured-source",
+    )
+    reported_unknown = replace(
+        reported_unknown,
+        value=Value(
+            ValueKind.UNAVAILABLE,
+            unavailable_reason="source printed values but no closed quantity token",
+        ),
+        evidence=replace(
+            reported_unknown.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
     context = replace(
         _context(
             F.work(),
@@ -10379,6 +10402,7 @@ def test_comparison_candidates_rehome_context_and_reference_rows() -> None:
             known_absence,
             not_applicable_absence,
             unmarked_reference,
+            reported_unknown,
         ),
         origins={
             reference.observation_id: (
@@ -10397,6 +10421,7 @@ def test_comparison_candidates_rehome_context_and_reference_rows() -> None:
         "known-quantity-absence",
         "not-applicable-quantity-absence",
         "unmarked-reference",
+        "reported-unknown-quantity",
     }
 
 

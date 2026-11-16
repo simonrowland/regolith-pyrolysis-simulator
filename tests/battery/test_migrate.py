@@ -15917,7 +15917,7 @@ def test_fresh_store_unavailable_values_partition_queue(tmp_path: Path) -> None:
             "units": "atm",
             "values": {
                 "quantity": "unknown_fixture_quantity",
-                "method_class": "measured_direct",
+                "method_class": "method_only",
                 "series": [{"T_K": 1450.0}],
             },
         },
@@ -15933,7 +15933,7 @@ def test_fresh_store_unavailable_values_partition_queue(tmp_path: Path) -> None:
             "units": "atm",
             "values": {
                 "quantity": "unknown_fixture_quantity",
-                "method_class": "measured_direct",
+                "method_class": "method_only",
                 "series": [{"T_K": 1500.0}],
             },
         },
@@ -16242,6 +16242,35 @@ def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
         ),
         value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
     )
+    source_stated_unknown = F.observation(
+        "source-stated-unknown",
+        experiment.experiment_id,
+        replace(
+            known_identity,
+            quantity=State.unknown("unsupported quantity 'fixture_observable'"),
+        ),
+        Decimal("6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-source",
+    )
+    source_stated_unknown = replace(
+        source_stated_unknown,
+        value=Value(
+            ValueKind.UNAVAILABLE,
+            unavailable_reason="source printed values but no closed quantity token",
+        ),
+        evidence=replace(
+            source_stated_unknown.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
+    declared_gap = "declared source schema gap"
+    schema_gap_unknown = replace(
+        source_stated_unknown,
+        observation_id="schema-gap-unknown",
+        identity=replace(known_identity, quantity=State.unknown(declared_gap)),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason=declared_gap),
+    )
     sources = {
         "context-row": "data/literature/extracts/fixture-source.yaml",
         "reference-row": (
@@ -16253,6 +16282,8 @@ def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
         ),
         "known-absence": "data/literature/extracts/fixture-source.yaml",
         "not-applicable-absence": "data/literature/extracts/fixture-source.yaml",
+        "source-stated-unknown": "data/literature/extracts/fixture-source.yaml",
+        "schema-gap-unknown": "data/literature/extracts/fixture-source.yaml",
     }
     reference_manifest = (
         root / "data/literature/compilations/fixture-reference/manifest.yaml"
@@ -16277,6 +16308,8 @@ def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
         ledger_row,
         known_absence,
         not_applicable_absence,
+        source_stated_unknown,
+        schema_gap_unknown,
     ):
         migrator.result.observations[observation.observation_id] = observation
         source = sources[observation.observation_id]
@@ -16295,6 +16328,8 @@ def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
     assert [entry.observation_id for entry in migrator.result.queue] == [
         "known-absence",
         "not-applicable-absence",
+        "source-stated-unknown",
+        "schema-gap-unknown",
     ]
     assert migrator.result.queue_work_counts is not None
     assert sum(
