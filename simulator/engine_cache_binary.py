@@ -6,6 +6,7 @@ no decimal rounding is introduced. Values retain their IEEE-754 bits.
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from functools import lru_cache
 import math
 import struct
 
@@ -31,6 +32,7 @@ _KEY_FIELDS = (
     "temperature_K", "temperature_C", "physical_pressure_bar", "pressure_bar",
     "fO2_log", "po2", "kwargs", "engine_settings",
 )
+_KEY_FIELD_ORDER = {value: index for index, value in enumerate(_KEY_FIELDS)}
 
 # Wire tokens only: oxide/species names remain inline. Append, never reorder.
 _VALUE_TOKENS = (
@@ -71,6 +73,28 @@ def _unsigned(value: int) -> bytes:
     return bytes(result)
 
 
+@lru_cache(maxsize=8192)
+def _string_bytes(value: str, key: bool) -> bytes:
+    if key and value in _KEY_FIELD_ORDER:
+        return bytes((128 + _KEY_FIELD_ORDER[value],))
+    if not key and value in _VALUE_TOKEN_NUMBERS:
+        return bytes((_VALUE_TOKEN_NUMBERS[value],))
+    data = value.encode("utf-8")
+    return b"\x05" + _unsigned(len(data)) + data
+
+
+@lru_cache(maxsize=65536)
+def _key_float_bytes(value: float, negative: bool) -> bytes:
+    mantissa, exponent = math.frexp(abs(value))
+    if value == 0.0:
+        exponent = -1074
+    fixed = int(mantissa * (1 << 53))
+    body = struct.pack(">HQ", exponent + 1074, fixed)
+    return b"\x09" + bytes((0 if negative else 1,)) + (
+        bytes(byte ^ 255 for byte in body) if negative else body
+    )
+
+
 def pack(value, *, key: bool = False) -> bytes:
     if isinstance(value, _Reference):
         return b"\x0a" + _unsigned(value.index)
@@ -92,22 +116,9 @@ def pack(value, *, key: bool = False) -> bytes:
                 integer = int(value)
                 return b"\x0d" + _unsigned(2 * integer if integer >= 0 else -2 * integer - 1)
             return b"\x04" + struct.pack(">d", value)
-        mantissa, exponent = math.frexp(abs(value))
-        if value == 0.0:
-            exponent = -1074
-        fixed = int(mantissa * (1 << 53))
-        body = struct.pack(">HQ", exponent + 1074, fixed)
-        negative = math.copysign(1.0, value) < 0
-        return b"\x09" + bytes((0 if negative else 1,)) + (
-            bytes(byte ^ 255 for byte in body) if negative else body
-        )
+        return _key_float_bytes(value, math.copysign(1.0, value) < 0)
     if isinstance(value, str):
-        if key and value in _KEY_FIELDS:
-            return bytes((128 + _KEY_FIELDS.index(value),))
-        if not key and value in _VALUE_TOKEN_NUMBERS:
-            return bytes((_VALUE_TOKEN_NUMBERS[value],))
-        data = value.encode("utf-8")
-        return b"\x05" + _unsigned(len(data)) + data
+        return _string_bytes(value, key)
     if isinstance(value, (tuple, list)):
         tag = b"\x07" if isinstance(value, tuple) else b"\x06"
         return tag + _unsigned(len(value)) + b"".join(pack(item, key=key) for item in value)
@@ -115,7 +126,7 @@ def pack(value, *, key: bool = False) -> bytes:
         if any(not isinstance(name, str) for name in value):
             raise TypeError("cache map names must be strings")
         names = sorted(value, key=lambda name: (
-            _KEY_FIELDS.index(name) if key and name in _KEY_FIELDS else len(_KEY_FIELDS), name,
+            _KEY_FIELD_ORDER.get(name, len(_KEY_FIELDS)) if key else len(_KEY_FIELDS), name,
         ))
         return b"\x08" + _unsigned(len(names)) + b"".join(
             pack(name, key=key) + pack(value[name], key=key) for name in names
