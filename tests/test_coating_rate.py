@@ -684,14 +684,23 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
 
 
 @pytest.mark.parametrize("positive", [False, True])
-def test_source_carrier_refusal_preserves_a_measured_positive_wall_figure(positive):
+@pytest.mark.parametrize("booked", [False, True])
+def test_source_carrier_refusal_requires_species_supply_booking(positive, booked):
     from simulator.wall_deposit_availability import wall_deposit_figure_availability
 
     availability = wall_deposit_figure_availability(
         has_positive_deposit=positive,
-        authority={"refused_carrier_species": ["CrO2"]},
+        authority={
+            "refused_carrier_species": ["CrO2"],
+            "wall_supply_bound_bookings": [{
+                "species": "CrO2", "supply_upper_bound_kg": 1.0,
+                "deposit_kg": 0.1 if positive else 0.0,
+            }] if booked else [],
+        },
     )
-    assert availability.status == ("available" if positive else "refused")
+    assert availability.status == (
+        ("available" if positive else "measured_empty") if booked else "refused"
+    )
 
 
 def test_positive_production_diagnostic_and_resumed_session_are_local() -> None:

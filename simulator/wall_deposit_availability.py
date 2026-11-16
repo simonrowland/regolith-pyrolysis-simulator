@@ -61,13 +61,7 @@ def wall_deposit_figure_availability(
     pressure_refused = cumulative_pressure_refused or _has_pressure_refusal(
         explicit_authority
     )
-    # d-367: source-carrier uncertainty cannot erase a booked positive
-    # deposit. It does prevent certifying an empty wall without a supply
-    # bound. Wall-pressure and explicit measurement refusals still apply.
-    carrier_refused = (
-        not has_positive_deposit
-        and bool(decision_authority.get("refused_carrier_species"))
-    )
+    carrier_refused = bool(decision_authority.get("refused_carrier_species"))
     if explicit_refusal or pressure_refused or carrier_refused:
         # An authority payload with pressure refusals may already aggregate
         # earlier campaigns; the explicit refusal can describe only the latest.
