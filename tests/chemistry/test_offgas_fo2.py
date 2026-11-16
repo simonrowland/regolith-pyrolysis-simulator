@@ -595,10 +595,19 @@ def test_non_wgs_result_omits_the_optional_source_band(polys):
     assert "uncertainty_band_dex" not in result.as_dict()
 
 
-def test_full_balance_direct_couple_outside_cea_domain_is_extrapolated(polys):
+@pytest.mark.parametrize(
+    ("gas", "temperature_K", "couple_fragment"),
+    (
+        ({"CO2": 2.0, "CO": 1.0}, 20001.0, "CO2/CO couple"),
+        ({"H2O": 2.0, "H2": 1.0}, 199.0, "H2O/H2 couple"),
+    ),
+)
+def test_full_balance_direct_couple_outside_cea_domain_is_extrapolated(
+    polys, gas, temperature_K, couple_fragment
+):
     result, _cea, band = _full_balance_fo2_with_janaf_band(
-        {"CO2": 2.0, "CO": 1.0},
-        20001.0,
+        gas,
+        temperature_K,
         None,
         None,
         polys,
@@ -607,7 +616,10 @@ def test_full_balance_direct_couple_outside_cea_domain_is_extrapolated(polys):
 
     assert math.isfinite(result.log10_fO2)
     assert band == 0.0
-    assert any("extrapolat" in reason for reason in result.domain_reasons)
+    assert any(
+        "extrapolat" in reason and couple_fragment in reason
+        for reason in result.domain_reasons
+    )
 
 
 def test_full_element_balance_keeps_free_oxygen_and_co2_limit(polys):

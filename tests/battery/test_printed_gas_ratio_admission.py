@@ -150,6 +150,53 @@ def test_inherited_sossi_log_uses_gas_evaluation_temperature() -> None:
     assert inherited_decision == row_decision
 
 
+@pytest.mark.parametrize("pressure_state", ("absent", "unknown", "invalid"))
+def test_gas_mix_without_valid_total_pressure_keeps_log_but_withholds_frame(
+    pressure_state: str,
+) -> None:
+    from simulator.battery.migrate import PrintedOxygenFacts, printed_oxygen_decision
+    from simulator.battery.records import Located, Locator
+    from simulator.state_types import State
+
+    locator = Locator(page=1)
+    point_conditions = {}
+    if pressure_state == "unknown":
+        point_conditions["total_pressure_Pa"] = Located(
+            State.unknown("not_published"), locator=locator
+        )
+    elif pressure_state == "invalid":
+        point_conditions["total_pressure_Pa"] = Located(
+            State.of(Decimal("0")), locator=locator
+        )
+    facts = PrintedOxygenFacts(
+        log_fO2=Located(State.of(Decimal("-10")), locator=locator),
+        bare_log=True,
+    )
+
+    decision = printed_oxygen_decision(
+        facts,
+        raw_item={},
+        point_conditions=point_conditions,
+        scope="row",
+        run_temperature_K=Decimal("1600"),
+        printed_atmospheres=(
+            "H2O 1.000 × 1.00 SCCM + H2 1.000 × 1.00 SCCM",
+        ),
+    )
+
+    assert decision is not None
+    assert decision.state.is_value
+    assert decision.state.value == log10_fo2_to_pa(Decimal("-10"))
+    assert decision.notice_kind is NoticeKind.INPUT_OMITTED
+    assert "gas-mixture consistency check unavailable" in decision.notice_reason
+    assert "total pressure" in decision.notice_reason
+    assert decision.notice_authority is None
+    assert not any(
+        notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+        for notice in decision.notices
+    )
+
+
 def test_real_sossi_and_doyle_migrations_preserve_gas_fugacity_identity() -> None:
     sossi = _source_doc("sossi-2020-magma-ocean-redox.yaml")
     doyle = _source_doc("doyle-1989-tio2-feo-activity-magma.yaml")
@@ -253,18 +300,15 @@ def test_real_sossi_and_doyle_migrations_preserve_gas_fugacity_identity() -> Non
         assert observation.identity.temperature_K.value == Decimal("1600")
         assert observation.identity.fO2_Pa.value == log10_fo2_to_pa(printed_log_fO2)
         assert any(
-            notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            notice.kind is NoticeKind.INPUT_OMITTED
+            and "gas-mixture consistency check unavailable" in notice.reason
             for notice in observation.notices
         ), tuple(
             (notice.kind.value, notice.reason) for notice in observation.notices
         )
-        assert any(
-            notice.kind is NoticeKind.INPUT_OMITTED
-            and "run temperature 1600 K used for the gas-mixture check"
-            in notice.reason
+        assert not any(
+            notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
             for notice in observation.notices
-        ), tuple(
-            (notice.kind.value, notice.reason) for notice in observation.notices
         )
 
 
@@ -369,7 +413,9 @@ def test_jayasuriya_fev15_precision_band_admits_printed_value() -> None:
 
 
 @pytest.mark.parametrize("sample", ("FeV2", "FeV12", "FeV15", "FeV19", "FeV22"))
-def test_jayasuriya_real_mixtures_stay_certified(sample: str) -> None:
+def test_jayasuriya_real_mixtures_keep_log_without_pressure_certification(
+    sample: str,
+) -> None:
     jayasuriya = _source_doc("jayasuriya-2004-iron-mossbauer.yaml")
     observation = next(
         item
@@ -389,7 +435,12 @@ def test_jayasuriya_real_mixtures_stay_certified(sample: str) -> None:
         printed_atmospheres=(atmosphere,),
     )
     assert decision.state.is_value
-    assert decision.notice_authority.value == "certified"
+    assert decision.notice_kind is NoticeKind.INPUT_OMITTED
+    assert "total pressure" in decision.notice_reason
+    assert not any(
+        notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+        for notice in decision.notices
+    )
     assert not any("graphite saturation" in notice.reason for notice in decision.notices)
 
 
@@ -400,6 +451,7 @@ def test_graphite_saturated_match_keeps_value_but_downgrades_authority() -> None
         Decimal(str(result.log10_fO2)),
         Decimal("1000"),
         printed_atmospheres=(atmosphere,),
+        total_pressure_pa=Decimal("101325"),
     )
     assert decision.state.is_value
     assert decision.notice_authority.value == "extrapolated"
@@ -415,6 +467,7 @@ def test_cold_hydrogen_rich_mix_downgrades_when_methane_moves_fo2() -> None:
         Decimal(str(result.log10_fO2)),
         Decimal("700"),
         printed_atmospheres=(atmosphere,),
+        total_pressure_pa=Decimal("101325"),
     )
     assert decision.state.is_value
     assert decision.notice_authority.value == "extrapolated"
@@ -488,8 +541,9 @@ def test_real_jayasuriya_mixtures_use_full_balance(
 
     assert Decimal(str(result.log10_fO2)).quantize(Decimal("0.0001")) == Decimal(expected_log_fO2)
     assert decision.state.is_value
-    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert f"expected JANAF full-balance log10(fO2/bar)={expected_log_fO2}" in decision.notice_reason
+    assert decision.state.value == log10_fo2_to_pa(printed)
+    assert decision.notice_kind is NoticeKind.INPUT_OMITTED
+    assert "total pressure" in decision.notice_reason
 
 
 def test_deliberately_wrong_printed_log_is_refused_with_dex_mismatch() -> None:

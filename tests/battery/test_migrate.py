@@ -19451,6 +19451,7 @@ def test_bare_log_accepts_printed_gas_mix_from_full_balance_band(
         Decimal(str(expected.log10_fO2)),
         Decimal("1682.15"),
         printed_atmospheres=(gas_as_printed,),
+        total_pressure_pa=Decimal("101325"),
     )
 
     assert decision.state.is_value
@@ -19461,9 +19462,29 @@ def test_bare_log_accepts_printed_gas_mix_from_full_balance_band(
     assert "expected JANAF full-balance log10(fO2/bar)=" in decision.notice_reason
 
 
-def test_direct_printed_co_couple_below_cea_domain_is_extrapolated() -> None:
+@pytest.mark.parametrize(
+    ("atmosphere", "couple", "oxidised", "reduced"),
+    (
+        (
+            "CO2 1.000 × 1.00 SCCM + CO 1.000 × 1.00 SCCM",
+            "CO",
+            "CO2",
+            "CO",
+        ),
+        (
+            "H2O 1.000 × 1.00 SCCM + H2 1.000 × 1.00 SCCM",
+            "H2",
+            "H2O",
+            "H2",
+        ),
+    ),
+)
+def test_direct_printed_gas_couple_below_cea_domain_is_extrapolated(
+    atmosphere: str, couple: str, oxidised: str, reduced: str
+) -> None:
     from simulator.battery.enums import Authority, NoticeKind
     from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.oxygen_identity import _printed_sccm_gas_mixture
     from simulator.chemistry.offgas_fo2 import (
         _couple_log10_fO2,
         _log10_K_couple,
@@ -19471,12 +19492,14 @@ def test_direct_printed_co_couple_below_cea_domain_is_extrapolated() -> None:
     )
 
     temperature_K = 199.0
-    atmosphere = "CO2 1.000 × 1.00 SCCM + CO 1.000 × 1.00 SCCM"
     polynomials = load_buffer_polynomials()
+    mix = _printed_sccm_gas_mixture(atmosphere)
+    assert mix is not None
+    species_mol, _precision = mix
     expected = _couple_log10_fO2(
-        1.0,
+        float(species_mol[oxidised] / species_mol[reduced]),
         _log10_K_couple(
-            polynomials, "CO", temperature_K, allow_extrapolation=True
+            polynomials, couple, temperature_K, allow_extrapolation=True
         ),
     )
 
@@ -19484,12 +19507,16 @@ def test_direct_printed_co_couple_below_cea_domain_is_extrapolated() -> None:
         Decimal(str(expected)),
         Decimal(str(temperature_K)),
         printed_atmospheres=(atmosphere,),
+        total_pressure_pa=Decimal("100000"),
     )
 
     assert decision.state.is_value
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
     assert decision.notice_authority is Authority.EXTRAPOLATED
-    assert any("extrapolat" in notice.reason for notice in decision.notices)
+    assert any(
+        "extrapolat" in notice.reason and f"{oxidised}/{reduced}" in notice.reason
+        for notice in decision.notices
+    )
 
 
 def test_bare_log_direct_couple_mismatch_is_refused_as_possible_misprint() -> None:
@@ -19500,6 +19527,7 @@ def test_bare_log_direct_couple_mismatch_is_refused_as_possible_misprint() -> No
         Decimal("-0.30"),
         Decimal("1682.15"),
         printed_atmospheres=("CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM",),
+        total_pressure_pa=Decimal("101325"),
     )
 
     assert decision.state.is_unknown
@@ -19524,6 +19552,7 @@ def test_gas_couple_without_janaf_refuses_without_fabricating_a_band(monkeypatch
         printed_atmospheres=(
             "CO2 82.200 × 100.00 SCCM + CO 1.000 × 1.00 SCCM",
         ),
+        total_pressure_pa=Decimal("101325"),
     )
 
     assert decision.state.is_unknown
