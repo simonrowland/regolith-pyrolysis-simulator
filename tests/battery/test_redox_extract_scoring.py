@@ -169,9 +169,12 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert len(residuals) == 1
     assert residuals[0].numeric is not None
     assert residuals[0].numeric.operation is MetricOperation.DEX
-    assert residuals[0].status is ResidualStatus.NO_BAND
-    assert residuals[0].refusal is not None
-    assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residuals[0].status is ResidualStatus.MISMATCH
+    assert residuals[0].refusal is None
+    assert not any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+        for notice in residuals[0].notices
+    )
 
 
 def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
@@ -496,6 +499,27 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     residuals, _ = score_store(
         context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
     )
+    sossi_sd_ids = {
+        observation_id
+        for observation_id, observation in _observations.items()
+        if observation.source_id == "sossi-2020-magma-ocean-redox"
+        and isinstance(observation.uncertainty.verbatim, dict)
+        and "confidence_level" not in observation.uncertainty.verbatim
+    }
+    assert len(sossi_sd_ids) == 11
+    sossi_sd_residuals = [
+        residual for residual in residuals if residual.reference in sossi_sd_ids
+    ]
+    assert len(sossi_sd_residuals) == 11
+    for residual in sossi_sd_residuals:
+        assert residual.numeric is not None
+        assert residual.numeric.decision_band is not None
+        assert residual.numeric.decision_band.rule.startswith("printed_1sigma:")
+        assert not any(
+            notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+            or "two_sigma_reading_verdict=" in (notice.band or "")
+            for notice in residual.notices
+        )
     encoded = json.dumps(
         [residual_to_plain(residual) for residual in residuals],
         sort_keys=True,
@@ -519,9 +543,12 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # atmosphere. Nine fO2 identities match green again; fO2-10 keeps its
     # pressure. Their residual notices now carry the certified atmosphere
     # frame instead of the prior 1-bar-convention notice. The two Sossi rows
-    # without gas ratios and all six Aithala rows are unchanged.
+    # without gas ratios and all six Aithala rows are unchanged by t-1792.
+    # d-341 (t-1646) assumes 1 sigma only where neither metadata nor printed
+    # text states the level; the Sossi rows' printed SD caption keeps their
+    # primary 1-sigma verdicts without the assumption/alternative notices.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "2f13d472331c6ccb9234a7b04c45ad9f351434ad2dc22fc201119a6497634a26"
+        "b42f5ab911a5ae924bb51d8c0f3c3df3e1a0224b0e8f443ec1d236c7a55a1f5a"
     )
 
 
@@ -1366,8 +1393,13 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
             "openimcc",
         }:
             assert residual.numeric is not None
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+            assert residual.refusal is None
+            assert residual.numeric.decision_band is not None
+            assert residual.numeric.decision_band.rule.startswith("printed_1sigma:")
+            assert any(
+                notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+                for notice in residual.notices
+            )
         elif engine in {"alphamelts", "thermoengine"}:
             # Composition is printed, so these engines attempt a ferric split.
             # The unsupported-engine refusal is the one from before that path.
