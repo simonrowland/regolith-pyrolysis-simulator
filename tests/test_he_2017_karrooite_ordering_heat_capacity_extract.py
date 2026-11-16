@@ -53,8 +53,8 @@ def _document() -> dict:
 def _require_migration_inputs(corpus_root: Path) -> None:
     require_corpus_files(
         (
-            corpus_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf",
             corpus_root / "tables" / SOURCE_ID / "table-5.csv",
+            corpus_root / "tables" / SOURCE_ID / "table-5.provenance.yaml",
         )
     )
 
@@ -228,7 +228,7 @@ def test_partial_corpus_skips_migration_without_table5_csv(tmp_path: Path) -> No
         _require_migration_inputs(corpus_root)
 
 
-def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
+def _assert_isolated_migration_types_both_experimental_entropy_rows() -> None:
     _require_migration_inputs(CORPUS_ROOT)
     index = load_index()
     index[SOURCE_ID] = {
@@ -281,6 +281,67 @@ def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
             observation.read_from == f"pdf:{SOURCE_ID}"
             for observation in observations.values()
         )
+
+
+def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
+    _assert_isolated_migration_types_both_experimental_entropy_rows()
+
+
+def test_table_only_corpus_runs_isolated_migration(tmp_path: Path, monkeypatch) -> None:
+    corpus_root = tmp_path / "regolith-corpus"
+    table_dir = corpus_root / "tables" / SOURCE_ID
+    table_dir.mkdir(parents=True)
+    (table_dir / "table-5.csv").write_text(
+        "row,ordering_state_as_printed,S_vib_J_mol-1_K-1_as_printed,"
+        "S_config_J_mol-1_K-1_as_printed,S_total_J_mol-1_K-1_as_printed\n"
+        '1,"Synthetic state A",100.0(1),1.0(1),101.0(1)\n'
+        '2,"Synthetic state B",200.0(1),7.0(1),207.0(1)\n',
+        encoding="utf-8",
+    )
+    (table_dir / "table-5.provenance.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "page": 1,
+                "published_page": "1",
+                "table": "synthetic",
+                "method": "Synthetic input for the table-only migration test.",
+                "reviewer": "test fixture",
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    document = _document()
+    synthetic_rows = {
+        "he2017_table5_standard_entropy_x014": (101.0, "101.0(1)", "100.0(1)", "1.0(1)"),
+        "he2017_table5_standard_entropy_x037": (207.0, "207.0(1)", "200.0(1)", "7.0(1)"),
+    }
+    for observation in document["species"]["MgTi2O5"]["observations"]:
+        synthetic = synthetic_rows.get(observation["observation_id"])
+        if synthetic is None:
+            continue
+        total, total_as_printed, vibrational, configurational = synthetic
+        observation["values"].update(
+            {
+                "entropy": total,
+                "S_as_printed": total_as_printed,
+                "components_as_printed": {
+                    "S_vib": vibrational,
+                    "S_config": configurational,
+                },
+            }
+        )
+        observation["uncertainty"]["value"] = "0.1"
+    synthetic_extract = tmp_path / f"{SOURCE_ID}.yaml"
+    synthetic_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+
+    monkeypatch.setitem(globals(), "CORPUS_ROOT", corpus_root)
+    monkeypatch.setitem(globals(), "PDF", corpus_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf")
+    monkeypatch.setitem(globals(), "TABLE5_CSV", table_dir / "table-5.csv")
+    monkeypatch.setitem(globals(), "EXTRACT", synthetic_extract)
+    assert not PDF.is_file()
+    _assert_isolated_migration_types_both_experimental_entropy_rows()
 
 
 def test_all_locators_match_physical_pdf_pages() -> None:

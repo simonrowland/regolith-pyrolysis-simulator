@@ -21,10 +21,13 @@ from tools import ingest_pankratz_1987_usbm_b689 as harvest
 ROOT = loader.COMPILATION_ROOT
 
 
-def _require_b689_corpus_inputs(corpus_root: pathlib.Path) -> None:
+def _require_b689_corpus_inputs(
+    corpus_root: pathlib.Path, *, include_decode_chunks: bool
+) -> None:
     pdf, sidecar, source_chunks = harvest._b689_source_inputs(corpus_root)
     required_paths = [pdf, sidecar]
-    required_paths.extend(source_path for _, _, _, source_path in source_chunks)
+    if include_decode_chunks:
+        required_paths.extend(source_path for _, _, _, source_path in source_chunks)
     require_corpus_files(required_paths)
 
 
@@ -451,9 +454,7 @@ def test_valid_but_wrong_continuation_formula_cannot_certify():
 
 @pytest.fixture
 def corpus():
-    path = regolith_corpus_root()
-    _require_b689_corpus_inputs(path)
-    return path
+    return regolith_corpus_root()
 
 
 def test_partial_corpus_skips_b689_at_first_missing_input(tmp_path: pathlib.Path):
@@ -464,10 +465,11 @@ def test_partial_corpus_skips_b689_at_first_missing_input(tmp_path: pathlib.Path
     missing = pdf.parent / "sidecar.yaml"
 
     with pytest.raises(pytest.skip.Exception, match=str(missing)):
-        _require_b689_corpus_inputs(corpus_root)
+        _require_b689_corpus_inputs(corpus_root, include_decode_chunks=True)
 
 
 def test_rebuild_preserves_native_chunk_offsets_and_artifacts(corpus):
+    _require_b689_corpus_inputs(corpus, include_decode_chunks=True)
     artifacts = harvest.build(corpus)
     audited = {a["record_id"] for a in _audits()}
     checked = skipped = skipped_controller = 0
@@ -529,6 +531,7 @@ def test_rebuild_preserves_native_chunk_offsets_and_artifacts(corpus):
 
 
 def test_rebuild_refuses_missing_later_decode(corpus, tmp_path):
+    _require_b689_corpus_inputs(corpus, include_decode_chunks=True)
     (tmp_path / "raw").symlink_to(corpus / "raw", target_is_directory=True)
     decode = tmp_path / "text" / harvest.SOURCE_ID / "mineru"
     decode.mkdir(parents=True)
@@ -539,10 +542,31 @@ def test_rebuild_refuses_missing_later_decode(corpus, tmp_path):
         harvest.build(tmp_path)
 
 
-def test_rebuild_refuses_audit_gap(corpus, tmp_path, monkeypatch):
-    (tmp_path / "source").mkdir()
+def _assert_rebuild_refuses_audit_gap(corpus_root, destination, monkeypatch):
+    (destination / "source").mkdir(parents=True)
     audits = _audits()
-    (tmp_path / "source/formula-audit.jsonl").write_text("\n".join(json.dumps(a) for a in audits if a["pdf_page"] != 41))
-    monkeypatch.setattr(harvest, "DEST", tmp_path)
+    (destination / "source/formula-audit.jsonl").write_text(
+        "\n".join(json.dumps(a) for a in audits if a["pdf_page"] != 41)
+    )
+    monkeypatch.setattr(harvest, "DEST", destination)
     with pytest.raises(ValueError, match="every table page"):
-        harvest.build(corpus)
+        harvest.build(corpus_root)
+
+
+def test_rebuild_refuses_audit_gap(corpus, tmp_path, monkeypatch):
+    _require_b689_corpus_inputs(corpus, include_decode_chunks=False)
+    _assert_rebuild_refuses_audit_gap(corpus, tmp_path, monkeypatch)
+
+
+def test_audit_gap_refusal_runs_without_decode_chunks(tmp_path, monkeypatch):
+    corpus_root = tmp_path / "regolith-corpus"
+    raw = corpus_root / "raw" / harvest.SOURCE_ID
+    raw.mkdir(parents=True)
+    pdf = raw / f"{harvest.SOURCE_ID}.pdf"
+    pdf.write_bytes(b"review checksum fixture")
+    (raw / "sidecar.yaml").write_text(
+        yaml.safe_dump({"sha256": hashlib.sha256(pdf.read_bytes()).hexdigest()})
+    )
+
+    _require_b689_corpus_inputs(corpus_root, include_decode_chunks=False)
+    _assert_rebuild_refuses_audit_gap(corpus_root, tmp_path / "audit-gap", monkeypatch)
