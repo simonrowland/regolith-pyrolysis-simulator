@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 import sqlite3
@@ -15,6 +16,18 @@ from simulator import engine_cache
 
 
 def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> None:
+    import openimcc
+
+    module = Path(openimcc.__file__)
+    # Match the brief's `find . ... | sort | xargs shasum | shasum` proof.
+    paths = sorted(module.parent.rglob("*.py"))
+    manifest = "".join(
+        f"{hashlib.sha1(path.read_bytes()).hexdigest()}  ./{path.relative_to(module.parent).as_posix()}\n"
+        for path in paths
+    )
+    tree_hash = hashlib.sha1(manifest.encode()).hexdigest()
+    warnings.warn(f"OpenIMCC imported:{module} source_tree_shasum:{tree_hash}", stacklevel=1)
+    assert tree_hash.startswith("308672269d6e"), "smoke must run on the declared 66ec4a3 tree"
     root = Path(__file__).resolve().parents[2]
     subset = tmp_path / "subset"
     cache_smoke._link_smoke_sources(root, subset, cache_smoke.DEFAULT_WORKS)
