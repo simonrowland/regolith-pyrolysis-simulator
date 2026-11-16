@@ -1103,20 +1103,24 @@ def _initialize_cold(connection: sqlite3.Connection, schema: str = "main") -> No
                        "(key BLOB PRIMARY KEY, value BLOB NOT NULL) WITHOUT ROWID")
 
 
-def _store_cold(path: Path, key: bytes, values: Mapping[str, Any]) -> None:
-    if not values:
-        return
-    cold_path = str(path) + ".cold"
-    connection_key = (cold_path, False)
-    connection = _CONNECTIONS.get(connection_key)
-    if connection is None:
-        connection = sqlite3.connect(cold_path, timeout=_TIMEOUT_MS / 1000, check_same_thread=False)
-        connection.execute("PRAGMA journal_mode=WAL")
-        _initialize_cold(connection)
-        _CONNECTIONS[connection_key] = connection
-    value = zlib.compress(pack(values), level=6)
-    connection.execute("INSERT OR IGNORE INTO engine_values VALUES (?,?)", (key, value))
-    connection.commit()
+def _store_cold(connection: sqlite3.Connection, path: Path, key: bytes, values: Mapping[str, Any]) -> None:
+    if not any(row[1] == "cold" for row in connection.execute("PRAGMA database_list")):
+        cold_path = _cache_pair(path)[1]
+        if not values and not cold_path.exists():
+            return
+        # Set up WAL before attaching to the active HOT transaction. No payload
+        # is committed here; both payload writes share the caller's commit/rollback.
+        with closing(sqlite3.connect(cold_path, timeout=_TIMEOUT_MS / 1000)) as setup:
+            setup.execute("PRAGMA journal_mode=WAL")
+            _initialize_cold(setup)
+            setup.commit()
+        connection.execute("ATTACH DATABASE ? AS cold", (str(cold_path.resolve()),))
+        _check_cold_schema(connection)
+    if values:
+        value = zlib.compress(pack(values), level=6)
+        connection.execute("INSERT OR REPLACE INTO cold.engine_values VALUES (?,?)", (key, value))
+    else:
+        connection.execute("DELETE FROM cold.engine_values WHERE key=?", (key,))
 
 
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
@@ -1206,9 +1210,8 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 source_box,
                 provenance=provenance,
             )
-            # Snapshot locks on HOT must also cover completion of its COLD data.
-            if inserted and isinstance(solved, EngineCacheValue):
-                _store_cold(path, cache_key, solved.cold)
+            if inserted:
+                _store_cold(connection, path, cache_key, solved.cold if isinstance(solved, EngineCacheValue) else {})
             connection.commit()
             if inserted:
                 _record_bloom_key(connection, cache_key)
