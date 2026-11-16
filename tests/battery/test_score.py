@@ -11348,11 +11348,14 @@ def test_indexed_work_inputs_match_independent_per_work_resolution() -> None:
     )
     assert indexed == expected
     assert experiments.lookups == len(observations)
+    # DOI lineage retains each Work identity (fffb75bf, 60258145).
     assert expected[first_work.work_id].ids == {
+        first_work.work_id,
         first_observation.observation_id,
         "nasa-cea-thermo",
     }
     assert expected[second_work.work_id].ids == {
+        second_work.work_id,
         second_observation.observation_id,
         "nasa-cea-thermo",
     }
