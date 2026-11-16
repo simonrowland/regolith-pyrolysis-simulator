@@ -9,6 +9,23 @@ from simulator.battery.score import SCORE_ENGINE_SET
 from scripts import battery_cache_equivalence as gate
 
 
+def test_canonical_rows_ignore_traceback_text_but_preserve_the_failure():
+    payload = {
+        "prediction": 1.25,
+        "provenance": {
+            "traceback": "worker-specific stack text",
+            "elapsed_s": 2.0,
+            "process_cpu_seconds": 1.0,
+            "status": "refusal",
+            "refusal_reason": "engine_timeout",
+        },
+    }
+    assert gate._without_cache_counters(payload) == {
+        "prediction": 1.25,
+        "provenance": {"status": "refusal", "refusal_reason": "engine_timeout"},
+    }
+
+
 def test_default_slice_uses_all_engines_and_all_rails(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
