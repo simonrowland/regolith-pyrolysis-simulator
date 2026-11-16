@@ -141,6 +141,44 @@ def test_floss_1998_render_pins_conditions_and_run_count() -> None:
         for row in species.get("observations", [])
     ]
     assert all(row["locator"]["source_path"] == TABLE_CELLS for row in all_rows)
+    microprobe_precision = {
+        "Al2O3": "0.9",
+        "CaO": "1.3",
+        "TiO2": "1.3",
+        "FeO": "1.8",
+        "SiO2": "4.7",
+        "MgO": "1.6",
+        "La2O3": "7.4",
+        "CeO2": "16.3",
+        "Pr2O3": "7.1",
+        "Nd2O3": "17.4",
+        "ThO2": "6.7",
+    }
+    microprobe_rows = [
+        row
+        for row in all_rows
+        if row["locator"].get("table") in {"3", "4"}
+        and row["values"].get("analytical_method_as_printed")
+        == "electron microprobe WDS"
+        and row["values"].get("analyte") in microprobe_precision
+    ]
+    assert len(microprobe_rows) == 60
+    assert sum(row["locator"]["table"] == "3" for row in microprobe_rows) == 12
+    assert sum(row["locator"]["table"] == "4" for row in microprobe_rows) == 48
+    for row in microprobe_rows:
+        precision = microprobe_precision[row["values"]["analyte"]]
+        uncertainty = row["uncertainty"]
+        assert uncertainty["method_precision_relative_1sigma_pct_as_printed"] == precision
+        assert uncertainty["basis_as_printed"] == "relative standard deviation (%)"
+        assert uncertainty["confidence_level"] == "one_sigma"
+        assert uncertainty["replicate_analyses"] == 10
+        assert uncertainty["sample_scope_as_printed"] == "one Madagascar hibonite grain"
+        assert uncertainty["precision_scope"] == "method_level_not_cell_specific"
+        assert uncertainty["cell_specific_uncertainty"] == "not reported"
+        assert uncertainty["locator"]["page"] == 2
+        assert uncertainty["locator"]["pdf_page_index"] == 1
+        assert uncertainty["locator"]["published_page"] == 192
+
     one_sigma_rows = [
         row
         for row in all_rows
@@ -258,6 +296,37 @@ def test_floss_1998_render_pins_conditions_and_run_count() -> None:
     assert sum(len(rows) for rows in result.context_by_work.values()) == 677
     assert not result.validation.hard_issues
 
+    method_context = next(
+        context
+        for rows in result.context_by_work.values()
+        for context in rows
+        if context["observation_id"] == "floss_1998_context_0675"
+    )
+    precision_context = method_context["values"][
+        "individual_phase_major_minor_precision"
+    ]
+    assert precision_context == {
+        "relative_1sigma_standard_deviation_pct_as_printed": microprobe_precision,
+        "basis_as_printed": "relative standard deviation (%)",
+        "confidence_level": "one_sigma",
+        "replicate_analyses": 10,
+        "sample_scope_as_printed": "one Madagascar hibonite grain",
+        "locator": {
+            "source_path": (
+                "corpus/raw/floss-1998-corundum-hibonite-evaporation-residues/"
+                "floss-1998-corundum-hibonite-evaporation-residues.pdf"
+            ),
+            "page": 2,
+            "pdf_page_index": 1,
+            "published_page": 192,
+            "section": "Analytical procedure",
+            "note": (
+                "Relative 1σ standard deviations from ten replicate analyses "
+                "of one Madagascar hibonite grain."
+            ),
+        },
+    }
+
     expected_migrated_values = (
         ("floss_1998_table1_mh_1_mass_loss", Decimal("0.375")),
         ("floss_1998_p005_t04_r02_c02_mh_1_al2o3", Decimal("86.09")),
@@ -265,6 +334,13 @@ def test_floss_1998_render_pins_conditions_and_run_count() -> None:
     )
     for source_id, expected in expected_migrated_values:
         assert _migrated_observation(result, source_id).value.point == expected
+    for source_row in microprobe_rows:
+        migrated = _migrated_observation(result, source_row["observation_id"])
+        assert migrated.uncertainty.kind is UncertaintyKind.PRINTED
+        assert migrated.uncertainty.value is None
+        assert migrated.uncertainty.verbatim == source_row["uncertainty"]
+        assert migrated.uncertainty.verbatim["locator"]["page"] == 2
+        assert migrated.uncertainty.verbatim["locator"]["published_page"] == 192
     for source_row in (mh1_mass_loss, table4_alumina, table6_hafnia):
         migrated = _migrated_observation(result, source_row["observation_id"])
         assert migrated.locator.page == source_row["locator"]["page"]
