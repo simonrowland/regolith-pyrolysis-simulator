@@ -965,7 +965,10 @@ def _validate_condensation_snapshots(
         physical_species = _positive_species(ledger.get(account, {}))
         if not physical_species:
             continue
-        physical_atoms = _element_atoms(physical_species, registry)
+        # Origins are reconciled against canonical signed mol, including
+        # admissible negative withdrawal roundoff. Validate that same ledger
+        # here; the positive-only species projection is for display.
+        physical_atoms = _element_atoms(ledger[account], registry)
 
         tracked = row.get("material_origin_atom_moles_by_account")
         if not isinstance(tracked, Mapping):
