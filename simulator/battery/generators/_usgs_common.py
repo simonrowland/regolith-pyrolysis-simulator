@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import re
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
@@ -248,3 +250,190 @@ def _neighbour_sign_hits(
                 }
             )
     return hits
+
+
+def _account_token(
+    token: Any,
+    bucket: str,
+    by_column: Any,
+    by_column_basis: Any,
+) -> None:
+    by_column[token.column][bucket] += 1
+    by_column[token.column]["raw"] += 1
+    key = f"{token.column}:{token.formation_basis or 'shared'}"
+    by_column_basis[key][bucket] += 1
+    by_column_basis[key]["raw"] += 1
+
+
+def _identity_token_text(
+    token: Any | None,
+    grains: Mapping[tuple[str, str | None], Decimal],
+    *,
+    candidate_value: Any,
+) -> str | None:
+    """Identity consumes the reconstructed value, never the raw jammed token."""
+
+    if token is None:
+        return None
+    value, _reconstruction, reason = candidate_value(token, grains)
+    if reason is not None or value is None:
+        return None
+    return format(value, "f")
+
+
+def _recover_glued_gibbs_via_logk(
+    token: Any,
+    grains: Mapping[tuple[str, str | None], Decimal],
+    t_text: str,
+    logk_text: str,
+    gibbs_unit: str,
+    *,
+    numeric_payload: Any,
+    logk_identity: Any,
+) -> tuple[dict[str, Any], Decimal, Decimal, Decimal] | None:
+    """Keep the unique grain cut that restores identity inside the existing 10× band.
+
+    Do not widen the band; ambiguous cuts stay unrecovered.
+    """
+
+    payload = numeric_payload(token.as_published)
+    if not payload or _published_decimal(payload) is None or payload.count(".") >= 2:
+        return None
+    grain = grains.get((token.column, token.formation_basis))
+    if grain is None:
+        return None
+    passing_1x: list[tuple[Decimal, Decimal, Decimal, Decimal, Decimal]] = []
+    passing_notice: list[tuple[Decimal, Decimal, Decimal, Decimal, Decimal]] = []
+    for value, uncertainty in _grain_valid_splits(payload, grain, grain):
+        checked = logk_identity(
+            t_text, format(value, "f"), logk_text, gibbs_page_unit=gibbs_unit
+        )
+        if checked is None:
+            continue
+        residual, tolerance, calculated = checked
+        item = (value, uncertainty, residual, tolerance, calculated)
+        if residual <= tolerance:
+            passing_1x.append(item)
+        elif residual <= 10 * tolerance:
+            passing_notice.append(item)
+    chosen: tuple[Decimal, Decimal, Decimal, Decimal, Decimal] | None = None
+    if len(passing_1x) == 1:
+        chosen = passing_1x[0]
+    elif not passing_1x and len(passing_notice) == 1:
+        chosen = passing_notice[0]
+    if chosen is None:
+        return None
+    value, uncertainty, residual, tolerance, calculated = chosen
+    reconstruction = _merged_split_record(
+        value,
+        uncertainty,
+        evidence=(
+            f"merged value+uncertainty {token.as_published!r} has several grain-"
+            f"{grain} cuts; log10_Kf identity uniquely selects {value} ± "
+            f"{uncertainty}"
+        ),
+    )
+    return reconstruction, residual, tolerance, calculated
+
+
+def _mass_matches_formula_weight(
+    formula: str,
+    fw: Decimal,
+    *,
+    formula_mass: Any,
+) -> bool:
+    mass = formula_mass(formula)
+    if mass is None:
+        return False
+    grain = max(_value_grain(fw) * 2, Decimal("0.01"))
+    return abs(mass - fw) <= grain
+
+
+def _allotrope_from_weight(
+    name: str,
+    fw: Decimal,
+    *,
+    table2_elements: Any,
+    mass_matches_formula_weight: Any,
+) -> str | None:
+    weights, names = table2_elements()
+    hits: set[str] = set()
+    for element_name, symbol in names.items():
+        if not re.search(
+            rf"(?<![A-Za-z]){re.escape(element_name)}(?![A-Za-z])",
+            name,
+            flags=re.IGNORECASE,
+        ):
+            continue
+        aw = weights.get(symbol)
+        if aw is None or aw == 0:
+            continue
+        n = (fw / aw).to_integral_value()
+        if n < 1:
+            continue
+        formula = symbol if n == 1 else f"{symbol}{int(n)}"
+        if mass_matches_formula_weight(formula, fw):
+            hits.add(formula)
+    if len(hits) == 1:
+        return next(iter(hits))
+    return None
+
+
+def _identity_band_1x_10x(
+    record_id: str,
+    identity_results: Sequence[Mapping[str, Any]],
+    observations: Sequence[Any],
+) -> list[dict[str, Any]]:
+    """List every 1× < residual ≤ 10× identity fail, stored or not."""
+
+    noticed_ids = {
+        observation.observation_id
+        for observation in observations
+        if observation.notices
+    }
+    rows: list[dict[str, Any]] = []
+    for result in identity_results:
+        if result.get("ok") is not False:
+            continue
+        residual = Decimal(str(result.get("absolute_residual") or "0"))
+        tolerance = Decimal(str(result.get("rounding_tolerance") or "0"))
+        if not (tolerance > 0 and residual > tolerance and residual <= 10 * tolerance):
+            continue
+        row_index = result.get("row_index")
+        temperature = result.get("temperature_as_published")
+        stored_with_notice = sorted(
+            observation_id
+            for observation_id in noticed_ids
+            if temperature is not None and f":T={temperature}:" in observation_id
+        )
+        rows.append(
+            {
+                "record_id": record_id,
+                "row_index": row_index,
+                "temperature_as_published": result.get("temperature_as_published"),
+                "identity": result.get("identity"),
+                "absolute_residual": result.get("absolute_residual"),
+                "rounding_tolerance": result.get("rounding_tolerance"),
+                "stored_with_notice": stored_with_notice,
+            }
+        )
+    return rows
+
+
+def load_record(path: Path) -> Mapping[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, Mapping):
+        raise ValueError(f"{path}: record is not a mapping")
+    return payload
+
+
+def _run_generator_main(
+    argv: Sequence[str] | None,
+    *,
+    parse_args: Any,
+    documents_from_records: Any,
+    write_staging: Any,
+) -> int:
+    args = parse_args(argv)
+    write_staging(documents_from_records(args.records), args.out)
+    return 0

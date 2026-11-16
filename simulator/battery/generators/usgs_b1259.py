@@ -31,20 +31,28 @@ from simulator.battery.enums import (
 from simulator.battery.generators._usgs_common import (
     LETTER_TAIL_RE,
     MERGED_SPLIT_METHOD,
+    _account_token,
+    _allotrope_from_weight as _shared_allotrope_from_weight,
     _as_published_cell,
     _decimal_grain,
     _extract_signed_number,
     _formula_weight_decimal,
     _grain_valid_splits,
+    _identity_band_1x_10x,
+    _identity_token_text as _shared_identity_token_text,
     _letter_tail_grain_reason,
+    _mass_matches_formula_weight as _shared_mass_matches_formula_weight,
     _merged_split,
     _merged_split_record,
     _neighbour_sign_hits,
     _neighbours_of,
     _opposite_to_both_neighbours,
     _published_decimal,
+    _recover_glued_gibbs_via_logk as _shared_recover_glued_gibbs_via_logk,
     _reconstruction_coarser_than_column,
+    _run_generator_main,
     _value_grain,
+    load_record,
 )
 from simulator.battery.identity import (
     LN10,
@@ -578,14 +586,9 @@ def _candidate_value(
 def _identity_token_text(
     token: RawToken | None, grains: Mapping[tuple[str, str | None], Decimal]
 ) -> str | None:
-    """Identity consumes the reconstructed value, never the raw jammed token."""
-
-    if token is None:
-        return None
-    value, _recon, reason = _candidate_value(token, grains)
-    if reason is not None or value is None:
-        return None
-    return format(value, "f")
+    return _shared_identity_token_text(
+        token, grains, candidate_value=_candidate_value
+    )
 
 
 def _delta_fg_cal(gibbs: Decimal, *, gibbs_page_unit: str) -> Decimal:
@@ -619,46 +622,15 @@ def _recover_glued_gibbs_via_logk(
     logk_text: str,
     gibbs_unit: str,
 ) -> tuple[dict[str, Any], Decimal, Decimal, Decimal] | None:
-    """If a jammed integer ΔfG fails 10×, keep the unique grain cut that restores identity."""
-
-    payload = _numeric_payload(token.as_published)
-    if not payload or _published_decimal(payload) is None or payload.count(".") >= 2:
-        return None
-    grain = grains.get((token.column, token.formation_basis))
-    if grain is None:
-        return None
-    passing_1x: list[tuple[Decimal, Decimal, Decimal, Decimal, Decimal]] = []
-    passing_notice: list[tuple[Decimal, Decimal, Decimal, Decimal, Decimal]] = []
-    for value, uncertainty in _grain_valid_splits(payload, grain, grain):
-        checked = _logk_identity(
-            t_text, format(value, "f"), logk_text, gibbs_page_unit=gibbs_unit
-        )
-        if checked is None:
-            continue
-        residual, tolerance, calculated = checked
-        item = (value, uncertainty, residual, tolerance, calculated)
-        if residual <= tolerance:
-            passing_1x.append(item)
-        elif residual <= 10 * tolerance:
-            passing_notice.append(item)
-    chosen: tuple[Decimal, Decimal, Decimal, Decimal, Decimal] | None = None
-    if len(passing_1x) == 1:
-        chosen = passing_1x[0]
-    elif not passing_1x and len(passing_notice) == 1:
-        chosen = passing_notice[0]
-    if chosen is None:
-        return None
-    value, uncertainty, residual, tolerance, calculated = chosen
-    reconstruction = _merged_split_record(
-        value,
-        uncertainty,
-        evidence=(
-            f"merged value+uncertainty {token.as_published!r} has several grain-"
-            f"{grain} cuts; log10_Kf identity uniquely selects {value} ± "
-            f"{uncertainty}"
-        ),
+    return _shared_recover_glued_gibbs_via_logk(
+        token,
+        grains,
+        t_text,
+        logk_text,
+        gibbs_unit,
+        numeric_payload=_numeric_payload,
+        logk_identity=_logk_identity,
     )
-    return reconstruction, residual, tolerance, calculated
 
 
 def _logk_identity(
@@ -912,35 +884,18 @@ def _formula_mass(formula: str) -> Decimal | None:
 
 
 def _mass_matches_formula_weight(formula: str, fw: Decimal) -> bool:
-    mass = _formula_mass(formula)
-    if mass is None:
-        return False
-    grain = max(_value_grain(fw) * 2, Decimal("0.01"))
-    return abs(mass - fw) <= grain
+    return _shared_mass_matches_formula_weight(
+        formula, fw, formula_mass=_formula_mass
+    )
 
 
 def _allotrope_from_weight(name: str, fw: Decimal) -> str | None:
-    weights, names = _table2_elements()
-    hits: set[str] = set()
-    for element_name, symbol in names.items():
-        if not re.search(
-            rf"(?<![A-Za-z]){re.escape(element_name)}(?![A-Za-z])",
-            name,
-            flags=re.IGNORECASE,
-        ):
-            continue
-        aw = weights.get(symbol)
-        if aw is None or aw == 0:
-            continue
-        n = (fw / aw).to_integral_value()
-        if n < 1:
-            continue
-        formula = symbol if n == 1 else f"{symbol}{int(n)}"
-        if _mass_matches_formula_weight(formula, fw):
-            hits.add(formula)
-    if len(hits) == 1:
-        return next(iter(hits))
-    return None
+    return _shared_allotrope_from_weight(
+        name,
+        fw,
+        table2_elements=_table2_elements,
+        mass_matches_formula_weight=_mass_matches_formula_weight,
+    )
 
 
 def _ocr_formula_variants(text: str) -> tuple[str, ...]:
@@ -1918,45 +1873,6 @@ def _signed_series(
     return series
 
 
-def _identity_band_1x_10x(
-    record_id: str,
-    identity_results: Sequence[Mapping[str, Any]],
-    observations: Sequence[Observation],
-) -> list[dict[str, Any]]:
-    noticed_ids = {
-        observation.observation_id
-        for observation in observations
-        if observation.notices
-    }
-    rows: list[dict[str, Any]] = []
-    for result in identity_results:
-        if result.get("ok") is not False:
-            continue
-        residual = Decimal(str(result.get("absolute_residual") or "0"))
-        tolerance = Decimal(str(result.get("rounding_tolerance") or "0"))
-        if not (tolerance > 0 and residual > tolerance and residual <= 10 * tolerance):
-            continue
-        row_index = result.get("row_index")
-        temperature = result.get("temperature_as_published")
-        stored_with_notice = sorted(
-            observation_id
-            for observation_id in noticed_ids
-            if temperature is not None and f":T={temperature}:" in observation_id
-        )
-        rows.append(
-            {
-                "record_id": record_id,
-                "row_index": row_index,
-                "temperature_as_published": result.get("temperature_as_published"),
-                "identity": result.get("identity"),
-                "absolute_residual": result.get("absolute_residual"),
-                "rounding_tolerance": result.get("rounding_tolerance"),
-                "stored_with_notice": stored_with_notice,
-            }
-        )
-    return rows
-
-
 def _formula_resolution_report(
     kind: str, resolution: FormulaResolution | None
 ) -> dict[str, Any]:
@@ -2167,11 +2083,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     by_column_basis: dict[str, Counter[str]] = defaultdict(Counter)
 
     def account(token: RawToken, bucket: str) -> None:
-        by_column[token.column][bucket] += 1
-        by_column[token.column]["raw"] += 1
-        key = f"{token.column}:{token.formation_basis or 'shared'}"
-        by_column_basis[key][bucket] += 1
-        by_column_basis[key]["raw"] += 1
+        _account_token(token, bucket, by_column, by_column_basis)
 
     def refuse(token: RawToken, reason: str) -> None:
         nonlocal refused, merged_refused, merged_refused_10x, pending_merged
@@ -2463,13 +2375,6 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     return RecordGeneration(tuple(observations), report)
 
 
-def load_record(path: Path) -> Mapping[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, Mapping):
-        raise ValueError(f"{path}: record is not a mapping")
-    return payload
-
-
 def documents_from_records(directory: Path) -> Iterable[Mapping[str, Any]]:
     paths = sorted(directory.glob("*.json"))
     if not paths:
@@ -2624,9 +2529,12 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    args = _parse_args(argv)
-    write_staging(documents_from_records(args.records), args.out)
-    return 0
+    return _run_generator_main(
+        argv,
+        parse_args=_parse_args,
+        documents_from_records=documents_from_records,
+        write_staging=write_staging,
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover
