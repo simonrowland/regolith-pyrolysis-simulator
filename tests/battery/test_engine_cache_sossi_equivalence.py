@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
+import pytest
+import yaml
+
+from simulator.engine_cache import _engine_cache_path_scope
 from tests.battery.engine_cache_score_equivalence import (
     assert_residue_score_cache_equivalence,
 )
+from tests.battery.test_sossi_residue_predictions import ROOT, SOURCE
 
 
 def test_scored_sossi_residues_match_off_cold_warm_and_parallel_cache(
@@ -21,3 +27,122 @@ def test_scored_sossi_residues_match_off_cold_warm_and_parallel_cache(
         ),
         required_refusal_reason="outside_supported_species",
     )
+
+
+def test_fresh_sossi_cohorts_reuse_warm_engine_cache(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openimcc = pytest.importorskip("openimcc")
+
+    import simulator.battery.residue as residue
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+    experiment_id = str(experiment["experiment_id"])
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+
+    def no_evaporation(inventory, *_args, **_kwargs):
+        return SimpleNamespace(
+            residue_mol=dict(inventory), buffer_oxygen_exchange_mol=0.0
+        )
+
+    monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
+    record_engine_open = engine_cache.record_engine_open
+    recorded_opens: list[str] = []
+
+    def capture_engine_open(engine_id: str, backend=None):
+        recorded_opens.append(engine_id)
+        return record_engine_open(engine_id, backend)
+
+    monkeypatch.setattr(engine_cache, "record_engine_open", capture_engine_open)
+
+    original_gas_evaluate = openimcc.evaluate_gas
+    openimcc_gas_calls = 0
+
+    def count_openimcc_gas(*args, **kwargs):
+        nonlocal openimcc_gas_calls
+        openimcc_gas_calls += 1
+        return original_gas_evaluate(*args, **kwargs)
+
+    monkeypatch.setattr(openimcc, "evaluate_gas", count_openimcc_gas)
+
+    original_analytical_evaluate = (
+        battery._internal_analytical_vapor_pressure_adapter
+    )
+    analytical_vapor_calls = 0
+
+    def count_analytical_vapor(**kwargs):
+        nonlocal analytical_vapor_calls
+        analytical_vapor_calls += 1
+        return original_analytical_evaluate(**kwargs)
+
+    monkeypatch.setattr(
+        battery, "_internal_analytical_vapor_pressure_adapter", count_analytical_vapor
+    )
+
+    def predict(engine: str):
+        return residue._predict_sossi_residue_cohort(
+            [experiment],
+            catalog,
+            starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+            buffered_fO2_log_by_experiment={experiment_id: -10.0},
+            engine=engine,
+        )
+
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache.engine_cache_runtime_identities(reset=True)
+    with _engine_cache_path_scope(tmp_path / "sossi-openimcc.sqlite"):
+        openimcc_cold = predict("openimcc")
+        openimcc_warm = predict("openimcc")
+    assert openimcc_cold == openimcc_warm
+    assert openimcc_gas_calls == 1
+    assert recorded_opens == ["openimcc", "openimcc"]
+    assert "openimcc" in engine_cache.engine_cache_runtime_identities()
+    openimcc_counts = engine_cache.engine_cache_counters(reset=True)["openimcc"]
+    assert openimcc_counts["misses"] > 0
+    assert openimcc_counts["hits"] > 0
+
+    recorded_opens.clear()
+    engine_cache.engine_cache_runtime_identities(reset=True)
+    with _engine_cache_path_scope(tmp_path / "sossi-internal-analytical.sqlite"):
+        analytical_cold = predict("internal-analytical")
+        analytical_warm = predict("internal-analytical")
+    assert tuple(
+        (
+            row.primary_element_ppm,
+            row.geometry_element_ppm,
+            row.sensitivity_band_ppm,
+        )
+        for row in analytical_cold
+    ) == tuple(
+        (
+            row.primary_element_ppm,
+            row.geometry_element_ppm,
+            row.sensitivity_band_ppm,
+        )
+        for row in analytical_warm
+    )
+    assert analytical_vapor_calls == 1
+    assert recorded_opens == ["internal-analytical", "internal-analytical"]
+    assert "internal-analytical" in engine_cache.engine_cache_runtime_identities()
+    analytical_counts = engine_cache.engine_cache_counters(reset=True)[
+        "internal-analytical"
+    ]
+    assert analytical_counts["misses"] > 0
+    assert analytical_counts["hits"] > 0
