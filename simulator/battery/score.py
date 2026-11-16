@@ -275,6 +275,7 @@ from simulator.battery.validate import (
     _observation_lineage,
     observation_issue_location,
     _pressure_blocking_notices,
+    _quoted_source_observation_ids,
     _resolve_coefficient_sources,
     _VAPOUR_EQUILIBRIUM,
     _build_validation_indexes,
@@ -16738,16 +16739,19 @@ def _compile_residual_with_lineage(
             fo2_mode=fo2_mode,
         )
 
-    if (
-        prediction is not None
-        and prediction.refusal_reason is RefusalReason.REFERENTIAL_INTEGRITY
-        and prediction.refusal_detail.get("reason") == "duplicate_of"
-    ):
+    duplicate_detail = _duplicate_observation_refusal_detail(context, reference)
+    if duplicate_detail is not None:
+        source_relation = (
+            SourceRelation.SAME_INPUT
+            if duplicate_detail.get("resolution")
+            in {"excluded", "primary_not_admitted"}
+            else SourceRelation.UNKNOWN
+        )
         return _refused(
             RefusalReason.REFERENTIAL_INTEGRITY,
-            prediction.refusal_detail,
-            execution=prediction.execution,
-            extra_notices=prediction.notices,
+            duplicate_detail,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            source_relation=source_relation,
             exclusions=("duplicate_of",),
         )
 
@@ -18188,34 +18192,38 @@ def _has_duplicate_observation_link(
 
 def _duplicate_observation_refusal_detail(
     context: ScoreContext, observation: Observation
-) -> dict[str, object]:
+) -> dict[str, object] | None:
     provenance = observation.provenance
     has_explicit_duplicate = (
         isinstance(provenance, Mapping)
         and "duplicate_of_observation_id" in provenance
     )
-    explicit_target = (
-        provenance["duplicate_of_observation_id"]
-        if has_explicit_duplicate
-        else None
-    )
-    if not has_explicit_duplicate:
+    if has_explicit_duplicate:
+        explicit_target = provenance["duplicate_of_observation_id"]
+    else:
         experiment = context.experiments.get(observation.experiment_id)
         quoted_from = experiment.quoted_from if experiment is not None else None
-        assert quoted_from is not None
+        if quoted_from is None:
+            return None
+        primary_ids = _quoted_source_observation_ids(
+            experiment, context.observations, context.experiments
+        )
         if quoted_from.target_kind is QuotedTargetKind.EXPERIMENT:
-            primary_ids = sorted(
-                candidate.observation_id
-                for candidate in context.observations.values()
-                if candidate.experiment_id == quoted_from.target_id
-            )
             return {
                 "reason": "duplicate_of",
                 "primary_experiment_id": quoted_from.target_id,
-                "primary_observation_ids": primary_ids,
-                "resolution": "excluded" if primary_ids else "primary_missing",
+                "primary_observation_ids": list(primary_ids or ()),
+                "resolution": "excluded"
+                if primary_ids is not None
+                else "primary_missing",
             }
-        explicit_target = quoted_from.target_id
+        if primary_ids is None:
+            return {
+                "reason": "duplicate_of",
+                "primary_observation_id": quoted_from.target_id,
+                "resolution": "primary_missing",
+            }
+        explicit_target = primary_ids[0]
 
     target = explicit_target
     detail: dict[str, object] = {
@@ -18554,11 +18562,7 @@ def _score_store_with_decisions(
         ):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
-                duplicate_detail = (
-                    _duplicate_observation_refusal_detail(context, obs)
-                    if _has_duplicate_observation_link(obs, context.experiments)
-                    else None
-                )
+                duplicate_detail = _duplicate_observation_refusal_detail(context, obs)
                 for point in _iter_compilation_series_cells(obs, origin):
                     point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (
@@ -18684,24 +18688,6 @@ def _score_store_with_decisions(
                         ):
                             prediction = _knudsen_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
-                            )
-                        if duplicate_detail is not None:
-                            prediction = EnginePrediction(
-                                engine=engine,
-                                channel=ENGINE_CHANNELS[engine],
-                                execution=Execution(
-                                    state=ExecutionState.NOT_PROBED
-                                ),
-                                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[
-                                    engine
-                                ],
-                                refusal_reason=RefusalReason.REFERENTIAL_INTEGRITY,
-                                refusal_detail=duplicate_detail,
-                                identity=(
-                                    point.identity
-                                    if isinstance(point.identity, Identity)
-                                    else None
-                                ),
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
                             engine, point
@@ -18936,6 +18922,10 @@ def score_proprietary_aggregate(
             raise ValueError(
                 f"observation_id {observation_id!r} has no score rail"
             )
+
+        if _duplicate_observation_refusal_detail(context, observation) is not None:
+            count_refusal(rail, RefusalReason.REFERENTIAL_INTEGRITY.value)
+            continue
 
         if provider is None:
             outcome: ProprietaryProviderResult = ProprietaryRefused(
