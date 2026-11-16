@@ -8,10 +8,12 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from simulator.alpha_kinetics import ALPHA_AUTHORITY_STATUS_FIELD
+from simulator.config import DEFAULT_DATA_DIR
 from simulator.scalar_boundary import finite_float
 from simulator.wall_deposit_availability import (
     WALL_SATURATION_PRESSURE_REFUSED_CODE,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 _EPS = 1e-12
 PRESSURE_COATING_PARETO_SPECIES = ("Na", "K", "SiO", "Fe")
@@ -326,11 +328,19 @@ def wall_deposit_sticking_authority_status(
             not_applicable_species,
         )
     }
+    catalog = load_cached_safe_yaml(
+        (DEFAULT_DATA_DIR / "species_catalog.yaml").read_text(encoding="utf-8")
+    )
+    # d-428: collision-only audit carriers have no declared melt supply.
+    non_supply_species = {
+        str(row["id"]) for row in catalog["species"]
+        if row.get("direct_vapour_flux") is False
+    }
     carrier_species = tuple(sorted(
         (
             set(deposited_species)
             | set(carrier_authority)
-        ) - not_applicable_species - not_applicable_products
+        ) - not_applicable_species - not_applicable_products - non_supply_species
     ))
     def _lineage_sources(species: str) -> tuple[str, ...]:
         return vapour_carrier_lineage_species(

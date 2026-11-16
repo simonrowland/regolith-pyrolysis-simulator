@@ -1969,6 +1969,51 @@ def test_measured_zero_alias_conflicts_with_a_positive_alias() -> None:
     assert not _coating_wall_deposit_selection(zero_vs_zero)[1]
 
 
+@pytest.mark.parametrize("species", ["Cr2O3_gas", "CrO"])
+def test_wall_supply_refusal_uses_catalog_direct_flux_declaration(species):
+    from simulator.config import DEFAULT_DATA_DIR
+    from simulator.optimize.physics import _classify_wall_supply_interval
+    from simulator.wall_deposit_availability import wall_deposit_figure_availability
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    catalog = load_cached_safe_yaml(
+        (DEFAULT_DATA_DIR / "species_catalog.yaml").read_text(encoding="utf-8")
+    )
+    declaration = next(row for row in catalog["species"] if row["id"] == species)
+    direct_flux = declaration["direct_vapour_flux"]
+    assert direct_flux is (species == "CrO")
+    carriers = _carrier_authority(species, status="refused")
+    for key in ("pressure", "flux"):
+        carriers[species][key] = {
+            "kind": "refusal", "code": "missing_channel_contract",
+            "detail": "no flux law or computable activity-1 pressure",
+        }
+    interval = _classify_wall_supply_interval(
+        SimpleNamespace(
+            temperature_C=1600.0, duration_h=1.0,
+            oxygen_reservoir={"headspace_transport_pO2_bar": 1.0e-3},
+            evap_flux=SimpleNamespace(
+                published_species_kg_hr={}, species_kg_hr={},
+                melt_surface_area_m2=0.2, carrier_authority_by_species=carriers,
+            ),
+        ),
+        species,
+    )
+    assert interval.kind == "unavailable"
+    assert interval.evidence == "no_flux_law_and_no_psat"
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Fe": 0.1}},
+        {"vapour_carrier_authority_by_species": carriers},
+    )
+    assert (species in authority["refused_carrier_species"]) is direct_flux
+    # Keep the refusal audit even when the catalog declares no melt supply.
+    assert authority["vapour_carrier_authority_by_species"][species] == carriers[species]
+    figure = wall_deposit_figure_availability(
+        has_positive_deposit=True, authority=authority,
+    )
+    assert figure.status == ("refused" if direct_flux else "available")
+
+
 @pytest.mark.parametrize("has_positive_deposit", [False, True])
 @pytest.mark.parametrize("carrier_status", ["refused", "status_bearing", "authoritative"])
 def test_wall_figure_preserves_upstream_carrier_refusal(
