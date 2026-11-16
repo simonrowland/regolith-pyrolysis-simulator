@@ -777,6 +777,9 @@ PIPE_SEGMENT_NAMES = tuple(
 # A refusal without segment-specific wall evidence is booked as upstream;
 # its physical wall is the declared hot duct before Stage 1.
 UPSTREAM_WALL_DEPOSIT_SEGMENT = 'upstream'
+WALL_DEPOSIT_SEGMENT_GEOMETRY_ALIASES = (
+    (UPSTREAM_WALL_DEPOSIT_SEGMENT, pipe_segment_name(0, 1)),
+)
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX = 'process.wall_deposit_segment_'
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS = tuple(
     f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{name}'

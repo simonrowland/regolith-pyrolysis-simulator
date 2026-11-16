@@ -14,7 +14,11 @@ from simulator.accounting.yield_disposition import (
     ledger_snapshots_from_sim,
 )
 from simulator.diagnostics import wall_deposit_sticking_authority_status
-from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX, HourSnapshot
+from simulator.state import (
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
+    WALL_DEPOSIT_SEGMENT_GEOMETRY_ALIASES,
+    HourSnapshot,
+)
 
 
 def _freeze_mapping(values: Mapping[Any, Any]) -> Mapping[Any, Any]:
@@ -283,7 +287,11 @@ def wall_zone_by_segment(sim: Any) -> dict[str, str]:
             continue
         if math.isfinite(temperature):
             temperatures[name] = temperature
-    return bucket_wall_segments_by_temperature(temperatures)
+    zones = bucket_wall_segments_by_temperature(temperatures)
+    for deposit_segment, geometry_segment in WALL_DEPOSIT_SEGMENT_GEOMETRY_ALIASES:
+        if geometry_segment in zones:
+            zones[deposit_segment] = zones[geometry_segment]
+    return zones
 
 
 def bucket_wall_segments_by_temperature(
