@@ -712,7 +712,6 @@ def _k2o_authority_exclusion_for_pack_digest(
 # prior under-prediction rationale is unsupported at this version. Revisit
 # after seekq mare-basalt-liquid-sio-pressure-1700-1950k.
 BUILTIN_VAPOUR_CHANNEL_SWITCH_K = 1950.0
-_HIGH_T_ACTIVITY_SEAM_LIMIT_DEX = 0.1
 OPENIMCC_LIQUID_SIO_BELOW_1950K_NOTICE = {
     "code": "openimcc_liquid_sio_below_1950K_band",
     "type": "typed_notice",
@@ -819,18 +818,6 @@ def _openimcc_vapour_selected(
     if phase_basis == "liquid":
         return temperature_K >= switch_K
     return temperature_K > switch_K
-
-
-def _openimcc_vapour_crossed_switch(
-    previous_temperature_K: float,
-    temperature_K: float,
-    phase_basis: str,
-) -> bool:
-    return _openimcc_vapour_selected(
-        temperature_K, phase_basis,
-    ) and not _openimcc_vapour_selected(
-        previous_temperature_K, phase_basis,
-    )
 
 
 def _append_openimcc_liquid_sio_band_notice(
@@ -1559,34 +1546,6 @@ def _build_high_t_melt_activity_authority(
             ),
         }
 
-    previous_temperature = controls.get(
-        "high_t_melt_activity_previous_temperature_K"
-    )
-    crossing = bool(controls.get("high_t_melt_activity_crossing", False))
-    if not crossing and previous_temperature is not None:
-        try:
-            crossing = _openimcc_vapour_crossed_switch(
-                float(previous_temperature),
-                temperature_K,
-                phase_basis,
-            )
-        except (TypeError, ValueError):
-            crossing = False
-    if crossing and max_abs_dex > _HIGH_T_ACTIVITY_SEAM_LIMIT_DEX:
-        base["notices"].append(
-            {
-                "code": "openimcc_activity_cap_step_exceeds_0_1_dex",
-                "type": "typed_notice",
-                "temperature_K": float(temperature_K),
-                "cap_K": applied_vapour_switch_K,
-                "max_abs_ratio_dex": max_abs_dex,
-                "threshold_dex": _HIGH_T_ACTIVITY_SEAM_LIMIT_DEX,
-                "message": (
-                    "openimcc/below-cap activity source switch exceeds "
-                    "the provisional cap seam screen"
-                ),
-            }
-        )
     base["seam_max_abs_ratio_dex"] = max_abs_dex
     if vapour_selected and not bridge.extrapolated and projection_notice is None:
         composition = _high_t_composition_vector(composition_mol)
