@@ -18201,12 +18201,13 @@ def _duplicate_observation_refusal_detail(
     if has_explicit_duplicate:
         explicit_target = provenance["duplicate_of_observation_id"]
     else:
-        experiment = context.experiments.get(observation.experiment_id)
+        experiments = getattr(context, "experiments", {})
+        experiment = experiments.get(observation.experiment_id)
         quoted_from = experiment.quoted_from if experiment is not None else None
         if quoted_from is None:
             return None
         primary_ids = _quoted_source_observation_ids(
-            experiment, context.observations, context.experiments
+            experiment, context.observations, experiments
         )
         if quoted_from.target_kind is QuotedTargetKind.EXPERIMENT:
             return {
