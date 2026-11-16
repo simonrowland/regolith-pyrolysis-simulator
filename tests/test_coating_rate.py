@@ -683,6 +683,17 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     )
 
 
+@pytest.mark.parametrize("positive", [False, True])
+def test_source_carrier_refusal_preserves_a_measured_positive_wall_figure(positive):
+    from simulator.wall_deposit_availability import wall_deposit_figure_availability
+
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=positive,
+        authority={"refused_carrier_species": ["CrO2"]},
+    )
+    assert availability.status == ("available" if positive else "refused")
+
+
 def test_positive_production_diagnostic_and_resumed_session_are_local() -> None:
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
