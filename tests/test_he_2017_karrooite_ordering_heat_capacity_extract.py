@@ -12,7 +12,11 @@ import subprocess
 import pytest
 import yaml
 
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
+from tests.helpers.regression import (
+    assert_regression_completes_without_skip,
+    assert_regression_raises_assertion_without_skip,
+)
 from tests.literature_extract_test_helpers import iter_locators
 from simulator.battery.migrate import Migrator, load_index
 from data.literature.build_index import corpus_pointers, sha256_file
@@ -48,6 +52,15 @@ TABLE1_RENDER_GRID = [
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+
+def _require_migration_inputs(corpus_root: Path) -> None:
+    require_corpus_files(
+        (
+            corpus_root / "tables" / SOURCE_ID / "table-5.csv",
+            corpus_root / "tables" / SOURCE_ID / "table-5.provenance.yaml",
+        )
+    )
 
 
 def _context_by_id(document: dict) -> dict:
@@ -186,8 +199,9 @@ def test_mutating_an_independent_render_grid_cell_breaks_the_source_pins() -> No
     mutated_values = list(values)
     mutated_values[5] = "9.7462(1)"
     mutated_grid[7] = (key, tuple(mutated_values))
-    with pytest.raises(AssertionError):
-        _assert_source_pins(_document(), mutated_grid)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_source_pins(_document(), mutated_grid)
+    )
 
 
 def test_mutating_an_extract_grid_cell_breaks_the_source_pins() -> None:
@@ -196,21 +210,33 @@ def test_mutating_an_extract_grid_cell_breaks_the_source_pins() -> None:
         "values"
     ]["rows_as_printed"]
     rows["b_A"][5] = "9.7462(1)"
-    with pytest.raises(AssertionError):
-        _assert_source_pins(mutated)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_source_pins(mutated)
+    )
 
 
 def test_mutating_an_extrapolated_entropy_context_value_breaks_the_source_pins() -> None:
     mutated = deepcopy(_document())
     row = _context_by_id(mutated)["he2017_prose_extrapolated_ordered_standard_entropy"]
     row["values"]["value_as_printed"] = "126.2"
-    with pytest.raises(AssertionError):
-        _assert_source_pins(mutated)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_source_pins(mutated)
+    )
 
 
-def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
-    if not CORPUS_ROOT.is_dir():
-        pytest.skip("regolith-corpus checkout is absent")
+def test_partial_corpus_skips_migration_without_table5_csv(tmp_path: Path) -> None:
+    corpus_root = tmp_path / "regolith-corpus"
+    pdf = corpus_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"seed")
+    missing = corpus_root / "tables" / SOURCE_ID / "table-5.csv"
+
+    with pytest.raises(pytest.skip.Exception, match=re.escape(str(missing))):
+        _require_migration_inputs(corpus_root)
+
+
+def _assert_isolated_migration_types_both_experimental_entropy_rows() -> None:
+    _require_migration_inputs(CORPUS_ROOT)
     index = load_index()
     index[SOURCE_ID] = {
         "source_id": SOURCE_ID,
@@ -262,6 +288,69 @@ def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
             observation.read_from == f"pdf:{SOURCE_ID}"
             for observation in observations.values()
         )
+
+
+def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
+    _assert_isolated_migration_types_both_experimental_entropy_rows()
+
+
+def test_table_only_corpus_runs_isolated_migration(tmp_path: Path, monkeypatch) -> None:
+    corpus_root = tmp_path / "regolith-corpus"
+    table_dir = corpus_root / "tables" / SOURCE_ID
+    table_dir.mkdir(parents=True)
+    (table_dir / "table-5.csv").write_text(
+        "row,ordering_state_as_printed,S_vib_J_mol-1_K-1_as_printed,"
+        "S_config_J_mol-1_K-1_as_printed,S_total_J_mol-1_K-1_as_printed\n"
+        '1,"Synthetic state A",100.0(1),1.0(1),101.0(1)\n'
+        '2,"Synthetic state B",200.0(1),7.0(1),207.0(1)\n',
+        encoding="utf-8",
+    )
+    (table_dir / "table-5.provenance.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "page": 1,
+                "published_page": "1",
+                "table": "synthetic",
+                "method": "Synthetic input for the table-only migration test.",
+                "reviewer": "test fixture",
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    document = _document()
+    synthetic_rows = {
+        "he2017_table5_standard_entropy_x014": (101.0, "101.0(1)", "100.0(1)", "1.0(1)"),
+        "he2017_table5_standard_entropy_x037": (207.0, "207.0(1)", "200.0(1)", "7.0(1)"),
+    }
+    for observation in document["species"]["MgTi2O5"]["observations"]:
+        synthetic = synthetic_rows.get(observation["observation_id"])
+        if synthetic is None:
+            continue
+        total, total_as_printed, vibrational, configurational = synthetic
+        observation["values"].update(
+            {
+                "entropy": total,
+                "S_as_printed": total_as_printed,
+                "components_as_printed": {
+                    "S_vib": vibrational,
+                    "S_config": configurational,
+                },
+            }
+        )
+        observation["uncertainty"]["value"] = "0.1"
+    synthetic_extract = tmp_path / f"{SOURCE_ID}.yaml"
+    synthetic_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+
+    monkeypatch.setitem(globals(), "CORPUS_ROOT", corpus_root)
+    monkeypatch.setitem(globals(), "PDF", corpus_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf")
+    monkeypatch.setitem(globals(), "TABLE5_CSV", table_dir / "table-5.csv")
+    monkeypatch.setitem(globals(), "EXTRACT", synthetic_extract)
+    assert not PDF.is_file()
+    assert_regression_completes_without_skip(
+        _assert_isolated_migration_types_both_experimental_entropy_rows
+    )
 
 
 def test_all_locators_match_physical_pdf_pages() -> None:
