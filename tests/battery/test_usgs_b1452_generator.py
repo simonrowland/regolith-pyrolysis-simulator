@@ -224,6 +224,23 @@ FORMATION_QUANTITIES = (
 )
 
 
+@pytest.mark.parametrize(
+    ("record_id", "printed_log_k"),
+    [(record_id, sample[2]) for record_id, sample in REVIEWED_OXIDE_SAMPLES.items()]
+    + [("robie-hemingway-fisher-1978-usgs-b1452-0398", Decimal("3.743"))],
+)
+def test_localizing_ocr_names_preserves_printed_numeric_cells(
+    record_id: str, printed_log_k: Decimal,
+) -> None:
+    """Source golden before moving the OCR spellings out of mineral vocabulary."""
+    rows = _formation_observations(
+        _generation(record_id), basis="from_the_oxides",
+        quantity=Quantity.LOG10_K_REACTION, temperature="298.15",
+    )
+    assert len(rows) == 1
+    assert rows[0].value.point == printed_log_k
+
+
 def _load(record_id: str) -> dict:
     path = RECORDS_DIR / f"{record_id}.json"
     return json.loads(path.read_text(encoding="utf-8"))
