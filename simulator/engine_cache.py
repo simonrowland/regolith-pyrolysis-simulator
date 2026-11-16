@@ -116,6 +116,15 @@ def _key_float_bytes(value: float, negative: bool) -> bytes:
 
 
 def pack(value, *, key: bool = False) -> bytes:
+    if isinstance(value, dict):
+        if any(not isinstance(name, str) for name in value):
+            raise TypeError("cache map names must be strings")
+        names = sorted(value, key=lambda name: (
+            _KEY_FIELD_ORDER.get(name, len(_KEY_FIELDS)) if key else len(_KEY_FIELDS), name,
+        ))
+        return b"\x08" + _unsigned(len(names)) + b"".join(
+            pack(name, key=key) + pack(value[name], key=key) for name in names
+        )
     if isinstance(value, _Reference):
         return b"\x0a" + _unsigned(value.index)
     if value is None:
@@ -143,14 +152,7 @@ def pack(value, *, key: bool = False) -> bytes:
         tag = b"\x07" if isinstance(value, tuple) else b"\x06"
         return tag + _unsigned(len(value)) + b"".join(pack(item, key=key) for item in value)
     if isinstance(value, Mapping):
-        if any(not isinstance(name, str) for name in value):
-            raise TypeError("cache map names must be strings")
-        names = sorted(value, key=lambda name: (
-            _KEY_FIELD_ORDER.get(name, len(_KEY_FIELDS)) if key else len(_KEY_FIELDS), name,
-        ))
-        return b"\x08" + _unsigned(len(names)) + b"".join(
-            pack(name, key=key) + pack(value[name], key=key) for name in names
-        )
+        return pack(dict(value), key=key)
     raise TypeError(f"unsupported cache shape: {type(value).__name__}")
 
 
