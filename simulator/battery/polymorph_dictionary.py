@@ -181,7 +181,6 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "andalusite": Polymorph.ANDALUSITE,
     "kyanite": Polymorph.KYANITE,
     "sillimanite": Polymorph.SILLIMANITE,
-    "high sanidine": Polymorph.SANIDINE_HIGH,
     "mullite": Polymorph.MULLITE,
     "wustite": Polymorph.WUSTITE,
     "pyrrhotite": Polymorph.PYRRHOTITE,

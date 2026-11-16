@@ -29,6 +29,7 @@ from simulator.battery.identity import (
 from simulator.battery.migrate import (
     iter_observation_store_paths,
     observation_from_plain,
+    to_plain,
 )
 from simulator.battery.polymorph_dictionary import resolve_printed_name_polymorph
 from simulator.battery.validate import reaction_atom_balance
@@ -2730,6 +2731,7 @@ def test_all_generated_reference_oxides_follow_the_audited_transitions(record_id
     for row in _generation(record_id).observations:
         if row.identity.reaction is None or not row.identity.reaction.is_value:
             continue
+        assert observation_from_plain(to_plain(row)).identity == row.identity
         temperature = row.identity.temperature_K.value
         for term in row.identity.reaction.value.terms:
             if term.coefficient >= 0:

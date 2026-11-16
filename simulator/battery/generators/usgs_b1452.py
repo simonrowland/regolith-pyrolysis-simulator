@@ -809,10 +809,10 @@ B1452_SOURCE_TEXT_CORRECTIONS = {
             ('TBAISITIOIS IN        BE~EREICE    STATE OXIDES\n  K2 0 •••••••• DECOIIPOS!S ABOVE 1154 K.\n  SiOz•••• ••• ALPHA -       BETA TBAIISITIOII 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
         ),
     },
-    # Physical PDF p. 408 / folio 402.
+    # Physical PDF p. 408 / folio 402 names High Sanidine; use its existing token.
     f"{SOURCE_ID}-0376": {
         "name_as_published": (
-            ('HIGH SANIDIRE', 'High sanidine'),
+            ('HIGH SANIDIRE', 'sanidine_high'),
         ),
         "phase_as_published": (
             ('crystals 298.15 to melting point 1473 K.', 'Crystals 298.15 to melting point 1473 K.'),
