@@ -65,6 +65,8 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> N
             )
         assert results[label] == baseline, label
     warnings.warn("rows identical: yes", stacklevel=1)
+    for engine in cache_smoke.ENGINE_ORDER:
+        assert engine.value in requests, f"{engine.value}: no cacheable cold request"
     def measure(call):
         batches = []
         for _ in range(5):

@@ -182,7 +182,7 @@ def test_disabled_cache_calls_solver_without_creating_store(
     assert list(tmp_path.iterdir()) == []
 
 
-def test_internal_analytical_backend_bypasses_nested_engine_cache(
+def test_internal_analytical_backend_hits_before_its_nested_engine_call(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -196,25 +196,27 @@ def test_internal_analytical_backend_bypasses_nested_engine_cache(
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
     _engine_cache_counters(reset=True)
 
-    handle = SimpleNamespace(name="internal-analytical")
+    handle = SimpleNamespace(
+        name="internal-analytical", engine_settings={},
+        backend=SimpleNamespace(_core=SimpleNamespace(_high_t_melt_activity="openimcc")),
+    )
 
-    def solve() -> dict[str, int]:
-        return _call_with_hard_timeout(
+    def solve():
+        nested = _call_with_hard_timeout(
             lambda: _cached_engine_call()(
                 "openimcc", {"request": "nested-internal-analytical"},
                 lambda: {"answer": 7},
             ),
             timeout_s=1.0,
         )
+        return SimpleNamespace(status="ok", liquid_fraction=1.0, activity_coefficients={"FeO": nested["answer"]})
 
-    assert _call_cached_backend_equilibrate(
-        handle,
-        {},
-        solve,
-    ) == {"answer": 7}
-
-    assert _engine_cache_counters(reset=True) == {}
-    assert not database.exists()
+    for _ in range(2):
+        assert _call_cached_backend_equilibrate(handle, {}, solve).activity_coefficients == {"FeO": 7}
+    counts = _engine_cache_counters(reset=True)
+    assert counts["internal-analytical"]["hits"] == 1
+    assert counts["internal-analytical"]["stores"] == 1
+    assert counts["openimcc"]["misses"] == 1
 
 
 def test_concurrent_processes_can_write_the_same_cache_key(
@@ -548,7 +550,7 @@ def test_recursive_simple_namespace_is_an_uncacheable_shape_without_projection(
     }
 
 
-def test_internal_analytical_cache_call_always_solves_without_a_store(
+def test_stateless_internal_analytical_cache_call_hits(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -562,16 +564,17 @@ def test_internal_analytical_cache_call_always_solves_without_a_store(
         calls += 1
         return {"answer": 42}
 
-    request = {"call": "stateful residue"}
+    request = {"call": "stateless residue"}
     assert engine_cache.cached_engine_call("internal-analytical", request, solve) == {
         "answer": 42
     }
     assert engine_cache.cached_engine_call("internal-analytical", request, solve) == {
         "answer": 42
     }
-    assert calls == 2
-    assert _engine_cache_counters(reset=True).get("internal-analytical", {}) == {}
-    assert not database.exists()
+    assert calls == 1
+    counts = _engine_cache_counters(reset=True)["internal-analytical"]
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+    assert database.exists()
 
 
 def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
