@@ -108,6 +108,7 @@ def _assert_optimizer_stage_measurement(
 # f30a49a628 and 83.2 CPU-s at be76d28ad. A 2x factor covers host/trial
 # variation; 2 * 145.3 CPU-s = 290.6 CPU-s, rounded up to 300 CPU-s.
 @pytest.mark.cpu_budget(300)
+@pytest.mark.nightly
 def test_optimizer_60h_stage_records_real_cold_work() -> None:
     assert bench.OPTIMIZER_STAGE_NAME in STAGE_NAMES, (
         "optimizer stage missing from STAGE_NAMES"
@@ -118,6 +119,7 @@ def test_optimizer_60h_stage_records_real_cold_work() -> None:
     )
 
 
+@pytest.mark.nightly
 def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
     """Catch the multi-hour CI incident class before full-run tests wedge.
 
