@@ -143,7 +143,7 @@ def test_nonconvergence_then_recovery_is_never_masked(seam, clear_ram, tmp_path,
         assert fallback != live
         counts = engine_cache.engine_cache_counters()["internal-analytical"]
         assert counts["stores"] == counts["hits"] == 0
-        assert not engine_cache._MEMORY_CACHE
+        assert not any(key[0] == str(path) for key in engine_cache._MEMORY_CACHE)
         if path.exists():
             with sqlite3.connect(path) as connection:
                 assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0

@@ -34,6 +34,7 @@ from urllib.parse import quote
 class EngineCacheValue:
     hot: object
     cold: Mapping = field(default_factory=dict)
+    cacheable: bool = True
 
 
 @dataclass(frozen=True)
@@ -550,6 +551,7 @@ def _tuple_to_list_if_needed(value: Any) -> Any:
 
 
 _ENGINE_CACHE_SETTINGS_PROJECTIONS: dict[str, dict[str, Any]] = {
+    "internal-analytical": {"oxygen_balance_backend": None, "high_t_melt_activity": None},
     "openimcc": {"pack": "melt_pack", "gas_pack": None},
     "alphamelts": {
         "transport": "transport_mode",
@@ -584,8 +586,6 @@ def engine_cache_settings(
     normalized_settings: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Project prediction inputs from normalized opener settings."""
-    if engine_name == "internal-analytical":
-        return {}
     try:
         projection = _ENGINE_CACHE_SETTINGS_PROJECTIONS[engine_name]
     except KeyError as exc:
@@ -1152,6 +1152,8 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
 
     solved = solve()
     hot = live_hot(solved)
+    if isinstance(solved, EngineCacheValue) and not solved.cacheable:
+        return hot
     if (_is_refusal(hot) and not cacheable_refusal(hot)) or readonly or connection is None:
         return hot
     try:
@@ -1221,6 +1223,8 @@ def load_cache_rows(
     assert connection is not None
     values = []
     for digest, hot, engine, version, source_box, row_seq in rows:
+        if isinstance(hot, EngineCacheValue) and not hot.cacheable:
+            raise ValueError("transient engine results are not cacheable")
         if not isinstance(digest, bytes) or not 4 <= len(digest) <= _NATURAL_KEY_LIMIT:
             raise ValueError("cache keys must be natural packed keys or 16-byte request digests")
         if engine not in ENGINE_CHEMISTRY_VERSION:

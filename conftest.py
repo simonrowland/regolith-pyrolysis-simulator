@@ -244,9 +244,10 @@ def magemin_openmpi_tmpdir(
 
 @pytest.fixture(autouse=True)
 def _box_for_test_owned_engine_caches(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Give test-created caches an explicit range without configuring a live cache."""
-    if not os.environ.get("REGOLITH_ENGINE_CACHE") and "REGOLITH_ENGINE_CACHE_BOX" not in os.environ:
-        monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    """Only a test's explicit temporary cache may serve or store its doubles."""
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
 
 
 @pytest.fixture(autouse=True)

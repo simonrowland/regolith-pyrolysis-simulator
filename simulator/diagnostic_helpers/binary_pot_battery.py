@@ -353,13 +353,13 @@ def _call_cached_backend_equilibrate(
         if isinstance(result, EquilibriumResult):
             return result.to_hot(engine_id=handle.name)
         if isinstance(result, SimpleNamespace):
-            return equilibrium_to_hot(vars(result), engine_id=handle.name)
+            return equilibrium_to_hot(vars(result), engine_id=handle.name, live_value=result)
         if isinstance(result, Mapping):
             return equilibrium_to_hot(result, engine_id=handle.name)
         return result
 
     adapter_settings = (
-        _internal_analytical_cache_settings(handle.backend._core)
+        _internal_analytical_cache_settings(handle.backend._core, handle.engine_settings)
         if handle.name == "internal-analytical"
         else engine_cache_settings(handle.name, handle.engine_settings)
     )
@@ -781,6 +781,8 @@ class EquilibrateCell:
     def to_hot(self) -> Any:
         from simulator.engine_cache import EngineCacheValue, Provenance
 
+        if self.backend_failure_disposition:
+            return EngineCacheValue(self.as_payload(), cacheable=False)
         payload = self.to_engine_cache_value()
         if self.model_id is not None:
             payload[11][8] = Provenance(self.model_id)
@@ -3805,6 +3807,9 @@ def _internal_analytical_vapor_pressure_adapter(
         "vapor_pressure_diagnostic": core_diagnostic,
         "imcc_notices": imcc_notices,
     }
+    high_t_activity = core_diagnostic.get("high_t_melt_activity")
+    if isinstance(high_t_activity, Mapping) and high_t_activity.get("backend_failure_disposition"):
+        diagnostics["backend_failure_disposition"] = high_t_activity["backend_failure_disposition"]
     activities = dict(core_diagnostic.get("activities") or {})
     from simulator.chemistry.melt_activity import (
         MELT_OXIDE_CATIONS_PER_FORMULA,
@@ -3883,12 +3888,11 @@ def internal_analytical_residue_vapor_pressure(
     from types import SimpleNamespace
 
     from simulator.engine_cache import _configured_engine_cache_path, cached_engine_call, record_engine_open
-    from simulator.engine_cache import live_hot
     from simulator.melt_backend.base import equilibrium_cache_from_value, equilibrium_to_hot
 
     record_engine_open("internal-analytical", core)
 
-    def solve():
+    def solve_live():
         from simulator.engine_cache import _without_engine_cache
 
         with _without_engine_cache():
@@ -3898,12 +3902,16 @@ def internal_analytical_residue_vapor_pressure(
                 fO2_log=fO2_log, po2_request=po2_request,
                 include_diagnostic_shadows=include_diagnostic_shadows,
             )
+        return result
+
+    def solve():
+        result = solve_live()
         if getattr(result, "status", None) == "ok" and isinstance(getattr(result, "diagnostics", None), Mapping):
-            return equilibrium_to_hot(vars(result), engine_id="internal-analytical")
+            return equilibrium_to_hot(vars(result), engine_id="internal-analytical", live_value=result)
         return result
 
     if _configured_engine_cache_path() is None:
-        result = live_hot(solve())
+        return solve_live()
     else:
         request = {
             "call": "residue_pressure", "temperature_C": temperature_C,
@@ -3918,11 +3926,15 @@ def internal_analytical_residue_vapor_pressure(
     return result
 
 
-def _internal_analytical_cache_settings(core: Any) -> dict[str, str]:
+def _internal_analytical_cache_settings(core: Any, settings: Mapping[str, Any] | None = None) -> dict[str, Any]:
     from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
+    from simulator.engine_cache import engine_cache_settings
 
-    # This existing construction switch changes the pressure law; no prior tick is read.
-    return {"high_t_melt_activity": normalize_high_t_melt_activity(core._high_t_melt_activity)}
+    normalized = {
+        "oxygen_balance_backend": {"pack": _internal_analytical_oxygen_pack(settings)},
+        "high_t_melt_activity": normalize_high_t_melt_activity(core._high_t_melt_activity),
+    }
+    return engine_cache_settings("internal-analytical", normalized)
 
 
 class _InternalAnalyticalBatteryBackend:
@@ -3931,13 +3943,9 @@ class _InternalAnalyticalBatteryBackend:
     supports_intrinsic_fo2 = True
 
     def __init__(self, *, oxygen_balance_pack: str | None = None) -> None:
-        from simulator.melt_backend import openimcc_bridge
-
         self._core = _new_internal_analytical_core()
         self._oxygen_balance_backend: Any | None = None
-        self._oxygen_balance_pack = str(
-            oxygen_balance_pack or openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
-        )
+        self._oxygen_balance_pack = _internal_analytical_oxygen_pack({"oxygen_balance_backend": {"pack": oxygen_balance_pack}})
 
     def _oxygen_balance_backend_for(self, request: Po2Request | None) -> Any | None:
         if (
@@ -4789,6 +4797,14 @@ def _engine_identities_from_toml() -> dict[str, dict[str, str]]:
     return payload
 
 
+def _internal_analytical_oxygen_pack(settings: Mapping[str, Any] | None) -> str:
+    from simulator.melt_backend.openimcc_bridge import DEFAULT_BACKEND_PACK_NAME
+
+    oxygen_backend = (settings or {}).get("oxygen_balance_backend") or {}
+    pack = oxygen_backend.get("pack") if isinstance(oxygen_backend, Mapping) else None
+    return (str(pack) if pack is not None else "") or DEFAULT_BACKEND_PACK_NAME
+
+
 def normalize_engine_settings(
     engine_name: str,
     settings: Mapping[str, Any] | None,
@@ -4796,14 +4812,13 @@ def normalize_engine_settings(
     """Normalize opener settings once for backend construction and cache keys."""
     fields: Mapping[str, Any] = settings or {}
     if engine_name == "internal-analytical":
-        oxygen_backend = fields.get("oxygen_balance_backend")
-        if oxygen_backend is None:
-            from simulator.melt_backend.openimcc_bridge import (
-                DEFAULT_BACKEND_PACK_NAME,
-            )
-
-            oxygen_backend = {"pack": DEFAULT_BACKEND_PACK_NAME}
-        return {"oxygen_balance_backend": oxygen_backend}
+        from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
+        return {
+            "oxygen_balance_backend": {"pack": _internal_analytical_oxygen_pack(fields)},
+            "high_t_melt_activity": normalize_high_t_melt_activity(
+                _load_setpoints_file(REPO_ROOT / "data" / "setpoints.yaml").get("high_t_melt_activity", "openimcc")
+            ),
+        }
     if engine_name == "openimcc":
         from simulator.melt_backend.openimcc_bridge import (
             DEFAULT_BACKEND_PACK_NAME,

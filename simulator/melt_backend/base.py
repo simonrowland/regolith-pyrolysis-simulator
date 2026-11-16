@@ -306,8 +306,7 @@ def equilibrium_cache_from_value(
     status, liquid_fraction, phase_available = payload[:3]
     if status is not None:
         restored['status'] = status
-    if liquid_fraction is not None:
-        restored['liquid_fraction'] = liquid_fraction
+    restored['liquid_fraction'] = liquid_fraction
     if phase_available is not None:
         restored['phase_assemblage_available'] = bool(phase_available)
     for index, field_name in (
@@ -320,7 +319,7 @@ def equilibrium_cache_from_value(
         (10, 'fe_redox_split'),
     ):
         values = restore_pairs(payload[index])
-        if values:
+        if values or field_name in {'activity_coefficients', 'vapor_pressures_Pa', 'vapor_pressures_source'}:
             restored[field_name] = values
     details: dict[str, Any] = {}
     if not isinstance(payload[5], list):
@@ -532,9 +531,14 @@ def _cold_numbers(value: Any) -> Any:
     return None
 
 
-def equilibrium_to_hot(values: Mapping[str, Any], *, engine_id: str | None = None) -> Any:
+def equilibrium_to_hot(
+    values: Mapping[str, Any], *, engine_id: str | None = None, live_value: Any = None,
+) -> Any:
     from simulator.engine_cache import EngineCacheValue
 
+    diagnostics = values.get('diagnostics')
+    if isinstance(diagnostics, Mapping) and diagnostics.get('backend_failure_disposition'):
+        return EngineCacheValue(values if live_value is None else live_value, cacheable=False)
     return EngineCacheValue(
         equilibrium_cache_value(values, engine_id=engine_id),
         {

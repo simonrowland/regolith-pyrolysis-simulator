@@ -1059,6 +1059,8 @@ def _build_high_t_melt_activity_authority(
             "type": type(exc).__name__,
             "detail": str(exc),
         }
+        if code == "imcc_nonconvergence" or isinstance(exc, OpenImccUnavailableError):
+            base["backend_failure_disposition"] = code
         fallback_notice = {
             "code": code,
             "reason": code,
