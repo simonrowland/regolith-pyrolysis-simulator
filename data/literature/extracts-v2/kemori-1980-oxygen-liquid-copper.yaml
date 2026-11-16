@@ -76,8 +76,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=This work
   notices: []
   source_id: kemori-1980-oxygen-liquid-copper
   locator:

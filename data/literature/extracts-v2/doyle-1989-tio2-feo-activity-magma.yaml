@@ -128,6 +128,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r01
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r01
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -479,6 +494,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r02
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r02
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -830,6 +860,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r03
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r03
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1181,6 +1226,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r04
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r04
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1532,6 +1592,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r05
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r05
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1883,6 +1958,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r06
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r06
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -2234,6 +2324,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r07
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r07
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -2585,6 +2690,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r08
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r08
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -2936,6 +3056,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r09
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r09
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -3287,6 +3422,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r10
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r10
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -3638,6 +3788,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r11
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r11
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -3989,6 +4154,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r12
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r12
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -4340,6 +4520,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r13
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r13
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -4691,6 +4886,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r14
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r14
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5042,6 +5252,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r15
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r15
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5393,6 +5618,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r16
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r16
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5744,6 +5984,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r17
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r17
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6095,6 +6350,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r18
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r18
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6446,6 +6716,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r19
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r19
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6797,6 +7082,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r20
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r20
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7148,6 +7448,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r21
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r21
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7499,6 +7814,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r22
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r22
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7850,6 +8180,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r23
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r23
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8201,6 +8546,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r24
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r24
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8552,6 +8912,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r25
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r25
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8903,6 +9278,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r26
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r26
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9254,6 +9644,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r27
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r27
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9605,6 +10010,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r28
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r28
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9956,6 +10376,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r29
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r29
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10307,6 +10742,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r30
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r30
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10658,6 +11108,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r31
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r31
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11009,6 +11474,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r32
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r32
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11360,6 +11840,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r33
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r33
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11711,6 +12206,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r34
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r34
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12070,6 +12580,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r35
     original: '102.3'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r35
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r35
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12422,6 +12947,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r36
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r36
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12781,6 +13321,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r37
     original: '102.2'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r37
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r37
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13141,6 +13696,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r38
     original: '103'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r38
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r38
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13501,6 +14071,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r39
     original: '102.9'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r39
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r39
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13853,6 +14438,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r40
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r40
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14204,6 +14804,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r41
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r41
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14563,6 +15178,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r42
     original: '102.7'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r42
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r42
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14915,6 +15545,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r43
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r43
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -15274,6 +15919,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r44
     original: '102.3'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r44
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r44
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -15634,6 +16294,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r45
     original: '102.2'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r45
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r45
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -15994,6 +16669,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r46
     original: '103.2'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r46
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r46
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -16354,6 +17044,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r47
     original: '102.7'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r47
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r47
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -16706,6 +17411,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r48
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r48
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -17065,6 +17785,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r49
     original: '102.5'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r49
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r49
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -17425,6 +18160,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r50
     original: '104.4'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r50
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r50
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -17785,6 +18535,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r51
     original: '103'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9571; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r51
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r51
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -18145,6 +18910,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r52
     original: '102.9'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9571; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r52
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r52
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -18505,6 +19285,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r53
     original: '102.2'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9571; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r53
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r53
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -18865,6 +19660,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r54
     original: '102.4'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9571; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r54
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r54
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -19225,6 +20035,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r55
     original: '103'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9571; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r55
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r55
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -19585,6 +20410,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r56
     original: '102.4'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9571; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r56
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r56
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -19945,6 +20785,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r57
     original: '103.2'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9571; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r57
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r57
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -20305,6 +21160,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r58
     original: '102.6'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9571; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r58
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0006656954769148626 dex; combined_allowance=0.0106656954769148626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4a_r58
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -20657,6 +21527,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r01
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r01
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -21008,6 +21893,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r02
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r02
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -21359,6 +22259,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r03
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r03
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -21710,6 +22625,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r04
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r04
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -22061,6 +22991,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r05
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r05
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -22412,6 +23357,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r06
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r06
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -22763,6 +23723,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r07
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r07
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -23114,6 +24089,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r08
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r08
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -23465,6 +24455,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r09
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r09
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -23816,6 +24821,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r10
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r10
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -24167,6 +25187,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r11
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r11
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -24518,6 +25553,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r12
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r12
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -24869,6 +25919,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r13
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r13
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -25220,6 +26285,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r14
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r14
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -25571,6 +26651,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r15
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r15
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -25930,6 +27025,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r16
     original: '102.4'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r16
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r16
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -26282,6 +27392,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r17
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r17
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -26633,6 +27758,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r18
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r18
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -26984,6 +28124,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r19
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r19
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -27335,6 +28490,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r20
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r20
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -27686,6 +28856,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r21
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r21
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -28037,6 +29222,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r22
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r22
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -28388,6 +29588,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r23
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r23
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -28739,6 +29954,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r24
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r24
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -29090,6 +30320,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r25
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r25
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -29441,6 +30686,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r26
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r26
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -29800,6 +31060,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r27
     original: '102.4'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r27
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r27
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -30160,6 +31435,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r28
     original: '103.1'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r28
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r28
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -30512,6 +31802,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r29
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r29
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -30871,6 +32176,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r30
     original: '102.8'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r30
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r30
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -31231,6 +32551,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r31
     original: '102.2'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r31
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r31
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -31591,6 +32926,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r32
     original: '103'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r32
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r32
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -31951,6 +33301,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r33
     original: '103.4'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r33
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r33
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -32303,6 +33668,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r34
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r34
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -32662,6 +34042,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r35
     original: '102.8'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r35
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r35
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -33022,6 +34417,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r36
     original: '102.9'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r36
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r36
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -33374,6 +34784,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r37
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r37
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -33725,6 +35150,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r38
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r38
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -34076,6 +35516,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r39
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r39
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -34427,6 +35882,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r40
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r40
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -34778,6 +36248,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r41
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r41
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -35129,6 +36614,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r42
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r42
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -35480,6 +36980,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r43
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r43
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -35831,6 +37346,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r44
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r44
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -36182,6 +37712,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r45
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r45
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -36533,6 +38078,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r46
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r46
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -36884,6 +38444,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r47
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r47
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -37235,6 +38810,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r48
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r48
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -37586,6 +39176,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r49
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r49
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -37937,6 +39542,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r50
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4b_r50
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -38288,6 +39908,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r01
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r01
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -38639,6 +40274,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r02
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r02
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -38990,6 +40640,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r03
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r03
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -39341,6 +41006,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r04
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r04
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -39692,6 +41372,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r05
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r05
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -40043,6 +41738,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r06
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r06
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -40394,6 +42104,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r07
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r07
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -40745,6 +42470,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r08
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r08
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -41096,6 +42836,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r09
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r09
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -41447,6 +43202,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r10
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r10
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -41798,6 +43568,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r11
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r11
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -42149,6 +43934,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r12
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r12
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -42500,6 +44300,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r13
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r13
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -42851,6 +44666,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.9193; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r14
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.00037340243617478563 dex; combined_allowance=0.01037340243617478563
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r14
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -43202,6 +45032,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r15
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r15
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -43553,6 +45398,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r16
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r16
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -43904,6 +45764,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r17
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r17
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -44255,6 +46130,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r18
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r18
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -44606,6 +46496,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r19
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r19
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -44957,6 +46862,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r20
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r20
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -45308,6 +47228,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r21
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r21
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -45659,6 +47594,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r22
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r22
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -46010,6 +47960,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r23
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r23
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -46361,6 +48326,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r24
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r24
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -46712,6 +48692,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r25
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r25
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -47063,6 +49058,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r26
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r26
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -47414,6 +49424,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.5652; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r27
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0004464785386844028 dex; combined_allowance=0.0104464785386844028
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r27
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -47765,6 +49790,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r28
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r28
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -48116,6 +50156,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r29
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r29
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -48467,6 +50522,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r30
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r30
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -48818,6 +50888,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r31
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r31
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -49169,6 +51254,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r32
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r32
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -49520,6 +51620,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r33
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r33
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -49871,6 +51986,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r34
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r34
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -50222,6 +52352,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r35
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r35
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -50581,6 +52726,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r36
     original: '102.5'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r36
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r36
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -50933,6 +53093,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r37
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r37
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -51284,6 +53459,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r38
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r38
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -51635,6 +53825,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r39
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r39
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -51986,6 +54191,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r40
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r40
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -52337,6 +54557,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r41
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r41
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -52688,6 +54923,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r42
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r42
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -53047,6 +55297,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r43
     original: '102.4'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.3188; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r43
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005182096508420386 dex; combined_allowance=0.0105182096508420386
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r43
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -53399,6 +55664,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r44
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r44
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -53750,6 +56030,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r45
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r45
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -54101,6 +56396,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r46
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r46
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -54452,6 +56762,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r47
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r47
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -54803,6 +57128,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r48
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r48
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -55154,6 +57494,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r49
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r49
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -55513,6 +57868,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r50
     original: '102.5'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r50
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r50
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -55865,6 +58235,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r51
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r51
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -56224,6 +58609,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r52
     original: '102.1'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r52
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r52
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -56576,6 +58976,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r53
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r53
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -56927,6 +59342,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r54
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r54
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -57278,6 +59708,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r55
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r55
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -57629,6 +60074,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r56
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r56
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -57988,6 +60448,21 @@ observations:
     origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r57
     original: '102.9'
     band: 95-102 wt% kept oxide total
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r57
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r57
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -58340,6 +60815,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r58
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r58
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -58691,6 +61181,21 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - activity
+    reason: printed fO2 frame matched printed atmosphere 'CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min'; expected JANAF full-balance
+      log10(fO2/bar)=-11.1153; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r59
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0005942662977567181 dex; combined_allowance=0.0105942662977567181
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - activity
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1600 K used for the gas-mixture check
+    origin: doyle-1989-tio2-feo-activity-magma::doyle_1989_table1a_fig4c_r59
   - kind: admission_defaulted
     affected_quantities:
     - activity

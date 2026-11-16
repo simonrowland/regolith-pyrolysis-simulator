@@ -76,8 +76,16 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
   notices: []
   source_id: kems-213-schneider-1980-nbsir-80-2139
   locator:

@@ -1832,8 +1832,16 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        note: TiO2/Ti3O5 comparative evaporation paragraph immediately below Table 1
   notices: []
   source_id: lopatin-2021-ce-ti-zr-kems-ru
   locator:

@@ -362,9 +362,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 40.0 × 200 SCCM + CO 40.0 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-5.9108; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09418061978032104 dex; combined_allowance=0.10418061978032104
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=01c415b649f2
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09418061978032104 dex; combined_allowance=0.10418061978032104
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=01c415b649f2
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -640,9 +662,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-3.9489; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=7ada62bc3297
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=7ada62bc3297
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -918,8 +962,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -1196,9 +1247,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 60.0 × 10 SCCM + CO 47.0 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9027; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0933717550843874 dex; combined_allowance=0.1033717550843874
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=b95ff7ff5c58
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0933717550843874 dex; combined_allowance=0.1033717550843874
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=b95ff7ff5c58
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -1474,9 +1547,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 98.0 × 200 SCCM + O2 20.0 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-1.9787; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.04580442363114626 dex; combined_allowance=0.05580442363114626
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=c01c0119ca50
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.04580442363114626 dex; combined_allowance=0.05580442363114626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=c01c0119ca50
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -2026,9 +2121,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 60.0 × 10 SCCM + CO 47.0 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-10.9027; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0933717550843874 dex; combined_allowance=0.1033717550843874
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=18843d3a76e0
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.0933717550843874 dex; combined_allowance=0.1033717550843874
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=18843d3a76e0
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -2304,9 +2421,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 40.0 × 200 SCCM + CO 40.0 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-5.9108; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09418061978032104 dex; combined_allowance=0.10418061978032104
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=1d19fb5ffbb4
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09418061978032104 dex; combined_allowance=0.10418061978032104
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=1d19fb5ffbb4
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -2582,9 +2721,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 45.0 × 200 SCCM + O2 100.0 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-0.9940; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.041872541725662356 dex; combined_allowance=0.051872541725662356
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=370e7e24c9fb
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.041872541725662356 dex; combined_allowance=0.051872541725662356
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=370e7e24c9fb
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -2860,9 +3021,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 6.7 × 200 SCCM + CO 33.4 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-9.9081; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.019016616640908063 dex; combined_allowance=0.029016616640908063
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=446b26076db6
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.019016616640908063 dex; combined_allowance=0.029016616640908063
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=446b26076db6
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -3138,9 +3321,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 27.0 × 200 SCCM + CO 13.0 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-7.8779; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01371762163926916 dex; combined_allowance=0.02371762163926916
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=4f41da0bb1fd
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01371762163926916 dex; combined_allowance=0.02371762163926916
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=4f41da0bb1fd
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -3416,9 +3621,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 150.0 × 200 SCCM + O2 10.0 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-2.4183; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.04142891272047127 dex; combined_allowance=0.05142891272047127
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=52973296ac71
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.04142891272047127 dex; combined_allowance=0.05142891272047127
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=52973296ac71
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -3694,9 +3921,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 98.0 × 200 SCCM + O2 20.0 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-1.9787; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.04580442363114626 dex; combined_allowance=0.05580442363114626
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=5abed069dd36
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.04580442363114626 dex; combined_allowance=0.05580442363114626
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=5abed069dd36
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -3972,8 +4221,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -4250,9 +4506,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 20.0 × 200 SCCM + CO 31.0 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-8.8934; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.011623209869100499 dex; combined_allowance=0.021623209869100499
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=6d7c12f79953
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.011623209869100499 dex; combined_allowance=0.021623209869100499
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=6d7c12f79953
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -4528,9 +4806,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-6.9073; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=75525bfef32b
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=75525bfef32b
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -4806,9 +5106,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 95.0 × 200 SCCM + O2 62.0 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-1.4926; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.04486335283595388 dex; combined_allowance=0.05486335283595388
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=ab812444def1
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.04486335283595388 dex; combined_allowance=0.05486335283595388
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=ab812444def1
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -5086,7 +5408,22 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 20.0 × 10 SCCM + H2 50.0 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-12.9442; tolerance=0.1 dex; full_balance_cea_janaf_and_mix_band=0.09782879090236747 dex; combined_allowance=0.19782879090236747
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=b44407e9e857
+    band: tolerance=0.1 dex; full_balance_cea_janaf_and_mix_band=0.09782879090236747 dex; combined_allowance=0.19782879090236747
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=b44407e9e857
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -5345,9 +5682,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 51.0 × 200 SCCM + CO 16.0 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-4.9052; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09724150441681335 dex; combined_allowance=0.10724150441681335
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=ba516537ebb5
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09724150441681335 dex; combined_allowance=0.10724150441681335
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=ba516537ebb5
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -5623,8 +5982,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -5901,8 +6267,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -6179,9 +6552,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 6
+        published_page: 1602
+        table: '3'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-3.9489; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=d7b42462271f
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=d7b42462271f
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -6457,9 +6852,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-6.9073; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=0096e21fd51d
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=0096e21fd51d
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -6731,8 +7148,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -7005,8 +7429,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -7279,9 +7710,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-6.9073; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=53737f184d45
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=53737f184d45
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -7553,8 +8006,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -7827,9 +8287,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-3.9489; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=6e35a813dfe0
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=6e35a813dfe0
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -8101,8 +8583,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -8375,9 +8864,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-3.9489; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=8e556c97b6ed
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=8e556c97b6ed
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -8649,9 +9160,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-3.9489; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=9fcdfe6af77f
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=9fcdfe6af77f
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -8923,9 +9456,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-3.9489; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=b5bd1bbebe8e
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=b5bd1bbebe8e
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -9197,9 +9752,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-3.9489; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=b931af42c583
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.09555225886038234 dex; combined_allowance=0.10555225886038234
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=b931af42c583
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -9471,8 +10048,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -9745,8 +10329,15 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
   notices: []
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
@@ -10019,9 +10610,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-6.9073; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=e34a63c8762a
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=e34a63c8762a
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -10293,9 +10906,31 @@ observations:
       value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 7
+        published_page: 1603
+        table: '4'
+  notices:
+  - kind: fo2_frame_from_printed_atmosphere
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: printed fO2 frame matched printed atmosphere 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM'; expected JANAF full-balance
+      log10(fO2/bar)=-6.9073; tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=ed66821a944c
+    band: tolerance=0.01 dex; full_balance_cea_janaf_and_mix_band=0.01964354587782422 dex; combined_allowance=0.02964354587782422
+      dex
+    authority: certified
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: source does not state the gas-fO2 evaluation temperature; run temperature 1682.15 K used for the gas-mixture check
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=ed66821a944c
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7

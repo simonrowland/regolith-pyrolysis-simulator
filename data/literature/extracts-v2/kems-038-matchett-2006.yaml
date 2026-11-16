@@ -1795,8 +1795,15 @@ observations:
       value: measured_direct
     original_method_class: solar_fresnel_vacuum_pyrolysis
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 27
+        table: '3'
+        source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
   notices: []
   source_id: kems-038-matchett-2006
   locator:

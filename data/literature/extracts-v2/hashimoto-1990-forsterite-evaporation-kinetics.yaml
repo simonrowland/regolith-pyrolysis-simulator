@@ -665,8 +665,16 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: batch admission d-413-batch-literature
+    decided_by:
+      worker: d-413-batch-literature
+      date: '2026-11-15'
+      evidence:
+        page: 3
+        published_page: 55
+        pdf_page_index: 2
+        note: Approximately 65 wt% SiO2 in the most highly evaporated residues.
   notices: []
   source_id: hashimoto-1990-forsterite-evaporation-kinetics
   locator:
