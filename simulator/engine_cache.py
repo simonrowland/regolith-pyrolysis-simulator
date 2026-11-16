@@ -108,10 +108,68 @@ _COUNTER_NAMES = (
     "read_error",
     "conflicts",
 )
-_MEMORY_CACHE_MAXSIZE = 4096
+_MEMORY_CACHE_MAXSIZE = 65536
 _MEMORY_CACHE: OrderedDict[tuple[str, bytes, bool], Any] = OrderedDict()
 _MEMORY_CACHE_PID = os.getpid()
 _RUNTIME_BACKENDS: dict[str, Any] = {}
+
+
+class _Bloom:
+    """RAM-only negative filter; external commits revoke negative answers."""
+
+    def __init__(self, rows: int, version: int) -> None:
+        bit_count = 1 << (max(4096, rows * 10) - 1).bit_length()
+        self.bits = bytearray(bit_count // 8)
+        self.mask = bit_count - 1
+        self.version = version
+        self.trusted = True
+        self.count = 0
+
+    def _positions(self, key: bytes):
+        hashed = hash(key)
+        stride = (hashed >> 32) | 1
+        for index in range(7):
+            yield (hashed + index * stride) & self.mask
+
+    def add(self, key: bytes) -> None:
+        for bit in self._positions(key):
+            self.bits[bit >> 3] |= 1 << (bit & 7)
+        self.count += 1
+
+    def maybe_contains(self, key: bytes) -> bool:
+        return not self.trusted or all(
+            self.bits[bit >> 3] & (1 << (bit & 7)) for bit in self._positions(key)
+        )
+
+
+_BLOOMS: dict[sqlite3.Connection, _Bloom] = {}
+
+
+def _build_bloom(connection: sqlite3.Connection) -> _Bloom:
+    rows = connection.execute(f"SELECT count(*) FROM {_TABLE}").fetchone()[0]
+    bloom = _Bloom(rows, connection.execute("PRAGMA data_version").fetchone()[0])
+    for (key,) in connection.execute(f"SELECT key FROM {_TABLE}"):
+        bloom.add(bytes(key))
+    return bloom
+
+
+def _record_bloom_key(connection: sqlite3.Connection, key: bytes) -> None:
+    bloom = _BLOOMS.get(connection)
+    if bloom is not None:
+        bloom.add(key)
+        if bloom.count * 10 > len(bloom.bits) * 8:
+            _BLOOMS[connection] = _build_bloom(connection)
+
+
+def _definitely_absent(connection: sqlite3.Connection, key: bytes) -> bool:
+    bloom = _BLOOMS[connection]
+    if bloom.maybe_contains(key):
+        return False
+    if connection.execute("PRAGMA data_version").fetchone()[0] != bloom.version:
+        # Imported rows may arrive out of sequence. Never trust a stale negative.
+        bloom.trusted = False
+        return False
+    return True
 
 
 @dataclass(frozen=True)
@@ -539,6 +597,7 @@ def _close_connections() -> None:
         except sqlite3.Error:
             pass
     _CONNECTIONS.clear()
+    _BLOOMS.clear()
     _CONNECTION_PID = os.getpid()
     _CONNECTION_PATH = None
 
@@ -578,8 +637,8 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
     if readonly:
         if not path.exists():
             return None
-        uri = f"file:{quote(str(path), safe='/')}?mode=ro&immutable=1"
-        connection = sqlite3.connect(uri, uri=True, timeout=_TIMEOUT_MS / 1000)
+        uri = f"file:{quote(str(path), safe='/')}?mode=ro"
+        connection = sqlite3.connect(uri, uri=True, timeout=_TIMEOUT_MS / 1000, check_same_thread=False)
     else:
         path.parent.mkdir(parents=True, exist_ok=True)
         connection = sqlite3.connect(
@@ -637,6 +696,7 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
         )
         connection.commit()
     _CONNECTIONS[key] = connection
+    _BLOOMS[connection] = _build_bloom(connection)
     return connection
 
 
@@ -784,10 +844,9 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             raise ValueError("REGOLITH_ENGINE_CACHE_BOX must be set in read-write mode")
         if source_box not in ENGINE_CACHE_BOX_RANGES:
             raise ValueError(f"engine cache box {source_box!r} has no configured row range")
-    path = Path(path_value).expanduser()
     chem_version = ENGINE_CHEMISTRY_VERSION[engine_id]
     cache_key = engine_cache_key(engine_id, chem_version, request)
-    memory_key = (str(path), cache_key, readonly)
+    memory_key = (path_value, cache_key, readonly)
     with _LOCK:
         _prepare_memory_cache()
         counts = _counter_bucket(engine_id)
@@ -797,11 +856,22 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             counts["hits"] += 1
             return result
 
-    connection = _connect(path, readonly=readonly)
+    path = Path(path_value).expanduser()
+    try:
+        connection = _connect(path, readonly=readonly)
+    except (sqlite3.Error, OSError):
+        with _LOCK:
+            counts["read_error"] += 1
+            counts["misses"] += 1
+        return live_hot(solve())
     with _LOCK:
-        row = None if connection is None else connection.execute(
-            f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (cache_key,)
-        ).fetchone()
+        try:
+            row = None if connection is None or _definitely_absent(connection, cache_key) else connection.execute(
+                f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (cache_key,)
+            ).fetchone()
+        except sqlite3.Error:
+            counts["read_error"] += 1
+            row = None
         if row is not None:
             try:
                 result = _decode_hot(row[0], _read_provenance(connection, row[1]))
@@ -844,6 +914,8 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 provenance=provenance,
             )
             connection.commit()
+            if inserted:
+                _record_bloom_key(connection, cache_key)
             if inserted and isinstance(solved, EngineCacheValue):
                 _store_cold(path, cache_key, solved.cold)
             counts = _counter_bucket(engine_id)
@@ -918,6 +990,8 @@ def load_cache_rows(
                 provenance=provenance,
             )
             inserted_count += int(inserted)
+            if inserted:
+                _record_bloom_key(connection, digest)
             if conflict:
                 conflicts[engine] = conflicts.get(engine, 0) + 1
         connection.commit()
@@ -943,4 +1017,8 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
         (engine_id, str(chem_version)),
     )
     connection.commit()
+    with _LOCK:
+        for memory_key in tuple(_MEMORY_CACHE):
+            if memory_key[0] == path_value:
+                del _MEMORY_CACHE[memory_key]
     return cursor.rowcount

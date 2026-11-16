@@ -1,16 +1,20 @@
 """Real-engine parity and storage probe for every cache-format revision."""
 
 from dataclasses import replace
+from copy import deepcopy
 import json
 from pathlib import Path
 import sqlite3
+from statistics import median
+import time
 import warnings
 import zlib
 
 from scripts import cache_smoke
+from simulator import engine_cache
 
 
-def test_every_engine_smoke_rows_are_identical(tmp_path: Path) -> None:
+def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> None:
     root = Path(__file__).resolve().parents[2]
     subset = tmp_path / "subset"
     cache_smoke._link_smoke_sources(root, subset, cache_smoke.DEFAULT_WORKS)
@@ -21,17 +25,29 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path) -> None:
     cache = tmp_path / "engine-cache.sqlite"
     results = {}
     report = []
+    requests = {}
+    original_call = engine_cache.cached_engine_call
+
+    def capture_request(engine, request, solve):
+        result = original_call(engine, request, solve)
+        key = engine_cache.engine_cache_key(engine, engine_cache.ENGINE_CHEMISTRY_VERSION[engine], request)
+        if (str(cache), key, False) in engine_cache._MEMORY_CACHE:
+            requests[engine] = deepcopy(request)
+        return result
     for label, path, workers in (
         ("off", None, 1),
         ("cold", cache, 1),
         ("warm", cache, 1),
         ("warm-workers-2", cache, 2),
     ):
-        rows, counts, wall, cpu = cache_smoke._run(
-            context, root, tmp_path / label,
-            slices=cache_smoke.DEFAULT_SLICES, limit=1, workers=workers,
-            cache_path=path,
-        )
+        with monkeypatch.context() as scoped:
+            if label == "cold":
+                scoped.setattr(engine_cache, "cached_engine_call", capture_request)
+            rows, counts, wall, cpu = cache_smoke._run(
+                context, root, tmp_path / label,
+                slices=cache_smoke.DEFAULT_SLICES, limit=1, workers=workers,
+                cache_path=path,
+            )
         assert rows, label
         report.append(f"run={label} wall_s={wall:.3f} process_cpu_s={cpu:.3f}")
         for engine in cache_smoke.ENGINE_ORDER:
@@ -49,6 +65,23 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path) -> None:
             )
         assert results[label] == baseline, label
     warnings.warn("rows identical: yes", stacklevel=1)
+    def measure(call):
+        batches = []
+        for _ in range(5):
+            started = time.perf_counter_ns()
+            for _ in range(1000):
+                call()
+            batches.append((time.perf_counter_ns() - started) / 1_000_000)
+        return median(batches)
+
+    with engine_cache._engine_cache_path_scope(cache):
+        for engine, request in sorted(requests.items()):
+            version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+            def unexpected_miss():
+                raise AssertionError(f"{engine}: benchmark reached the engine")
+            hit_us = measure(lambda: original_call(engine, request, unexpected_miss))
+            key_us = measure(lambda: engine_cache.engine_cache_key(engine, version, request))
+            warnings.warn(f"cache-speed {engine} median_hit_us:{hit_us:.3f} median_key_us:{key_us:.3f}", stacklevel=1)
     from simulator.engine_cache_binary import pack, unpack
 
     def check_strings(value):

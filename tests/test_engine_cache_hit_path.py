@@ -13,9 +13,13 @@ def test_bloom_definite_miss_skips_the_disk_lookup(tmp_path, monkeypatch):
     engine_cache.cached_engine_call("openimcc", {"temperature_K": 1700.0}, lambda: {"answer": 1})
     connection = engine_cache._connect(path, readonly=False)
     queries = []
+    before_solve = []
     connection.set_trace_callback(queries.append)
-    engine_cache.cached_engine_call("openimcc", {"temperature_K": 1701.0}, lambda: {"answer": 2})
-    assert not any(query.startswith("SELECT value, provenance_id FROM engine_outputs") for query in queries)
+    def solve():
+        before_solve.extend(queries)
+        return {"answer": 2}
+    engine_cache.cached_engine_call("openimcc", {"temperature_K": 1701.0}, solve)
+    assert not any(query.startswith("SELECT value, provenance_id FROM engine_outputs") for query in before_solve)
 
 
 def test_readonly_reader_sees_external_wal_inserts(tmp_path, monkeypatch):
