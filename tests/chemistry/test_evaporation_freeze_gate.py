@@ -5214,6 +5214,16 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
             })
+        if curve_calls > 1:
+            return engine_binding_admission.write_gate_curve_memo_record(
+                sim,
+                curve,
+                evidence=engine_binding_admission.GateCurveEvidence(
+                    'a' * 64,
+                    False,
+                ),
+                provider_outcome=GateCurveProviderOutcome.PRODUCED,
+            )
         return gate_curve_memo_record(
             curve,
             None,
@@ -5633,7 +5643,7 @@ def test_cold_magemin_version_failures_do_not_store_or_reuse_gate_memos(
 
     def dispatch_curve(_reasons, **_kwargs):
         dispatch_calls.append(True)
-        return dict(curve)
+        return _freeze_gate_curve_with_outcome(sim, curve)
 
     monkeypatch.setattr(sim, '_freeze_gate_curve_from_gate_dispatch', dispatch_curve)
 
