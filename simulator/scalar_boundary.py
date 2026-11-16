@@ -38,16 +38,23 @@ def finite_float(value: Any) -> float | None:
     return number if math.isfinite(number) else None
 
 
-def finite_builtin_number(value: Any) -> float | None:
-    """Convert a built-in int or float (never bool) when it is finite.
+def finite_builtin_number(
+    value: Any,
+    *,
+    preserve_value: bool = False,
+) -> int | float | None:
+    """Admit finite int/float values without accepting bools.
 
-    Non-numeric shapes and non-finite numbers return ``None``. Conversion
-    errors from numeric subclasses propagate so callers can preserve their
-    existing refusal or omission behavior.
+    ``preserve_value`` checks the original number and returns it unchanged.
+    Otherwise the function converts to float before checking finiteness.
+    Conversion errors propagate so callers can preserve their own refusal or
+    omission behavior.
     """
 
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
+    if preserve_value:
+        return value if math.isfinite(value) else None
     number = float(value)
     return number if math.isfinite(number) else None
 

@@ -4290,7 +4290,7 @@ def _phase_number(
         raise LinerCorrosionDataError(
             source_id, "invalid_numeric_value", f"{observation_id}.{field} is not numeric"
         )
-    if finite_builtin_number(value) is None:
+    if finite_builtin_number(value, preserve_value=True) is None:
         raise LinerCorrosionDataError(
             source_id, "non_finite_value", f"{observation_id}.{field} is not finite"
         )

@@ -663,9 +663,11 @@ def _well_formed_disclosure(item: Any) -> dict[str, Any] | None:
         and not isinstance(band, (str, bytes))
         and len(band) == 2
     ):
+        lo_value = band[0]
+        hi_value = band[1]
         try:
-            lo = finite_builtin_number(band[0])
-            hi = finite_builtin_number(band[1])
+            lo = finite_builtin_number(lo_value)
+            hi = finite_builtin_number(hi_value)
         except (TypeError, ValueError):
             return None
         if lo is None or hi is None:

@@ -125,6 +125,7 @@ from simulator.vapour_rail.run_disclosure import (
     accept_stored_memo,
     disclosure_scope,
     open_computation,
+    parse_stored_disclosure_field,
     publish_stored_disclosures,
     published_run_disclosures,
     stored_disclosures_known,
@@ -174,6 +175,25 @@ def _assert_fe_disclosure(row: dict, *, law_id: str, count: int) -> None:
     )
     assert round(gaps["gap_dex_law_vs_rail"], 3) == 1.113
     assert round(gaps["gap_dex_law_vs_vaporock"], 3) == 1.454
+
+
+def test_stored_disclosure_band_indexing_error_propagates() -> None:
+    class RaisesOnIndex(list):
+        def __getitem__(self, index):
+            raise TypeError("band index failed")
+
+    record = {
+        "law_id": "law",
+        "provenance": "fixture",
+        "authority": "diagnostic/extrapolated",
+        "certified_band_K": RaisesOnIndex((1000.0, 2000.0)),
+        "anchor_gaps_dex": {},
+        "closer": "",
+        "certification_route": [],
+        "evaluation_count": 1,
+    }
+    with pytest.raises(TypeError, match="band index failed"):
+        parse_stored_disclosure_field([record], present=True)
 
 
 def test_ellingham_float_registers_fe_law_once() -> None:

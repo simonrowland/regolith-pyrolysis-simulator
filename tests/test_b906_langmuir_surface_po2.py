@@ -207,6 +207,30 @@ def _buffered_melt():
     return comp_wt, fe_atom_mol
 
 
+def test_apply_langmuir_surface_pins_ordinary_evaluator_exponent():
+    from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+    compiled = SimpleNamespace(
+        species={
+            "CaO_gas": SimpleNamespace(
+                evaluator=SimpleNamespace(pO2_exponent=-0.5)
+            )
+        }
+    )
+    result = apply_langmuir_surface_oxygen(
+        {"CaO_gas": 1.0},
+        temperature_K=_GEN_T_K,
+        compiled_catalog=compiled,
+        melt_redox_capacity_mol_per_ln_fO2=0.0,
+    )
+
+    assert result.applied is True
+    assert result.pressures_Pa == {}
+    assert result.refused_species == {
+        "CaO_gas": "missing pO2 reference; surface pressure omitted"
+    }
+
+
 def _ca_flux_kg_m2_h(pressure_Pa: float) -> float:
     return (
         pressure_Pa

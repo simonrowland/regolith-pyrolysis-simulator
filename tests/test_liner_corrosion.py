@@ -3280,6 +3280,60 @@ def test_all_source_records_load_with_temperature_phases_and_locators() -> None:
         assert row["locator"].get("table") or row["locator"].get("section")
 
 
+def _patch_rankin_temperature(monkeypatch: pytest.MonkeyPatch, temperature: float) -> None:
+    source_id = "rankin-wright-1915-ajs-cao-al2o3-sio2"
+    observation_id = "rankin_wright_1915_tB_r1_invariant"
+    read_extract = liner_corrosion._read_extract
+
+    def read_extract_with_temperature(filename, expected_source_id):
+        document = read_extract(filename, expected_source_id)
+        if expected_source_id == source_id:
+            observation = document["species"]["CaO"]["observations"][0]
+            assert observation["observation_id"] == observation_id
+            observation["values"]["temperature_C"] = temperature
+        return document
+
+    monkeypatch.setattr(liner_corrosion, "_read_extract", read_extract_with_temperature)
+
+
+def test_public_liner_loader_rejects_nan_float_subclass_with_forged_float(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class NaNWithFiniteConversion(float):
+        def __float__(self):
+            return 1.0
+
+    _patch_rankin_temperature(monkeypatch, NaNWithFiniteConversion(float("nan")))
+
+    with pytest.raises(liner_corrosion.LinerCorrosionDataError) as refused:
+        load_liner_corrosion_invariants()
+    assert refused.value.reason == "non_finite_value"
+    assert str(refused.value) == (
+        "rankin-wright-1915-ajs-cao-al2o3-sio2: non_finite_value: "
+        "rankin_wright_1915_tB_r1_invariant.temperature_C is not finite"
+    )
+
+
+def test_public_liner_loader_preserves_finite_float_subclass_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FiniteWithInvalidConversion(float):
+        def __float__(self):
+            raise TypeError("must not coerce a stored float subclass")
+
+    temperature = FiniteWithInvalidConversion(1436.0)
+    _patch_rankin_temperature(monkeypatch, temperature)
+
+    records = load_liner_corrosion_invariants()
+    row = next(
+        item
+        for item in records
+        if item["observation_id"] == "rankin_wright_1915_tB_r1_invariant"
+    )
+    assert row["T_invariant_C"] is temperature
+    assert row["T_invariant_C"] == 1436.0
+
+
 def test_binary_aluminates_keep_source_specific_temperatures_and_compositions() -> None:
     records = {
         (row["source_id"], row["observation_id"]): row

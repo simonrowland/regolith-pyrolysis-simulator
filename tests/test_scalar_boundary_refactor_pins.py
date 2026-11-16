@@ -129,6 +129,8 @@ def test_finite_builtin_number_contract():
     assert finite_builtin_number(3) == 3.0
     assert isinstance(finite_builtin_number(3), float)
     assert finite_builtin_number(3.5) == 3.5
+    assert finite_builtin_number(3, preserve_value=True) == 3
+    assert isinstance(finite_builtin_number(3, preserve_value=True), int)
     for value in (True, "3", Decimal("3"), None, float("nan"), float("inf")):
         assert finite_builtin_number(value) is None
     try:
@@ -137,6 +139,14 @@ def test_finite_builtin_number_contract():
         pass
     else:
         raise AssertionError("oversized integer conversion must preserve OverflowError")
+
+    class FloatWithMisleadingConversion(float):
+        def __float__(self):
+            return 1.0
+
+    raw_nan = FloatWithMisleadingConversion(float("nan"))
+    assert finite_builtin_number(raw_nan, preserve_value=True) is None
+    assert finite_builtin_number(raw_nan) == 1.0
 
 
 def test_target_modules_have_no_local_scalar_boundary_copies():
