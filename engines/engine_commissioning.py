@@ -32,7 +32,6 @@ import yaml
 
 from engines.domain_reason import OutOfDomainReason
 from engines.yaml_loader import YAML12SafeLoader
-from simulator.scalar_boundary import coerce_nonnegative_hours
 
 # Historical published constants this table replaced. Cited by tests that
 # pin defaults; not a second runtime band.
@@ -488,7 +487,7 @@ def commissioning_step_from_diagnostics(
     plain = _plain_commissioning_notice(notice)
     if plain is None:
         return None
-    return {'hour': coerce_nonnegative_hours(hour), 'notice': plain}
+    return {'hour': hour, 'notice': plain}
 
 
 def aggregate_engine_commissioning_notice(
@@ -516,8 +515,8 @@ def aggregate_engine_commissioning_notice(
         if plain is None:
             continue
         try:
-            hour = coerce_nonnegative_hours(step['hour'])
-        except (KeyError, TypeError, ValueError):
+            hour = step['hour']
+        except KeyError:
             continue
         hours.append(hour)
         identity = (
