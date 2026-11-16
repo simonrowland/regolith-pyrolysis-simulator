@@ -7248,20 +7248,26 @@ def test_studio_requires_host_environment_variable(
     assert "REGOLITH_STUDIO_HOST" in capsys.readouterr().err
 
 
-def test_studio_dispatch_uses_caller_host(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_studio_dispatch_uses_caller_host(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from scripts import battery_score
 
     monkeypatch.setenv("REGOLITH_STUDIO_HOST", "example-studio.invalid")
     monkeypatch.setattr(battery_score.socket, "gethostname", lambda: "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    engine_cache_path = tmp_path / "engine-cache.sqlite"
 
     def record_host(
         _engines: list[str],
         _extra: list[str],
         *,
+        engine_cache_path: Path | None,
         studio_host: str,
         output_directory: Path,
         remote_output_directory: Path,
     ):
+        assert engine_cache_path == tmp_path / "engine-cache.sqlite"
         assert studio_host == "example-studio.invalid"
         assert output_directory.name
         assert remote_output_directory.parts
@@ -7272,7 +7278,16 @@ def test_studio_dispatch_uses_caller_host(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(battery_score, "load_score_context", lambda _root: None)
     monkeypatch.setattr(battery_score, "_run_studio", record_host)
     with pytest.raises(RuntimeError, match="dispatch host recorded"):
-        battery_score.main(["--studio", "--engines", "magemin"])
+        battery_score.main(
+            [
+                "--studio",
+                "--engines",
+                "magemin",
+                "--engine-cache",
+                str(engine_cache_path),
+            ]
+        )
+    assert "REGOLITH_ENGINE_CACHE" not in os.environ
 
 
 def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:
@@ -7343,6 +7358,8 @@ def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> Non
             source_id,
             "--limit",
             "1",
+            "--workers",
+            "3",
         ],
         cwd=repo_root,
         capture_output=True,
@@ -8065,7 +8082,7 @@ def test_magemin_melt_activity_call_stays_observable() -> None:
         "candidate_request": {"engine": Engine.MAGEMIN.value},
         "execution": {
             "state": "unsupported",
-            "call_evidence": "equilibrate_cell:magemin:host=test:exit=None",
+            "call_evidence": "equilibrate_cell:magemin:exit=None",
         },
         "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
     }
@@ -9795,6 +9812,11 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
     from simulator.battery import residue, score
 
     context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    monkeypatch.setattr(
+        score.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
     references = sorted(
         (
             observation
@@ -9880,6 +9902,8 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         second_prediction = score._hashimoto_residue_prediction(context, second, engine, cache)
         assert first_prediction.execution.state is ExecutionState.PRODUCED, first_prediction.refusal_detail
         assert second_prediction.execution.state is ExecutionState.PRODUCED
+        assert first_prediction.version is None
+        assert "code_revision" not in first_prediction.refusal_detail
         assert first_prediction.value != second_prediction.value
         assert first_prediction.refusal_detail["experiment_id"] == first.experiment_id
         assert first_prediction.refusal_detail["consumed_row"]["observation_id"] == first.observation_id
@@ -12939,6 +12963,59 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
     )
     assert not any(row.get("status") == ResidualStatus.NO_BAND.value for row in rows)
     assert any(row.get("status") == ResidualStatus.REFUSED.value for row in rows)
+
+
+@pytest.mark.parametrize("workers", (1, 2))
+def test_species_selection_count_printed_once_for_serial_and_worker_scoring(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    workers: int,
+) -> None:
+    context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    reference = context.observations["fixture-measured-vapour"]
+    monkeypatch.setattr(
+        score_mod,
+        "comparison_candidates",
+        lambda _context: (reference,),
+    )
+    monkeypatch.setattr(score_mod, "diagnostic_references", lambda _context: ())
+    monkeypatch.setattr(
+        score_mod, "_refusal_diagnostic_references", lambda _context: ()
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_compile_residual_with_lineage",
+        lambda observation, _engine, **_kwargs: (
+            fixture_residuals[observation.observation_id],
+            fixture_candidates.get(
+                fixture_residuals[observation.observation_id].candidate or ""
+            ),
+        ),
+    )
+    if workers > 1:
+        from simulator.battery import score_run
+
+        monkeypatch.setattr(score_run, "_SCORE_WORKER_SETUP", None)
+
+        def run_inline(tasks, worker, *, initializer, initargs, **_kwargs):
+            initializer(*initargs)
+            return [worker(task) for task in tasks]
+
+        monkeypatch.setattr(score_mod, "supervised_process_map", run_inline)
+
+    score_mod._score_store_to_jsonl(
+        context,
+        tmp_path / f"species-count-{workers}.jsonl",
+        root=score_mod.REPO_ROOT,
+        engines=(engine,),
+        species_formulas=("Na",),
+        include_diagnostics=False,
+        workers=workers,
+    )
+
+    line = "species references selected=1 formulas=Na"
+    assert capsys.readouterr().out.splitlines().count(line) == 1
 
 
 def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
@@ -16448,7 +16525,7 @@ def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
     assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_detail["reason"] == "engine_not_converged"
-    assert prediction.refusal_detail["elapsed_s"] >= 0.0
+    assert "elapsed_s" not in prediction.refusal_detail
     notice = next(
         item for item in prediction.notices
         if item.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
@@ -16577,7 +16654,16 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
     backend._available = True
     backend._bridge = "subprocess"
     backend._binary_path = Path("/fake/MAGEMin")
-    backend._subprocess_pool = FailedPool()
+    pool = FailedPool()
+    pool.workers = (SimpleNamespace(
+        name="MAGEMin subprocess pool slot 0",
+        _bootstrap_args=(
+            str(backend._binary_path.resolve()),
+            backend._database,
+            dict(backend._config),
+        ),
+    ),)
+    backend._subprocess_pool = pool
     results = []
     equilibrate = backend.equilibrate
 

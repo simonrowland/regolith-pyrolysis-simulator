@@ -9,6 +9,7 @@ derived from resolve_backend.
 
 from __future__ import annotations
 
+import hashlib
 import difflib
 import json
 import math
@@ -25,7 +26,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from fractions import Fraction
-from functools import lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from types import MappingProxyType
 from typing import (
@@ -38,6 +39,7 @@ from typing import (
     Mapping,
     Protocol,
     Sequence,
+    TextIO,
 )
 
 import yaml
@@ -45,6 +47,9 @@ import yaml
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.supervised_process_pool import (
+    supervised_process_map,
+)
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -214,6 +219,7 @@ from simulator.battery.score_report import (
     _condition_hull_lines,
     _e15_markdown_lines,
     _e15_number,
+    _score_shard_failure_report_lines,
     format_element_retention_diagnostics,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
@@ -223,6 +229,14 @@ from simulator.battery.score_report import (
 from simulator.battery.score_report_data import (
     eligibility_failure_census,
     element_retention_report_data,
+)
+from simulator.battery.score_run import (
+    _ScoreShardResult,
+    _partition_score_refs,
+    _prepare_score_run,
+    _residue_cohort_selection,
+    _score_store_to_jsonl,
+    _score_store_with_decisions,
 )
 from simulator.battery.score_metrics import (
     QUANTITY_METRIC,
@@ -7046,7 +7060,16 @@ def cell_notices(
         kind = str(row.get("kind") or "")
         if _row_out_of_certified_band(kind, row):
             raw_band = row.get("certified_band") or row.get("band")
-            band = str(raw_band or "")
+            band = (
+                json.dumps(
+                    to_plain(raw_band),
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    default=str,
+                )
+                if isinstance(raw_band, Mapping)
+                else str(raw_band or "")
+            )
             if kind == "openimcc_temperature_extrapolated" and isinstance(
                 raw_band, Mapping
             ):
@@ -7176,7 +7199,7 @@ def cell_notices(
             )
     status_reason = getattr(cell, "vapor_pressure_backend_status_reason", None)
     backend_status = getattr(cell, "vapor_pressure_backend_status", None)
-    if backend_status == AUTHORITY_FALLBACK or (
+    if backend_status == AUTHORITY_FALLBACK or status_reason == "fallback" or (
         isinstance(status_reason, str) and "fallback" in status_reason
     ):
         notices.append(
@@ -7189,7 +7212,9 @@ def cell_notices(
                 destination="antoine_fallback",
             )
         )
-    if isinstance(status_reason, str) and _FLOOR_INVERSION_REASON in status_reason:
+    if status_reason == "floor" or (
+        isinstance(status_reason, str) and _FLOOR_INVERSION_REASON in status_reason
+    ):
         notices.append(
             Notice(
                 kind=NoticeKind.FLOOR_INVERSION,
@@ -8658,7 +8683,7 @@ def _predict_distin_closed_feo_activity(
     inventory["Fe"] = inventory.get("Fe", 0.0) + 1.0
     try:
         import openimcc
-        import openimcc.redox as openimcc_redox
+        from simulator.melt_backend.openimcc_bridge import evaluate_redox
     except ImportError as exc:
         return refused(
             RefusalReason.OPENIMCC_NOT_IMPORTABLE,
@@ -8668,8 +8693,12 @@ def _predict_distin_closed_feo_activity(
             },
         )
     try:
-        result = openimcc_redox.evaluate_redox(
-            inventory, float(temperature_K), "closed"
+        temperature = float(temperature_K)
+        result = evaluate_redox(
+            inventory,
+            temperature,
+            "closed",
+            entry="openimcc.redox.evaluate_redox",
         )
     except openimcc.ImccRefusal as exc:
         return refused(
@@ -8905,11 +8934,16 @@ def _predict_fe_redox(
                 },
             )
         try:
-            result = openimcc.evaluate_redox(
+            from simulator.melt_backend.openimcc_bridge import evaluate_redox
+
+            temperature = float(material.temperature)
+            lambda_imposed = float(fo2_log) * math.log(10.0)
+            result = evaluate_redox(
                 inventory,
-                float(material.temperature),
+                temperature,
                 "imposed",
-                lambda_imposed=float(fo2_log) * math.log(10.0),
+                lambda_imposed=lambda_imposed,
+                entry="openimcc.evaluate_redox",
             )
         except openimcc.ImccRefusal as exc:
             return refused(
@@ -9128,10 +9162,7 @@ def _predict_fe_redox(
         physical_pressure_bar=pressure_bar,
     )
     name = str(getattr(handle, "name", engine.value))
-    call_evidence = (
-        f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-        f":exit={getattr(cell, 'exit_code', None)}"
-    )
+    call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
     model_id = getattr(cell, "model_id", None)
     version = None if model_id is None else (str(model_id) or None)
     status = getattr(cell, "status", None)
@@ -10356,7 +10387,16 @@ def _equilibrate_phase_assemblage(
                     f"{solute_fugacity_parameter}"
                 )
             kwargs[solute_fugacity_parameter] = solute_fugacity_bar
-        return backend.equilibrate(**kwargs)
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _call_cached_backend_equilibrate,
+        )
+
+        # The shared equilibrium cache codec omits phase-composition maps,
+        # which this scorer consumes below. Keep this result uncached until
+        # that codec can preserve the full assemblage without changing schema.
+        return _call_cached_backend_equilibrate(
+            handle, kwargs, lambda: backend.equilibrate(**kwargs), cache=False
+        )
     finally:
         if owns_handle:
             from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -14188,8 +14228,8 @@ def _predict_with_engine(
     # MAGEMin's existing warm-worker hard wall is 15 s; the scorer's 20 s
     # cell timeout remains a secondary bound. call_timeout_s carries the
     # remaining cell budget into the worker, whose 15 s pool limit kills the
-    # observed >50 s non-finite Gamma loop. Expiry maps below to
-    # engine_not_converged with this cell's elapsed wall time.
+    # observed >50 s non-finite Gamma loop. Expiry maps below to the typed
+    # engine_not_converged refusal without adding runtime timing to the row.
     native_activity_formula = (
         formula
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
@@ -14455,10 +14495,7 @@ def _predict_with_engine(
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
     status = getattr(cell, "status", None)
-    call_evidence = (
-        f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-        f":exit={getattr(cell, 'exit_code', None)}"
-    )
+    call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
     if engine is Engine.INTERNAL_ANALYTICAL:
         engine_version = (
             getattr(cell, "vapor_pressure_backend_status_reason", None)
@@ -14500,7 +14537,6 @@ def _predict_with_engine(
                 refusal_reason=refusal_reason,
                 refusal_detail={
                     "reason": typed_reason,
-                    "elapsed_s": float(getattr(cell, "wall_s", 0.0) or 0.0),
                     "cell_refusal_reason": typed,
                     "engine_status": cell_status,
                     "engine_reason": engine_side_reason,
@@ -14909,10 +14945,7 @@ def _predict_with_engine(
             origin=_KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN,
         )
         notices = union_notices(notices, (pressure_notice,))
-        call_evidence = (
-            f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-            f":exit={getattr(cell, 'exit_code', None)}"
-        )
+        call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
         activities = dict(getattr(cell, "melt_activities", None) or {})
         pressures = updated_pressures
         identity = replace(
@@ -15457,6 +15490,7 @@ def _hashimoto_residue_prediction(
     ],
     *,
     selected_experiment_ids: frozenset[str] | None = None,
+    test_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
@@ -15464,8 +15498,11 @@ def _hashimoto_residue_prediction(
     quantity = quantity_token(reference.identity)
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
+    cohort_selection = _residue_cohort_selection(
+        selected_experiment_ids, test_experiment_ids
+    )
     rows_by_key = _residue_prediction_cache_entry(
-        cache, _HASHIMOTO_SOURCE_ID, engine, selected_experiment_ids
+        cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection
     )
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
@@ -15481,6 +15518,10 @@ def _hashimoto_residue_prediction(
                 for row in context.observations.values()
                 if row.source_id == _HASHIMOTO_SOURCE_ID
                 and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
+                and (
+                    test_experiment_ids is None
+                    or row.experiment_id in test_experiment_ids
+                )
                 and isinstance(row.identity, Identity)
                 and quantity_token(row.identity)
                 is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -15490,10 +15531,21 @@ def _hashimoto_residue_prediction(
                 for row in observations
                 if row.experiment_id in context.experiments
             }
-            if len(experiments_by_id) != 24:
+            expected_experiments = test_experiment_ids or frozenset(experiments_by_id)
+            expected_count = (
+                24
+                if test_experiment_ids is None
+                else len(test_experiment_ids)
+            )
+            if (
+                len(experiments_by_id) != expected_count
+                or set(experiments_by_id) != set(expected_experiments)
+            ):
                 raise ResidueInventoryRefusal(
                     "hashimoto_cohort_invalid",
-                    f"scorer found {len(experiments_by_id)} Hashimoto runs, expected 24",
+                    "scorer found "
+                    f"{len(experiments_by_id)} Hashimoto runs, expected "
+                    f"{expected_count}",
                 )
             source_path = (
                 REPO_ROOT
@@ -15510,20 +15562,13 @@ def _hashimoto_residue_prediction(
                 to_plain(experiments_by_id[experiment_id])
                 for experiment_id in sorted(experiments_by_id)
             ]
-            revision = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
             rows = _predict_hashimoto_residue_cohort(
                 experiments,
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
                 preform_dimensions_mm=geometry,
-                code_revision=revision,
                 engine=engine.value,
-                selected_experiment_ids=selected_experiment_ids,
+                _allow_partial_cohort_for_test=test_experiment_ids is not None,
+                selected_experiment_ids=cohort_selection,
             )
             rows_by_key = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
@@ -15532,7 +15577,7 @@ def _hashimoto_residue_prediction(
                 cache,
                 _HASHIMOTO_SOURCE_ID,
                 engine,
-                selected_experiment_ids,
+                cohort_selection,
                 value=rows_by_key,
             )
         if "__cohort_error__" in rows_by_key:
@@ -15726,7 +15771,6 @@ def _hashimoto_residue_prediction(
             # The source-resolved Phase.L identity denotes the modeled run-end
             # liquid's bulk oxide inventory; quenching preserves that inventory.
             identity=reference.identity,
-            version=str(primary.provenance.get("code_revision") or "unknown"),
             refusal_detail=(
                 {
                     **primary_provenance,
@@ -15742,7 +15786,7 @@ def _hashimoto_residue_prediction(
         infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
         if (
             _residue_prediction_cache_entry(
-                cache, _HASHIMOTO_SOURCE_ID, engine, selected_experiment_ids
+                cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection
             )
             is None
             and not infrastructure_failure
@@ -15751,7 +15795,7 @@ def _hashimoto_residue_prediction(
                 cache,
                 _HASHIMOTO_SOURCE_ID,
                 engine,
-                selected_experiment_ids,
+                cohort_selection,
                 value={"__cohort_error__": str(reason)},
             )
         detail: dict[str, object] = {
@@ -15947,6 +15991,7 @@ def _sossi_residue_prediction(
     ],
     *,
     selected_experiment_ids: frozenset[str] | None = None,
+    test_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
@@ -15955,6 +16000,9 @@ def _sossi_residue_prediction(
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     formula = reference.identity.species.formula
+    cohort_selection = _residue_cohort_selection(
+        selected_experiment_ids, test_experiment_ids
+    )
     if formula not in {"Mn", "Ti"}:
         return EnginePrediction(
             engine=engine,
@@ -15973,7 +16021,7 @@ def _sossi_residue_prediction(
             identity=reference.identity,
         )
     cohort = _residue_prediction_cache_entry(
-        cache, _SOSSI_SOURCE_ID, engine, selected_experiment_ids
+        cache, _SOSSI_SOURCE_ID, engine, cohort_selection
     )
     try:
         from simulator.battery.residue import (
@@ -15991,6 +16039,10 @@ def _sossi_residue_prediction(
                 row
                 for row in context.observations.values()
                 if row.source_id == _SOSSI_SOURCE_ID
+                and (
+                    test_experiment_ids is None
+                    or row.experiment_id in test_experiment_ids
+                )
                 and isinstance(row.identity, Identity)
                 and quantity_token(row.identity)
                 is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -16013,10 +16065,28 @@ def _sossi_residue_prediction(
                         trace_ppm_by_experiment.setdefault(short_id, {})[
                             element
                         ] = float(trace.state.value)
-            if len(experiments_by_run) != 43:
+            expected_experiments = (
+                {
+                    experiment_id.rsplit("::", 1)[-1]
+                    for experiment_id in test_experiment_ids
+                }
+                if test_experiment_ids is not None
+                else set(experiments_by_run)
+            )
+            expected_count = (
+                43
+                if test_experiment_ids is None
+                else len(expected_experiments)
+            )
+            if (
+                len(experiments_by_run) != expected_count
+                or set(experiments_by_run) != expected_experiments
+            ):
                 raise ResidueInventoryRefusal(
                     "sossi_cohort_invalid",
-                    f"scorer found {len(experiments_by_run)} Sossi runs, expected 43",
+                    "scorer found "
+                    f"{len(experiments_by_run)} Sossi runs, expected "
+                    f"{expected_count}",
                 )
             source = load_yaml(
                 REPO_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
@@ -16032,21 +16102,13 @@ def _sossi_residue_prediction(
                     "sossi_experiment_missing_from_extract", ",".join(sorted(missing_runs))
                 )
             experiments = [source_experiments[key] for key in sorted(experiments_by_run)]
-            revision = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
             rows = _predict_sossi_residue_cohort(
                 experiments,
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
                 starting_trace_ppm_by_experiment=trace_ppm_by_experiment,
                 buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
-                code_revision=revision,
                 engine=engine.value,
-                selected_experiment_ids=selected_experiment_ids,
+                selected_experiment_ids=cohort_selection,
             )
             cohort = {
                 row.experiment_id: row for row in rows
@@ -16055,7 +16117,7 @@ def _sossi_residue_prediction(
                 cache,
                 _SOSSI_SOURCE_ID,
                 engine,
-                selected_experiment_ids,
+                cohort_selection,
                 value=cohort,
             )
         if "__cohort_error__" in cohort:
@@ -16220,7 +16282,6 @@ def _sossi_residue_prediction(
             lineage_complete=False,
             notices=tuple(notices),
             identity=reference.identity,
-            version=str(provenance.get("code_revision") or "unknown"),
             refusal_detail=provenance,
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
@@ -16228,7 +16289,7 @@ def _sossi_residue_prediction(
         infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
         if (
             _residue_prediction_cache_entry(
-                cache, _SOSSI_SOURCE_ID, engine, selected_experiment_ids
+                cache, _SOSSI_SOURCE_ID, engine, cohort_selection
             )
             is None
             and not infrastructure_failure
@@ -16237,7 +16298,7 @@ def _sossi_residue_prediction(
                 cache,
                 _SOSSI_SOURCE_ID,
                 engine,
-                selected_experiment_ids,
+                cohort_selection,
                 value={"__cohort_error__": str(reason)},
             )
         if infrastructure_failure:
@@ -17085,7 +17146,9 @@ def _compile_residual_with_lineage(
         and experiment is not None and experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     ):
-        prediction = _knudsen_residue_prediction(context, reference, engine)
+        prediction = _knudsen_residue_prediction(
+            context, reference, engine
+        )
     if prediction is None:
         builtin_predictor = (
             predict is _BUILTIN_SCORE_PREDICTOR
@@ -18322,491 +18385,6 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
-def _score_store_with_decisions(
-    context: ScoreContext,
-    *,
-    engines: Sequence[Engine] | None = None,
-    rail: Rail | None = None,
-    species_formulas: Sequence[str] = (),
-    work_id: str | None = None,
-    limit: int | None = None,
-    include_diagnostics: bool = True,
-    measured_only: bool = False,
-    predict: Callable[..., EnginePrediction] | None = None,
-    handles: Mapping[str, object] | None = None,
-    _stream: _ResidualJsonlStream | None = None,
-) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
-    engine_set = (
-        _validated_score_engines(tuple(engines))
-        if engines is not None
-        else SCORE_ENGINE_SET
-    )
-    provided_handles = dict(handles or {})
-    resolved_handles = dict(provided_handles)
-    refs = list(comparison_candidates(context))
-    seen = {o.observation_id for o in refs}
-    fusion_diagnostic_ids: set[str] = set()
-    if include_diagnostics:
-        for obs in diagnostic_references(context):
-            if obs.observation_id not in seen:
-                refs.append(obs)
-                seen.add(obs.observation_id)
-        for obs in context.observations.values():
-            converted = fusion_comparison_reference(obs)
-            if converted is not obs:
-                if any(
-                    _is_fusion_conversion_notice(notice) for notice in converted.notices
-                ):
-                    fusion_diagnostic_ids.add(obs.observation_id)
-                if obs.observation_id not in seen:
-                    refs.append(converted)
-                    seen.add(obs.observation_id)
-        for obs in _refusal_diagnostic_references(context):
-            if obs.observation_id not in seen:
-                refs.append(obs)
-                seen.add(obs.observation_id)
-    for obs in context.observations.values():
-        if _has_duplicate_observation_link(obs) and obs.observation_id not in seen:
-            refs.append(obs)
-            seen.add(obs.observation_id)
-    if measured_only:
-        refs = [
-            obs for obs in refs
-            if obs.evidence.class_.is_value
-            and obs.evidence.class_.value in MEASURED_EVIDENCE
-        ]
-    selected_species = set(species_formulas)
-    species_filter = (
-        (lambda observation: _matches_species_filter(observation, selected_species))
-        if selected_species
-        else None
-    )
-    if work_id or rail is not None or species_filter is not None:
-        refs = [
-            obs
-            for obs in refs
-            if _observation_matches_run_filters(
-                context,
-                obs,
-                work_id=work_id,
-                rail=rail,
-                observation_filter=species_filter,
-            )
-        ]
-    refs.sort(key=lambda o: o.observation_id)
-    if limit is not None:
-        refs = refs[: int(limit)]
-    hashimoto_experiment_ids = frozenset(
-        obs.experiment_id
-        for obs in refs
-        if obs.source_id == _HASHIMOTO_SOURCE_ID
-        and isinstance(obs.identity, Identity)
-        and quantity_token(obs.identity)
-        is Quantity.RESIDUE_COMPONENT_COMPOSITION
-    )
-    sossi_experiment_ids = frozenset(
-        obs.experiment_id.rsplit("::", 1)[-1]
-        for obs in refs
-        if obs.source_id == _SOSSI_SOURCE_ID
-        and isinstance(obs.identity, Identity)
-        and quantity_token(obs.identity)
-        is Quantity.RESIDUE_COMPONENT_COMPOSITION
-    )
-    if _stream is not None:
-        _stream.selected_reference_ids.update(obs.observation_id for obs in refs)
-        if species_formulas:
-            print(
-                f"species references selected={len(refs)} "
-                f"formulas={','.join(species_formulas)}",
-                flush=True,
-            )
-    from simulator.battery.compilation_tier import (
-        _SelectedResiduals, _compilation_engines_for_scoring,
-        _is_compilation_thermo_reference,
-        _compilation_series_point_count,
-        _iter_compilation_series_cells,
-        is_compilation_evidence,
-    )
-
-    comparison_ids = {o.observation_id for o in comparison_candidates(context)}
-    residuals: list[Residual] | None = [] if _stream is None else None
-    candidates: dict[str, Observation] = {}
-    # Snapshot. Engine candidates are returned separately and are not
-    # lineage inputs. The work-input index is this snapshot.
-    observations = dict(context.observations)
-    origins = context.origins
-    live_context = replace(context, observations=observations, origins=origins)
-    condensed_frame_diagnostics = _condensed_element_reference_table_diagnostics(
-        observations.values()
-    )
-    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
-        observations.values()
-    )
-    from simulator.battery.validate import _build_validation_indexes
-
-    validation_indexes = _build_validation_indexes(
-        context.works, observations, context.experiments
-    )
-    lineage_resolver = _ScoringLineageResolver(live_context, validation_indexes)
-    empirical_ids = comparison_ids
-    started = time.monotonic()
-    last_progress = started
-    done = 0
-
-    def report_progress_if_due() -> None:
-        nonlocal last_progress
-        now = time.monotonic()
-        if now - last_progress < 60:
-            return
-        if _stream is not None:
-            _stream.flush()
-        progress = f"score progress {done}/{total} residuals"
-        if _stream is not None:
-            progress += f" written={_stream.count}"
-        print(
-            f"{progress} {int(now - started)}s host={context.hostname}",
-            flush=True,
-        )
-        last_progress = now
-
-    total = sum(
-        _compilation_series_point_count(obs, origins.get(obs.observation_id))
-        for obs in refs
-    ) * max(len(engine_set), 1)
-    from simulator.battery.validate import _bound_work_inputs
-
-    table_index = validation_indexes.printed_thermo_index
-    ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
-        context.root
-    )
-    source_bands, _source_band_records, source_band_reasons = _source_band_catalog(
-        context, ratchet_entries
-    )
-    kems_partial_pressure_band = derive_kems_partial_pressure_band(
-        observations, context.experiments, benches=context.benches
-    )
-    residue_prediction_cache: dict[
-        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
-    ] = {}
-    try:
-        with _bound_work_inputs(
-            context.works,
-            observations,
-            context.experiments,
-            _indexes=validation_indexes,
-        ):
-            for obs in refs:
-                origin = origins.get(obs.observation_id)
-                duplicate_detail = (
-                    _duplicate_observation_refusal_detail(context, obs)
-                    if _has_duplicate_observation_link(obs)
-                    else None
-                )
-                for point in _iter_compilation_series_cells(obs, origin):
-                    point_origin = origins.get(point.observation_id, origin or "")
-                    diagnostic = (
-                        obs.observation_id not in empirical_ids
-                        or is_internal_consistency(point_origin)
-                        or is_compilation_source(point.source_id, point_origin)
-                        or is_compilation_evidence(point)
-                        or is_sf04_workbook(point)
-                    )
-                    quantity = (
-                        quantity_token(point.identity)
-                        if isinstance(point.identity, Identity)
-                        else None
-                    )
-                    compilation_thermo = _is_compilation_thermo_reference(
-                        point, point_origin
-                    )
-                    source_tier = (
-                        "compilation"
-                        if is_compilation_evidence(point)
-                        or is_compilation_source(point.source_id, point_origin)
-                        else "empirical"
-                        if obs.observation_id in comparison_ids
-                        else None
-                    )
-                    source_band = None
-                    source_band_reason = None
-                    if (
-                        source_tier is not None
-                        and not is_internal_consistency(point_origin)
-                        and not is_sf04_workbook(point)
-                    ):
-                        group_key = _source_alignment_group_key(
-                            point, tier=source_tier
-                        )
-                        if group_key is not None:
-                            source_key = _group_token(group_key)
-                            source_band = source_bands.get(source_key)
-                            source_band_reason = source_band_reasons.get(source_key)
-                    derived_band = source_band
-                    derived_band_reason = source_band_reason
-                    experiment = context.experiments.get(point.experiment_id)
-                    if (
-                        derived_band is None
-                        and quantity is Quantity.P_PARTIAL
-                        and experiment is not None
-                        and experiment.method.is_value
-                        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-                    ):
-                        derived_band = kems_partial_pressure_band
-                        derived_band_reason = None
-                    for engine in _compilation_engines_for_scoring(
-                        engine_set,
-                        point,
-                        point_origin,
-                        production_scoring=predict is None,
-                    ):
-                        lineage_id = (
-                            obs.observation_id
-                            if point.observation_id != obs.observation_id
-                            else None
-                        )
-                        diagnostic_prediction = (
-                            duplicate_detail is None
-                            and diagnostic
-                            and point.observation_id not in fusion_diagnostic_ids
-                            and predict is None
-                            and not compilation_thermo
-                        )
-                        prediction = None
-                        if diagnostic_prediction:
-                            prediction = EnginePrediction(
-                                engine=engine,
-                                channel=ENGINE_CHANNELS[engine],
-                                execution=Execution(state=ExecutionState.NOT_PROBED),
-                                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
-                                lineage_complete=False,
-                                refusal_reason=RefusalReason.UNSUPPORTED,
-                                refusal_detail={"reason": "diagnostic_population"},
-                                identity=point.identity if isinstance(point.identity, Identity) else None,
-                            )
-                        if (
-                            duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and point.source_id == _HASHIMOTO_SOURCE_ID
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
-                        ):
-                            prediction = _hashimoto_residue_prediction(
-                                context,
-                                point,
-                                engine,
-                                residue_prediction_cache,
-                                selected_experiment_ids=hashimoto_experiment_ids,
-                            )
-                        if (
-                            duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and point.source_id == _SOSSI_SOURCE_ID
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
-                        ):
-                            prediction = _sossi_residue_prediction(
-                                context,
-                                point,
-                                engine,
-                                residue_prediction_cache,
-                                selected_experiment_ids=sossi_experiment_ids,
-                            )
-                        if (
-                            duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and experiment is not None and experiment.method.is_value
-                            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-                        ):
-                            prediction = _knudsen_residue_prediction(
-                                context, point, engine, residue_prediction_cache,
-                            )
-                        if duplicate_detail is not None:
-                            prediction = EnginePrediction(
-                                engine=engine,
-                                channel=ENGINE_CHANNELS[engine],
-                                execution=Execution(
-                                    state=ExecutionState.NOT_PROBED
-                                ),
-                                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[
-                                    engine
-                                ],
-                                refusal_reason=RefusalReason.REFERENTIAL_INTEGRITY,
-                                refusal_detail=duplicate_detail,
-                                identity=(
-                                    point.identity
-                                    if isinstance(point.identity, Identity)
-                                    else None
-                                ),
-                            )
-                        intrinsic_redox_activity = _has_intrinsic_redox_activity(
-                            engine, point
-                        )
-                        residual, candidate = _compile_residual_with_lineage(
-                            point,
-                            engine,
-                            context=live_context,
-                            prediction=prediction,
-                            comparison_ids=comparison_ids,
-                            predict=predict,
-                            handles=resolved_handles,
-                            lineage_observation_id=lineage_id,
-                            table_index=table_index,
-                            derived_band=derived_band,
-                            derived_band_reason=derived_band_reason,
-                            ratchet_missing=ratchet_missing,
-                            point_observations=point_observations_by_experiment.get(
-                                point.experiment_id, ()
-                            ),
-                            condensed_frame_diagnostics=condensed_frame_diagnostics,
-                            fo2_mode=(
-                                Fo2Mode.SHARED_LADDER
-                                if intrinsic_redox_activity
-                                else None
-                            ),
-                            _source_relation_resolver=lineage_resolver,
-                            _validation_indexes=validation_indexes,
-                        )
-                        if _stream is None:
-                            assert residuals is not None
-                            residuals.append(residual)
-                        else:
-                            _stream.append(residual, candidate)
-                        if (
-                            residual.fo2_mode is Fo2Mode.SHARED_LADDER
-                            and intrinsic_redox_activity
-                            and prediction is None
-                            and predict is None
-                        ):
-                            total += 1
-                            intrinsic_residual, intrinsic_candidate = _compile_residual_with_lineage(
-                                point,
-                                engine,
-                                context=live_context,
-                                comparison_ids=comparison_ids,
-                                handles=resolved_handles,
-                                lineage_observation_id=(
-                                    obs.observation_id
-                                    if point.observation_id != obs.observation_id
-                                    else None
-                                ),
-                                table_index=table_index,
-                                derived_band=derived_band,
-                                derived_band_reason=derived_band_reason,
-                                ratchet_missing=ratchet_missing,
-                                point_observations=point_observations_by_experiment.get(
-                                    point.experiment_id, ()
-                                ),
-                                condensed_frame_diagnostics=condensed_frame_diagnostics,
-                                fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
-                                _validation_indexes=validation_indexes,
-                            )
-                            if _stream is None:
-                                assert residuals is not None
-                                residuals.append(intrinsic_residual)
-                            else:
-                                _stream.append(
-                                    intrinsic_residual,
-                                    intrinsic_candidate,
-                                )
-                            if intrinsic_candidate is not None and _stream is None:
-                                candidates[intrinsic_candidate.observation_id] = (
-                                    intrinsic_candidate
-                                )
-                        if candidate is not None and _stream is None:
-                            candidates[candidate.observation_id] = candidate
-                        done += 1
-                        report_progress_if_due()
-    finally:
-        from simulator.diagnostic_helpers.binary_pot_battery import (
-            close_battery_engine_handles,
-        )
-
-        close_battery_engine_handles(
-            resolved_handles,
-            exclude=provided_handles,
-            active_error=sys.exc_info()[1],
-        )
-
-    if _stream is not None:
-        _stream.finalize(
-            context=context,
-            engines=engine_set,
-        )
-        return (), {}, []
-
-    assert residuals is not None
-    residuals.sort(
-        key=lambda r: (
-            "" if r.rail is None else r.rail.value,
-            r.reference,
-            r.key,
-        )
-    )
-    scored = _SelectedResiduals(residuals, (obs.observation_id for obs in refs))
-    return scored, candidates, _compilation_decision_strata(scored, context)
-
-
-def _score_store_to_jsonl(
-    context: ScoreContext,
-    path: Path,
-    *,
-    root: Path | None = None,
-    engines: Sequence[Engine] | None = None,
-    rail: Rail | None = None,
-    species_formulas: Sequence[str] = (),
-    work_id: str | None = None,
-    limit: int | None = None,
-    include_diagnostics: bool = True,
-    measured_only: bool = False,
-    predict: Callable[..., EnginePrediction] | None = None,
-    handles: Mapping[str, object] | None = None,
-    compact_static_refusals: bool = False,
-) -> tuple[int, _ResidualReportMetadata]:
-    """Score directly to a sorted ``.partial`` JSONL without retaining rows."""
-
-    stream = _ResidualJsonlStream(
-        path,
-        root=root,
-        compact_static_refusals=compact_static_refusals,
-    )
-    try:
-        _score_store_with_decisions(
-            context,
-            engines=engines,
-            rail=rail,
-            species_formulas=species_formulas,
-            work_id=work_id,
-            limit=limit,
-            include_diagnostics=include_diagnostics,
-            measured_only=measured_only,
-            predict=predict,
-            handles=handles,
-            _stream=stream,
-        )
-        return stream.count, _ResidualReportMetadata(
-            family_band_values=dict(stream.band_values),
-            headline_band_values=dict(stream.headline_band_values),
-            tier_band_values=dict(stream.tier_band_values),
-            aggregate=stream.report_aggregate,
-            static_refusals=stream.static_refusals,
-            selected_reference_count=len(stream.selected_reference_ids),
-            selected_reference_ids=frozenset(stream.selected_reference_ids),
-        )
-    finally:
-        stream.close()
 
 
 def score_store(
@@ -19172,6 +18750,9 @@ class _ResidualReportMetadata:
     headline_band_values: Mapping[tuple[str, str, str], set[str]]
     tier_band_values: Mapping[tuple[str, str, str, str, str, str], set[str]]
     aggregate: _ScorePayloadAccumulator | None = None
+    engine_cache_counters: Mapping[str, Mapping[str, object]] | None = None
+    engine_cache_runtime_identities: Mapping[str, str] | None = None
+    shard_failures: tuple[Mapping[str, object], ...] = ()
     static_refusals: Sequence[Mapping[str, object]] = ()
     selected_reference_count: int = 0
     selected_reference_ids: frozenset[str] | None = None
@@ -23039,6 +22620,7 @@ def _render_score_report_from_payloads_legacy(
     studio_hostname: str | None = None,
     store_stamp: Mapping[str, object] | None = None,
     _aggregate: _ScorePayloadAccumulator | None = None,
+    shard_failures: Sequence[Mapping[str, object]] = (),
 ) -> str:
     aggregate = _aggregate or _ScorePayloadAccumulator.from_rows(
         rows, context=context, engines=engines
@@ -23063,7 +22645,7 @@ def _render_score_report_from_payloads_legacy(
             pending += 1
         elif observation.admission.status is AdmissionStatus.ADMITTED:
             admitted += 1
-    return render_legacy_score_report_markdown(
+    report = render_legacy_score_report_markdown(
         hostname=context.hostname,
         studio_hostname=studio_hostname,
         stamp=stamp,
@@ -23093,6 +22675,13 @@ def _render_score_report_from_payloads_legacy(
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
     )
+    if shard_failures:
+        report = (
+            f"{report.rstrip()}\n\n"
+            + "\n".join(_score_shard_failure_report_lines(shard_failures))
+            + "\n"
+        )
+    return report
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -23428,8 +23017,10 @@ class _ResidualJsonlStream:
         path: Path,
         *,
         root: Path | None = None,
+        sort_on_finalize: bool = True,
         compact_static_refusals: bool = False,
     ) -> None:
+        self.sort_on_finalize = sort_on_finalize
         self.partial_path = path.with_name(path.name + ".partial")
         self.root = root or REPO_ROOT
         self.compact_static_refusals = compact_static_refusals
@@ -23441,21 +23032,48 @@ class _ResidualJsonlStream:
             (dumps_store_stamp(self.store_stamp) + "\n").encode("utf-8")
         )
         self.file.flush()
-        self._temporary = tempfile.TemporaryDirectory(prefix="battery-score-index-")
-        self._database = sqlite3.connect(
-            Path(self._temporary.name) / "residual-order.sqlite"
-        )
-        self._database.execute("PRAGMA cache_size=-16384")
-        self._database.execute("PRAGMA temp_store=FILE")
-        self._database.execute("PRAGMA journal_mode=OFF")
-        self._database.execute("PRAGMA synchronous=OFF")
-        self._database.execute(
-            "CREATE TABLE residual_order ("
-            "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-            "key TEXT NOT NULL, offset INTEGER NOT NULL, band_value TEXT, "
-            "numeric_value TEXT)"
-        )
-        self._pending: list[tuple[str, str, str, int, str | None, str | None]] = []
+        self._temporary: tempfile.TemporaryDirectory | None = None
+        self._database: sqlite3.Connection | None = None
+        self._order_path: Path | None = None
+        self._order_file: TextIO | None = None
+        if sort_on_finalize:
+            self._temporary = tempfile.TemporaryDirectory(
+                prefix="battery-score-index-"
+            )
+            self._database = sqlite3.connect(
+                Path(self._temporary.name) / "residual-order.sqlite"
+            )
+            self._database.execute("PRAGMA cache_size=-16384")
+            self._database.execute("PRAGMA temp_store=FILE")
+            self._database.execute("PRAGMA journal_mode=OFF")
+            self._database.execute("PRAGMA synchronous=OFF")
+            self._database.execute(
+                "CREATE TABLE residual_order ("
+                "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
+                "key TEXT NOT NULL, offset INTEGER NOT NULL, "
+                "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
+                "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
+                "order_subrow INTEGER NOT NULL)"
+            )
+        else:
+            self._order_path = self.partial_path.with_name(
+                f"{self.partial_path.name}.order"
+            )
+            self._order_file = self._order_path.open("w", encoding="utf-8")
+        self._pending: list[
+            tuple[
+                str,
+                str,
+                str,
+                int,
+                str | None,
+                str | None,
+                str,
+                int,
+                int,
+                int,
+            ]
+        ] = []
         self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         self.headline_band_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
         self.tier_band_values: dict[
@@ -23484,32 +23102,102 @@ class _ResidualJsonlStream:
         self,
         residual: Residual,
         candidate: Observation | None,
+        *,
+        sort_order: tuple[str, int, int, int] | None = None,
     ) -> None:
         if self.compact_static_refusals:
             static_key = _static_refusal_summary_key(residual)
             if static_key is not None:
                 self.static_refusal_counts[static_key] += 1
                 return
-        offset = self.file.tell()
         line = dumps_residual_line(residual, candidate).encode("utf-8")
-        self.file.write(line + b"\n")
         numeric = residual.numeric
         decision_band = None if numeric is None else numeric.decision_band
         band_value = None if decision_band is None else str(decision_band.value)
         numeric_value = None if numeric is None else str(numeric.value)
-        self._pending.append(
-            (
-                "" if residual.rail is None else residual.rail.value,
-                residual.reference,
-                residual.key,
-                offset,
-                band_value,
-                numeric_value,
-            )
+        self._append_line(
+            line,
+            rail="" if residual.rail is None else residual.rail.value,
+            reference=residual.reference,
+            key=residual.key,
+            band_value=band_value,
+            numeric_value=numeric_value,
+            sort_order=sort_order,
         )
+
+    def append_payload_line(
+        self,
+        line: bytes,
+        *,
+        sort_order: tuple[str, int, int, int] | None = None,
+    ) -> None:
+        payload = json.loads(line)
+        if not isinstance(payload, Mapping):
+            raise ValueError("score shard row is not an object")
+        numeric = payload.get("numeric")
+        band = numeric.get("decision_band") if isinstance(numeric, Mapping) else None
+        band_value = (
+            str(band["value"])
+            if isinstance(band, Mapping) and band.get("value") is not None
+            else None
+        )
+        numeric_value = (
+            str(numeric["value"])
+            if isinstance(numeric, Mapping) and numeric.get("value") is not None
+            else None
+        )
+        self._append_line(
+            line.rstrip(b"\r\n"),
+            rail=str(payload.get("rail") or ""),
+            reference=str(payload.get("reference") or ""),
+            key=str(payload.get("key") or ""),
+            band_value=band_value,
+            numeric_value=numeric_value,
+            sort_order=sort_order,
+        )
+
+    def _append_line(
+        self,
+        line: bytes,
+        *,
+        rail: str,
+        reference: str,
+        key: str,
+        band_value: str | None,
+        numeric_value: str | None,
+        sort_order: tuple[str, int, int, int] | None,
+    ) -> None:
+        stable_order = sort_order or ("", self.count, 0, 0)
+        if not self.sort_on_finalize:
+            assert self._order_file is not None
+            # The sidecar is written first. After both flushes, each complete
+            # residual line has exactly one recoverable serial-order entry.
+            self._order_file.write(
+                json.dumps(stable_order, ensure_ascii=False, separators=(",", ":"))
+                + "\n"
+            )
+            self._order_file.flush()
+        offset = self.file.tell()
+        self.file.write(line + b"\n")
+        if self.sort_on_finalize:
+            self._pending.append(
+                (
+                    rail,
+                    reference,
+                    key,
+                    offset,
+                    band_value,
+                    numeric_value,
+                    *stable_order,
+                )
+            )
+            if len(self._pending) >= self._INDEX_BATCH:
+                self._flush_index()
+        else:
+            # Shard workers may die without running Python cleanup. A flushed
+            # line is therefore the unit recovery can safely preserve.
+            self.file.flush()
         self.count += 1
-        if len(self._pending) >= self._INDEX_BATCH:
-            self._flush_index()
         now = time.monotonic()
         if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
             self.flush()
@@ -23517,15 +23205,19 @@ class _ResidualJsonlStream:
     def _flush_index(self) -> None:
         if not self._pending:
             return
+        assert self._database is not None
         self._database.executemany(
-            "INSERT INTO residual_order (rail, reference, key, offset, band_value, "
-            "numeric_value) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO residual_order (rail, reference, key, offset, "
+            "band_value, numeric_value, order_ref, order_point, order_engine, "
+            "order_subrow) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             self._pending,
         )
         self._database.commit()
         self._pending.clear()
 
     def flush(self) -> None:
+        if self._order_file is not None:
+            self._order_file.flush()
         self.file.flush()
         self._last_flush = time.monotonic()
 
@@ -23536,10 +23228,14 @@ class _ResidualJsonlStream:
         engines: Sequence[Engine],
     ) -> None:
         self.flush()
+        if not self.sort_on_finalize:
+            return
+        assert self._database is not None
         self._flush_index()
         self._database.execute(
             "CREATE INDEX residual_order_key ON residual_order("
-            "rail COLLATE BINARY, reference COLLATE BINARY, key COLLATE BINARY, seq)"
+            "rail COLLATE BINARY, reference COLLATE BINARY, key COLLATE BINARY, "
+            "order_ref COLLATE BINARY, order_point, order_engine, order_subrow, seq)"
         )
         report_aggregate = _ScorePayloadAccumulator(
             context,
@@ -23568,7 +23264,8 @@ class _ResidualJsonlStream:
                         "SELECT offset, band_value, numeric_value "
                         "FROM residual_order "
                         "ORDER BY rail COLLATE BINARY, reference COLLATE BINARY, "
-                        "key COLLATE BINARY, seq"
+                        "key COLLATE BINARY, order_ref COLLATE BINARY, order_point, "
+                        "order_engine, order_subrow, seq"
                     )
                     for offset, band_value, numeric_value in rows:
                         source.seek(offset)
@@ -23682,8 +23379,12 @@ class _ResidualJsonlStream:
     def close(self) -> None:
         if not self.file.closed:
             self.file.close()
-        self._database.close()
-        self._temporary.cleanup()
+        if self._order_file is not None and not self._order_file.closed:
+            self._order_file.close()
+        if self._database is not None:
+            self._database.close()
+        if self._temporary is not None:
+            self._temporary.cleanup()
 
 
 def flagged_stratum_payloads(
@@ -24602,11 +24303,16 @@ def _write_headline_summary_from_accumulator_json(
     path: Path,
     *,
     store_stamp: Mapping[str, object] | None,
+    shard_failures: Sequence[Mapping[str, object]] = (),
     filters: Mapping[str, object] | None = None,
     selected_references: int | None = None,
     subset: bool = False,
 ) -> None:
     payload = aggregate.summary_payload(store_stamp)
+    if shard_failures:
+        payload["score_shard_failures"] = [
+            dict(failure) for failure in shard_failures
+        ]
     if subset:
         if filters is None or selected_references is None:
             raise ValueError("subset summaries require filters and reference count")

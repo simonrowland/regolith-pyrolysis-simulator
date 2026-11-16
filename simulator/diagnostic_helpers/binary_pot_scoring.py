@@ -29,12 +29,14 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     BinaryPot,
     BinaryPotBatteryError,
     EquilibrateCell,
+    EngineHandle,
     Po2Request,
     close_battery_engine_handles,
     _refusal_matrix,
     cell_score_authority,
     cell_score_notice_kinds,
     reclassify_projected_composition_cells,
+    _activity_reference_phase,
 )
 from simulator.diagnostic_helpers.extract_reproduction import (
     AdoptedObservation,
@@ -842,17 +844,6 @@ def _engine_activity(cell: EquilibrateCell, species: str) -> float | None:
         number = _finite_positive(value)
         if number is not None and number > 0.0:
             return number
-    return None
-
-
-def _activity_reference_phase(text: str | None) -> str | None:
-    blob = str(text or "").lower()
-    if not blob:
-        return None
-    if "(s)" in blob or "solid" in blob:
-        return "solid"
-    if "(l)" in blob or "liquid" in blob:
-        return "liquid"
     return None
 
 
