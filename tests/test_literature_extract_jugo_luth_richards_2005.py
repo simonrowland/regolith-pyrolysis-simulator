@@ -9,7 +9,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+from simulator.battery.migrate import (
+    Migrator,
+    PrintedOxygenFacts,
+    printed_oxygen_decision,
+    wt_pct_to_mole_fraction,
+)
 from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 
 
@@ -188,13 +193,72 @@ def test_isolated_migration_keeps_printed_values_conditions_and_identity_axes() 
         if row.identity.species.phase.is_unknown
     } == set()
 
-    required_conditions = {"temperature_K", "total_pressure_Pa", "composition", "fO2_control"}
-    for row in migrated.values():
+    experiments = {
+        row["experiment_id"]: row for row in document["experiments"]
+    }
+    expected_fO2 = {}
+    expected_controls = {}
+    for observation_id, source_row in _source_observations(document).items():
+        source_conditions = source_row.get("point_conditions")
+        source_control = (
+            source_conditions.get("fO2_control")
+            if isinstance(source_conditions, dict)
+            else None
+        )
+        control_state = (
+            source_control.get("state") if isinstance(source_control, dict) else None
+        )
+        raw_control = (
+            control_state.get("value") if isinstance(control_state, dict) else None
+        )
+        if not isinstance(raw_control, str) or not raw_control.startswith("DFMQ"):
+            continue
+        experiment = experiments[source_row["experiment"]]
+        temperature_K = (
+            Decimal(experiment["temperature_C_as_printed"]) + Decimal("273.15")
+        )
+        total_pressure_pa = Decimal(experiment["pressure_GPa_as_printed"]) * Decimal(
+            "1000000000"
+        )
+        decision = printed_oxygen_decision(
+            PrintedOxygenFacts(),
+            raw_item={"fO2_control": raw_control},
+            point_conditions=None,
+            scope="row",
+            run_temperature_K=temperature_K,
+            total_pressure_pa=total_pressure_pa,
+            source_id=SID,
+        )
+        assert decision is not None and decision.state.is_value
+        expected_fO2[observation_id] = decision.state.value
+        expected_controls[observation_id] = raw_control
+    assert len(expected_fO2) == 117
+
+    required_conditions = {
+        "temperature_K",
+        "total_pressure_Pa",
+        "composition",
+        "fO2_control",
+    }
+    for observation_id, row in migrated.items():
         assert row.identity.species.phase.value.value == "glass"
         assert row.identity.temperature_K.is_value
         assert row.identity.total_pressure_Pa.is_value
         assert row.identity.composition.is_value
-        assert row.identity.fO2_Pa.is_unknown
+        assert (
+            row.point_conditions["temperature_K"].state.value
+            == row.identity.temperature_K.value
+        )
+        if observation_id in expected_fO2:
+            assert row.identity.fO2_Pa.is_value
+            assert row.identity.fO2_Pa.value == expected_fO2[observation_id]
+            control = row.point_conditions["fO2_control"]
+            assert control.state.is_value
+            assert control.state.value == expected_controls[observation_id]
+            assert control.locator.page == 10
+            assert control.locator.table == "5"
+        else:
+            assert row.identity.fO2_Pa.is_unknown
         assert required_conditions <= set(row.point_conditions)
         assert row.point_conditions["temperature_K"].state.is_value
         assert row.point_conditions["total_pressure_Pa"].state.is_value
@@ -249,7 +313,9 @@ def test_isolated_migration_keeps_printed_values_conditions_and_identity_axes() 
     assert run_26_s.point_conditions["fO2_control"].locator.page == 10
     assert run_26_s.point_conditions["fO2_control"].locator.table == "5"
     assert run_26_s.point_conditions["fO2_control"].state.is_value
-    assert run_26_s.identity.fO2_Pa.is_unknown
+    assert run_26_s.identity.fO2_Pa.is_value
+    run_26_id = run_26_s.observation_id.rsplit("::", 1)[1]
+    assert run_26_s.identity.fO2_Pa.value == expected_fO2[run_26_id]
 
     # Verify the sulfur-bearing starting bulk reaches identity through the existing converter.
     printed_30a = _source_observations(document)[

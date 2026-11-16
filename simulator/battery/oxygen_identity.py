@@ -43,7 +43,7 @@ def log10_fo2_to_pa(
 
 
 _ATM_BAR = Decimal("1.01325")
-_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
+_AIR_O2_MOLE_FRACTION = Decimal("0.20946")
 
 
 def _gas_mixture_evaluation_temperature(
