@@ -13996,7 +13996,44 @@ def test_d424_every_source_reaction_carrier_uses_the_existing_supply_owner(
         )
         interval = _classify_wall_supply_interval(snapshot, species, catalog)
         evaluator = compiled.evaluator
-        if species in refused:
+        if oxygen_bar is None and species == "FeO_association_gas":
+            from simulator.optimize.physics import (
+                _catalog_activity_one_ceiling_pa,
+            )
+            from simulator.vapour_rail.wall_saturation import (
+                resolve_wall_saturation,
+            )
+
+            row = physics_module._legacy_vapour_row(catalog, species)
+            wall_pressure = resolve_wall_saturation(
+                row,
+                species_id=species,
+                T_K=temperature_K,
+            )
+            pressure_Pa, evidence = _catalog_activity_one_ceiling_pa(
+                catalog,
+                species,
+                temperature_K,
+                hour_pO2_bar=None,
+                recorded_pO2_bar=(),
+            )
+            assert wall_pressure.reaction_id == "congruent"
+            assert [(part.role, part.record_id) for part in wall_pressure.participants] == [
+                ("vapour", "Fe-021"),
+                ("product", "Fe-018"),
+            ]
+            assert all(
+                participant.authority_level == "authoritative"
+                for participant in wall_pressure.participants
+            )
+            assert pressure_Pa == pytest.approx(
+                wall_pressure.pressure_Pa, rel=1e-12, abs=0.0,
+            )
+            assert evidence == ""
+            assert interval.kind == "supply_interval_upper_bound"
+            assert interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
+            assert math.isfinite(interval.rate_kg_hr) and interval.rate_kg_hr >= 0.0
+        elif species in refused:
             assert interval.kind == "unavailable", (species, interval)
             assert interval.evidence == "no_flux_law_and_no_psat", (species, interval)
             assert interval.rate_kg_hr is None, (species, interval)

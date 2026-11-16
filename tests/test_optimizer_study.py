@@ -3855,7 +3855,23 @@ def test_parallel_composition_target_stub_study_completes(
             assert summary["wall_deposit_cumulative_kg_by_species"]["Fe"] == (
                 pytest.approx(4.238593160063097e-12, rel=1e-9)
             )
-            ungrounded_lifetime = "resinter_threshold_kg / 6.18128169176e-12"
+            # Derivation (kg/run): the direct congruent JANAF pressure for
+            # FeO(cr)=FeO(g) enters the 24-hour activity-1 Hertz-Knudsen
+            # supply integral, sum(alpha * P_eq * sqrt(M/(2*pi*R*T)) *
+            # area * 3600 * duration), giving FeO_association_gas
+            # 4.4945768446829577e-5 kg. The same integral books K
+            # (2.0788664676353697e-6), MnO_gas (6.645065401993441e-9),
+            # Na (3.616923154680258e-5), and SiO2_gas
+            # (6.489072371783856e-11) kg. They have no located refusal
+            # segments, so their sum U=8.320057641739323e-5 kg is the
+            # unlocated bound. Adding the committed Fe deposit
+            # (4.207683789812068e-12 kg) makes stage_0_to_stage_1 in the
+            # Hottest zone the governing segment. The 24-hour C3 run spans
+            # 24/35 of a campaign, so (U + Fe) / (24/35) = 0.000121334180078237
+            # kg/campaign, rendered to 12 significant digits below.
+            ungrounded_lifetime = (
+                "resinter_threshold_kg / 0.000121334180078"
+            )
             assert summary["campaigns_to_resinter"] == ungrounded_lifetime
             assert summary["campaigns_to_resinter_worst_segment"] == (
                 ungrounded_lifetime
