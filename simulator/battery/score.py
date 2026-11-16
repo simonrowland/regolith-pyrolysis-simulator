@@ -10384,10 +10384,19 @@ _ENGINE_WORKER_LIFECYCLE_FAILURES = (
     "EngineWorkerUnavailable",
     "EngineWorkerPoolLifecycleError",
 )
+_MAGEMIN_WORKER_LIFECYCLE_REASONS = frozenset({
+    "engine_crash",
+    "magemin_subprocess_slot_timeout",
+    "magemin_subprocess_slot_unavailable",
+    "magemin_aggregate_budget_timeout",
+    "magemin_engine_worker_unavailable",
+})
 
 
-def _engine_worker_lifecycle_failure(result: object) -> str | None:
-    """Return a typed worker lifecycle failure preserved by the backend."""
+def _engine_worker_lifecycle_failure(
+    result: object, *, engine: Engine
+) -> dict[str, str] | None:
+    """Return the typed worker lifecycle detail preserved by the backend."""
 
     diagnostics = getattr(result, "diagnostics", None)
     failure = (
@@ -10395,17 +10404,33 @@ def _engine_worker_lifecycle_failure(result: object) -> str | None:
         if isinstance(diagnostics, Mapping)
         else None
     )
-    if failure not in _ENGINE_WORKER_LIFECYCLE_FAILURES:
-        engine_reason = str(getattr(result, "engine_reason", None) or "")
-        failure = next(
-            (
-                name
-                for name in _ENGINE_WORKER_LIFECYCLE_FAILURES
-                if f"{name}:" in engine_reason
-            ),
-            None,
-        )
-    return failure if failure in _ENGINE_WORKER_LIFECYCLE_FAILURES else None
+    if failure in _ENGINE_WORKER_LIFECYCLE_FAILURES:
+        return {"backend_failure_exception": failure}
+
+    backend_reason = (
+        diagnostics.get("backend_status_reason")
+        if isinstance(diagnostics, Mapping)
+        else None
+    )
+    engine_reason = str(
+        backend_reason or getattr(result, "engine_reason", None) or ""
+    )
+    failure = next(
+        (
+            name
+            for name in _ENGINE_WORKER_LIFECYCLE_FAILURES
+            if f"{name}:" in engine_reason
+        ),
+        None,
+    )
+    if failure is not None:
+        return {"backend_failure_exception": failure}
+    if (
+        engine is Engine.MAGEMIN
+        and engine_reason in _MAGEMIN_WORKER_LIFECYCLE_REASONS
+    ):
+        return {"backend_status_reason": engine_reason}
+    return None
 
 
 def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
@@ -11437,14 +11462,14 @@ def _predict_phase_row(
             notices=exclusion_notices,
         )
 
-    worker_failure = _engine_worker_lifecycle_failure(result)
+    worker_failure = _engine_worker_lifecycle_failure(result, engine=engine)
     if worker_failure is not None:
         return refused(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
             {
                 "reason": f"engine_transport_error:{engine.value}",
                 "engine": engine.value,
-                "backend_failure_exception": worker_failure,
+                **worker_failure,
             },
             execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
             notices=exclusion_notices,
@@ -14507,7 +14532,7 @@ def _predict_with_engine(
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
             cell_status = str(getattr(cell, "engine_status", "") or "")
-            worker_failure = _engine_worker_lifecycle_failure(cell)
+            worker_failure = _engine_worker_lifecycle_failure(cell, engine=engine)
             if typed == REFUSAL_DIAGNOSTIC_GAP:
                 refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
                 typed_reason = REFUSAL_DIAGNOSTIC_GAP
@@ -14548,11 +14573,7 @@ def _predict_with_engine(
                     "cell_refusal_reason": typed,
                     "engine_status": cell_status,
                     "engine_reason": engine_side_reason,
-                    **(
-                        {"backend_failure_exception": worker_failure}
-                        if worker_failure is not None
-                        else {}
-                    ),
+                    **(worker_failure or {}),
                 },
                 identity=identity,
                 requested_composition=requested,

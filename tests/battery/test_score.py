@@ -16487,6 +16487,100 @@ def test_magemin_native_activity_failure_keeps_typed_cause(
     assert prediction.refusal_detail["cell_refusal_reason"] == cell_refusal
 
 
+@pytest.mark.parametrize(
+    ("backend_reason", "expected_reason"),
+    (
+        ("engine_crash", "engine_transport_error:magemin"),
+        (
+            "magemin_subprocess_slot_timeout",
+            "engine_transport_error:magemin",
+        ),
+        (
+            "magemin_subprocess_slot_unavailable",
+            "engine_transport_error:magemin",
+        ),
+        (
+            "magemin_aggregate_budget_timeout",
+            "engine_transport_error:magemin",
+        ),
+        (
+            "magemin_engine_worker_unavailable",
+            "engine_transport_error:magemin",
+        ),
+        ("magemin_subprocess_timeout", "engine_timeout"),
+    ),
+)
+def test_magemin_typed_lifecycle_reason_survives_battery_score(
+    monkeypatch: pytest.MonkeyPatch,
+    backend_reason: str,
+    expected_reason: str,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.melt_backend.base import EquilibriumResult
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        f"magemin-lifecycle-score-{backend_reason}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id=f"magemin-lifecycle-score-source-{backend_reason}",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+
+    class FailedBackend:
+        def equilibrate(self, **_kwargs):
+            return EquilibriumResult(
+                status="not_converged",
+                diagnostics={
+                    "backend_status": "not_converged",
+                    "backend_status_reason": backend_reason,
+                },
+            )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={
+            "magemin": EngineHandle(
+                "magemin", FailedBackend(), True, None, False, False
+            )
+        },
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == expected_reason
+    if expected_reason == "engine_transport_error:magemin":
+        assert prediction.refusal_detail["backend_status_reason"] == backend_reason
+
+
 def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
