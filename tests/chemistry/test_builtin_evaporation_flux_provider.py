@@ -66,6 +66,20 @@ _FLUX_TOLERANCE_REL = 1e-9
 _FLUX_TOLERANCE_ABS_KG_HR = 1e-9
 
 
+@pytest.mark.parametrize("spec", [0.3, {"form": "scalar", "value": 0.3}])
+def test_declared_alpha_without_authority_does_not_claim_measurement(spec):
+    from engines.builtin.evaporation_flux import publisher_effective_alpha
+
+    decision = publisher_effective_alpha(
+        "Na", 1723.15, {"Na": spec},
+        allow_unmeasured_alpha_fallback=True,
+        unmeasured_alpha_fallback_species_allowlist=None,
+    )
+    assert decision.alpha == 0.3
+    assert decision.policy_emits() is True
+    assert decision.evaluation["authority_status"] == "unavailable"
+
+
 def _series_resistance_reference_flux(
     sim: PyrolysisSimulator,
     vapor_pressures_Pa: dict,

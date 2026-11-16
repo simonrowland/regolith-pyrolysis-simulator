@@ -396,7 +396,7 @@ def publisher_effective_alpha(
     evaluation["authority_status"] = (
         ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
         if unmeasured or (provenance_status and not permitted)
-        else provenance_status or "measured"
+        else provenance_status or "unavailable"
     )
     return PublisherAlphaDecision(
         alpha=float(value),
