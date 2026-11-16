@@ -894,3 +894,109 @@ def test_perturbing_one_oxygen_coefficient_moves_psat() -> None:
     )
     assert moved.pressure_Pa != pytest.approx(baseline.pressure_Pa)
     assert moved.nu_O2 != pytest.approx(baseline.nu_O2)
+
+
+def _declared_janaf_wall_tables():
+    tables = set()
+    vapours = []
+    for species, row in _species_rows().items():
+        block = row.get("wall_reactions") or {}
+        reactions = block.get("reactions") or []
+        if not reactions or not all(r["vapour"].get("janaf") for r in reactions):
+            continue
+        vapours.append((species, str(reactions[0]["vapour"]["janaf"])))
+        citations = [block.get("oxygen") or {}]
+        citations.extend(c for r in reactions for c in [r["vapour"], *r["products"]])
+        for citation in citations:
+            raw = citation.get("janaf") or []
+            tables.update([raw] if isinstance(raw, str) else raw)
+    return tuple(sorted(tables)), tuple(sorted(vapours))
+
+
+_JANAF_WALL_TABLES, _JANAF_WALL_VAPOURS = _declared_janaf_wall_tables()
+
+
+def _mutated_janaf_wall_document(table_id, mutation):
+    from copy import deepcopy
+    from decimal import Decimal, InvalidOperation
+    from simulator.reference_data import janaf
+
+    document = deepcopy(janaf.load_table_document(TABLES_DIR / f"{table_id}.yaml"))
+    temperature = 1673.15
+    if mutation in {"missing_cell", "missing_row"}:
+        nodes = {}
+        for row in document["table"]["values"]:
+            try:
+                t = Decimal(str(row["temperature"]["as_published"]))
+                g = Decimal(str(row["formation_gibbs_energy"]["as_published"]))
+            except (KeyError, InvalidOperation, TypeError, ValueError):
+                continue
+            if t.is_finite() and g.is_finite():
+                nodes[t] = row
+        # A dense interior 100 K node avoids the owner's declared sparse
+        # high-temperature ladder and the 298.15--500 K reference interval.
+        candidates = [t for t in nodes if t-100 in nodes and t+100 in nodes
+                      and (t < 3000 or (t-200 in nodes and t+200 in nodes))]
+        assert candidates, table_id
+        node = min(candidates, key=lambda t: abs(t - 1700))
+        temperature = float(node - 25)
+        if mutation == "missing_row":
+            document["table"]["values"].remove(nodes[node])
+        else:
+            nodes[node]["formation_gibbs_energy"] = {"value": None, "as_published": None}
+    elif mutation == "table_id":
+        document["table"]["table_id"] = "fold265-wrong-table"
+    else:
+        assert mutation == "source_sidecar"
+        document["extraction"]["source_sha256"] = "fold265-wrong-source"
+    return document, temperature
+
+
+def _install_janaf_wall_mutation(monkeypatch, table_id, document):
+    from simulator.reference_data import janaf
+    from simulator.vapour_rail import wall_saturation as wall
+
+    original = janaf.load_table_document
+    def loader(path):
+        return document if path.stem == table_id else original(path)
+    monkeypatch.setattr(janaf, "load_table_document", loader)
+    # Also exercise the pre-fix reader in the baseline regression run.
+    if hasattr(wall, "load_table_document"):
+        monkeypatch.setattr(wall, "load_table_document", loader)
+    wall._janaf_record_data.cache_clear()
+    wall._janaf_state_for_source.cache_clear()
+    return wall
+
+
+@pytest.mark.parametrize("table_id", _JANAF_WALL_TABLES)
+@pytest.mark.parametrize("mutation", ["missing_cell", "missing_row", "table_id", "source_sidecar"])
+def test_every_declared_janaf_wall_table_uses_checked_owner(monkeypatch, table_id, mutation):
+    document, temperature = _mutated_janaf_wall_document(table_id, mutation)
+    wall = _install_janaf_wall_mutation(monkeypatch, table_id, document)
+    try:
+        with pytest.raises(WallSaturationLawRefusal) as error:
+            wall._janaf_record_state(table_id, temperature)
+        assert error.value.reason == "wall_condensation_thermo_missing"
+        assert table_id in str(error.value)
+        if mutation.startswith("missing"):
+            assert "missing grid node" in str(error.value)
+    finally:
+        wall._janaf_record_data.cache_clear()
+        wall._janaf_state_for_source.cache_clear()
+
+
+@pytest.mark.parametrize("species,table_id", _JANAF_WALL_VAPOURS)
+@pytest.mark.parametrize("mutation", ["missing_cell", "table_id", "source_sidecar"])
+def test_every_janaf_wall_resolver_propagates_checked_refusal(monkeypatch, species, table_id, mutation):
+    from copy import deepcopy
+    document, temperature = _mutated_janaf_wall_document(table_id, mutation)
+    wall = _install_janaf_wall_mutation(monkeypatch, table_id, document)
+    row = deepcopy(_species_rows()[species])
+    row["wall_reactions"]["thermo"] = "janaf"
+    try:
+        with pytest.raises(WallSaturationLawRefusal) as error:
+            resolve_wall_saturation(row, species_id=species, T_K=temperature, pO2_Pa=_PO2_PA)
+        assert error.value.reason == "wall_condensation_thermo_missing"
+    finally:
+        wall._janaf_record_data.cache_clear()
+        wall._janaf_state_for_source.cache_clear()
