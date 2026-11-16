@@ -3881,6 +3881,39 @@ def test_numeric_value_kind_plain_admission_pin(
     )
 
 
+def test_observation_plain_round_trip_preserves_production_payload() -> None:
+    observation = F.observation(
+        "perf-c-round-trip",
+        "perf-c-experiment",
+        F.psat_identity("SiO2"),
+        Decimal("-250.125"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="perf-c-source",
+    )
+    payload = to_plain(observation)
+
+    assert to_plain(observation_from_plain(payload)) == payload
+
+
+def test_observation_plain_identity_refusal_precedes_malformed_value() -> None:
+    observation = F.observation(
+        "perf-c-exception-order",
+        "perf-c-experiment",
+        F.psat_identity("SiO2"),
+        Decimal("-250.125"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="perf-c-source",
+    )
+    payload = to_plain(observation)
+    payload["identity"]["quantity"] = {"tag": "bad-state-tag", "value": "bad"}
+    payload["value"] = {"kind": "bad-value-kind"}
+
+    with pytest.raises(ValueError) as error:
+        observation_from_plain(payload)
+
+    assert str(error.value) == "'bad-state-tag' is not a valid StateTag"
+
+
 def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     values = extract["species"]["Na"]["observations"][0]["values"]

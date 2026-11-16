@@ -64,6 +64,7 @@ from simulator.battery.score import (
     _ScorePayloadAccumulator,
     _alignment_axes,
     _phase_component_reference_wt_percent,
+    _phase_mole_sibling_amounts,
     _residual_engine_observable,
     compile_residual,
     compute_metric,
@@ -2316,6 +2317,56 @@ def test_mole_fraction_without_siblings_stays_refused(
     assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
     assert prediction.refusal_detail["reason"] == "phase_mole_fraction_siblings_unavailable"
+
+
+def test_mole_sibling_rows_keep_experiment_order_and_append_reference() -> None:
+    """Foreign experiments are skipped; a missing reference stays last."""
+
+    reference_identity = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    sibling_identity = _phase_identity(
+        "CaO",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    reference = F.observation(
+        "phase-reference",
+        "phase-experiment",
+        reference_identity,
+        Decimal("0.6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="phase-source",
+    )
+    foreign = F.observation(
+        "foreign-phase-row",
+        "other-experiment",
+        reference_identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="phase-source",
+    )
+    sibling = F.observation(
+        "phase-sibling",
+        "phase-experiment",
+        sibling_identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="phase-source",
+    )
+
+    amounts, refusal = _phase_mole_sibling_amounts((foreign, sibling), reference)
+
+    assert refusal is None
+    assert amounts is not None
+    assert tuple(amounts.items()) == (
+        ("CaO", Decimal("0.4")),
+        ("SiO2", Decimal("0.6")),
+    )
 
 
 def test_duplicate_mole_fraction_component_stays_refused(
