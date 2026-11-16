@@ -519,6 +519,10 @@ class EngineCacheSchemaMismatch(RuntimeError):
         )
 
 
+class EngineCacheAliasError(ValueError):
+    """A synchronization output aliases an input or another output."""
+
+
 class EngineCacheSettingsError(ValueError):
     """Engine cache settings do not contain the normalized projection inputs."""
 
@@ -948,8 +952,7 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
     if readonly:
         if not path.exists():
             return None
-        uri = f"file:{quote(str(path), safe='/')}?mode=ro"
-        connection = sqlite3.connect(uri, uri=True, timeout=_TIMEOUT_MS / 1000, check_same_thread=False)
+        connection = sqlite3.connect(_cache_uri(path), uri=True, timeout=_TIMEOUT_MS / 1000, check_same_thread=False)
     else:
         path.parent.mkdir(parents=True, exist_ok=True)
         connection = sqlite3.connect(
@@ -1045,14 +1048,7 @@ def _insert_cache_row_if_absent(
     if row_seq is None:
         row_seq = _next_row_seq(connection, source_box)
     elif source_box in ENGINE_CACHE_BOX_RANGES:
-        first, stop = ENGINE_CACHE_BOX_RANGES[source_box]
-        if not first <= row_seq < stop:
-            raise ValueError(f"row sequence is outside the {source_box!r} range")
-        connection.execute("INSERT OR IGNORE INTO box_sequences VALUES (?,?)", (source_box, first))
-        connection.execute(
-            "UPDATE box_sequences SET next_seq=CASE WHEN next_seq<=? THEN ? ELSE next_seq END WHERE source_box=?",
-            (row_seq, row_seq + 1, source_box),
-        )
+        _advance_box_sequence(connection, source_box, row_seq)
     connection.execute(
         f"INSERT INTO {_TABLE} "
         "(key, value, engine, chem_version, source_box, row_seq, provenance_id) "
@@ -1068,6 +1064,17 @@ def _insert_cache_row_if_absent(
         ),
     )
     return True, False
+
+
+def _advance_box_sequence(connection: sqlite3.Connection, source_box: str, row_seq: int) -> None:
+    first, stop = ENGINE_CACHE_BOX_RANGES[source_box]
+    if not first <= row_seq < stop:
+        raise ValueError(f"row sequence is outside the {source_box!r} range")
+    connection.execute("INSERT OR IGNORE INTO box_sequences VALUES (?,?)", (source_box, first))
+    connection.execute(
+        "UPDATE box_sequences SET next_seq=? WHERE source_box=? AND next_seq<=?",
+        (row_seq + 1, source_box, row_seq),
+    )
 
 
 def _next_row_seq(connection: sqlite3.Connection, source_box: str) -> int:
@@ -1091,6 +1098,11 @@ def _read_provenance(connection: sqlite3.Connection, provenance_id: int) -> byte
     return bytes(row[0])
 
 
+def _initialize_cold(connection: sqlite3.Connection, schema: str = "main") -> None:
+    connection.execute(f"CREATE TABLE IF NOT EXISTS {schema}.engine_values "
+                       "(key BLOB PRIMARY KEY, value BLOB NOT NULL) WITHOUT ROWID")
+
+
 def _store_cold(path: Path, key: bytes, values: Mapping[str, Any]) -> None:
     if not values:
         return
@@ -1100,7 +1112,7 @@ def _store_cold(path: Path, key: bytes, values: Mapping[str, Any]) -> None:
     if connection is None:
         connection = sqlite3.connect(cold_path, timeout=_TIMEOUT_MS / 1000, check_same_thread=False)
         connection.execute("PRAGMA journal_mode=WAL")
-        connection.execute("CREATE TABLE IF NOT EXISTS engine_values (key BLOB PRIMARY KEY, value BLOB NOT NULL) WITHOUT ROWID")
+        _initialize_cold(connection)
         _CONNECTIONS[connection_key] = connection
     value = zlib.compress(pack(values), level=6)
     connection.execute("INSERT OR IGNORE INTO engine_values VALUES (?,?)", (key, value))
@@ -1194,11 +1206,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 source_box,
                 provenance=provenance,
             )
+            # Snapshot locks on HOT must also cover completion of its COLD data.
+            if inserted and isinstance(solved, EngineCacheValue):
+                _store_cold(path, cache_key, solved.cold)
             connection.commit()
             if inserted:
                 _record_bloom_key(connection, cache_key)
-            if inserted and isinstance(solved, EngineCacheValue):
-                _store_cold(path, cache_key, solved.cold)
             counts = _counter_bucket(engine_id)
             if inserted:
                 counts["stores"] += 1
@@ -1286,6 +1299,188 @@ def load_cache_rows(
             {engine: {"conflicts": count} for engine, count in conflicts.items()}
         )
     return inserted_count
+
+
+def _cache_pair(path: Path) -> tuple[Path, Path]:
+    return path, Path(str(path) + ".cold")
+
+
+def _refuse_cache_aliases(outputs: Iterable[Path], inputs: Iterable[Path]) -> None:
+    outputs, inputs = list(outputs), list(inputs)
+    for index, output in enumerate(outputs):
+        for other in inputs + outputs[:index]:
+            if output.resolve() == other.resolve() or (
+                output.exists() and other.exists() and output.samefile(other)
+            ):
+                raise EngineCacheAliasError(f"cache output aliases another file: {output} -> {other}")
+
+
+def _cache_uri(path: Path, mode: str = "ro") -> str:
+    return f"file:{quote(str(path.resolve()), safe='/')}?mode={mode}"
+
+
+def _check_cold_schema(connection: sqlite3.Connection) -> None:
+    expected = ["key", "value"]
+    found = [row[1] for row in connection.execute("PRAGMA cold.table_info(engine_values)")]
+    if found != expected:
+        raise EngineCacheSchemaMismatch("cold.engine_values", expected, found)
+    # The lean COLD format has always used SQLite's default namespace (0).
+    namespace = connection.execute("PRAGMA cold.user_version").fetchone()[0]
+    if namespace != 0:
+        raise EngineCacheSchemaMismatch("cold.user_version", ("0",), (str(namespace),))
+
+
+@contextmanager
+def _read_cache(path: Path):
+    with closing(sqlite3.connect(_cache_uri(path), uri=True, timeout=_TIMEOUT_MS / 1000)) as connection:
+        cold = _cache_pair(path)[1]
+        has_cold = cold.exists()
+        if has_cold:
+            connection.execute("ATTACH DATABASE ? AS cold", (_cache_uri(cold),))
+        connection.execute("BEGIN")
+        _check_cache_schema(connection)
+        # Pin both read views, including schemas needed to interpret the HOT bytes.
+        connection.execute("SELECT id,value FROM provenance LIMIT 0")
+        connection.execute("SELECT source_box,next_seq FROM box_sequences LIMIT 0")
+        if has_cold:
+            _check_cold_schema(connection)
+        yield connection, has_cold
+
+
+def _cache_space(connection: sqlite3.Connection, schema: str, table: str) -> dict[str, Any]:
+    count = connection.execute(f"SELECT count(*) FROM {schema}.{table}").fetchone()[0]
+    size = (connection.execute(f"PRAGMA {schema}.page_count").fetchone()[0]
+            * connection.execute(f"PRAGMA {schema}.page_size").fetchone()[0])
+    return {"rows": count, "database_bytes": size, "bytes_per_row": size / count if count else None}
+
+
+def engine_cache_stats(path: Path) -> dict[str, Any]:
+    """Allocated SQLite bytes, including pages currently in WAL, per stored row."""
+    with _read_cache(path) as (connection, has_cold):
+        return {
+            "file": str(path),
+            "hot": _cache_space(connection, "main", _TABLE),
+            "cold": _cache_space(connection, "cold", "engine_values") if has_cold else {
+                "rows": 0, "database_bytes": 0, "bytes_per_row": None,
+            },
+        }
+
+
+def snapshot_cache(live: Path, out: Path) -> dict[str, Any]:
+    """Back up a live HOT/COLD pair into exclusively new, standalone files."""
+    live, out = live.expanduser(), out.expanduser()
+    _refuse_cache_aliases(_cache_pair(out), _cache_pair(live))
+    for path in _cache_pair(out):
+        if path.exists() or path.is_symlink():
+            raise FileExistsError(str(path))
+    with ExitStack() as stack:
+        # Serialize with the runtime's HOT transaction while pinning both views.
+        # Release the lock before the potentially large backup; readers retain WAL snapshots.
+        with closing(sqlite3.connect(_cache_uri(live, "rw"), uri=True, timeout=_TIMEOUT_MS / 1000)) as lock:
+            lock.execute("BEGIN IMMEDIATE")
+            source, has_cold = stack.enter_context(_read_cache(live))
+            lock.rollback()
+        for name, path in (("main", out), ("cold", _cache_pair(out)[1])):
+            if name == "cold" and not has_cold:
+                continue
+            with path.open("xb"):
+                pass
+            with closing(sqlite3.connect(path)) as destination:
+                source.backup(destination, name=name)
+                destination.execute("PRAGMA journal_mode=DELETE")
+        if _cache_pair(out)[1].exists():
+            with closing(sqlite3.connect(_cache_pair(out)[1])) as cold:
+                cold.execute("ATTACH DATABASE ? AS hot", (_cache_uri(out),))
+                # A failed live solve may have committed COLD before rolling back HOT.
+                cold.execute("DELETE FROM engine_values WHERE NOT EXISTS ("
+                             "SELECT 1 FROM hot.engine_outputs h WHERE h.key=engine_values.key)")
+                cold.commit()
+    return engine_cache_stats(out)
+
+
+def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -> dict[str, Any]:
+    """Accumulate new per-box sequences without replacing a natural-key value."""
+    into = into.expanduser()
+    inputs = [path.expanduser() for path in inputs]
+    report_path = Path(str(into) + ".conflicts.jsonl")
+    _refuse_cache_aliases((*_cache_pair(into), report_path),
+                         [part for path in inputs for part in _cache_pair(path)])
+    counts = dict.fromkeys(("read", "inserted", "already_present", "conflicts"), 0)
+    with ExitStack() as stack:
+        # All inputs are validated before creating a master or a conflict report.
+        sources = [stack.enter_context(_read_cache(path)) for path in inputs]
+        into.parent.mkdir(parents=True, exist_ok=True)
+        destination = stack.enter_context(closing(sqlite3.connect(into, timeout=_TIMEOUT_MS / 1000, uri=True)))
+        _check_cache_schema(destination, allow_empty=True)
+        cold_path = _cache_pair(into)[1]
+        cold_exists = cold_path.exists()
+        destination.execute("ATTACH DATABASE ? AS cold", (str(cold_path),))
+        if cold_exists:
+            _check_cold_schema(destination)
+        _initialize_cache(destination)
+        destination.execute("PRAGMA journal_mode=WAL")
+        destination.execute("PRAGMA cold.journal_mode=WAL")
+        _initialize_cold(destination, "cold")
+        destination.execute("CREATE TABLE IF NOT EXISTS sync_watermarks "
+                            "(source_box TEXT PRIMARY KEY, row_seq INTEGER NOT NULL) WITHOUT ROWID")
+        destination.commit()
+        report = stack.enter_context(report_path.open("a", encoding="utf-8"))
+        destination.execute("BEGIN IMMEDIATE")
+        try:
+            for source, has_cold in sources:
+                for box, next_seq in source.execute("SELECT source_box,next_seq FROM box_sequences"):
+                    if box not in ENGINE_CACHE_BOX_RANGES:
+                        raise ValueError(f"unknown cache source box {box!r}")
+                    watermark = destination.execute(
+                        "SELECT row_seq FROM sync_watermarks WHERE source_box=?", (box,),
+                    ).fetchone()
+                    last = watermark[0] if watermark else 0
+                    cursor = source.execute(
+                        "SELECT e.key,e.value,e.engine,e.chem_version,e.row_seq,COALESCE(p.value,X'') "
+                        "FROM engine_outputs e LEFT JOIN provenance p ON p.id=e.provenance_id "
+                        "WHERE e.source_box=? AND e.row_seq>? ORDER BY e.row_seq", (box, last),
+                    )
+                    for key, value, engine, version, seq, provenance in cursor:
+                        counts["read"] += 1
+                        incoming_cold = source.execute(
+                            "SELECT value FROM cold.engine_values WHERE key=?", (key,),
+                        ).fetchone() if has_cold else None
+                        kept_cold = destination.execute("SELECT value FROM cold.engine_values WHERE key=?", (key,)).fetchone()
+                        inserted, conflict = _insert_cache_row_if_absent(
+                            destination, key, value, engine, version, box, seq, provenance=provenance,
+                        )
+                        conflict = conflict or bool(incoming_cold and kept_cold and incoming_cold != kept_cold)
+                        counts["inserted"] += int(inserted)
+                        counts["conflicts"] += int(conflict)
+                        counts["already_present"] += int(not inserted and not conflict)
+                        if conflict:
+                            kept_box, kept_seq = destination.execute(
+                                "SELECT source_box,row_seq FROM engine_outputs WHERE key=?", (key,),
+                            ).fetchone()
+                            report.write(json.dumps({
+                                "key": key.hex(), "master": {"source_box": kept_box, "row_seq": kept_seq},
+                                "input": {"source_box": box, "row_seq": seq},
+                            }, sort_keys=True) + "\n")
+                        elif incoming_cold:
+                            destination.execute("INSERT OR IGNORE INTO cold.engine_values VALUES (?,?)", (key, incoming_cold[0]))
+                        last = seq
+                    if last > (watermark[0] if watermark else 0):
+                        destination.execute(
+                            "INSERT INTO sync_watermarks VALUES (?,?) ON CONFLICT(source_box) "
+                            "DO UPDATE SET row_seq=excluded.row_seq", (box, last),
+                        )
+                    # Seeded boxes must never reuse sequences, including deduplicated rows.
+                    if next_seq > ENGINE_CACHE_BOX_RANGES[box][0]:
+                        _advance_box_sequence(destination, box, next_seq - 1)
+            report.flush()
+            destination.commit()
+        except Exception:
+            destination.rollback()
+            raise
+        if vacuum:
+            destination.execute("VACUUM main")
+            destination.execute("VACUUM cold")
+    return {**counts, **engine_cache_stats(into), "conflict_report": str(report_path), "vacuumed": vacuum}
 
 
 def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
