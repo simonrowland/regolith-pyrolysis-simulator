@@ -70,7 +70,7 @@ from simulator.diagnostics import (
     wall_deposit_remobilization_by_segment_species,
     wall_deposit_sticking_authority_status,
 )
-from simulator.state import UPSTREAM_WALL_DEPOSIT_SEGMENT
+from simulator.state import PIPE_SEGMENT_NAMES
 from simulator.trace import _priced_wall_deposit_kg, wall_deposit_kg_by_zone_species
 from simulator.optimize.backend_status import (
     backend_statuses_from_carrier as _backend_statuses_from_carrier,
@@ -84,6 +84,7 @@ from simulator.optimize.backend_status import (
 _MISSING = object()
 BELOW_WALL_SUPPLY_UPPER_BOUND = "below_wall_supply_upper_bound"
 WALL_DEPOSIT_UPPER_BOUND_USED = "wall_deposit_upper_bound_used"
+UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT = "unlocated_supply_bound_worst_segment"
 WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN = (
     "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
 )
@@ -5522,6 +5523,10 @@ def _wall_supply_booking_fields(booked: Mapping[str, Any]) -> dict[str, Any]:
     fields: dict[str, Any] = {}
     notice_authority = booked.get("notice_authority")
     if isinstance(notice_authority, MappingABC):
+        if UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT in notice_authority:
+            fields[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] = notice_authority[
+                UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT
+            ]
         upper_bounds = notice_authority.get(
             WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN
         )
@@ -5571,7 +5576,7 @@ def _refusal_candidate_segments(
         by_segment = records.get(species)
         if isinstance(by_segment, Mapping) and by_segment:
             return tuple(sorted(str(segment) for segment in by_segment))
-    return (UPSTREAM_WALL_DEPOSIT_SEGMENT,)
+    return ()
 
 
 def _refusal_reason(
@@ -5628,11 +5633,13 @@ def _assign_refused_supplies_at_binding_load(
     existing_loads: Mapping[str, float],
     supplies: Mapping[str, float],
     eligible: Mapping[str, Sequence[str]],
+    *,
+    unlocated_segments: Sequence[str] = PIPE_SEGMENT_NAMES,
 ) -> dict[str, Any]:
-    """Place every refused supply on its best closed-form segment.
+    """Place located supplies and bound unlocated supplies over possible walls.
 
     Invariant, independent of species order. Each supply is booked
-    wholly on one eligible segment:
+    wholly on one eligible segment when eligibility is evidenced:
 
         chosen(i) = argmax over s eligible for i of closed_form(s)
         tie-break: smaller segment id
@@ -5669,9 +5676,12 @@ def _assign_refused_supplies_at_binding_load(
     best closed-form segment is B. Booking A, the smaller id, leaves B
     at its existing 3 kg.
 
-    The returned per-segment loads are the loads after this assignment.
+    An empty eligible set provides no location evidence. Its full supply
+    is a separate alternative bound on every declared wall (or the explicit
+    laboratory surfaces), never an entry in ``segment_by_species`` or the
+    booked loads. The returned per-segment loads contain only located mass.
     ``binding_segment`` is s*. ``closed_form_kg`` is the per-segment
-    closed form, including segments that receive no supply.
+    closed form, including the unlocated bound and walls receiving no booking.
     """
 
     closed_form: dict[str, float] = {
@@ -5688,18 +5698,30 @@ def _assign_refused_supplies_at_binding_load(
                 if str(segment)
             )
         )
-        if not candidates:
-            candidates = (UPSTREAM_WALL_DEPOSIT_SEGMENT,)
         normalized[species] = candidates
         for segment in candidates:
             closed_form.setdefault(segment, float(existing_loads.get(segment, 0.0)))
+    unlocated_supply = {
+        species: float(supplies[species])
+        for species, candidates in normalized.items()
+        if not candidates
+    }
+    unlocated_bound = sum(unlocated_supply.values())
+    if unlocated_supply:
+        for segment in unlocated_segments:
+            closed_form.setdefault(str(segment), 0.0)
+    # d-430: if u_s is the unknown kg landing on wall s, 0 <= u_s <= U,
+    # where U is the full unlocated supply bound. Thus L_s + u_s <= L_s + U
+    # and max_s(L_s + U) bounds any wall's load. These are ALTERNATIVES,
+    # never booked mass on every wall. Units: kg + kg = kg. U=0 leaves the
+    # load unchanged; with one segment the bound is exact at full supply.
     for segment in tuple(closed_form):
         extra = sum(
             float(supplies[species])
             for species, candidates in normalized.items()
             if segment in candidates
         )
-        closed_form[segment] = float(existing_loads.get(segment, 0.0)) + extra
+        closed_form[segment] = float(existing_loads.get(segment, 0.0)) + extra + unlocated_bound
 
     def best_segment(candidates: Sequence[str]) -> str:
         # One rank for s* and for every species. The smaller segment id
@@ -5713,6 +5735,7 @@ def _assign_refused_supplies_at_binding_load(
     segment_by_species = {
         species: best_segment(candidates)
         for species, candidates in normalized.items()
+        if candidates
     }
     segment_loads: dict[str, float] = {
         str(segment): float(load)
@@ -5729,6 +5752,7 @@ def _assign_refused_supplies_at_binding_load(
         "segment_loads_kg": segment_loads,
         "closed_form_kg": closed_form,
         "worst_max_load_kg": closed_form[binding_segment],
+        "unlocated_supply_kg_by_species": unlocated_supply,
     }
 
 
@@ -5767,8 +5791,9 @@ def _book_wall_deposits_at_vapour_supply(
       so a measurement above the supply cannot stay priced.
       ``deposit_wall,i`` is 0, which is <= ``supply_i``.
     - Supply above that resolution: the priced aggregate equals the
-      supply, once (``wall_deposit_upper_bound_used``), on exactly one
-      eligible segment. Partial measurements of that species are removed
+      supply, once (``wall_deposit_upper_bound_used``). With eligibility it
+      occupies one segment; without it the separate worst-segment bound
+      carries the mass. Partial measurements of that species are removed
       first. ``deposit_wall,i == supply_i``.
 
     Booked masses stay in kg/run here. The per-campaign authority is
@@ -5782,17 +5807,14 @@ def _book_wall_deposits_at_vapour_supply(
     species order. ``binding_segment`` is the argmax s* of that closed
     form. Each species, including one that cannot use s*, is booked on
     its own argmax of that same closed form. ``segment_loads_kg`` is the
-    load on each segment after every non-negligible supply has been
-    placed. ``worst_max_load_kg`` is that maximum.
+    located load on each segment. ``worst_max_load_kg`` includes the full
+    unlocated bound as an alternative on every declared segment.
 
     The refusal stays on the notice authority in every branch.
     """
 
     notice_authority = _plain_payload(authority)
-    refused = tuple(sorted(
-        set(_coating_wall_refused_species(notice_authority))
-        | set(notice_authority.get("refused_carrier_species") or ())
-    ))
+    refused = _coating_wall_refused_species(notice_authority)
     if not refused or run_execution is None:
         return {
             "deposit": wall_deposit,
@@ -5896,6 +5918,7 @@ def _book_wall_deposits_at_vapour_supply(
         species for species, _supply, _candidates, booked_kg in classified
         if booked_kg > 0.0
     }
+    model = getattr(getattr(run_execution, "simulator", None), "condensation_model", None)
     assignment: dict[str, Any] | None = None
     if upper_species:
         assignment = _assign_refused_supplies_at_binding_load(
@@ -5910,7 +5933,26 @@ def _book_wall_deposits_at_vapour_supply(
                 for species, _supply, candidates, booked_kg in classified
                 if booked_kg > 0.0
             },
+            unlocated_segments=(
+                tuple(segment.name for segment in model.pipe_segments)
+                if getattr(model, "lab_geometry", None) is not None
+                else PIPE_SEGMENT_NAMES
+            ),
         )
+        unlocated = assignment["unlocated_supply_kg_by_species"]
+        if unlocated:
+            segment = assignment["binding_segment"]
+            zones = _coating_zone_by_segment(run_execution)
+            if zones is None or segment not in zones:
+                raise ObjectiveComputationError(f"missing wall zone for segment {segment}")
+            notice_authority[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] = {
+                "bound_kg": sum(unlocated.values()),
+                "supply_kg_by_species": unlocated,
+                "governing_segment": segment,
+                "governing_zone": zones[segment],
+                "potential_load_kg": assignment["worst_max_load_kg"],
+                "campaigns_elapsed": window_campaigns_elapsed,
+            }
     placements = (
         {}
         if assignment is None
@@ -5921,7 +5963,7 @@ def _book_wall_deposits_at_vapour_supply(
             refusal_reason = _refusal_reason(
                 notice_authority,
                 species,
-                candidates[0],
+                candidates[0] if candidates else "",
             )
             bookings.append({
                 "species": species,
@@ -5936,15 +5978,13 @@ def _book_wall_deposits_at_vapour_supply(
         # d-376 amendment 1 wall-deposit ruling: the scored mass is the
         # supply bound. A partial deposit kept in another segment is the
         # same vapour, so the aggregate is the supply and not
-        # measured + supply. The kilogram goes on the closed-form segment.
-        segment = str(placements[species])
-        refusal_reason = _refusal_reason(notice_authority, species, segment)
-        _replace_species_deposit_with_supply(
-            booked_deposit,
-            species,
-            segment,
-            booked_kg,
-        )
+        # measured + supply. Unlocated kilograms stay outside the segment map.
+        segment = placements.get(species)
+        refusal_reason = _refusal_reason(notice_authority, species, segment or "")
+        if segment is None:
+            _drop_species_wall_deposit(booked_deposit, species)
+        else:
+            _replace_species_deposit_with_supply(booked_deposit, species, segment, booked_kg)
         bookings.append({
             "species": species,
             "reason": WALL_DEPOSIT_UPPER_BOUND_USED,
@@ -6045,8 +6085,11 @@ def _coating_lifetime_projection(
         if sum(species_kg.values()) > 0.0
     ]
     by_species = _wall_deposit_by_species_summary(
-        wall_deposit_by_segment_species
+        wall_deposit_by_segment_species, authority=authority,
     )
+    unlocated = (authority or {}).get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
+    if unlocated:
+        segment_loads.append(float(unlocated["potential_load_kg"]) / elapsed)
     aggregate_load = sum(by_species.values()) / elapsed
     if not segment_loads:
         campaigns_to_resinter: float | str = "infinite"
@@ -6072,7 +6115,7 @@ def _coating_lifetime_projection(
     lifetime = campaigns_to_resinter
     has_positive_fouling: bool | None = _has_positive_wall_deposit(
         wall_deposit_by_segment_species
-    )
+    ) or bool(unlocated and unlocated["bound_kg"] > 0.0)
     availability = wall_deposit_figure_availability(
         has_positive_deposit=has_positive_fouling,
         authority=authority,
@@ -6158,6 +6201,8 @@ def _campaigns_elapsed(run_execution: Any) -> float:
 
 def _wall_deposit_by_species_summary(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    *,
+    authority: Mapping[str, Any] | None = None,
 ) -> Mapping[str, float]:
     by_species: dict[str, float] = {}
     for key, kg in wall_deposit_by_segment_species.items():
@@ -6172,6 +6217,10 @@ def _wall_deposit_by_species_summary(
         priced = _priced_wall_deposit_kg(amount)
         if priced is not None:
             by_species[species] = by_species.get(species, 0.0) + priced
+    unlocated = (authority or {}).get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
+    if unlocated:
+        for species, kg in unlocated["supply_kg_by_species"].items():
+            by_species[species] = by_species.get(species, 0.0) + float(kg)
     return MappingProxyType(dict(sorted(by_species.items())))
 
 
@@ -6227,7 +6276,7 @@ def _furnace_lifespan_cost_summary_from_raw(
     if elapsed <= 0.0:
         raise ObjectiveComputationError("campaigns_elapsed must be positive")
     cumulative_by_species = _wall_deposit_by_species_summary(
-        wall_deposit_by_segment_species
+        wall_deposit_by_segment_species, authority=authority,
     )
     cumulative_total_wall_load_kg = sum(cumulative_by_species.values())
     by_species = MappingProxyType({
@@ -6283,7 +6332,11 @@ def _furnace_lifespan_cost_summary_from_raw(
         return MappingProxyType(summary)
     if threshold is None:
         return MappingProxyType(summary)
-    summary["furnace_lifespan_consumed_fraction"] = total_wall_load_kg / threshold
+    unlocated = (authority or {}).get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
+    controlling_load = (
+        float(unlocated["potential_load_kg"]) / elapsed if unlocated else total_wall_load_kg
+    )
+    summary["furnace_lifespan_consumed_fraction"] = controlling_load / threshold
     summary["lifespan_cost_status"] = "available"
     summary["lifespan_cost_status_reason"] = ""
     return MappingProxyType(summary)

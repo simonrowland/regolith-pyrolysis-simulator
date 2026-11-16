@@ -13632,7 +13632,9 @@ def test_source_carrier_refusal_requires_a_complete_supply_booking(
     monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
     snapshot = _activity_one_refusal_snapshot(species, hour=1, pressure_pa=pressure_pa)
     execution = _refused_supply_execution((snapshot,), ())
-    execution.trace.wall_zone_by_segment = {"upstream": "Hot"}
+    execution.trace.wall_zone_by_segment = {
+        segment: "Hot" for segment in objective_module.PIPE_SEGMENT_NAMES
+    }
     execution.trace.wall_deposit_sticking_authority = {
         "vapour_carrier_authority_by_species": {
             species: snapshot.evap_flux.carrier_authority_by_species[species],
@@ -13646,6 +13648,7 @@ def test_source_carrier_refusal_requires_a_complete_supply_booking(
     assert not authority.get("wall_saturation_pressure_refused_species")
     if pressure_pa is None:
         assert not summary.get("wall_supply_bound_bookings")
+        assert objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT not in summary
         assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
         assert summary["wall_deposit_total_kg"] is None
         assert species in summary["wall_deposit_refusal"]["authority"]["refused_carrier_species"]
@@ -13659,6 +13662,93 @@ def test_source_carrier_refusal_requires_a_complete_supply_booking(
         assert summary["wall_deposit_total_kg"] == pytest.approx(bound[species])
         assert summary["lifespan_cost_status"] == "threshold_unavailable"
         assert "wall_deposit_refusal" not in summary
+        assert not summary["wall_deposit_kg_by_segment_species"]
+        if booking["deposit_kg"] > 0.0:
+            flag = summary[objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT]
+            assert flag["bound_kg"] == pytest.approx(bound[species])
+            assert flag["governing_segment"] in objective_module.PIPE_SEGMENT_NAMES
+            assert flag["governing_zone"] == execution.trace.wall_zone_by_segment[flag["governing_segment"]]
+
+
+@pytest.mark.parametrize("campaigns_elapsed", [1.0, 2.0])
+def test_unlocated_supply_bounds_the_worst_physical_wall_without_booking_zones(
+    monkeypatch, campaigns_elapsed,
+) -> None:
+    from simulator.condensation_routing import pipe_segment_name
+
+    threshold_kg = 4.0
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: threshold_kg)
+    species, bound_kg, retained_kg, other_kg = "CrO2", 0.25, 1.0, 0.1
+    snapshot = _activity_one_refusal_snapshot(species, hour=1)
+    baseline = _optimizer_refused_flux_bounds((snapshot,), (species,), campaigns_elapsed=1.0)
+    snapshot.duration_h = bound_kg / baseline[species]
+    execution = _refused_supply_execution((snapshot,), ())
+    execution.campaigns_elapsed = campaigns_elapsed
+    duct, cooler = pipe_segment_name(0, 1), pipe_segment_name(1, 2)
+    deposit = {(duct, "Fe"): retained_kg, (cooler, "Fe"): other_kg}
+    execution.trace.wall_deposit_by_segment_species_kg = deposit
+    execution.trace.wall_zone_by_segment = {
+        segment: "Hot" for segment in objective_module.PIPE_SEGMENT_NAMES
+    }
+    execution.trace.wall_zone_by_segment.update({duct: "Hottest", cooler: "Rest"})
+    execution.trace.wall_deposit_sticking_authority = {
+        "vapour_carrier_authority_by_species": {
+            species: snapshot.evap_flux.carrier_authority_by_species[species],
+        },
+    }
+    summary = objective_module._coating_product_summary(execution)
+    flag_key = objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT
+    flag = summary[flag_key]
+    potential_kg = retained_kg + bound_kg
+    assert flag["bound_kg"] == pytest.approx(bound_kg)
+    assert flag["governing_segment"] == duct
+    assert flag["governing_zone"] == execution.trace.wall_zone_by_segment[duct]
+    assert flag["potential_load_kg"] == pytest.approx(potential_kg)
+    assert summary["wall_deposit_kg_by_segment_species"] == {
+        duct: {"Fe": retained_kg}, cooler: {"Fe": other_kg},
+    }
+    zones = summary["wall_deposit_kg_by_zone_species"]
+    assert zones["Hottest"] == {"Fe": retained_kg}
+    assert zones["Rest"] == {"Fe": other_kg}
+    assert all(species not in by_species for by_species in zones.values())
+    assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
+        retained_kg + other_kg + bound_kg
+    )
+    assert summary["campaigns_to_resinter"] == pytest.approx(
+        threshold_kg / (potential_kg / campaigns_elapsed)
+    )
+    assert summary["campaigns_to_resinter_worst_segment"] == summary["campaigns_to_resinter"]
+    assert summary["furnace_lifespan_consumed_fraction"] == pytest.approx(
+        1.0 / summary["campaigns_to_resinter"]
+    )
+
+    # Exercise the real gate handoff: its margin uses the same alternative,
+    # rather than the sum of the two walls or a duplicated bound per zone.
+    constraints = physics_module.PhysicsConstraintSet(active_gates=("coating",))
+    overlay = _trace_with_optimizer_coating_report(execution, constraints)
+    margin = constraints.coating(overlay)
+    assert margin.status_payload[flag_key] == flag
+    assert margin.status_payload["upstream_wall_deposit_upper_bound_kg_per_campaign"] == pytest.approx(
+        potential_kg / campaigns_elapsed
+    )
+    assert any(item["reason"] == flag_key for item in margin.status_payload["coating_warning_flags"])
+
+
+def test_unlocated_bound_closed_form_limits_and_declared_universe() -> None:
+    segments = objective_module.PIPE_SEGMENT_NAMES
+    existing = {segments[0]: 1.0}
+    zero = objective_module._assign_refused_supplies_at_binding_load(
+        existing, {"CrO2": 0.0}, {},
+    )
+    assert set(zero["closed_form_kg"]) == set(segments)
+    assert zero["worst_max_load_kg"] == max(existing.values())
+    bound = 0.25
+    one = objective_module._assign_refused_supplies_at_binding_load(
+        existing, {"CrO2": bound}, {}, unlocated_segments=(segments[0],),
+    )
+    assert one["worst_max_load_kg"] == existing[segments[0]] + bound
+    assert one["segment_loads_kg"] == existing
+    assert one["segment_by_species"] == {}
 
 
 @pytest.fixture(scope="module")

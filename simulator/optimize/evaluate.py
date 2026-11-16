@@ -98,6 +98,11 @@ from simulator.optimize.objective import (
     ObjectiveProfileError,
     ObjectiveVector,
     _campaigns_elapsed,
+    _book_wall_deposits_at_vapour_supply,
+    _coating_authority_status,
+    _coating_lifetime_projection,
+    _wall_supply_booking_fields,
+    UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT,
     _merged_run_for_fidelity,
     admit_executed_objective_weight,
     composition_target_eval_metadata,
@@ -1883,7 +1888,7 @@ def _trace_with_optimizer_coating_report(
         by_species[str(key[1])] = by_species.get(str(key[1]), 0.0) + normalized_kg
     charge_mass_kg = _optimizer_feedstock_charge_mass(run_execution, spec)
     wall_authority = getattr(trace, "wall_deposit_sticking_authority", {}) or {}
-    refusal_sources = [wall_authority]
+    refusal_sources = [_coating_authority_status(raw_deposit, run_execution)]
     if isinstance(wall_authority, MappingABC):
         nested_authority = wall_authority.get("sticking_alpha_authority")
         if isinstance(nested_authority, MappingABC):
@@ -2060,6 +2065,23 @@ def _trace_with_optimizer_coating_report(
             status="warning",
             verdict="non-authoritative",
         )
+    booked = _book_wall_deposits_at_vapour_supply(
+        raw_deposit,
+        refusal_sources[0],
+        run_execution,
+        campaigns_elapsed=campaigns_elapsed,
+    )
+    booking_fields = _wall_supply_booking_fields(booked)
+    if UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT in booking_fields:
+        lifetime = _coating_lifetime_projection(
+            booked["deposit"],
+            campaigns_elapsed=campaigns_elapsed,
+            authority=booked["availability_authority"],
+        )
+        report.update(booking_fields)
+        report["campaigns_to_resinter_worst_segment"] = lifetime[
+            "campaigns_to_resinter_worst_segment"
+        ]
     return _TraceAttributeOverlay(trace, {"wall_fouling_report": report})
 
 

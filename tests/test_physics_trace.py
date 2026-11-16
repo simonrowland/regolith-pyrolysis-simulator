@@ -23,7 +23,8 @@ from simulator.optimize.objective import (
     _assign_refused_supplies_at_binding_load,
     _refusal_candidate_segments,
 )
-from simulator.state import EvaporationFlux, MOLAR_MASS
+from simulator.state import EvaporationFlux, MOLAR_MASS, PIPE_SEGMENT_NAMES
+from simulator.condensation_routing import STAGE3_BYPASS_SEGMENT_NAME, pipe_segment_name
 from simulator.trace import (
     PhysicsTrace,
     WALL_DEPOSIT_ZONE_NAMES,
@@ -192,47 +193,54 @@ def test_snapshot_deltas_sum_to_cumulative_trace_totals():
             key, 0.0) == pytest.approx(kg, abs=1e-9)
 
 
-def test_wall_zone_map_covers_bookable_segments_and_upstream_deposit():
+@pytest.mark.parametrize("route", ["through", "divert"])
+def test_wall_zone_map_covers_every_declared_wall_and_booking_candidate(route):
     sim = _representative_sim(hours=0)
-    segments = tuple(sim.condensation_model.pipe_segments)
-    declared_segments = {segment.name for segment in segments}
-    upstream_geometry = next(
-        segment
-        for segment in segments
-        if segment.upstream_stage == "stage_0"
-        and segment.downstream_stage == "stage_1"
-    )
+    model = sim.condensation_model
+    model.train.collection_route["stage3_route"] = route
+    model.configure_operating_conditions()
+    active = {segment.name for segment in model.active_pipe_segments}
+    declared_segments = set(PIPE_SEGMENT_NAMES)
+    assert active <= declared_segments
+    assert (STAGE3_BYPASS_SEGMENT_NAME in active) == (route == "divert")
+    assert all(segment.length_m > 0 for segment in model.active_pipe_segments)
     refusal_authority = {
         "wall_saturation_pressure_refusals_by_species": {
             "Fe": {segment: {} for segment in declared_segments},
         },
     }
     candidate_segments = _refusal_candidate_segments(refusal_authority, "Fe")
-    fallback_segments = _refusal_candidate_segments({}, "Fe")
-    assignment = _assign_refused_supplies_at_binding_load(
-        {}, {"Fe": 0.25}, {}
-    )
-    booked_segment = assignment["segment_by_species"]["Fe"]
-    bookable_segments = (
-        declared_segments
-        | set(candidate_segments)
-        | set(fallback_segments)
-        | {booked_segment}
-    )
     zone_by_segment = PhysicsTrace.from_simulator(sim).wall_zone_by_segment
-
-    assert bookable_segments <= zone_by_segment.keys()
+    assert set(candidate_segments) == declared_segments == zone_by_segment.keys()
+    assert _refusal_candidate_segments({}, "Fe") == ()
     assert all(zone in WALL_DEPOSIT_ZONE_NAMES for zone in zone_by_segment.values())
-    assert booked_segment == fallback_segments[0]
-    assert zone_by_segment[booked_segment] == zone_by_segment[
-        upstream_geometry.name
-    ]
+    for segment in PIPE_SEGMENT_NAMES:
+        assignment = _assign_refused_supplies_at_binding_load(
+            {}, {"Fe": 0.25}, {"Fe": (segment,)},
+        )
+        assert assignment["segment_by_species"] == {"Fe": segment}
+        booked_by_zone = wall_deposit_kg_by_zone_species(
+            {(segment, "Fe"): 0.25}, zone_by_segment,
+        )
+        assert booked_by_zone[zone_by_segment[segment]]["Fe"] == 0.25
 
-    booked_by_zone = wall_deposit_kg_by_zone_species(
-        {(booked_segment, "Fe"): 0.25},
-        zone_by_segment,
+
+def test_cooler_stage_zero_duct_uses_its_own_temperature_zone():
+    sim = _representative_sim(hours=0)
+    model = sim.condensation_model
+    duct = pipe_segment_name(0, 1)
+    other_temperatures = [
+        segment.wall_temperature_C for segment in model.pipe_segments
+        if segment.name != duct
+    ] + [model.stage3_bypass["wall_temperature_C"]]
+    model.operating_history.clear()
+    model.configure_operating_conditions(
+        pipe_segment_temperatures_C={duct: min(other_temperatures) - 1.0},
     )
-    assert booked_by_zone[zone_by_segment[upstream_geometry.name]]["Fe"] == 0.25
+    zones = PhysicsTrace.from_simulator(sim).wall_zone_by_segment
+    assert zones[duct] == "Rest"
+    assert any(zone == "Hottest" for zone in zones.values())
+    assert "upstream" not in zones
 
 
 def test_snapshot_o2_delta_cannot_overwrite_terminal_oxygen_trace_total():

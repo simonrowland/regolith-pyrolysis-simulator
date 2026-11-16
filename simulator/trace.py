@@ -16,7 +16,6 @@ from simulator.accounting.yield_disposition import (
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.state import (
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
-    WALL_DEPOSIT_SEGMENT_GEOMETRY_ALIASES,
     HourSnapshot,
 )
 
@@ -287,11 +286,15 @@ def wall_zone_by_segment(sim: Any) -> dict[str, str]:
             continue
         if math.isfinite(temperature):
             temperatures[name] = temperature
-    zones = bucket_wall_segments_by_temperature(temperatures)
-    for deposit_segment, geometry_segment in WALL_DEPOSIT_SEGMENT_GEOMETRY_ALIASES:
-        if geometry_segment in zones:
-            zones[deposit_segment] = zones[geometry_segment]
-    return zones
+    # An isolated bypass is still a declared possible wall for an unlocated
+    # supply bound. Its own configured temperature is evidence, not a duct alias.
+    if model is not None and getattr(model, "lab_geometry", None) is None:
+        from simulator.condensation_routing import STAGE3_BYPASS_SEGMENT_NAME
+
+        bypass = getattr(model, "stage3_bypass", {})
+        if STAGE3_BYPASS_SEGMENT_NAME not in temperatures and bypass:
+            temperatures[STAGE3_BYPASS_SEGMENT_NAME] = float(bypass["wall_temperature_C"])
+    return bucket_wall_segments_by_temperature(temperatures)
 
 
 def bucket_wall_segments_by_temperature(

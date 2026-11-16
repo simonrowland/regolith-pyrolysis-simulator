@@ -4374,7 +4374,10 @@ def _coating_from_upstream_deposit_fraction_report(
     # Product costing books the same species through
     # the same run-total cutoff classifier: measured mass of a bounded
     # species is replaced, not added.
-    from simulator.optimize.objective import _mass_balance_ledger_resolution_kg
+    from simulator.optimize.objective import (
+        UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT,
+        _mass_balance_ledger_resolution_kg,
+    )
 
     resolution_kg = _mass_balance_ledger_resolution_kg(charge_mass_kg)
     classified_supply = _classify_refused_wall_supply_window(
@@ -4392,6 +4395,15 @@ def _coating_from_upstream_deposit_fraction_report(
     )
     warning_flags: list[dict[str, Any]] = []
     violation_reasons: list[dict[str, Any]] = []
+    unlocated = report.get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
+    if isinstance(unlocated, Mapping):
+        # The segment assignment owner has maximized the alternative loads.
+        # Consume its result without booking the bound in any zone or wall.
+        bound = _non_negative_number(unlocated["bound_kg"], "unlocated supply kg")
+        potential = _non_negative_number(unlocated["potential_load_kg"], "potential wall load kg")
+        priced_certain_kg = (potential - bound) / campaigns_elapsed
+        booked_supply_kg = bound / campaigns_elapsed
+        warning_flags.append({"reason": UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT, **_plain_value(unlocated)})
 
     for record in certain_records:
         amount = float(record["deposit_kg_per_campaign"])
@@ -4845,6 +4857,9 @@ def _coating_wall_refused_species(
         raw_map = source.get("wall_saturation_pressure_refusals_by_species")
         if isinstance(raw_map, Mapping):
             species.update(str(item) for item in raw_map if str(item))
+        carriers = source.get("refused_carrier_species", ())
+        if isinstance(carriers, (tuple, list, set, frozenset)):
+            species.update(str(item) for item in carriers if str(item))
     return tuple(sorted(species))
 
 
