@@ -1,5 +1,7 @@
-"""Locator aliases and typed refusals at the extract migration boundary."""
+"""Locator aliases and typed refusals at the migration boundaries."""
 
+import copy
+import json
 from decimal import Decimal
 from pathlib import Path
 
@@ -18,6 +20,28 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import Locator
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+_COMPILATION_GENERATOR_RECORDS = (
+    ("data/literature/compilations/janaf/tables/Na-014.yaml", 33),
+    (
+        "data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-corundum.json",
+        79,
+    ),
+    (
+        "data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json",
+        1858,
+    ),
+    (
+        "data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0001-silver.json",
+        4,
+    ),
+    (
+        "data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p189.json",
+        5,
+    ),
+)
 
 
 def test_row_and_column_aliases_survive_extract_migration(tmp_path: Path) -> None:
@@ -135,8 +159,11 @@ def test_row_label_aliases_bind_initial_composition_to_final_phase_row(
     migrator._validate_extract_locators(document, source_key="phase-alias.yaml")
     rows = [*initial_rows, ("FeO", final_row)]
 
-    assert all("row" in row["locator"] for _formula, row in rows)
-    assert all("row_label" not in row["locator"] for _formula, row in rows)
+    assert all(
+        _locator_from_mapping(row["locator"]).row
+        == ("initial melt" if "initial melt" in row["observation_id"] else "final phase analysis")
+        for _formula, row in rows
+    )
     initial_melts = _same_run_initial_melts(rows)
     bound = _bind_same_run_initial_composition(
         final_row, {"same_run_initial_melts": initial_melts}
@@ -148,6 +175,124 @@ def test_row_label_aliases_bind_initial_composition_to_final_phase_row(
     )
     assert dict(bound.components) == dict(expected.components)
     assert migrator.result.registry_issues == []
+
+
+@pytest.mark.parametrize(
+    ("locator_fields", "expected_row", "expected_column"),
+    (
+        ({"table_id": 1}, None, None),
+        ({"row_label": 19}, "19", None),
+        ({"column_header": 2}, None, "2"),
+        ({"table_row_number": 19, "table_column_number": 2}, "19", "2"),
+    ),
+    ids=("neither", "row-only", "column-only", "both"),
+)
+def test_series_child_ids_survive_locator_validation_without_coordinate_gain(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    locator_fields: dict[str, object],
+    expected_row: str | None,
+    expected_column: str | None,
+) -> None:
+    extract = _extract_with_series_points(locator_fields)
+    children = _assert_series_child_ids_unchanged_by_validation(
+        tmp_path, monkeypatch, extract
+    )
+
+    assert len(children) == 2
+    assert all(child.locator is not None for child in children.values())
+    assert all(child.locator.row == expected_row for child in children.values())
+    assert all(child.locator.column == expected_column for child in children.values())
+
+
+def test_series_child_id_pin_detects_locator_canonicalization_mutation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery.migrate import _locator_from_plain, to_plain
+
+    extract = _extract_with_series_points({"row_label": 19, "column_header": 2})
+
+    def canonicalizing_validator(
+        migrator: Migrator, document: dict, *, source_key: str
+    ) -> None:
+        pending: list[object] = [document]
+        while pending:
+            current = pending.pop()
+            if isinstance(current, dict):
+                for field_name in ("locator", "source_locator"):
+                    if field_name not in current:
+                        continue
+                    locator = _locator_from_plain(
+                        current[field_name], refuse_invalid=True
+                    )
+                    if locator is not None:
+                        current[field_name] = to_plain(locator)
+                pending.extend(current.values())
+            elif isinstance(current, list):
+                pending.extend(current)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            Migrator, "_validate_extract_locators", canonicalizing_validator
+        )
+        with pytest.raises(AssertionError):
+            _assert_series_child_ids_unchanged_by_validation(
+                tmp_path, monkeypatch, extract
+            )
+
+
+def _extract_with_series_points(
+    locator_fields: dict[str, object],
+) -> dict:
+    extract = copy.deepcopy(FIXTURE_EXTRACT)
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["values"].pop("series")
+    observation["values"]["points"] = [
+        {
+            "T_K": 1200,
+            "pressure_atm": 1.0,
+            "locator": {"page": 2, "table": "I", **locator_fields},
+        },
+        {
+            "T_K": 1300,
+            "pressure_atm": 2.0,
+            "locator": {"page": 2, "table": "I", **locator_fields},
+        },
+    ]
+    return extract
+
+
+def _migrate_series_children(tmp_path: Path, extract: dict, name: str) -> dict:
+    result = migrate(_write_min_tree(tmp_path / name, extract), write=False)
+    return {
+        observation_id: observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=")
+    }
+
+
+def _assert_series_child_ids_unchanged_by_validation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    extract: dict,
+) -> dict:
+    validated = _migrate_series_children(tmp_path, extract, "validated")
+    with monkeypatch.context() as baseline:
+        baseline.setattr(
+            Migrator,
+            "_validate_extract_locators",
+            lambda _migrator, _document, *, source_key: None,
+        )
+        unnormalized = _migrate_series_children(tmp_path, extract, "unnormalized")
+    assert validated
+    assert set(validated) == set(unnormalized)
+    return validated
+
+
+def _locator_from_mapping(payload: object) -> Locator | None:
+    from simulator.battery.migrate import locator_from_mapping
+
+    return locator_from_mapping(payload)
 
 
 def test_canonical_and_alias_page_indexes_normalize_before_conflict_check() -> None:
@@ -201,6 +346,56 @@ def test_persisted_observation_refuses_unknown_locator_keys(tmp_path: Path) -> N
     assert "unreviewed_locator_axis" in str(exc_info.value)
 
 
+def test_persisted_admission_decision_evidence_refuses_unknown_locator_keys(
+    tmp_path: Path,
+) -> None:
+    result = migrate(_write_min_tree(tmp_path), write=False)
+    payload = to_plain(next(iter(result.observations.values())))
+    assert isinstance(payload, dict)
+    payload["admission"]["status"] = "admitted"
+    payload["admission"]["decided_by"] = {
+        "worker": "reviewer",
+        "date": "2026-11-16",
+        "evidence": {"page": 2, "unreviewed_locator_axis": "axis"},
+    }
+
+    _assert_invalid_admission_evidence(payload)
+
+
+def test_persisted_admission_evidence_guard_mutation_is_detected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import importlib
+
+    migrate_module = importlib.import_module("simulator.battery.migrate")
+    result = migrate(_write_min_tree(tmp_path), write=False)
+    payload = to_plain(next(iter(result.observations.values())))
+    assert isinstance(payload, dict)
+    payload["admission"]["status"] = "admitted"
+    payload["admission"]["decided_by"] = {
+        "worker": "reviewer",
+        "date": "2026-11-16",
+        "evidence": {"page": 2, "unreviewed_locator_axis": "axis"},
+    }
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            migrate_module, "_validate_persisted_locator_mappings", lambda _payload: None
+        )
+        with pytest.raises(AssertionError):
+            _assert_invalid_admission_evidence(payload)
+
+
+def _assert_invalid_admission_evidence(payload: dict) -> None:
+    try:
+        observation_from_plain(payload)
+    except ValueError as exc:
+        assert getattr(exc, "reason", None) is RefusalReason.INVALID_SOURCE
+        assert "unreviewed_locator_axis" in str(exc)
+    else:
+        raise AssertionError("admission evidence with an unknown locator key was accepted")
+
+
 def test_compilation_refuses_unknown_locator_keys_with_invalid_source(
     tmp_path: Path,
 ) -> None:
@@ -242,6 +437,98 @@ def test_compilation_refuses_unknown_locator_keys_with_invalid_source(
     assert issue.reason is RefusalReason.INVALID_SOURCE
     assert issue.path.endswith("record.yaml].source_locator")
     assert "unreviewed_locator_axis" in issue.detail
+
+
+@pytest.mark.parametrize(
+    ("relative_path", "expected_count"),
+    _COMPILATION_GENERATOR_RECORDS,
+    ids=("janaf", "b1544", "b1452", "b1259", "b2131"),
+)
+def test_compilation_generator_routes_migrate_real_records(
+    relative_path: str, expected_count: int
+) -> None:
+    source_path = REPO_ROOT / relative_path
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+
+    migrator._migrate_compilation_file(source_path)
+
+    assert len(migrator.result.observations) == expected_count
+
+
+@pytest.mark.parametrize(
+    ("relative_path", "_expected_count"),
+    _COMPILATION_GENERATOR_RECORDS,
+    ids=("janaf", "b1544", "b1452", "b1259", "b2131"),
+)
+def test_compilation_generator_routes_refuse_unknown_source_locator_keys(
+    tmp_path: Path, relative_path: str, _expected_count: int
+) -> None:
+    _assert_compilation_generator_refuses_unknown_locator(
+        tmp_path, relative_path
+    )
+
+
+def test_compilation_generator_refusal_mutation_is_detected_for_every_route(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import importlib
+
+    migrate_module = importlib.import_module("simulator.battery.migrate")
+    decode = migrate_module._locator_from_plain
+
+    def tolerate_unknown(payload: object, *, refuse_invalid: bool = False):
+        try:
+            return decode(payload, refuse_invalid=refuse_invalid)
+        except ValueError as exc:
+            if refuse_invalid and "unknown locator key" in str(exc):
+                return decode(payload)
+            raise
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(migrate_module, "_locator_from_plain", tolerate_unknown)
+        for relative_path, _expected_count in _COMPILATION_GENERATOR_RECORDS:
+            with pytest.raises(AssertionError):
+                _assert_compilation_generator_refuses_unknown_locator(
+                    tmp_path / Path(relative_path).stem, relative_path
+                )
+
+
+def _assert_compilation_generator_refuses_unknown_locator(
+    tmp_path: Path, relative_path: str
+) -> None:
+    source_path = REPO_ROOT / relative_path
+    source_doc = _load_compilation_document(source_path)
+    source_locator = source_doc.get("source_locator")
+    source_locator = dict(source_locator) if isinstance(source_locator, dict) else {}
+    source_locator["unreviewed_locator_axis"] = "axis"
+    source_doc["source_locator"] = source_locator
+
+    path = tmp_path / relative_path
+    path.parent.mkdir(parents=True)
+    _write_compilation_document(path, source_doc)
+    migrator = Migrator(root=tmp_path, index={}, aliases={})
+
+    migrator._migrate_compilation_file(path)
+
+    assert migrator.result.observations == {}
+    assert len(migrator.result.registry_issues) == 1
+    issue = migrator.result.registry_issues[0]
+    assert issue.reason is RefusalReason.INVALID_SOURCE
+    assert issue.path.endswith(".source_locator")
+    assert "unreviewed_locator_axis" in issue.detail
+
+
+def _load_compilation_document(path: Path) -> dict:
+    if path.suffix == ".json":
+        return json.loads(path.read_text(encoding="utf-8"))
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def _write_compilation_document(path: Path, document: dict) -> None:
+    if path.suffix == ".json":
+        path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    else:
+        path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
 
 
 def test_conflicting_locator_aliases_are_listed_as_invalid_source(
