@@ -1556,6 +1556,42 @@ def test_magemin_equilibrate_failure_exits_have_literal_typed_expectations(
     assert result.status == expected_status
     assert result.diagnostics['backend_status'] == expected_status
     assert result.diagnostics['backend_status_reason'] == expected_reason
+    assert result.diagnostics['backend_status_reason'] != (
+        'magemin_untyped_failure'
+    )
+
+
+def test_public_magemin_equilibrate_normalizes_bare_failure_result(monkeypatch):
+    from simulator.melt_backend.base import EquilibriumResult
+
+    backend = MAGEMinBackend()
+    bare_failure = EquilibriumResult(status='not_converged')
+    captured = {}
+
+    def return_bare_failure(*args, **kwargs):
+        captured['args'] = args
+        captured['kwargs'] = kwargs
+        return bare_failure
+
+    monkeypatch.setattr(backend, '_equilibrate_body', return_bare_failure)
+    result = backend.equilibrate(
+        1400.0,
+        {'SiO2': 60.0},
+        -8.0,
+        2.0,
+        composition_mol={'SiO2': 1.0},
+        call_timeout_s=3.0,
+    )
+
+    assert result is bare_failure
+    assert captured['args'] == (1400.0, {'SiO2': 60.0}, -8.0, 2.0)
+    assert captured['kwargs']['composition_mol'] == {'SiO2': 1.0}
+    assert captured['kwargs']['call_timeout_s'] == 3.0
+    assert result.diagnostics['backend_status'] == 'not_converged'
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_untyped_failure'
+    )
+    assert result.diagnostics['magemin_untyped_failure_diagnostic_gap'] is True
 
 
 @pytest.mark.parametrize(
@@ -1565,6 +1601,7 @@ def test_magemin_equilibrate_failure_exits_have_literal_typed_expectations(
         ('magemin_subprocess_timeout', 'engine_timeout', True),
         ('magemin_subprocess_slot_unavailable', 'unavailable', False),
         ('magemin_aggregate_budget_timeout', 'engine_timeout', True),
+        ('magemin_untyped_failure', 'unavailable', False),
         ('engine_crash', 'engine_crash', False),
         ('magemin_engine_worker_unavailable', 'unavailable', False),
     ),

@@ -413,6 +413,24 @@ _MAGEMIN_FAILURE_REASON_BY_EXCEPTION = {
     'FileNotFoundError': 'missing_binary',
     'MAGEMinOutputError': 'parse_empty_output',
 }
+_MAGEMIN_UNTYPED_FAILURE_REASON = 'magemin_untyped_failure'
+
+
+def _normalize_magemin_equilibrium_result(
+    result: EquilibriumResult,
+) -> EquilibriumResult:
+    """Backstop non-success returns that bypass a typed failure path."""
+    if result.status == 'ok':
+        return result
+    diagnostics = dict(result.diagnostics or {})
+    diagnostics['backend_status'] = result.status
+    if not diagnostics.get('backend_status_reason'):
+        diagnostics.update({
+            'backend_status_reason': _MAGEMIN_UNTYPED_FAILURE_REASON,
+            'magemin_untyped_failure_diagnostic_gap': True,
+        })
+    result.diagnostics = diagnostics
+    return result
 
 
 def _admit_magemin_call_scalars(
@@ -1727,29 +1745,61 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
         native_activity_formula: Optional[str] = None,
     ) -> EquilibriumResult:
-        """
-        Minimize Gibbs energy via MAGEMin.
+        """Minimize Gibbs energy via MAGEMin.
 
         Conforms to the layered ``MeltBackend`` ABC: when
         ``composition_mol_by_account`` is supplied, only the
         ``process.cleaned_melt`` account is consumed — gas, metal, salt,
-        sulfide and halide accounts are filtered out before the library
-        is called (binding spec §7).  Populates ``phases_present``,
+        sulfide and halide accounts are filtered out before the library is
+        called (binding spec §7). Populates ``phases_present``,
         ``phase_masses_kg``, ``liquid_fraction``, and
         ``liquid_composition_wt_pct``.
 
         ``EquilibriumResult.ledger_transition`` is left ``None``: MAGEMin
-        holds no ``AtomLedger`` authority.  Because this method still
+        holds no ``AtomLedger`` authority. Because this method still
         populates ``phase_masses_kg`` with a phase assemblage, a result
-        from this adapter is **not** safe to feed through
+        from this adapter is not safe to feed through
         ``simulator/core.py::_get_equilibrium`` as the active backend —
         that path rejects a populated phase result with no ledger
-        transition and fails closed (see the module "Authority posture"
-        note).  The result is only meaningful to a shadow comparator.
+        transition and fails closed. The result is only meaningful to a
+        shadow comparator.
 
-        On library error returns an empty result with a warning rather
-        than raising.
+        Every returned non-success result has a matching ``backend_status``
+        and a typed ``backend_status_reason``. The return boundary marks any
+        missed typed failure so it remains visible without raising.
         """
+        return _normalize_magemin_equilibrium_result(
+            self._equilibrate_body(
+                temperature_C,
+                composition_kg,
+                fO2_log,
+                pressure_bar,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_formula_registry,
+                call_timeout_s=call_timeout_s,
+                projected_oxide_wt_pct=projected_oxide_wt_pct,
+                native_activity_formula=native_activity_formula,
+            )
+        )
+
+    def _equilibrate_body(
+        self,
+        temperature_C: float,
+        composition_kg: Optional[Dict[str, float]] = None,
+        fO2_log: float = -9.0,
+        pressure_bar: float = 1e-6,
+        *,
+        composition_mol: Optional[Dict[str, float]] = None,
+        composition_mol_by_account: Optional[
+            Mapping[str, Mapping[str, float]]
+        ] = None,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+        call_timeout_s: Optional[float] = None,
+        projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
+        native_activity_formula: Optional[str] = None,
+    ) -> EquilibriumResult:
+        """Implementation behind the public typed-result boundary."""
         requested_temperature_C = temperature_C
         requested_pressure_bar = pressure_bar
         requested_fO2_log = fO2_log

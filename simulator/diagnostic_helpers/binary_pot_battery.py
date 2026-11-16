@@ -162,7 +162,10 @@ _CRASH_TOKENS = frozenset(
     }
 )
 _UNAVAILABLE_TOKENS = frozenset(
-    {"unavailable", "backend_unavailable", "missing_binary", "not_initialized"}
+    {
+        "unavailable", "backend_unavailable", "missing_binary",
+        "magemin_untyped_failure", "not_initialized",
+    }
 )
 _IMCC_OUT_OF_BASIS_CODES = frozenset(
     {

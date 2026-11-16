@@ -722,13 +722,18 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
     assert reason == "no_liquid"
 
 
-def test_classify_missing_binary_as_unavailable_from_backend_reason() -> None:
+@pytest.mark.parametrize(
+    "reason_code", ("missing_binary", "magemin_untyped_failure"),
+)
+def test_classify_backend_infrastructure_reason_as_unavailable(
+    reason_code: str,
+) -> None:
     status, reason, engine_reason = classify_equilibrate_outcome(
         SimpleNamespace(
             status="not_converged",
             diagnostics={
                 "backend_status": "not_converged",
-                "backend_status_reason": "missing_binary",
+                "backend_status_reason": reason_code,
             },
             warnings=[],
             activity_coefficients={},
@@ -739,7 +744,7 @@ def test_classify_missing_binary_as_unavailable_from_backend_reason() -> None:
 
     assert status == "refusal"
     assert reason == REFUSAL_UNAVAILABLE
-    assert engine_reason == "missing_binary"
+    assert engine_reason == reason_code
 
 
 def test_classify_thermoengine_nonfinite_keeps_field_detail() -> None:
