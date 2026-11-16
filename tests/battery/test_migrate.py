@@ -50,6 +50,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
+from simulator.battery.non_observations import is_non_observation
 from simulator.battery.score import (
     liquid_model_subsolidus_sample_notice,
     parse_migration_headline,
@@ -2817,6 +2818,10 @@ def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> Non
         obs.identity.quantity.is_unknown and obs.value.kind is ValueKind.UNAVAILABLE
         for obs in table_rows
     )
+    queued_observation_ids = {
+        entry.observation_id for entry in migrator.result.queue
+    }
+    assert not {obs.observation_id for obs in table_rows} & queued_observation_ids
     activities = [
         obs
         for obs in observations
@@ -11617,7 +11622,7 @@ def test_k02_zr_th_and_pending_anchors_are_unavailable_domains() -> None:
         assert lo in blob and hi in blob, fname
 
 
-def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
+def test_k03_ledger_missing_phase_is_not_candidate_queued(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
         yaml.safe_dump(
@@ -11646,8 +11651,7 @@ def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
         for e in result.queue
         if e.observation_id == "ledger-unknown-phase" and "phase" in (e.axes or ())
     ]
-    assert phase_entries
-    assert any("phase" in (e.why or "").lower() for e in phase_entries)
+    assert phase_entries == []
 
 
 def _quantity_state(obs) -> tuple[object, str | None]:
@@ -11690,7 +11694,10 @@ def test_l01_type_does_not_assign_contradicted_alpha(tmp_path: Path) -> None:
     assert token is None
     blob = " ".join(filter(None, [reason, _queue_blob(result, obs.observation_id)]))
     assert "not_hkl_langmuir_coefficient" in blob or "HKL" in blob
-    assert any("quantity" in (e.axes or ()) for e in result.queue)
+    assert not any(
+        e.observation_id == obs.observation_id and "quantity" in (e.axes or ())
+        for e in result.queue
+    )
 
 
 def test_l01_gibbs_type_does_not_assign_dissociation_note(tmp_path: Path) -> None:
@@ -11710,7 +11717,7 @@ def test_l01_gibbs_type_does_not_assign_dissociation_note(tmp_path: Path) -> Non
     assert token is None
     blob = " ".join(filter(None, [reason, _queue_blob(result, obs.observation_id)]))
     assert "dissociation" in blob.lower()
-    assert any("quantity" in (e.axes or ()) for e in result.queue)
+    assert not any(e.observation_id == obs.observation_id for e in result.queue)
 
 
 def test_l01_gibbs_type_does_not_assign_vapor_pressure_equations(tmp_path: Path) -> None:
@@ -11727,7 +11734,7 @@ def test_l01_gibbs_type_does_not_assign_vapor_pressure_equations(tmp_path: Path)
     obs = next(iter(result.observations.values()))
     token, _reason = _quantity_state(obs)
     assert token is None
-    assert any("quantity" in (e.axes or ()) for e in result.queue)
+    assert not any(e.observation_id == obs.observation_id for e in result.queue)
 
 
 def test_l01_activity_type_does_not_assign_ordering_units(tmp_path: Path) -> None:
@@ -11780,7 +11787,7 @@ def test_l01_alpha_field_is_not_hkl_when_flagged(tmp_path: Path) -> None:
     token, _reason = _quantity_state(obs)
     assert token is None
     assert obs.value.kind is ValueKind.UNAVAILABLE
-    assert any("quantity" in (e.axes or ()) for e in result.queue)
+    assert not any(e.observation_id == obs.observation_id for e in result.queue)
 
 
 def test_l01_janaf_evaluator_gibbs_table_stays_delta_fg(tmp_path: Path) -> None:
@@ -12600,7 +12607,7 @@ def test_l05g0_atomic_weight_rows_are_not_delta_fg(tmp_path: Path) -> None:
     token, reason = _quantity_state(obs)
     assert token is None
     assert reason and "closed quantity" in reason
-    assert any(
+    assert not any(
         e.observation_id == obs.observation_id and "quantity" in (e.axes or ())
         for e in result.queue
     )
@@ -15376,7 +15383,11 @@ def test_l04_log10_psat_over_p0_is_not_a_pressure(tmp_path: Path) -> None:
     assert quantity_token(obs.identity) is not Quantity.P_SAT
     assert quantity_token(obs.identity) is not Quantity.P_PARTIAL
     assert obs.value.kind is ValueKind.UNAVAILABLE
-    assert any(reason == (e.why or "") for e in result.queue if e.observation_id == obs.observation_id)
+    assert not any(
+        reason == (e.why or "")
+        for e in result.queue
+        if e.observation_id == obs.observation_id
+    )
 
 
 
@@ -15531,7 +15542,7 @@ def test_g3_vaporization_lift_mutation_proof(tmp_path: Path) -> None:
     assert mutant_obs.identity.quantity.is_unknown
     assert quantity_token(mutant_obs.identity) is not Quantity.DELTA_FG
     assert mutant_obs.value.kind is ValueKind.UNAVAILABLE
-    assert any(
+    assert not any(
         reason == (e.why or "")
         for e in mutant.queue
         if e.observation_id == mutant_obs.observation_id
@@ -15795,15 +15806,21 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
     assert not bad, bad[:20]
 
 
-def test_l05c5_store_unavailable_values_are_queued() -> None:
-    queue_path = REPO_ROOT / "data" / "battery" / "migration-queue.yaml"
+def _unavailable_store_queue_partition(
+    root: Path,
+) -> tuple[
+    list[tuple[Path, dict]],
+    list[tuple[Path, dict]],
+    dict[str, list[dict]],
+]:
+    queue_path = root / "data" / "battery" / "migration-queue.yaml"
     roots = [
-        REPO_ROOT / "data" / "literature" / "extracts-v2",
-        REPO_ROOT / "data" / "literature" / "observations-v2",
+        root / "data" / "literature" / "extracts-v2",
+        root / "data" / "literature" / "observations-v2",
     ]
-    if not queue_path.is_file() or not roots[0].is_dir():
-        pytest.skip("migrated store not generated yet")
-    queued = yaml.load(queue_path.read_text(encoding="utf-8"), Loader=_YAML_LOADER) or {}
+    queued = yaml.load(
+        queue_path.read_text(encoding="utf-8"), Loader=_YAML_LOADER
+    ) or {}
     entries = queued.get("entries") or queued.get("queue") or queued
     if isinstance(entries, dict):
         entries = entries.get("items") or []
@@ -15815,9 +15832,9 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
         why = str(e.get("why") or "")
         axes = e.get("axes") or []
         by_id.setdefault(oid, []).append(why + " " + " ".join(str(a) for a in axes))
-    missing = []
-    scanned = 0
-    summary = load_observation_store_summary(REPO_ROOT)
+    comparison_rows: list[tuple[Path, dict]] = []
+    non_observations: list[tuple[Path, dict]] = []
+    summary = load_observation_store_summary(root) if root == REPO_ROOT else {}
     needle = b"kind: unavailable"
     for folder in roots:
         for path in iter_observation_store_paths(folder):
@@ -15828,20 +15845,132 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
                 val = obs.get("value") or {}
                 if val.get("kind") != "unavailable":
                     continue
-                scanned += 1
-                oid = str(obs.get("observation_id") or "")
-                q = ((obs.get("identity") or {}).get("quantity") or {}).get("value") or (
-                    ((obs.get("identity") or {}).get("quantity") or {}).get("reason") or ""
+                origin = path.relative_to(root).as_posix()
+                target = (
+                    non_observations
+                    if is_non_observation(observation_from_plain(obs), origin)
+                    else comparison_rows
                 )
-                blob = " ".join(by_id.get(oid) or [])
-                if not blob:
-                    missing.append(oid)
-                    continue
-                token = str(q)
-                if token and token not in blob and "field" not in blob.lower() and "value" not in blob.lower():
-                    missing.append(f"{oid} queue={blob!r} token={token!r}")
-    assert scanned > 0
+                target.append((path, obs))
+    return comparison_rows, non_observations, by_id
+
+
+def _assert_typed_unavailable_values_are_queued(
+    rows: list[tuple[Path, dict]], by_id: dict[str, list[str]]
+) -> None:
+    missing = []
+    for _path, obs in rows:
+        oid = str(obs.get("observation_id") or "")
+        q = ((obs.get("identity") or {}).get("quantity") or {}).get("value") or (
+            ((obs.get("identity") or {}).get("quantity") or {}).get("reason") or ""
+        )
+        blob = " ".join(by_id.get(oid) or [])
+        if not blob:
+            missing.append(oid)
+            continue
+        token = str(q)
+        if (
+            token
+            and token not in blob
+            and "field" not in blob.lower()
+            and "value" not in blob.lower()
+        ):
+            missing.append(f"{oid} queue={blob!r} token={token!r}")
+    assert rows
     assert not missing, missing[:20]
+
+
+def test_l05c5_store_unavailable_values_are_queued() -> None:
+    queue_path = REPO_ROOT / "data" / "battery" / "migration-queue.yaml"
+    roots = [
+        REPO_ROOT / "data" / "literature" / "extracts-v2",
+        REPO_ROOT / "data" / "literature" / "observations-v2",
+    ]
+    if not queue_path.is_file() or not roots[0].is_dir():
+        pytest.skip("migrated store not generated yet")
+    comparison_rows, _non_observations, by_id = _unavailable_store_queue_partition(
+        REPO_ROOT
+    )
+    _assert_typed_unavailable_values_are_queued(comparison_rows, by_id)
+
+
+def test_fresh_store_unavailable_values_partition_queue(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "typed-unavailable",
+            "type": "psat_series",
+            "locator": {"table": "I", "page": 2},
+            "phase": "gas",
+            "units": "atm",
+            "values": {
+                "quantity": "partial_pressure",
+                "method_class": "measured_direct",
+                "series": [{"T_K": 1400.0}],
+            },
+        },
+        {
+            "observation_id": "unknown-context",
+            "type": "psat_series",
+            "locator": {"table": "II", "page": 3},
+            "phase": "gas",
+            "units": "atm",
+            "values": {
+                "quantity": "unknown_fixture_quantity",
+                "method_class": "measured_direct",
+                "series": [{"T_K": 1450.0}],
+            },
+        },
+        {
+            "observation_id": "unknown-context-repair",
+            "type": "psat_series",
+            "locator": {
+                "source_path": "ocr/missing.md",
+                "table": "III",
+                "page": 4,
+            },
+            "phase": "gas",
+            "units": "atm",
+            "values": {
+                "quantity": "unknown_fixture_quantity",
+                "method_class": "measured_direct",
+                "series": [{"T_K": 1500.0}],
+            },
+        },
+    ]
+    root = _write_min_tree(tmp_path / "repo", extract)
+    result = migrate(root, write=True)
+
+    comparison_rows, non_observations, by_id = _unavailable_store_queue_partition(
+        root
+    )
+    _assert_typed_unavailable_values_are_queued(comparison_rows, by_id)
+    assert any(
+        "typed-unavailable" in obs["observation_id"]
+        for _, obs in comparison_rows
+    )
+    assert any(
+        "unknown-context" in obs["observation_id"]
+        for _, obs in non_observations
+    )
+    unknown_context_ids = {
+        str(obs["observation_id"])
+        for _, obs in non_observations
+        if "unknown-context" in str(obs.get("observation_id"))
+    }
+    assert unknown_context_ids
+    repairs = [
+        entry
+        for entry in result.queue
+        if entry.observation_id in unknown_context_ids
+        and "read_from" in (entry.axes or ())
+    ]
+    assert repairs
+    assert all(
+        "read_from" in (entry.axes or ())
+        for entry in result.queue
+        if entry.observation_id in unknown_context_ids
+    )
 
 
 def _queue_fingerprints(entries: list[dict]) -> list[str]:
@@ -16040,6 +16169,139 @@ def test_queue_accounting_uses_manifest_eligibility_and_tracks_mutation(
     assert counts.reference_by_source == {}
 
 
+def test_finalize_rehomes_non_observation_queue_rows(tmp_path: Path) -> None:
+    from tests.battery import factories as F
+    from simulator.battery.records import Derivation, Value
+
+    root = _write_min_tree(tmp_path / "repo")
+    work = F.work("fixture-source")
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    known_identity = F.psat_identity("K")
+    unknown_identity = replace(
+        known_identity, quantity=State.unknown("run-condition table row")
+    )
+    context_row = replace(
+        F.observation(
+            "context-row",
+            experiment.experiment_id,
+            unknown_identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="no observable"),
+    )
+    reference_row = F.observation(
+        "reference-row",
+        experiment.experiment_id,
+        F.psat_identity("Zn"),
+        Decimal("2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-reference",
+        derivation=Derivation(
+            relation=(
+                "compilation_role engine_reference_input=true, "
+                "scoring_eligible=false"
+            ),
+            inputs=("record",),
+            parameters=(),
+            output_unit="Pa",
+        ),
+    )
+    ledger_row = F.observation(
+        "ledger-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-source",
+    )
+    known_absence = replace(
+        F.observation(
+            "known-absence",
+            experiment.experiment_id,
+            known_identity,
+            Decimal("4"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
+    )
+    not_applicable_identity = replace(
+        known_identity,
+        quantity=State.not_applicable("not a quantity on this row"),
+    )
+    not_applicable_absence = replace(
+        F.observation(
+            "not-applicable-absence",
+            experiment.experiment_id,
+            not_applicable_identity,
+            Decimal("5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
+    )
+    sources = {
+        "context-row": "data/literature/extracts/fixture-source.yaml",
+        "reference-row": (
+            "data/literature/compilations/fixture-reference/records/row.json"
+        ),
+        "ledger-row": (
+            "data/literature/observations-v2/"
+            "species_rail_differential_ledger.yaml"
+        ),
+        "known-absence": "data/literature/extracts/fixture-source.yaml",
+        "not-applicable-absence": "data/literature/extracts/fixture-source.yaml",
+    }
+    reference_manifest = (
+        root / "data/literature/compilations/fixture-reference/manifest.yaml"
+    )
+    reference_manifest.parent.mkdir(parents=True)
+    reference_manifest.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "fixture-reference",
+                "compilation_role": {"scoring_eligible": False},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    migrator = Migrator(root, aliases={}, index={})
+    migrator.result.works[work.work_id] = work
+    migrator.result.experiments[experiment.experiment_id] = experiment
+    for observation in (
+        context_row,
+        reference_row,
+        ledger_row,
+        known_absence,
+        not_applicable_absence,
+    ):
+        migrator.result.observations[observation.observation_id] = observation
+        source = sources[observation.observation_id]
+        migrator._obs_source[observation.observation_id] = source
+        migrator.result.add_queue(
+            work.work_id,
+            observation.locator,
+            ["value"],
+            "fixture queue reason",
+            source=source,
+            observation_id=observation.observation_id,
+        )
+
+    migrator.finalize()
+
+    assert [entry.observation_id for entry in migrator.result.queue] == [
+        "known-absence",
+        "not-applicable-absence",
+    ]
+    assert migrator.result.queue_work_counts is not None
+    assert sum(
+        migrator.result.queue_work_counts.reference_by_source.values()
+    ) == 0
+
+
 def test_migration_report_headline_is_accepted_by_scorer(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path / "repo")
     result = migrate(root, write=True)
@@ -16053,7 +16315,7 @@ def test_migration_report_headline_is_accepted_by_scorer(tmp_path: Path) -> None
     assert f"queue backlog: {len(result.queue)}\n" in report
 
 
-def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
+def test_l05c5_internal_ledger_unavailable_value_is_not_queued(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="delta_fG",
         units="",
@@ -16083,12 +16345,7 @@ def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
     result = migrate(root, write=False)
     logk = result.observations["ledger-logk"]
     assert logk.value.kind is ValueKind.UNAVAILABLE
-    assert any(
-        e.observation_id == "ledger-logk"
-        and "value" in (e.axes or ())
-        and ("log10_Kf" in (e.why or "") or "field" in (e.why or ""))
-        for e in result.queue
-    )
+    assert not any(e.observation_id == "ledger-logk" for e in result.queue)
 
 
 _USGS_F1_FAMILIES = (
