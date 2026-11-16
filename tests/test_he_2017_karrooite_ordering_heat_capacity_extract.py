@@ -13,6 +13,10 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
+from tests.helpers.regression import (
+    assert_regression_completes_without_skip,
+    assert_regression_raises_assertion_without_skip,
+)
 from tests.literature_extract_test_helpers import iter_locators
 from simulator.battery.migrate import Migrator, load_index
 from data.literature.build_index import corpus_pointers, sha256_file
@@ -195,8 +199,9 @@ def test_mutating_an_independent_render_grid_cell_breaks_the_source_pins() -> No
     mutated_values = list(values)
     mutated_values[5] = "9.7462(1)"
     mutated_grid[7] = (key, tuple(mutated_values))
-    with pytest.raises(AssertionError):
-        _assert_source_pins(_document(), mutated_grid)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_source_pins(_document(), mutated_grid)
+    )
 
 
 def test_mutating_an_extract_grid_cell_breaks_the_source_pins() -> None:
@@ -205,16 +210,18 @@ def test_mutating_an_extract_grid_cell_breaks_the_source_pins() -> None:
         "values"
     ]["rows_as_printed"]
     rows["b_A"][5] = "9.7462(1)"
-    with pytest.raises(AssertionError):
-        _assert_source_pins(mutated)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_source_pins(mutated)
+    )
 
 
 def test_mutating_an_extrapolated_entropy_context_value_breaks_the_source_pins() -> None:
     mutated = deepcopy(_document())
     row = _context_by_id(mutated)["he2017_prose_extrapolated_ordered_standard_entropy"]
     row["values"]["value_as_printed"] = "126.2"
-    with pytest.raises(AssertionError):
-        _assert_source_pins(mutated)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_source_pins(mutated)
+    )
 
 
 def test_partial_corpus_skips_migration_without_table5_csv(tmp_path: Path) -> None:
@@ -341,7 +348,9 @@ def test_table_only_corpus_runs_isolated_migration(tmp_path: Path, monkeypatch) 
     monkeypatch.setitem(globals(), "TABLE5_CSV", table_dir / "table-5.csv")
     monkeypatch.setitem(globals(), "EXTRACT", synthetic_extract)
     assert not PDF.is_file()
-    _assert_isolated_migration_types_both_experimental_entropy_rows()
+    assert_regression_completes_without_skip(
+        _assert_isolated_migration_types_both_experimental_entropy_rows
+    )
 
 
 def test_all_locators_match_physical_pdf_pages() -> None:

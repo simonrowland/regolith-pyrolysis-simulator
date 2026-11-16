@@ -15,6 +15,10 @@ import yaml
 from simulator import reference_data
 from simulator.reference_data import pankratz_1987_usbm_b689_loader as loader
 from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
+from tests.helpers.regression import (
+    assert_regression_completes_without_skip,
+    assert_regression_raises_assertion_without_skip,
+)
 from tools import ingest_pankratz_1987_usbm_b689 as harvest
 
 
@@ -22,13 +26,30 @@ ROOT = loader.COMPILATION_ROOT
 
 
 def _require_b689_corpus_inputs(
-    corpus_root: pathlib.Path, *, include_decode_chunks: bool
+    corpus_root: pathlib.Path,
+    *,
+    include_decode_chunks: bool,
+    decode_chunks_before: str | None = None,
 ) -> None:
     pdf, sidecar, source_chunks = harvest._b689_source_inputs(corpus_root)
     required_paths = [pdf, sidecar]
-    if include_decode_chunks:
+    if decode_chunks_before is not None:
+        chunk_names = [chunk for _, _, chunk, _ in source_chunks]
+        boundary = chunk_names.index(decode_chunks_before)
+        required_paths.extend(path for _, _, _, path in source_chunks[:boundary])
+    elif include_decode_chunks:
         required_paths.extend(source_path for _, _, _, source_path in source_chunks)
     require_corpus_files(required_paths)
+
+
+def _write_b689_raw_checksum(corpus_root: pathlib.Path) -> None:
+    raw = corpus_root / "raw" / harvest.SOURCE_ID
+    raw.mkdir(parents=True)
+    pdf = raw / f"{harvest.SOURCE_ID}.pdf"
+    pdf.write_bytes(b"review checksum fixture")
+    (raw / "sidecar.yaml").write_text(
+        yaml.safe_dump({"sha256": hashlib.sha256(pdf.read_bytes()).hexdigest()})
+    )
 
 
 def test_published_curves_keep_equation_records_separate_from_source_cells():
@@ -135,31 +156,36 @@ def test_self_consistent_wrong_identity_and_audit_cannot_certify():
             item["formula"] = "A1S"
             item["formula_as_published"] = "A1S(g)"
     assert next(a for a in audits if a["record_id"] == "page-0007")["formula"] == "A1S"
-    with pytest.raises(AssertionError):
-        _assert_image_anchors(records)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_image_anchors(records)
+    )
 
 
 def test_reverting_numeric_repair_is_detected():
     records = _records()
     record = next(r for r in records if r["record_id"] == "page-0030")
     record["rows"][14]["cells"]["log_k"].update(raw="-968", value=-968)
-    with pytest.raises(AssertionError):
-        _assert_image_anchors(records)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_image_anchors(records)
+    )
     records = _records()
     record = next(r for r in records if r["record_id"] == "page-0342")
     record["rows"][0]["cells"]["log_k"].update(raw="416.861", value=416.861)
-    with pytest.raises(AssertionError):
-        _assert_image_anchors(records)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_image_anchors(records)
+    )
     records = _records()
     record = next(r for r in records if r["record_id"] == "page-0370")
     record["rows"][2]["cells"]["log_k"].update(raw="13.944", value=13.944)
-    with pytest.raises(AssertionError):
-        _assert_image_anchors(records)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_image_anchors(records)
+    )
     records = _records()
     record = next(r for r in records if r["record_id"] == "page-0348")
     record["rows"][6]["cells"]["log_k"].update(raw="4.841", value=4.841)
-    with pytest.raises(AssertionError):
-        _assert_image_anchors(records)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_image_anchors(records)
+    )
 
 
 def test_complete_page_three_numeric_image_fixture():
@@ -448,8 +474,9 @@ def test_valid_but_wrong_continuation_formula_cannot_certify():
         if item["record_id"] == "page-0041":
             item.update(formula="B2S2", formula_as_published="B₂S₂(g)")
     assert next(a for a in audits if a["record_id"] == "page-0041")["formula"] == "B2S2"
-    with pytest.raises(AssertionError):
-        _assert_image_anchors(records)
+    assert_regression_raises_assertion_without_skip(
+        lambda: _assert_image_anchors(records)
+    )
 
 
 @pytest.fixture
@@ -530,16 +557,34 @@ def test_rebuild_preserves_native_chunk_offsets_and_artifacts(corpus):
         assert by_page[pdf_page] == {"pdf_page": pdf_page, "items": [i for i in items if i["page_idx"] == pdf_page - 41]}
 
 
-def test_rebuild_refuses_missing_later_decode(corpus, tmp_path):
-    _require_b689_corpus_inputs(corpus, include_decode_chunks=True)
-    (tmp_path / "raw").symlink_to(corpus / "raw", target_is_directory=True)
-    decode = tmp_path / "text" / harvest.SOURCE_ID / "mineru"
-    decode.mkdir(parents=True)
-    for chunk in (corpus / "text" / harvest.SOURCE_ID / "mineru").glob("chunk-*"):
-        if chunk.name != "chunk-p081-p120":
-            (decode / chunk.name).symlink_to(chunk, target_is_directory=True)
-    with pytest.raises(FileNotFoundError, match="chunk-p081-p120"):
-        harvest.build(tmp_path)
+def test_rebuild_refuses_missing_later_decode(tmp_path):
+    corpus = tmp_path / "corpus"
+    missing_chunk = "p081-p120"
+    missing_chunk_dir = f"chunk-{missing_chunk}"
+    _write_b689_raw_checksum(corpus)
+    _, _, source_chunks = harvest._b689_source_inputs(corpus)
+    for first, last, _, source_path in source_chunks[:2]:
+        source_path.parent.mkdir(parents=True)
+        source_path.write_text(
+            json.dumps([{"page_idx": page} for page in range(last - first + 1)])
+        )
+
+    def probe_missing_later_decode() -> None:
+        _require_b689_corpus_inputs(
+            corpus,
+            include_decode_chunks=False,
+            decode_chunks_before=missing_chunk,
+        )
+        (tmp_path / "raw").symlink_to(corpus / "raw", target_is_directory=True)
+        decode = tmp_path / "text" / harvest.SOURCE_ID / "mineru"
+        decode.mkdir(parents=True)
+        for chunk in (corpus / "text" / harvest.SOURCE_ID / "mineru").glob("chunk-*"):
+            if chunk.name != missing_chunk_dir:
+                (decode / chunk.name).symlink_to(chunk, target_is_directory=True)
+        with pytest.raises(FileNotFoundError, match=missing_chunk_dir):
+            harvest.build(tmp_path)
+
+    assert_regression_completes_without_skip(probe_missing_later_decode)
 
 
 def _assert_rebuild_refuses_audit_gap(corpus_root, destination, monkeypatch):
@@ -560,13 +605,12 @@ def test_rebuild_refuses_audit_gap(corpus, tmp_path, monkeypatch):
 
 def test_audit_gap_refusal_runs_without_decode_chunks(tmp_path, monkeypatch):
     corpus_root = tmp_path / "regolith-corpus"
-    raw = corpus_root / "raw" / harvest.SOURCE_ID
-    raw.mkdir(parents=True)
-    pdf = raw / f"{harvest.SOURCE_ID}.pdf"
-    pdf.write_bytes(b"review checksum fixture")
-    (raw / "sidecar.yaml").write_text(
-        yaml.safe_dump({"sha256": hashlib.sha256(pdf.read_bytes()).hexdigest()})
-    )
+    _write_b689_raw_checksum(corpus_root)
 
-    _require_b689_corpus_inputs(corpus_root, include_decode_chunks=False)
-    _assert_rebuild_refuses_audit_gap(corpus_root, tmp_path / "audit-gap", monkeypatch)
+    def probe_audit_gap_without_decode_chunks() -> None:
+        _require_b689_corpus_inputs(corpus_root, include_decode_chunks=False)
+        _assert_rebuild_refuses_audit_gap(
+            corpus_root, tmp_path / "audit-gap", monkeypatch
+        )
+
+    assert_regression_completes_without_skip(probe_audit_gap_without_decode_chunks)
