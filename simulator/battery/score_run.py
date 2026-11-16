@@ -344,7 +344,6 @@ def _score_store_with_decisions(
         _has_duplicate_observation_link,
         _has_intrinsic_redox_activity,
         _hashimoto_residue_prediction,
-        _is_compilation_thermo_reference,
         _knudsen_residue_prediction,
         _prepare_score_run,
         _source_alignment_group_key,
