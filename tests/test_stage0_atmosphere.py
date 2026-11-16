@@ -18,7 +18,10 @@ from simulator.campaigns import c0_exit_record, c0_exit_run_notice
 from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.reduced_real_determinism import PT0DeterminismStore
+from simulator.reduced_real_determinism import (
+    PT0DeterminismStore,
+    record_dependency_vector,
+)
 from simulator.runner import build_per_hour_summary
 from simulator.state import CondensationTrain, EvaporationFlux
 
@@ -294,6 +297,31 @@ def test_c0_forecast_context_does_not_retain_loaded_sulfsat_module():
         name: getattr(sulfur_module, name)
         for name in _PYSULFSAT_MUTABLE_EXPORTS
     } == mutable_exports_before
+
+
+def test_c0_forecast_preserves_sulfsat_cache_identity_without_gate_object():
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    _attach_mutable_sulfsat_module(sim)
+    live_sulfur_side = record_dependency_vector(
+        sim,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+    )["sulfur_side"]
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert context._sulfsat_gate is None
+    forecast_sulfur_side = record_dependency_vector(
+        context,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+    )["sulfur_side"]
+    assert forecast_sulfur_side == live_sulfur_side
 
 
 def test_c0_forecast_rebuilds_registry_around_live_engine_pool_locks():

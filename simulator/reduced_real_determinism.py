@@ -2794,6 +2794,19 @@ def record_dependency_vector(
         sim, intent, provider_role
     )
     sulfsat_gate = getattr(sim, "_sulfsat_gate", None)
+    sulfsat_identity = getattr(
+        sim, "_c0_forecast_sulfsat_identity", None
+    )
+    if sulfsat_identity is None:
+        sulfsat_identity = _sulfsat_identity(sulfsat_gate)
+    elif (
+        not isinstance(sulfsat_identity, Mapping)
+        or not isinstance(
+            sulfsat_identity.get("sulfsat_provider_selection"), str
+        )
+        or type(sulfsat_identity.get("sulfsat_available")) is not bool
+    ):
+        raise ValueError("invalid C0 forecast SulfSat cache identity")
     return {
         "namespace_id": _engine_result_namespace_id(
             artifact=artifact,
@@ -2815,8 +2828,10 @@ def record_dependency_vector(
                     ),
                 }
             ),
-            "sulfsat_available": _sulfsat_available(sulfsat_gate),
-            "sulfsat_provider_selection": type(sulfsat_gate).__name__,
+            "sulfsat_available": sulfsat_identity["sulfsat_available"],
+            "sulfsat_provider_selection": sulfsat_identity[
+                "sulfsat_provider_selection"
+            ],
         },
         "model": {
             "model": provider.get("model"),
@@ -4687,10 +4702,8 @@ def _equilibrium_payload_intent(sim: Any) -> ChemistryIntent:
 
 def _sulfsat_identity(gate: Any) -> dict[str, Any]:
     return {
-        "sulfsat_provider": type(gate).__name__,
+        "sulfsat_provider_selection": type(gate).__name__,
         "sulfsat_available": _sulfsat_available(gate),
-        "sulfsat_package_version": _sulfsat_package_version(gate),
-        "sulfsat_calibration_version": _sulfsat_calibration_version(gate),
     }
 
 
@@ -4702,32 +4715,6 @@ def _sulfsat_available(gate: Any) -> bool:
         except Exception:  # noqa: BLE001 - diagnostic only
             return False
     return False
-
-
-def _sulfsat_package_version(gate: Any) -> str:
-    from simulator.engine_binding_admission import pt1_version_provenance
-
-    getter = getattr(gate, "package_version", None)
-    if callable(getter):
-        return pt1_version_provenance(getter)
-    module = getattr(gate, "_module", None)
-    version = getattr(module, "__version__", None)
-    if version is not None:
-        return str(version)
-    return pt1_version_provenance(
-        lambda: (_ for _ in ()).throw(AttributeError("package version missing"))
-    )
-
-
-def _sulfsat_calibration_version(gate: Any) -> str:
-    from simulator.engine_binding_admission import pt1_version_provenance
-
-    getter = getattr(gate, "calibration_version", None)
-    if callable(getter):
-        return pt1_version_provenance(getter)
-    return pt1_version_provenance(
-        lambda: (_ for _ in ()).throw(AttributeError("calibration version missing"))
-    )
 
 
 def _cached_real_config(sim: Any) -> Any | None:
