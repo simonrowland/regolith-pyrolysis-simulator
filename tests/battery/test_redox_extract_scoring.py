@@ -547,9 +547,55 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # d-341 (t-1646) assumes 1 sigma only where neither metadata nor printed
     # text states the level; the Sossi rows' printed SD caption keeps their
     # primary 1-sigma verdicts without the assumption/alternative notices.
+    # t-1646 round 4 transports all 18 ferric-fraction uncertainties into
+    # the stored Fe3+/Fe2+ log metric. The payload now hashes to
+    # b06acccd01315fceea58a5f65e339b7959a9eb10b402f2949385fc170a97a559.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "b42f5ab911a5ae924bb51d8c0f3c3df3e1a0224b0e8f443ec1d236c7a55a1f5a"
+        "b06acccd01315fceea58a5f65e339b7959a9eb10b402f2949385fc170a97a559"
     )
+
+
+def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
+    context, observations = _sossi_aithala_redox_context()
+    residuals, _ = score_store(
+        context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
+    )
+    residual_by_reference = {row.reference: row for row in residuals}
+    assert set(residual_by_reference) == set(observations)
+    assert len(residual_by_reference) == 18
+
+    for reference, observation in observations.items():
+        derivation_parameters = dict(observation.derivation.parameters)
+        fraction = derivation_parameters["original_Fe3_over_FeT"].state.value
+        printed_sigma, _, _ = score_module._printed_uncertainty_source(
+            observation.uncertainty,
+            exact_fields=("Fe3_over_FeT",),
+        )
+        assert isinstance(fraction, Decimal)
+        assert isinstance(printed_sigma, Decimal)
+        residual = residual_by_reference[reference]
+        assert residual.refusal is None
+        assert residual.numeric is not None
+        assert residual.numeric.decision_band is not None
+
+        # Independent first-order propagation into the scorer's log10 ratio
+        # metric, using only each row's recorded printed r and sigma_r.
+        expected_band = (
+            printed_sigma
+            / (Decimal(10).ln() * fraction * (Decimal(1) - fraction))
+            * score_module.NORMAL_95_TICKET_MULTIPLIER
+        )
+        assert abs(residual.numeric.decision_band.value - expected_band) < Decimal("1e-20")
+
+    assert sum(row.status is ResidualStatus.MATCH for row in residuals) == 4
+    assert sum(row.status is ResidualStatus.MISMATCH for row in residuals) == 14
+    aithala_1800_30 = next(
+        observation_id
+        for observation_id, observation in observations.items()
+        if observation.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
+        and observation.experiment_id.rsplit("::", 1)[-1] == "aithala-2026-1800-30"
+    )
+    assert residual_by_reference[aithala_1800_30].status is ResidualStatus.MATCH
 
 
 def _assert_kress91_citation_is_unknown(residuals, observations) -> None:

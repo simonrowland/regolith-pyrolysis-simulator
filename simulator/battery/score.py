@@ -144,6 +144,7 @@ from simulator.battery.migrate import (
     REPO_ROOT,
     _COMPOSITION_COMPONENTS,
     _COMPOSITION_COMPONENTS_RETAINED_BY_DEFAULT,
+    FERRIC_FRACTION_RELATION,
     canonicalize_rail,
     iter_observation_store_paths,
     load_migrated_benches,
@@ -155,6 +156,7 @@ from simulator.battery.migrate import (
     PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
+    _fe3_fe2_log10_uncertainty_from_ferric_fraction,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
@@ -171,6 +173,7 @@ from simulator.battery.migrate import (
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
+from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
@@ -6674,6 +6677,14 @@ def _printed_uncertainty_band(
         kind = "printed_range"
     else:
         kind = "printed_unstated"
+    if confidence_level == "not_stated":
+        if shape == "range" or kind == "printed_range":
+            kind = "printed_range"
+        elif _has_printed_plus_minus(uncertainty):
+            confidence_level = "one_sigma"
+            kind = "printed_1sigma"
+        else:
+            kind = "printed_unstated"
     if isinstance(source_value, tuple):
         lower, upper = source_value
         width = (upper - lower) / Decimal(2)
@@ -6694,6 +6705,95 @@ def _printed_uncertainty_band(
                 "original": raw_text,
             }
         )
+
+    fraction_derivation = None
+    if quantity is Quantity.FE3_FE2_RATIO and source_observation is not None:
+        fraction_derivation = source_observation.derivation
+    if fraction_derivation is not None:
+        relation = fraction_derivation.relation or ""
+        fraction_parameters = [
+            parameter
+            for name, parameter in fraction_derivation.parameters
+            if name.removeprefix("original_") in FERRIC_FRACTION_FIELDS
+        ]
+        if FERRIC_FRACTION_RELATION in relation or fraction_parameters:
+            if FERRIC_FRACTION_RELATION not in relation or len(fraction_parameters) != 1:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_provenance_unmapped",
+                        "quantity": quantity.value,
+                        "relation": relation,
+                    }
+                )
+            fraction_state = getattr(fraction_parameters[0], "state", None)
+            fraction_r = (
+                fraction_state.value
+                if isinstance(fraction_state, State) and fraction_state.is_value
+                else None
+            )
+            if not isinstance(fraction_r, Decimal):
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_input_unmapped",
+                        "quantity": quantity.value,
+                        "relation": relation,
+                    }
+                )
+            if converted_unit not in {"fraction", QUANTITY_UNITS[quantity]}:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_unit_unmapped",
+                        "quantity": quantity.value,
+                        "source_unit": source_unit,
+                        "converted_unit": converted_unit,
+                    }
+                )
+            if fe3_fe2_ratio_from_ferric_fraction(fraction_r) != reference:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_value_mismatch",
+                        "quantity": quantity.value,
+                        "fraction": str(fraction_r),
+                        "reference": str(reference),
+                    }
+                )
+            if operation is not MetricOperation.DEX:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_metric_unmapped",
+                        "quantity": quantity.value,
+                        "operation": operation.value,
+                    }
+                )
+            confidence_width_scale = (
+                Decimal(2)
+                if confidence_level == "two_sigma"
+                else NORMAL_95_TICKET_MULTIPLIER
+                if confidence_level == "ci95"
+                else Decimal(1)
+            )
+            sigma_r = converted / confidence_width_scale
+            # FE3/Fe2 residuals use log10 distance, so propagate directly to
+            # dex at the reduction owner before the scorer applies its band policy.
+            sigma_log10_r, refusal_reason = (
+                _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+                    fraction_r, sigma_r
+                )
+            )
+            if sigma_log10_r is None:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": refusal_reason
+                        or "ferric_fraction_uncertainty_propagation_unavailable",
+                        "quantity": quantity.value,
+                        "fraction": str(fraction_r),
+                        "sigma_r": str(sigma_r),
+                        "distance_to_r_one": str(Decimal(1) - fraction_r),
+                    }
+                )
+            converted = sigma_log10_r * confidence_width_scale
+            converted_unit = "dex"
+
     ticket = _metric_uncertainty_width(
         operation,
         quantity,
@@ -6709,14 +6809,6 @@ def _printed_uncertainty_band(
                 "original": raw_text,
             }
     )
-    if confidence_level == "not_stated":
-        if shape == "range" or kind == "printed_range":
-            kind = "printed_range"
-        elif _has_printed_plus_minus(uncertainty):
-            confidence_level = "one_sigma"
-            kind = "printed_1sigma"
-        else:
-            kind = "printed_unstated"
     if confidence_level == "one_sigma" and kind == "printed_1sigma":
         ticket *= NORMAL_95_TICKET_MULTIPLIER
     unit = (

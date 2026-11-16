@@ -16676,6 +16676,38 @@ def fe3_fe2_ratio_from_ferric_fraction(r: Decimal) -> Decimal | None:
     return r / (Decimal(1) - r)
 
 
+def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+    r: Decimal, sigma_r: Decimal
+) -> tuple[Decimal | None, str | None]:
+    """Propagate a ferric-fraction standard uncertainty into log10(R)."""
+
+    if (
+        not r.is_finite()
+        or r <= 0
+        or r >= 1
+        or not sigma_r.is_finite()
+        or sigma_r < 0
+    ):
+        return None, "ferric_fraction_uncertainty_input_invalid"
+    gap = Decimal(1) - r
+    if Decimal(2) * sigma_r >= gap:
+        return None, "ferric_fraction_uncertainty_linearization_invalid"
+
+    # Premise: the print gives r = Fe3+/sumFe, while the stored value is
+    # R = Fe3+/Fe2+ = r/(1-r). Algebra: dR/dr = 1/(1-r)^2, so
+    # sigma_R = sigma_r/(1-r)^2; the dex scorer uses
+    # sigma_log10R = sigma_R/(R*ln(10)) = sigma_r/(ln(10)*r*(1-r)).
+    # Unit check: r, R, sigma_r and sigma_R are dimensionless ratios, so both
+    # sides are dimensionless (the final uncertainty is in dex). Sanity:
+    # r=0.5 gives R=1 and sigma_R=4*sigma_r; as r->0, sigma_R->sigma_r.
+    # Refuse when a two-sigma span reaches the pole at r=1; linearisation
+    # there cannot represent the printed uncertainty without inventing a band.
+    sigma_log10_r = sigma_r / (Decimal(10).ln() * r * gap)
+    if not sigma_log10_r.is_finite():
+        return None, "ferric_fraction_uncertainty_input_invalid"
+    return sigma_log10_r, None
+
+
 def fe3_fe2_ratio_from_oxide_wt_pct(w_fe2o3: Decimal, w_feo: Decimal) -> Decimal | None:
     """R = 2 (w3/M(Fe2O3))/(w2/M(FeO)); None unless both are finite and > 0."""
 

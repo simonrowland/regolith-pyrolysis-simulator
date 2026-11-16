@@ -1503,10 +1503,10 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
         "redox-field-uncertainty",
         "redox-field-experiment",
         identity,
-        Decimal("0.72"),
+        Decimal("18") / Decimal("7"),
         evidence=EvidenceClass.MEASURED_REDUCED,
         derivation=Derivation(
-            relation="Fe3_over_FeT to Fe3+/Fe2+",
+            relation=score_mod.FERRIC_FRACTION_RELATION,
             inputs=("redox-source-row",),
             parameters=(("original_Fe3_over_FeT", F.located(Decimal("0.72"))),),
             output_unit="dimensionless",
@@ -1520,14 +1520,20 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     printed = _printed_uncertainty_band(
         Quantity.FE3_FE2_RATIO,
         uncertainty,
-        Decimal("0.72"),
+        Decimal("18") / Decimal("7"),
         source_observation=observation,
     )
 
     assert printed.refusal is None
     assert printed.band is not None
     assert printed.band.band_basis == "row_printed"
-    assert printed.band.value == Decimal("0.02397909394776774589233425516")
+    expected_sigma_log10_ratio = Decimal("0.02") / (
+        Decimal(10).ln() * Decimal("0.72") * Decimal("0.28")
+    )
+    assert abs(
+        printed.band.value
+        - expected_sigma_log10_ratio * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    ) < Decimal("1e-20")
 
     unparseable = _printed_uncertainty_band(
         Quantity.FE3_FE2_RATIO,
@@ -1541,6 +1547,47 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert unparseable.band is None
     assert unparseable.refusal is not None
     assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
+
+    near_one = F.observation(
+        "redox-near-one-uncertainty",
+        "redox-near-one-experiment",
+        identity,
+        Decimal("99"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derivation=Derivation(
+            relation=score_mod.FERRIC_FRACTION_RELATION,
+            inputs=("redox-source-row",),
+            parameters=(("original_Fe3_over_FeT", F.located(Decimal("0.99"))),),
+            output_unit="dimensionless",
+        ),
+    )
+    near_one_band = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        uncertainty,
+        Decimal("99"),
+        source_observation=near_one,
+    )
+    assert near_one_band.band is None
+    assert near_one_band.refusal is not None
+    assert near_one_band.refusal["reason"] == (
+        "ferric_fraction_uncertainty_linearization_invalid"
+    )
+
+    from simulator.battery.score_metrics import populate_numeric
+
+    numeric, reason, _ = populate_numeric(
+        quantity=Quantity.FE3_FE2_RATIO,
+        candidate=Decimal("100"),
+        reference=Decimal("99"),
+        source_relation=SourceRelation.UNKNOWN,
+        printed_refusal=near_one_band.refusal,
+        operation_override=MetricOperation.DEX,
+        band_operation=MetricOperation.DEX,
+    )
+    assert reason is None
+    assert numeric is not None
+    assert numeric.value.is_finite()
+    assert numeric.decision_band is None
 
 
 @pytest.mark.parametrize(
