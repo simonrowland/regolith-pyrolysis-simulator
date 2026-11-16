@@ -13463,6 +13463,10 @@ def _reference_phase_for_formula(
     formula: str,
     convention: ReferenceStateConvention,
 ) -> Phase | State[Phase]:
+    if convention is ReferenceStateConvention.TEMKIN:
+        return State.unknown(
+            "Temkin reference phase requires a structured standard_state payload"
+        )
     attached = {
         phase
         for phase, named in _named_reference_endmembers(text)
@@ -13525,6 +13529,10 @@ def reference_state_from_extract(
     lowered = text.casefold()
     if not text:
         return None
+    if "temkin" in lowered:
+        return State.unknown(
+            "Temkin reference requires a structured standard_state payload"
+        )
 
     if "vapour reference" in lowered or "vapor reference" in lowered:
         return State.unknown(
