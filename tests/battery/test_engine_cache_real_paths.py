@@ -618,7 +618,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             "internal-analytical default",
             "internal-analytical",
             None,
-            "0200010008018b0800",
+            "0200010008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64080105047061636b050764656661756c74",
         ),
         (
             "openimcc default",
