@@ -100,6 +100,32 @@ def _mass_action_residual(
     return ratio * equilibrium_K - 1.0
 
 
+@pytest.mark.parametrize(
+    "temperature_K,expected_pressure_Pa",
+    [
+        (500.0, 5.100364215161105e-41),
+        (1000.0, 4.256671819358322e-14),
+        (1500.0, 2.5101771894980384e-5),
+    ],
+)
+def test_feo_congruent_sublimation_matches_janaf_rows(
+    temperature_K, expected_pressure_Pa,
+) -> None:
+    result = resolve_wall_saturation(
+        _species_rows()["FeO_association_gas"],
+        species_id="FeO_association_gas",
+        T_K=temperature_K,
+    )
+
+    assert [(part.role, part.record_id) for part in result.participants] == [
+        ("vapour", "Fe-021"),
+        ("product", "Fe-018"),
+    ]
+    assert result.pressure_Pa == pytest.approx(
+        expected_pressure_Pa, rel=1e-8, abs=0.0,
+    )
+
+
 def test_sio_disproportionation_matches_published_nasa_pressure() -> None:
     pressure_Pa = wall_saturation_pressure_pa(_sio_disp(), T_K=_T_K)
     assert pressure_Pa == pytest.approx(1.14529, rel=1e-5)
