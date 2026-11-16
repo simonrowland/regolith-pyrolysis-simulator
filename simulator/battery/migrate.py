@@ -19984,7 +19984,7 @@ class PrintedOxygenDecision:
     notices: tuple[PrintedOxygenNotice, ...] = ()
     buffer_request: _BufferRequest | None = None
     pressure_pa_used: Decimal | None = None
-    interval_condition: Located[Value] | None = None
+    interval_condition: Located[Any] | None = None
     interval_notice_reason: str | None = None
 
 
@@ -20565,6 +20565,9 @@ _KEMS_137_SOURCE_ID = "kems-137-bischof-2023"
 
 def _canonical_buffer_name(text: str) -> str:
     lowered = text.casefold().replace("−", "-").replace("–", "-")
+    normalized = lowered.replace("ü", "u")
+    if "iron-wustite" in normalized or "iron wustite" in normalized:
+        return "IW"
     if "fmq" in lowered or "qfm" in lowered:
         return "QFM"
     if "iw" in lowered:
@@ -21092,9 +21095,9 @@ _BUFFER_OFFSET_INTRO_RE = re.compile(
     rf"(?<![a-z0-9])(?:{_BUFFER_TOKEN})(?![a-z0-9])\s*(?:=|[+-])",
     re.IGNORECASE,
 )
-_LOG_UNITS_PHRASE_RE = re.compile(
-    r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+log\s+units?\s+(?P<dir>below|above)\s+"
-    rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])",
+_BUFFER_DISTANCE_PHRASE_RE = re.compile(
+    r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+(?:log\s+units?\s+)?(?P<dir>below|above)\s+"
+    rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN}|iron[- ]w[uü]stite(?:\s+buffer)?)(?![a-z0-9])",
     re.IGNORECASE,
 )
 _APPROX_BUFFER_RE = re.compile(
@@ -21323,7 +21326,7 @@ def _classify_buffer_phrase(
         if match is not None:
             family = _BUFFER_FAMILY[match.group("buf").casefold()]
         return family or "", None, None, True
-    phrase = _LOG_UNITS_PHRASE_RE.search(text)
+    phrase = _BUFFER_DISTANCE_PHRASE_RE.search(text)
     if phrase is not None:
         number, _printed = _offset_number(phrase.group("n")) or (None, None)
         if number is None:
@@ -21333,7 +21336,7 @@ def _classify_buffer_phrase(
         else:
             number = abs(number)
         return (
-            _BUFFER_FAMILY[phrase.group("buf").casefold()],
+            _canonical_buffer_name(phrase.group("buf")),
             number,
             phrase.group("n"),
             False,
@@ -21796,10 +21799,24 @@ def _printed_fo2_interval(
     raw_item: object,
     point_conditions: Mapping[str, Any] | None,
     *,
-    temperature_K: Decimal | None,
     total_pressure_pa: Decimal | None,
-) -> tuple[Located[Value], str] | None:
+) -> tuple[Located[Any], str] | None:
     """Retain a printed fO2 bound or qualitative air/buffer condition."""
+
+    def value_condition(
+        payload: Mapping[str, Any],
+        locator: Locator | None,
+        inference: Derivation,
+    ) -> Located[Any]:
+        located = _point_condition_from_plain(
+            {"state": {"tag": StateTag.VALUE.value, "value": payload}},
+            key="fO2_log",
+        )
+        return replace(
+            located,
+            locator=locator or located.locator,
+            inference=inference,
+        )
 
     located = (point_conditions or {}).get("fO2_log")
     if isinstance(located, Located) and located.state.is_value:
@@ -21830,6 +21847,55 @@ def _printed_fo2_interval(
                 for text in _text_pieces(candidate):
                     texts.append((key, text.strip()))
 
+    for mapping in mappings:
+        node = mapping.get("oxygen_partial_pressure")
+        if not isinstance(node, Mapping):
+            continue
+        raw_value = node.get("value")
+        if not isinstance(raw_value, str):
+            continue
+        comparison = re.fullmatch(
+            r"\s*(?P<operator><=|>=|<|>|≤|≥)\s*(?P<amount>.*?)\s*",
+            raw_value,
+        )
+        if comparison is None:
+            continue
+        amount = _printed_decimal(comparison.group("amount"))
+        units = str(node.get("units") or node.get("unit") or "").strip()
+        pressure_pa, conversion = convert_pressure_to_pa(amount, units)
+        if amount is None or amount <= 0 or pressure_pa is None or pressure_pa <= 0:
+            continue
+        operator = {"≤": "<=", "≥": ">="}.get(
+            comparison.group("operator"), comparison.group("operator")
+        )
+        log_bar = (pressure_pa / PA_PER_BAR_DEC).log10()
+        locator = _locator_from_plain(node.get("locator")) or _locator_from_plain(
+            mapping.get("locator")
+        )
+        condition = value_condition(
+            {
+                "kind": ValueKind.BOUND.value,
+                "bound_operator": operator,
+                "bound_value": log_bar,
+            },
+            locator,
+            Derivation(
+                relation="printed_oxygen_pressure_inequality_to_log_fO2_bound",
+                inputs=(
+                    f"values.oxygen_partial_pressure={raw_value}",
+                    f"units={units}",
+                    f"pressure_conversion={conversion}",
+                ),
+                parameters=(),
+                output_unit="log10(fO2/bar)",
+            ),
+        )
+        return (
+            condition,
+            "bound_type=printed_oxygen_pressure_inequality; "
+            "frame=log10(fO2/bar); interval condition not yet scorable",
+        )
+
     for key, text in texts:
         atmosphere = _atmosphere_kind(text)
         is_air = (
@@ -21844,22 +21910,41 @@ def _printed_fo2_interval(
             explicit_total_bar = atmosphere[2] if atmosphere is not None else None
             if explicit_total_bar is not None:
                 total_pa = explicit_total_bar * PA_PER_BAR_DEC
-            elif total_pa is None and "ambient" in text.casefold():
-                total_pa = PA_PER_ATM_DEC
-            if total_pa is None or total_pa <= 0 or not total_pa.is_finite():
-                continue
-            po2_pa = total_pa * _AIR_O2_MOLE_FRACTION
-            log_bar = (po2_pa / PA_PER_BAR_DEC).log10()
-            value = Value(
-                ValueKind.INTERVAL, interval_low=log_bar, interval_high=log_bar
-            )
             locator = _locator_from_plain(
                 (mappings[0].get("locator") if mappings else None)
             )
-            condition = Located(
-                State.of(value),
-                locator=locator,
-                inference=Derivation(
+            if total_pa is None or not total_pa.is_finite() or total_pa <= 0:
+                has_pressure_input = any(
+                    "total_pressure_Pa" in mapping for mapping in mappings
+                )
+                reason = (
+                    "invalid total pressure for printed air fO2; no value assigned"
+                    if has_pressure_input or total_pa is not None
+                    else "missing input: printed air fO2 requires stated total pressure"
+                )
+                return (
+                    Located(
+                        State.unknown(reason),
+                        locator=locator,
+                        inference=Derivation(
+                            relation="air_fO2_requires_stated_total_pressure",
+                            inputs=(f"{key}={text}",),
+                            parameters=(),
+                            output_unit="log10(fO2/bar)",
+                        ),
+                    ),
+                    reason,
+                )
+            po2_pa = total_pa * _AIR_O2_MOLE_FRACTION
+            log_bar = (po2_pa / PA_PER_BAR_DEC).log10()
+            condition = value_condition(
+                {
+                    "kind": ValueKind.INTERVAL.value,
+                    "interval_low": log_bar,
+                    "interval_high": log_bar,
+                },
+                locator,
+                Derivation(
                     relation=(
                         "air_interval_from_total_pressure; "
                         "pO2=0.20946*P_total; degenerate interval"
@@ -21878,11 +21963,14 @@ def _printed_fo2_interval(
         bound_match = re.search(
             r"(?:(?P<distance>\d+(?:\.\d+)?)\s*(?:log\s+units?\s+)?)?"
             r"\b(?P<direction>below|under|less than|above|over|greater than)\s+"
-            r"(?P<buffer>IW|FMQ|QFM|NNO|iron[- ]w[uü]stite(?:\s+buffer)?)\b",
+            r"(?P<buffer>IW|FMQ|QFM|NNO|iron[- ]w[uü]stite(?:\s+buffer)?)\b"
+            r"(?P<threshold_offset>\s*[+-]\s*\d+(?:\.\d+)?)?",
             text,
             re.IGNORECASE,
         )
         if bound_match is None:
+            continue
+        if bound_match.group("distance") is not None:
             continue
         buffer = _canonical_buffer_name(bound_match.group("buffer"))
         direction = (
@@ -21891,43 +21979,29 @@ def _printed_fo2_interval(
             in {"below", "under", "less than"}
             else BoundDirection.LOWER
         )
-        bound = -Decimal(bound_match.group("distance") or "0")
+        threshold_offset = bound_match.group("threshold_offset")
+        if threshold_offset is None:
+            bound = Decimal(0)
+        else:
+            parsed_offset = _offset_number(threshold_offset)
+            if parsed_offset is None:
+                continue
+            bound = parsed_offset[0]
         frame = f"log10({buffer})"
-        calibration_notice = ""
-        calibration_text = _printed_buffer_calibration(
-            raw_item, None, point_conditions
-        )
-        pressure_bar = (
-            float(total_pressure_pa / PA_PER_BAR_DEC)
-            if total_pressure_pa is not None and total_pressure_pa > 0
-            else 1.0
-        )
-        if temperature_K is not None and temperature_K.is_finite() and temperature_K > 0:
-            calibrated = _relative_buffer_calibration(
-                buffer,
-                float(temperature_K),
-                pressure_bar,
-                calibration_text,
-            )
-            if calibrated is not None:
-                bound += Decimal(str(calibrated[0]))
-                frame = "log10(fO2/bar)"
-                calibration_notice = f"; calibration={calibrated[1]}"
-        value = Value(
-            ValueKind.BOUND,
-            bound_operator="<" if direction is BoundDirection.UPPER else ">",
-            bound_value=bound,
-        )
         locator = _locator_from_plain(
             (mappings[0].get("locator") if mappings else None)
         )
-        condition = Located(
-            State.of(value),
-            locator=locator,
-            inference=Derivation(
+        condition = value_condition(
+            {
+                "kind": ValueKind.BOUND.value,
+                "bound_operator": "<" if direction is BoundDirection.UPPER else ">",
+                "bound_value": bound,
+            },
+            locator,
+            Derivation(
                 relation=(
                     f"buffer_relative_fO2_inequality; buffer={buffer}; "
-                    f"frame={frame}{calibration_notice}"
+                    f"frame={frame}"
                 ),
                 inputs=(f"{key}={text}",),
                 parameters=(),
@@ -21936,7 +22010,7 @@ def _printed_fo2_interval(
         )
         return (
             condition,
-            f"bound_type={direction.value}; buffer={buffer}; frame={frame}{calibration_notice}; "
+            f"bound_type={direction.value}; buffer={buffer}; frame={frame}; "
             "interval condition not yet scorable",
         )
     return None
@@ -22026,7 +22100,6 @@ def printed_oxygen_decision(
         _printed_fo2_interval(
             raw_item,
             point_conditions,
-            temperature_K=run_temperature_K,
             total_pressure_pa=total_pressure_pa,
         )
         if not absolute
@@ -22034,9 +22107,16 @@ def printed_oxygen_decision(
     )
     if interval is not None:
         interval_condition, interval_notice = interval
+        interval_state = (
+            interval_condition.state
+            if interval_condition.state.is_unknown
+            else State.unknown(
+                "bounded or qualitative fO2 retained as a typed condition"
+            )
+        )
         return PrintedOxygenDecision(
             "interval",
-            State.unknown("bounded or qualitative fO2 retained as a typed condition"),
+            interval_state,
             interval_condition=interval_condition,
             interval_notice_reason=interval_notice,
         )
