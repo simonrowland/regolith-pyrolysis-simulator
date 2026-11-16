@@ -926,7 +926,7 @@ def _unwrap_engine_cache_value(engine_id: str, value: Any) -> Any:
         and isinstance(value, Mapping)
         and _ENGINE_CACHE_VALUE_KEY in value
     ):
-        return value[_ENGINE_CACHE_VALUE_KEY]
+        return live_hot(value[_ENGINE_CACHE_VALUE_KEY])
     return value
 
 
@@ -1239,7 +1239,8 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         return hot
     if (_is_refusal(hot) and not cacheable_refusal(hot)) or readonly or connection is None:
         return hot
-    cache_hot = hot
+    memory_value = hot
+    storage_value = solved.hot if isinstance(solved, EngineCacheValue) else solved
     if engine_id == _LAW_DISCLOSURE_ENGINE:
         from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot, disclosure_delta
 
@@ -1254,7 +1255,11 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                     disclosure_before, active_snapshot()
                 )
             ]
-        cache_hot = {
+        storage_value = {
+            _ENGINE_CACHE_VALUE_KEY: storage_value,
+            "law_disclosures": disclosures,
+        }
+        memory_value = {
             _ENGINE_CACHE_VALUE_KEY: hot,
             "law_disclosures": disclosures,
         }
@@ -1264,7 +1269,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             or isinstance(hot, (list, tuple))
         ):
             raise TypeError("result has no declared HOT projection")
-        hot_value, provenance = _encode_hot(cache_hot)
+        hot_value, provenance = _encode_hot(storage_value)
     except (TypeError, ValueError):
         with _LOCK:
             counts = _counter_bucket(engine_id)
@@ -1302,7 +1307,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             _counter_bucket(engine_id)["store_error"] += 1
     with _LOCK:
         _prepare_memory_cache()
-        _remember_memory_value(memory_key, cache_hot)
+        _remember_memory_value(memory_key, memory_value)
     return hot
 
 
