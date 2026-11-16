@@ -399,6 +399,7 @@ def _read_markova_residue_cache_in_fresh_process(
     inventory: dict[str, float],
 ) -> None:
     os.environ["REGOLITH_ENGINE_CACHE"] = cache_path
+    from simulator import engine_cache
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
         PO2_COMMANDED,
@@ -406,6 +407,11 @@ def _read_markova_residue_cache_in_fresh_process(
         internal_analytical_residue_vapor_pressure,
     )
 
+    def unexpected_solve(**_kwargs):
+        raise AssertionError("fresh-process Markova request must hit the disk cache")
+
+    battery._internal_analytical_vapor_pressure_adapter = unexpected_solve
+    engine_cache.engine_cache_counters(reset=True)
     result = internal_analytical_residue_vapor_pressure(
         core=battery._new_internal_analytical_core(),
         temperature_C=temperature_K - 273.15,
@@ -416,6 +422,9 @@ def _read_markova_residue_cache_in_fresh_process(
         po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0),
         include_diagnostic_shadows=False,
     )
+    counts = engine_cache.engine_cache_counters()["internal-analytical"]
+    assert counts["hits"] == 1
+    assert counts["misses"] == 0
     with open(result_path, "wb") as stream:
         pickle.dump(result, stream)
 
@@ -599,7 +608,7 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     tmp_path,
     monkeypatch,
 ):
-    """An uncached IA recomputation retains the recorded below-threshold proof."""
+    """Cold storage and a fresh-process hit retain the below-threshold proof."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.enums import NoticeKind
     from simulator import engine_cache
@@ -630,10 +639,10 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     engine_cache.engine_cache_counters(reset=True)
     cold = internal_analytical_residue_vapor_pressure(**residue_request)
-    assert engine_cache.engine_cache_counters(reset=True).get(
-        "internal-analytical", {}
-    ) == {}
-    assert not database.exists()
+    counts = engine_cache.engine_cache_counters(reset=True)["internal-analytical"]
+    assert counts["misses"] == counts["stores"] == 1
+    assert counts["hits"] == counts["read_error"] == counts["store_error"] == 0
+    assert database.exists()
 
     result_path = tmp_path / "markova-warm-result.pkl"
     context = multiprocessing.get_context("spawn")
