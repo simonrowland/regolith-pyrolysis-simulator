@@ -442,24 +442,22 @@ _LISTED_REDOX_ELEMENTS = ("Ti", "Mn", "Cr")
 @dataclass(frozen=True)
 class _CationOxide:
     element: str
-    oxide: str
-    cations_per_formula: int
     valence: int
 
 
 # Reference valences from t-1609. Oxygen atoms per cation = valence / 2.
 # Mn2+ and Cr3+ are the stated extras. No other valence is assigned here.
 _CATION_OXIDES = (
-    _CationOxide("Si", "SiO2", 1, 4),
-    _CationOxide("Ti", "TiO2", 1, 4),
-    _CationOxide("Al", "Al2O3", 2, 3),
-    _CationOxide("Fe", _OXIDE_FEO, 1, 2),
-    _CationOxide("Mg", "MgO", 1, 2),
-    _CationOxide("Ca", "CaO", 1, 2),
-    _CationOxide("Na", "Na2O", 2, 1),
-    _CationOxide("K", "K2O", 2, 1),
-    _CationOxide("Mn", "MnO", 1, 2),
-    _CationOxide("Cr", "Cr2O3", 2, 3),
+    _CationOxide("Si", 4),
+    _CationOxide("Ti", 4),
+    _CationOxide("Al", 3),
+    _CationOxide("Fe", 2),
+    _CationOxide("Mg", 2),
+    _CationOxide("Ca", 2),
+    _CationOxide("Na", 1),
+    _CationOxide("K", 1),
+    _CationOxide("Mn", 2),
+    _CationOxide("Cr", 3),
 )
 _CATION_BY_ELEMENT = {row.element: row for row in _CATION_OXIDES}
 
@@ -496,6 +494,13 @@ class ElementMassFractionRedox:
     # grams plus the in-range excess oxygen. FeO_T charge: FeO_T grams.
     # None when the row has no cation relabel.
     charge_mass_g_per_100g: Decimal | None = None
+
+
+@dataclass(frozen=True)
+class _ElementWtOxideProjection:
+    components: tuple[tuple[str, Decimal], ...]
+    oxygen_closure_residual_wt_percent: Decimal | None
+    projected_component_mass_g_per_100g: tuple[tuple[str, Decimal], ...]
 
 
 def canonical_element_symbol(name: str) -> str:
@@ -642,6 +647,144 @@ def _formula_molar_mass(formula: str) -> Decimal:
     for element, count in parsed:
         total += _atomic_weight(element) * Decimal(str(count))
     return total
+
+
+def _oxide_formula_for_valence(element: str, valence: int) -> tuple[str, int]:
+    """Smallest neutral oxide formula and cations per formula unit."""
+
+    if isinstance(valence, bool) or not isinstance(valence, int) or valence <= 0:
+        raise ValueError(f"element_reference_valence_not_positive_integer: {element}")
+    divisor = math.gcd(valence, 2)
+    cations = 2 // divisor
+    oxygens = valence // divisor
+    cation_suffix = "" if cations == 1 else str(cations)
+    oxygen_suffix = "" if oxygens == 1 else str(oxygens)
+    return f"{element}{cation_suffix}O{oxygen_suffix}", cations
+
+
+def _element_wt_percent_to_oxide_moles(
+    element_wt_percent: Mapping[str, Decimal],
+    valence_by_element: Mapping[str, int],
+) -> tuple[dict[str, Decimal], Decimal, dict[str, Decimal]]:
+    """Shared cation-to-oxide formula-unit and oxygen-demand calculation."""
+
+    formula_moles: dict[str, Decimal] = {}
+    oxygen_demand = Decimal(0)
+    cation_moles_by_element: dict[str, Decimal] = {}
+    for element, valence in valence_by_element.items():
+        weight = element_wt_percent.get(element)
+        if weight is None or weight == 0:
+            continue
+        cation_moles = weight / _atomic_weight(element)
+        formula, cations_per_formula = _oxide_formula_for_valence(element, valence)
+        formula_moles[formula] = cation_moles / Decimal(cations_per_formula)
+        oxygen_demand += cation_moles * Decimal(valence) / Decimal(2)
+        cation_moles_by_element[element] = cation_moles
+    return formula_moles, oxygen_demand, cation_moles_by_element
+
+
+def _element_wt_percent_stoichiometric_oxide_projection(
+    elements: Mapping[str, object],
+    *,
+    valence_by_element: Mapping[str, int],
+    retained_components: Sequence[str] = (),
+) -> _ElementWtOxideProjection:
+    """Project elemental wt% to oxide mole fractions with an O closure check.
+
+    For each cation, ``n_E = w_E / M_E`` and a valence ``z+`` gives the
+    smallest neutral oxide ``E_(2/g)O_(z/g)``, where ``g = gcd(z, 2)``.
+    Thus Si4+ -> SiO2, Fe3+ -> Fe2O3, Mg2+ -> MgO and Na+ -> Na2O.
+    Formula-unit moles are ``n_E / (2/g)``; oxygen demand is ``n_E*z/2``.
+    Retained components such as Cl, CO2 and H2O remain their own formula
+    units. The oxide mass factor is ``M(E_(2/g)O_(z/g)) / ((2/g) * M(E))``;
+    for Fe2+ it is ``71.844 / 55.845`` g FeO per g Fe. The residual is measured
+    O wt% minus oxygen in these oxides and retained compounds. It is a check
+    only: measured O never enters the component moles or their normalization,
+    and Cl contributes no oxygen correction.
+
+    Unit check: wt% is g per 100 g, so ``w_E/M_E`` and oxygen demand are
+    mol per 100 g; multiplying the residual oxygen moles by ``M_O`` returns
+    wt% on that same 100 g basis. Sanity: 42.5 g Fe at the typed Fe2+
+    assumption is 42.5/55.845 mol Fe and therefore the same moles of FeO,
+    about 54.68 g FeO per 100 g assay. Independently, 28.085 g Si is 1 mol Si,
+    so SiO2 requires 2 mol O = 31.998 g; measured O of 31.998 g gives zero
+    residual.
+    """
+
+    retained = tuple(str(name).strip() for name in retained_components)
+    if len(set(retained)) != len(retained) or "O" in retained:
+        raise ValueError("element_projection_invalid_retained_components")
+    if set(retained) & set(valence_by_element):
+        raise ValueError("element_projection_component_has_two_roles")
+
+    cation_weights: dict[str, Decimal] = {}
+    retained_weights: dict[str, Decimal] = {}
+    measured_oxygen: Decimal | None = None
+    seen: set[str] = set()
+    for raw_name, raw_weight in elements.items():
+        name = canonical_element_symbol(str(raw_name).strip())
+        if name in seen:
+            raise ValueError(f"element_projection_duplicate_component: {name}")
+        seen.add(name)
+        weight = _as_printed_amount(raw_weight)
+        if weight is None or weight < 0:
+            raise ValueError(
+                f"element_projection_amount_not_nonnegative: {raw_name}"
+            )
+        if name == "O":
+            measured_oxygen = weight
+        elif name in valence_by_element:
+            cation_weights[name] = weight
+        elif name in retained:
+            if parse_species_formula(name) is None:
+                raise ValueError(f"element_projection_invalid_formula: {name}")
+            retained_weights[name] = weight
+        else:
+            raise ValueError(f"element_reference_valence_not_stated: {name}")
+
+    for element, valence in valence_by_element.items():
+        _oxide_formula_for_valence(element, valence)
+    oxide_moles, oxygen_demand_mol, _ = _element_wt_percent_to_oxide_moles(
+        cation_weights, valence_by_element
+    )
+    component_moles = dict(oxide_moles)
+    retained_oxygen_mol = Decimal(0)
+    for name in retained:
+        weight = retained_weights.get(name, Decimal(0))
+        if weight == 0:
+            continue
+        formula_moles = weight / _formula_molar_mass(name)
+        component_moles[name] = formula_moles
+        parsed = parse_species_formula(name)
+        assert parsed is not None
+        oxygen_atoms = sum(
+            (Decimal(str(count)) for element, count in parsed if element == "O"),
+            Decimal(0),
+        )
+        retained_oxygen_mol += formula_moles * oxygen_atoms
+
+    mole_total = sum(component_moles.values(), Decimal(0))
+    if mole_total <= 0:
+        raise ValueError("element_projection_has_no_positive_components")
+    mole_fractions = tuple(
+        (name, amount / mole_total)
+        for name, amount in component_moles.items()
+        if amount > 0
+    )
+    projected_component_mass = tuple(
+        (name, amount * _formula_molar_mass(name))
+        for name, amount in component_moles.items()
+        if amount > 0
+    )
+    residual = None
+    if measured_oxygen is not None:
+        oxygen_weight = _atomic_weight("O")
+        residual = measured_oxygen - (
+            oxygen_demand_mol + retained_oxygen_mol
+        ) * oxygen_weight
+    return _ElementWtOxideProjection(
+        mole_fractions, residual, projected_component_mass
+    )
 
 
 def _is_circular_observable(observable: object | None) -> bool:
@@ -805,18 +948,13 @@ def element_mass_fraction_redox(
         )
         notices.append(ElementWtNotice(NoticeKind.INPUT_OMITTED, reason, ("Cl",)))
 
-    formula_moles: dict[str, Decimal] = {}
-    oxygen_demand = Decimal(0)
-    n_fe = Decimal(0)
-    for row in _CATION_OXIDES:
-        weight = canonical.get(row.element)
-        if weight is None or weight == 0:
-            continue
-        cation_moles = weight / _atomic_weight(row.element)
-        formula_moles[row.oxide] = cation_moles / Decimal(row.cations_per_formula)
-        oxygen_demand += cation_moles * Decimal(row.valence) / Decimal(2)  # t-1609: z_i / 2
-        if row.element == "Fe":
-            n_fe = cation_moles
+    formula_moles, oxygen_demand, cation_moles_by_element = (
+        _element_wt_percent_to_oxide_moles(
+            canonical,
+            {row.element: row.valence for row in _CATION_OXIDES},
+        )
+    )
+    n_fe = cation_moles_by_element.get("Fe", Decimal(0))
 
     if include_chlorine and chloride_name is not None and chlorine is not None:
         parsed = parse_species_formula(chloride_name)
@@ -1071,7 +1209,8 @@ def element_wt_percent_of_oxide_phase(
     if row is None:
         return None
     weight = _atomic_weight(symbol)
-    oxides = {_OXIDE_FEO, _OXIDE_FE2O3} if symbol == "Fe" else {row.oxide}
+    oxide, _cations_per_formula = _oxide_formula_for_valence(symbol, row.valence)
+    oxides = {_OXIDE_FEO, _OXIDE_FE2O3} if symbol == "Fe" else {oxide}
     total = Decimal(0)
     found = False
     for name, amount, parsed in parsed_rows:

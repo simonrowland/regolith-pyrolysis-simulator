@@ -20,12 +20,10 @@ from pathlib import Path
 SEAT = Path(__file__).resolve().parents[2]
 SOURCE = SEAT / "simulator" / "battery" / "composition.py"
 DEMAND_MARKER = (
-    "oxygen_demand += cation_moles * Decimal(row.valence) / Decimal(2)"
-    "  # t-1609: z_i / 2"
+    "oxygen_demand += cation_moles * Decimal(valence) / Decimal(2)"
 )
 DEMAND_BROKEN = (
-    "oxygen_demand += cation_moles * Decimal(row.valence) / Decimal(1)"
-    "  # t-1609: z_i / 2"
+    "oxygen_demand += cation_moles * Decimal(valence) / Decimal(1)"
 )
 DEMAND_SELECT = (
     "hand_example_relabels or extra_oxygen_mass_fraction "
@@ -54,7 +52,10 @@ def _env() -> dict[str, str]:
 def _mutate(original: str, marker: str, broken: str, select: str, label: str) -> str:
     count = original.count(marker)
     if count != 1:
-        print(f"{label}: marker count is {count}, expected 1", file=sys.stderr)
+        print(
+            f"{label}: expected exactly one marker in {SOURCE}, found {count}",
+            file=sys.stderr,
+        )
         return "marker"
     mutated = original.replace(marker, broken, 1)
     if mutated == original or broken not in mutated:
