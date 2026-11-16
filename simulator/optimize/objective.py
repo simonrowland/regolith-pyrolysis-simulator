@@ -4879,7 +4879,6 @@ def _furnace_amortization_summary(
             ),
             "furnace_amortization_cost_per_run_usd": None,
             "furnace_amortization_batch_cost_equivalents": None,
-            "campaigns_to_resinter": campaigns_to_resinter,
         })
     amortization = furnace_amortization_cost_per_run(
         batch_cost,

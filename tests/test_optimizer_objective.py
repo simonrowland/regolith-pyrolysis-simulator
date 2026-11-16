@@ -10822,7 +10822,7 @@ def test_ungrounded_resinter_lifetime_returns_typed_amortization_status(
         "resinter_threshold_kg is not qualified"
     )
     assert summary["furnace_amortization_cost_per_run_usd"] is None
-    assert summary["campaigns_to_resinter"] == campaigns_to_resinter
+    assert "campaigns_to_resinter" not in summary
 
 
 def test_instant_death_furnace_cost_stays_finite_through_pareto_scoring() -> None:
@@ -13700,6 +13700,57 @@ def test_source_carrier_refusal_requires_a_complete_supply_booking(
             assert depreciation["campaigns_to_resinter"] == priced["aggregate_campaigns_to_resinter"]
             assert depreciation["depreciation_expense_per_run_usd"] > 0.0
             assert depreciation[objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] == flag
+
+
+@pytest.mark.parametrize("with_cost_parameters", [False, True])
+def test_product_summary_keeps_generic_resinter_lifetime_per_segment(
+    monkeypatch, with_cost_parameters,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
+    first_segment, second_segment = objective_module.PIPE_SEGMENT_NAMES[:2]
+    sim = _FakeProductSim()
+    sim.record.cost_rollup = {
+        "run_input_cost": {"owner_ratify_money_projection": 20.0},
+    }
+    execution = SimpleNamespace(
+        simulator=sim,
+        campaigns_elapsed=1.0,
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={
+                (first_segment, "Fe"): 1.0,
+                (second_segment, "Fe"): 0.1,
+            },
+            wall_zone_by_segment={first_segment: "Hot", second_segment: "Rest"},
+            wall_deposit_sticking_authority={},
+        ),
+    )
+
+    kwargs = (
+        {"cost_parameters": _furnace_test_cost_parameters()}
+        if with_cost_parameters
+        else {}
+    )
+    summary = product_summary(
+        execution,
+        {"feedstock": "lunar_mare_low_ti"},
+        **kwargs,
+    )
+
+    assert summary["campaigns_to_resinter"] == "resinter_threshold_kg / 1"
+    assert summary["campaigns_to_resinter_worst_segment"] == (
+        "resinter_threshold_kg / 1"
+    )
+    assert summary["aggregate_campaigns_to_resinter"] == (
+        "resinter_threshold_kg / 1.1"
+    )
+    assert summary["lifespan_cost_status"] == "threshold_unavailable"
+    assert summary["furnace_lifespan_consumed_fraction"] is None
+    if with_cost_parameters:
+        assert summary["furnace_amortization_status"] == (
+            objective_module.FURNACE_AMORTIZATION_STATUS_UNGROUNDED
+        )
+        assert summary["furnace_amortization_cost_per_run_usd"] is None
+        assert summary["furnace_amortization_batch_cost_equivalents"] is None
 
 
 @pytest.mark.parametrize("campaigns_elapsed", [1.0, 2.0])
