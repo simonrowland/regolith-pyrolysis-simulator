@@ -146,8 +146,50 @@ def test_numeric_buffer_distances_are_exact_point_offsets() -> None:
 
 
 @pytest.mark.parametrize(
+    ("distance_buffer", "signed_buffer", "family", "calibration"),
+    (
+        ("IW", "iw", "IW", None),
+        ("FMQ", "QFM", "QFM", None),
+        ("NNO", "nno", "NNO", None),
+        ("Mo-MoO2", "mo-moo2", "Mo-MoO2", None),
+        ("M-H", "M-H", "MH", None),
+        ("MH", "M-H", "MH", None),
+        ("M-H", "magnetite-hematite", "MH", "MH; Frost (1991)"),
+        ("magnetite-hematite", "MH", "MH", None),
+        ("MW", "mw", "MW", None),
+    ),
+)
+def test_equivalent_buffer_spellings_do_not_conflict(
+    distance_buffer: str, signed_buffer: str, family: str, calibration: str | None
+) -> None:
+    classified_family, offset, _printed, is_prose = _classify_buffer_phrase(
+        f"2 log units above {distance_buffer}"
+    )
+    expected_raw = {"oxygen_buffer_as_published": f"{signed_buffer}+2"}
+    actual_raw = {
+        "fO2_control": f"2 log units above {distance_buffer}",
+        "oxygen_buffer_as_published": f"{signed_buffer}+2",
+    }
+    if calibration is not None:
+        expected_raw["buffer_calibration"] = calibration
+        actual_raw["buffer_calibration"] = calibration
+    expected = _decision(expected_raw)
+    actual = _decision(actual_raw)
+
+    assert expected is not None and expected.state.is_value
+    assert actual is not None and actual.state.is_value
+    assert actual.state.value == expected.state.value
+    assert (classified_family, offset, is_prose) == (
+        family,
+        Decimal("2"),
+        False,
+    )
+
+
+@pytest.mark.parametrize(
     ("relation", "calibration", "operator", "threshold"),
     (
+        ("below IW", "IW; Frost (1991)", "<", Decimal("0")),
         ("below IW+1", "IW; Frost (1991)", "<", Decimal("1")),
         ("above NNO-2", "NNO; Frost (1991)", ">", Decimal("-2")),
     ),

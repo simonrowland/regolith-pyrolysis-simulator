@@ -19847,8 +19847,10 @@ class PrintedOxygenFacts:
 # oxygen_buffer_as_published string, including CO-CO2 with no ratio, stays
 # a typed missing-input refusal. The curve is not applied to a bounded or
 # approximate print.
-_BUFFER_TOKEN = r"mo-moo2|m-h|fmq|qfm|nno|mh|mw|iw"
-_BUFFER_NAME_TOKENS = ("mo-moo2", "m-h", "fmq", "qfm", "nno", "mh", "mw", "iw")
+_BUFFER_TOKEN = (
+    r"magnetite[- ]hematite|iron[- ]w[uü]stite(?:\s+buffer)?|"
+    r"mo-moo2|m-h|fmq|qfm|nno|mh|mw|iw"
+)
 _BOUNDED_FO2_REASON = (
     "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
 )
@@ -20528,7 +20530,7 @@ def _printed_oxygen_buffer_text(
         and isinstance(buffer_control.state.value, str)
     ):
         control_text = buffer_control.state.value
-        if any(token in control_text.casefold() for token in _BUFFER_NAME_TOKENS):
+        if _BUFFER_TOKEN_RE.search(control_text):
             return control_text
     if not isinstance(raw_item, Mapping):
         return None
@@ -20540,13 +20542,13 @@ def _printed_oxygen_buffer_text(
         if not isinstance(raw_log, Mapping):
             continue
         units = str(raw_log.get("units") or raw_log.get("unit") or "")
-        if any(token in units.casefold() for token in _BUFFER_NAME_TOKENS):
+        if _BUFFER_TOKEN_RE.search(units):
             return units
     return None
 
 
 _BUFFER_OFFSET_TEXT_RE = re.compile(
-    r"^\s*(?:Δ\s*)?(IW|FMQ|QFM|NNO|CO[-–]CO2|M[-–]H|MH|MW|Mo[-–]MoO2)"
+    rf"^\s*(?:Δ\s*)?(CO[-–]CO2|{_BUFFER_TOKEN})"
     r"\s*([+−-])\s*((?:\d+(?:\.\d*)?|\.\d+))\s*$",
     re.IGNORECASE,
 )
@@ -20554,7 +20556,7 @@ _BUFFER_OFFSET_TEXT_RE = re.compile(
 # pressure. log10(bar) and log10(atm) stay absolute frames.
 _LOG_BUFFER_UNITS_RE = re.compile(
     r"^\s*log(?:10)?\s*\(\s*"
-    r"(IW|FMQ|QFM|NNO|CO[-–]CO2|M[-–]H|MH|MW|Mo[-–]MoO2)"
+    rf"(CO[-–]CO2|{_BUFFER_TOKEN})"
     r"\s*\)\s*$",
     re.IGNORECASE,
 )
@@ -20565,25 +20567,13 @@ _KEMS_137_SOURCE_ID = "kems-137-bischof-2023"
 
 def _canonical_buffer_name(text: str) -> str:
     lowered = text.casefold().replace("−", "-").replace("–", "-")
-    normalized = lowered.replace("ü", "u")
-    if "iron-wustite" in normalized or "iron wustite" in normalized:
-        return "IW"
-    if "fmq" in lowered or "qfm" in lowered:
-        return "QFM"
-    if "iw" in lowered:
-        return "IW"
-    if "nno" in lowered:
-        return "NNO"
-    if "co-co2" in lowered:
-        return "CO-CO2"
-    if "mo-moo2" in lowered:
-        return "Mo-MoO2"
-    if "m-h" in lowered:
-        return "M-H"
-    if "mh" in lowered:
-        return "MH"
-    if "mw" in lowered:
-        return "MW"
+    match = _BUFFER_TOKEN_RE.search(lowered)
+    if match is not None:
+        token = match.group("buf").casefold().replace("ü", "u")
+        token = re.sub(r"\s+", "-", token)
+        return _BUFFER_FAMILY[token]
+    if "co-co2" in lowered or "coco2" in re.sub(r"[^a-z0-9]", "", lowered):
+        return _BUFFER_FAMILY["co-co2"]
     return text.strip()
 
 
@@ -20600,22 +20590,11 @@ def _buffer_named_by_log_units(units: object) -> str | None:
 
 def _relative_buffer_for_field(name: str) -> str | None:
     normalized = re.sub(r"[^a-z0-9]", "", name.casefold())
-    suffixes = (
-        ("iw", "IW"),
-        ("fmq", "QFM"),
-        ("qfm", "QFM"),
-        ("nno", "NNO"),
-        ("coco2", "CO-CO2"),
-        ("momoo2", "Mo-MoO2"),
-        ("mw", "MW"),
-        ("mh", "M-H" if re.search(r"m\s*[-–]\s*h", name, re.I) else "MH"),
-    )
     prefixes = ("delta", "d", "fo2delta", "logfo2asdelta")
-    for suffix, buffer in suffixes:
-        if any(normalized == f"{prefix}{suffix}" for prefix in prefixes) or any(
-            normalized == f"{prefix}{suffix}asprinted" for prefix in prefixes
-        ):
-            return buffer
+    for token in _BUFFER_FAMILY:
+        suffix = re.sub(r"[^a-z0-9]", "", token.casefold())
+        if any(normalized in {f"{prefix}{suffix}", f"{prefix}{suffix}asprinted"} for prefix in prefixes):
+            return _canonical_buffer_name(token)
     return None
 
 
@@ -20695,7 +20674,7 @@ def _printed_relative_oxygen(
     buffer, offset = next(iter(unique))
     if buffer_text:
         control_buffer = _canonical_buffer_name(buffer_text)
-        known_buffers = {"IW", "QFM", "NNO", "CO-CO2", "M-H", "MH", "MW", "Mo-MoO2"}
+        known_buffers = {*_BUFFER_FAMILY.values()}
         if control_buffer in known_buffers and control_buffer != buffer:
             return ("ambiguous", Decimal(0), "offset and buffer control disagree")
     printed = next(
@@ -21097,7 +21076,7 @@ _BUFFER_OFFSET_INTRO_RE = re.compile(
 )
 _BUFFER_DISTANCE_PHRASE_RE = re.compile(
     r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+(?:log\s+units?\s+)?(?P<dir>below|above)\s+"
-    rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN}|iron[- ]w[uü]stite(?:\s+buffer)?)(?![a-z0-9])",
+    rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])",
     re.IGNORECASE,
 )
 _APPROX_BUFFER_RE = re.compile(
@@ -21110,11 +21089,15 @@ _IDEAL_FEO_FE_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _BUFFER_FAMILY = {
+    "co-co2": "CO-CO2",
     "iw": "IW",
+    "iron-wustite": "IW",
+    "iron-wustite-buffer": "IW",
     "qfm": "QFM",
     "fmq": "QFM",
     "nno": "NNO",
     "mo-moo2": "Mo-MoO2",
+    "magnetite-hematite": "MH",
     "mh": "MH",
     "m-h": "MH",
     "mw": "MW",
@@ -21136,10 +21119,6 @@ _CALIBRATION_TEXT_FIELDS = (
     "fo2_calibration",
 )
 _BUFFER_NAME_WORDS = (
-    "iron-wüstite",
-    "iron-wustite",
-    "iron wüstite",
-    "iron wustite",
     "fayalite-magnetite-quartz",
     "fayalite magnetite quartz",
     "nickel-nickel oxide",
@@ -21148,8 +21127,7 @@ _BUFFER_NAME_WORDS = (
 
 
 def _units_name_buffer(units: str) -> bool:
-    folded = units.casefold()
-    return any(token in folded for token in _BUFFER_NAME_TOKENS)
+    return _BUFFER_TOKEN_RE.search(units) is not None
 
 
 def _buffer_named_in_mapping(mapping: Mapping[str, Any]) -> bool:
@@ -21324,7 +21302,7 @@ def _classify_buffer_phrase(
         family = None
         match = _BUFFER_TOKEN_RE.search(text.casefold())
         if match is not None:
-            family = _BUFFER_FAMILY[match.group("buf").casefold()]
+            family = _canonical_buffer_name(match.group("buf"))
         return family or "", None, None, True
     phrase = _BUFFER_DISTANCE_PHRASE_RE.search(text)
     if phrase is not None:
@@ -21344,7 +21322,7 @@ def _classify_buffer_phrase(
     matches = list(_BUFFER_OFFSET_RE.finditer(text))
     if not matches:
         return "", None, None, False
-    families = {_BUFFER_FAMILY[item.group("buf").casefold()] for item in matches}
+    families = {_canonical_buffer_name(item.group("buf")) for item in matches}
     if len(families) != 1:
         return "", None, None, True
     family = next(iter(families))
@@ -21465,7 +21443,7 @@ def _buffer_request_from_row(
             number, printed = parsed
             _push_point(
                 points,
-                _BUFFER_FAMILY[match.group("buf").casefold()],
+                _canonical_buffer_name(match.group("buf")),
                 number,
                 printed,
                 units,
