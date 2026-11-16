@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+from tests._plugins.time_isolation import patch_module_time
 import simulator.melt_backend.alphamelts as alphamelts_module
 
 from simulator.engine_pool import EngineWorkerTimeout
@@ -336,7 +337,9 @@ def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> Non
     ],
 )
 @pytest.mark.parametrize(
-    'mode', ['python_api', None], ids=['requested-api', 'discovered-api']
+    'mode',
+    ['python_api', None, 'auto'],
+    ids=['requested-api', 'discovered-api', 'explicit-auto'],
 )
 @pytest.mark.parametrize('warm_worker', [False, True], ids=['cold', 'warm'])
 def test_python_api_initialization_refuses_raw_model_before_worker_creation(
@@ -3946,7 +3949,9 @@ def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
 
         def equilibrate(self, **kwargs):
             vapor_calls.append(kwargs)
-            return SimpleNamespace(status='ok', vapor_pressures_Pa={'SiO': 1.0})
+            return types.SimpleNamespace(
+                status='ok', vapor_pressures_Pa={'SiO': 1.0}
+            )
 
     backend._vaporock_available = True
     backend._vaporock_helper = VapoRockSpy()
@@ -5902,10 +5907,10 @@ def test_thermoengine_timeout_dumps_then_kills_worker(monkeypatch):
         'kill',
         lambda pid, signum: events.append(('diagnostic_signal', pid, signum)),
     )
-    monkeypatch.setattr(
-        engine_worker_module.time,
-        'sleep',
-        lambda seconds: events.append(('grace', seconds)),
+    patch_module_time(
+        monkeypatch,
+        engine_worker_module,
+        sleep=lambda seconds: events.append(('grace', seconds)),
     )
     transport = ThermoEngineTransport(
         model_name='MELTSv1.0.2',

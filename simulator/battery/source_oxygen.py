@@ -18,6 +18,7 @@ from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 
 SOURCE_OXYGEN_RELATION = "source_oxygen_condition;"
 CO_MEASURED_CONSISTENCY_ORIGIN = "co-measured oxygen consistency"
+RYS_SOURCE_ID = "rys-2007-alkali-oxide-thermodynamics"
 
 
 def oxygen_pressure_point(row: Observation) -> Located | None:
@@ -597,6 +598,15 @@ def resolve_source_oxygen(
             or row.value.kind is not ValueKind.POINT or row.value.point is None
             or not row.value.point.is_finite() or row.value.point <= 0
         ):
+            continue
+        if (
+            row.source_id == RYS_SOURCE_ID
+            and (row.provenance or {}).get("oxygen_measurement_status")
+            != "measured_independent"
+        ):
+            # Ryś §4.1.6 reports both direct O2 measurements and pO2
+            # calculated by congruent effusion. A table locator alone does
+            # not establish which method produced this row's value.
             continue
         printed += 1
         ancestry = _lineage(row, point)

@@ -7,7 +7,9 @@ absent.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import metadata
@@ -42,6 +44,7 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
+    _call_with_hard_timeout,
     split_cleaned_melt_account,
 )
 
@@ -58,6 +61,9 @@ _IMCC_REFUSAL_ERROR_TYPE: type[BaseException] | None = (
     if _openimcc is not None
     else None
 )
+_EVALUATE_SOLVE_TIMEOUT_S: ContextVar[float | None] = ContextVar(
+    "openimcc_evaluate_solve_timeout_s", default=None
+)
 
 
 OPENIMCC_INSTALL_HINT = (
@@ -68,6 +74,7 @@ OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
     "@66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
 )
+DEFAULT_GAS_PACK_SELECTION = "default"
 
 
 def imported_openimcc_commit() -> str | None:
@@ -121,6 +128,10 @@ def imported_openimcc_commit() -> str | None:
                 )
                 if isinstance(commit_id, str) and commit_id:
                     return commit_id
+
+    # A loose openimcc.py module is not an identifiable source checkout.
+    if imported_path.name != "__init__.py" or imported_path.parent.name != "openimcc":
+        return None
 
     # A PYTHONPATH source checkout may shadow a stale distribution. In that
     # case report the checkout's HEAD, never the unrelated dist-info commit.
@@ -312,15 +323,59 @@ class OpenImccBridgeResult:
             "parent_oxide_x_star_ratios": dict(self.parent_oxide_x_star_ratios),
         }
 
+    def to_hot(self) -> Any:
+        from simulator.engine_cache import EngineCacheValue, Provenance
+        from simulator.melt_backend.base import encode_engine_notice_codes
+
+        transport = self.to_transport()
+        return EngineCacheValue([
+            transport["parent_oxide_activities"], transport["parent_oxides"],
+            encode_engine_notice_codes("openimcc", [
+                {"kind": "openimcc_flag", "flag": value} for value in self.flags
+            ]),
+            encode_engine_notice_codes("openimcc", [
+                {"kind": "openimcc_notice", "text": value} for value in self.notices
+            ]), transport["acid_sink_ratio"],
+            transport["envelope_status"], transport["extrapolated"],
+            Provenance(transport["coverage"]), transport["activity_coefficients"],
+            transport["parent_oxide_x_star_ratios"],
+            Provenance([
+                transport["pack_model_id"], transport["pack_version"],
+                transport["pack_digest"], transport["openimcc_version"],
+                {name: transport["labels"][name] for name in ("identity", "trust")},
+            ]),
+        ])
+
+    @classmethod
+    def from_hot(cls, payload: Any) -> OpenImccBridgeResult:
+        from simulator.melt_backend.base import decode_engine_notice_codes
+
+        if not isinstance(payload, list) or len(payload) != 11:
+            raise ValueError("invalid OpenIMCC HOT shape")
+        payload = list(payload)
+        payload[2] = tuple(row["flag"] for row in decode_engine_notice_codes("openimcc", *payload[2]))
+        payload[3] = tuple(row["text"] for row in decode_engine_notice_codes("openimcc", *payload[3]))
+        payload[10] = list(payload[10])
+        payload[10][4] = {
+            **payload[10][4], "coverage": payload[7], "envelope_status": payload[5],
+            "flags": payload[2], "notices": payload[3], "acid_sink_ratio": payload[4],
+        }
+        return cls.from_transport(dict(zip((
+            "parent_oxide_activities", "parent_oxides", "flags", "notices",
+            "acid_sink_ratio", "envelope_status", "extrapolated", "coverage",
+            "activity_coefficients", "parent_oxide_x_star_ratios",
+            "pack_model_id", "pack_version", "pack_digest", "openimcc_version", "labels",
+        ), [*payload[:10], *payload[10]])))
+
     @classmethod
     def from_transport(cls, payload: Mapping[str, Any]) -> OpenImccBridgeResult:
         """Rebuild the immutable bridge DTO after crossing a process boundary."""
         labels = payload["labels"]
         return cls(
             parent_oxide_activities=payload["parent_oxide_activities"],
-            parent_oxides=payload["parent_oxides"],
-            flags=payload["flags"],
-            notices=payload["notices"],
+            parent_oxides=tuple(payload["parent_oxides"]),
+            flags=tuple(payload["flags"]),
+            notices=tuple(payload["notices"]),
             acid_sink_ratio=payload["acid_sink_ratio"],
             pack_model_id=payload["pack_model_id"],
             pack_version=payload["pack_version"],
@@ -328,7 +383,13 @@ class OpenImccBridgeResult:
             openimcc_version=payload["openimcc_version"],
             envelope_status=payload["envelope_status"],
             extrapolated=payload["extrapolated"],
-            labels=ImccAdapterLabels(**labels),
+            labels=ImccAdapterLabels(
+                **{
+                    **labels,
+                    "flags": tuple(labels["flags"]),
+                    "notices": tuple(labels["notices"]),
+                }
+            ),
             coverage=payload["coverage"],
             activity_coefficients=payload["activity_coefficients"],
             parent_oxide_x_star_ratios=payload["parent_oxide_x_star_ratios"],
@@ -355,6 +416,103 @@ class OpenImccBridgeResult:
                     for key, value in (self.activity_coefficients or {}).items()
                 }
             ),
+        )
+
+
+@dataclass(frozen=True)
+class OpenImccRedoxResult:
+    """The redox fields consumed by battery scoring and its provenance rows."""
+
+    temperature_K: float
+    mode: str
+    lambda_ln_f_o2: float
+    parent_activity: Mapping[str, float]
+    ferric_fe_mol: float
+    ferrous_fe_mol: float
+    metal_buffered: bool
+    flags: tuple[str, ...]
+    extrapolated_redox_rows: tuple[str, ...]
+    active_row_band_intersection_K: tuple[float, float]
+    redox_pack_digest: str
+
+    def lean(self) -> dict[str, Any]:
+        return {
+            "temperature_K": self.temperature_K,
+            "mode": self.mode,
+            "lambda_ln_f_o2": self.lambda_ln_f_o2,
+            "parent_activity": dict(self.parent_activity),
+            "ferric_fe_mol": self.ferric_fe_mol,
+            "ferrous_fe_mol": self.ferrous_fe_mol,
+            "metal_buffered": self.metal_buffered,
+            "flags": self.flags,
+            "extrapolated_redox_rows": self.extrapolated_redox_rows,
+            "active_row_band_intersection_K": self.active_row_band_intersection_K,
+            "redox_pack_digest": self.redox_pack_digest,
+        }
+
+    def to_hot(self) -> Any:
+        from simulator.engine_cache import EngineCacheValue, Provenance
+
+        values = self.lean()
+        return EngineCacheValue([
+            values["temperature_K"], values["mode"], values["lambda_ln_f_o2"],
+            values["parent_activity"], values["ferric_fe_mol"], values["ferrous_fe_mol"],
+            values["metal_buffered"], values["flags"], values["extrapolated_redox_rows"],
+            values["active_row_band_intersection_K"], Provenance(values["redox_pack_digest"]),
+        ])
+
+    @classmethod
+    def from_hot(cls, payload: Any) -> OpenImccRedoxResult:
+        if not isinstance(payload, list) or len(payload) != 11:
+            raise ValueError("invalid OpenIMCC redox HOT shape")
+        return cls.from_lean(dict(zip((
+            "temperature_K", "mode", "lambda_ln_f_o2", "parent_activity",
+            "ferric_fe_mol", "ferrous_fe_mol", "metal_buffered", "flags",
+            "extrapolated_redox_rows", "active_row_band_intersection_K", "redox_pack_digest",
+        ), payload)))
+
+    @classmethod
+    def from_lean(cls, payload: Mapping[str, Any]) -> OpenImccRedoxResult:
+        return cls(
+            temperature_K=float(payload["temperature_K"]),
+            mode=str(payload["mode"]),
+            lambda_ln_f_o2=float(payload["lambda_ln_f_o2"]),
+            parent_activity=MappingProxyType(
+                {str(name): float(value) for name, value in payload["parent_activity"].items()}
+            ),
+            ferric_fe_mol=float(payload["ferric_fe_mol"]),
+            ferrous_fe_mol=float(payload["ferrous_fe_mol"]),
+            metal_buffered=bool(payload["metal_buffered"]),
+            flags=tuple(str(value) for value in payload["flags"]),
+            extrapolated_redox_rows=tuple(
+                str(value) for value in payload["extrapolated_redox_rows"]
+            ),
+            active_row_band_intersection_K=tuple(
+                float(value) for value in payload["active_row_band_intersection_K"]
+            ),
+            redox_pack_digest=str(payload["redox_pack_digest"]),
+        )
+
+    @classmethod
+    def from_engine_result(cls, result: Any) -> OpenImccRedoxResult:
+        return cls(
+            temperature_K=float(result.temperature_K),
+            mode=str(result.mode),
+            lambda_ln_f_o2=float(result.lambda_ln_f_o2),
+            parent_activity={
+                "FeO": float(result.parent_activity["FeO"])
+            },
+            ferric_fe_mol=float(result.ferric_fe_mol),
+            ferrous_fe_mol=float(result.ferrous_fe_mol),
+            metal_buffered=bool(result.metal_buffered),
+            flags=tuple(str(value) for value in result.flags),
+            extrapolated_redox_rows=tuple(
+                str(value) for value in result.extrapolated_redox_rows
+            ),
+            active_row_band_intersection_K=tuple(
+                float(value) for value in result.active_row_band_intersection_K
+            ),
+            redox_pack_digest=str(result.redox_pack_digest),
         )
 
 
@@ -920,7 +1078,7 @@ def engine_binding_identity(melt_pack: Any, gas_pack: Any) -> dict[str, str]:
     return result
 
 
-def evaluate(
+def _evaluate_uncached(
     composition_mol: Mapping[str, float] | None = None,
     temperature_K: float | None = None,
     *,
@@ -1050,6 +1208,174 @@ def evaluate(
     )
 
 
+def _evaluate_request_vector(
+    composition_mol: Mapping[str, float] | None = None,
+    temperature_K: float | None = None,
+    *,
+    composition_kg: Mapping[str, float] | None = None,
+    pack: str | None = None,
+    allow_extrapolation: bool = False,
+    allow_out_of_envelope: bool = False,
+) -> dict[str, Any]:
+    """Build the shared cache vector for direct and residue OpenIMCC evaluations."""
+    return {
+        "call": "evaluate",
+        "composition_mol": composition_mol,
+        "composition_kg": composition_kg,
+        "temperature_K": temperature_K,
+        "pack": DEFAULT_BACKEND_PACK_NAME if pack is None else pack,
+        "allow_extrapolation": allow_extrapolation,
+        "allow_out_of_envelope": allow_out_of_envelope,
+    }
+
+
+@contextmanager
+def _with_solve_timeout(timeout_s: float | None):
+    token = _EVALUATE_SOLVE_TIMEOUT_S.set(timeout_s)
+    try:
+        yield
+    finally:
+        _EVALUATE_SOLVE_TIMEOUT_S.reset(token)
+
+
+def _evaluate_with_timeout(
+    composition_mol: Mapping[str, float] | None = None,
+    temperature_K: float | None = None,
+    *,
+    composition_kg: Mapping[str, float] | None = None,
+    pack: str | None = None,
+    allow_extrapolation: bool = False,
+    allow_out_of_envelope: bool = False,
+    solve_timeout_s: float | None = None,
+) -> OpenImccBridgeResult:
+    from simulator.engine_cache import cached_engine_call, record_engine_open
+
+    record_engine_open("openimcc")
+
+    request = _evaluate_request_vector(
+        composition_mol=composition_mol,
+        temperature_K=temperature_K,
+        composition_kg=composition_kg,
+        pack=pack,
+        allow_extrapolation=allow_extrapolation,
+        allow_out_of_envelope=allow_out_of_envelope,
+    )
+    def solve() -> Any:
+        return _evaluate_uncached(
+            composition_mol=composition_mol,
+            temperature_K=temperature_K,
+            composition_kg=composition_kg,
+            pack=pack,
+            allow_extrapolation=allow_extrapolation,
+            allow_out_of_envelope=allow_out_of_envelope,
+        ).to_hot()
+
+    payload = cached_engine_call(
+        "openimcc",
+        request,
+        (
+            solve
+            if solve_timeout_s is None
+            else lambda: _call_with_hard_timeout(solve, solve_timeout_s)
+        ),
+    )
+    return OpenImccBridgeResult.from_hot(payload)
+
+
+def evaluate(
+    composition_mol: Mapping[str, float] | None = None,
+    temperature_K: float | None = None,
+    *,
+    composition_kg: Mapping[str, float] | None = None,
+    pack: str | None = None,
+    allow_extrapolation: bool = False,
+    allow_out_of_envelope: bool = False,
+) -> OpenImccBridgeResult:
+    return _evaluate_with_timeout(
+        composition_mol=composition_mol,
+        temperature_K=temperature_K,
+        composition_kg=composition_kg,
+        pack=pack,
+        allow_extrapolation=allow_extrapolation,
+        allow_out_of_envelope=allow_out_of_envelope,
+        solve_timeout_s=_EVALUATE_SOLVE_TIMEOUT_S.get(),
+    )
+
+
+def evaluate_gas(
+    parent_oxide_activities: Mapping[str, float],
+    temperature_K: float,
+    pressure_bar: float,
+    gas_pack: Any,
+    *,
+    parent_oxides: Sequence[str] | None = None,
+    allow_extrapolation: bool = False,
+    gas_pack_selection: str = DEFAULT_GAS_PACK_SELECTION,
+) -> dict[str, float]:
+    from openimcc import evaluate_gas as openimcc_evaluate_gas
+    from simulator.engine_cache import cached_engine_call, record_engine_open
+
+    record_engine_open("openimcc")
+
+    request = {
+        "call": "evaluate_gas",
+        "parent_oxide_activities": dict(parent_oxide_activities),
+        "temperature_K": temperature_K,
+        "pressure_bar": pressure_bar,
+        "gas_pack_selection": gas_pack_selection,
+        "parent_oxides": None if parent_oxides is None else tuple(parent_oxides),
+        "allow_extrapolation": allow_extrapolation,
+    }
+    return cached_engine_call(
+        "openimcc",
+        request,
+        lambda: dict(openimcc_evaluate_gas(
+            parent_oxide_activities,
+            temperature_K,
+            pressure_bar,
+            gas_pack,
+            parent_oxides=parent_oxides,
+            allow_extrapolation=allow_extrapolation,
+        )),
+    )
+
+def evaluate_redox(
+    inventory: Mapping[str, float],
+    temperature_K: float,
+    mode: str,
+    *,
+    lambda_imposed: float | None = None,
+    entry: str = "openimcc.evaluate_redox",
+) -> Any:
+    import openimcc
+    from simulator.engine_cache import cached_engine_call, record_engine_open
+
+    record_engine_open("openimcc")
+
+    request = {
+        "call": entry,
+        "inventory": dict(inventory),
+        "temperature_K": temperature_K,
+        "mode": mode,
+        "lambda_imposed": lambda_imposed,
+    }
+
+    def solve() -> Any:
+        if entry == "openimcc.redox.evaluate_redox":
+            import openimcc.redox as openimcc_redox
+
+            result = openimcc_redox.evaluate_redox(inventory, temperature_K, mode)
+        else:
+            result = openimcc.evaluate_redox(
+                inventory, temperature_K, mode, lambda_imposed=lambda_imposed
+            )
+        lean = OpenImccRedoxResult.from_engine_result(result)
+        return lean.to_hot()
+
+    payload = cached_engine_call("openimcc", request, solve)
+    return OpenImccRedoxResult.from_hot(payload)
+
+
 evaluate_openimcc = evaluate
 
 
@@ -1174,5 +1500,7 @@ __all__ = [
     "FE2O3_TO_FEO_TOTAL_WT_FACTOR",
     "evaluate",
     "evaluate_cleaned_melt",
+    "evaluate_gas",
     "evaluate_openimcc",
+    "evaluate_redox",
 ]
