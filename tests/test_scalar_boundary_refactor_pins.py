@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from decimal import Decimal
 from pathlib import Path
 
 from engines.alphamelts.parser import is_finite as alphamelts_parser_is_finite
@@ -19,7 +20,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     finite_float as binary_pot_finite_float,
 )
 from simulator.diagnostics import finite_float as diagnostics_finite_float
-from simulator.scalar_boundary import finite_float, is_finite
+from simulator.scalar_boundary import finite_builtin_number, finite_float, is_finite
 
 IS_FINITE_HELPERS = (
     ("engines/magemin/provider.py", magemin_provider_is_finite),
@@ -122,6 +123,20 @@ def test_finite_float_pin_grid():
     for label, value, _, expected in OUTPUT_PIN_GRID:
         for source, helper in FINITE_FLOAT_HELPERS:
             assert _outcome(helper, value) == expected, f"{source} {label}"
+
+
+def test_finite_builtin_number_contract():
+    assert finite_builtin_number(3) == 3.0
+    assert isinstance(finite_builtin_number(3), float)
+    assert finite_builtin_number(3.5) == 3.5
+    for value in (True, "3", Decimal("3"), None, float("nan"), float("inf")):
+        assert finite_builtin_number(value) is None
+    try:
+        finite_builtin_number(10**400)
+    except OverflowError:
+        pass
+    else:
+        raise AssertionError("oversized integer conversion must preserve OverflowError")
 
 
 def test_target_modules_have_no_local_scalar_boundary_copies():

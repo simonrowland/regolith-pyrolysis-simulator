@@ -28,7 +28,11 @@ from simulator.physical_constants import (
     PA_PER_BAR,
     PA_PER_MBAR,
 )
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import (
+    finite_builtin_number,
+    is_declared_real_scalar,
+    is_finite,
+)
 
 
 EXTRACTS_DIR = Path(__file__).resolve().parents[1] / "data" / "literature" / "extracts"
@@ -118,17 +122,17 @@ class CurveLiquidFractionSampler(Protocol):
     ) -> Any: ...
 
 
-def _finite_real(value: Any, field: str) -> float:
+def _liner_real(value: Any, field: str) -> float:
     if not is_declared_real_scalar(value):
         raise LinerCorrosionRefusal("invalid_liner_input", f"{field} must be numeric")
     result = float(value)
-    if not math.isfinite(result):
+    if not is_finite(result):
         raise LinerCorrosionRefusal("invalid_liner_input", f"{field} must be finite")
     return result
 
 
 def _positive(value: Any, field: str) -> float:
-    result = _finite_real(value, field)
+    result = _liner_real(value, field)
     if result <= 0.0:
         raise LinerCorrosionRefusal("invalid_liner_input", f"{field} must be positive")
     return result
@@ -144,16 +148,16 @@ def _resolve_rating_and_onset(
 ) -> LinerRatingResolution:
     """Resolve the d-419 margin, optional pure cap, and service onset once."""
 
-    margin = _finite_real(margin_C, "margin_C")
+    margin = _liner_real(margin_C, "margin_C")
     if margin < 0.0:
         raise LinerCorrosionRefusal("temperature_margin_invalid")
     pure_first_liquid = (
-        _finite_real(pure_first_liquid_temperature_C, "pure_first_liquid_temperature_C")
+        _liner_real(pure_first_liquid_temperature_C, "pure_first_liquid_temperature_C")
         if pure_first_liquid_temperature_C is not None
         else None
     )
     contaminated_first_liquid = (
-        _finite_real(
+        _liner_real(
             contaminated_first_liquid_temperature_C,
             "contaminated_first_liquid_temperature_C",
         )
@@ -184,12 +188,12 @@ def _resolve_rating_and_onset(
     if onset_below_scan_range:
         if service_temperature_C is None:
             raise LinerCorrosionRefusal("liner_service_temperature_missing")
-        _finite_real(service_temperature_C, "service_temperature_C")
+        _liner_real(service_temperature_C, "service_temperature_C")
         onset: bool | None = True
     elif rating is None or service_temperature_C is None:
         onset = None
     else:
-        onset = _finite_real(service_temperature_C, "service_temperature_C") >= rating
+        onset = _liner_real(service_temperature_C, "service_temperature_C") >= rating
     return LinerRatingResolution(
         rating_temperature_C=rating,
         cap_temperature_C=cap,
@@ -206,7 +210,7 @@ def validate_oxide_composition(composition_wt_pct: Mapping[str, Any]) -> dict[st
     result: dict[str, float] = {}
     for raw_oxide, raw_wt_pct in composition_wt_pct.items():
         oxide = str(raw_oxide).strip()
-        wt_pct = _finite_real(raw_wt_pct, f"composition_wt_pct[{oxide!r}]")
+        wt_pct = _liner_real(raw_wt_pct, f"composition_wt_pct[{oxide!r}]")
         if not oxide or wt_pct < 0.0:
             raise LinerCorrosionRefusal("liner_composition_invalid", oxide)
         try:
@@ -252,7 +256,7 @@ def _checked_deposit(deposit_kg_by_species: Mapping[str, Any]) -> dict[str, floa
             raise LinerCorrosionRefusal(
                 "deposit_species_unmapped", f"no oxide mapping for {species!r}"
             )
-        kg = _finite_real(raw_kg, f"deposit_kg_by_species[{species!r}]")
+        kg = _liner_real(raw_kg, f"deposit_kg_by_species[{species!r}]")
         if kg < 0.0:
             raise LinerCorrosionRefusal("deposit_mass_negative", species)
         result[species] = result.get(species, 0.0) + kg
@@ -452,7 +456,7 @@ def reacted_layer_depths(reacted_layer_depth_m: float) -> tuple[float, float, fl
 def post_onset_dissolution_ratio(x_star: float) -> float:
     """Equilibrium liner dissolved per kg deposit after onset: (1-x*)/x*."""
 
-    fraction = _finite_real(x_star, "x_star")
+    fraction = _liner_real(x_star, "x_star")
     if fraction <= 0.0 or fraction > 1.0:
         raise LinerCorrosionRefusal(
             "dissolution_fraction_invalid", "x_star must be in (0, 1]"
@@ -496,7 +500,7 @@ def _species_aggressiveness_finite_difference_with_reference(
     if oxide is None:
         raise LinerCorrosionRefusal("deposit_species_unmapped", species)
     base = validate_oxide_composition(liner_composition_wt_pct)
-    service_C = _finite_real(temperature_C, "temperature_C")
+    service_C = _liner_real(temperature_C, "temperature_C")
     pressure = _positive(pressure_bar, "pressure_bar")
     if base_reference_profile is None:
         try:
@@ -600,7 +604,7 @@ def sticking_deposit_interval(
 
 
 def _checked_liquid_fraction(value: Any) -> float:
-    fraction = _finite_real(value, "liquid_fraction")
+    fraction = _liner_real(value, "liquid_fraction")
     if fraction < 0.0 or fraction > 1.0:
         raise LinerCorrosionRefusal("liquid_fraction_invalid")
     return fraction
@@ -649,7 +653,7 @@ def _campaign_branch(
     invariant_table: Mapping[str, Any] | None = None,
 ) -> tuple[int | str, dict[str, float], float, dict[str, Any] | None]:
     deposits = _checked_deposit(initial_deposit_kg_by_species)
-    service_temperature = _finite_real(temperature_C, "temperature_C")
+    service_temperature = _liner_real(temperature_C, "temperature_C")
     pressure = (
         None if pressure_bar is None else _positive(pressure_bar, "pressure_bar")
     )
@@ -896,7 +900,7 @@ def _tier_b_reference_profile_single(
         # constant saturation profiles with ordinary onset brackets.
         result["constant_endmember_bracket"] = constant_endmember_bracket
     if literature_melting_temperature_C is not None:
-        literature_temperature = _finite_real(
+        literature_temperature = _liner_real(
             literature_melting_temperature_C,
             "literature_melting_temperature_C",
         )
@@ -1412,12 +1416,12 @@ def _tier_a_fallback_melt_activity(
                 f"{exc.detail}; continuity={dict(sensitivity)!r}"
             ),
         ) from exc
-    contaminated_temperature = _finite_real(
+    contaminated_temperature = _liner_real(
         contaminated_first,
         "tier_a_contaminated_first_liquid_T_C",
     )
     literature_temperature = (
-        _finite_real(literature_melting_temperature_C, "literature_melting_temperature_C")
+        _liner_real(literature_melting_temperature_C, "literature_melting_temperature_C")
         if literature_melting_temperature_C is not None
         else None
     )
@@ -1519,7 +1523,7 @@ def _tier_b_melt_activity_rating(
     interface = validate_oxide_composition(interface_composition_wt_pct)
     deposits = _checked_deposit(deposit_kg_by_species)
     pressure = _positive(pressure_bar, "pressure_bar")
-    margin = _finite_real(margin_C, "margin_C")
+    margin = _liner_real(margin_C, "margin_C")
     if margin < 0.0:
         raise LinerCorrosionRefusal("temperature_margin_invalid")
     reference_flags = list(pure_reference.get("flags", ()))
@@ -1556,7 +1560,7 @@ def _tier_b_melt_activity_rating(
         literature_source = "engine_bulk_melt_lower_bracket"
         reference_flags.append(ENGINE_BULK_MELT_REFERENCE_FALLBACK_FLAG)
     else:
-        literature_temperature = _finite_real(
+        literature_temperature = _liner_real(
             literature_melting_temperature_C,
             "literature_melting_temperature_C",
         )
@@ -1656,7 +1660,7 @@ def _tier_b_melt_activity_rating(
         )
         flags = list(reference_flags)
     if service_temperature_C is not None and deposits and selected_contaminated is not None:
-        service_temperature = _finite_real(service_temperature_C, "service_temperature_C")
+        service_temperature = _liner_real(service_temperature_C, "service_temperature_C")
         service_fraction = selected_contaminated.get("service_liquid_fraction")
         baseline_service = _tier_b_sample_at_temperature_with_reference(
             sampler,
@@ -1764,7 +1768,7 @@ def _corrosion_campaign_recurrence_impl(
         }
     if isinstance(horizon, bool) or not isinstance(horizon, int) or horizon < 0:
         raise LinerCorrosionRefusal("campaign_horizon_invalid")
-    margin = _finite_real(margin_C, "margin_C")
+    margin = _liner_real(margin_C, "margin_C")
     if margin < 0.0:
         raise LinerCorrosionRefusal("temperature_margin_invalid")
 
@@ -1926,7 +1930,7 @@ def _tier_b_onset_at_service_temperature(
     if rating is not None:
         resolution = _resolve_rating_and_onset(
             None,
-            _finite_real(rating, "rating_temperature_C"),
+            _liner_real(rating, "rating_temperature_C"),
             0.0,
             service_temperature_C,
         )
@@ -2250,7 +2254,7 @@ def _tier_a_pure_phase_melting_reference(
             liner, liquid, row["liquid_composition"]
         ):
             continue
-        temperature = _finite_real(row.get("T_invariant_C"), "T_invariant_C")
+        temperature = _liner_real(row.get("T_invariant_C"), "T_invariant_C")
         matches.append((temperature, row))
     if not matches:
         return None
@@ -2318,15 +2322,15 @@ def first_liquid_tier_a(
                 else:
                     covered = False
                     break
-                lower = _finite_real(low, f"{oxide}.min")
-                upper = _finite_real(high, f"{oxide}.max")
+                lower = _liner_real(low, f"{oxide}.min")
+                upper = _liner_real(high, f"{oxide}.max")
                 wt_pct = composition.get(str(oxide), 0.0)
                 if lower > upper or wt_pct < lower or wt_pct > upper:
                     covered = False
                     break
             if covered:
                 matches.append(
-                    _finite_real(
+                    _liner_real(
                         row.get("first_liquid_temperature_C"),
                         "first_liquid_temperature_C",
                     )
@@ -2398,7 +2402,7 @@ def first_liquid_tier_a(
                 composition, liquid, liquid_composition
             ):
                 pure_phase_matches.append(
-                    _finite_real(row.get("T_invariant_C"), "T_invariant_C")
+                    _liner_real(row.get("T_invariant_C"), "T_invariant_C")
                 )
             continue
         if invariant_type == "peritectic":
@@ -2423,14 +2427,14 @@ def first_liquid_tier_a(
                     # A peritectic row applies at its single solid reactant;
                     # the adjacent compatibility segment is tested below.
                     pure_phase_matches.append(
-                        _finite_real(row.get("T_invariant_C"), "T_invariant_C")
+                        _liner_real(row.get("T_invariant_C"), "T_invariant_C")
                     )
         if len(solid_phases) in {2, 3} and _bulk_inside_open_compatibility_field(
             composition,
             [phases_by_name[phase] for phase in solid_phases],
         ):
             matches.append(
-                _finite_real(row.get("T_invariant_C"), "T_invariant_C")
+                _liner_real(row.get("T_invariant_C"), "T_invariant_C")
             )
     if pure_phase_matches:
         # A cited pure phase is a compatibility-field endpoint even when its
@@ -2478,8 +2482,8 @@ def tier_a_first_liquid_onset(
     margin_C: float,
 ) -> dict[str, Any]:
     first_liquid_C = first_liquid_tier_a(invariant_table, composition_wt_pct)
-    margin = _finite_real(margin_C, "margin_C")
-    service_temperature = _finite_real(service_temperature_C, "service_temperature_C")
+    margin = _liner_real(margin_C, "margin_C")
+    service_temperature = _liner_real(service_temperature_C, "service_temperature_C")
     service_limit_C = service_temperature + margin
     resolution = _resolve_rating_and_onset(
         None,
@@ -2552,7 +2556,7 @@ class TierAInvariantSampler:
             composition_wt_pct,
         )
         return float(
-            first_liquid_C <= _finite_real(temperature_C, "temperature_C")
+            first_liquid_C <= _liner_real(temperature_C, "temperature_C")
         )
 
 
@@ -2765,7 +2769,7 @@ def _tier_a_saturated_deposit_fraction(
         # Dissolution saturation is evaluated at operating service temperature;
         # the first-melt point and its margin do not supply that liquid composition.
         if not math.isclose(
-            _finite_real(temperature, "T_invariant_C"),
+            _liner_real(temperature, "T_invariant_C"),
             service_temperature_C,
             rel_tol=0.0,
             abs_tol=1.0e-9,
@@ -2817,7 +2821,7 @@ def _tier_b_saturated_deposit_fraction(
     corrected_points: list[tuple[float, float]] = []
     continuity_evidence: list[dict[str, Any]] = []
     for raw_fraction, raw_liquid_fraction in points:
-        fraction = _finite_real(raw_fraction, "deposit_fraction")
+        fraction = _liner_real(raw_fraction, "deposit_fraction")
         if (
             fraction < 0.0
             or fraction > 1.0
@@ -2945,7 +2949,7 @@ def build_liner_state_segment(
     if horizon is None:
         raise LinerCorrosionRefusal("campaign_horizon_missing")
     area = _positive(area_m2, "area_m2")
-    service_C = _finite_real(service_temperature_C, "service_temperature_C")
+    service_C = _liner_real(service_temperature_C, "service_temperature_C")
     if service_C <= -CELSIUS_TO_KELVIN_OFFSET:
         raise LinerCorrosionRefusal("liner_service_temperature_invalid")
     pressure = (
@@ -2953,7 +2957,7 @@ def build_liner_state_segment(
     )
     depth = _positive(h, "reacted_layer_depth_m")
     density = _positive(rho, "density_kg_m3")
-    margin_C = _finite_real(margin, "margin_C")
+    margin_C = _liner_real(margin, "margin_C")
     if margin_C < 0.0:
         raise LinerCorrosionRefusal("temperature_margin_invalid")
     if isinstance(horizon, bool) or not isinstance(horizon, int) or horizon < 0:
@@ -3329,7 +3333,7 @@ def _reactive_deposit_upper_bound_for_segment(
                     "reactive_deposit_operating_state_invalid",
                     f"{segment.name}:{species}: candidate is not a mapping",
                 )
-            supply_mol_s = _finite_real(
+            supply_mol_s = _liner_real(
                 record.get("available_supply_mol_s"),
                 f"available_supply_mol_s[{segment.name},{species}]",
             )
@@ -3378,7 +3382,7 @@ def _reactive_deposit_upper_bound_for_segment(
                 getattr(snapshot, "duration_h", None), "snapshot.duration_h"
             )
             saw_candidate = True
-            supply_mol_s = _finite_real(
+            supply_mol_s = _liner_real(
                 record.get("available_supply_mol_s"),
                 f"available_supply_mol_s[{segment.name},{species}]",
             )
@@ -3389,7 +3393,7 @@ def _reactive_deposit_upper_bound_for_segment(
                 )
             if supply_mol_s == 0.0:
                 continue
-            pressure = _finite_real(
+            pressure = _liner_real(
                 record.get("species_partial_pressure_pa"),
                 f"species_partial_pressure_pa[{segment.name},{species}]",
             )
@@ -3404,7 +3408,7 @@ def _reactive_deposit_upper_bound_for_segment(
                 if isinstance(surface, Mapping)
                 else None
             )
-            wall_temperature_C = _finite_real(
+            wall_temperature_C = _liner_real(
                 wall_temperature_K, "wall_temperature_K"
             ) - CELSIUS_TO_KELVIN_OFFSET
             if wall_temperature_C <= -CELSIUS_TO_KELVIN_OFFSET:
@@ -3471,7 +3475,7 @@ def _reactive_deposit_upper_bound_for_segment(
                         or species
                     ),
                 )
-            candidate_kg_hr = _finite_real(
+            candidate_kg_hr = _liner_real(
                 candidate, "reactive_deposit_candidate"
             )
             reactive_mass_kg += candidate_kg_hr * duration_h
@@ -3689,7 +3693,7 @@ def _rounded_composition(composition_wt_pct: Mapping[str, Any]) -> tuple[tuple[s
         sorted(
             (
                 str(oxide),
-                round(_finite_real(value, f"composition_wt_pct[{oxide!r}]"), MAGEMIN_CACHE_DECIMAL_PLACES),
+                round(_liner_real(value, f"composition_wt_pct[{oxide!r}]"), MAGEMIN_CACHE_DECIMAL_PLACES),
             )
             for oxide, value in composition_wt_pct.items()
         )
@@ -3722,9 +3726,9 @@ def magemin_request_cache_key(
         engine_id,
         version,
         _rounded_composition(composition_wt_pct),
-        round(_finite_real(temperature_C, "temperature_C"), MAGEMIN_CACHE_DECIMAL_PLACES),
+        round(_liner_real(temperature_C, "temperature_C"), MAGEMIN_CACHE_DECIMAL_PLACES),
         _rounded_pressure_bar(pressure_bar),
-        round(_finite_real(fO2_log, "fO2_log"), MAGEMIN_CACHE_DECIMAL_PLACES),
+        round(_liner_real(fO2_log, "fO2_log"), MAGEMIN_CACHE_DECIMAL_PLACES),
     )
 
 
@@ -3781,7 +3785,7 @@ def _check_element_closure(
     masses: dict[str, float] = {}
     all_phase_masses: dict[str, float] = {}
     for phase, raw_mass in phase_masses.items():
-        mass = _finite_real(raw_mass, f"phase_masses_kg[{phase!r}]")
+        mass = _liner_real(raw_mass, f"phase_masses_kg[{phase!r}]")
         if mass < 0.0:
             raise LinerCorrosionRefusal(ELEMENT_CLOSURE_FLAG, "negative phase mass")
         all_phase_masses[str(phase)] = mass
@@ -3991,7 +3995,7 @@ def _infer_deposit_fraction(
     numerator = math.fsum(
         delta[oxide]
         * (
-            _finite_real(composition_wt_pct.get(oxide, 0.0), f"{oxide} wt%")
+            _liner_real(composition_wt_pct.get(oxide, 0.0), f"{oxide} wt%")
             - liner_composition_wt_pct.get(oxide, 0.0)
         )
         for oxide in oxides
@@ -4005,7 +4009,7 @@ def _infer_deposit_fraction(
         for oxide in oxides
     }
     for oxide in oxides:
-        observed = _finite_real(composition_wt_pct.get(oxide, 0.0), f"{oxide} wt%")
+        observed = _liner_real(composition_wt_pct.get(oxide, 0.0), f"{oxide} wt%")
         if not math.isclose(observed, expected[oxide], rel_tol=0.0, abs_tol=1e-5):
             raise LinerCorrosionRefusal("magemin_curve_composition_mismatch")
     return min(1.0, max(0.0, fraction))
@@ -4016,7 +4020,7 @@ def interpolate_liquid_fraction_curve(
 ) -> float:
     """Piecewise-linear phi(f) interpolation inside the tabulated range."""
 
-    value = _finite_real(fraction, "deposit_fraction")
+    value = _liner_real(fraction, "deposit_fraction")
     if value < 0.0 or value > 1.0 or len(points) < 2:
         raise LinerCorrosionRefusal("magemin_curve_fraction_out_of_range")
     fractions = [float(point[0]) for point in points]
@@ -4075,7 +4079,7 @@ class MageminLinerSampler:
         pressure_bar: float,
     ) -> float:
         composition = validate_oxide_composition(composition_wt_pct)
-        temperature = _finite_real(temperature_C, "temperature_C")
+        temperature = _liner_real(temperature_C, "temperature_C")
         pressure = _positive(pressure_bar, "pressure_bar")
         from engines.magemin.domain import MAGEMinDomainGate
 
@@ -4151,7 +4155,7 @@ class MageminLinerSampler:
             engine=MAGEMIN_ENGINE_ID,
             version=MAGEMIN_REQUEST_CACHE_VERSION,
             composition_wt_pct=composition,
-            temperature_C=_finite_real(temperature_C, "temperature_C"),
+            temperature_C=_liner_real(temperature_C, "temperature_C"),
             pressure_bar=_positive(pressure_bar, "pressure_bar"),
             fO2_log=MAGEMIN_FO2_LOG,
         )
@@ -4169,7 +4173,7 @@ class MageminLinerSampler:
         deposit = deposit_oxide_composition(deposit_kg_by_species)
         if not deposit:
             raise LinerCorrosionRefusal("campaign_deposit_missing")
-        temperature = _finite_real(temperature_C, "temperature_C")
+        temperature = _liner_real(temperature_C, "temperature_C")
         pressure = _positive(pressure_bar, "pressure_bar")
         key = (
             MAGEMIN_ENGINE_ID,
@@ -4279,14 +4283,14 @@ def _read_extract(filename: str, expected_source_id: str) -> Mapping[str, Any]:
     return document
 
 
-def _finite_number(
+def _phase_number(
     value: Any, source_id: str, observation_id: str, field: str
 ) -> int | float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise LinerCorrosionDataError(
             source_id, "invalid_numeric_value", f"{observation_id}.{field} is not numeric"
         )
-    if not math.isfinite(value):
+    if finite_builtin_number(value) is None:
         raise LinerCorrosionDataError(
             source_id, "non_finite_value", f"{observation_id}.{field} is not finite"
         )
@@ -4363,7 +4367,7 @@ def _composition(
                 "invalid_composition_component",
                 f"{observation_id} has a non-text oxide key",
             )
-        result[oxide] = _finite_number(
+        result[oxide] = _phase_number(
             value, source_id, observation_id, f"composition.{oxide}"
         )
     return result
@@ -4389,12 +4393,12 @@ def _temperature(
             raise LinerCorrosionDataError(
                 source_id, "unknown_temperature_unit", f"{observation_id} declares {units!r}"
             )
-        temperature = _finite_number(
+        temperature = _phase_number(
             values["temperature_K"], source_id, observation_id, "temperature_K"
         ) - CELSIUS_TO_KELVIN_OFFSET
         uncertainty_key = "temperature_uncertainty_K"
         uncertainty = (
-            _finite_number(values[uncertainty_key], source_id, observation_id, uncertainty_key)
+            _phase_number(values[uncertainty_key], source_id, observation_id, uncertainty_key)
             if uncertainty_key in values
             else None
         )
@@ -4403,12 +4407,12 @@ def _temperature(
         raise LinerCorrosionDataError(
             source_id, "unknown_temperature_unit", f"{observation_id} declares {units!r}"
         )
-    temperature = _finite_number(
+    temperature = _phase_number(
         values["temperature_C"], source_id, observation_id, "temperature_C"
     )
     uncertainty_key = "temperature_uncertainty_C"
     uncertainty = (
-        _finite_number(values[uncertainty_key], source_id, observation_id, uncertainty_key)
+        _phase_number(values[uncertainty_key], source_id, observation_id, uncertainty_key)
         if uncertainty_key in values
         else None
     )
@@ -4608,7 +4612,7 @@ def _morey_context_records(document: Mapping[str, Any]) -> list[dict[str, Any]]:
             raise LinerCorrosionDataError(
                 source_id, "missing_subsystem", f"{observation_id} has no subsystem"
             )
-        temperature = _finite_number(
+        temperature = _phase_number(
             values.get("temperature_C_as_printed"),
             source_id,
             observation_id,
@@ -4684,7 +4688,7 @@ def _morey_context_records(document: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "temperature_qualification_as_printed"
             ]
         if "temperature_uncertainty_C_as_printed" in values:
-            record["temperature_uncertainty_C"] = _finite_number(
+            record["temperature_uncertainty_C"] = _phase_number(
                 values["temperature_uncertainty_C_as_printed"],
                 source_id,
                 observation_id,
@@ -4882,7 +4886,7 @@ def _rankin_table_a_records(document: Mapping[str, Any]) -> list[dict[str, Any]]
                 )
             phases = [formula, *products]
             invariant_type = "dissociation"
-        temperature = _finite_number(
+        temperature = _phase_number(
             values.get("temperature_C"), source_id, observation_id, "temperature_C"
         )
         locator = _locator(context, source_id, observation_id)

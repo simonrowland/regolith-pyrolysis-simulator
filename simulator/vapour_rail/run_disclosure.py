@@ -58,8 +58,9 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 import json
-import math
 from typing import Any
+
+from simulator.scalar_boundary import finite_builtin_number
 
 _ACTIVE: ContextVar[RunDisclosure | None] = ContextVar(
     "vapour_law_run_disclosure",
@@ -624,18 +625,6 @@ def parse_stored_disclosure_field(
     return tuple(measured)
 
 
-def _finite_number(value: Any) -> float | None:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        return None
-    try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    if not math.isfinite(number):
-        return None
-    return number
-
-
 def _well_formed_disclosure(item: Any) -> dict[str, Any] | None:
     """A complete disclosure row, or None when any required field is missing.
 
@@ -674,8 +663,11 @@ def _well_formed_disclosure(item: Any) -> dict[str, Any] | None:
         and not isinstance(band, (str, bytes))
         and len(band) == 2
     ):
-        lo = _finite_number(band[0])
-        hi = _finite_number(band[1])
+        try:
+            lo = finite_builtin_number(band[0])
+            hi = finite_builtin_number(band[1])
+        except (TypeError, ValueError):
+            return None
         if lo is None or hi is None:
             return None
         certified = [lo, hi]
@@ -688,7 +680,10 @@ def _well_formed_disclosure(item: Any) -> dict[str, Any] | None:
     for key, value in raw_gaps.items():
         if not isinstance(key, str) or not key:
             return None
-        gap = _finite_number(value)
+        try:
+            gap = finite_builtin_number(value)
+        except (TypeError, ValueError):
+            return None
         if gap is None:
             return None
         gaps[key] = gap
