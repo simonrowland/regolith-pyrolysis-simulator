@@ -394,6 +394,24 @@ def test_work_membership_completeness_is_typed_and_round_trips() -> None:
     assert payload["membership_completeness"] == "unknown"
     assert work_from_plain(payload) == work
 
+    ordinary_work = replace(
+        work,
+        work_id="ordinary-literature-work",
+        source_ids=("ordinary-source",),
+    )
+    ordinary_payload = to_plain(ordinary_work)
+    assert "membership_completeness" not in ordinary_payload
+    assert work_from_plain(ordinary_payload) == ordinary_work
+
+    partial_calibration_work = replace(
+        ordinary_work,
+        work_id="engine-calibration-partial",
+        membership_completeness=MembershipCompleteness.PARTIAL,
+    )
+    partial_payload = to_plain(partial_calibration_work)
+    assert partial_payload["membership_completeness"] == "partial"
+    assert work_from_plain(partial_payload) == partial_calibration_work
+
     payload["membership_completeness"] = "guessed"
     with pytest.raises(ValueError, match="MembershipCompleteness"):
         work_from_plain(payload)

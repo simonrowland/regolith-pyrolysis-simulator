@@ -1402,6 +1402,12 @@ def to_plain(obj: object) -> object:
     if is_dataclass(obj) and not isinstance(obj, type):
         out: dict[str, object] = {}
         for item in fields(obj):
+            if (
+                isinstance(obj, Work)
+                and item.name == "membership_completeness"
+                and not obj.is_calibration_membership
+            ):
+                continue
             value = getattr(obj, item.name)
             if value is None:
                 continue
