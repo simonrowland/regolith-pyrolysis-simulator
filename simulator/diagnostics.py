@@ -11,7 +11,7 @@ from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
 )
-from simulator.scalar_boundary import finite_float
+from simulator.scalar_boundary import coerce_nonnegative_hours, finite_float
 from simulator.wall_deposit_availability import (
     WALL_SATURATION_PRESSURE_REFUSED_CODE,
 )
@@ -1306,7 +1306,7 @@ def wall_deposit_remobilization_by_segment_species(
     *,
     snapshots: Sequence[Any] | None = None,
     cumulative_deposits_kg: Mapping[tuple[str, str], float] | None = None,
-    through_hour: int | None = None,
+    through_hour: int | float | None = None,
 ) -> dict[str, dict[str, dict[str, Any]]]:
     """Tag whether later segment wall temperatures exceed species condensation thresholds.
 
@@ -1404,7 +1404,7 @@ def wall_deposit_remobilization_by_segment_species(
 def _cumulative_wall_deposit_kg(
     snapshots: Sequence[Any],
     *,
-    through_hour: int | None,
+    through_hour: int | float | None,
 ) -> dict[tuple[str, str], float]:
     totals: dict[tuple[str, str], float] = {}
     for snapshot in snapshots:
@@ -1429,9 +1429,9 @@ def _cumulative_wall_deposit_kg(
 def _deposit_last_hour_by_segment_species(
     snapshots: Sequence[Any],
     *,
-    through_hour: int | None,
-) -> dict[tuple[str, str], int]:
-    last_hour: dict[tuple[str, str], int] = {}
+    through_hour: int | float | None,
+) -> dict[tuple[str, str], int | float]:
+    last_hour: dict[tuple[str, str], int | float] = {}
     for snapshot in snapshots:
         hour = _snapshot_hour(snapshot)
         if through_hour is not None and hour > through_hour:
@@ -1453,9 +1453,9 @@ def _deposit_last_hour_by_segment_species(
 def _deposit_first_hour_by_segment_species(
     snapshots: Sequence[Any],
     *,
-    through_hour: int | None,
-) -> dict[tuple[str, str], int]:
-    first_hour: dict[tuple[str, str], int] = {}
+    through_hour: int | float | None,
+) -> dict[tuple[str, str], int | float]:
+    first_hour: dict[tuple[str, str], int | float] = {}
     for snapshot in snapshots:
         hour = _snapshot_hour(snapshot)
         if through_hour is not None and hour > through_hour:
@@ -1477,11 +1477,11 @@ def _deposit_first_hour_by_segment_species(
 def _operating_history_hours(
     sim: Any,
     snapshots: Sequence[Any],
-) -> list[tuple[int, Mapping[str, Any]]]:
+) -> list[tuple[int | float, Mapping[str, Any]]]:
     model = getattr(sim, "condensation_model", None)
     history = tuple(getattr(model, "operating_history", ()) or ())
     snapshot_hours = [_snapshot_hour(snapshot) for snapshot in snapshots]
-    resolved: list[tuple[int, Mapping[str, Any]]] = []
+    resolved: list[tuple[int | float, Mapping[str, Any]]] = []
     for index, entry in enumerate(history):
         if not isinstance(entry, Mapping):
             continue
@@ -1495,30 +1495,34 @@ def _operating_history_hours(
 def _resolve_operating_history_hour(
     entry: Mapping[str, Any],
     index: int,
-    snapshot_hours: Sequence[int],
-) -> int | None:
+    snapshot_hours: Sequence[int | float],
+) -> int | float | None:
     if "hour" in entry:
-        return _positive_int(entry["hour"])
+        try:
+            return coerce_nonnegative_hours(entry["hour"])
+        except (TypeError, ValueError):
+            return None
     if index < len(snapshot_hours):
         # Production records campaign_hour before the campaign tick increments,
         # while HourSnapshot.hour is global/post-tick. Index alignment is the
         # supplied conversion into the global snapshot-hour domain.
-        return int(snapshot_hours[index])
+        return snapshot_hours[index]
     if snapshot_hours:
         return None
     if "campaign_hour" in entry:
-        campaign_hour = _positive_int(entry["campaign_hour"])
-        if campaign_hour is not None:
-            return campaign_hour
+        try:
+            return coerce_nonnegative_hours(entry["campaign_hour"])
+        except (TypeError, ValueError):
+            return None
     return index + 1 if index >= 0 else None
 
 
 def _later_max_segment_temperature_C(
     segment: str,
     *,
-    deposit_last_hour: int | None,
-    history_hours: Sequence[tuple[int, Mapping[str, Any]]],
-    through_hour: int | None,
+    deposit_last_hour: int | float | None,
+    history_hours: Sequence[tuple[int | float, Mapping[str, Any]]],
+    through_hour: int | float | None,
 ) -> float | None:
     if deposit_last_hour is None:
         return None
@@ -1542,19 +1546,11 @@ def _later_max_segment_temperature_C(
     return later_max
 
 
-def _snapshot_hour(snapshot: Any) -> int:
+def _snapshot_hour(snapshot: Any) -> int | float:
     hour = getattr(snapshot, "hour", None)
     if hour is None:
         return 0
-    return int(hour)
-
-
-def _positive_int(value: Any) -> int | None:
-    try:
-        number = int(value)
-    except (TypeError, ValueError):
-        return None
-    return number if number >= 0 else None
+    return coerce_nonnegative_hours(hour)
 
 
 def _attach_pareto_source_notices(

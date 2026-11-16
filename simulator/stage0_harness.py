@@ -75,7 +75,7 @@ class Stage0HarnessError(RuntimeError):
 
 @dataclass(frozen=True)
 class HourlyDispositionEntry:
-    hour: int
+    hour: int | float
     campaign: str
     stage0_phase: str | None
     ratified_ceiling_C: float | None
@@ -492,7 +492,7 @@ def _pending_diagnostic_events_by_phase(
 
 def _timeline_entry_from_step(
     *,
-    hour: int,
+    hour: int | float,
     sim: PyrolysisSimulator,
     step: StepResult,
     registry: FoulantRegistry,
@@ -595,7 +595,7 @@ def run_stage0_harness(
 
         timeline.append(
             _timeline_entry_from_step(
-                hour=int(sim.melt.hour),
+                hour=sim.melt.hour,
                 sim=sim,
                 step=step,
                 registry=foulant_registry,

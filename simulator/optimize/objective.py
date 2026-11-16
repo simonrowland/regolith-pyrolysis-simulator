@@ -49,7 +49,10 @@ from simulator.thermal_train import (
     thermal_train_parameters_from_mapping,
 )
 from simulator.wall_deposit_availability import wall_deposit_figure_availability
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import (
+    coerce_nonnegative_hours,
+    is_declared_real_scalar,
+)
 from simulator.three_product_report import classify_products
 from simulator.diagnostics import (
     wall_deposit_remobilization_by_segment_species,
@@ -2403,7 +2406,7 @@ def _composition_target_score_at(
     *,
     evidence: dict[str, Any] | None = None,
     pool_projection: Mapping[str, Mapping[str, float]] | None = None,
-    pool_snapshot_hour: int | None = None,
+    pool_snapshot_hour: int | float | None = None,
     tap_provenance: str | None = None,
 ) -> float:
     target = objective["target"]
@@ -2426,7 +2429,7 @@ def _composition_target_score_at(
         "certification_tier": "certified",
     }
     if pool_snapshot_hour is not None:
-        target_trace["pool_snapshot_hour"] = int(pool_snapshot_hour)
+        target_trace["pool_snapshot_hour"] = pool_snapshot_hour
     if tap_provenance is not None:
         target_trace["tap_provenance"] = str(tap_provenance)
 
@@ -2509,7 +2512,7 @@ def _best_tap_score(
     curve: list[dict[str, Any]] = []
     candidates: list[dict[str, Any]] = []
     terminal_rump_exclusions: list[dict[str, Any]] = []
-    traces_by_hour: dict[int, dict[str, Any]] = {}
+    traces_by_hour: dict[int | float, dict[str, Any]] = {}
     target = objective["target"]
 
     for snapshot in snapshots:
@@ -2610,10 +2613,10 @@ def _best_tap_score(
         key=lambda item: (
             _finite_float(item["score"], "best_tap score"),
             bool(item["certified"]),
-            -int(item["hour"]),
+            -float(item["hour"]),
         ),
     )
-    tap_hour = int(winner["hour"])
+    tap_hour = winner["hour"]
     nonterminal = tap_hour < configured_hours
     if nonterminal and _target_uses_captured_pool(target):
         policy = str(best_tap["captured_pool_nonterminal_policy"])
@@ -2647,13 +2650,16 @@ def _best_tap_score(
             "tap_grid": _jsonable_tap_grid(best_tap["tap_grid"]),
             "tap_hour": tap_hour,
             "configured_hours": configured_hours,
-            "tap_stability_hours": int(best_tap["tap_stability_hours"]),
+            "tap_stability_hours": best_tap["tap_stability_hours"],
             "operator_instruction": operator_instruction,
             "pool_snapshot_hour": tap_hour,
             "tap_provenance": "tap_truncated" if nonterminal else "completed_run",
             "knife_edge": bool(winner["knife_edge"]),
             "certified": bool(winner["certified"]),
-            "tap_score_curve": sorted(curve, key=lambda item: int(item["hour"])),
+            "tap_score_curve": sorted(
+                curve,
+                key=lambda item: float(item["hour"]),
+            ),
             "tap_grade_report": winner["grade_report"],
             "truncated_recipe": {
                 "provenance": "tap_truncated" if nonterminal else "completed_run",
@@ -2689,7 +2695,7 @@ def _tap_snapshots(
     grid = best_tap["tap_grid"]
     if grid == "recorded_hours":
         return snapshots
-    requested = {int(hour) for hour in grid}
+    requested = set(grid)
     by_hour = {_snapshot_hour(snapshot): snapshot for snapshot in snapshots}
     missing = sorted(requested - set(by_hour))
     if missing:
@@ -2738,7 +2744,7 @@ def _tap_pool_projection(
 def _tap_coating_product_summary(
     run_execution: Any,
     snapshots: Sequence[Any],
-    hour: int,
+    hour: int | float,
 ) -> Mapping[str, Any]:
     raw_by_segment = _cumulative_wall_deposit_by_segment_species_kg(snapshots, hour)
     campaigns_elapsed = _campaigns_elapsed_through_hour(
@@ -2814,7 +2820,7 @@ def _tap_coating_product_summary(
 def _campaigns_elapsed_through_hour(
     run_execution: Any,
     snapshots: Sequence[Any],
-    hour: int,
+    hour: int | float,
 ) -> float:
     terminal_elapsed = _campaigns_elapsed(run_execution)
     terminal_hour = max((_snapshot_hour(snapshot) for snapshot in snapshots), default=0)
@@ -2823,9 +2829,16 @@ def _campaigns_elapsed_through_hour(
 
     session = getattr(run_execution, "session", None)
     step_results = tuple(getattr(session, "_step_results", ()))
-    if len(step_results) < terminal_hour:
+    if not step_results:
         return terminal_elapsed * float(hour) / float(terminal_hour)
     snapshot = _snapshot_by_hour(snapshots, hour)
+    tap_step_results = tuple(
+        result
+        for result in step_results
+        if _snapshot_hour(getattr(result, "snapshot", None)) <= hour
+    )
+    if not tap_step_results:
+        return terminal_elapsed * float(hour) / float(terminal_hour)
     sim = getattr(run_execution, "simulator", run_execution)
     tap_sim = SimpleNamespace(
         campaign_mgr=getattr(sim, "campaign_mgr", None),
@@ -2836,7 +2849,7 @@ def _campaigns_elapsed_through_hour(
     # tap_hour: completed campaigns count as units and the active campaign uses
     # its configured max-hold, never a later campaign's actual close duration.
     tap_session = SimpleNamespace(
-        _step_results=step_results[:hour],
+        _step_results=tap_step_results,
         simulator=tap_sim,
     )
     from simulator.run_executor import _campaigns_elapsed_from_session_history
@@ -2849,7 +2862,7 @@ def _campaigns_elapsed_through_hour(
 
 def _cumulative_wall_deposit_by_segment_species_kg(
     snapshots: Sequence[Any],
-    hour: int,
+    hour: int | float,
 ) -> dict[tuple[str, str], float]:
     result: dict[tuple[str, str], float] = {}
     for snapshot in snapshots:
@@ -2993,7 +3006,7 @@ def _oxide_wt_pct_from_kg(
 def _cumulative_stage_species_mol(
     run_execution: Any,
     snapshots: Sequence[Any],
-    hour: int,
+    hour: int | float,
 ) -> dict[tuple[int, str], float]:
     kg_by_stage_species = _cumulative_stage_species_kg(snapshots, hour)
     result: dict[tuple[int, str], float] = {}
@@ -3006,7 +3019,7 @@ def _cumulative_stage_species_mol(
 
 def _cumulative_stage_species_kg(
     snapshots: Sequence[Any],
-    hour: int,
+    hour: int | float,
 ) -> dict[tuple[int, str], float]:
     result: dict[tuple[int, str], float] = {}
     for snapshot in snapshots:
@@ -3026,13 +3039,16 @@ def _cumulative_stage_species_kg(
 
 
 def _tap_certification(
-    hour: int,
-    traces_by_hour: Mapping[int, Mapping[str, Any]],
+    hour: int | float,
+    traces_by_hour: Mapping[int | float, Mapping[str, Any]],
     *,
     best_tap: Mapping[str, Any],
-) -> tuple[bool, bool, tuple[int, ...]]:
-    stability = int(best_tap["tap_stability_hours"])
-    dwell_hours = tuple(range(hour - stability + 1, hour + 1))
+) -> tuple[bool, bool, tuple[int | float, ...]]:
+    stability = best_tap["tap_stability_hours"]
+    dwell_hours = tuple(
+        hour - offset
+        for offset in reversed(range(stability))
+    )
     instant_pass = _tap_trace_certifies(traces_by_hour.get(hour, {}))
     if not instant_pass:
         return False, False, dwell_hours
@@ -3094,7 +3110,7 @@ def _melt_tap_grade(snapshot: Any, run_execution: Any) -> Mapping[str, Any]:
 def _distillation_train_grade(
     run_execution: Any,
     snapshots: Sequence[Any],
-    hour: int,
+    hour: int | float,
 ) -> Mapping[str, Any]:
     stage_species_kg = _cumulative_stage_species_kg(snapshots, hour)
     by_stage: dict[int, dict[str, float]] = {}
@@ -3171,13 +3187,13 @@ def _terminal_rump_nonterminal_best_tap_trace(
     objective: Mapping[str, Any],
     best_tap: Mapping[str, Any],
     *,
-    configured_hours: int,
+    configured_hours: int | float,
     curve: Sequence[Mapping[str, Any]],
     exclusion: Mapping[str, Any],
 ) -> dict[str, Any]:
     target = objective["target"]
     window = target.get("composition_window", {})
-    tap_hour = int(exclusion["hour"])
+    tap_hour = exclusion["hour"]
     operator_instruction = exclusion.get("operator_instruction")
     if not isinstance(operator_instruction, Mapping):
         operator_instruction = MappingProxyType({})
@@ -3200,7 +3216,7 @@ def _terminal_rump_nonterminal_best_tap_trace(
         "tap_grid": _jsonable_tap_grid(best_tap["tap_grid"]),
         "tap_hour": tap_hour,
         "configured_hours": configured_hours,
-        "tap_stability_hours": int(best_tap["tap_stability_hours"]),
+        "tap_stability_hours": best_tap["tap_stability_hours"],
         "pool_snapshot_hour": tap_hour,
         "tap_provenance": "tap_truncated",
         "operator_instruction": operator_instruction,
@@ -3208,7 +3224,7 @@ def _terminal_rump_nonterminal_best_tap_trace(
         "certified": False,
         "tap_score_curve": sorted(
             [dict(item) for item in curve],
-            key=lambda item: int(item["hour"]),
+            key=lambda item: float(item["hour"]),
         ),
         "tap_grade_report": dict(exclusion.get("grade_report", {})),
         "truncated_recipe": {
@@ -3224,8 +3240,8 @@ def _terminal_rump_nonterminal_best_tap_trace(
 def _operator_instruction(
     snapshot: Any,
     *,
-    tap_hour: int,
-    configured_hours: int,
+    tap_hour: int | float,
+    configured_hours: int | float,
     profile: Mapping[str, Any],
     stamped_carrier: str = "",
 ) -> Mapping[str, Any]:
@@ -3291,7 +3307,10 @@ def _operator_instruction(
     return MappingProxyType(payload)
 
 
-def _configured_run_hours(run_execution: Any, profile: Mapping[str, Any]) -> int:
+def _configured_run_hours(
+    run_execution: Any,
+    profile: Mapping[str, Any],
+) -> int | float:
     run = profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {}
     raw = run.get("hours")
     if raw is None:
@@ -3300,41 +3319,43 @@ def _configured_run_hours(run_execution: Any, profile: Mapping[str, Any]) -> int
     if raw is None:
         snapshots = tuple(getattr(run_execution, "snapshots", ()) or ())
         raw = _snapshot_hour(snapshots[-1]) if snapshots else 0
-    return _positive_runtime_int(raw, "configured run hours")
+    return _positive_runtime_hour(raw, "configured run hours")
 
 
-def _positive_runtime_int(value: Any, where: str) -> int:
+def _positive_runtime_hour(value: Any, where: str) -> int | float:
     try:
-        if not is_declared_real_scalar(value, allow_numeric_str=True):
-            raise TypeError
-        numeric = int(value)
+        numeric = coerce_nonnegative_hours(value)
     except (TypeError, ValueError) as exc:
-        raise ObjectiveComputationError(f"{where} must be an integer") from exc
+        raise ObjectiveComputationError(
+            f"{where} must be a finite non-negative number of hours"
+        ) from exc
     if numeric <= 0:
         raise ObjectiveComputationError(f"{where} must be positive")
     return numeric
 
 
-def _snapshot_hour(snapshot: Any) -> int:
-    return _positive_runtime_int(getattr(snapshot, "hour", None), "snapshot.hour")
+def _snapshot_hour(snapshot: Any) -> int | float:
+    return _positive_runtime_hour(getattr(snapshot, "hour", None), "snapshot.hour")
 
 
-def _snapshot_by_hour(snapshots: Sequence[Any], hour: int) -> Any:
+def _snapshot_by_hour(snapshots: Sequence[Any], hour: int | float) -> Any:
     for snapshot in snapshots:
         if _snapshot_hour(snapshot) == hour:
             return snapshot
     raise ObjectiveComputationError(f"best_tap missing selected hour {hour}")
 
 
-def _per_hour_summary_by_hour(run_execution: Any) -> dict[int, Mapping[str, Any]]:
-    result: dict[int, Mapping[str, Any]] = {}
+def _per_hour_summary_by_hour(
+    run_execution: Any,
+) -> dict[int | float, Mapping[str, Any]]:
+    result: dict[int | float, Mapping[str, Any]] = {}
     for entry in getattr(run_execution, "per_hour", ()) or ():
         if not isinstance(entry, Mapping):
             continue
         raw_hour = entry.get("hour")
         if raw_hour is None:
             continue
-        result[_positive_runtime_int(raw_hour, "per_hour.hour")] = entry
+        result[_positive_runtime_hour(raw_hour, "per_hour.hour")] = entry
     return result
 
 
@@ -3412,7 +3433,7 @@ def _composition_window_score(
     *,
     evidence: dict[str, Any] | None = None,
     pool_projection: Mapping[str, Mapping[str, float]] | None = None,
-    pool_snapshot_hour: int | None = None,
+    pool_snapshot_hour: int | float | None = None,
     tap_provenance: str | None = None,
 ) -> float:
     pool = str(window["pool"])
@@ -3674,7 +3695,7 @@ def _composition_window_evidence(
     reached_window: bool,
     window_mode: str,
     pool_source: str,
-    pool_snapshot_hour: int | None = None,
+    pool_snapshot_hour: int | float | None = None,
 ) -> dict[str, Any]:
     return {
         "rows": [dict(row) for row in row_verdicts],
@@ -3688,7 +3709,7 @@ def _composition_window_evidence(
         "window_mode": window_mode,
         **({"terminal_rump_source": pool_source} if pool_source else {}),
         **(
-            {"pool_snapshot_hour": int(pool_snapshot_hour)}
+            {"pool_snapshot_hour": pool_snapshot_hour}
             if pool_snapshot_hour is not None
             else {}
         ),

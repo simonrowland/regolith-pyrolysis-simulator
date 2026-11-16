@@ -626,7 +626,8 @@ def _valid_patch() -> RecipePatch:
     return RecipePatch({PO2_DEFAULT: 9.0})
 
 
-def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal() -> None:
+@pytest.mark.parametrize("hour", [1, 0.25])
+def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal(hour) -> None:
     execution = _execution(backend_status="ok", backend_authoritative=True)
     deep = estimate_subambient_pump_cost(
         target_pressure_pa=1.0e-4,  # 1e-9 bar deep-vacuum point
@@ -646,7 +647,7 @@ def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal() -> None:
             "feasible": None,
             "rows": [
                 {
-                    "hour": 1,
+                    "hour": hour,
                     "target_pressure_pa": 1.0e-4,
                     "offgas_mol_per_s": 0.02,
                     "duration_s": 7.0 * 3600.0,
@@ -687,6 +688,7 @@ def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal() -> None:
     )
     assert proposal["rows"][0]["pumping_cost_evidence"]["regime"] == "vent-free"
     assert proposal["rows"][0]["pumping_cost_evidence"]["energy_kWh"] == 0.0
+    assert proposal["rows"][0]["hour"] == hour
 
 
 def test_sc67_pressure_proposal_reports_mixed_failing_rows_as_partial() -> None:

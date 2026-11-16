@@ -599,7 +599,7 @@ class CampaignManager:
         self.c0_first_melt_backstop = False
         self.c5_enabled = False
         self._c2a_staged_stage_idx: int = 0
-        self._c2a_staged_stage_start_hour: int = 0
+        self._c2a_staged_stage_start_hour: float = 0.0
         self._c2a_staged_peak_flux_by_species: dict[str, float] = {}
         self._c2a_staged_cumulative_yield_mol_by_species: dict[str, float] = {}
         self._c2a_staged_last_log_slope_by_species: dict[str, float] = {}
@@ -1708,14 +1708,16 @@ class CampaignManager:
     ) -> dict | None:
         if not isinstance(stages, list) or not stages:
             return None
-        hour = max(0, int(campaign_hour))
+        # Stage definitions are discrete integer-hour bins. Floor the elapsed
+        # campaign clock explicitly when selecting that categorical stage.
+        hour_bucket = max(0, math.floor(campaign_hour))
         elapsed = 0
         selected = stages[-1]
         for stage in stages:
             if not isinstance(stage, dict):
                 continue
             duration = max(1, int(self._float(stage.get('duration_h'), 1.0)))
-            if hour < elapsed + duration:
+            if hour_bucket < elapsed + duration:
                 selected = stage
                 break
             elapsed += duration

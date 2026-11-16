@@ -15,6 +15,7 @@ from simulator.accounting.lots import allocate_pool_withdrawal
 from simulator.accounting.queries import (
     TERMINAL_RUMP_REFRACTORY_OXIDES,
 )
+from simulator.scalar_boundary import coerce_nonnegative_hours
 
 
 YIELD_DISPOSITION_SCHEMA_VERSION = "5.0"
@@ -140,9 +141,9 @@ def capture_ledger_snapshot(sim: Any, snapshot: Any) -> None:
         setattr(sim, "_yield_disposition_ledger_snapshots", rows)
     campaign = _campaign_name(getattr(snapshot, "campaign", ""))
     key = (
-        int(getattr(snapshot, "hour", len(rows))),
+        coerce_nonnegative_hours(getattr(snapshot, "hour", len(rows))),
         campaign,
-        int(getattr(snapshot, "campaign_hour", 0)),
+        coerce_nonnegative_hours(getattr(snapshot, "campaign_hour", 0)),
     )
     balances = ledger.mol_by_account()
     origin_balances = ledger.origin_atom_moles_by_account()

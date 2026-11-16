@@ -153,7 +153,10 @@ from simulator.optimize.strategy.staged import (
     enumerate_topologies,
     make_prefix_eval_spec,
 )
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import (
+    coerce_nonnegative_hours,
+    is_declared_real_scalar,
+)
 from web.advisory import ceramic_rump_payload
 
 VALID_FIDELITIES = (
@@ -6279,7 +6282,7 @@ def _tap_truncated_materialized_patch(
     profile: Mapping[str, Any],
     payload: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    tap_hour = _positive_int(payload.get("tap_hour"), "tap_hour")
+    tap_hour = _positive_hour(payload.get("tap_hour"), "tap_hour")
     path = _tap_duration_path(payload, profile)
     values = dict(record.patch.values)
     values[path] = float(tap_hour)
@@ -6352,13 +6355,11 @@ def _tap_duration_path(
     )
 
 
-def _positive_int(value: Any, label: str) -> int:
+def _positive_hour(value: Any, label: str) -> int | float:
     try:
-        if not is_declared_real_scalar(value, allow_numeric_str=True):
-            raise TypeError
-        numeric = int(value)
+        numeric = coerce_nonnegative_hours(value)
     except (TypeError, ValueError) as exc:
-        raise StudyAbort(f"{label} must be an integer") from exc
+        raise StudyAbort(f"{label} must be a finite non-negative number of hours") from exc
     if numeric <= 0:
         raise StudyAbort(f"{label} must be positive")
     return numeric

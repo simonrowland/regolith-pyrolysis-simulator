@@ -45,7 +45,7 @@ _NACL_CL_MASS_FRACTION = 35.45 / (22.98976928 + 35.45)
 
 @dataclass
 class _FakeTimelineEntry:
-    hour: int
+    hour: int | float
     by_group: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
 
 
@@ -332,6 +332,35 @@ def test_per_property_clear_records_clear_step_while_other_property_active():
     assert liquidus_clear
     assert liquidus_clear[0]["clear_hour"] == 2
     assert redox_active
+
+
+def test_verdict_timeline_preserves_fractional_step_times():
+    timeline = (
+        _FakeTimelineEntry(hour=0.25, by_group={"other_mineral_contaminant": []}),
+        _FakeTimelineEntry(
+            hour=0.5,
+            by_group={
+                "other_mineral_contaminant": [
+                    {
+                        "carrier": "NaCl",
+                        "disposition": "escaped",
+                        "source": "diagnostic",
+                    }
+                ]
+            },
+        ),
+    )
+    verdict = evaluate_verdict_a_timeline(
+        {"NaCl": 0.3},
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+        timeline=timeline,
+    )
+
+    assert [step["hour"] for step in verdict.step_resolved] == [0.25, 0.5]
+    assert verdict.step_resolved[0]["residual_wt_pct"]["NaCl"] == pytest.approx(0.3)
+    assert verdict.step_resolved[1]["residual_wt_pct"]["NaCl"] == 0.0
 
 
 def test_raw_and_adjusted_are_separate_with_provenance():

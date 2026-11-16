@@ -632,6 +632,25 @@ def test_thermal_train_report_marks_absent_vented_o2_rate_unmeasured() -> None:
     assert report["peaks"]["cold_o2_status"] == "complete"
 
 
+def test_thermal_train_report_keeps_fractional_snapshot_times() -> None:
+    report = AccountingQueries(
+        _sim(
+            BatchRecord(
+                snapshots=[
+                    _bare_carrier(hour=0.25, melt_offgas_O2_mol_hr=100.0),
+                    _bare_carrier(hour=0.5, melt_offgas_O2_mol_hr=150.0),
+                ]
+            )
+        )
+    ).thermal_train_report()
+
+    assert [
+        row["hour"]
+        for row in report["unmeasured_hours"]
+        if row["field"] == "O2_vented_kg_hr"
+    ] == [0.25, 0.5]
+
+
 def test_thermal_train_report_marks_absent_melt_offgas_o2_rate_unmeasured() -> None:
     """An ABSENT melt_offgas_O2_mol_hr is not a proven zero (b-293)."""
     report = AccountingQueries(

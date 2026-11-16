@@ -249,7 +249,7 @@ class AccountingQueries:
                     for species, rate in dict(species_rates or {}).items()
                 }
             )
-            hour = int(getattr(snapshot, "hour", len(hot_series)))
+            hour = getattr(snapshot, "hour", len(hot_series))
             raw_oxygen = getattr(snapshot, "melt_offgas_O2_mol_hr", None)
             if raw_oxygen is None:
                 unmeasured_hours.append({

@@ -158,7 +158,10 @@ from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor, campaign_stop_record
 from simulator.recipe_errors import MalformedRecipeError
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import (
+    coerce_nonnegative_hours,
+    is_declared_real_scalar,
+)
 from simulator.runner import PyrolysisRun, RunnerError
 from simulator.transport_regime import (
     TransportRegimeRefusal,
@@ -5095,7 +5098,9 @@ def _pumping_diagnostic_is_certified_pass(
         ):
             return False
         context_row = {
-            "hour": int(row.get("hour", len(context_rows))),
+            "hour": coerce_nonnegative_hours(
+                row.get("hour", len(context_rows))
+            ),
             "target_pressure_pa": target_pressure_pa,
             "offgas_mol_per_s": offgas_mol_per_s,
             "duration_s": duration_s,
@@ -5242,7 +5247,7 @@ def _pumping_pressure_proposal(diagnostic: Mapping[str, Any]) -> dict[str, Any]:
             continue
         raw_hour = raw_row.get("hour", row_index)
         try:
-            proposal_hour = int(raw_hour)
+            proposal_hour = coerce_nonnegative_hours(raw_hour)
         except (TypeError, ValueError, OverflowError):
             proposal_hour = row_index
         proposals.append(

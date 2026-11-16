@@ -29,7 +29,7 @@ from simulator.chemistry.kernel import (
     BACKEND_STATUS_PRECEDENCE,
     select_backend_status,
 )
-from simulator.scalar_boundary import finite_float
+from simulator.scalar_boundary import coerce_nonnegative_hours, finite_float
 
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
 
@@ -548,10 +548,10 @@ class PropertyFlag:
     grounded: bool
     correctable: bool
     residual_wt_pct: float
-    hour: int
+    hour: int | float
     active: bool = True
     cleared: bool = False
-    clear_hour: int | None = None
+    clear_hour: int | float | None = None
     noise_floor_status: str = "proposed"
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
@@ -1618,7 +1618,7 @@ def _classify_flag(pert: PropertyPerturbation) -> str | None:
 def evaluate_verdict_a(
     perturbations: tuple[PropertyPerturbation, ...],
     *,
-    hour: int,
+    hour: int | float,
     confounding_threshold_pct: float = 0.01,
     residual_wt_pct: Mapping[str, float] | None = None,
 ) -> tuple[PropertyFlag, ...]:
@@ -1655,11 +1655,11 @@ def evaluate_verdict_a(
 
 def _bakeoff_hour_by_species(
     timeline: tuple[Any, ...],
-) -> dict[str, int]:
+) -> dict[str, int | float]:
     """First hour a carrier is cleared by escape/decompose/burn."""
-    bakeoff: dict[str, int] = {}
+    bakeoff: dict[str, int | float] = {}
     for entry in timeline:
-        hour = int(getattr(entry, "hour", 0))
+        hour = coerce_nonnegative_hours(getattr(entry, "hour", 0))
         for group_events in (getattr(entry, "by_group", {}) or {}).values():
             for event in group_events:
                 carrier = str(event.get("carrier", ""))
@@ -1674,16 +1674,16 @@ def _bakeoff_hour_by_species(
 def _estimate_hourly_residuals(
     final_residual_wt_pct: Mapping[str, float],
     timeline: tuple[Any, ...],
-) -> list[tuple[int, dict[str, float]]]:
+) -> list[tuple[int | float, dict[str, float]]]:
     """Step-resolved residual fractions from disposition bakeoff events."""
     if not timeline:
         return [(0, dict(final_residual_wt_pct))]
 
     bakeoff = _bakeoff_hour_by_species(timeline)
-    hourly: list[tuple[int, dict[str, float]]] = []
+    hourly: list[tuple[int | float, dict[str, float]]] = []
 
     for entry in timeline:
-        hour = int(getattr(entry, "hour", 0))
+        hour = coerce_nonnegative_hours(getattr(entry, "hour", 0))
         residual_at_hour: dict[str, float] = {}
         for species, final_wt in final_residual_wt_pct.items():
             clear_hour = bakeoff.get(species)
@@ -1704,7 +1704,7 @@ def _timeline_flag_record(
     flag: PropertyFlag,
     *,
     cleared: bool,
-    clear_hour: int | None,
+    clear_hour: int | float | None,
 ) -> dict[str, Any]:
     return {
         "property": flag.property,
@@ -1737,7 +1737,7 @@ def evaluate_verdict_a_timeline(
     all_flags: list[PropertyFlag] = []
     step_resolved: list[dict[str, Any]] = []
     previous_active: dict[tuple[str, str, str], PropertyFlag] = {}
-    clear_hour_by_key: dict[tuple[str, str, str], int] = {}
+    clear_hour_by_key: dict[tuple[str, str, str], int | float] = {}
 
     for hour, residual_at_hour in hourly:
         adjustment = melt_effect_adjustment(

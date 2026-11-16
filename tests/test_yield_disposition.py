@@ -97,6 +97,20 @@ def test_campaign_snapshot_captures_only_condensation_origin_state() -> None:
     ] == ["inputs"]
 
 
+def test_campaign_snapshot_keys_preserve_fractional_elapsed_times() -> None:
+    sim = _sim(AtomLedger())
+    for hour in (0.25, 0.5):
+        capture_ledger_snapshot(
+            sim,
+            SimpleNamespace(hour=hour, campaign="C0", campaign_hour=hour),
+        )
+
+    snapshots = ledger_snapshots_from_sim(sim)
+
+    assert [snapshot["hour"] for snapshot in snapshots] == [0.25, 0.5]
+    assert [snapshot["campaign_hour"] for snapshot in snapshots] == [0.25, 0.5]
+
+
 def test_clean_feedstock_closes_on_element_basis_with_chart_payload() -> None:
     ledger = AtomLedger()
     ledger.load_external(

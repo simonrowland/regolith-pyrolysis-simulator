@@ -5033,7 +5033,8 @@ def test_two_phase_ranking_preserves_nullable_objective_positions(tmp_path) -> N
     ]
 
 
-def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path) -> None:
+@pytest.mark.parametrize("tap_hour", [1, 0.25])
+def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path, tap_hour) -> None:
     profile = {
         **PROFILE,
         "run": {
@@ -5055,11 +5056,11 @@ def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path) -> None:
         trace_summary={
             "composition_target": {
                 "best_tap_enabled": True,
-                "tap_hour": 1,
+                "tap_hour": tap_hour,
                 "configured_hours": 2,
                 "tap_provenance": "tap_truncated",
                 "operator_instruction": {
-                    "tap_hour": 1,
+                    "tap_hour": tap_hour,
                     "configured_hours": 2,
                     "configured_campaign": "C0b_p_cleanup",
                     "phase_at_tap": "C0B",
@@ -5077,7 +5078,7 @@ def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path) -> None:
                         }
                     },
                 },
-                "tap_score_curve": [{"hour": 1, "score": 1.0, "certified": True}],
+                "tap_score_curve": [{"hour": tap_hour, "score": 1.0, "certified": True}],
             }
         },
     )
@@ -5102,22 +5103,22 @@ def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path) -> None:
     )
 
     recipe = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
-    assert recipe["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert recipe["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(tap_hour)
     assert RecipePatch.from_nested(recipe).validated(RecipeSchema())
     pareto = json.loads((tmp_path / "pareto.json").read_text())
     pareto_row = pareto["pareto"][0]
     assert pareto_row["patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
-    assert pareto_row["materialized_patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert pareto_row["materialized_patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(tap_hour)
     assert pareto_row["parent_trajectory_patch"] == {}
     leaderboard_row = next(csv.DictReader((tmp_path / "leaderboard.csv").open()))
     assert json.loads(leaderboard_row["patch_json"])["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
-    assert json.loads(leaderboard_row["materialized_patch_json"])["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert json.loads(leaderboard_row["materialized_patch_json"])["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(tap_hour)
     assert json.loads(leaderboard_row["parent_trajectory_patch_json"]) == {}
     sidecar = json.loads((tmp_path / "winner.tap-truncated.json").read_text())
     assert artifacts["winner_tap_truncated"] == tmp_path / "winner.tap-truncated.json"
-    assert sidecar["materialized_patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert sidecar["materialized_patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(tap_hour)
     assert sidecar["parent_trajectory_patch"] == {}
-    assert sidecar["operator_instruction"]["tap_hour"] == 1
+    assert sidecar["operator_instruction"]["tap_hour"] == tap_hour
     assert sidecar["tap_grade_report"]["melt_tap"]["oxide_wt_pct"] == {
         "CaO": 50.0,
         "SiO2": 50.0,

@@ -32,6 +32,7 @@ import yaml
 
 from engines.domain_reason import OutOfDomainReason
 from engines.yaml_loader import YAML12SafeLoader
+from simulator.scalar_boundary import coerce_nonnegative_hours
 
 # Historical published constants this table replaced. Cited by tests that
 # pin defaults; not a second runtime band.
@@ -472,7 +473,7 @@ _RUNTIME_TABLE = parse_engine_commissioning_file(DEFAULT_COMMISSIONING_PATH)
 def commissioning_step_from_diagnostics(
     diagnostics: Mapping[str, Any] | None,
     *,
-    hour: int,
+    hour: int | float,
 ) -> dict[str, Any] | None:
     """One equilibrium's commissioning notice, or None when the step is in band.
 
@@ -487,7 +488,7 @@ def commissioning_step_from_diagnostics(
     plain = _plain_commissioning_notice(notice)
     if plain is None:
         return None
-    return {'hour': int(hour), 'notice': plain}
+    return {'hour': coerce_nonnegative_hours(hour), 'notice': plain}
 
 
 def aggregate_engine_commissioning_notice(
@@ -502,7 +503,7 @@ def aggregate_engine_commissioning_notice(
 
     if not isinstance(steps, (list, tuple)) or not steps:
         return None
-    hours: list[int] = []
+    hours: list[int | float] = []
     distinct: list[dict[str, Any]] = []
     seen: set[tuple[Any, ...]] = set()
     for step in steps:
@@ -515,7 +516,7 @@ def aggregate_engine_commissioning_notice(
         if plain is None:
             continue
         try:
-            hour = int(step['hour'])
+            hour = coerce_nonnegative_hours(step['hour'])
         except (KeyError, TypeError, ValueError):
             continue
         hours.append(hour)
