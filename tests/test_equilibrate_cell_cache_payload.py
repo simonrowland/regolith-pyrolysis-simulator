@@ -61,9 +61,9 @@ def test_hot_round_trip_preserves_real_engine_consumer_view(
     handle = open_available_engine(Engine(engine_name), nodeid=request.node.nodeid)
     try:
         cold = equilibrate_cell(
-            handle, _REAL_POTS[0], temperature_K=1700.0,
+            handle, _REAL_POTS[0], temperature_K=2000.0,
             po2=Po2Request(mode="commanded", po2_bar=1e-8),
-            timeout_s=90.0, isolated=False, _cache_engine_call=False,
+            timeout_s=90.0, isolated=False,
         )
         assert cold.status == "ok", cold.engine_reason
         monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "hot.sqlite"))
