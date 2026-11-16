@@ -875,6 +875,22 @@ def test_p_partial_optional_axes_do_not_block_identity_or_score(axis: str) -> No
     assert residual.refusal is None
 
 
+def test_identity_profile_resolution_pins_hashable_pref_and_psat_identities() -> None:
+    pref = F.pref_identity()
+    psat = F.psat_identity("Na")
+
+    assert isinstance(hash(pref), int)
+    assert isinstance(hash(psat), int)
+    assert quantity_token(pref) is Quantity.P_REFERENCE
+    assert quantity_token(psat) is Quantity.P_SAT
+    assert profile_for(pref).required == frozenset(
+        {"temperature_K", "reservoir", "reaction", "reference_state", "fO2_Pa"}
+    )
+    assert profile_for(psat).required == frozenset({"temperature_K", "reservoir"})
+    assert validate_quantity_profile(pref).kind is IdentityEqualKind.EQUAL
+    assert validate_quantity_profile(psat).kind is IdentityEqualKind.EQUAL
+
+
 def test_migrated_p_partial_optional_axes_are_retained_without_changing_score(
     tmp_path: Path,
 ) -> None:
