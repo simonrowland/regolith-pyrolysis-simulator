@@ -1154,7 +1154,7 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
                     watermark = destination.execute(
                         "SELECT row_seq FROM sync_watermarks WHERE source_box=?", (box,),
                     ).fetchone()
-                    last = watermark[0] if watermark else 0
+                    last = 0
                     cursor = source.execute(
                         "SELECT e.key,e.value,e.engine,e.chem_version,e.row_seq,COALESCE(p.value,X'') "
                         "FROM engine_outputs e LEFT JOIN provenance p ON p.id=e.provenance_id "
