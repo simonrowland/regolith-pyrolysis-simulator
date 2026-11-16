@@ -1125,6 +1125,27 @@ def test_al091_enthalpy_evaluator_subtracts_source_formation_anchor() -> None:
     )
 
 
+def test_sidecar_segment_readers_keep_distinct_mapping_filter_order() -> None:
+    record = {
+        "status": "accepted",
+        "is_element_reference": True,
+        "formula": "Fe",
+        "validity": {"T_min_K": 10.0, "T_max_K": 20.0},
+        "thermo_record": {"segments": [None]},
+        "reference_pressure_Pa": PRESSURE_PA,
+    }
+
+    with pytest.raises(TypeError):
+        compilation_thermo_fits.sidecar_element_reference_curves([record])
+
+    assert evaluate_sidecar_fit(
+        record, Quantity.CP, 5.0, reference_curves={}
+    ) == (None, "outside_validity")
+    assert evaluate_sidecar_fit(
+        record, Quantity.CP, 15.0, reference_curves={}
+    ) == (None, "outside_segments")
+
+
 def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> None:
     expected_missing_comparison_reference = {
         "Al-009": ("g", "Br, none, no accepted reference fit covers 200 K"),

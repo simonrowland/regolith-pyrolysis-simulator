@@ -42,11 +42,12 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
+from collections.abc import Mapping
 from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, field, fields, is_dataclass
 from decimal import Decimal, InvalidOperation
 from enum import Enum
-from typing import Any, Iterable, Iterator, Mapping, Sequence
+from typing import Any, Iterable, Iterator, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -1916,19 +1917,21 @@ def _build_validation_indexes(
 _BOUND_WORK_INPUTS: dict[tuple[int, int], _ValidationIndexes] = {}
 
 
-def _experiment_membership_failure(
+def _observations_by_work(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment] | None,
-) -> Ancestry | None:
-    """INCOMPLETE when a work cannot be shown to contain every member."""
+) -> tuple[dict[str, tuple[Observation, ...]], Ancestry | None]:
+    """Group observations once, or return the shared membership failure."""
 
     if not experiments:
-        return Ancestry.incomplete(AncestryFailure.MISSING_EXPERIMENT_MAP)
-    if any(
-        experiments.get(obs.experiment_id) is None for obs in observations.values()
-    ):
-        return Ancestry.incomplete(AncestryFailure.MISSING_EXPERIMENT_MAP)
-    return None
+        return {}, Ancestry.incomplete(AncestryFailure.MISSING_EXPERIMENT_MAP)
+    grouped: dict[str, list[Observation]] = {}
+    for observation in observations.values():
+        experiment = experiments.get(observation.experiment_id)
+        if experiment is None:
+            return {}, Ancestry.incomplete(AncestryFailure.MISSING_EXPERIMENT_MAP)
+        grouped.setdefault(experiment.work_id, []).append(observation)
+    return {work_id: tuple(rows) for work_id, rows in grouped.items()}, None
 
 
 def _inputs_for_work(
@@ -1940,9 +1943,11 @@ def _inputs_for_work(
     asset_ids: set[str] | None = None,
     lineage_cache: dict[str, Ancestry] | None = None,
 ) -> Ancestry:
-    membership = _experiment_membership_failure(observations, experiments)
-    if membership is not None:
-        return membership
+    # A supplied grouping is the validated result built by _index_work_inputs.
+    if obs_by_work is None:
+        obs_by_work, membership = _observations_by_work(observations, experiments)
+        if membership is not None:
+            return membership
     assert experiments is not None
     ids: set[str] = set()
     # The corpus registry, when the caller has one. A single-work caller
@@ -1955,17 +1960,7 @@ def _inputs_for_work(
     for asset in work.source_files.files:
         if asset.role is AssetRole.TABLE_CSV:
             ids.add(asset.asset_id)
-    grouped = (
-        obs_by_work.get(work.work_id, ())
-        if obs_by_work is not None
-        else tuple(
-            obs
-            for obs in observations.values()
-            if (experiment := experiments.get(obs.experiment_id)) is not None
-            and experiment.work_id == work.work_id
-        )
-    )
-    for obs in grouped:
+    for obs in obs_by_work.get(work.work_id, ()):
         nested = _observation_lineage(
             obs.observation_id,
             observations,
@@ -1988,22 +1983,10 @@ def _index_work_inputs(
     experiments: Mapping[str, Experiment] | None,
     indexes: _ValidationIndexes,
 ) -> dict[str, Ancestry]:
-    membership = _experiment_membership_failure(observations, experiments)
+    # Build membership and the work grouping in one pass for this store index.
+    grouped, membership = _observations_by_work(observations, experiments)
     if membership is not None:
         return {work.work_id: membership for work in works.values()}
-    obs_by_work: dict[str, list[Observation]] = {}
-    assert experiments is not None
-    for obs in observations.values():
-        experiment = experiments.get(obs.experiment_id)
-        if experiment is None:
-            return {
-                work.work_id: Ancestry.incomplete(
-                    AncestryFailure.MISSING_EXPERIMENT_MAP
-                )
-                for work in works.values()
-            }
-        obs_by_work.setdefault(experiment.work_id, []).append(obs)
-    grouped = {work_id: tuple(rows) for work_id, rows in obs_by_work.items()}
     return {
         work.work_id: _inputs_for_work(
             work,
