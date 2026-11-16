@@ -1395,7 +1395,7 @@ def test_refused_wall_evidence_is_unavailable_not_zero_cost() -> None:
         )
 
 
-def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> None:
+def test_refused_empty_wall_deposit_is_unpriced_and_ranks_on_physical_objectives() -> None:
     run_execution = _refused_empty_wall_deposit_execution()
     reference = _run_reference(
         run_execution,
@@ -1411,12 +1411,11 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
     assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
     assert "furnace_amortization_cost_per_run_usd" not in summary
     assert summary["furnace_amortization_batch_cost_equivalents"] is None
-    with pytest.raises(ObjectiveComputationError, match="batch_cost_unavailable"):
-        cost_adjusted_objective_scores(
-            {"oxygen_kg": 10.0, "energy_kWh": 1.0},
-            DEFINITIONS,
-            product_summary=summary,
-        )
+    assert cost_adjusted_objective_scores(
+        {"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        DEFINITIONS,
+        product_summary=summary,
+    ) == (10.0, -1.0)
 
     # StudyRecord.search_provenance is a dataclass field. __post_init__ always
     # materializes it, and _to_record always sets it. _rank_key reads that
@@ -1435,14 +1434,67 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
         product_summary=_available_furnace_summary(0.0),
         search_provenance={},
     )
-    assert study._record_objective_scores(refused_record, DEFINITIONS) == (
-        None,
-        None,
+    comparison = study._record_cost_comparison((refused_record, clean_record))
+    assert comparison["flag"] == "furnace cost excluded: 1 of 2 unpriced"
+    assert comparison["candidates"]["refused"]["unpriced_reason"] == (
+        summary["lifespan_cost_status"]
     )
-    assert study._rank_key(refused_record, DEFINITIONS) > study._rank_key(
-        clean_record,
-        DEFINITIONS,
+    assert comparison["candidates"]["refused"]["applied"] is False
+    assert study._record_objective_scores(
+        refused_record, DEFINITIONS, comparison=comparison,
+    ) == (10.0, -1.0)
+    assert study._rank_records(
+        (clean_record, refused_record), DEFINITIONS, comparison=comparison,
+    ) == (refused_record, clean_record)
+
+
+@pytest.mark.parametrize(
+    "metric",
+    ("furnace_lifespan_consumed_fraction", "throughput_cost_owner_ratify_usd"),
+)
+def test_refused_empty_wall_deposit_cannot_rank_a_requested_lifespan_cost(metric) -> None:
+    execution = _refused_empty_wall_deposit_execution()
+    sim = execution.simulator
+    sim.energy_cumulative_breakdown_kWh = {
+        "electrical": 0.0,
+        "evaporation_thermal": 0.0,
+    }
+    costs = _furnace_test_cost_parameters()
+    reference = _run_reference(
+        execution,
+        {},
+        cost_parameters=costs,
     )
+    value = _metric_value(
+        metric,
+        sim,
+        objective_module._product_ledger(sim),
+        {},
+        run_execution=execution,
+        cost_parameters=costs,
+    )
+    assert value is None
+    definitions = (ObjectiveDefinition(metric, "minimize"),)
+    summary = reference.product_summary
+    record = SimpleNamespace(
+        candidate_id="refused",
+        objectives={metric: value},
+        product_summary=summary,
+    )
+    comparison = study._record_cost_comparison((record,))
+
+    assert comparison["flag"] == "furnace cost excluded: 1 of 1 unpriced"
+    assert cost_adjusted_objective_scores(
+        record.objectives,
+        definitions,
+        product_summary=summary,
+        comparison=comparison,
+    ) == (None,)
+    assert study._record_objective_scores(
+        record,
+        definitions,
+        comparison=comparison,
+    ) == (None,)
 
 
 def test_nonnegligible_refused_wall_species_uses_supply_bound_and_stays_ranked(
