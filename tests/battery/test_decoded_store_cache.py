@@ -275,6 +275,12 @@ def test_decoded_record_cache_obeys_shared_disable_setting(
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_dir))
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE", "off")
     calls = 0
+    identity_calls = 0
+
+    def decoder_identity() -> str:
+        nonlocal identity_calls
+        identity_calls += 1
+        return "decoder"
 
     def decode() -> str:
         nonlocal calls
@@ -284,12 +290,13 @@ def test_decoded_record_cache_obeys_shared_disable_setting(
     for _ in range(2):
         assert (
             load_cached_decoded_record(
-                b"same", decoder_identity="decoder", decode=decode
+                b"same", decoder_identity=decoder_identity, decode=decode
             )
             == "decoded"
         )
 
     assert calls == 2
+    assert identity_calls == 0
     assert not (cache_dir / "decoded-records").exists()
 
 
