@@ -12,8 +12,15 @@ _GENERATOR_SOURCE_DIRS = (
     "robie-hemingway-fisher-1978-usgs-b1452",
     "robie-waldbaum-1968-usgs-b1259",
 )
+# Re-pinned from pre-move scratch commit 4d76149804d5c7e561db8968844c0eea16e622e0;
+# its equivalent candidate snapshot 91fda04a23e3dcb44b915ca0ec7526018b1b5c74
+# was paired against merged base e4496039e842c67a2bc1a914ae94a94d9fec3eea in
+# receipt 596cc09762d344b1bae94f25109e6bab (both on Mac-Studio-256-2). The old
+# 406d9c40 pin used the older writer; queue-report changes in 3c99a4492 and
+# 241d8641e changed migration-report.md, so the digest moved with the writer,
+# not the consolidation.
 _BASELINE_STORE_SHA256 = (
-    "406d9c40fa8724586a26151c68453e1a1ce6ea8bfe5a4b3d2381f758463bf3dc"
+    "84404b759339cc9624808dcdfaa5cc984afea7ccac48fb8d65cb4715e2623262"
 )
 
 
