@@ -127,6 +127,7 @@ REFUSAL_TIMEOUT = "engine_timeout"
 REFUSAL_ENGINE_CRASH = "engine_crash"
 ENGINE_ANNOTATION_CRASH_FLOOR = "sio2_below_observed_crash_floor"
 REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
+REFUSAL_DIAGNOSTIC_GAP = "diagnostic_gap"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 AUTHORITY_EXTRAPOLATED = "extrapolated"
@@ -164,7 +165,7 @@ _CRASH_TOKENS = frozenset(
 _UNAVAILABLE_TOKENS = frozenset(
     {
         "unavailable", "backend_unavailable", "missing_binary",
-        "magemin_untyped_failure", "not_initialized",
+        "not_initialized",
     }
 )
 _IMCC_OUT_OF_BASIS_CODES = frozenset(
@@ -1182,6 +1183,15 @@ def engine_flags_from_result(
     ):
         certified_band = _plain_data(diagnostics["certified_band"])
 
+    if diagnostics.get("magemin_untyped_failure_diagnostic_gap"):
+        notices.append(
+            {
+                "kind": REFUSAL_DIAGNOSTIC_GAP,
+                "reason": diagnostics.get("backend_status_reason"),
+                "magemin_untyped_failure_diagnostic_gap": True,
+            }
+        )
+
     if diagnostics.get("imcc_notices"):
         imcc_rows = diagnostics["imcc_notices"]
     else:
@@ -1541,6 +1551,11 @@ def classify_equilibrate_outcome(
     category = str(diagnostics.get("backend_failure_category") or "")
     engine_reason = structured or ("; ".join(str(w) for w in warnings) if warnings else engine_status)
     haystack = _haystack(engine_status, structured, category, warnings, diagnostics)
+    if (
+        diagnostics.get("magemin_untyped_failure_diagnostic_gap")
+        or structured == "magemin_untyped_failure"
+    ):
+        return "refusal", REFUSAL_DIAGNOSTIC_GAP, engine_reason
     if (
         category == REFUSAL_ENGINE_CRASH
         or structured in {"subprocess_died", REFUSAL_ENGINE_CRASH}

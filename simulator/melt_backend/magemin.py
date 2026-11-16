@@ -1758,11 +1758,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         ``EquilibriumResult.ledger_transition`` is left ``None``: MAGEMin
         holds no ``AtomLedger`` authority. Because this method still
         populates ``phase_masses_kg`` with a phase assemblage, a result
-        from this adapter is not safe to feed through
+        from this adapter is **not** safe to feed through
         ``simulator/core.py::_get_equilibrium`` as the active backend —
         that path rejects a populated phase result with no ledger
-        transition and fails closed. The result is only meaningful to a
-        shadow comparator.
+        transition and fails closed (see the module "Authority posture"
+        note). The result is only meaningful to a shadow comparator.
 
         Every returned non-success result has a matching ``backend_status``
         and a typed ``backend_status_reason``. The return boundary marks any

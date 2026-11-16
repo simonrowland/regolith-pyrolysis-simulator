@@ -29,6 +29,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     QUANTITY_PRESSURE,
     PO2_NOT_AN_INPUT,
     REFUSAL_COMPOSITION_PROJECTED,
+    REFUSAL_DIAGNOSTIC_GAP,
     REFUSAL_ENGINE_CRASH,
     REFUSAL_GATE_REFUSED_IN_ADAPTER,
     REFUSAL_TIMEOUT,
@@ -723,18 +724,24 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
 
 
 @pytest.mark.parametrize(
-    "reason_code", ("missing_binary", "magemin_untyped_failure"),
+    ("reason_code", "expected_refusal"),
+    (
+        ("missing_binary", REFUSAL_UNAVAILABLE),
+        ("magemin_untyped_failure", REFUSAL_DIAGNOSTIC_GAP),
+    ),
 )
-def test_classify_backend_infrastructure_reason_as_unavailable(
+def test_classify_backend_reason_into_typed_refusal(
     reason_code: str,
+    expected_refusal: str,
 ) -> None:
+    diagnostics = {
+        "backend_status": "not_converged",
+        "backend_status_reason": reason_code,
+    }
     status, reason, engine_reason = classify_equilibrate_outcome(
         SimpleNamespace(
             status="not_converged",
-            diagnostics={
-                "backend_status": "not_converged",
-                "backend_status_reason": reason_code,
-            },
+            diagnostics=diagnostics,
             warnings=[],
             activity_coefficients={},
             vapor_pressures_Pa={},
@@ -743,8 +750,61 @@ def test_classify_backend_infrastructure_reason_as_unavailable(
     )
 
     assert status == "refusal"
-    assert reason == REFUSAL_UNAVAILABLE
+    assert reason == expected_refusal
     assert engine_reason == reason_code
+
+
+def test_magemin_untyped_failure_remains_visible_in_battery_cell(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    bare_failure = EquilibriumResult(status="not_converged", diagnostics={})
+    monkeypatch.setattr(
+        backend,
+        "_equilibrate_body",
+        lambda *_args, **_kwargs: bare_failure,
+    )
+    handle = EngineHandle(
+        name="magemin",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="untyped-failure",
+        kato_1993_table4_system=None,
+        why="diagnostic gap battery row",
+        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        isolated=False,
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_DIAGNOSTIC_GAP
+    assert cell.engine_reason == "magemin_untyped_failure"
+    notices = [
+        notice for notice in cell.notices
+        if notice.get("kind") == REFUSAL_DIAGNOSTIC_GAP
+    ]
+    assert notices == [
+        {
+            "kind": REFUSAL_DIAGNOSTIC_GAP,
+            "reason": "magemin_untyped_failure",
+            "magemin_untyped_failure_diagnostic_gap": True,
+        }
+    ]
+    assert cell.as_payload()["notices"] == cell.notices
 
 
 def test_classify_thermoengine_nonfinite_keeps_field_detail() -> None:

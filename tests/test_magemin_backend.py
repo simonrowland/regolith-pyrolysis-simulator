@@ -1601,7 +1601,7 @@ def test_public_magemin_equilibrate_normalizes_bare_failure_result(monkeypatch):
         ('magemin_subprocess_timeout', 'engine_timeout', True),
         ('magemin_subprocess_slot_unavailable', 'unavailable', False),
         ('magemin_aggregate_budget_timeout', 'engine_timeout', True),
-        ('magemin_untyped_failure', 'unavailable', False),
+        ('magemin_untyped_failure', 'diagnostic_gap', False),
         ('engine_crash', 'engine_crash', False),
         ('magemin_engine_worker_unavailable', 'unavailable', False),
     ),
@@ -1625,6 +1625,11 @@ def test_magemin_lifecycle_reasons_keep_existing_consumer_classification(
         diagnostics={
             'backend_status': 'not_converged',
             'backend_status_reason': reason,
+            **(
+                {'magemin_untyped_failure_diagnostic_gap': True}
+                if reason == 'magemin_untyped_failure'
+                else {}
+            ),
         },
     )
 
