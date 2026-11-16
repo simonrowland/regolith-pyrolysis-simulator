@@ -5107,11 +5107,11 @@ def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path, tap_hour
     assert RecipePatch.from_nested(recipe).validated(RecipeSchema())
     pareto = json.loads((tmp_path / "pareto.json").read_text())
     pareto_row = pareto["pareto"][0]
-    assert pareto_row["patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert pareto_row["patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(tap_hour)
     assert pareto_row["materialized_patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(tap_hour)
     assert pareto_row["parent_trajectory_patch"] == {}
     leaderboard_row = next(csv.DictReader((tmp_path / "leaderboard.csv").open()))
-    assert json.loads(leaderboard_row["patch_json"])["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert json.loads(leaderboard_row["patch_json"])["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(tap_hour)
     assert json.loads(leaderboard_row["materialized_patch_json"])["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(tap_hour)
     assert json.loads(leaderboard_row["parent_trajectory_patch_json"]) == {}
     sidecar = json.loads((tmp_path / "winner.tap-truncated.json").read_text())
