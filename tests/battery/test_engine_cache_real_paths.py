@@ -356,6 +356,7 @@ def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> No
     ("engine", "expected_fields"),
     (
         (Engine.OPENIMCC, {"melt_pack", "gas_pack"}),
+        (Engine.INTERNAL_ANALYTICAL, {"oxygen_balance_backend", "high_t_melt_activity"}),
         (
             Engine.ALPHAMELTS,
             {
@@ -836,7 +837,7 @@ def _capture_engine_cache_settings_paths(
     monkeypatch.setattr(engine_cache, "engine_cache_settings", record_projection)
     monkeypatch.setattr(engine_cache, "cached_engine_call", cached_call)
 
-    if engine not in {"openimcc", "internal-analytical"}:
+    if engine != "openimcc":
         handle = binary_pot_battery.EngineHandle(
             name=engine,
             backend=backend,
@@ -902,19 +903,24 @@ def test_default_engine_cache_settings_match_across_call_paths(
     case = next(
         (case for case in _setting_cases() if case.engine.value == engine), None
     )
-    backend = object() if case is None else case.backend_factory()
+    from simulator.diagnostic_helpers.binary_pot_battery import _InternalAnalyticalBatteryBackend
+
+    backend = (
+        _InternalAnalyticalBatteryBackend() if engine == "internal-analytical"
+        else object() if case is None else case.backend_factory()
+    )
 
     requests, projection_inputs = _capture_engine_cache_settings_paths(
         engine, normalized, backend, monkeypatch
     )
 
     expected_request_count = (
-        1 if engine in {"internal-analytical", "openimcc"} else 2
+        1 if engine == "openimcc" else 2
     )
     assert len(requests) == expected_request_count
     if engine == "internal-analytical":
-        assert expected_projection == {}
-        assert projection_inputs == [normalized]
+        assert expected_projection["oxygen_balance_backend"] == normalized["oxygen_balance_backend"]
+        assert len(projection_inputs) == 2
 
     for request in requests:
         assert engine_cache_key(
@@ -1664,10 +1670,11 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
     assert projected
 
 
-def test_internal_analytical_projection_does_not_inspect_uncacheable_backend() -> None:
-    from simulator.engine_cache import engine_cache_settings
+def test_internal_analytical_projection_requires_normalized_inputs() -> None:
+    from simulator.engine_cache import EngineCacheSettingsError, engine_cache_settings
 
-    assert engine_cache_settings("internal-analytical", object()) == {}
+    with pytest.raises(EngineCacheSettingsError):
+        engine_cache_settings("internal-analytical", object())
 
 
 @pytest.mark.parametrize(
@@ -2153,13 +2160,8 @@ def test_stateless_internal_analytical_equilibrate_hits_enabled_cache(
     )
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
-    monkeypatch.setattr(
-        engine_cache,
-        "engine_cache_settings",
-        lambda *_args: pytest.fail("analytical settings must come from its named construction switch"),
-    )
     engine_cache.engine_cache_counters(reset=True)
-    handle = SimpleNamespace(name="internal-analytical", backend=SimpleNamespace(_core=SimpleNamespace(_high_t_melt_activity="openimcc")))
+    handle = SimpleNamespace(name="internal-analytical", engine_settings={}, backend=SimpleNamespace(_core=SimpleNamespace(_high_t_melt_activity="openimcc")))
     result = EquilibriumResult(status="ok", liquid_fraction=0.75)
 
     for _ in range(2):
@@ -2797,8 +2799,13 @@ def test_internal_analytical_high_temperature_modes_cache_separately_and_exactly
     constant_gamma_on = evaluate("constant_gamma", cache=True)
     constant_gamma_warm = evaluate("constant_gamma", cache=True)
 
-    assert openimcc_on == openimcc_off == openimcc_warm
-    assert constant_gamma_on == constant_gamma_off == constant_gamma_warm
+    from simulator.melt_backend.base import equilibrium_cache_value
+
+    def consumed(result):
+        return equilibrium_cache_value(vars(result), engine_id="internal-analytical")
+
+    assert consumed(openimcc_on) == consumed(openimcc_off) == consumed(openimcc_warm)
+    assert consumed(constant_gamma_on) == consumed(constant_gamma_off) == consumed(constant_gamma_warm)
     assert openimcc_off.vapor_pressures_Pa != constant_gamma_off.vapor_pressures_Pa
     assert calls == 4
     counts = engine_cache.engine_cache_counters(reset=True)["internal-analytical"]

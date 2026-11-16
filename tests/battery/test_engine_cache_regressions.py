@@ -10,6 +10,16 @@ from simulator import engine_cache
 from simulator.diagnostic_helpers import binary_pot_battery as battery
 
 
+@pytest.mark.parametrize("engine", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
+def test_every_normalized_prediction_setting_changes_the_key(engine):
+    normalized = battery.normalize_engine_settings(engine, None)
+    settings = engine_cache.engine_cache_settings(engine, normalized)
+    original = engine_cache.engine_cache_key(engine, engine_cache.ENGINE_CHEMISTRY_VERSION[engine], {"engine_settings": settings})
+    for name, value in settings.items():
+        changed = {**settings, name: {"pack": "changed"} if isinstance(value, dict) else [value, "changed"]}
+        assert engine_cache.engine_cache_key(engine, engine_cache.ENGINE_CHEMISTRY_VERSION[engine], {"engine_settings": changed}) != original, name
+
+
 @pytest.mark.parametrize("seam", ["inline", "isolated"])
 def test_analytical_oxygen_pack_changes_each_key(seam, tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
@@ -95,23 +105,16 @@ def test_nonconvergence_then_recovery_is_never_masked(seam, clear_ram, tmp_path,
     worker.engine_settings = battery.normalize_engine_settings(worker.engine, None)
     worker._lock = Lock()
     handle = SimpleNamespace(name=worker.engine, backend=core_backend, engine_settings=worker.engine_settings)
-    calls = []
-
     def solve():
-        calls.append(1)
         return core_backend.equilibrate(**request)
 
-    def cell_payload(_payload, *, timeout_s):
-        result = solve()
-        return battery.EquilibrateCell(
-            pot_id="recovery", engine=worker.engine, temperature_K=2400.65,
-            po2=request["po2_request"], status=result.status, refusal_reason=None,
-            engine_status=result.status, engine_reason=None,
-            melt_activities=result.activity_coefficients,
-            gas_partial_pressures_Pa=result.vapor_pressures_Pa,
-            liquid_fraction=result.liquid_fraction, wall_s=0.0, cpu_s=0.0, hostname="test",
-            backend_failure_disposition=result.diagnostics.get("backend_failure_disposition"),
-        ).as_payload()
+    real_handle = battery.EngineHandle(
+        name=worker.engine, backend=core_backend, available=True, unavailable_reason=None,
+        takes_fo2=True, supports_intrinsic_fo2=True, engine_settings=worker.engine_settings,
+    )
+
+    def cell_payload(payload, *, timeout_s):
+        return battery.run_isolated_cell_worker(payload, handle=real_handle)
 
     worker._worker = SimpleNamespace(call=cell_payload)
 
@@ -123,6 +126,7 @@ def test_nonconvergence_then_recovery_is_never_masked(seam, clear_ram, tmp_path,
         if seam == "inline":
             return battery._call_cached_backend_equilibrate(handle, request, solve).vapor_pressures_Pa
         payload = {
+            "engine": worker.engine, "pot_id": "recovery",
             "temperature_K": 2400.65, "composition_wt_pct": {"MgO": 40.0, "SiO2": 60.0},
             "physical_pressure_bar": 1e-6, "po2": request["po2_request"].as_payload(),
         }
@@ -141,6 +145,7 @@ def test_nonconvergence_then_recovery_is_never_masked(seam, clear_ram, tmp_path,
         scoped.setattr(vapor_pressure, "_same_composition_temperature_bridge", lambda *args, **kwargs: None)
         fallback = evaluate()
         assert fallback != live
+        assert core_backend._core._last_high_t_melt_activity["fallback_reason"]["code"] == "imcc_nonconvergence"
         counts = engine_cache.engine_cache_counters()["internal-analytical"]
         assert counts["stores"] == counts["hits"] == 0
         assert not any(key[0] == str(path) for key in engine_cache._MEMORY_CACHE)
@@ -177,4 +182,49 @@ def test_inherited_cache_is_neither_read_nor_written_by_fake_worker(tmp_path, mo
     assert len(calls) == 2
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT * FROM engine_outputs").fetchall() == before
+
+
+@pytest.mark.parametrize("seam", ["inline", "isolated"])
+def test_mutation_dropped_oxygen_pack_is_detected(seam, tmp_path, monkeypatch):
+    original = engine_cache.engine_cache_settings
+
+    def omit_pack(engine, settings):
+        result = original(engine, settings)
+        if engine == "internal-analytical":
+            result.pop("oxygen_balance_backend")
+        return result
+
+    monkeypatch.setattr(engine_cache, "engine_cache_settings", omit_pack)
+    with pytest.raises(AssertionError):
+        test_analytical_oxygen_pack_changes_each_key(seam, tmp_path, monkeypatch)
+
+
+@pytest.mark.parametrize("seam", ["inline", "residue", "isolated"])
+def test_mutation_dropped_transient_disposition_is_detected(seam, tmp_path, monkeypatch):
+    original = battery._internal_analytical_vapor_pressure_adapter
+
+    def forget_failure(**kwargs):
+        result = original(**kwargs)
+        result.diagnostics.pop("backend_failure_disposition", None)
+        return result
+
+    monkeypatch.setattr(battery, "_internal_analytical_vapor_pressure_adapter", forget_failure)
+    with pytest.raises(AssertionError):
+        test_nonconvergence_then_recovery_is_never_masked(seam, False, tmp_path, monkeypatch)
+
+
+def test_mutation_dropped_empty_pressure_field_is_detected(tmp_path, monkeypatch):
+    from simulator.melt_backend import base
+
+    original = base.equilibrium_cache_from_value
+
+    def lose_empty(payload, **kwargs):
+        result = original(payload, **kwargs)
+        if not result.get("vapor_pressures_Pa"):
+            result.pop("vapor_pressures_Pa", None)
+        return result
+
+    monkeypatch.setattr(base, "equilibrium_cache_from_value", lose_empty)
+    with pytest.raises(AttributeError):
+        test_empty_residue_surface_survives_off_cold_and_disk_hit(tmp_path, monkeypatch)
 
