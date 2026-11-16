@@ -19,8 +19,13 @@ from simulator.accounting.queries import (
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.mass_balance import MassBalance
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.optimize.objective import _refusal_candidate_segments
 from simulator.state import EvaporationFlux, MOLAR_MASS
-from simulator.trace import PhysicsTrace
+from simulator.trace import (
+    PhysicsTrace,
+    WALL_DEPOSIT_ZONE_NAMES,
+    wall_deposit_kg_by_zone_species,
+)
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -182,6 +187,33 @@ def test_snapshot_deltas_sum_to_cumulative_trace_totals():
     for key, kg in wall_by_segment_species.items():
         assert trace.wall_deposit_by_segment_species_kg.get(
             key, 0.0) == pytest.approx(kg, abs=1e-9)
+
+
+def test_wall_zone_map_covers_bookable_segments_and_upstream_deposit():
+    sim = _representative_sim(hours=0)
+    segments = tuple(sim.condensation_model.pipe_segments)
+    declared_segments = {segment.name for segment in segments}
+    upstream_geometry = next(
+        segment
+        for segment in segments
+        if segment.upstream_stage == "stage_0"
+        and segment.downstream_stage == "stage_1"
+    )
+    fallback_segments = _refusal_candidate_segments({}, "Fe")
+    bookable_segments = declared_segments | set(fallback_segments)
+    zone_by_segment = PhysicsTrace.from_simulator(sim).wall_zone_by_segment
+
+    assert bookable_segments <= zone_by_segment.keys()
+    assert all(zone in WALL_DEPOSIT_ZONE_NAMES for zone in zone_by_segment.values())
+    assert zone_by_segment[fallback_segments[0]] == zone_by_segment[
+        upstream_geometry.name
+    ]
+
+    booked_by_zone = wall_deposit_kg_by_zone_species(
+        {(fallback_segments[0], "Fe"): 0.25},
+        zone_by_segment,
+    )
+    assert booked_by_zone[zone_by_segment[upstream_geometry.name]]["Fe"] == 0.25
 
 
 def test_snapshot_o2_delta_cannot_overwrite_terminal_oxygen_trace_total():
