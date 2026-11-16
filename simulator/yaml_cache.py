@@ -319,7 +319,7 @@ def _cache_root() -> Path:
     else:
         xdg_cache = os.environ.get("XDG_CACHE_HOME")
         if xdg_cache:
-            xdg_root = Path(xdg_cache)
+            xdg_root = Path(xdg_cache).resolve()
             if _ensure_private_directory(xdg_root):
                 candidate = _private_descendant(
                     xdg_root,
@@ -331,7 +331,7 @@ def _cache_root() -> Path:
         else:
             user_token = str(os.getuid()) if hasattr(os, "getuid") else "user"
             candidate = _private_descendant(
-                Path(tempfile.gettempdir()),
+                Path(tempfile.gettempdir()).resolve(),
                 f"regolith-pyrolysis-simulator-{user_token}",
                 "parsed-yaml",
             )

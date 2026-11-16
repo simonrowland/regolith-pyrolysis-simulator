@@ -717,8 +717,23 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
 
     monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
     monkeypatch.setattr(score, "SCORE_ENGINE_SET", (Engine.THERMOENGINE,))
+    original_iter_cells = compilation_tier._iter_compilation_series_cells
+    expanded_observations = []
+
+    def count_cell_expansions(observation, origin=None):
+        expanded_observations.append(observation.observation_id)
+        yield from original_iter_cells(observation, origin)
+
+    monkeypatch.setattr(
+        compilation_tier, "_iter_compilation_series_cells", count_cell_expansions
+    )
     output_path = tmp_path / "compilation-comparisons.jsonl"
     assert write_compilation_comparisons_jsonl(context, output_path) == len(comparisons)
+    import hashlib
+    assert hashlib.sha256(output_path.read_bytes()).hexdigest() == (
+        "2cf216e2ca3d477b87d2f2738e8c1a0e8f52b8ccba53ac4172aaee67c035bf97"
+    )
+    assert len(expanded_observations) == len(context.observations)
     written = tuple(iter_compilation_comparisons_jsonl(output_path))
     fit_row = next(
         row
@@ -743,6 +758,124 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
     }
     assert fit_row["refusal_reason"] is None
     assert fit_row["refusal_detail"] == {}
+
+
+def test_nasa9_fit_duplicate_records_preserve_comparison_order(monkeypatch) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.generators.compilation_thermo_fits as fit_generator
+    from simulator.battery.compilation_tier import ThermoAttempt, _nasa9_fit_comparisons
+    from simulator.battery.enums import QUANTITY_UNITS
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+
+    def echo_fit(engine, observation, **_kwargs):
+        return ThermoAttempt(
+            value=observation.value.point,
+            unit=QUANTITY_UNITS[Quantity.CP],
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="duplicate-fit-pin",
+            coefficient_sources=(),
+        )
+
+    monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", echo_fit)
+    original_evaluate = fit_generator.evaluate_sidecar_fit
+    evaluations = []
+
+    def count_evaluation(*args, **kwargs):
+        evaluations.append((args[1], args[2]))
+        return original_evaluate(*args, **kwargs)
+
+    monkeypatch.setattr(fit_generator, "evaluate_sidecar_fit", count_evaluation)
+    single = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+        fit_records=(record,),
+    )
+    single_evaluations = len(evaluations)
+    evaluations.clear()
+    repeated = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+        fit_records=(record, record),
+    )
+
+    assert single
+    assert repeated == [*single, *single]
+    assert single_evaluations > 0
+    assert len(evaluations) == single_evaluations
+
+
+def test_nasa9_fit_does_not_reuse_values_for_a_different_coefficient_set(
+    monkeypatch,
+) -> None:
+    from copy import deepcopy
+
+    import simulator.battery.generators.compilation_thermo_fits as fit_generator
+    from simulator.battery.compilation_tier import _nasa9_fit_comparisons
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+    changed_record = deepcopy(record)
+    first_segment = changed_record["thermo_record"]["segments"][0]
+    first_segment["a_coefficients"][0] = (
+        float(first_segment["a_coefficients"][0]) + 1e-6
+    )
+    original_evaluate = fit_generator.evaluate_sidecar_fit
+    coefficient_sets = []
+
+    def record_coefficient_set(record_arg, *args, **kwargs):
+        coefficient_sets.append(
+            tuple(
+                tuple(segment["a_coefficients"])
+                for segment in record_arg["thermo_record"]["segments"]
+            )
+        )
+        return original_evaluate(record_arg, *args, **kwargs)
+
+    monkeypatch.setattr(
+        fit_generator, "evaluate_sidecar_fit", record_coefficient_set
+    )
+    _nasa9_fit_comparisons(
+        context,
+        engines=(),
+        invoke_pure_phase=False,
+        fit_records=(record, changed_record),
+    )
+
+    assert coefficient_sets
+    assert len(set(coefficient_sets)) == 2
+
+
+def test_nasa9_fit_cache_validates_before_parsing_later_segment() -> None:
+    from copy import deepcopy
+
+    from simulator.battery.compilation_tier import _nasa9_fit_comparisons
+    from simulator.vapour_rail.nasa_cea import NasaCeaSegmentError
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+    malformed = deepcopy(record)
+    malformed["is_element_reference"] = False
+    first_segment = deepcopy(malformed["thermo_record"]["segments"][0])
+    second_segment = deepcopy(first_segment)
+    first_segment["T_min_K"] = -1.0
+    del second_segment["b2"]
+    malformed["thermo_record"]["segments"] = [first_segment, second_segment]
+
+    with pytest.raises(NasaCeaSegmentError) as exc_info:
+        _nasa9_fit_comparisons(
+            context,
+            engines=(),
+            invoke_pure_phase=False,
+            fit_records=(malformed,),
+        )
+
+    assert str(exc_info.value) == (
+        "NASA-9 segment requires T_min_K > 0 K; got -1.0"
+    )
 
 
 def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> None:

@@ -440,6 +440,67 @@ def test_numeric_temperature_spellings_share_alignment_but_distinct_values_do_no
     assert _only_band(distinct, tier="compilation") is None
 
 
+def test_source_band_catalog_preserves_series_cell_alignment_groups(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_module
+    from simulator.battery.compilation_tier import _iter_compilation_series_cells
+    from simulator.battery.records import Value, ValueKind
+
+    experiment, rows, origins = _observations(
+        (Decimal("0"), Decimal("0")), source_ids=("series-a", "series-b")
+    )
+    series_rows = (
+        replace(
+            rows[0],
+            value=Value(
+                ValueKind.SERIES,
+                series=(
+                    (Decimal("1000"), Decimal("10")),
+                    (Decimal("1100"), Decimal("20")),
+                ),
+            ),
+        ),
+        replace(
+            rows[1],
+            value=Value(
+                ValueKind.SERIES,
+                series=(
+                    (Decimal("1000"), Decimal("12")),
+                    (Decimal("1100"), Decimal("22")),
+                ),
+            ),
+        ),
+    )
+    context = _context(tmp_path, series_rows, origins, experiment)
+    expected_tokens = {
+        _group_token(key)
+        for row in series_rows
+        for cell in _iter_compilation_series_cells(
+            row, origins.get(row.observation_id)
+        )
+        if (key := _source_alignment_group_key(cell, tier="compilation")) is not None
+    }
+    original_group_key = score_module._source_alignment_group_key
+    group_key_calls = []
+
+    def count_group_key_calls(observation, *, tier):
+        group_key_calls.append(observation.observation_id)
+        return original_group_key(observation, tier=tier)
+
+    monkeypatch.setattr(
+        score_module, "_source_alignment_group_key", count_group_key_calls
+    )
+
+    bands, records, _no_band_reasons = _source_band_catalog(context, {})
+
+    assert len(expected_tokens) == 2
+    assert len(group_key_calls) == len(series_rows)
+    assert set(bands) == expected_tokens
+    assert [record["aligned_T_K"] for record in records] == ["1000", "1100"]
+    assert all(band.value == _Z95 * _MAD_NORMAL_SCALE for band in bands.values())
+
+
 def test_valence_basis_is_part_of_source_alignment_key() -> None:
     first_basis = ValenceBasis(
         numerator_oxidation_states=(2,),
