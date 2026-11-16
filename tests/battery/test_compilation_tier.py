@@ -776,6 +776,46 @@ def test_nasa9_fit_duplicate_records_preserve_comparison_order(monkeypatch) -> N
     assert repeated == [*single, *single]
 
 
+def test_nasa9_fit_does_not_reuse_values_for_a_different_coefficient_set(
+    monkeypatch,
+) -> None:
+    from copy import deepcopy
+
+    import simulator.battery.generators.compilation_thermo_fits as fit_generator
+    from simulator.battery.compilation_tier import _nasa9_fit_comparisons
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+    changed_record = deepcopy(record)
+    first_segment = changed_record["thermo_record"]["segments"][0]
+    first_segment["a_coefficients"][0] = (
+        float(first_segment["a_coefficients"][0]) + 1e-6
+    )
+    original_evaluate = fit_generator.evaluate_sidecar_fit
+    coefficient_sets = []
+
+    def record_coefficient_set(record_arg, *args, **kwargs):
+        coefficient_sets.append(
+            tuple(
+                tuple(segment["a_coefficients"])
+                for segment in record_arg["thermo_record"]["segments"]
+            )
+        )
+        return original_evaluate(record_arg, *args, **kwargs)
+
+    monkeypatch.setattr(
+        fit_generator, "evaluate_sidecar_fit", record_coefficient_set
+    )
+    _nasa9_fit_comparisons(
+        context,
+        engines=(),
+        invoke_pure_phase=False,
+        fit_records=(record, changed_record),
+    )
+
+    assert coefficient_sets
+    assert len(set(coefficient_sets)) == 2
+
+
 def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> None:
     from simulator.battery.compilation_tier import _compilation_engines_for_pair
     from simulator.battery.score import SCORE_ENGINE_SET
