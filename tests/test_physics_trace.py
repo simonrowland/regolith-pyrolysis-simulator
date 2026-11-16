@@ -19,7 +19,10 @@ from simulator.accounting.queries import (
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.mass_balance import MassBalance
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.optimize.objective import _refusal_candidate_segments
+from simulator.optimize.objective import (
+    _assign_refused_supplies_at_binding_load,
+    _refusal_candidate_segments,
+)
 from simulator.state import EvaporationFlux, MOLAR_MASS
 from simulator.trace import (
     PhysicsTrace,
@@ -199,18 +202,34 @@ def test_wall_zone_map_covers_bookable_segments_and_upstream_deposit():
         if segment.upstream_stage == "stage_0"
         and segment.downstream_stage == "stage_1"
     )
+    refusal_authority = {
+        "wall_saturation_pressure_refusals_by_species": {
+            "Fe": {segment: {} for segment in declared_segments},
+        },
+    }
+    candidate_segments = _refusal_candidate_segments(refusal_authority, "Fe")
     fallback_segments = _refusal_candidate_segments({}, "Fe")
-    bookable_segments = declared_segments | set(fallback_segments)
+    assignment = _assign_refused_supplies_at_binding_load(
+        {}, {"Fe": 0.25}, {}
+    )
+    booked_segment = assignment["segment_by_species"]["Fe"]
+    bookable_segments = (
+        declared_segments
+        | set(candidate_segments)
+        | set(fallback_segments)
+        | {booked_segment}
+    )
     zone_by_segment = PhysicsTrace.from_simulator(sim).wall_zone_by_segment
 
     assert bookable_segments <= zone_by_segment.keys()
     assert all(zone in WALL_DEPOSIT_ZONE_NAMES for zone in zone_by_segment.values())
-    assert zone_by_segment[fallback_segments[0]] == zone_by_segment[
+    assert booked_segment == fallback_segments[0]
+    assert zone_by_segment[booked_segment] == zone_by_segment[
         upstream_geometry.name
     ]
 
     booked_by_zone = wall_deposit_kg_by_zone_species(
-        {(fallback_segments[0], "Fe"): 0.25},
+        {(booked_segment, "Fe"): 0.25},
         zone_by_segment,
     )
     assert booked_by_zone[zone_by_segment[upstream_geometry.name]]["Fe"] == 0.25
