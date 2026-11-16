@@ -72,8 +72,12 @@ def test_bulk_loader_rejects_transient_refusals(tmp_path):
         )])
 
 
-@pytest.mark.parametrize("engine", ["alphamelts", "vaporock"])
-def test_real_engine_basis_refusal_hits_before_the_worker_pipe(engine, tmp_path, monkeypatch):
+@pytest.mark.parametrize(("engine", "composition"), [
+    ("alphamelts", {"Al2O3": 100.0}),
+    # The existing VapoRock basis contract refuses metal/sulfide/halide input.
+    ("vaporock", {"Fe": 50.0, "FeS": 30.0, "NaCl": 20.0}),
+])
+def test_real_engine_basis_refusal_hits_before_the_worker_pipe(engine, composition, tmp_path, monkeypatch):
     from simulator.diagnostic_helpers.binary_pot_battery import (
         BinaryPot, Po2Request, _close_isolated_cell_workers,
         close_battery_engine_handle, equilibrate_cell, open_battery_engine,
@@ -87,7 +91,7 @@ def test_real_engine_basis_refusal_hits_before_the_worker_pipe(engine, tmp_path,
     if not handle.available:
         close_battery_engine_handle(handle)
         pytest.skip(handle.unavailable_reason or f"{engine} is unavailable")
-    pot = BinaryPot("silica-free", None, "basis refusal", {"Al2O3": 100.0})
+    pot = BinaryPot("basis-refusal", None, "basis refusal", composition)
     calls = []
     original = WarmEngineWorker.call
 
