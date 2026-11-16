@@ -293,7 +293,10 @@ def test_inline_request_keys_cover_every_forwarded_solve_input(engine, tmp_path,
             if name not in inspect.signature(handle.backend.equilibrate).parameters:
                 continue
             battery._call_cached_backend_equilibrate(handle, {**kwargs, name: changed}, lambda: None)
-            assert keys[-1] != keys[0], (engine, name)
+            if engine == "internal-analytical" and name == "fO2_log":
+                assert keys[-1] == keys[0]
+            else:
+                assert keys[-1] != keys[0], (engine, name)
         battery._call_cached_backend_equilibrate(handle, {**kwargs, "call_timeout_s": 5}, lambda: None)
         assert keys[-1] == keys[0]
     finally:
@@ -313,3 +316,20 @@ def test_direct_openimcc_key_covers_every_bridge_input():
     ):
         request = _evaluate_request_vector(**{**kwargs, name: changed})
         assert engine_cache.engine_cache_key("openimcc", 1, request) != original, name
+
+
+def test_analytical_fo2_argument_is_not_consumed():
+    import ast
+    import inspect
+    import textwrap
+    from tests.chemistry.test_internal_analytical_stateless import _COMPOSITION_MOL
+
+    function = ast.parse(textwrap.dedent(inspect.getsource(battery._internal_analytical_vapor_pressure_adapter)))
+    assert not any(isinstance(node, ast.Name) and node.id == "fO2_log" and isinstance(node.ctx, ast.Load) for node in ast.walk(function))
+    backend = battery._InternalAnalyticalBatteryBackend()
+    kwargs = dict(
+        temperature_C=2400.65 - 273.15, pressure_bar=1e-6,
+        composition_mol=_COMPOSITION_MOL,
+        po2_request=battery.Po2Request("commanded", 1e-9),
+    )
+    assert vars(backend.equilibrate(**kwargs, fO2_log=-9.0)) == vars(backend.equilibrate(**kwargs, fO2_log=-8.0))

@@ -325,6 +325,8 @@ def _call_cached_backend_equilibrate(
         return solve()
     request_kwargs = dict(kwargs)
     request_kwargs.pop("call_timeout_s", None)
+    if handle.name == "internal-analytical":
+        request_kwargs = _internal_analytical_cache_inputs(request_kwargs)
     # The resolved handle owns AlphaMELTS's effective child calculation mode.
     # Never reread the parent environment while building a request key.
     po2_request = request_kwargs.get("po2_request")
@@ -3920,10 +3922,15 @@ def internal_analytical_residue_vapor_pressure(
             "po2": po2_request.as_payload(),
             "engine_settings": _internal_analytical_cache_settings(core),
         }
-        result = cached_engine_call("internal-analytical", request, solve)
+        result = cached_engine_call("internal-analytical", _internal_analytical_cache_inputs(request), solve)
     if isinstance(result, list):
         return SimpleNamespace(**equilibrium_cache_from_value(result, engine_id="internal-analytical"))
     return result
+
+
+def _internal_analytical_cache_inputs(request: Mapping[str, Any]) -> dict[str, Any]:
+    # The adapter derives fugacity from Po2Request and never reads this argument.
+    return {name: value for name, value in request.items() if name != "fO2_log"}
 
 
 def _internal_analytical_cache_settings(core: Any, settings: Mapping[str, Any] | None = None) -> dict[str, Any]:
