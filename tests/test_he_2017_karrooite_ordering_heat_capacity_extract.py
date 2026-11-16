@@ -12,7 +12,7 @@ import subprocess
 import pytest
 import yaml
 
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from tests.literature_extract_test_helpers import iter_locators
 from simulator.battery.migrate import Migrator, load_index
 from data.literature.build_index import corpus_pointers, sha256_file
@@ -48,6 +48,15 @@ TABLE1_RENDER_GRID = [
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+
+def _require_migration_inputs(corpus_root: Path) -> None:
+    require_corpus_files(
+        (
+            corpus_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf",
+            corpus_root / "tables" / SOURCE_ID / "table-5.csv",
+        )
+    )
 
 
 def _context_by_id(document: dict) -> dict:
@@ -208,9 +217,19 @@ def test_mutating_an_extrapolated_entropy_context_value_breaks_the_source_pins()
         _assert_source_pins(mutated)
 
 
+def test_partial_corpus_skips_migration_without_table5_csv(tmp_path: Path) -> None:
+    corpus_root = tmp_path / "regolith-corpus"
+    pdf = corpus_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"seed")
+    missing = corpus_root / "tables" / SOURCE_ID / "table-5.csv"
+
+    with pytest.raises(pytest.skip.Exception, match=re.escape(str(missing))):
+        _require_migration_inputs(corpus_root)
+
+
 def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
-    if not CORPUS_ROOT.is_dir():
-        pytest.skip("regolith-corpus checkout is absent")
+    _require_migration_inputs(CORPUS_ROOT)
     index = load_index()
     index[SOURCE_ID] = {
         "source_id": SOURCE_ID,

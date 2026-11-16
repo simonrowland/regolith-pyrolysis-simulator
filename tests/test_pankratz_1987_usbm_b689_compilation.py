@@ -14,11 +14,18 @@ import yaml
 
 from simulator import reference_data
 from simulator.reference_data import pankratz_1987_usbm_b689_loader as loader
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from tools import ingest_pankratz_1987_usbm_b689 as harvest
 
 
 ROOT = loader.COMPILATION_ROOT
+
+
+def _require_b689_corpus_inputs(corpus_root: pathlib.Path) -> None:
+    pdf, sidecar, source_chunks = harvest._b689_source_inputs(corpus_root)
+    required_paths = [pdf, sidecar]
+    required_paths.extend(source_path for _, _, _, source_path in source_chunks)
+    require_corpus_files(required_paths)
 
 
 def test_published_curves_keep_equation_records_separate_from_source_cells():
@@ -445,9 +452,19 @@ def test_valid_but_wrong_continuation_formula_cannot_certify():
 @pytest.fixture
 def corpus():
     path = regolith_corpus_root()
-    if not (path / "raw" / harvest.SOURCE_ID).exists():
-        pytest.skip("B689 source corpus unavailable")
+    _require_b689_corpus_inputs(path)
     return path
+
+
+def test_partial_corpus_skips_b689_at_first_missing_input(tmp_path: pathlib.Path):
+    corpus_root = tmp_path / "regolith-corpus"
+    pdf = corpus_root / "raw" / harvest.SOURCE_ID / f"{harvest.SOURCE_ID}.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"seed")
+    missing = pdf.parent / "sidecar.yaml"
+
+    with pytest.raises(pytest.skip.Exception, match=str(missing)):
+        _require_b689_corpus_inputs(corpus_root)
 
 
 def test_rebuild_preserves_native_chunk_offsets_and_artifacts(corpus):

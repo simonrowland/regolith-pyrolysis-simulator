@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import csv
 import json
 import os
+import re
 import subprocess
 import sys
 from io import StringIO
@@ -9,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from tools import mineru_table_qa as qa
 
 
@@ -50,6 +52,26 @@ def _write_corpus(
 
 def _by_sid(rows: list[dict[str, object]], sid: str) -> dict[str, object]:
     return next(row for row in rows if row["sid"] == sid)
+
+
+def _require_calibration_inputs(checkout: Path, calibration: Path) -> None:
+    with calibration.open(encoding="utf-8", newline="") as stream:
+        table_ids = [row["table_id"] for row in csv.DictReader(stream, delimiter="\t")]
+    source_ids = sorted({table_id.rsplit("/", 2)[0] for table_id in table_ids})
+    source_roots = qa._source_roots(checkout)
+    required_paths = [calibration]
+    for source_id in source_ids:
+        roots = source_roots.get(source_id, [])
+        content_files = qa._content_list_files(roots)
+        if content_files:
+            required_paths.extend(content_files)
+        else:
+            source_root = roots[0] if roots else checkout / "raw" / source_id / "ocr-mineru"
+            required_paths.append(source_root / "**" / "*content_list*.json")
+        required_paths.append(
+            checkout / "text" / source_id / "pdftotext-layout.txt"
+        )
+    require_corpus_files(required_paths)
 
 
 def test_clean_table_scores_zero_and_uses_absolute_pdf_page(tmp_path: Path) -> None:
@@ -210,8 +232,7 @@ def test_calibration_tsv_matches_live_scores_and_ranks_mangled_tables(tmp_path: 
         part for part in (repo_path, env.get("PYTHONPATH", "")) if part
     )
     checkout = regolith_corpus_root()
-    if not checkout.is_dir():
-        pytest.skip("regolith-corpus checkout is absent")
+    _require_calibration_inputs(checkout, calibration)
 
     subprocess.run(
         [
@@ -233,6 +254,20 @@ def test_calibration_tsv_matches_live_scores_and_ranks_mangled_tables(tmp_path: 
     mangled = [row for row in rows if row[1] == "MANGLED"]
     assert len(mangled) == 4
     assert all(int(row[4]) <= 8 for row in mangled)
+
+
+def test_partial_calibration_corpus_skips_at_missing_source_input(tmp_path: Path) -> None:
+    checkout = tmp_path / "regolith-corpus"
+    checkout.mkdir()
+    calibration = tmp_path / "calibration.tsv"
+    calibration.write_text(
+        "table_id\tverdict\told_score\nmissing-source/1/1\tOK\t0\n",
+        encoding="utf-8",
+    )
+    missing = checkout / "raw" / "missing-source" / "ocr-mineru" / "**" / "*content_list*.json"
+
+    with pytest.raises(pytest.skip.Exception, match=re.escape(str(missing))):
+        _require_calibration_inputs(checkout, calibration)
 
 
 def test_score_formula_docstring_lists_all_weights_and_overlap_gate() -> None:
