@@ -5033,7 +5033,7 @@ def test_two_phase_ranking_preserves_nullable_objective_positions(tmp_path) -> N
     ]
 
 
-@pytest.mark.parametrize("tap_hour", [1, 0.25])
+@pytest.mark.parametrize("tap_hour", [1, 0.5])
 def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path, tap_hour) -> None:
     profile = {
         **PROFILE,
