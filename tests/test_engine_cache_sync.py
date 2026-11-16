@@ -92,6 +92,10 @@ def test_conflicts_keep_master_report_both_origins_and_strict_only_exit(tmp_path
     assert invoke(capsys, "merge", "--strict", strict_master, first, second, status=2)["conflicts"] == 1
     assert cache.merge_cache_files(master, [first, second])["read"] == 0
     assert (rows(first), rows(second)) == before
+    seeded = tmp_path / "seeded"
+    cache.snapshot_cache(master, seeded)
+    write_box(monkeypatch, seeded, "s2", [(2, {"answer": 3})])
+    assert next(row[5] for row in rows(seeded) if row[4] == "s2") == before[1][0][5] + 1
 
 
 def test_cold_provenance_and_notice_values_follow_only_matching_hot(tmp_path, monkeypatch):
@@ -108,7 +112,7 @@ def test_cold_provenance_and_notice_values_follow_only_matching_hot(tmp_path, mo
         assert connection.execute("SELECT count(*) FROM provenance").fetchone()[0] == 1
     # A provenance-only difference also conflicts even with identical HOT bytes.
     third = tmp_path / "c"
-    write_box(monkeypatch, third, "s3", [(1, {**hot, "text": Provenance("other notice")})])
+    write_box(monkeypatch, third, "s3", [(1, EngineCacheValue({**hot, "text": Provenance("other notice")}))])
     assert cache.merge_cache_files(master, [third])["conflicts"] == 1
     assert rows(master) == rows(first)
 
@@ -184,6 +188,18 @@ def test_cold_is_written_before_hot_commit(tmp_path, monkeypatch):
     monkeypatch.setattr(cache, "_store_cold", store)
     write_box(monkeypatch, path, "s1", [(1, EngineCacheValue({"answer": 1}, {"enthalpy": 2.0}))])
     assert len(rows(path)) == len(cold_rows(path)) == 1
+
+
+def test_old_master_namespace_is_refused_even_without_a_hot_table(tmp_path, monkeypatch):
+    source, master = tmp_path / "source", tmp_path / "master"
+    write_box(monkeypatch, source, "s1", [(1, {"answer": 1})])
+    with sqlite3.connect(master) as connection:
+        connection.execute("PRAGMA user_version=1")
+    with pytest.raises(cache.EngineCacheSchemaMismatch):
+        cache.merge_cache_files(master, [source])
+    with sqlite3.connect(master) as connection:
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 1
+        assert not connection.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
 
 
 def test_live_subprocess_snapshot_has_all_cold_rows_and_committed_wal(tmp_path, monkeypatch):
