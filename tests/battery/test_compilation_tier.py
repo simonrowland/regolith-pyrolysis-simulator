@@ -844,6 +844,32 @@ def test_nasa9_fit_does_not_reuse_values_for_a_different_coefficient_set(
     assert len(set(coefficient_sets)) == 2
 
 
+def test_nasa9_fit_cache_parses_all_segment_fields_before_validation() -> None:
+    from copy import deepcopy
+
+    from simulator.battery.compilation_tier import _nasa9_fit_comparisons
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+    malformed = deepcopy(record)
+    malformed["is_element_reference"] = False
+    first_segment = deepcopy(malformed["thermo_record"]["segments"][0])
+    second_segment = deepcopy(first_segment)
+    first_segment["T_min_K"] = -1.0
+    del second_segment["b2"]
+    malformed["thermo_record"]["segments"] = [first_segment, second_segment]
+
+    with pytest.raises(KeyError) as exc_info:
+        _nasa9_fit_comparisons(
+            context,
+            engines=(),
+            invoke_pure_phase=False,
+            fit_records=(malformed,),
+        )
+
+    assert exc_info.value.args == ("b2",)
+    assert str(exc_info.value) == "'b2'"
+
+
 def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> None:
     from simulator.battery.compilation_tier import _compilation_engines_for_pair
     from simulator.battery.score import SCORE_ENGINE_SET
