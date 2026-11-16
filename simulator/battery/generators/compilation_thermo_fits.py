@@ -1945,6 +1945,26 @@ def load_sidecar(path: Path = DEFAULT_SIDECAR_PATH) -> list[dict[str, Any]]:
     return records
 
 
+def _decode_sidecar_nasa9_segment(item: Mapping[str, Any]) -> Nasa9Segment:
+    return Nasa9Segment(
+        T_min_K=float(item["T_min_K"]),
+        T_max_K=float(item["T_max_K"]),
+        coefficients=tuple(float(value) for value in item["a_coefficients"]),
+        b1=float(item["b1"]),
+        b2=float(item["b2"]),
+    )
+
+
+def _sidecar_fit_segments(
+    thermo: Mapping[str, Any],
+) -> tuple[Nasa9Segment, ...]:
+    return tuple(
+        _decode_sidecar_nasa9_segment(item)
+        for item in thermo.get("segments", ())
+        if isinstance(item, Mapping)
+    )
+
+
 def sidecar_element_reference_curves(
     records: Sequence[Mapping[str, Any]],
 ) -> dict[str, list[FittedCurve]]:
@@ -1967,14 +1987,10 @@ def sidecar_element_reference_curves(
         pressure = record.get("reference_pressure_Pa")
         if pressure is None:
             continue
+        # Reference curves decode every segment entry; malformed entries still
+        # fail here instead of being filtered out.
         segments = tuple(
-            Nasa9Segment(
-                T_min_K=float(item["T_min_K"]),
-                T_max_K=float(item["T_max_K"]),
-                coefficients=tuple(float(value) for value in item["a_coefficients"]),
-                b1=float(item["b1"]),
-                b2=float(item["b2"]),
-            )
+            _decode_sidecar_nasa9_segment(item)
             for item in thermo.get("segments", ())
         )
         if not segments:
@@ -2019,17 +2035,7 @@ def evaluate_sidecar_fit(
         return None, "fit_validity_missing"
     if temperature_K < lo or temperature_K > hi:
         return None, "outside_validity"
-    segments = tuple(
-        Nasa9Segment(
-            T_min_K=float(item["T_min_K"]),
-            T_max_K=float(item["T_max_K"]),
-            coefficients=tuple(float(value) for value in item["a_coefficients"]),
-            b1=float(item["b1"]),
-            b2=float(item["b2"]),
-        )
-        for item in thermo.get("segments", ())
-        if isinstance(item, Mapping)
-    )
+    segments = _sidecar_fit_segments(thermo)
     segment = next(
         (
             item

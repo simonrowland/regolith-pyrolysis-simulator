@@ -929,6 +929,28 @@ class ScoreContext:
     hard_issues_by_observation: Mapping[str, tuple[ValidationIssue, ...]] = field(
         default_factory=dict
     )
+    _observations_by_experiment: Mapping[str, tuple[Observation, ...]] = field(
+        init=False, repr=False, compare=False
+    )
+    _observation_ids: frozenset[str] = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        rows_by_experiment: dict[str, list[Observation]] = {}
+        observation_ids: set[str] = set()
+        for observation in self.observations.values():
+            rows_by_experiment.setdefault(observation.experiment_id, []).append(
+                observation
+            )
+            observation_ids.add(observation.observation_id)
+        object.__setattr__(
+            self,
+            "_observations_by_experiment",
+            {
+                experiment_id: tuple(rows)
+                for experiment_id, rows in rows_by_experiment.items()
+            },
+        )
+        object.__setattr__(self, "_observation_ids", frozenset(observation_ids))
 
 
 @dataclass(frozen=True)
@@ -6696,6 +6718,13 @@ def _axis_alignment_value(identity: Identity, name: str, profile: object) -> obj
     return None
 
 
+def _source_aligned_temperature(identity: Identity) -> object | None:
+    temperature = identity.temperature_K
+    if isinstance(temperature, State) and temperature.is_value:
+        return to_plain(temperature.value)
+    return None
+
+
 def _source_alignment_group_key(
     observation: Observation,
     *,
@@ -6727,10 +6756,6 @@ def _source_alignment_group_key(
         if value is None:
             return None
         axes[name] = value
-    if isinstance(identity.temperature_K, State) and identity.temperature_K.is_value:
-        aligned_temperature = to_plain(identity.temperature_K.value)
-    else:
-        aligned_temperature = None
     return {
         "comparison_set": tier,
         "formula": identity.species.formula,
@@ -6740,7 +6765,7 @@ def _source_alignment_group_key(
         "quantity": quantity.value,
         "unit": unit,
         "axes": axes,
-        "aligned_T_K": aligned_temperature,
+        "aligned_T_K": _source_aligned_temperature(identity),
     }
 
 
@@ -6827,6 +6852,8 @@ def _source_band_catalog(
             )
         ):
             continue
+        alignment_template: dict[str, object] | None = None
+        alignment_profile: object | None = None
         for cell in _iter_compilation_series_cells(parent, origin):
             if not isinstance(cell.identity, Identity):
                 continue
@@ -6836,9 +6863,25 @@ def _source_band_catalog(
             magnitude = point_magnitude(cell.value)
             if magnitude is None or not magnitude.is_finite():
                 continue
-            key_doc = _source_alignment_group_key(cell, tier=tier)
-            if key_doc is None:
-                continue
+            if alignment_template is None:
+                key_doc = _source_alignment_group_key(cell, tier=tier)
+                if key_doc is None:
+                    continue
+                alignment_template = key_doc
+                alignment_profile = profile_for(cell.identity)
+            else:
+                key_doc = dict(alignment_template)
+                axes = dict(alignment_template["axes"])
+                if "temperature_K" in axes:
+                    assert alignment_profile is not None
+                    temperature_axis = _axis_alignment_value(
+                        cell.identity, "temperature_K", alignment_profile
+                    )
+                    if temperature_axis is None:
+                        continue
+                    axes["temperature_K"] = temperature_axis
+                key_doc["axes"] = axes
+                key_doc["aligned_T_K"] = _source_aligned_temperature(cell.identity)
             key = _group_token(key_doc)
             group_keys[key] = key_doc
             identities[key] = cell.identity
@@ -10600,6 +10643,8 @@ def _coefficient_basis_detail(
 def _phase_mole_sibling_amounts(
     observations: Iterable[Observation],
     reference: Observation,
+    *,
+    reference_present: bool,
 ) -> tuple[Mapping[str, Decimal] | None, str | None]:
     """Printed sibling amounts for one phase point, or a typed refusal.
 
@@ -10624,7 +10669,7 @@ def _phase_mole_sibling_amounts(
         return None, None
     temperature = temperature_of(identity)
     rows = list(observations)
-    if all(row.observation_id != reference.observation_id for row in rows):
+    if not reference_present:
         rows.append(reference)
     amounts: dict[str, Decimal] = {}
     for row in rows:
@@ -17135,7 +17180,9 @@ def _compile_residual_with_lineage(
     # prediction still converts the reference with the same map, so a raw
     # mole fraction is not compared with an engine wt%.
     phase_siblings, phase_sibling_refusal = _phase_mole_sibling_amounts(
-        context.observations.values(), reference
+        context._observations_by_experiment.get(reference.experiment_id, ()),
+        reference,
+        reference_present=reference.observation_id in context._observation_ids,
     )
     if (
         prediction is None and predict in (None, predict_with_engine)
