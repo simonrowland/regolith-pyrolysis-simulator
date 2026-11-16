@@ -180,7 +180,7 @@ def test_row_label_aliases_bind_initial_composition_to_final_phase_row(
 @pytest.mark.parametrize(
     ("locator_fields", "expected_row", "expected_column"),
     (
-        ({"table_id": 1}, None, None),
+        ({"table_id": "I"}, None, None),
         ({"row_label": 19}, "19", None),
         ({"column_header": 2}, None, "2"),
         ({"table_row_number": 19, "table_column_number": 2}, "19", "2"),
@@ -195,6 +195,10 @@ def test_series_child_ids_survive_locator_validation_without_coordinate_gain(
     expected_column: str | None,
 ) -> None:
     extract = _extract_with_series_points(locator_fields)
+    validator = Migrator(root=tmp_path, index={}, aliases={})
+    validator._validate_extract_locators(extract, source_key="fixture-source.yaml")
+    assert validator.result.registry_issues == []
+
     children = _assert_series_child_ids_unchanged_by_validation(
         tmp_path, monkeypatch, extract
     )
@@ -205,12 +209,57 @@ def test_series_child_ids_survive_locator_validation_without_coordinate_gain(
     assert all(child.locator.column == expected_column for child in children.values())
 
 
+@pytest.mark.parametrize(
+    ("source_id", "relative_path"),
+    (
+        (
+            "sato-hickling-mclane-1973-lunar-fo2",
+            "data/literature/extracts/sato-hickling-mclane-1973-lunar-fo2.yaml",
+        ),
+        (
+            "mysen-1985-cmas-redox",
+            "data/literature/extracts/mysen-1985-cmas-redox.yaml",
+        ),
+    ),
+)
+def test_real_extract_series_child_ids_survive_locator_validation(
+    monkeypatch: pytest.MonkeyPatch, source_id: str, relative_path: str
+) -> None:
+    source = REPO_ROOT / relative_path
+    validated = Migrator(REPO_ROOT)
+    validated._migrate_extract(source)
+    validated.finalize()
+    validated_ids = {
+        observation_id
+        for observation_id, observation in validated.result.observations.items()
+        if observation.source_id == source_id
+    }
+
+    with monkeypatch.context() as baseline:
+        baseline.setattr(
+            Migrator,
+            "_validate_extract_locators",
+            lambda _migrator, _document, *, source_key: None,
+        )
+        unvalidated = Migrator(REPO_ROOT)
+        unvalidated._migrate_extract(source)
+        unvalidated.finalize()
+    unvalidated_ids = {
+        observation_id
+        for observation_id, observation in unvalidated.result.observations.items()
+        if observation.source_id == source_id
+    }
+
+    assert len(validated_ids) > 1
+    assert validated_ids == unvalidated_ids
+
+
 def test_series_child_id_pin_detects_locator_canonicalization_mutation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from simulator.battery.migrate import _locator_from_plain, to_plain
 
-    extract = _extract_with_series_points({"row_label": 19, "column_header": 2})
+    extract = _extract_with_series_points({"table_id": "I"})
 
     def canonicalizing_validator(
         migrator: Migrator, document: dict, *, source_key: str
