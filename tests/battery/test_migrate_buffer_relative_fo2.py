@@ -12,6 +12,7 @@ import yaml
 from simulator.battery.enums import NoticeKind, ValueKind
 from simulator.battery.migrate import (
     PrintedOxygenFacts,
+    _PrintedOxygenRefusalCode,
     _delta_iw_ideal_ratio_notice,
     _log_fO2_to_pa,
     _classify_buffer_phrase,
@@ -184,7 +185,20 @@ def test_unresolved_prefixed_buffer_control_keeps_typed_row_refusal() -> None:
     assert decision is not None and decision.kind == "refusal"
     assert decision.state.is_unknown
     assert "buffer-relative fO2" in decision.state.reason
+    assert decision.refusal_code is _PrintedOxygenRefusalCode.BUFFER_RELATIVE
     assert not inherited
+
+
+def test_co_co2_missing_ratio_has_typed_refusal() -> None:
+    decision = _decision({"fO2_control": "CO-CO2."})
+
+    assert decision is not None and decision.kind == "refusal"
+    assert decision.state.is_unknown
+    assert decision.state.reason == (
+        "CO-CO2. buffer-relative fO2 requires the printed CO/CO2 ratio; "
+        "no fO2_Pa assigned"
+    )
+    assert decision.refusal_code is _PrintedOxygenRefusalCode.BUFFER_RELATIVE
 
 
 @pytest.mark.parametrize(

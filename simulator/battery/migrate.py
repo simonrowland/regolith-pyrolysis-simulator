@@ -19966,6 +19966,23 @@ class _BufferRequest:
     source_id: str | None = None
 
 
+class _PrintedOxygenRefusalCode(Enum):
+    BUFFER_RELATIVE = "buffer_relative"
+
+
+@dataclass(frozen=True)
+class _BufferRefusal:
+    reason: str
+    code: _PrintedOxygenRefusalCode
+
+
+def _buffer_refusal(reason: str) -> _BufferRefusal:
+    return _BufferRefusal(
+        reason=reason,
+        code=_PrintedOxygenRefusalCode.BUFFER_RELATIVE,
+    )
+
+
 @dataclass(frozen=True)
 class PrintedOxygenDecision:
     """Identity outcome for one printed oxygen fact.
@@ -19992,6 +20009,15 @@ class PrintedOxygenDecision:
     pressure_pa_used: Decimal | None = None
     interval_condition: Located[Any] | None = None
     interval_notice_reason: str | None = None
+    refusal_code: _PrintedOxygenRefusalCode | None = None
+
+
+def _buffer_refusal_decision(refusal: _BufferRefusal) -> PrintedOxygenDecision:
+    return PrintedOxygenDecision(
+        "refusal",
+        State.unknown(refusal.reason),
+        refusal_code=refusal.code,
+    )
 
 
 def _oxygen_pressure_point(located: object) -> Decimal | None:
@@ -21027,19 +21053,17 @@ def _relative_oxygen_decision(
         return None
     buffer, offset, offset_as_printed = relative
     if buffer == "ambiguous":
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 "buffer-relative fO2 is ambiguous; no fO2_Pa assigned"
-            ),
+            )
         )
     if temperature_K is None or not temperature_K.is_finite() or temperature_K <= 0:
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 f"buffer-relative fO2 ({buffer} {offset_as_printed}) has no "
                 "finite run temperature; no fO2_Pa assigned"
-            ),
+            )
         )
     pressure_bar = (
         pressure_bar
@@ -21062,12 +21086,11 @@ def _relative_oxygen_decision(
             if calibration_text
             else f"buffer {buffer} has no cited canonical calibration"
         )
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 f"buffer-relative fO2 ({buffer}, offset {offset_as_printed}) "
                 f"refused: {cited}; no fO2_Pa assigned"
-            ),
+            )
         )
     calibration_log = calibrated[0]
     absolute_log = Decimal(str(calibration_log)) + offset
@@ -21392,8 +21415,8 @@ def _buffer_request_from_row(
     raw_item: object,
     point_conditions: Mapping[str, Any] | None,
     temperature_K: Decimal | None,
-) -> _BufferRequest | str | None:
-    """A buffer point, a refusal sentence, or None when the row names no buffer."""
+) -> _BufferRequest | _BufferRefusal | None:
+    """A buffer point, a typed refusal, or None when the row names no buffer."""
 
     points: list[tuple[str, Decimal, str, str, bool]] = []
     prose: list[tuple[str, str]] = []
@@ -21520,18 +21543,24 @@ def _buffer_request_from_row(
         families = {item[0] for item in points}
         offsets = {item[1] for item in points}
         if len(families) != 1 or len(offsets) != 1:
-            return _BUFFER_RELATIVE_CONFLICT.format(
-                buffer=" / ".join(item[3] for item in points)
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_CONFLICT.format(
+                    buffer=" / ".join(item[3] for item in points)
+                )
             )
         family, offset, offset_printed, source, _bare = points[0]
         for prose_family, prose_text in prose:
             if prose_family and prose_family != family:
-                return _BUFFER_RELATIVE_CONFLICT.format(
-                    buffer=f"{source} / {prose_text}"
+                return _buffer_refusal(
+                    _BUFFER_RELATIVE_CONFLICT.format(
+                        buffer=f"{source} / {prose_text}"
+                    )
                 )
         if unknown:
-            return _BUFFER_RELATIVE_CONFLICT.format(
-                buffer=f"{source} / {unknown[0]}"
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_CONFLICT.format(
+                    buffer=f"{source} / {unknown[0]}"
+                )
             )
         if (
             temperature_K is None
@@ -21539,7 +21568,9 @@ def _buffer_request_from_row(
             or not temperature_K.is_finite()
             or temperature_K <= 0
         ):
-            return _BUFFER_RELATIVE_NO_TEMPERATURE.format(buffer=source)
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_NO_TEMPERATURE.format(buffer=source)
+            )
         matched = match_printed_calibration(family, joined)
         unmatched = None
         if matched is None and calibration_bits:
@@ -21559,9 +21590,13 @@ def _buffer_request_from_row(
             ),
         )
     if unknown:
-        return _BUFFER_RELATIVE_FO2_REASON.format(buffer=unknown[0])
+        return _buffer_refusal(
+            _BUFFER_RELATIVE_FO2_REASON.format(buffer=unknown[0])
+        )
     label = next((text for _family, text in prose if text), "buffer")
-    return _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+    return _buffer_refusal(
+        _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+    )
 
 
 def _band_text(width: Decimal | None) -> str:
@@ -21607,19 +21642,21 @@ def _decision_for_buffer(
         and request.calibration_id is None
         and request.calibration_text is None
     ):
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 "Bischof ΔIW has no cited buffer calibration; no fO2_Pa assigned"
-            ),
+            )
         )
     if request.buffer == "CO-CO2":
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
-                "CO-CO2 buffer-relative fO2 requires the printed CO/CO2 ratio; "
+        printed_buffer = (request.buffer_as_printed or "").strip()
+        if printed_buffer.removesuffix(".").casefold() != request.buffer.casefold():
+            printed_buffer = request.buffer
+        return _buffer_refusal_decision(
+            _buffer_refusal(
+                f"{printed_buffer} buffer-relative fO2 requires the printed "
+                "CO/CO2 ratio; "
                 "no fO2_Pa assigned"
-            ),
+            )
         )
     pressure_bar = (
         total_pressure_pa / _BAR_PA
@@ -21790,8 +21827,8 @@ def _buffer_relative_decision(
     outcome = _buffer_request_from_row(raw_item, point_conditions, run_temperature_K)
     if outcome is None:
         return None
-    if isinstance(outcome, str):
-        return PrintedOxygenDecision("refusal", State.unknown(outcome))
+    if isinstance(outcome, _BufferRefusal):
+        return _buffer_refusal_decision(outcome)
     outcome = replace(outcome, source_id=source_id)
     resolved = _point_total_pressure_pa(point_conditions)
     if resolved is None:
@@ -22190,9 +22227,10 @@ def printed_oxygen_decision(
     if relative_decision is not None:
         return relative_decision
     if buffer_text is not None:
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(_BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)),
+        return _buffer_refusal_decision(
+            _buffer_refusal(
+                _BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)
+            )
         )
     return None
 
@@ -22398,7 +22436,7 @@ def _printed_oxygen_state_for(
         and current.reason != decision.state.reason
         and decision.state.reason != _BOUNDED_FO2_REASON
         and decision.state.reason != _BARE_LOG_SCALE_UNKNOWN
-        and not (decision.state.reason or "").startswith("buffer-relative fO2 (")
+        and decision.refusal_code is not _PrintedOxygenRefusalCode.BUFFER_RELATIVE
     ):
         return None
     if (
