@@ -29,6 +29,8 @@ from types import SimpleNamespace
 from typing import Any, cast
 from urllib.parse import quote
 
+from simulator.engine_cache_binary import pack
+
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 1,
@@ -79,6 +81,14 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
 OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
 
 _TABLE = "engine_outputs"
+_CACHE_SCHEMA_VERSION = 2
+_ENGINE_NUMBERS = {
+    name: number for number, name in enumerate((
+        "openimcc", "internal-analytical", "vaporock", "magemin",
+        "alphamelts", "thermoengine",
+    ), start=1)
+}
+_NATURAL_KEY_LIMIT = 128
 _TIMEOUT_MS = 60_000
 _LOCK = threading.RLock()
 _CONNECTIONS: dict[tuple[str, bool], sqlite3.Connection] = {}
@@ -198,14 +208,17 @@ def _canonical_json_dumps(value: Any) -> str:
 def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> bytes:
     if engine_id not in ENGINE_CHEMISTRY_VERSION:
         raise ValueError(f"unknown engine {engine_id!r}")
-    version: str | int = chem_version
-    if isinstance(version, str) and version.isdecimal():
-        version = int(version)
+    version = int(chem_version)
+    if not 0 <= version <= 65535:
+        raise ValueError("chemistry version must fit u16")
     try:
-        payload = _canonical_json_dumps([engine_id, version, request]).encode("utf-8")
+        payload = pack(request, key=True)
     except (TypeError, ValueError) as exc:
-        raise ValueError("engine request must be finite, canonical JSON data") from exc
-    return hashlib.sha256(payload).digest()
+        raise ValueError("engine request must contain finite canonical scalars") from exc
+    header = bytes((_ENGINE_NUMBERS[engine_id],)) + version.to_bytes(2, "big")
+    if len(payload) + 4 > _NATURAL_KEY_LIMIT:
+        return header + b"\xff" + hashlib.blake2b(payload, digest_size=16).digest()
+    return header + b"\x00" + payload
 
 
 def _tuple_to_list_if_needed(value: Any) -> Any:
@@ -628,7 +641,14 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
     if columns and found != expected:
         connection.close()
         raise EngineCacheSchemaMismatch(table, expected, found)
+    namespace = connection.execute("PRAGMA user_version").fetchone()[0]
+    if columns and namespace != _CACHE_SCHEMA_VERSION:
+        connection.close()
+        raise EngineCacheSchemaMismatch(
+            "user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),)
+        )
     if not readonly:
+        connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
         connection.execute(
             f"CREATE TABLE IF NOT EXISTS {table} "
             "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
@@ -827,8 +847,8 @@ def load_cache_rows(
     assert connection is not None
     values = []
     for digest, hot, engine, version, source_box, row_seq in rows:
-        if not isinstance(digest, bytes) or len(digest) != 32:
-            raise ValueError("cache keys must be raw 32-byte SHA-256 digests")
+        if not isinstance(digest, bytes) or not 4 <= len(digest) <= _NATURAL_KEY_LIMIT:
+            raise ValueError("cache keys must be natural packed keys or 16-byte request digests")
         if engine not in ENGINE_CHEMISTRY_VERSION:
             raise ValueError(f"unknown engine {engine!r}")
         values.append(
