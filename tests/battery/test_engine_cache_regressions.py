@@ -258,3 +258,58 @@ def test_mutation_dropped_empty_pressure_field_is_detected(tmp_path, monkeypatch
     with pytest.raises(AttributeError):
         test_empty_residue_surface_survives_off_cold_and_disk_hit(tmp_path, monkeypatch)
 
+
+@pytest.mark.parametrize("engine", ["internal-analytical", "alphamelts", "magemin", "thermoengine", "vaporock"])
+def test_inline_request_keys_cover_every_forwarded_solve_input(engine, tmp_path, monkeypatch):
+    import inspect
+
+    keys = []
+
+    def capture(name, request, solve):
+        keys.append(engine_cache.engine_cache_key(name, engine_cache.ENGINE_CHEMISTRY_VERSION[name], request))
+        return None
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setattr(engine_cache, "cached_engine_call", capture)
+    handle = battery.open_battery_engine(engine)
+    assert handle.available, handle.unavailable_reason
+    kwargs = {
+        "temperature_C": 1426.85, "composition_mol": {"SiO2": 1.0},
+        "composition_kg": None, "pressure_bar": 1e-6, "fO2_log": -9.0,
+    }
+    try:
+        battery._call_cached_backend_equilibrate(handle, kwargs, lambda: pytest.fail("key capture must not solve"))
+        for name, changed in (
+            ("temperature_C", 1427.85), ("composition_mol", {"SiO2": 2.0}),
+            ("composition_kg", {"SiO2": 1.0}), ("pressure_bar", 1e-5),
+            ("fO2_log", -8.0),
+            ("po2_request", battery.Po2Request("commanded", 1e-8)),
+            ("redox_mode", "not_an_input"),
+            ("vapor_transport_pO2_bar", 1e-8),
+            ("vapor_transport_floor_bar", 1e-12),
+            ("vapor_transport_pO2_admission", "observation"),
+            ("native_activity_formula", "MgO"),
+        ):
+            if name not in inspect.signature(handle.backend.equilibrate).parameters:
+                continue
+            battery._call_cached_backend_equilibrate(handle, {**kwargs, name: changed}, lambda: None)
+            assert keys[-1] != keys[0], (engine, name)
+        battery._call_cached_backend_equilibrate(handle, {**kwargs, "call_timeout_s": 5}, lambda: None)
+        assert keys[-1] == keys[0]
+    finally:
+        battery.close_battery_engine_handle(handle)
+
+
+def test_direct_openimcc_key_covers_every_bridge_input():
+    from simulator.melt_backend.openimcc_bridge import _evaluate_request_vector
+
+    kwargs = {"composition_mol": {"SiO2": 1.0}, "temperature_K": 1700.0}
+    original = engine_cache.engine_cache_key("openimcc", 1, _evaluate_request_vector(**kwargs))
+    for name, changed in (
+        ("composition_mol", {"SiO2": 2.0}),
+        ("composition_kg", {"SiO2": 1.0}), ("temperature_K", 1701.0),
+        ("pack", "published-core"), ("allow_extrapolation", True),
+        ("allow_out_of_envelope", True),
+    ):
+        request = _evaluate_request_vector(**{**kwargs, name: changed})
+        assert engine_cache.engine_cache_key("openimcc", 1, request) != original, name

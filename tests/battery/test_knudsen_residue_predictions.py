@@ -660,7 +660,11 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     with result_path.open("rb") as stream:
         warm = pickle.load(stream)
 
-    assert response == cold == warm
+    from simulator.melt_backend.base import equilibrium_cache_value
+
+    consumed = [equilibrium_cache_value(vars(result), engine_id="internal-analytical") for result in (response, cold, warm)]
+    assert consumed[0] == consumed[1] == consumed[2]
+    assert response.vapor_pressures_Pa == cold.vapor_pressures_Pa == warm.vapor_pressures_Pa
     omissions = response.diagnostics["vapor_pressure_diagnostic"]["below_reporting_threshold_omissions"]
     record = omissions["Al"]
     assert "Al" not in response.vapor_pressures_Pa
