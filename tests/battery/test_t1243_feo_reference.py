@@ -32,13 +32,18 @@ from simulator.battery.enums import (
     ReferenceStateConvention,
     ResidualStatus,
 )
+from simulator.battery import score as score_module
 from simulator.battery.generators.janaf import (
     JANAF_R_J_PER_MOL_K,
     _fusion_table_points,
     _interpolate_formation_gibbs,
     load_table_document,
 )
-from simulator.battery.identity import identity_equal, quantity_token
+from simulator.battery.identity import (
+    THERMOCHEMICAL_CALORIE_J,
+    identity_equal,
+    quantity_token,
+)
 from simulator.battery.migrate import (
     REPO_ROOT,
     Migrator,
@@ -69,6 +74,7 @@ from simulator.battery.score import (
     score_store,
     temperature_of,
 )
+from simulator.physical_constants import GAS_CONSTANT_DECIMAL
 from tests.battery import factories as F
 
 ROOT = Path(REPO_ROOT)
@@ -83,6 +89,7 @@ _HOLZHEID = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
 _DISTIN = "distin-1971-ferrous-silicate-melts"
 _BANYA_1980 = "banya-chiba-hikosaka-1980-feto-binary-solid-iron"
 _BANYA_1985 = "banya-hino-takezoe-1985-na-fe-silicate-redox"
+_BANYA_YUGE_1985 = "banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity"
 _DOYLE_1988 = "doyle-1988-feo-activity-multicomponent-magma"
 _DOYLE_1989 = "doyle-1989-tio2-feo-activity-magma"
 
@@ -181,13 +188,15 @@ def _independent_factor(
     ).exp()
 
 
-def _independent_banya_eq23_factor(temperature_K: Decimal) -> Decimal:
-    """Independent Ban-ya Eq. 23 calculation, with the printed cal units."""
+def _independent_banya_feto_to_feo_rs_factor(
+    temperature_K: Decimal,
+) -> Decimal:
+    """Independent evaluation of Ban-ya's printed relation in cal units."""
 
     delta_g_cal = Decimal("-2040") + Decimal("1.707") * temperature_K
-    delta_g_J = Decimal("4.184") * delta_g_cal
+    delta_g_J = THERMOCHEMICAL_CALORIE_J * delta_g_cal
     return (
-        -delta_g_J / (Decimal("8.3144626") * temperature_K)
+        -delta_g_J / (GAS_CONSTANT_DECIMAL * temperature_K)
     ).exp()
 
 
@@ -421,7 +430,7 @@ def migration():
 @pytest.fixture(scope="module")
 def banya_migration():
     migrator = Migrator(root=ROOT)
-    for name in (_BANYA_1980, _BANYA_1985):
+    for name in (_BANYA_1980, _BANYA_1985, _BANYA_YUGE_1985):
         migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
     migrator.finalize()
     return migrator.result
@@ -1247,11 +1256,12 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
             and quantity_token(observation.identity)
             in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
         )
-        for source_id in (_BANYA_1980, _BANYA_1985)
+        for source_id in (_BANYA_1980, _BANYA_1985, _BANYA_YUGE_1985)
     }
     assert {source_id: len(rows) for source_id, rows in rows_by_source.items()} == {
         _BANYA_1980: 69,
         _BANYA_1985: 19,
+        _BANYA_YUGE_1985: 30,
     }
     # The 12 openimcc 66ec4a3 row values at 1673.15 K independently confirm
     # the source conversion (openimcc-feo-d420.md, reconstructed from Eq. 23).
@@ -1278,8 +1288,8 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
         assert observation.value.point == Decimal(source_text)
         temperature_K = temperature_of(observation.identity)
         assert temperature_K == Decimal("1673.15")
-        independent_value = observation.value.point * _independent_banya_eq23_factor(
-            temperature_K
+        independent_value = observation.value.point * (
+            _independent_banya_feto_to_feo_rs_factor(temperature_K)
         )
         assert independent_value.quantize(Decimal("0.001")) == Decimal(
             converted_text
@@ -1313,6 +1323,23 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
         assert "FeO(l) D&G/Masson" in assumption.reason
         assert "FeO(R.S.)" in assumption.reason
 
+    relation_citations = {
+        _BANYA_1980: "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770",
+        _BANYA_1985: "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770",
+        _BANYA_YUGE_1985: "Ban-ya, Hino & Yuge 1985 Eqs. 25–27, p. 4 / folio 856",
+    }
+    yuge_run_101 = next(
+        row
+        for row in rows_by_source[_BANYA_YUGE_1985]
+        if row.observation_id.endswith(
+            "banya_hino_yuge_1985_t1_run_101_p002_t01_r03_c08"
+        )
+    )
+    assert yuge_run_101.value.point == Decimal("0.100")
+    yuge_expected = yuge_run_101.value.point * (
+        _independent_banya_feto_to_feo_rs_factor(Decimal("1723.15"))
+    )
+    assert yuge_expected.quantize(Decimal("1e-8")) == Decimal("0.07685536")
     for source_id, rows in rows_by_source.items():
         for observation in rows:
             converted = fusion_comparison_reference(
@@ -1320,8 +1347,8 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
             )
             temperature_K = temperature_of(observation.identity)
             assert temperature_K is not None
-            expected = observation.value.point * _independent_banya_eq23_factor(
-                temperature_K
+            expected = observation.value.point * (
+                _independent_banya_feto_to_feo_rs_factor(temperature_K)
             )
             assert converted.value.point.quantize(Decimal("1e-8")) == expected.quantize(
                 Decimal("1e-8")
@@ -1333,6 +1360,7 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
                 if notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
                 and notice.reason.startswith("source_relation=Ban-ya")
             )
+            assert relation_citations[source_id] in conversion.reason
             assert "source_standard=Fe_tO(l), Fe-saturated" in conversion.reason
             assert "destination_standard=FeO(R.S.)" in conversion.reason
             assert any(
@@ -1340,6 +1368,24 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
                 and "FeO(R.S.)" in notice.reason
                 for notice in converted.notices
             ), source_id
+
+
+def test_banya_source_relation_pins_reject_the_old_dg_janaf_conversion(
+    banya_migration, monkeypatch
+) -> None:
+    calibration, _ = score_module._iron_saturated_feo_calibration()
+    monkeypatch.setattr(
+        score_module,
+        "_banya_feto_to_feo_rs_factor",
+        lambda temperature_K: score_module._feo_reference_factor(
+            calibration, temperature_K
+        ),
+    )
+
+    with pytest.raises(AssertionError):
+        test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
+            banya_migration
+        )
 
 
 def test_doyle_coughlin_reference_keeps_the_dg_janaf_conversion(
