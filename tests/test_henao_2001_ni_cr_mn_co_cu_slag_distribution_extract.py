@@ -11,6 +11,9 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.composition import (
+    _element_wt_percent_stoichiometric_oxide_projection,
+)
 from simulator.battery.enums import AmountBasis, NoticeKind
 from simulator.battery.migrate import Migrator
 
@@ -178,10 +181,132 @@ def _assert_composition_bindings(document: dict) -> None:
     }
     assert by_group[("henao:C-18", "metal")]["Co"] == "3.68"
     assert by_group[("henao:C-28", "metal")]["Co"] == "1.63"
+    assert all(
+        "composition_status" not in observation["values"]
+        for observation in observations
+        if observation["values"].get("phase_label") == "metal"
+    )
 
 
-def test_printed_phase_assays_are_bound_without_oxide_conversion() -> None:
-    _assert_composition_bindings(_document())
+def _assert_slag_projection_bindings(document: dict) -> None:
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for observation in _observations(document):
+        values = observation["values"]
+        if values.get("phase_label") == "slag":
+            groups.setdefault((observation["experiment"], "slag"), []).append(
+                observation
+            )
+
+    assert len(groups) == 55
+    assert sum(len(rows) for rows in groups.values()) == 298
+    for (experiment, _phase), rows in groups.items():
+        values = rows[0]["values"]
+        printed = values["composition_wt_pct"]
+        missing = {
+            name: str(amount)
+            for name, amount in printed.items()
+            if str(amount).replace(" ", "") == "<0.03"
+        }
+        for row in rows:
+            assert row["values"]["composition_wt_pct"] == printed
+            assert row["values"]["composition_status"] == "calculated"
+            assert row["point_conditions"]["composition"] == rows[0][
+                "point_conditions"
+            ]["composition"]
+        projection = rows[0]["point_conditions"]["composition"]
+        assert projection["state"]["tag"] == "value"
+        projected_value = projection["state"]["value"]
+        assert projected_value["basis"] == "stoichiometric_oxide_projection"
+        assert projected_value["amount_basis"] == "mole_fraction"
+        inference = projection["inference"]
+        assert inference["relation"] == (
+            "element_wt_percent_stoichiometric_oxide_projection"
+        )
+        assert inference["inputs"] == [
+            f"henao-2001-ni-cr-mn-co-cu-slag-distribution::{row['observation_id']}"
+            for row in rows
+        ]
+        parameters = {
+            name: located
+            for name, located in inference["parameters"]
+        }
+        assert parameters["assumed_valence_Fe"]["state"]["value"] == "2"
+        assert parameters["oxygen_closure_residual_wt_percent"]["state"]["tag"] == "unknown"
+        valences = {}
+        for name, located in inference["parameters"]:
+            if name == "assumed_valence_Fe":
+                valences["Fe"] = int(located["state"]["value"])
+            elif name.startswith("source_formula_valence_"):
+                valences[name.removeprefix("source_formula_valence_")] = int(
+                    located["state"]["value"]
+                )
+        retained = tuple(name for name in printed if name not in valences)
+        usable = {
+            name: str(amount)
+            for name, amount in printed.items()
+            if name not in missing
+        }
+        expected = _element_wt_percent_stoichiometric_oxide_projection(
+            usable,
+            valence_by_element=valences,
+            retained_components=retained,
+        )
+        actual = tuple(
+            (name, Decimal(str(amount)))
+            for name, amount in projected_value["components"]
+        )
+        assert dict(actual) == dict(expected.components)
+        if experiment == "henao:A-1":
+            projected_mass_by_component = dict(
+                expected.projected_component_mass_g_per_100g
+            )
+            assert projected_mass_by_component["FeO"].quantize(
+                Decimal("0.01")
+            ) == Decimal("54.68")
+        projected_mass = sum(
+            (mass for _, mass in expected.projected_component_mass_g_per_100g),
+            Decimal(0),
+        )
+        assert Decimal(
+            parameters["projected_mass_lower_bound_g_per_100g"]["state"]["value"]
+        ) == projected_mass
+        if missing:
+            declared_missing = rows[0]["values"]["composition_missing_components"]
+            assert {
+                item["component"]: item["value_as_published"]
+                for item in declared_missing
+            } == {name: "<0.03" for name in missing}
+            assert all(
+                item["reason"] == "below_detection_limit"
+                for item in declared_missing
+            )
+            assert all("<0.03" in row["values"]["note"] for row in rows)
+            with_bounds = {**usable, **{name: "0.03" for name in missing}}
+            upper = _element_wt_percent_stoichiometric_oxide_projection(
+                with_bounds,
+                valence_by_element=valences,
+                retained_components=retained,
+            )
+            upper_mass = sum(
+                (mass for _, mass in upper.projected_component_mass_g_per_100g),
+                Decimal(0),
+            )
+            assert Decimal(
+                parameters[
+                    "below_detection_max_projected_mass_g_per_100g"
+                ]["state"]["value"]
+            ) == upper_mass - projected_mass
+        else:
+            assert all(
+                "composition_missing_components" not in row["values"]
+                for row in rows
+            )
+
+
+def test_printed_phase_assays_are_bound_and_slag_projection_is_derived() -> None:
+    document = _document()
+    _assert_composition_bindings(document)
+    _assert_slag_projection_bindings(document)
 
 
 def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
@@ -209,14 +334,15 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
     assert all(row.point_conditions and "fO2_log" in row.point_conditions for row in observations)
     assert all(row.identity.fO2_Pa.tag.value == "value" for row in observations)
-    # Below-95 phase assays remain refused under the shared closure gate.
-    # The A-1 metal assay closes at 102.9 wt% and is normalized with notice.
+    # The slag point compositions use the flagged projection; alloy assays
+    # retain their elemental mass-percent basis.
     by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in observations}
     assert all(row.identity.composition is not None for row in observations)
     a1_slag = by_id["henao_2001_t1_A-1_slag_Ni"]
-    assert a1_slag.identity.composition.is_unknown
-    assert a1_slag.identity.composition.reason.endswith(
-        "kept sum=80.10 wt% is below 95 wt%"
+    assert a1_slag.identity.composition.is_value
+    assert a1_slag.identity.composition.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert a1_slag.point_conditions["composition"].inference.relation == (
+        "element_wt_percent_stoichiometric_oxide_projection"
     )
     a1_metal = by_id["henao_2001_t1_A-1_alloy_Ni"]
     assert a1_metal.identity.composition.is_value
@@ -231,8 +357,15 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
         and "printed phase mass-percent total=102.9 wt%" in notice.reason
     )
     assert renormalization.original == Decimal("102.9")
-    assert len([row for row in observations if row.identity.composition.is_value]) == 114
-    assert len([row for row in observations if row.identity.composition.is_unknown]) == 317
+    assert len([row for row in observations if row.identity.composition.is_value]) == 406
+    assert len([row for row in observations if row.identity.composition.is_unknown]) == 25
+    projected_slag = [
+        row for row in observations if row.point_conditions and
+        row.point_conditions["composition"].inference is not None and
+        row.point_conditions["composition"].inference.relation
+        == "element_wt_percent_stoichiometric_oxide_projection"
+    ]
+    assert len(projected_slag) == 298
     assert all(
         row.identity.composition.value.input_provenance is None
         for row in observations
@@ -286,3 +419,13 @@ def test_typed_cell_mutation_is_detected_by_independent_pdf_pins() -> None:
     bound["values"].pop("composition_wt_pct")
     with pytest.raises(AssertionError):
         _assert_composition_bindings(mutated)
+
+    mutated = deepcopy(_document())
+    bound = next(
+        observation
+        for observation in _observations(mutated)
+        if observation["observation_id"] == "henao_2001_t1_A-1_slag_Fe"
+    )
+    bound["values"]["composition_wt_pct"]["Fe"] = "42.6"
+    with pytest.raises(AssertionError):
+        _assert_slag_projection_bindings(mutated)

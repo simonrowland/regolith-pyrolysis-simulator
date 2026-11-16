@@ -2430,7 +2430,12 @@ def _composition_located_from_plain(
                 base_derivation=serialized_inference,
             )
         else:
-            accepted_wt = _oxide_mass_percent_components(wt)
+            accepted_wt = _oxide_mass_percent_components(
+                wt,
+                retain_chloride=_phase_assay_retains_chloride(
+                    composition_context
+                ),
+            )
             derivation = _mass_percent_composition_derivation(
                 accepted_wt,
                 locator,
@@ -5501,6 +5506,14 @@ def _is_printed_chemical_component_name(name: str) -> bool:
     )
 
 
+def _phase_assay_retains_chloride(closure_context: object) -> bool:
+    return (
+        isinstance(closure_context, Mapping)
+        and str(closure_context.get("quantity") or "")
+        == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+    )
+
+
 def _unrecognized_printed_chemical_components(
     wt: Mapping[str, Decimal],
     closure_context: object,
@@ -5512,6 +5525,12 @@ def _unrecognized_printed_chemical_components(
     green_read_maps: Sequence[Mapping[str, Any]] = (),
     dropped_sources: dict[str, str] | None = None,
 ) -> dict[str, Decimal]:
+    composition_components = {
+        _mass_percent_component_key(str(raw_name))[0]
+        for component_map in (wt, declared_component_map or {})
+        for raw_name in component_map
+    }
+    retain_phase_chloride = _phase_assay_retains_chloride(closure_context)
     source_map: dict[str, tuple[Any, str]] = {
         str(name): (amount, _GREEN_READ_OXIDE_MAP)
         for name, amount in wt.items()
@@ -5559,8 +5578,13 @@ def _unrecognized_printed_chemical_components(
             # Explicit ppm units are not mass-percent amounts for closure.
             or str(raw_name).strip().casefold().endswith(("_ppm", " ppm"))
             or (volatile is not None and volatile[0] != "Cl")
-            # Only Cl is a recognized composition component that this
-            # conversion deliberately omits; its mass still counts as dropped.
+            # A phase assay reports Cl as a component; it is admitted by the
+            # conversion above and must not also count as unsupported mass.
+            or (
+                name == "Cl"
+                and name in composition_components
+                and retain_phase_chloride
+            )
             or (name in _COMPOSITION_COMPONENTS and name != "Cl")
             or (equivalent is not None and equivalent[0] != "Cl")
             or (
@@ -6061,6 +6085,7 @@ def _printed_composition_closure_components(
 def _oxide_mass_percent_components(
     wt: Mapping[str, Any],
     *,
+    retain_chloride: bool = False,
     validation_maps: Sequence[Mapping[str, Any]] = (),
     green_read_maps: Sequence[Mapping[str, Any]] = (),
     diagnostics: list[tuple[str, str]] | None = None,
@@ -6152,6 +6177,12 @@ def _oxide_mass_percent_components(
                         f"malformed printed oxide amount for {name!r}: "
                         f"{amount!r}"
                     )
+            continue
+        if name == "Cl":
+            if retain_chloride:
+                # For a phase assay, Cl is its own formula component; it
+                # remains in closure and contributes its own molar mass.
+                components["Cl"] = components.get("Cl", Decimal("0")) + numeric_amount
             continue
         component = _COMPOSITION_COMPONENTS.get(name)
         if component is not None:
@@ -6911,6 +6942,7 @@ def _wt_percent_conversion_or_refusal(
     component_vocabulary: Literal["oxide", "elemental"] = "oxide",
 ) -> _MassPercentClosureResult:
     try:
+        retain_phase_chloride = _phase_assay_retains_chloride(closure_context)
         declared_maps = [declared_component_map]
         declared_from_context = _declared_printed_composition_map(closure_context)
         if (
@@ -6985,6 +7017,7 @@ def _wt_percent_conversion_or_refusal(
         try:
             oxide_wt = _oxide_mass_percent_components(
                 wt,
+                retain_chloride=retain_phase_chloride,
                 validation_maps=component_maps,
                 green_read_maps=green_read_maps,
                 diagnostics=diagnostics,
@@ -7549,7 +7582,12 @@ def _mass_percent_composition_located(
             )
         else:
             inference = _mass_percent_composition_derivation(
-                _oxide_mass_percent_components(wt),
+                _oxide_mass_percent_components(
+                    wt,
+                    retain_chloride=_phase_assay_retains_chloride(
+                        closure_context
+                    ),
+                ),
                 locator,
                 closure_result=closure_result,
             )
@@ -8583,7 +8621,10 @@ def _located_printed_and_initial(
         return printed, direct_phase_composition or Located(state, locator=locator)
     if direct_phase_composition is not None:
         return printed, direct_phase_composition
-    conversion_map = _oxide_mass_percent_components(wt)
+    conversion_map = _oxide_mass_percent_components(
+        wt,
+        retain_chloride=_phase_assay_retains_chloride(composition_context),
+    )
     initial = Located(
         state,
         locator=locator,
@@ -28873,6 +28914,9 @@ class Migrator:
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
         observation_notices: list[Notice] = []
+        observation_notices.extend(
+            _notice_from_plain(notice) for notice in (obs.get("notices") or ())
+        )
         if ambient_pressure_notice is not None:
             observation_notices.append(ambient_pressure_notice)
         if obs.get("standard_pressure") == "not_printed":
