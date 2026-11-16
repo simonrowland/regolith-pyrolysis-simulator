@@ -7,11 +7,12 @@ import sqlite3
 import subprocess
 import sys
 import warnings
+import zlib
 
 import pytest
 
 from simulator import engine_cache as cache
-from simulator.engine_cache_binary import EngineCacheValue, Provenance
+from simulator.engine_cache_binary import EngineCacheValue, Provenance, pack, unpack
 
 
 @pytest.fixture(autouse=True)
@@ -188,6 +189,72 @@ def test_cold_is_written_before_hot_commit(tmp_path, monkeypatch):
     monkeypatch.setattr(cache, "_store_cold", store)
     write_box(monkeypatch, path, "s1", [(1, EngineCacheValue({"answer": 1}, {"enthalpy": 2.0}))])
     assert len(rows(path)) == len(cold_rows(path)) == 1
+
+
+def test_failed_cold_write_rolls_back_the_entire_solve(tmp_path, monkeypatch):
+    live = tmp_path / "live"
+    original = cache._store_cold
+
+    def fail_after_cold_write(*args):
+        original(*args)
+        raise sqlite3.OperationalError("injected failure after COLD write")
+
+    monkeypatch.setattr(cache, "_store_cold", fail_after_cold_write)
+    write_box(monkeypatch, live, "s1", [(1, EngineCacheValue({"answer": 1}, {"enthalpy": 111.0}))])
+    assert rows(live) == []
+    assert cold_rows(live) == []
+
+
+@pytest.mark.parametrize("retry_kind", ["cold", "empty_cold", "hot_only"])
+def test_failure_after_legacy_cold_commit_retry_keeps_matching_pair(tmp_path, monkeypatch, retry_kind):
+    live, snapshot, master = (tmp_path / name for name in ("live", "snapshot", "master"))
+    key = cache.engine_cache_key("openimcc", 1, {"request": 1})
+    cache._connect(live, readonly=False)
+    # Reproduce the persisted orphan left by the old independent COLD commit.
+    with sqlite3.connect(str(live) + ".cold") as cold:
+        cache._initialize_cold(cold)
+        cold.execute("INSERT INTO engine_values VALUES (?,?)", (key, zlib.compress(pack({"enthalpy": 111.0}))))
+    original = cache._store_cold
+
+    def fail_after_cold_write(*args):
+        original(*args)
+        raise sqlite3.OperationalError("injected failure after COLD write, before HOT commit")
+
+    monkeypatch.setattr(cache, "_store_cold", fail_after_cold_write)
+    write_box(monkeypatch, live, "s1", [(1, EngineCacheValue({"answer": 1}, {"enthalpy": 111.0}))])
+    assert rows(live) == []
+    assert unpack(zlib.decompress(cold_rows(live)[0][1])) == {"enthalpy": 111.0}
+    cache._close_connections()
+    cache._MEMORY_CACHE.clear()
+    monkeypatch.setattr(cache, "_store_cold", original)
+    answer = {"answer": 2}
+    expected_cold = {"enthalpy": 222.0} if retry_kind == "cold" else {}
+    retry = answer if retry_kind == "hot_only" else EngineCacheValue(answer, expected_cold)
+    write_box(monkeypatch, live, "s1", [(1, retry)])
+    cache.snapshot_cache(live, snapshot)
+    assert cache.merge_cache_files(master, [snapshot])["conflicts"] == 0
+    for path in (live, snapshot, master):
+        stored = rows(path)
+        assert len(stored) == 1
+        assert cache._decode_hot(stored[0][1], stored[0][6]) == answer
+        assert {k: unpack(zlib.decompress(v)) for k, v in cold_rows(path)} == (
+            {key: expected_cold} if expected_cold else {}
+        )
+
+
+def test_racing_writer_keeps_the_committed_hot_and_cold_pair(tmp_path, monkeypatch):
+    live = tmp_path / "live"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s1")
+
+    def racing_solve():
+        write_box(monkeypatch, live, "s1", [(1, EngineCacheValue({"answer": 1}, {"enthalpy": 111.0}))])
+        return EngineCacheValue({"answer": 2}, {"enthalpy": 222.0})
+
+    with cache._engine_cache_path_scope(live):
+        assert cache.cached_engine_call("openimcc", {"request": 1}, racing_solve) == {"answer": 2}
+    stored = rows(live)[0]
+    assert cache._decode_hot(stored[1], stored[6]) == {"answer": 1}
+    assert unpack(zlib.decompress(cold_rows(live)[0][1])) == {"enthalpy": 111.0}
 
 
 def test_old_master_namespace_is_refused_even_without_a_hot_table(tmp_path, monkeypatch):
