@@ -7789,18 +7789,7 @@ def test_ta_badro_unparameterized_wt_relation_keeps_sample_waypoint() -> None:
         (
             "kress-carmichael-1991-iron-redox-calibration.yaml",
             "kc91_fe3_t5_B27::T=1710.15",
-            {
-                "SiO2": Decimal("0.5547006776234626671942286324"),
-                "TiO2": Decimal("0.01554763773103709860256304399"),
-                "Al2O3": Decimal("0.08984819686101508537518088147"),
-                "Fe2O3": Decimal("0.03945861816145157104309105157"),
-                "FeO": Decimal("0.03144116729029423686753613424"),
-                "MnO": Decimal("0.001582846840746962967156111480"),
-                "MgO": Decimal("0.1120910690156758058306665902"),
-                "CaO": Decimal("0.1254376460586280468178866151"),
-                "Na2O": Decimal("0.02855988945220116658624516451"),
-                "K2O": Decimal("0.001332250965487358715445775201"),
-            },
+            None,
         ),
         (
             "cacciatore-zajacz-2026-v-sc-oxybarometer.yaml",
@@ -7857,9 +7846,9 @@ def test_b704_waypoint_guard_keeps_green_composition_for_real_rows(
     tmp_path: Path,
     source: str,
     row_token: str,
-    expected: dict[str, Decimal],
+    expected: dict[str, Decimal] | None,
 ) -> None:
-    from simulator.battery.waypoints import normalized_composition
+    from simulator.battery.waypoints import GapReason, normalized_composition
 
     result = _migrate_real_extract(tmp_path, source, write=False)
     observation = next(
@@ -7870,6 +7859,18 @@ def test_b704_waypoint_guard_keeps_green_composition_for_real_rows(
     experiment = result.experiments[observation.experiment_id]
 
     waypoint = normalized_composition(experiment, _bench(), observation)
+
+    if expected is None:
+        assert experiment.sample.initial_composition is None
+        assert observation.point_conditions["composition"].state.is_unknown
+        assert waypoint.selected is None
+        assert waypoint.absence is not None
+        assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        assert any(
+            path.endswith(".point_conditions.composition")
+            for path in waypoint.absence.missing
+        )
+        return
 
     assert waypoint.absence is None
     assert waypoint.selected is not None

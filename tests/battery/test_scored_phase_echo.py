@@ -24,6 +24,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import Identity
 from simulator.battery.input_provenance import (
+    PRINTED_STARTING_BULK,
     phase_map_provenance,
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
@@ -833,14 +834,15 @@ def test_gorojovsky_crystal_bearing_products_score_with_the_liquid_notice(
     )
 
 
-def test_kc91_table3_final_refuses_same_run_initial_melt() -> None:
+def test_kc91_table3_final_uses_printed_starting_composition() -> None:
     observation, _experiment = _observation(
         "kress-carmichael-1991-iron-redox-calibration.yaml",
         "kc91_t3_0011_0014_final_SiO2",
     )
     composition = observation.identity.composition
-    assert composition is not None and composition.is_unknown
-    assert composition.reason == "input_is_same_run_analysed_melt"
+    assert composition is not None and composition.is_value
+    assert composition.value.input_provenance == PRINTED_STARTING_BULK
+    assert _input_composition_echo_detail(observation.identity) is None
 
 
 def test_t1593_mixture_token_passes_the_guard(tmp_path: Path) -> None:
