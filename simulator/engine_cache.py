@@ -18,9 +18,9 @@ import sqlite3
 import threading
 import time
 import zlib
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from collections.abc import Iterable, Iterator, Mapping
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
 from functools import lru_cache
@@ -871,6 +871,129 @@ def load_cache_rows(
             {engine: {"conflicts": count} for engine, count in conflicts.items()}
         )
     return connection.total_changes - before
+
+
+@contextmanager
+def _read_cache(path: Path):
+    # immutable=1 would ignore committed rows still in a live writer's WAL.
+    uri = f"file:{quote(str(path.resolve()), safe='/')}?mode=ro"
+    connection = sqlite3.connect(uri, uri=True, timeout=_TIMEOUT_MS / 1000)
+    try:
+        connection.execute("BEGIN")
+        result = connection.execute("PRAGMA integrity_check").fetchall()
+        if result != [("ok",)]:
+            raise ValueError(f"integrity_check failed for {path}: {result}")
+        connection.execute(
+            f"SELECT key, value, engine, chem_version, source_box, row_seq "
+            f"FROM {_TABLE} LIMIT 0"
+        )
+        yield connection
+    finally:
+        connection.close()
+
+
+def _stats(path: Path, connection: sqlite3.Connection) -> dict:
+    groups = [
+        dict(zip(("engine", "chem_version", "source_box", "rows"), row))
+        for row in connection.execute(
+            f"SELECT engine, chem_version, source_box, COUNT(*) FROM {_TABLE} "
+            "GROUP BY engine, chem_version, source_box ORDER BY engine, chem_version, source_box"
+        )
+    ]
+    by_engine: Counter = Counter()
+    for group in groups:
+        by_engine[group["engine"]] += group["rows"]
+    count = sum(by_engine.values())
+    size = path.stat().st_size
+    return {
+        "file": str(path), "rows": count, "groups": groups,
+        "by_engine": dict(by_engine), "file_bytes": size,
+        "bytes_per_row": size / count if count else None,
+    }
+
+
+@contextmanager
+def read_cache_rows(path: Path):
+    """Validate a cache and stream opaque value bytes plus their provenance.
+
+    Rows are (key, value, engine, chem_version, source_box, row_seq). Keep
+    the read transaction open until the consumer finishes to include WAL rows
+    consistently; synchronization never decodes or re-encodes stored values.
+    """
+    with _read_cache(path) as connection:
+        yield connection.execute(
+            f"SELECT key, value, engine, chem_version, source_box, row_seq FROM {_TABLE}"
+        )
+
+
+def snapshot_cache(live: Path, out: Path) -> dict:
+    """Use SQLite backup to produce a checked, standalone, exclusively new file."""
+    with _read_cache(live) as source:
+        # Exclusive creation also refuses aliases of the live file and races.
+        with out.open("xb"):
+            pass
+        destination = sqlite3.connect(out)
+        try:
+            source.backup(destination)
+            destination.execute("PRAGMA journal_mode=DELETE")
+        finally:
+            destination.close()
+    with _read_cache(out) as connection:
+        result = _stats(out, connection)
+    result["sha256"] = _file_sha256(out)
+    return result
+
+
+def merge_cache_files(into: Path, inputs: list[Path]) -> dict:
+    """Insert the union without replacements, preserving bytes and provenance."""
+    by_engine: dict[str, dict[str, int]] = {}
+    by_box: dict[str, dict[str, int]] = {}
+    report_path = Path(str(into) + ".conflicts.jsonl")
+    with ExitStack() as stack:
+        # Validate every input before even creating a new destination or report.
+        sources = [stack.enter_context(read_cache_rows(path)) for path in inputs]
+        destination = _connect(into, readonly=False)
+        assert destination is not None
+        report = stack.enter_context(report_path.open("a", encoding="utf-8"))
+        destination.execute("BEGIN IMMEDIATE")
+        try:
+            for source in sources:
+                for key, value, engine, version, box, seq in source:
+                    inserted, conflict = _insert_cache_row_if_absent(
+                        destination, key, value, engine, version, box, seq,
+                    )
+                    for dimension, name in ((by_engine, engine), (by_box, box)):
+                        counts = dimension.setdefault(name, dict.fromkeys(
+                            ("read", "inserted", "already_present", "conflicts"), 0,
+                        ))
+                        counts["read"] += 1
+                        counts["inserted"] += int(inserted)
+                        counts["already_present"] += int(not inserted and not conflict)
+                        counts["conflicts"] += int(conflict)
+                    if conflict:
+                        kept_value, kept_box = destination.execute(
+                            f"SELECT value, source_box FROM {_TABLE} WHERE key=?", (key,),
+                        ).fetchone()
+                        report.write(json.dumps({
+                            "key": key.hex(), "engine": engine, "chem_version": version,
+                            "source_boxes": [kept_box, box],
+                            "value_sha256": [hashlib.sha256(kept_value).hexdigest(), hashlib.sha256(value).hexdigest()],
+                        }, sort_keys=True) + "\n")
+            report.flush()
+            destination.commit()
+        except Exception:
+            destination.rollback()
+            raise
+    return {
+        "file": str(into), "by_engine": by_engine, "by_source_box": by_box,
+        "conflict_report": str(report_path),
+    }
+
+
+def engine_cache_stats(path: Path) -> dict:
+    """Return grouped counts and main-file size using the cache's own layout."""
+    with _read_cache(path) as connection:
+        return _stats(path, connection)
 
 
 def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:

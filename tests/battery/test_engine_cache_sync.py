@@ -211,3 +211,10 @@ def test_stats_groups_by_engine_version_and_box(tmp_path, monkeypatch, capsys):
     ]
     assert report["file_bytes"] == database.stat().st_size
     assert report["bytes_per_row"] == report["file_bytes"] / 2
+
+
+def test_public_row_reader_preserves_committed_bytes(tmp_path, monkeypatch):
+    live = tmp_path / "live"
+    write_box(monkeypatch, live, "s1", [("openimcc", {"T": 1000}, {"x": 0.5})])
+    with engine_cache.read_cache_rows(live) as stream:
+        assert list(stream) == rows(live)
