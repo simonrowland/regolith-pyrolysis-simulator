@@ -822,7 +822,8 @@ class EquilibrateCell:
             self.engine_status,
             _activity_reference_phase(self.engine_reason),
             vapor_pressure_source_code(self.vapor_pressure_backend_status),
-            vapor_pressure_source_code(self.vapor_pressure_backend_status_reason),
+            # Internal-analytical uses this field for its provenance version record.
+            self.vapor_pressure_backend_status_reason,
             self.authoritative_for_requested_vapor_pressure,
             self.authority,
             self.certified_band,
