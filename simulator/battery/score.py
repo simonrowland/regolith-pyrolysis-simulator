@@ -143,7 +143,12 @@ from simulator.battery.input_provenance import (
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
 )
-from simulator.physical_constants import ATM_PA_DECIMAL, GAS_CONSTANT, PA_PER_BAR
+from simulator.physical_constants import (
+    ATM_PA_DECIMAL,
+    GAS_CONSTANT,
+    GAS_CONSTANT_DECIMAL,
+    PA_PER_BAR,
+)
 
 if TYPE_CHECKING:
     from simulator.diagnostic_helpers.binary_pot_battery import Po2Request
@@ -3918,12 +3923,26 @@ _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
-_BANYA_FETO_ACTIVITY_SOURCES = frozenset(
-    {
-        "banya-chiba-hikosaka-1980-feto-binary-solid-iron",
-        "banya-hino-takezoe-1985-na-fe-silicate-redox",
-    }
-)
+# There is no shared observation field linking the printed equation to its
+# activity rows: Takezoe keeps it as context, while the Yuge extract omits its
+# Eqs. 25–27. The repo-wide scan found these three cohorts with the
+# nonstoichiometric Fe_tO(l), Fe-saturated reference. Watanabe 1977 explicitly
+# uses Raoultian pure-liquid FeO; Ohta 1996 reports a different γ(Fe_tO), and
+# the 1993 slag extract carries a separate conversion relation.
+_BANYA_FETO_ACTIVITY_RELATIONS = {
+    # Ban-ya 1980 uses the same Fe_tO(l), Fe-saturated reference as the
+    # conversion printed in Ban-ya, Hino & Takezoe 1985 Eq. 23.
+    "banya-chiba-hikosaka-1980-feto-binary-solid-iron": (
+        "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770 "
+        "(same Fe_tO(l), Fe-saturated reference as the 1980 data)"
+    ),
+    "banya-hino-takezoe-1985-na-fe-silicate-redox": (
+        "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770"
+    ),
+    "banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity": (
+        "Ban-ya, Hino & Yuge 1985 Eqs. 25–27, p. 4 / folio 856"
+    ),
+}
 _TOTAL_IRON_BASIS_RELATION = "total_iron_basis"
 _SOLID_WUSTITE_REFERENCE_UNGROUNDED = (
     "solid_wustite_reference_conversion_not_grounded"
@@ -4167,20 +4186,21 @@ def _banya_feto_to_feo_rs_factor(temperature_K: Decimal) -> Decimal:
     (a_FetO * a_Fe**(1-t)) = exp(-ΔG19 / RT), giving
     log10(a_FeO) = log10(a_FetO) - ΔG19[J/mol] / (R T ln 10).
     Ban-ya, Hino & Takezoe 1985 prints this relation as Eq. 23 (p. 1770;
-    controller physics ruling d-432 calls it Eq. 19); the 1980 set uses the
-    same Fe-saturated Fe_tO reference. The printed ΔG is
-    -2040 + 1.707 T cal/mol.
-    Convert with 4.184 J/cal; T is K and R = 8.3144626 J/(mol K), so the
-    exponent is dimensionless. At 1673.15 K, ΔG19 is
+    controller physics ruling d-432 calls it Eq. 19); Ban-ya, Hino & Yuge
+    1985 independently prints the same relation in Eqs. 25–27 (p. 4 / folio
+    856). The 1980 set uses the same Fe-saturated Fe_tO reference. The
+    printed ΔG is -2040 + 1.707 T cal/mol. Convert with the owned
+    THERMOCHEMICAL_CALORIE_J; T is K and the owned CODATA
+    GAS_CONSTANT_DECIMAL is J/(mol K), so the exponent is dimensionless.
+    At 1673.15 K, ΔG19 is
     816.1 cal/mol and the log10 shift is -0.1066 dex (a_FeO = 0.7824
     a_FetO); ΔG19 = 0 gives equal activities. This relation already performs
     the reference change and must not receive the D&G/JANAF or N0 factors.
     """
 
     delta_g_cal = Decimal("-2040") + Decimal("1.707") * temperature_K
-    delta_g_J = Decimal("4.184") * delta_g_cal
-    gas_constant_J_per_mol_K = Decimal("8.3144626")
-    return (-delta_g_J / (gas_constant_J_per_mol_K * temperature_K)).exp()
+    delta_g_J = THERMOCHEMICAL_CALORIE_J * delta_g_cal
+    return (-delta_g_J / (GAS_CONSTANT_DECIMAL * temperature_K)).exp()
 
 
 def _banya_feto_activity_comparison(
@@ -4190,6 +4210,7 @@ def _banya_feto_activity_comparison(
     standard_state: StandardState,
     quantity: Quantity,
     temperature_K: Decimal,
+    relation_citation: str,
 ) -> Observation:
     factor = _banya_feto_to_feo_rs_factor(temperature_K)
     converted = reference.value.point * factor
@@ -4197,7 +4218,7 @@ def _banya_feto_activity_comparison(
         kind=NoticeKind.DERIVATION_USES_COMPILATION,
         affected_quantities=(quantity,),
         reason=(
-            "source_relation=Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770; "
+            f"source_relation={relation_citation}; "
             "Fe_tO(l) + (1-t) Fe(s,l) = FeO(R.S.); "
             "source_standard=Fe_tO(l), Fe-saturated; "
             "destination_standard=FeO(R.S.); "
@@ -4615,7 +4636,10 @@ def _iron_saturated_feo_comparison(
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
     standard_state = identity.reference_state.value
-    banya_source_relation = reference.source_id in _BANYA_FETO_ACTIVITY_SOURCES
+    banya_relation_citation = _BANYA_FETO_ACTIVITY_RELATIONS.get(
+        reference.source_id
+    )
+    banya_source_relation = banya_relation_citation is not None
     species_formulas = (
         {_FEO_STOICHIOMETRIC_FORMULA, "Fe_tO"}
         if banya_source_relation
@@ -4668,13 +4692,14 @@ def _iron_saturated_feo_comparison(
             ),
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
-    if banya_source_relation:
+    if banya_relation_citation is not None:
         return _banya_feto_activity_comparison(
             reference,
             identity=identity,
             standard_state=standard_state,
             quantity=quantity,
             temperature_K=temperature_K,
+            relation_citation=banya_relation_citation,
         )
 
     composition_decision = iron_saturation_composition(reference)

@@ -19,6 +19,9 @@ from simulator.battery.score import (
     temperature_of,
 )
 from tests.battery.test_migrate import _migrate_real_extract
+from tests.battery.test_t1243_feo_reference import (
+    _independent_banya_feto_to_feo_rs_factor,
+)
 
 
 ROOT_SOURCES = {
@@ -163,10 +166,16 @@ def test_total_iron_activity_rows_migrate_and_receive_source_ferric_bands(
 
             comparison = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
             assert comparison.identity.reference_state.value.endmember.formula == "FeO"
-            assert comparison.value.point > row.value.point
+            expected_value = row.value.point * (
+                _independent_banya_feto_to_feo_rs_factor(
+                    temperature_of(row.identity)
+                )
+            )
+            assert comparison.value.point == expected_value
             if row.observation_id.endswith("bch80_t1_c_b_1_activity"):
-                assert comparison.value.point.quantize(Decimal("0.0000000001")) == Decimal(
-                    "1.7650575301"
+                assert row.value.point == Decimal("0.985")
+                assert expected_value.quantize(Decimal("1e-10")) == Decimal(
+                    "0.7706234646"
                 )
                 assert resolution.band.value.quantize(
                     Decimal("0.0000000001")
