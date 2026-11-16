@@ -2369,6 +2369,84 @@ def test_mole_sibling_rows_keep_experiment_order_and_append_reference() -> None:
     )
 
 
+def test_mole_sibling_reference_id_collision_keeps_global_append_decision(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A same-id row in another experiment suppresses the external reference."""
+
+    def hook(*args, **kwargs):
+        raise AssertionError("unclosed phase amounts must refuse before assembly")
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
+    work = F.work()
+    experiment_a = F.tabulation_experiment(
+        experiment_id="phase-experiment-a",
+        T_K=celsius_to_kelvin(T_C),
+    )
+    experiment_b = F.tabulation_experiment(
+        experiment_id="phase-experiment-b",
+        T_K=celsius_to_kelvin(T_C),
+    )
+    reference_identity = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    sibling_identity = _phase_identity(
+        "CaO",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    reference = F.observation(
+        "colliding-phase-id",
+        experiment_a.experiment_id,
+        reference_identity,
+        Decimal("0.6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="phase-collision-source",
+    )
+    foreign = F.observation(
+        reference.observation_id,
+        experiment_b.experiment_id,
+        reference_identity,
+        Decimal("0.6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=reference.source_id,
+    )
+    sibling = F.observation(
+        "phase-collision-cao",
+        experiment_a.experiment_id,
+        sibling_identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=reference.source_id,
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={
+            experiment_a.experiment_id: experiment_a,
+            experiment_b.experiment_id: experiment_b,
+        },
+        observations={foreign.observation_id: foreign, sibling.observation_id: sibling},
+        extract_review={reference.source_id: "reviewed"},
+        hostname="test",
+    )
+
+    residual, _ = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=context,
+        comparison_ids={reference.observation_id},
+    )
+
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert residual.refusal.detail["reason"] == "phase_mole_fraction_set_unclosed"
+
+
 def test_duplicate_mole_fraction_component_stays_refused(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

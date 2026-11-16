@@ -199,6 +199,33 @@ def test_wt_percent_conversion_keeps_trace_b2o3_without_dropping_it() -> None:
     assert result.dropped_components == ()
 
 
+def test_plain_mass_percent_composition_matches_converter_without_metadata() -> None:
+    payload = {
+        "basis": "oxide_weight_percent_as_published",
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "70"], ["MgO", "27.55"]],
+    }
+    wt = migrate_module._mass_percent_components(payload)
+    assert wt is not None
+    expected = migrate_module._wt_percent_conversion_or_refusal(
+        wt,
+        closure_context=payload,
+    )
+    assert expected.refusal is None
+    assert expected.composition is not None
+
+    composition = migrate_module._composition_from_plain(payload)
+
+    assert composition == expected.composition
+    assert hash(composition) == hash(expected.composition)
+    assert (
+        composition.proxy_flag,
+        composition.proxy_source,
+        composition.analysis_selection_rule,
+        composition.input_provenance,
+    ) == (None, None, None, None)
+
+
 def test_v2o3_phase_composition_component_row_migrates(tmp_path: Path) -> None:
     source = "wang-2017-cao-sio2-vox-tables-s1-s32"
     result = _migrate_real_extract(tmp_path, f"{source}.yaml")
