@@ -24,6 +24,10 @@ from simulator.battery.oxygen_balance import (
     _solve_vacuum_oxygen_balance,
 )
 from simulator.battery.records import nominal_pressure_pa
+from simulator.battery.source_declarations import (
+    HASHIMOTO_SOURCE_ID,
+    SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+)
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -3269,7 +3273,7 @@ def _predict_hashimoto_residue_cohort(
             }
             provenance = {
                 "experiment_id": experiment_id,
-                "source_id": "kems-015-hashimoto-1983",
+                "source_id": HASHIMOTO_SOURCE_ID,
                 "run_locator": dict(experiment.get("locator") or {}),
                 "temperature_K": temperature_K,
                 "duration_s": duration_s,
@@ -3407,7 +3411,6 @@ def _predict_hashimoto_residue_cohort(
     return tuple(prediction_rows)
 
 
-_SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 _SOSSI_TRACE_PARENTS = {"Mn": "MnO", "Ti": "TiO2"}
 _SOSSI_GEOMETRIES = (
     "pt_loop_bead_sphere_constant",

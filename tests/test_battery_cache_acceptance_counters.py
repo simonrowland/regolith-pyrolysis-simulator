@@ -135,6 +135,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
             self.tier_band_values: dict = {}
             self.report_aggregate = None
             self.static_refusal_counts: dict = {}
+            self.selected_reference_ids: set[str] = set()
 
         def append_payload_line(self, *_args: Any, **_kwargs: Any) -> None:
             self.count += 1
@@ -146,7 +147,10 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
             return None
 
     context = object()
-    refs = (object(), object())
+    refs = (
+        SimpleNamespace(observation_id="ref-1"),
+        SimpleNamespace(observation_id="ref-2"),
+    )
     prepared = SimpleNamespace(
         context=context,
         engine_set=SCORE_ENGINE_SET,

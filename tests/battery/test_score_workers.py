@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import subprocess
 import time
+from types import SimpleNamespace
 
 import pytest
 
@@ -585,7 +586,7 @@ def test_jsonl_sort_preserves_append_order_for_tied_rows(
 ) -> None:
     class _Aggregate:
         def __init__(self, *args, **kwargs) -> None:
-            pass
+            self.tier_accumulator = SimpleNamespace(selected=set())
 
         def add(self, _payload):
             return None
@@ -641,7 +642,7 @@ def test_jsonl_sort_restores_serial_order_after_engine_shard_merge(
 ) -> None:
     class _Aggregate:
         def __init__(self, *args, **kwargs) -> None:
-            pass
+            self.tier_accumulator = SimpleNamespace(selected=set())
 
         def add(self, _payload):
             return None

@@ -224,7 +224,9 @@ def test_engine_request_preserves_and_rejects_temkin_coefficient_basis(
 
 @pytest.mark.parametrize("consumer", ("fo2", "coefficient", "catalog", "bench"))
 def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
-    from simulator.battery.fo2_ladder import _metal_saturation_fo2
+    from simulator.battery.fo2_ladder import (
+        metal_saturation_activity_refusal,
+    )
     from simulator.battery.score import _CatalogScoreRow
 
     row = next(item for item in _feo_rows(migration) if item.source_id == _DISTIN)
@@ -239,7 +241,18 @@ def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
         "temkin-fo2", "exp-feo", fo2_identity, Decimal("0.8")
     )
     if consumer == "fo2":
-        assert _metal_saturation_fo2(activity, 2153.15, Quantity.ACTIVITY) is None
+        experiment = migration.experiments[row.experiment_id]
+        experiment = replace(
+            experiment,
+            sample=replace(
+                experiment.sample,
+                form=F.located("melt in equilibrium with liquid iron"),
+            ),
+        )
+        refusal = metal_saturation_activity_refusal(
+            experiment, activity, Quantity.ACTIVITY
+        )
+        assert refusal is None
         return
     if consumer == "bench":
         assert _reference_matches(
