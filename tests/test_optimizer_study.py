@@ -4556,6 +4556,49 @@ def test_degenerate_furnace_lifetimes_complete_study_with_bounded_ordering(
     assert result.winner.product_summary["case"] == "clean-nan"
 
 
+@pytest.mark.parametrize("unpriced_oxygen", (10.0, 9.0))
+def test_mixed_furnace_population_winner_leaderboard_and_provenance(tmp_path, unpriced_oxygen):
+    definitions = objective_definitions(PROFILE)
+    records = tuple(
+        study.StudyRecord(
+            candidate_id=candidate_id,
+            patch=RecipePatch({}),
+            feasible=True,
+            status="ok",
+            objectives={"oxygen_kg": oxygen, ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: 2.0},
+            feasibility_margins={},
+            cache_key=candidate_id,
+            product_summary=summary,
+            search_provenance={"ask_ordinal": ordinal},
+        )
+        for ordinal, (candidate_id, oxygen, summary) in enumerate((
+            ("A", 10.0, {"furnace_amortization_status": "available", "furnace_amortization_batch_cost_equivalents": 1.0}),
+            ("B", unpriced_oxygen, {"furnace_amortization_status": "batch_cost_unavailable", "lifespan_cost_status": "wall_deposit_unavailable", "furnace_amortization_batch_cost_equivalents": None}),
+        ))
+    )
+    leaderboard = study._rank_records(records, definitions)
+    selection = study._select_pareto(records, definitions)
+    assert leaderboard[0].candidate_id == selection.winner.candidate_id == "A"
+    assert {row.candidate_id for row in selection.published} == ({"A", "B"} if unpriced_oxygen == 10.0 else {"A"})
+    progress, _ = study._study_progress(records, definitions, (0.6, 0.4))
+    assert progress == pytest.approx(5.2)
+    path = tmp_path / "leaderboard.csv"
+    study._write_leaderboard(path, leaderboard, selection.published, selection.winner, definitions, RecipeSchema())
+    with path.open() as handle:
+        rows = list(csv.DictReader(handle))
+    assert [row["candidate_id"] for row in rows] == ["A", "B"]
+    assert all(row["furnace_cost_comparison_flag"] == "furnace cost excluded: 1 of 2 unpriced" for row in rows)
+    assert rows[0]["furnace_amortization_batch_cost_equivalents"] == "1.0"
+    assert rows[0]["furnace_cost_penalty_applied"] == "False"
+    assert rows[1]["furnace_cost_unpriced_reason"] == "wall_deposit_unavailable"
+    provenance = study._search_provenance_payload(leaderboard, winner=selection.winner, best_non_seeded=None)
+    comparison = provenance["furnace_cost_comparison"]
+    assert comparison["flag"] == rows[0]["furnace_cost_comparison_flag"]
+    assert comparison["candidates"]["A"]["penalty"] == 1.0
+    assert comparison["candidates"]["A"]["applied"] is False
+    assert comparison["candidates"]["B"]["unpriced_reason"] == "wall_deposit_unavailable"
+
+
 def test_degraded_furnace_evidence_is_excluded_from_study_ranking() -> None:
     definitions = study.objective_definitions(PROFILE)
 
@@ -7479,6 +7522,11 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     assert pareto["status"] == "completed"
     assert pareto["winner_candidate_id"] == winner_id
     assert winner_id == "random-7-000000"
+    with (out_dir / "leaderboard.csv").open() as handle:
+        leaderboard = list(csv.DictReader(handle))
+    assert leaderboard[0]["candidate_id"] == winner_id
+    assert leaderboard[0]["furnace_cost_comparison_flag"] == "furnace cost excluded: 1 of 1 unpriced"
+    assert leaderboard[0]["furnace_cost_penalty_applied"] == "False"
     winner_rows = [
         row for row in pareto["pareto"] if row.get("candidate_id") == winner_id
     ]
@@ -7678,6 +7726,8 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     rows = list(csv.DictReader(leaderboard_path.open()))
     assert rows
     assert rows[0]["rank"] == "1"
+    assert rows[0]["is_winner"] == "True"
+    assert rows[0]["furnace_cost_comparison_flag"] == "furnace cost excluded: 1 of 1 unpriced"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
     # Seed 0 starts at 40 C (313.15 K), without committed pO2. The

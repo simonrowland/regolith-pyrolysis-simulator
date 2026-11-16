@@ -17,6 +17,7 @@ from simulator.optimize.objective import (
     ask_time_objective_definitions,
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
+    furnace_cost_comparison,
     objective_definitions,
     objective_scores,
     scoring_profile_for_executed_spec,
@@ -37,8 +38,6 @@ if TYPE_CHECKING:
 TellBatchRow = tuple[
     Candidate,
     "ScoredResult",
-    Any,
-    tuple[float, ...] | None,
     tuple[float, ...],
     tuple[str, ...],
 ]
@@ -329,6 +328,7 @@ class OptunaTPEStrategy:
             self.objective_profile,
             self._objective_definitions,
             scored,
+            comparison=getattr(self, "_furnace_cost_comparison", None),
         )
 
 
@@ -512,11 +512,13 @@ def objective_values_for_executed_spec(
     profile: Mapping[str, Any],
     frozen: Sequence[ObjectiveDefinition],
     scored: "ScoredResult",
+    *,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[float, ...] | None:
     definitions = executed_definitions_for_scored(profile, frozen, scored)
     if definitions is None:
         return None
-    return _objective_values_for_definitions(scored, definitions)
+    return _objective_values_for_definitions(scored, definitions, comparison=comparison)
 
 
 def _tell_optuna_trial(
@@ -557,6 +559,8 @@ def _tell_optuna_trial(
 def _objective_values_for_definitions(
     scored: "ScoredResult",
     definitions: Sequence[ObjectiveDefinition],
+    *,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[float, ...] | None:
     feasible = bool(getattr(scored, "feasible", False))
     objectives = getattr(scored, "objectives", None)
@@ -576,6 +580,7 @@ def _objective_values_for_definitions(
             mapping,
             definitions,
             product_summary=product_summary,
+            comparison=comparison,
         )
     except ObjectiveComputationError:
         # Feasible results without available furnace evidence stay
@@ -694,6 +699,45 @@ def _pruned_trial_state() -> Any:
     return _require_optuna().trial.TrialState.PRUNED
 
 
+def _refresh_furnace_comparison(strategy: Any, comparison: Mapping[str, Any]) -> None:
+    """Reprice the entire observed set before the sampler sees another result.
+
+    Optuna completed trials are immutable. When the observed set first becomes
+    unpriced, rebuild its in-memory study with raw historical observations;
+    retaining adjusted history beside raw arrivals would repeat d-429 online.
+    Pending trials keep their numbers, parameters, and candidate bindings.
+    """
+    previous = getattr(strategy, "_furnace_cost_comparison", {"excluded": False})
+    strategy._furnace_cost_comparison = comparison
+    if comparison["excluded"] != previous["excluded"] and strategy._results:
+        optuna = _require_optuna()
+        old_study = strategy._study
+        rebuilt = optuna.create_study(directions=strategy.directions, sampler=old_study.sampler)
+        for key, value in old_study.user_attrs.items():
+            rebuilt.set_user_attr(key, value)
+        for frozen in old_study.get_trials():
+            candidate_id = frozen.user_attrs.get(_CANDIDATE_ID_ATTR)
+            if candidate_id in strategy._result_by_id and frozen.values is not None:
+                scored = strategy._result_by_id[candidate_id]
+                definitions = executed_definitions_for_scored(
+                    strategy.objective_profile, strategy._objective_definitions, scored,
+                )
+                values = strategy._objective_values(scored)
+                if values is not None and definitions is not None:
+                    by_metric = dict(zip((item.metric for item in definitions), values, strict=True))
+                    frozen.values = [by_metric[item.metric] for item in strategy._objective_definitions]
+                    if _EXECUTED_OBJECTIVE_VALUES_ATTR in frozen.user_attrs:
+                        frozen.user_attrs[_EXECUTED_OBJECTIVE_VALUES_ATTR] = list(values)
+            rebuilt.add_trial(frozen)
+        strategy._study = rebuilt
+        for candidate_id, trial in strategy._trial_by_candidate_id.items():
+            if candidate_id in strategy._result_by_id:
+                continue
+            frozen = rebuilt.trials[trial.number]
+            strategy._trial_by_candidate_id[candidate_id] = optuna.trial.Trial(rebuilt, frozen._trial_id)
+    strategy._study.set_user_attr("furnace_cost_comparison", comparison)
+
+
 def _tell_optuna_strategy(
     strategy: Any,
     results: Sequence[tuple[Candidate, "ScoredResult"]],
@@ -736,21 +780,36 @@ def _tell_optuna_strategy(
         trial = strategy._trial_by_candidate_id.get(candidate.id)
         if trial is None:
             raise ValueError(f"candidate trial is unknown: {candidate.id!r}")
-        objective_values = strategy._objective_values(scored)
         constraint_names, constraint_values = _constraint_values(scored)
         seen.add(candidate.id)
         batch.append(
             (
                 candidate,
                 scored,
-                trial,
-                objective_values,
                 constraint_values,
                 constraint_names,
             )
         )
 
-    for candidate, scored, trial, values, constraints, constraint_names in batch:
+    if not batch:
+        return
+    comparison = furnace_cost_comparison({
+        candidate.id: scored.run_reference.product_summary if scored.run_reference else {}
+        for candidate, scored, *_ in (*strategy._results, *batch)
+    })
+    # Validate the complete batch on its actual comparison basis before mutating
+    # history. Even validation must not apply an excluded cost transform.
+    values_by_candidate = {
+        candidate.id: objective_values_for_executed_spec(
+            strategy.objective_profile, strategy._objective_definitions, scored,
+            comparison=comparison,
+        )
+        for candidate, scored, *_ in batch
+    }
+    _refresh_furnace_comparison(strategy, comparison)
+    for candidate, scored, constraints, constraint_names in batch:
+        trial = strategy._trial_by_candidate_id[candidate.id]
+        values = values_by_candidate[candidate.id]
         trial.set_user_attr(_CANDIDATE_ID_ATTR, candidate.id)
         trial.set_user_attr(_CONSTRAINT_NAMES_ATTR, constraint_names)
         trial.set_user_attr(_CONSTRAINT_VALUES_ATTR, constraints)

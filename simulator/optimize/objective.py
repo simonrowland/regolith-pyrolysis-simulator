@@ -4392,20 +4392,59 @@ def furnace_amortization_cost_per_run(
     )
 
 
+def _unpriced_lifespan_reason(summary: Mapping[str, Any]) -> str | None:
+    reason = summary.get("lifespan_cost_status")
+    if reason in {"threshold_unavailable", "wall_deposit_unavailable"}:
+        return str(reason)
+    if summary.get("furnace_amortization_status") == FURNACE_AMORTIZATION_STATUS_UNGROUNDED:
+        return "threshold_unavailable"
+    return None
+
+
+def furnace_cost_comparison(
+    product_summaries: Mapping[str, Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Own d-429 scoring policy and provenance for one comparison set."""
+    reasons = {
+        candidate_id: _unpriced_lifespan_reason(summary)
+        for candidate_id, summary in product_summaries.items()
+    }
+    count = sum(reason is not None for reason in reasons.values())
+    # A priced maximize score is s/(1+p), with dimensionless p >= 0.
+    # Returning s only for an unpriced candidate implicitly assigns it p=0,
+    # so equal physical scores cease to tie. Excluding p for the entire set
+    # compares s with s (and -s with -s for minimize), in the original units.
+    # At count=0 retain the shipped transform; at count=n all scores stay raw.
+    excluded = count > 0
+    return {
+        "excluded": excluded,
+        "flag": f"furnace cost excluded: {count} of {len(reasons)} unpriced" if excluded else None,
+        "unpriced_count": count,
+        "candidate_count": len(reasons),
+        "candidates": {
+            candidate_id: {
+                "unpriced_reason": reasons[candidate_id],
+                "penalty": summary.get("furnace_amortization_batch_cost_equivalents"),
+                "applied": not excluded and summary.get("furnace_amortization_status") == "available",
+            }
+            for candidate_id, summary in product_summaries.items()
+        },
+    }
+
+
 def cost_adjusted_objective_scores(
     objectives: ObjectiveLike,
     definitions: Sequence[ObjectiveDefinition],
     *,
     product_summary: Mapping[str, Any] | None,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[float | None, ...]:
     """Apply the continuous furnace cost in batch-equivalent objective units."""
 
     scores = objective_scores(objectives, definitions)
     summary = product_summary or {}
     status = summary.get("furnace_amortization_status")
-    if status == FURNACE_AMORTIZATION_STATUS_UNGROUNDED or summary.get(
-        "lifespan_cost_status"
-    ) in {"threshold_unavailable", "wall_deposit_unavailable"}:
+    if _unpriced_lifespan_reason(summary) is not None:
         # d-367/d-412: an unavailable lifespan is unpriced and flagged,
         # whether the threshold or wall figure is missing. Keep other
         # objectives rankable; objective_scores retains None for a
@@ -4421,6 +4460,8 @@ def cost_adjusted_objective_scores(
     penalty = _finite_float(raw_penalty, "furnace amortization penalty")
     if penalty < 0.0:
         raise ObjectiveComputationError("furnace amortization penalty must be non-negative")
+    if comparison is not None and comparison["excluded"]:
+        return scores
     cost_factor = 1.0 + penalty
     adjusted: list[float | None] = []
     for score, definition in zip(scores, definitions):

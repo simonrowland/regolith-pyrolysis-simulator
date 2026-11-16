@@ -77,6 +77,7 @@ from simulator.optimize.objective import (
     candidate_rank_key,
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
+    furnace_cost_comparison,
     executed_objective_definitions,
     objective_definitions,
     objective_importance_evidence,
@@ -999,12 +1000,7 @@ def run(
 
     failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
-    explore_leaderboard = tuple(
-        sorted(
-            feasible,
-            key=lambda row: _rank_key(row, definitions, profile=resolved_profile),
-        )
-    )
+    explore_leaderboard = _rank_records(feasible, definitions, profile=resolved_profile)
     explore_selection = _select_pareto(
         feasible, definitions, profile=resolved_profile
     )
@@ -1348,12 +1344,7 @@ def run_certify(
         )
     eligible = (record,) if record.feasible else ()
     leaderboard = (
-        tuple(
-            sorted(
-                eligible,
-                key=lambda row: _rank_key(row, definitions, profile=resolved_profile),
-            )
-        )
+        _rank_records(eligible, definitions, profile=resolved_profile)
         if eligible
         else (record,)
     )
@@ -1951,12 +1942,7 @@ def _load_study_journal(
 
     feasible = tuple(record for record in records if record.feasible)
     leaderboard = (
-        tuple(
-            sorted(
-                feasible,
-                key=lambda row: _rank_key(row, definitions, profile=resolved_profile),
-            )
-        )
+        _rank_records(feasible, definitions, profile=resolved_profile)
         if feasible
         else tuple(sorted(records, key=_sampling_order_key))
     )
@@ -2827,12 +2813,7 @@ def _run_exact_certification(
             status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
         )
-    leaderboard = tuple(
-        sorted(
-            certified_feasible,
-            key=lambda row: _rank_key(row, definitions, profile=profile),
-        )
-    )
+    leaderboard = _rank_records(certified_feasible, definitions, profile=profile)
     selection = _select_pareto(
         certified_feasible, definitions, profile=profile
     )
@@ -4282,6 +4263,7 @@ def _pareto_records(
     definitions: Sequence[ObjectiveDefinition],
     *,
     profile: Mapping[str, Any] | None = None,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[StudyRecord, ...]:
     """Non-dominated records, grouped when candidates execute different metrics.
 
@@ -4292,12 +4274,14 @@ def _pareto_records(
 
     if not records:
         return ()
+    if comparison is None:
+        comparison = _record_cost_comparison(records)
     if profile is None or _records_share_fallback_metrics(records, definitions, profile):
         return pareto_front(
             records,
             definitions,
             objective_getter=lambda row: row.objectives,
-            score_getter=lambda row: _record_objective_scores(row, definitions),
+            score_getter=lambda row: _record_objective_scores(row, definitions, comparison=comparison),
         )
     grouped: dict[
         tuple[str, ...],
@@ -4321,6 +4305,7 @@ def _pareto_records(
             score_getter=lambda row, active=active: _record_objective_scores(
                 row,
                 active,
+                comparison=comparison,
             ),
         )
         front.extend(selected)
@@ -5207,12 +5192,10 @@ def _select_pareto(
     """
 
     feasible_rows = tuple(record for record in feasible if record.feasible)
-    front = _pareto_records(feasible_rows, definitions, profile=profile)
-    ranked = tuple(
-        sorted(
-            front,
-            key=lambda row: _rank_key(row, definitions, profile=profile),
-        )
+    comparison = _record_cost_comparison(feasible_rows)
+    front = _pareto_records(feasible_rows, definitions, profile=profile, comparison=comparison)
+    ranked = _rank_records(
+        front, definitions, profile=profile, comparison=comparison,
     )
     return _ParetoSelection(
         published=_publish_pareto(front),
@@ -5221,14 +5204,33 @@ def _select_pareto(
     )
 
 
+def _record_cost_comparison(records: Sequence[StudyRecord]) -> Mapping[str, Any]:
+    return furnace_cost_comparison({row.candidate_id: row.product_summary for row in records})
+
+
+def _rank_records(
+    records: Sequence[StudyRecord],
+    definitions: Sequence[ObjectiveDefinition],
+    *,
+    profile: Mapping[str, Any] | None = None,
+    comparison: Mapping[str, Any] | None = None,
+) -> tuple[StudyRecord, ...]:
+    if comparison is None:
+        comparison = _record_cost_comparison(records)
+    return tuple(sorted(records, key=lambda row: _rank_key(
+        row, definitions, profile=profile, comparison=comparison,
+    )))
+
+
 def _rank_key(
     record: StudyRecord,
     definitions: Sequence[ObjectiveDefinition],
     *,
     profile: Mapping[str, Any] | None = None,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[Any, ...]:
     retained = _executed_definitions(record, definitions, profile)
-    scores = _record_objective_scores(record, retained)
+    scores = _record_objective_scores(record, retained, comparison=comparison)
     # Keep profile-aware objective slots while using green's sampling order for
     # exact ties in the shared selection helper.
     rank = candidate_rank_key(
@@ -5244,20 +5246,17 @@ def _rank_key(
 def _record_objective_scores(
     record: StudyRecord,
     definitions: Sequence[ObjectiveDefinition],
+    *,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[float | None, ...]:
-    """Rank on physical scores, with the furnace penalty when it exists.
-
-    ``cost_adjusted_objective_scores`` owns the ungrounded-threshold
-    case: a null liner threshold leaves the physical scores in place
-    and invents no campaign count. Any other missing furnace price is
-    unscoreable.
-    """
+    """Use the owner's furnace policy for the full comparison set."""
 
     try:
         return cost_adjusted_objective_scores(
             record.objectives,
             definitions,
             product_summary=record.product_summary,
+            comparison=comparison,
         )
     except ObjectiveComputationError:
         return (None,) * len(definitions)
@@ -5281,6 +5280,7 @@ def _study_progress(
         if any(record.feasible for record in records)
         else records
     )
+    comparison = _record_cost_comparison(progress_records)
     for record in progress_records:
         active_definitions = definitions
         active_weights = weights
@@ -5292,7 +5292,7 @@ def _study_progress(
                 weights,
                 profile,
             )
-        scores = _record_objective_scores(record, active_definitions)
+        scores = _record_objective_scores(record, active_definitions, comparison=comparison)
         if len(scores) != len(active_weights) or any(score is None for score in scores):
             continue
         score_row = tuple(float(score) for score in scores)
@@ -5326,7 +5326,7 @@ def _study_progress(
             scores_by_candidate[record.candidate_id] for record in front
         )
         return max(scalarized_scores), pareto_signature
-    front_records = _pareto_records(scored_records, definitions, profile=profile)
+    front_records = _pareto_records(scored_records, definitions, profile=profile, comparison=comparison)
     pareto_signature = frozenset(
         (
             metrics_by_candidate[record.candidate_id],
@@ -6408,12 +6408,7 @@ def _write_aborted_artifacts_from_cache(
     resolved_failure_counts.update(computed_failures)
     feasible = tuple(record for record in records if record.feasible)
     leaderboard = (
-        tuple(
-            sorted(
-                feasible,
-                key=lambda row: _rank_key(row, definitions, profile=profile),
-            )
-        )
+        _rank_records(feasible, definitions, profile=profile)
         if feasible
         else tuple(sorted(records, key=_sampling_order_key))
     )
@@ -6754,6 +6749,7 @@ def _search_provenance_payload(
         ),
         "proposal_source_counts": dict(sorted(counts.items())),
         "seeded_candidate_ids": seeded_ids,
+        "furnace_cost_comparison": _record_cost_comparison(records),
     }
     if strategy_provenance:
         payload["strategy_provenance"] = _jsonable_value(strategy_provenance)
@@ -6763,7 +6759,12 @@ def _search_provenance_payload(
 def _strategy_provenance_payload(*strategies: Strategy) -> Mapping[str, Any]:
     dropped = 0
     dropped_ids: list[str] = []
+    comparisons: list[Mapping[str, Any]] = []
     for strategy in strategies:
+        comparison = getattr(strategy, "_furnace_cost_comparison", None)
+        if comparison is not None:
+            comparisons.append(comparison)
+        comparisons.extend(getattr(strategy, "furnace_cost_comparisons", ()))
         count = getattr(strategy, "warm_start_rejected_seed_count", 0)
         try:
             dropped += int(count)
@@ -6772,12 +6773,15 @@ def _strategy_provenance_payload(*strategies: Strategy) -> Mapping[str, Any]:
         raw_ids = getattr(strategy, "warm_start_rejected_seed_ids", ())
         if isinstance(raw_ids, Sequence) and not isinstance(raw_ids, (str, bytes)):
             dropped_ids.extend(str(value) for value in raw_ids)
-    if not dropped:
-        return {}
-    return {
-        "optuna_incomplete_seed_dropped_count": dropped,
-        "optuna_incomplete_seed_dropped_ids": dropped_ids,
-    }
+    payload: dict[str, Any] = {}
+    if dropped:
+        payload.update({
+            "optuna_incomplete_seed_dropped_count": dropped,
+            "optuna_incomplete_seed_dropped_ids": dropped_ids,
+        })
+    if comparisons:
+        payload["furnace_cost_comparisons"] = comparisons
+    return payload
 
 
 def _winner_knob_saturation_payload(winner: StudyRecord) -> Any:
@@ -6866,6 +6870,7 @@ def _write_leaderboard(
     composition_target_fields = _composition_target_leaderboard_fields(leaderboard)
     sso2_objective_fields = _sso2_objective_leaderboard_fields(leaderboard)
     materialized_patch_fields = _materialized_patch_leaderboard_fields(leaderboard)
+    comparison = _record_cost_comparison(leaderboard)
     fieldnames = [
         "rank",
         "candidate_id",
@@ -6874,6 +6879,10 @@ def _write_leaderboard(
         "is_winner",
         "proposal_source",
         "seed_lineage",
+        "furnace_cost_comparison_flag",
+        "furnace_cost_unpriced_reason",
+        "furnace_amortization_batch_cost_equivalents",
+        "furnace_cost_penalty_applied",
         *(definition.metric for definition in definitions),
         *(f"margin_{name}" for name in margin_names),
         *coating_fields,
@@ -6894,6 +6903,10 @@ def _write_leaderboard(
                 "is_winner": bool(winner and record.candidate_id == winner.candidate_id),
                 "proposal_source": record.proposal_source,
                 "seed_lineage": record.seed_lineage,
+                "furnace_cost_comparison_flag": comparison["flag"] or "",
+                "furnace_cost_unpriced_reason": comparison["candidates"][record.candidate_id]["unpriced_reason"] or "",
+                "furnace_amortization_batch_cost_equivalents": comparison["candidates"][record.candidate_id]["penalty"],
+                "furnace_cost_penalty_applied": comparison["candidates"][record.candidate_id]["applied"],
                 # For tap rows, patch_json is the materialized tap-hour patch, not the parent trajectory.
                 "patch_json": _json_dump_value(
                     _materialized_record_patch(record, schema, profile)

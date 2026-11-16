@@ -8517,16 +8517,18 @@ def _furnace_summary(status: str) -> dict[str, object]:
 def _call_ranker(
     ranker: str,
     scored: SimpleNamespace,
+    comparison=None,
 ) -> tuple[float, ...] | tuple[None, ...] | None:
     if ranker == "study":
-        return study._record_objective_scores(scored, DEFINITIONS)
+        return study._record_objective_scores(scored, DEFINITIONS, comparison=comparison)
     if ranker == "bayesian":
         return bayesian_strategy._objective_values_for_definitions(
             scored,
             DEFINITIONS,
+            comparison=comparison,
         )
     if ranker == "staged":
-        return staged_strategy._scored_objective_scores(scored, DEFINITIONS)
+        return staged_strategy._scored_objective_scores(scored, DEFINITIONS, comparison=comparison)
     raise AssertionError(ranker)
 
 
@@ -8542,7 +8544,8 @@ def test_furnace_homogeneous_population_numeric_pin(ranker, unpriced):
         }
         for penalty in (1.0, 3.0)
     ]
-    scores = [_call_ranker(ranker, _ranker_scored(True, summary)) for summary in summaries]
+    comparison = objective_module.furnace_cost_comparison(dict(zip(("A", "B"), summaries)))
+    scores = [_call_ranker(ranker, _ranker_scored(True, summary), comparison) for summary in summaries]
     # Exact binary values from the shipped transform: 10/2, 10/4;
     # minimize energy 1 costs 2 and 4. Unpriced points retain 10 and 1.
     expected = [(10.0, -1.0), (10.0, -1.0)] if unpriced else [(5.0, -2.0), (2.5, -4.0)]
@@ -8551,6 +8554,41 @@ def test_furnace_homogeneous_population_numeric_pin(ranker, unpriced):
     assert scores == expected
     native = [(row[0], -row[1] if ranker == "bayesian" else row[1]) for row in scores]
     assert sorted(range(2), key=lambda index: tuple(-v for v in native[index])) == [0, 1]
+    assert comparison["flag"] == ("furnace cost excluded: 2 of 2 unpriced" if unpriced else None)
+
+
+@pytest.mark.parametrize("ranker", _RANKER_NAMES)
+@pytest.mark.parametrize("unpriced_oxygen", (10.0, 9.0))
+@pytest.mark.parametrize("reason", ("wall_deposit_unavailable", "threshold_unavailable"))
+def test_furnace_mixed_population_uses_raw_scores_and_reports_penalty(ranker, unpriced_oxygen, reason):
+    priced_summary = _furnace_summary("available")
+    unpriced_summary = {
+        "furnace_amortization_status": "batch_cost_unavailable",
+        "lifespan_cost_status": reason,
+        "furnace_amortization_batch_cost_equivalents": None,
+    }
+    comparison = objective_module.furnace_cost_comparison({"A": priced_summary, "B": unpriced_summary})
+    priced = _ranker_scored(True, priced_summary)
+    unpriced = _ranker_scored(True, unpriced_summary)
+    unpriced.objectives = SimpleNamespace(as_mapping=lambda: {"oxygen_kg": unpriced_oxygen, "energy_kWh": 1.0})
+    a = _call_ranker(ranker, priced, comparison)
+    b = _call_ranker(ranker, unpriced, comparison)
+    assert a == ((10.0, 1.0) if ranker == "bayesian" else (10.0, -1.0))
+    assert a[0] >= b[0]
+    assert (a == b) == (unpriced_oxygen == 10.0)
+    assert comparison["flag"] == "furnace cost excluded: 1 of 2 unpriced"
+    assert comparison["candidates"]["B"]["unpriced_reason"] == reason
+    assert comparison["candidates"]["A"] == {"unpriced_reason": None, "penalty": 1.0, "applied": False}
+    # Exclusion belongs to this set, not to the candidate or a global latch.
+    priced_only = objective_module.furnace_cost_comparison({"A": priced_summary})
+    assert _call_ranker(ranker, priced, priced_only)[0] == 5.0
+    assert priced_only["candidates"]["A"]["applied"] is True
+    assert cost_adjusted_objective_scores(
+        {"furnace_lifespan_consumed_fraction": None},
+        (ObjectiveDefinition("furnace_lifespan_consumed_fraction", "minimize"),),
+        product_summary=unpriced_summary,
+        comparison=comparison,
+    ) == (None,)
 
 
 @pytest.mark.parametrize("ranker", _RANKER_NAMES)
