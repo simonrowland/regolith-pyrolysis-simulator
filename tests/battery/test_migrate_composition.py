@@ -154,6 +154,45 @@ def test_wt_percent_conversion_handles_swept_species_and_feot_alias() -> None:
     assert abs(sum(components.values()) - Decimal("1")) < Decimal("1e-27")
 
 
+def test_feo15_mole_fraction_preserves_iron_to_silicon_atom_ratio() -> None:
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(
+        {
+            "composition_mole_fraction": {
+                "FeO1.5": Decimal("0.5"),
+                "SiO2": Decimal("0.5"),
+            }
+        }
+    )
+
+    assert omitted == ()
+    assert composition is not None
+    components = composition.as_map()
+    assert components == {
+        "Fe2O3": Decimal(1) / Decimal(3),
+        "SiO2": Decimal(2) / Decimal(3),
+    }
+    # Each FeO1.5 carries one Fe; each canonical Fe2O3 carries two.
+    assert abs(components["Fe2O3"] * 2 / components["SiO2"] - 1) < Decimal(
+        "1e-27"
+    )
+
+
+def test_feo15_wt_percent_maps_without_a_formula_unit_factor() -> None:
+    iron_mass = Decimal(str(ATOMIC_WEIGHTS_G_PER_MOL["Fe"]))
+    oxygen_mass = Decimal(str(ATOMIC_WEIGHTS_G_PER_MOL["O"]))
+    feo15_mass_per_iron = iron_mass + Decimal("1.5") * oxygen_mass
+    fe2o3_mass = Decimal("2") * iron_mass + Decimal("3") * oxygen_mass
+
+    assert fe2o3_mass == Decimal("2") * feo15_mass_per_iron
+    alias = wt_pct_to_mole_fraction(
+        {"FeO1.5": Decimal("50"), "SiO2": Decimal("50")}
+    )
+    canonical = wt_pct_to_mole_fraction(
+        {"Fe2O3": Decimal("50"), "SiO2": Decimal("50")}
+    )
+    assert alias.as_map() == canonical.as_map()
+
+
 def test_wt_percent_conversion_handles_vanadium_pentoxide() -> None:
     wt = {"MgO": Decimal("40"), "V2O5": Decimal("60")}
 

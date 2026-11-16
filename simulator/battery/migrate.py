@@ -7684,12 +7684,14 @@ def _kume_formula_unit_oxide(
         and name != "AlO1.5"
     ):
         return None
-    if name not in {"AlO1.5", "CrO1.5"}:
+    if name not in {"AlO1.5", "CrO1.5", "FeO1.5"}:
         return None if component is None else (component[1], Decimal("1"))
 
-    # AlO1.5 and CrO1.5 are half an Al2O3 and Cr2O3 formula unit respectively.
-    # Reuse the formula-unit resolver so mole-basis maps apply the 0.5 factor;
-    # mass percent is invariant, so the printed wt% path only renames the key.
+    # AlO1.5, CrO1.5, and FeO1.5 are half an Al2O3, Cr2O3, and Fe2O3
+    # formula unit respectively. Per formula unit, FeO1.5 = 1/2 Fe2O3, so
+    # x(Fe2O3) = x(FeO1.5)/2 before renormalisation; this keeps Fe atoms
+    # conserved. Reuse the resolver for mole-basis maps; mass percent is
+    # invariant, so the printed wt% path only renames the key.
     # For mole-to-mass, x [mol/mol] * M [g/mol] = relative mass [g/mol].
     # Sanity check: 50:50 CaO:AlO1.5 becomes 2/3 CaO, 1/3 Al2O3.
     from simulator.chemistry.structural_activity import normalize_formula_unit_moles
