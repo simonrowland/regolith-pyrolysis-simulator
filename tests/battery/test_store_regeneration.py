@@ -9,6 +9,9 @@ from types import SimpleNamespace
 import pytest
 
 import simulator.battery.migrate as migration
+from tests.battery.test_migrate_split_baseline import (
+    _assert_complete_store_regeneration_matches_checked_in_bytes,
+)
 
 
 def test_freshness_includes_the_migration_queue_output() -> None:
@@ -111,5 +114,4 @@ def test_reference_queue_report_is_stable_in_fresh_regeneration(
 @pytest.mark.cpu_budget(2600)
 def test_committed_store_is_byte_identical_to_regeneration() -> None:
     """CI must verify the real committed store against the committed inputs."""
-    repo_root = Path(__file__).resolve().parents[2]
-    assert migration.main(["--check-store", "--root", str(repo_root)]) == 0
+    _assert_complete_store_regeneration_matches_checked_in_bytes()
