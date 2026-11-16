@@ -1755,7 +1755,18 @@ def test_stolyarova_1992_untyped_bulk_thermodynamics_stays_in_context(
     assert table3[0]["minus_delta_G_exp_kcal_mol"] == 8.4
     assert table4[0]["mu_Na2O_exp_kcal_mol"] == 56.0
     assert result.validation is not None
-    assert result.validation.hard_issues == ()
+    locator_conflicts = [
+        issue
+        for issue in result.validation.hard_issues
+        if issue.reason is RefusalReason.INVALID_SOURCE
+        and "conflicting locator fields" in issue.detail
+    ]
+    assert len(locator_conflicts) == 1
+    assert locator_conflicts[0].path.endswith(".locator")
+    assert all(
+        field in locator_conflicts[0].detail
+        for field in ("source_path", "repaired_table_path")
+    )
 
 
 @pytest.mark.parametrize(

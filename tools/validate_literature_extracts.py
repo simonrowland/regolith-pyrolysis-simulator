@@ -208,25 +208,6 @@ def equipment_fields_from_vocabulary(
 
 EQUIPMENT_FIELDS = equipment_fields_from_vocabulary()
 
-LOCATOR_KEYS = frozenset(
-    {
-        "page",
-        "published_page",
-        "pdf_page_index",
-        "table",
-        "figure",
-        "paragraph",
-        "section",
-        "equation",
-        "line_range",
-        "note",
-        "source_path",
-        "quotes_path",
-        "record",
-        "source_sha256",
-    }
-)
-
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -3152,10 +3133,9 @@ def load_known_species_ids() -> set[str] | None:
 
 
 def _locator_ok(locator: Any) -> bool:
-    """True when locator is a mapping with ≥1 known key carrying a non-empty value.
+    """True when decoder vocabulary contains a non-empty locator address.
 
-    Extension keys are allowed but do not alone satisfy the rule — at least one
-    key from LOCATOR_KEYS must be present and non-empty (SCHEMA.md contract).
+    Conflicting aliases are reported by typed validation during migration.
     """
     if not isinstance(locator, Mapping):
         return False
@@ -3163,15 +3143,15 @@ def _locator_ok(locator: Any) -> bool:
         locator["source_sha256"]
     ):
         return False
-    for key, val in locator.items():
-        if key not in LOCATOR_KEYS or key == "source_sha256":
-            continue
-        if val is None:
-            continue
-        if isinstance(val, str) and not val.strip():
-            continue
-        return True
-    return False
+    from simulator.battery.migrate import (
+        _locator_mapping_has_address,
+        _locator_mapping_keys_are_supported,
+    )
+
+    return (
+        _locator_mapping_keys_are_supported(locator)
+        and _locator_mapping_has_address(locator)
+    )
 
 
 def _has_payload_leaf(values: Any) -> bool:
@@ -3238,8 +3218,8 @@ def _check_equipment(
             )
         elif not _locator_ok(payload["locator"]):
             errors.append(
-                f"{fpath}: locator must be a mapping with at least one of "
-                f"{sorted(LOCATOR_KEYS)}"
+                f"{fpath}: locator must contain a recognized, non-empty location key "
+                "and no unrecognized keys"
             )
         # Truthy inferred (not just identity True) requires a derivation note.
         if payload.get("inferred") and not (
@@ -3304,7 +3284,8 @@ def _check_observation(
         errors.append(f"{path}: locator is required on every observation")
     elif not _locator_ok(locator):
         errors.append(
-            f"{path}: locator must be a mapping with at least one of {sorted(LOCATOR_KEYS)}"
+            f"{path}: locator must contain a recognized, non-empty location key "
+            "and no unrecognized keys"
         )
 
     # Refuse recognized equipment field names parked outside equipment: {}
@@ -3409,8 +3390,8 @@ def _check_context_row(
         errors.append(f"{path}: locator is required on every context row")
     elif not _locator_ok(locator):
         errors.append(
-            f"{path}: locator must be a mapping with at least one of "
-            f"{sorted(LOCATOR_KEYS)}"
+            f"{path}: locator must contain a recognized, non-empty location key "
+            "and no unrecognized keys"
         )
 
     # Same anti-parking rule as observations.
@@ -3548,8 +3529,8 @@ def _check_fidelity_sample_shape(
     if locator_keys:
         if len(locator_keys) == 1 and not _locator_ok(loc):
             errors.append(
-                f"{sp}: {locator_keys[0]} must be a mapping with at least one of "
-                f"{sorted(LOCATOR_KEYS)}"
+                f"{sp}: {locator_keys[0]} must contain a recognized, non-empty "
+                "location key and no unrecognized keys"
             )
     elif structured:
         errors.append(
@@ -3727,8 +3708,8 @@ def _check_ambient_pressure_evidence(
             errors.append(f"{path}.quote: nonempty verbatim text is required")
         if not _locator_ok(evidence.get("locator")):
             errors.append(
-                f"{path}.locator: mapping with at least one of "
-                f"{sorted(LOCATOR_KEYS)} is required"
+                f"{path}.locator: recognized, non-empty location key with no "
+                "unrecognized keys is required"
             )
 
 

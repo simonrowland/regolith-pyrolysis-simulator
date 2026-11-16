@@ -22,7 +22,7 @@ Ambiguity resolutions:
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass, field, fields, is_dataclass
 from decimal import Decimal, localcontext
 from enum import StrEnum
 from fractions import Fraction
@@ -78,6 +78,8 @@ _LOCATOR_KEYS = (
     "table_caption_page",
     "table_continued",
     "table",
+    "row",
+    "column",
     "figure",
     "paragraph",
     "section",
@@ -466,7 +468,11 @@ def as_fraction(value: object) -> Fraction:
 
 @dataclass(frozen=True)
 class Locator:
-    """Extract SCHEMA locator; page is one-based physical PDF page, pdf_page_index is zero-based, and published_page is the printed folio (which may be absent or non-numeric)."""
+    """Extract location; row and column are printed table coordinates.
+
+    Page is the one-based physical PDF page, pdf_page_index is zero-based, and
+    published_page is the printed folio (which may be absent or non-numeric).
+    """
 
     page: str | int | None = None
     published_page: str | int | None = None
@@ -475,6 +481,8 @@ class Locator:
     table_caption_page: int | None = None
     table_continued: bool | None = None
     table: str | None = None
+    row: str | None = field(default=None, repr=False)
+    column: str | None = field(default=None, repr=False)
     figure: str | None = None
     paragraph: str | None = None
     section: str | None = None

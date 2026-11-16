@@ -610,6 +610,7 @@ observation.
 A locator is a mapping with at least one non-empty location key among:
 
 - `page`, `published_page`, `pdf_page_index`
+- `row`, `column` (printed table coordinates, stored as strings)
 - `table`, `figure`, `paragraph`, `section`, `equation`
 - `line_range` (e.g. thermo.inp line range)
 - `note` (prose locator when the above do not apply — allowed, but prefer structured keys)
@@ -618,6 +619,11 @@ A locator is a mapping with at least one non-empty location key among:
 `page` is the one-based physical page in the PDF. `pdf_page_index` is the
 zero-based PDF page index (the first PDF page is 0). `published_page` is the
 folio printed on the page; it may be absent, Roman-numeral, or non-numeric.
+`row` and `column` retain printed table coordinates as strings, including
+numeric-looking labels. `row_label` and `table_row_number` migrate to `row`;
+`column_header`, `column_label`, and `table_column_number` migrate to `column`.
+Conflicting canonical and alias values, and unknown locator keys, make the
+locator invalid.
 Example: a figure on the 12th PDF page with printed folio 7 has `page: 12`,
 `pdf_page_index: 11`, and `published_page: 7`.
 

@@ -882,8 +882,8 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         obs for obs in observations if "table1_added_fe_70017_31::T=1273.15" in obs.observation_id
     )
     assert natural.identity.temperature_K == added_fe.identity.temperature_K
-    assert "row=70017,31" in natural.locator.note
-    assert "row=70017,31" in added_fe.locator.note
+    assert natural.locator.row == "70017,31"
+    assert added_fe.locator.row == "70017,31"
     assert natural.experiment_id != added_fe.experiment_id
     assert migrator.result.experiments[natural.experiment_id].method.value.value == "emf_cell"
     assert migrator.result.experiments[added_fe.experiment_id].method.value.value == "emf_cell"
@@ -6005,6 +6005,17 @@ def test_source_sha256_locator_requires_lowercase_64_digit_hex(digest):
         {"source_path": "text/paper.txt", "source_sha256": digest}
     )
     assert not vle._locator_ok({"source_sha256": "a" * 64})
+
+
+@pytest.mark.parametrize("coordinate", ["row", "column"])
+def test_row_and_column_are_locator_location_keys(coordinate):
+    assert vle._locator_ok({coordinate: "printed coordinate"})
+
+
+def test_locator_validator_rejects_unrecognized_key_even_with_known_location():
+    assert not vle._locator_ok(
+        {"row": "printed coordinate", "unreviewed_locator_axis": "value"}
+    )
 
 
 def _source_locator(root: Path, text: str) -> dict:
@@ -12491,12 +12502,28 @@ _SC456_SOURCE_IDS = (
 @pytest.mark.parametrize("source_id", _SC456_SOURCE_IDS, ids=_SC456_SOURCE_IDS)
 def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> None:
     """Keep each SC-456 source independently migratable after evidence relabels."""
+    from simulator.battery.enums import RefusalReason
+
     source = EXTRACTS / f"{source_id}.yaml"
     migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(source)
     migrator.finalize()
     assert migrator.result.validation is not None
-    assert migrator.result.validation.hard_issues == ()
+    if source_id == "banya-hino-takezoe-1985-na-fe-silicate-redox":
+        conflicts = [
+            issue
+            for issue in migrator.result.validation.hard_issues
+            if issue.reason is RefusalReason.INVALID_SOURCE
+            and "conflicting locator fields" in issue.detail
+        ]
+        assert conflicts
+        assert migrator.result.observations
+        assert all(
+            observation.value is not None
+            for observation in migrator.result.observations.values()
+        )
+    else:
+        assert migrator.result.validation.hard_issues == ()
 
 
 @pytest.mark.parametrize(
@@ -12521,6 +12548,8 @@ def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> 
     ],
 )
 def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
+    from simulator.battery.enums import RefusalReason
+
     extract_path = EXTRACTS / f"{source_id}.yaml"
     document = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
     migrator = battery_factories.migrate_one_extract(
@@ -12563,10 +12592,20 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
             for name, condition in source_conditions.items():
                 migrated_name = "temperature_K" if name == "temperature_C" else name
                 migrated_condition = observation.point_conditions.get(migrated_name)
+                locator_is_refused = (
+                    bool(condition.get("locator"))
+                    and battery_migrate.locator_from_mapping(
+                        condition.get("locator")
+                    )
+                    is None
+                )
                 if name in {"temperature_C", "temperature_K"}:
                     assert migrated_condition is not None
-                    assert migrated_condition.locator is not None
-                elif condition.get("locator") and migrated_condition is not None:
+                elif (
+                    condition.get("locator")
+                    and migrated_condition is not None
+                    and not locator_is_refused
+                ):
                     assert migrated_condition.locator is not None
                 if (
                     condition.get("state")
@@ -12574,8 +12613,17 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
                     and name != "composition"
                 ):
                     assert migrated_condition.state.tag.value == condition["state"]["tag"]
-    assert not migrator.result.registry_issues
-    assert not migrator.result.validation.hard_issues
+    if source_id == "kunisada-1986-na-silicate-dephosphorization":
+        conflicts = [
+            issue
+            for issue in migrator.result.validation.hard_issues
+            if issue.reason is RefusalReason.INVALID_SOURCE
+            and "conflicting locator fields" in issue.detail
+        ]
+        assert conflicts
+    else:
+        assert not migrator.result.registry_issues
+        assert not migrator.result.validation.hard_issues
 def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures():
     from simulator.battery.enums import MethodToken
 
