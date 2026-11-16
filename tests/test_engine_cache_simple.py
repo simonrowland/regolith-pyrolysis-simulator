@@ -1869,7 +1869,10 @@ def test_actual_notice_emitters_use_registered_codes_for_each_engine() -> None:
         ) == notices
 
 
-def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip() -> None:
+def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from engines.builtin.vapor_pressure import (
         _openimcc_vapour_phase_signal_notice,
     )
@@ -1881,6 +1884,8 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip() -> 
         equilibrium_cache_value,
     )
 
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "d207.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     provider_notice = _openimcc_vapour_phase_signal_notice("missing")
     assert provider_notice is not None
     diagnostics = {
@@ -1891,16 +1896,31 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip() -> 
     cold_result = SimpleNamespace(diagnostics=diagnostics)
     cold_notices, _authority, _band = engine_flags_from_result(cold_result)
 
-    hot = equilibrium_cache_value(
-        {"status": "ok", "diagnostics": diagnostics},
-        engine_id="internal-analytical",
+    request = {"call": "internal-analytical d-207 notice"}
+    cold_hot = engine_cache.cached_engine_call(
+        "internal-analytical",
+        request,
+        lambda: equilibrium_cache_value(
+            {"status": "ok", "diagnostics": diagnostics},
+            engine_id="internal-analytical",
+        ),
+    )
+    warm_hot = engine_cache.cached_engine_call(
+        "internal-analytical",
+        request,
+        lambda: pytest.fail("expected the warmed HOT cache result"),
+    )
+    cold = equilibrium_cache_from_value(
+        cold_hot, engine_id="internal-analytical"
     )
     warm = equilibrium_cache_from_value(
-        hot,
-        engine_id="internal-analytical",
+        warm_hot, engine_id="internal-analytical"
     )
     warm_notices, _authority, _band = engine_flags_from_result(
         SimpleNamespace(diagnostics=warm["diagnostics"])
+    )
+    cold_notices, _authority, _band = engine_flags_from_result(
+        SimpleNamespace(diagnostics=cold["diagnostics"])
     )
 
     assert warm_notices == cold_notices
