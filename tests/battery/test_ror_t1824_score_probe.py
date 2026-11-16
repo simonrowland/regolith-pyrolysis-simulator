@@ -15,6 +15,7 @@ from simulator.battery.enums import (
     SourceRelation,
 )
 from simulator.battery.records import QuotedFrom
+from simulator.battery import score as score_module
 from simulator.battery.score import (
     ProprietaryProduced,
     ScoreContext,
@@ -243,3 +244,31 @@ def test_proprietary_aggregate_excludes_quoted_twin(
         RefusalReason.REFERENTIAL_INTEGRITY.value: 1
     }
     assert provider.calls == [primary_id]
+
+
+@pytest.mark.parametrize("target_kind", tuple(QuotedTargetKind))
+def test_scoring_routes_detect_removed_duplicate_suppression(
+    monkeypatch, target_kind: QuotedTargetKind
+) -> None:
+    monkeypatch.setattr(
+        score_module, "_duplicate_observation_refusal_detail", lambda *_args: None
+    )
+
+    with pytest.raises(AssertionError):
+        test_compile_residual_suppresses_quoted_twin(target_kind)
+    with pytest.raises(AssertionError):
+        test_proprietary_aggregate_excludes_quoted_twin(target_kind)
+
+
+@pytest.mark.parametrize("target_kind", tuple(QuotedTargetKind))
+def test_resolution_probe_detects_an_independent_scorer_resolver(
+    monkeypatch, target_kind: QuotedTargetKind
+) -> None:
+    monkeypatch.setattr(
+        score_module,
+        "_quoted_source_observation_ids",
+        lambda *_args: ("primary-source::primary-observation",),
+    )
+
+    with pytest.raises(AssertionError):
+        test_quoted_citation_refusal_uses_validator_resolution(target_kind)
