@@ -898,6 +898,22 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
         _MEMORY_CACHE.popitem(last=False)
 
 
+def _accept_cached_engine_disclosures(
+    engine_id: str, request: Any, value: Any
+) -> bool:
+    """Accept a residue-pressure cache row only when its disclosure is known."""
+
+    if not (
+        engine_id == "internal-analytical"
+        and isinstance(request, Mapping)
+        and request.get("call") == "residue_pressure"
+    ):
+        return True
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    return accept_stored_memo(value if isinstance(value, Mapping) else None) is not None
+
+
 def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> None:
     expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
     found = [row[1] for row in connection.execute(f"PRAGMA table_info({_TABLE})")]
@@ -1149,9 +1165,11 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         counts = _counter_bucket(engine_id)
         if memory_key in _MEMORY_CACHE:
             result = _MEMORY_CACHE[memory_key]
-            _MEMORY_CACHE.move_to_end(memory_key)
-            counts["hits"] += 1
-            return result
+            if _accept_cached_engine_disclosures(engine_id, request, result):
+                _MEMORY_CACHE.move_to_end(memory_key)
+                counts["hits"] += 1
+                return result
+            del _MEMORY_CACHE[memory_key]
 
     path = Path(path_value).expanduser()
     try:
@@ -1176,9 +1194,11 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 counts["read_error"] += 1
                 row = None
             else:
-                counts["hits"] += 1
-                _remember_memory_value(memory_key, result)
-                return result
+                if _accept_cached_engine_disclosures(engine_id, request, result):
+                    counts["hits"] += 1
+                    _remember_memory_value(memory_key, result)
+                    return result
+                row = None
         counts["misses"] += 1
 
     solved = solve()

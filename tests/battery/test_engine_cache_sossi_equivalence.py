@@ -111,6 +111,9 @@ def test_fresh_sossi_cohorts_reuse_warm_engine_cache(
         openimcc_cold = predict("openimcc")
         openimcc_warm = predict("openimcc")
     assert openimcc_cold == openimcc_warm
+    assert tuple(row.provenance["law_disclosures"] for row in openimcc_cold) == tuple(
+        row.provenance["law_disclosures"] for row in openimcc_warm
+    )
     assert openimcc_gas_calls == 1
     assert recorded_opens == ["openimcc", "openimcc"]
     assert "openimcc" in engine_cache.engine_cache_runtime_identities()
@@ -123,20 +126,11 @@ def test_fresh_sossi_cohorts_reuse_warm_engine_cache(
     with _engine_cache_path_scope(tmp_path / "sossi-internal-analytical.sqlite"):
         analytical_cold = predict("internal-analytical")
         analytical_warm = predict("internal-analytical")
+    assert analytical_cold == analytical_warm
     assert tuple(
-        (
-            row.primary_element_ppm,
-            row.geometry_element_ppm,
-            row.sensitivity_band_ppm,
-        )
-        for row in analytical_cold
+        row.provenance["law_disclosures"] for row in analytical_cold
     ) == tuple(
-        (
-            row.primary_element_ppm,
-            row.geometry_element_ppm,
-            row.sensitivity_band_ppm,
-        )
-        for row in analytical_warm
+        row.provenance["law_disclosures"] for row in analytical_warm
     )
     assert analytical_vapor_calls == 1
     assert recorded_opens == ["internal-analytical", "internal-analytical"]
@@ -146,3 +140,67 @@ def test_fresh_sossi_cohorts_reuse_warm_engine_cache(
     ]
     assert analytical_counts["misses"] > 0
     assert analytical_counts["hits"] > 0
+
+
+def test_internal_analytical_engine_cache_replays_direct_pressure_disclosures(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        internal_analytical_residue_vapor_pressure,
+    )
+    from simulator.melt_backend.base import equilibrium_cache_value
+    from simulator.physical_constants import PA_PER_BAR
+    from simulator.vapour_rail.run_disclosure import active_snapshot, disclosure_scope
+
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    schedule = experiment["thermal_schedule"]
+    temperature_K = residue._hashimoto_point_value(
+        schedule["setpoints_and_holds"][0]["temperature_K"]
+    )
+    pressure_Pa = residue._hashimoto_point_value(
+        experiment["pressure_environment"]["total_pressure_Pa"]
+    )
+    inventory, _, _ = residue._sossi_initial_inventory(experiment, starting_trace)
+    core = battery._new_internal_analytical_core()
+    request = {
+        "temperature_C": temperature_K - 273.15,
+        "pressure_bar": pressure_Pa / PA_PER_BAR,
+        "composition_kg": None,
+        "composition_mol": inventory,
+        "fO2_log": -10.0,
+        "po2_request": Po2Request(PO2_COMMANDED, 10.0**-10.0),
+        "include_diagnostic_shadows": False,
+    }
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache.engine_cache_counters(reset=True)
+    with _engine_cache_path_scope(tmp_path / "direct-residue-pressure.sqlite"):
+        with disclosure_scope(inherit=False):
+            cold = internal_analytical_residue_vapor_pressure(core=core, **request)
+            cold_disclosures = active_snapshot()
+        with disclosure_scope(inherit=False):
+            warm = internal_analytical_residue_vapor_pressure(core=core, **request)
+            warm_disclosures = active_snapshot()
+
+    assert cold_disclosures
+    assert warm_disclosures == cold_disclosures
+    assert equilibrium_cache_value(
+        vars(cold), engine_id="internal-analytical"
+    ) == equilibrium_cache_value(vars(warm), engine_id="internal-analytical")
+    assert engine_cache.engine_cache_counters(reset=True)["internal-analytical"][
+        "hits"
+    ] > 0

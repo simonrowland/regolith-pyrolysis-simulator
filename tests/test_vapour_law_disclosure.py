@@ -4799,15 +4799,31 @@ def _exercise_core_memo(_tmp_path, monkeypatch) -> None:
 def _openimcc_activity_state() -> object:
     from types import SimpleNamespace
 
-    return SimpleNamespace(
+    from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+
+    labels = SimpleNamespace(
+        identity={},
+        coverage={},
+        trust="test fixture",
+        envelope_status="in_envelope",
+        flags=(),
+        notices=(),
+        acid_sink_ratio=None,
+    )
+    return OpenImccBridgeResult(
         parent_oxide_activities={"FeO": 1.0},
         parent_oxides=("FeO",),
         flags=(),
+        notices=(),
+        acid_sink_ratio=None,
         extrapolated=False,
         pack_model_id="b119-disclosure",
         pack_version="b119-disclosure",
         pack_digest="b119-disclosure",
         openimcc_version="b119-disclosure",
+        envelope_status="in_envelope",
+        labels=labels,
+        coverage={},
     )
 
 
@@ -4880,7 +4896,10 @@ def _exercise_pressure_cache(_tmp_path, monkeypatch) -> None:
     cache: dict = {}
     bridge = SimpleNamespace(
         _cleaned_melt_policy=lambda composition: (dict(composition), {"policy": "test"}),
-        evaluate=lambda **_kwargs: None,
+        _evaluate_request_vector=lambda **kwargs: kwargs,
+        _evaluate_uncached=lambda **_kwargs: None,
+        evaluate_gas=lambda *_args, **_kwargs: {"Fe": 1.0},
+        DEFAULT_GAS_PACK_SELECTION="published-core",
     )
     model = _sossi_openimcc_pressure_model(
         cache,
@@ -4893,10 +4912,60 @@ def _exercise_pressure_cache(_tmp_path, monkeypatch) -> None:
         melt_activity_input_policy={},
         melt_activity_extensions={},
         openimcc_bridge=bridge,
-        evaluate_gas=lambda *_args, **_kwargs: {"Fe": 1.0},
         nonconvergence_error=RuntimeError,
     )
     _replay_pressure_closure(model, {"FeO": 1.0}, cache, calls)
+
+
+def _exercise_engine_cache(
+    tmp_path: Path, monkeypatch, *, persistent: bool
+) -> None:
+    """Replay an executed-law record from the engine cache's RAM or SQLite store."""
+
+    from simulator import engine_cache
+    from simulator.engine_cache import EngineCacheValue, _engine_cache_path_scope
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    request = {"call": "residue_pressure", "probe": "disclosure-inventory"}
+    path = tmp_path / "engine-cache-disclosure.sqlite"
+
+    def solve():
+        with computation_disclosure() as computation:
+            pressure = _fe_pressure("FeO_association_gas")
+            disclosures = [dict(item) for item in computation.snapshot()]
+        return EngineCacheValue(
+            {"pressure_Pa": pressure, "law_disclosures": disclosures}
+        )
+
+    with _engine_cache_path_scope(path):
+        with disclosure_scope(inherit=False) as cold:
+            cold_value = engine_cache.cached_engine_call(
+                "internal-analytical", request, solve
+            )
+            cold_disclosures = cold.snapshot()
+        assert cold_disclosures
+        assert cold_value["law_disclosures"] == list(cold_disclosures)
+
+        if persistent:
+            engine_cache._MEMORY_CACHE.clear()
+        with disclosure_scope(inherit=False) as warm:
+            warm_value = engine_cache.cached_engine_call(
+                "internal-analytical",
+                request,
+                lambda: pytest.fail("warm engine-cache call recomputed"),
+            )
+            assert warm.snapshot() == cold_disclosures
+        assert warm_value == cold_value
+
+
+def _exercise_engine_cache_memory(tmp_path, monkeypatch) -> None:
+    _exercise_engine_cache(tmp_path, monkeypatch, persistent=False)
+
+
+def _exercise_engine_cache_sqlite(tmp_path, monkeypatch) -> None:
+    _exercise_engine_cache(tmp_path, monkeypatch, persistent=True)
 
 
 def _exercise_pressure_state_cache(_tmp_path, monkeypatch) -> None:
@@ -4986,7 +5055,6 @@ def _one_internal_analytical_sossi_row(monkeypatch):
         catalog,
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="b-119-disclosure",
         engine="internal-analytical",
     )[0]
 
@@ -6639,12 +6707,15 @@ _DISCLOSURE_EXERCISERS = {
     "store:simulator/battery/residue.py:pressure_cache": _exercise_pressure_cache,
     "store:simulator/battery/residue.py:pressure_state_cache": _exercise_pressure_state_cache,
     "store:simulator/battery/score.py:residue_prediction_cache": _exercise_residue_prediction_cache,
+    "store:simulator/battery/score_run.py:residue_prediction_cache": _exercise_residue_prediction_cache,
     "store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE": (
         _exercise_melt_psat
     ),
     "store:simulator/diagnostic_helpers/kems.py:_surface_cache": (
         _exercise_kems_surface_cache
     ),
+    "store:simulator/engine_cache.py:_MEMORY_CACHE": _exercise_engine_cache_memory,
+    "sqlite:simulator/engine_cache.py:engine_outputs": _exercise_engine_cache_sqlite,
 }
 
 
