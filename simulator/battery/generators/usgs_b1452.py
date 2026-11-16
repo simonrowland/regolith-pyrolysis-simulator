@@ -127,83 +127,190 @@ B1452_ROW_POLYMORPHS = {
 B1452_FORMULA_CORRECTIONS = {
     f"{SOURCE_ID}-0368": "Ca2Mg5[Si8O22](OH)2",
 }
-_SCACCHITE_PHASE_TEXT_CORRECTIONS = (("Liqaid", "Liquid"),)
-_SULFUR_PHASE_TEXT_CORRECTIONS = (
-    ("O~tho~hombic", "Orthorhombic"),
-    ("c~ystals", "crystals"),
-)
-_NITER_PHASE_TEXT_CORRECTIONS = (
-    ("Bhoabohedral", "Rhombohedral"),
-    ("~rystals", "crystals"),
-    ("1101", "401"),
-    ("Liqlli.d", "Liquid"),
-)
 B1452_SOURCE_TEXT_CORRECTIONS = {
-    # Physical PDF p. 36 / folio 30 prints liquid silver from 1234 to 1800 K.
-    f"{SOURCE_ID}-0004-phase-02": (("LiqYid", "Liquid"),),
-    # Physical PDF p. 40 / folio 34 prints liquid gold from 1336.15 to 1800 K.
-    f"{SOURCE_ID}-0008-phase-02": (("LiquJ.d", "Liquid"),),
-    # Physical PDF p. 74 / folio 68 prints liquid lanthanum from 1193 to 1800 K.
-    f"{SOURCE_ID}-0042-phase-04": (("Liguid", "Liquid"),),
-    # Physical PDF p. 78 / folio 72 prints alpha-Mn through 980 K and beta-Mn to 1360 K.
-    f"{SOURCE_ID}-0046": (("98(J", "980"),),
-    f"{SOURCE_ID}-0046-phase-02": (("13&u", "1360"),),
-    # Physical PDF p. 89 / folio 83 prints liquid lead from 600.6 K.
-    f"{SOURCE_ID}-0057-phase-02": (("Liguid", "Liquid"),),
-    # Physical PDF p. 120 / folio 114 prints liquid yttrium from 1799 K.
-    f"{SOURCE_ID}-0088-phase-03": (("Liqu1.d", "Liquid"),),
-    # Physical PDF p. 213 / folio 207 prints liquid lead monoxide from 1170 K.
-    f"{SOURCE_ID}-0181-phase-03": (("Liguid", "Liquid"),),
-    # Physical PDF p. 319 / folio 313 prints liquid niter from 610 to 700 K.
-    f"{SOURCE_ID}-0287": _NITER_PHASE_TEXT_CORRECTIONS,
-    f"{SOURCE_ID}-0287-phase-02": _NITER_PHASE_TEXT_CORRECTIONS,
-    f"{SOURCE_ID}-0287-phase-03": _NITER_PHASE_TEXT_CORRECTIONS,
-    # PDF p. 384 / folio 378 prints the SiO2 alpha-beta transition at 844 K.
-    f"{SOURCE_ID}-0352": (("lLPBl", "ALPHA"), ("BBTl", "BETA"), ("841t", "844")),
-    # PDF p. 388 / folio 382 prints the SiO2 alpha-beta transition at 844 K.
-    f"{SOURCE_ID}-0356": ((".lLPH.l", "ALPHA"),),
-    # PDF p. 392 / folio 386 prints Eucryptite's phase names and SiO2 transition at 844 K.
-    f"{SOURCE_ID}-0360": (
-        ("81111", "844"),
-        ("cr Eucr:rptite", "alpha Eucryptite"),
-        ("Bucr:rptite", "beta Eucryptite"),
-    ),
-    # Physical PDF p. 426 / folio 420 prints liquid fluorphlogopite from 1670 K.
-    f"{SOURCE_ID}-0394": (
-        (".alting point", "melting point"),
-        ("Liq•id", "Liquid"),
-    ),
-    # PDF p. 264 prints the ilmenite melting point as 1640 K.
-    f"{SOURCE_ID}-0232": (("1&40", "1640"),),
-    f"{SOURCE_ID}-0232-phase-02": (("1&40", "1640"),),
-    # PDF p. 380 prints the wollastonite bound as 1400 K.
-    f"{SOURCE_ID}-0348": (("11t00", "1400"),),
-    # Physical PDF p. 128 / folio 122 prints the sulfur crystal ranges.
-    f"{SOURCE_ID}-0096": _SULFUR_PHASE_TEXT_CORRECTIONS,
-    f"{SOURCE_ID}-0096-phase-02": _SULFUR_PHASE_TEXT_CORRECTIONS,
-    f"{SOURCE_ID}-0096-phase-03": _SULFUR_PHASE_TEXT_CORRECTIONS,
-    # Physical PDF p. 286 / folio 280 prints liquid at and above 923 K.
-    f"{SOURCE_ID}-0254": _SCACCHITE_PHASE_TEXT_CORRECTIONS,
-    f"{SOURCE_ID}-0254-phase-02": _SCACCHITE_PHASE_TEXT_CORRECTIONS,
-    # Physical PDF p. 328 / folio 322 prints liquid from 1342 to 1700 K.
-    f"{SOURCE_ID}-0296-phase-03": (("Ligaid", "Liquid"),),
-    # Physical PDF p. 362 / folio 356 prints merwinite melting at 1848 K.
-    f"{SOURCE_ID}-0330": ((".altinq point 18118", "melting point 1848"),),
-    # Physical PDF p. 364 / folio 358 prints arcanite melting at 1727 K.
-    f"{SOURCE_ID}-0332": (("aeltiag poiat", "melting point"),),
-    # Physical PDF p. 370 prints forsterite crystals through melting at 2163 K.
-    f"{SOURCE_ID}-0338": (("298. 15", "298.15"), (".elting point", "melting point")),
-    # Physical PDF p. 386 prints diopside crystals through melting at 1664.50 K.
-    f"{SOURCE_ID}-0354": (("11:", "K"),),
-    # Physical PDF p. 396 / folio 390 prints rhodonite melting at 1564 K.
-    f"{SOURCE_ID}-0364": (("•eltiog poi.Dt 1564 lt", "melting point 1564 K"),),
-    # Physical PDF p. 425 / folio 419 prints muscovite crystals through 1500 K.
-    f"{SOURCE_ID}-0393": (("Crysta~s", "Crystals"),),
-    # The two kaliophillite records OCR the unit K as a tilde.
-    f"{SOURCE_ID}-0379": (("~", "K"),),
-    f"{SOURCE_ID}-0379-phase-02": (("~", "K"),),
-    f"{SOURCE_ID}-0380": (("~", "K"),),
-    f"{SOURCE_ID}-0380-phase-02": (("~", "K"),),
+    # Physical PDF p. 36 / folio 30.
+    f"{SOURCE_ID}-0004-phase-02": {
+        "phase_as_published": (('LiqYid', 'Liquid'),),
+    },
+    # Physical PDF p. 40 / folio 34.
+    f"{SOURCE_ID}-0008-phase-02": {
+        "phase_as_published": (('LiquJ.d', 'Liquid'),),
+    },
+    # Physical PDF p. 74 / folio 68.
+    f"{SOURCE_ID}-0042-phase-04": {
+        "phase_as_published": (('Liguid', 'Liquid'),),
+    },
+    # Physical PDF p. 78 / folio 72.
+    f"{SOURCE_ID}-0046": {
+        "phase_as_published": (('98(J', '980'),),
+    },
+    # Physical PDF p. 78 / folio 72.
+    f"{SOURCE_ID}-0046-phase-02": {
+        "phase_as_published": (('13&u', '1360'),),
+    },
+    # Physical PDF p. 89 / folio 83.
+    f"{SOURCE_ID}-0057-phase-02": {
+        "phase_as_published": (('Liguid', 'Liquid'),),
+    },
+    # Physical PDF p. 120 / folio 114.
+    f"{SOURCE_ID}-0088-phase-03": {
+        "phase_as_published": (('Liqu1.d', 'Liquid'),),
+    },
+    # Physical PDF p. 128 / folio 122.
+    f"{SOURCE_ID}-0096": {
+        "phase_as_published": (('O~tho~hombic', 'Orthorhombic'), ('c~ystals', 'crystals')),
+    },
+    # Physical PDF p. 128 / folio 122.
+    f"{SOURCE_ID}-0096-phase-02": {
+        "phase_as_published": (('O~tho~hombic', 'Orthorhombic'), ('c~ystals', 'crystals')),
+    },
+    # Physical PDF p. 128 / folio 122.
+    f"{SOURCE_ID}-0096-phase-03": {
+        "phase_as_published": (('O~tho~hombic', 'Orthorhombic'), ('c~ystals', 'crystals')),
+    },
+    # Physical PDF p. 213 / folio 207.
+    f"{SOURCE_ID}-0181-phase-03": {
+        "phase_as_published": (('Liguid', 'Liquid'),),
+    },
+    # Physical PDF p. 264 / folio 258.
+    f"{SOURCE_ID}-0232": {
+        "phase_as_published": (('1&40', '1640'),),
+    },
+    # Physical PDF p. 264 / folio 258.
+    f"{SOURCE_ID}-0232-phase-02": {
+        "phase_as_published": (('1&40', '1640'),),
+    },
+    # Physical PDF p. 286 / folio 280.
+    f"{SOURCE_ID}-0254": {
+        "phase_as_published": (('Liqaid', 'Liquid'),),
+    },
+    # Physical PDF p. 286 / folio 280.
+    f"{SOURCE_ID}-0254-phase-02": {
+        "phase_as_published": (('Liqaid', 'Liquid'),),
+    },
+    # Physical PDF p. 319 / folio 313.
+    f"{SOURCE_ID}-0287": {
+        "phase_as_published": (('Bhoabohedral', 'Rhombohedral'), ('~rystals', 'crystals'), ('1101', '401'), ('Liqlli.d', 'Liquid')),
+    },
+    # Physical PDF p. 319 / folio 313.
+    f"{SOURCE_ID}-0287-phase-02": {
+        "phase_as_published": (('Bhoabohedral', 'Rhombohedral'), ('~rystals', 'crystals'), ('1101', '401'), ('Liqlli.d', 'Liquid')),
+    },
+    # Physical PDF p. 319 / folio 313.
+    f"{SOURCE_ID}-0287-phase-03": {
+        "phase_as_published": (('Bhoabohedral', 'Rhombohedral'), ('~rystals', 'crystals'), ('1101', '401'), ('Liqlli.d', 'Liquid')),
+    },
+    # Physical PDF p. 328 / folio 322.
+    f"{SOURCE_ID}-0296-phase-03": {
+        "phase_as_published": (('Ligaid', 'Liquid'),),
+    },
+    # Physical PDF p. 346 / folio 340.
+    f"{SOURCE_ID}-0314": {
+        "name_as_published": (('KUIITI', 'Kyanite'),),
+    },
+    # Physical PDF p. 348 / folio 342.
+    f"{SOURCE_ID}-0316": {
+        "name_as_published": (('.lJDlLUSIT!', 'Andalusite'),),
+    },
+    # Physical PDF p. 350 / folio 344.
+    f"{SOURCE_ID}-0318": {
+        "name_as_published": (('SILLUliiTI', 'Sillimanite'),),
+    },
+    # Physical PDF p. 354 / folio 348.
+    f"{SOURCE_ID}-0322": {
+        "name_as_published": (('LlRNITE', 'Larnite'),),
+    },
+    # Physical PDF p. 354 / folio 348.
+    f"{SOURCE_ID}-0322-phase-02": {
+        "name_as_published": (('LlRNITE', 'Larnite'),),
+    },
+    # Physical PDF p. 354 / folio 348.
+    f"{SOURCE_ID}-0322-phase-03": {
+        "name_as_published": (('LlRNITE', 'Larnite'),),
+    },
+    # Physical PDF p. 356 / folio 350.
+    f"{SOURCE_ID}-0324": {
+        "name_as_published": (('CALCIU!I OLIVINE', 'Calcium olivine'),),
+    },
+    # Physical PDF p. 360 / folio 354.
+    f"{SOURCE_ID}-0328": {
+        "name_as_published": (('GBOSSOI.ll', 'Grossular'),),
+    },
+    # Physical PDF p. 362 / folio 356.
+    f"{SOURCE_ID}-0330": {
+        "phase_as_published": (('.altinq point 18118', 'melting point 1848'),),
+    },
+    # Physical PDF p. 364 / folio 358.
+    f"{SOURCE_ID}-0332": {
+        "phase_as_published": (('aeltiag poiat', 'melting point'),),
+    },
+    # Physical PDF p. 370 / folio 364.
+    f"{SOURCE_ID}-0338": {
+        "phase_as_published": (('298. 15', '298.15'), ('.elting point', 'melting point')),
+    },
+    # Physical PDF p. 380 / folio 374.
+    f"{SOURCE_ID}-0348": {
+        "phase_as_published": (('11t00', '1400'),),
+        "name_as_published": (("lOLLI STOll 'lB", 'Wollastonite'),),
+    },
+    # Physical PDF p. 382 / folio 376.
+    f"{SOURCE_ID}-0350": {
+        "name_as_published": (('PSBUDOiOLLlSTOIITI', 'Pseudowollastonite'),),
+    },
+    # Physical PDF p. 384 / folio 378.
+    f"{SOURCE_ID}-0352": {
+        "auxiliary_lines_as_published": (('lLPBl', 'ALPHA'), ('BBTl', 'BETA'), ('841t', '844')),
+        "name_as_published": (('Ca-ll PIBOIDB', 'Ca-Al pyroxene'),),
+    },
+    # Physical PDF p. 386 / folio 380.
+    f"{SOURCE_ID}-0354": {
+        "phase_as_published": (('11:', 'K'),),
+    },
+    # Physical PDF p. 388 / folio 382.
+    f"{SOURCE_ID}-0356": {
+        "auxiliary_lines_as_published": (('.lLPH.l', 'ALPHA'),),
+    },
+    # Physical PDF p. 392 / folio 386.
+    f"{SOURCE_ID}-0360": {
+        "phase_as_published": (('cr Eucr:rptite', 'alpha Eucryptite'), ('Bucr:rptite', 'beta Eucryptite')),
+        "auxiliary_lines_as_published": (('81111', '844'),),
+    },
+    # Physical PDF p. 394 / folio 388.
+    f"{SOURCE_ID}-0362": {
+        "name_as_published": (('CLIIOBISTATITE', 'Clinoenstatite'),),
+    },
+    # Physical PDF p. 396 / folio 390.
+    f"{SOURCE_ID}-0364": {
+        "phase_as_published": (('•eltiog poi.Dt 1564 lt', 'melting point 1564 K'),),
+    },
+    # Physical PDF p. 411 / folio 405.
+    f"{SOURCE_ID}-0379": {
+        "phase_as_published": (('~', 'K'),),
+    },
+    # Physical PDF p. 411 / folio 405.
+    f"{SOURCE_ID}-0379-phase-02": {
+        "phase_as_published": (('~', 'K'),),
+    },
+    # Physical PDF p. 412 / folio 406.
+    f"{SOURCE_ID}-0380": {
+        "phase_as_published": (('~', 'K'),),
+    },
+    # Physical PDF p. 412 / folio 406.
+    f"{SOURCE_ID}-0380-phase-02": {
+        "phase_as_published": (('~', 'K'),),
+    },
+    # Physical PDF p. 425 / folio 419.
+    f"{SOURCE_ID}-0393": {
+        "phase_as_published": (('Crysta~s', 'Crystals'),),
+    },
+    # Physical PDF p. 426 / folio 420.
+    f"{SOURCE_ID}-0394": {
+        "phase_as_published": (('.alting point', 'melting point'), ('Liq•id', 'Liquid')),
+    },
+    # Physical PDF p. 430 / folio 424.
+    f"{SOURCE_ID}-0398": {
+        "name_as_published": (('PIBOPBILLITB', 'Pyrophyllite'),),
+    },
 }
 B1452_CRYSTALLINE_PRODUCT_RECORDS = frozenset(
     {f"{SOURCE_ID}-0336", f"{SOURCE_ID}-0336-phase-02"}
@@ -1334,13 +1441,15 @@ def _normalized_phase_text(record: Mapping[str, Any]) -> str:
     text = re.sub(
         r"(?<=\d)\s+(?:K[o0]|[lI1]\.)", " K", text, flags=re.IGNORECASE
     )
-    return _corrected_source_text(record, text)
+    return _corrected_source_text(record, text, "phase_as_published")
 
 
-def _corrected_source_text(record: Mapping[str, Any], text: str) -> str:
+def _corrected_source_text(
+    record: Mapping[str, Any], text: str, field: str
+) -> str:
     for captured, printed in B1452_SOURCE_TEXT_CORRECTIONS.get(
-        str(record.get("record_id") or ""), ()
-    ):
+        str(record.get("record_id") or ""), {}
+    ).get(field, ()):
         text = text.replace(captured, printed)
     return text
 
@@ -1398,7 +1507,9 @@ def _polymorph_for_phase_window(
     override = B1452_RECORD_POLYMORPHS.get(record_id)
     if override is not None:
         return State.of(override)
-    name = str(record.get("name_as_published") or "")
+    name = _corrected_source_text(
+        record, str(record.get("name_as_published") or ""), "name_as_published"
+    )
     named = _polymorph_from_text(name)
     if named.is_value:
         return named
@@ -1545,7 +1656,9 @@ def _reference_oxide_transition(
     raw_lines = record.get("auxiliary_lines_as_published") or ()
     lines = (raw_lines,) if isinstance(raw_lines, str) else raw_lines
     for line in lines:
-        text = _corrected_source_text(record, str(line))
+        text = _corrected_source_text(
+            record, str(line), "auxiliary_lines_as_published"
+        )
         if pattern.search(text) is None:
             continue
         alpha_beta = re.search(r"\balpha\b.*?\bbeta\b", text, re.I)

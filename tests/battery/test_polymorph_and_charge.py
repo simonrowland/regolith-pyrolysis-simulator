@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import replace
 from decimal import Decimal
 
+import pytest
+
 from simulator.battery.enums import (
     IdentityEqualKind,
     Phase,
@@ -471,9 +473,11 @@ def test_tridymite_is_a_closed_polymorph_token() -> None:
     assert coerce_polymorph_token("tridymite") is Polymorph.TRIDYMITE
 
 
-def test_b1452_pyrophyllite_ocr_spelling_uses_existing_token() -> None:
-    assert POLYMORPH_ALIASES["pibopbillitb"] is Polymorph.PYROPHYLLITE
-    assert coerce_polymorph_token("PIBOPBILLITB") is Polymorph.PYROPHYLLITE
+def test_b1452_ocr_spellings_are_not_global_mineral_vocabulary() -> None:
+    for name in ("pibopbillitb", "kuiiti", ".ljdllusit!", "llrnite"):
+        assert name not in POLYMORPH_ALIASES
+        with pytest.raises(ValueError):
+            coerce_polymorph_token(name)
 
 
 def test_pseudowollastonite_token_matches_thermoengine_pwo() -> None:
