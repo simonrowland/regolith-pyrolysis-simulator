@@ -12176,6 +12176,11 @@ def test_calibration_membership_decides_only_cited_engine_source_overlap() -> No
         membership_completeness=MembershipCompleteness.COMPLETE,
     )
     complete_works = {**works, complete_melts_work.work_id: complete_melts_work}
+    complete_member_work = replace(
+        F.work("complete-melts-member-work"),
+        source_ids=complete_melts_work.source_ids,
+    )
+    complete_works[complete_member_work.work_id] = complete_member_work
     reference = F.observation(
         "complete-membership-nonmember",
         source_experiment.experiment_id,
@@ -12215,6 +12220,9 @@ def _complete_calibration_residual_case():
         ),
         membership_completeness=MembershipCompleteness.COMPLETE,
     )
+    member_work = replace(
+        F.work("calibration-member-work"), source_ids=complete_work.source_ids
+    )
     reference_work = F.work("complete-calibration-reference-work")
     reference_experiment = F.tabulation_experiment(
         experiment_id="complete-calibration-reference-exp",
@@ -12228,7 +12236,11 @@ def _complete_calibration_residual_case():
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="unlisted-melts-source",
     )
-    works = {reference_work.work_id: reference_work, complete_work.work_id: complete_work}
+    works = {
+        reference_work.work_id: reference_work,
+        complete_work.work_id: complete_work,
+        member_work.work_id: member_work,
+    }
     experiments = {reference_experiment.experiment_id: reference_experiment}
     candidate_sources = (complete_work.work_id,)
     candidate = F.observation(
@@ -12283,7 +12295,7 @@ def test_complete_calibration_ancestry_matches_score_and_residual_validation() -
     from simulator.battery.validate import _resolve_coefficient_sources
 
     (
-        melts_work,
+        _,
         complete_work,
         reference,
         candidate_sources,
@@ -12326,9 +12338,12 @@ def test_complete_calibration_ancestry_matches_score_and_residual_validation() -
     )
     assert scored_complete is True
     assert scored_lineage == validated_lineage
-    assert scored_lineage is not None and scored_lineage.ids == frozenset(
-        complete_work.source_ids
+    member_table_ids = frozenset(
+        asset.asset_id
+        for asset in works["calibration-member-work"].source_files.files
+        if asset.role.value == "table_csv"
     )
+    assert scored_lineage is not None and scored_lineage.ids == member_table_ids
     assert validate_residual(
         residual, observations, experiments, works
     ) == []
@@ -12344,25 +12359,96 @@ def test_complete_calibration_ancestry_matches_score_and_residual_validation() -
         experiments=experiments,
     ) is False
 
-    unknown_work = replace(
-        melts_work, membership_completeness=MembershipCompleteness.UNKNOWN
+
+def test_complete_calibration_member_table_overlap_is_not_independent() -> None:
+    from simulator.battery.score import _ScoringLineageResolver
+
+    (
+        _,
+        _,
+        reference,
+        candidate_sources,
+        works,
+        experiments,
+        observations,
+        residual,
+    ) = _complete_calibration_residual_case()
+    member_work = works["calibration-member-work"]
+    member_table = next(
+        asset
+        for asset in member_work.source_files.files
+        if asset.role.value == "table_csv"
     )
+    reference = replace(reference, read_from=member_table.asset_id)
+    observations = {**observations, reference.observation_id: reference}
+    context = ScoreContext(
+        works=works,
+        experiments=experiments,
+        observations=observations,
+        hostname="test",
+    )
+
+    assert _ScoringLineageResolver(context).for_reference(
+        reference, candidate_sources
+    ) == (True, SourceRelation.SAME_INPUT)
+    assert resolve_source_relation(
+        reference,
+        candidate_sources,
+        True,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    ) is SourceRelation.SAME_INPUT
+    issues = validate_residual(residual, observations, experiments, works)
+    assert any(
+        issue.path == "residual.source_relation"
+        and issue.reason is RefusalReason.CONDITIONAL_FIELD
+        for issue in issues
+    )
+
+
+def test_unknown_calibration_membership_with_registered_table_stays_unknown() -> None:
+    from simulator.battery.enums import MembershipCompleteness
+    from simulator.battery.score import _ScoringLineageResolver, lineage_complete_for
+
+    (
+        _,
+        complete_work,
+        reference,
+        candidate_sources,
+        works,
+        experiments,
+        observations,
+        residual,
+    ) = _complete_calibration_residual_case()
+    unknown_work = replace(
+        complete_work, membership_completeness=MembershipCompleteness.UNKNOWN
+    )
+    assert unknown_work.has_complete_membership_evidence
+    assert unknown_work.is_calibration_membership
     unknown_works = {**works, unknown_work.work_id: unknown_work}
-    unknown_context = ScoreContext(
+    context = ScoreContext(
         works=unknown_works,
         experiments=experiments,
         observations=observations,
         hostname="test",
     )
+
     assert lineage_complete_for(
         candidate_sources,
         works=unknown_works,
         observations=observations,
         experiments=experiments,
     ) is False
-    assert _ScoringLineageResolver(unknown_context).for_reference(
+    assert _ScoringLineageResolver(context).for_reference(
         reference, candidate_sources
     ) == (False, SourceRelation.UNKNOWN)
+    issues = validate_residual(residual, observations, experiments, unknown_works)
+    assert any(
+        issue.path == "residual.source_relation"
+        and issue.reason is RefusalReason.LINEAGE_UNKNOWN
+        for issue in issues
+    )
 
 
 def test_complete_calibration_residual_validates_with_shared_ancestry() -> None:

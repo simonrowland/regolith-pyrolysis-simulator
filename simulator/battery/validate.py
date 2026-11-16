@@ -2159,14 +2159,6 @@ def _calibration_membership_relation(
         for work in calibration_works
     ):
         return SourceRelation.TRAINING
-    if any(
-        work.membership_completeness is not MembershipCompleteness.COMPLETE
-        or not work.has_complete_membership_evidence
-        for work in calibration_works
-    ):
-        return SourceRelation.UNKNOWN
-    if len(calibration_works) == len(coefficient_sources):
-        return SourceRelation.INDEPENDENT
     return None
 
 
@@ -2319,15 +2311,49 @@ def _resolve_coefficient_sources(
                 indexes.coefficient_source_lineages[source_key] = result
                 return result
             if work.is_calibration_membership:
-                nested = (
-                    Ancestry.of(work.source_ids)
-                    if work.membership_completeness
-                    is MembershipCompleteness.COMPLETE
-                    and work.has_complete_membership_evidence
-                    else Ancestry.incomplete(
+                if (
+                    work.membership_completeness
+                    is not MembershipCompleteness.COMPLETE
+                    or not work.has_complete_membership_evidence
+                ):
+                    nested = Ancestry.incomplete(
                         AncestryFailure.UNRESOLVABLE_INPUT
                     )
-                )
+                else:
+                    member_ids: set[str] = set()
+                    for member_source in work.source_ids:
+                        member_work = indexes.work_by_alias.get(member_source)
+                        if member_work is None:
+                            nested = Ancestry.incomplete(
+                                AncestryFailure.UNKNOWN_ALIAS
+                            )
+                            break
+                        if member_work.is_calibration_membership:
+                            nested = Ancestry.incomplete(
+                                AncestryFailure.UNRESOLVABLE_INPUT
+                            )
+                            break
+                        member_lineage = _inputs_registered_under_work(
+                            member_work,
+                            observations,
+                            experiments,
+                            indexes.table_ids,
+                            indexes.asset_ids,
+                            _indexes=indexes,
+                        )
+                        if not member_lineage.complete:
+                            nested = member_lineage
+                            break
+                        assert member_lineage.ids is not None
+                        member_ids |= set(member_lineage.ids)
+                    else:
+                        nested = (
+                            Ancestry.of(member_ids)
+                            if member_ids
+                            else Ancestry.incomplete(
+                                AncestryFailure.UNRESOLVABLE_INPUT
+                            )
+                        )
             else:
                 nested = _inputs_registered_under_work(
                     work,

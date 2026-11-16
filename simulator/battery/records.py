@@ -1399,10 +1399,11 @@ class Work:
 
     @property
     def is_calibration_membership(self) -> bool:
-        """Identify Works with a declared list or its empty, typed-unknown state."""
+        """Identify calibration Works, including nonempty typed-unknown membership."""
 
         return (
-            not self.source_ids
+            self.work_id.startswith("engine-calibration-")
+            or not self.source_ids
             or self.membership_completeness is not MembershipCompleteness.UNKNOWN
         )
 
