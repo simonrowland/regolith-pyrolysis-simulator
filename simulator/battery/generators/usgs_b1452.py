@@ -123,12 +123,47 @@ B1452_ROW_POLYMORPHS = {
         "KALIOPHILLITE $KAlSiO_{4}$",
     ): Polymorph.KALIOPHILLITE_LOW,
 }
+# The OCR formula on the tremolite table is recoverable from its rendered page.
+B1452_FORMULA_CORRECTIONS = {
+    f"{SOURCE_ID}-0368": "Ca2Mg5[Si8O22](OH)2",
+}
+_SCACCHITE_PHASE_TEXT_CORRECTIONS = (("Liqaid", "Liquid"),)
+_SULFUR_PHASE_TEXT_CORRECTIONS = (
+    ("O~tho~hombic", "Orthorhombic"),
+    ("c~ystals", "crystals"),
+)
 B1452_PHASE_TEXT_CORRECTIONS = {
     # PDF p. 264 prints the ilmenite melting point as 1640 K.
     f"{SOURCE_ID}-0232": (("1&40", "1640"),),
     f"{SOURCE_ID}-0232-phase-02": (("1&40", "1640"),),
     # PDF p. 380 prints the wollastonite bound as 1400 K.
     f"{SOURCE_ID}-0348": (("11t00", "1400"),),
+    # Physical PDF p. 128 / folio 122 prints the sulfur crystal ranges.
+    f"{SOURCE_ID}-0096": _SULFUR_PHASE_TEXT_CORRECTIONS,
+    f"{SOURCE_ID}-0096-phase-02": _SULFUR_PHASE_TEXT_CORRECTIONS,
+    f"{SOURCE_ID}-0096-phase-03": _SULFUR_PHASE_TEXT_CORRECTIONS,
+    # Physical PDF p. 286 / folio 280 prints liquid at and above 923 K.
+    f"{SOURCE_ID}-0254": _SCACCHITE_PHASE_TEXT_CORRECTIONS,
+    f"{SOURCE_ID}-0254-phase-02": _SCACCHITE_PHASE_TEXT_CORRECTIONS,
+    # Physical PDF p. 328 / folio 322 prints liquid from 1342 to 1700 K.
+    f"{SOURCE_ID}-0296-phase-03": (("Ligaid", "Liquid"),),
+    # Physical PDF p. 362 / folio 356 prints merwinite melting at 1848 K.
+    f"{SOURCE_ID}-0330": ((".altinq point 18118", "melting point 1848"),),
+    # Physical PDF p. 364 / folio 358 prints arcanite melting at 1727 K.
+    f"{SOURCE_ID}-0332": (("aeltiag poiat", "melting point"),),
+    # Physical PDF p. 370 prints forsterite crystals through melting at 2163 K.
+    f"{SOURCE_ID}-0338": (("298. 15", "298.15"), (".elting point", "melting point")),
+    # Physical PDF p. 386 prints diopside crystals through melting at 1664.50 K.
+    f"{SOURCE_ID}-0354": (("11:", "K"),),
+    # Physical PDF p. 396 / folio 390 prints rhodonite melting at 1564 K.
+    f"{SOURCE_ID}-0364": (("•eltiog poi.Dt 1564 lt", "melting point 1564 K"),),
+    # Physical PDF p. 392 / folio 386 prints alpha- and beta-eucryptite.
+    f"{SOURCE_ID}-0360": (
+        ("cr Eucr:rptite", "alpha Eucryptite"),
+        ("Bucr:rptite", "beta Eucryptite"),
+    ),
+    # Physical PDF p. 425 / folio 419 prints muscovite crystals through 1500 K.
+    f"{SOURCE_ID}-0393": (("Crysta~s", "Crystals"),),
     # The two kaliophillite records OCR the unit K as a tilde.
     f"{SOURCE_ID}-0379": (("~", "K"),),
     f"{SOURCE_ID}-0379-phase-02": (("~", "K"),),
@@ -138,7 +173,6 @@ B1452_PHASE_TEXT_CORRECTIONS = {
 B1452_CRYSTALLINE_PRODUCT_RECORDS = frozenset(
     {f"{SOURCE_ID}-0336", f"{SOURCE_ID}-0336-phase-02"}
 )
-
 # Page-header units. Captured units_as_published on B1452 are OCR-destroyed
 # (J/aol•K, kJ/1101, …). Never map a stored unit from the captured string.
 HT_PAGE_UNITS = {
@@ -1138,6 +1172,30 @@ def _resolve_formula(
         "formula_weight_index": fw_indexed,
         "name_embedded": embedded,
     }
+    corrected_formula = B1452_FORMULA_CORRECTIONS.get(
+        str(record.get("record_id") or "")
+    )
+    if corrected_formula is not None:
+        consulted["printed_formula_correction"] = (
+            "physical PDF p. 400 / folio 394"
+        )
+        fw_value = _formula_weight_decimal(fw_text)
+        if fw_value is not None and not _mass_matches_formula_weight(
+            corrected_formula, fw_value
+        ):
+            return FormulaResolution(
+                None,
+                None,
+                consulted,
+                _consulted_formula_reason(
+                    consulted,
+                    prefix=FORMULA_CONFLICT_REASON_PREFIX,
+                    extra=f"corrected formula {corrected_formula} conflicts with formula weight",
+                ),
+            )
+        return FormulaResolution(
+            corrected_formula, "printed_formula_ocr", consulted, None
+        )
     candidates: list[tuple[str, str]] = []
     if embedded:
         candidates.append((embedded, "name_embedded"))
@@ -1346,18 +1404,23 @@ def _phase_state(
         and "pseudowollastonite is the stable phase" in text.lower()
     ):
         return State.of(Phase.CR), State.of(Polymorph.PSEUDOWOLLASTONITE)
-    window = phase_window_at(temperature, windows)
+    segment = record.get("phase_segment")
+    segment_ordinal = (
+        segment.get("ordinal") if isinstance(segment, Mapping) else None
+    )
+    if not isinstance(segment_ordinal, int):
+        segment_ordinal = None
+    window = phase_window_at(
+        temperature, windows, segment_ordinal=segment_ordinal
+    )
     if window is None:
         reason = (
-            f"{record_id}: {temperature} K is outside every printed phase window"
+            f"{record_id}: {temperature} K has no uniquely assignable printed phase window"
         )
         return State.unknown(reason), State.unknown(reason)
 
     phase = phase_of_label(window.label)
-    if (
-        phase.is_unknown
-        and record_id in B1452_RECORD_POLYMORPHS
-    ):
+    if phase.is_unknown and _polymorph_for_phase_window(record, window.label).is_value:
         phase = State.of(Phase.CR)
     if not phase.is_value:
         return phase, State.unknown(phase.reason or "printed phase is unresolved")
@@ -1412,8 +1475,10 @@ B1452_OXIDE_POLYMORPH_NAMES = {
     "MgO": "periclase",
     "TiO2": "rutile",
     "FeO": "wustite",
+    # Physical PDF p. 419 / folio 413 places Na2O's melting point at 1193 K.
+    "Na2O": "crystalline",
 }
-_OXIDE_REFERENCE_FORMULAS = frozenset((*B1452_OXIDE_POLYMORPH_NAMES, "H2O"))
+_OXIDE_REFERENCE_FORMULAS = frozenset((*B1452_OXIDE_POLYMORPH_NAMES, "K2O", "H2O"))
 _OXIDE_TRANSITION_FORMULAS = {
     "Al2O3": re.compile(r"\bAl\s*2\s*[O0]\s*3\b", re.I),
     "SiO2": re.compile(r"\bSi\s*[O0]\s*2\b", re.I),
@@ -1421,6 +1486,8 @@ _OXIDE_TRANSITION_FORMULAS = {
     "MgO": re.compile(r"\bMg\s*[O0]\b", re.I),
     "TiO2": re.compile(r"\bTi\s*[O0]\s*2\b", re.I),
     "FeO": re.compile(r"\bFe\s*[O0]\b", re.I),
+    "Na2O": re.compile(r"\bNa\s*2\s*[O0]\b", re.I),
+    "K2O": re.compile(r"\bK\s*2\s*[O0]\b", re.I),
     "H2O": re.compile(r"\bH\s*2\s*[O0]\b", re.I),
 }
 
@@ -1443,6 +1510,8 @@ def _reference_oxide_transition(
             kind = "melting"
         elif re.search(r"\bb\s*\.?\s*p\s*\.?", text, re.I):
             kind = "boiling"
+        elif re.search(r"(?:decomposes|decoiipos!s)\s+above\b", text, re.I):
+            kind = "decomposition"
         else:
             continue
         numbers = re.findall(r"(?<![\w.])\d+(?:\.\s*\d+)?", text)
@@ -1489,6 +1558,14 @@ def _oxide_species(
             return make_species(
                 formula, Phase.L, State.not_applicable("not crystal"), charge=0
             )
+        if kind == "decomposition" and temperature > boundary:
+            reason = f"{formula} decomposes above {boundary} K in the printed reference oxide state"
+            return make_species(
+                formula,
+                State.unknown(reason),
+                State.unknown(reason),
+                charge=0,
+            )
         if kind == "alpha_beta":
             transition_polymorph = (
                 Polymorph.ALPHA_QUARTZ
@@ -1498,17 +1575,9 @@ def _oxide_species(
             return make_species(
                 formula, Phase.CR, State.of(transition_polymorph), charge=0
             )
-    if temperature == REFERENCE_TEMPERATURE_K:
-        return make_species(formula, phase, polymorph, charge=0)
-
-    reason = (
-        f"{record.get('record_id')}: source does not state the "
-        f"{formula} reference-oxide "
-        f"phase at {temperature} K"
-    )
-    return make_species(
-        formula, State.unknown(reason), State.unknown(reason), charge=0
-    )
+    # Without a printed transition, B1452 keeps the oxide's named reference
+    # phase throughout the table's stated temperature range.
+    return make_species(formula, phase, polymorph, charge=0)
 
 
 def _formation_identity(

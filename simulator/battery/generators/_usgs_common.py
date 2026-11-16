@@ -82,6 +82,14 @@ def phase_of_label(label: str) -> State[Phase]:
     return State.of(hits[0])
 
 
+def _matching_phase_windows(
+    temperature: Decimal, windows: tuple[PhaseWindow, ...]
+) -> tuple[PhaseWindow, ...]:
+    return tuple(
+        window for window in windows if window.lo <= temperature <= window.hi
+    )
+
+
 def assign_phase_windows(
     temperatures: list[Decimal], windows: tuple[PhaseWindow, ...]
 ) -> list[PhaseWindow | None]:
@@ -90,7 +98,7 @@ def assign_phase_windows(
     seen: dict[Decimal, int] = {}
     assigned: list[PhaseWindow | None] = []
     for temperature in temperatures:
-        hits = [window for window in windows if window.lo <= temperature <= window.hi]
+        hits = _matching_phase_windows(temperature, windows)
         occurrence = seen.get(temperature, 0)
         seen[temperature] = occurrence + 1
         if len(hits) == 1:
@@ -103,12 +111,20 @@ def assign_phase_windows(
 
 
 def phase_window_at(
-    temperature: Decimal, windows: tuple[PhaseWindow, ...]
+    temperature: Decimal,
+    windows: tuple[PhaseWindow, ...],
+    *,
+    segment_ordinal: int | None = None,
 ) -> PhaseWindow | None:
-    """Select the first printed window at a shared boundary temperature."""
+    """Select a printed window, using the source segment at duplicate bounds."""
 
+    hits = _matching_phase_windows(temperature, windows)
+    if len(hits) < 2:
+        return hits[0] if hits else None
+    if segment_ordinal is None:
+        return None
     return next(
-        (window for window in windows if window.lo <= temperature <= window.hi),
+        (window for window in hits if window.index + 1 == segment_ordinal),
         None,
     )
 
