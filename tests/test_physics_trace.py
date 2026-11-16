@@ -197,11 +197,13 @@ def test_snapshot_deltas_sum_to_cumulative_trace_totals():
 def test_wall_zone_map_covers_every_declared_wall_and_booking_candidate(route):
     sim = _representative_sim(hours=0)
     model = sim.condensation_model
-    model.train.collection_route["stage3_route"] = route
+    sim.campaign_mgr.overrides.setdefault(sim.melt.campaign.name, {})["stage3_route"] = route
+    sim.campaign_mgr.apply_collection_route(sim.melt, sim.train)
     model.configure_operating_conditions()
     active = {segment.name for segment in model.active_pipe_segments}
     declared_segments = set(PIPE_SEGMENT_NAMES)
     assert active <= declared_segments
+    assert {segment.name for segment in model.pipe_segments} | {STAGE3_BYPASS_SEGMENT_NAME} == declared_segments
     assert (STAGE3_BYPASS_SEGMENT_NAME in active) == (route == "divert")
     assert all(segment.length_m > 0 for segment in model.active_pipe_segments)
     refusal_authority = {

@@ -13653,6 +13653,11 @@ def test_source_carrier_refusal_requires_a_complete_supply_booking(
         assert summary["wall_deposit_total_kg"] is None
         assert species in summary["wall_deposit_refusal"]["authority"]["refused_carrier_species"]
         assert authority[SUPPLY_UNAVAILABLE][species] == ["no_flux_law_and_no_psat"]
+        constraints = physics_module.PhysicsConstraintSet(active_gates=("coating",))
+        margin = constraints.coating(_trace_with_optimizer_coating_report(execution, constraints))
+        assert margin.status == "unavailable"
+        assert margin.observed is None
+        assert objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT not in margin.status_payload
     else:
         bound = _optimizer_refused_flux_bounds((snapshot,), (species,), campaigns_elapsed=1.0)
         booking, = summary["wall_supply_bound_bookings"]
@@ -13749,6 +13754,13 @@ def test_unlocated_bound_closed_form_limits_and_declared_universe() -> None:
     assert one["worst_max_load_kg"] == existing[segments[0]] + bound
     assert one["segment_loads_kg"] == existing
     assert one["segment_by_species"] == {}
+    for segment in segments:
+        assignment = objective_module._assign_refused_supplies_at_binding_load(
+            {segment: existing[segments[0]]}, {"CrO2": bound}, {},
+        )
+        assert set(assignment["closed_form_kg"]) == set(segments)
+        assert assignment["binding_segment"] == segment
+        assert assignment["worst_max_load_kg"] == one["worst_max_load_kg"]
 
 
 @pytest.fixture(scope="module")

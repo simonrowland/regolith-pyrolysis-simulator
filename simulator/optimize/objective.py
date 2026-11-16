@@ -5752,6 +5752,7 @@ def _assign_refused_supplies_at_binding_load(
         "segment_loads_kg": segment_loads,
         "closed_form_kg": closed_form,
         "worst_max_load_kg": closed_form[binding_segment],
+        "unlocated_bound_kg": unlocated_bound,
         "unlocated_supply_kg_by_species": unlocated_supply,
     }
 
@@ -5946,7 +5947,7 @@ def _book_wall_deposits_at_vapour_supply(
             if zones is None or segment not in zones:
                 raise ObjectiveComputationError(f"missing wall zone for segment {segment}")
             notice_authority[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] = {
-                "bound_kg": sum(unlocated.values()),
+                "bound_kg": assignment["unlocated_bound_kg"],
                 "supply_kg_by_species": unlocated,
                 "governing_segment": segment,
                 "governing_zone": zones[segment],
