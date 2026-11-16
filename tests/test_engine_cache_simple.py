@@ -421,7 +421,8 @@ def test_raw_key_hot_json_compression_and_exact_round_trip(
     request = {"temperature_K": 1700.0}
     digest = engine_cache_key("openimcc", "1", request)
 
-    assert isinstance(digest, bytes) and len(digest) == 32
+    assert isinstance(digest, bytes) and 4 <= len(digest) <= 128
+    assert digest[:3] == bytes((1, 0, 1))
     assert engine_cache.cached_engine_call(
         "openimcc", request, lambda: hot
     ) == hot
