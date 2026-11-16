@@ -5105,38 +5105,114 @@ def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
     assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
 
 
-def test_comparison_ratio_does_not_flag_unverified_activity_coefficient_regime() -> None:
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
+    quantity: Quantity,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_stratum_payloads,
+        flagged_stratum_rows,
+        flagged_strata,
+        headline_payloads,
+        headline_rows,
+    )
+
     identity = replace(
         F.activity_identity(formula="NaO0.5"),
-        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        quantity=quantity,
     )
     experiment = F.kems_experiment(
-        orifice_area=Decimal("3.14e-7"),
-        clausing=Decimal("0.9"),
+        orifice_area=None,
+        clausing=None,
         kn=None,
         calibrated=True,
     )
-    reference = replace(
-        F.observation(
-            "comparison-activity-coefficient-unverified-regime",
-            experiment.experiment_id,
-            identity,
-            Decimal("0.2"),
-            evidence=EvidenceClass.MEASURED_DIRECT,
-        ),
-        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+    reference = F.observation(
+        "comparison-activity-coefficient-unverified-regime",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
     )
 
-    residual, _candidate = _compile(
+    gates = run_validity_gates(experiment, reference)
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _candidate = compile_residual(
         reference,
-        experiment,
-        _predict(Decimal("0.2"), identity),
-        review="reviewed",
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={reference.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
     )
 
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.score_eligible is False
+    assert residual.refusal is None
+    apparatus_notices = [
+        item
+        for item in residual.notices
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+    ]
+    assert any(
+        item.reason.startswith("apparatus_unverified:in_cell_partial_pressure_sum")
+        for item in apparatus_notices
+    )
+    assert any(
+        item.reason == "apparatus_unverified:geometry_determinants"
+        for item in apparatus_notices
+    )
+    assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in flagged_strata(
+        residual.notices
+    )
+    assert headline_rows(
+        (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 0
+    assert {
+        row["stratum"]: row["n"]
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
+    payload = residual_to_plain(residual)
+    for tier in ("measured", "compilation"):
+        assert headline_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+        )[0]["n"] == 0
+    assert {
+        row["stratum"]: row["n"]
+        for row in flagged_stratum_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,)
+        )
+    }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
+
+    valueless = replace(
+        reference,
+        value=Value(
+            kind=ValueKind.UNAVAILABLE, unavailable_reason="no printed value"
+        ),
+    )
+    refused, _candidate = compile_residual(
+        valueless,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, valueless, review="reviewed"),
+        comparison_ids={valueless.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+    )
+    assert refused.status is ResidualStatus.REFUSED
+    assert refused.numeric is None
+    assert refused.refusal is not None
+    assert refused.refusal.reason is RefusalReason.METRIC_DOMAIN
 
 
 @pytest.mark.parametrize(
@@ -5214,8 +5290,15 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
     )
 
 
-def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> None:
-    identity = F.activity_identity(formula="NaO0.5")
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_pressure_sum_over_limit_still_refuses(
+    quantity: Quantity,
+) -> None:
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"), quantity=quantity
+    )
     experiment = F.kems_experiment(
         orifice_area=None, clausing=None, kn=None, calibrated=False
     )
@@ -18401,8 +18484,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             if row.reference not in class_s_activity_refs
         )
         assert any(
-            row.refusal is not None
-            and row.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            score_module.FLAGGED_STRATUM_UNVERIFIED_APPARATUS
+            in score_module.flagged_strata(row.notices)
             for row in activity_rows
         )
         assert all(not row.score_eligible for row in stolyarova_rows)

@@ -75,6 +75,8 @@ from simulator.reference_data.janaf import formula_composition
 from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
+KEMS_GEOMETRY_FACTS = ("orifice_area_m2", "clausing_factor")
+
 # KEMS equilibrium background ceiling (Pa). This remains a separate signal
 # quality check; it does not determine the in-cell effusion regime.
 KEMS_BACKGROUND_HIGH_PA = Decimal("1e-2")
@@ -585,7 +587,7 @@ def underdetermined_apparatus(
                 )
             )
         elif geometry is None:
-            missing.extend(["orifice_area_m2", "clausing_factor"])
+            missing.extend(KEMS_GEOMETRY_FACTS)
         else:
             if (
                 _finite_positive(geometry.orifice_area_m2) is None
