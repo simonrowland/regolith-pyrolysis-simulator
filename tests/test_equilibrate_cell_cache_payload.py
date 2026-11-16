@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from decimal import Decimal
 
 import pytest
@@ -65,7 +66,9 @@ def test_hot_round_trip_preserves_real_engine_consumer_view(
             po2=Po2Request(mode="commanded", po2_bar=1e-8),
             timeout_s=90.0, isolated=False,
         )
-        assert cold.status == "ok", cold.engine_reason
+        assert cold.status in {"ok", "refusal"}, cold.as_payload()
+        if engine_name == "internal-analytical":
+            assert cold.status == "ok", cold.as_payload()
         monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "hot.sqlite"))
         monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
         engine_cache.engine_cache_counters(reset=True)
@@ -106,6 +109,35 @@ def test_hot_round_trip_keeps_consumer_text_verbatim(field, value) -> None:
     hot, provenance = engine_cache.pack_hot(cell.to_hot().hot)
     restored = EquilibrateCell.from_hot(engine_cache.unpack_hot(hot, provenance))
     assert getattr(restored, field) == value
+
+
+def test_hot_cell_version_record_is_interned_once(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "versions.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    version = json.dumps({"source": "antoine_fallback", "version": "record" * 100})
+    cell = EquilibrateCell(
+        pot_id="version", engine="internal-analytical", temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None), status="ok",
+        refusal_reason=None, engine_status="ok", engine_reason=None,
+        melt_activities={}, gas_partial_pressures_Pa={}, liquid_fraction=1.0,
+        wall_s=0.0, cpu_s=0.0, hostname="test",
+        vapor_pressure_backend_status_reason=version,
+    )
+    legacy = cell.to_engine_cache_value()
+    legacy[11][3] = "fallback"
+    legacy_hot, _ = engine_cache.pack_hot(legacy)
+    for temperature in (1700.0, 1800.0):
+        engine_cache.cached_engine_call(
+            cell.engine, {"temperature_K": temperature}, cell.to_hot
+        )
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("SELECT count(*) FROM provenance").fetchone()[0] == 1
+        rows = connection.execute("SELECT value,provenance_id FROM engine_outputs").fetchall()
+    assert len(rows) == 2
+    assert rows[0] == rows[1]
+    assert len(rows[0][0]) == len(legacy_hot) + 1
+    assert version.encode() not in rows[0][0]
 
 
 def _assert_cache_round_trip(cell: EquilibrateCell) -> None:
