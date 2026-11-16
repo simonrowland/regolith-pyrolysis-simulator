@@ -1969,6 +1969,37 @@ def test_measured_zero_alias_conflicts_with_a_positive_alias() -> None:
     assert not _coating_wall_deposit_selection(zero_vs_zero)[1]
 
 
+@pytest.mark.parametrize("species_list", [False, True])
+def test_species_only_wall_pressure_refusal_survives_normalization(species_list):
+    from simulator.config import DEFAULT_DATA_DIR
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    catalog = load_cached_safe_yaml(
+        (DEFAULT_DATA_DIR / "species_catalog.yaml").read_text(encoding="utf-8")
+    )
+    for row in catalog["species"]:
+        species = row["id"]
+        notice = {
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": (
+                [species] if species_list else species
+            ),
+        }
+        authority = wall_deposit_sticking_authority_status({}, notice)
+        if row.get("direct_vapour_flux") is False:
+            assert species not in authority.get(
+                "wall_saturation_pressure_refused_species", (),
+            )
+            continue
+        for _ in range(2):
+            assert authority["wall_saturation_pressure_refused_species"] == [species]
+            assert authority["wall_saturation_pressure_refusals_by_species"] == {
+                species: {},
+            }
+            assert authority["authoritative_for_deposit_mass"] is False
+            authority = wall_deposit_sticking_authority_status({}, authority)
+
+
 @pytest.mark.parametrize("species", ["Cr2O3_gas", "CrO"])
 def test_wall_supply_refusal_uses_catalog_direct_flux_declaration(species):
     from simulator.config import DEFAULT_DATA_DIR

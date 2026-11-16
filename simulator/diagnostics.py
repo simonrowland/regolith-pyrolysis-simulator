@@ -336,6 +336,11 @@ def wall_deposit_sticking_authority_status(
         str(row["id"]) for row in catalog["species"]
         if row.get("direct_vapour_flux") is False
     }
+    saturation_pressure_refusals = {
+        species: records
+        for species, records in saturation_pressure_refusals.items()
+        if species not in non_supply_species
+    }
     carrier_species = tuple(sorted(
         (
             set(deposited_species)
@@ -1142,10 +1147,17 @@ def _alpha_provenance_by_species(
 def _wall_saturation_pressure_refusals_by_species(
     alpha_notice: Mapping[str, Any],
 ) -> dict[str, dict[str, Any]]:
+    # A species-only refusal has no wall location. Preserve it for d-430's
+    # unlocated supply bound without inventing a physical segment.
+    species_only = alpha_notice.get("wall_saturation_pressure_refused_species", ())
+    if isinstance(species_only, str):
+        species_only = (species_only,)
+    refusals: dict[str, dict[str, Any]] = {}
+    if isinstance(species_only, (tuple, list, set, frozenset)):
+        refusals = {str(species): {} for species in species_only if str(species)}
     raw = alpha_notice.get("wall_saturation_pressure_refusals_by_species")
     if not isinstance(raw, Mapping):
-        return {}
-    refusals: dict[str, dict[str, Any]] = {}
+        return refusals
     for species, by_segment in raw.items():
         if not isinstance(by_segment, Mapping):
             continue
@@ -1770,7 +1782,9 @@ def pressure_coating_pareto_diagnostic(
         if name in wall_refusals:
             by_species[name] = {
                 "status": "unavailable",
-                "reason": next(iter(wall_refusals[name].values()))["reason"],
+                "reason": next(iter(wall_refusals[name].values()), {}).get(
+                    "reason", WALL_SATURATION_PRESSURE_REFUSED_CODE,
+                ),
                 "current_wall_deposit_flux_kg_hr": None,
                 "cumulative_wall_deposit_kg": None,
                 "wall_saturation_pressure_refusals": wall_refusals[name],

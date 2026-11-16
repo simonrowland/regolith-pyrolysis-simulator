@@ -580,6 +580,15 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
     assert label["canonical"]["certification_allowed"] is False
     assert label["alpha_ceiling_species"] == ["Ca", "Ti"]
 
+    sim.condensation_model.last_sticking_alpha_provenance_notice = {
+        "wall_saturation_pressure_refused_species": ["CrO2"],
+    }
+    unlocated = pressure_coating_pareto_diagnostic(sim, target_species=("CrO2",))
+    refused = unlocated["by_species"]["CrO2"]
+    assert refused["status"] == "unavailable"
+    assert refused["reason"] == "wall_deposit_saturation_pressure_refused"
+    assert refused["wall_saturation_pressure_refusals"] == {}
+
 
 @pytest.mark.parametrize("species", ("Ca", "Ti"))
 def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
