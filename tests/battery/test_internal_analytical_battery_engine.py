@@ -140,6 +140,46 @@ def test_internal_analytical_low_temperature_result_ignores_prior_core_diagnosti
     )
 
 
+def test_internal_analytical_oxygen_balance_uses_configured_pack(monkeypatch) -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    created: list[tuple[str, str | None]] = []
+
+    class OpenImccBackendStub:
+        def __init__(self, engine_name: str, *, pack_name: str | None = None) -> None:
+            created.append((engine_name, pack_name))
+            self.pack_name = pack_name
+
+    seen: dict[str, object] = {}
+
+    def capture_adapter(**kwargs):
+        seen.update(kwargs)
+        return SimpleNamespace(status="ok")
+
+    monkeypatch.setattr(battery, "_OpenImccBatteryBackend", OpenImccBackendStub)
+    monkeypatch.setattr(
+        battery, "_internal_analytical_vapor_pressure_adapter", capture_adapter
+    )
+    backend = battery._InternalAnalyticalBatteryBackend(
+        oxygen_balance_pack="non-default-oxygen-pack"
+    )
+
+    backend.equilibrate(
+        temperature_C=1200.0,
+        po2_request=battery.Po2Request(
+            mode=battery.PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=1.0e-6,
+        ),
+    )
+
+    assert created == [("openimcc", "non-default-oxygen-pack")]
+    assert getattr(seen["oxygen_balance_backend"], "pack_name") == (
+        "non-default-oxygen-pack"
+    )
+
+
 def test_internal_analytical_battery_results_are_independent_of_request_order() -> None:
     """Every request keeps its full result across low-T, normal, and CO2 paths."""
     from copy import deepcopy

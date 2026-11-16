@@ -17,6 +17,7 @@ import yaml
 import scripts.grid_pregrind as grid_pregrind
 import scripts.grid_pregrind_writer as grid_pregrind_writer
 import simulator.melt_backend.vaporock as vaporock_module
+from tests._plugins.time_isolation import patch_module_time
 from scripts.grid_pregrind import (
     DEFAULT_FEEDSTOCKS,
     build_grid_points,
@@ -748,7 +749,9 @@ def test_grind_positive_subthreshold_component_is_not_refused(monkeypatch):
 
 
 def test_worker_failure_output_records_positive_wall_time(monkeypatch):
-    monkeypatch.setattr(grid_pregrind.time, "monotonic", lambda: 15.25)
+    patch_module_time(
+        monkeypatch, grid_pregrind, monotonic=lambda: 15.25
+    )
 
     output = grid_pregrind._worker_failure_output(
         RuntimeError("synthetic failure"),

@@ -243,6 +243,14 @@ def magemin_openmpi_tmpdir(
 
 
 @pytest.fixture(autouse=True)
+def _box_for_test_owned_engine_caches(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Only a test's explicit temporary cache may serve or store its doubles."""
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+
+
+@pytest.fixture(autouse=True)
 def _isolate_vapor_payload_cache_between_tests():
     module = sys.modules.get("engines.builtin.foulant_disposition")
     if module is not None:

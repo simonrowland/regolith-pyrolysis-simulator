@@ -15,11 +15,14 @@ from simulator.battery.enums import (
     Authority,
     CellMaterial,
     Engine,
+    EvidenceClass,
     ExecutionState,
     FO2Channel,
     Fo2Mode,
     MethodToken,
     NoticeKind,
+    PerBasis,
+    Phase,
     Quantity,
     Rail,
     RefusalReason,
@@ -27,7 +30,6 @@ from simulator.battery.enums import (
 )
 from simulator.battery.fo2_ladder import (
     ResolvedFo2,
-    fo2_tier_notice,
     resolve_row_fo2,
 )
 from simulator.battery.records import (
@@ -72,6 +74,20 @@ _COMPARABLE = (
     "openimcc",
     "internal-analytical",
 )
+
+
+def _fo2_input(resolved):
+    if resolved is None:
+        return None
+    return (
+        resolved.route,
+        resolved.tier,
+        resolved.physics_rung,
+        resolved.po2_bar,
+        resolved.closure,
+        resolved.cell_material,
+        None if resolved.closure else resolved.log10_fO2_bar,
+    )
 
 
 def test_fo2_ladder_and_migrate_share_redox_fields_in_fresh_interpreter() -> None:
@@ -157,6 +173,89 @@ def test_tier1_printed_log_is_bit_identical_on_every_engine() -> None:
     assert payload["fO2_borrowed"] is False
 
 
+def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
+    experiment, bench, observation = _feo_case(
+        oxygen=Decimal("-9"),
+        pressure=Value.point_of(Decimal("0.001")),
+    )
+    observation = replace(
+        observation,
+        source_id=experiment.work_id,
+        evidence=replace(
+            observation.evidence,
+            class_=State.of(EvidenceClass.MEASURED_DIRECT),
+        ),
+        identity=replace(
+            observation.identity,
+            per=State.of(PerBasis.DIMENSIONLESS),
+        ),
+    )
+    context = ScoreContext(
+        works={experiment.work_id: F.work(experiment.work_id)},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={experiment.work_id: "reviewed"},
+        hostname="test",
+        benches={bench.id: bench},
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    shared, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+    intrinsic, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+    )
+
+    assert shared.numeric is not None, shared.refusal
+    assert intrinsic.numeric is not None, intrinsic.refusal
+    assert shared.fo2_mode is Fo2Mode.SHARED_LADDER
+    assert intrinsic.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
+    assert shared.key != intrinsic.key
+    assert any(
+        notice.fo2_mode is Fo2Mode.SHARED_LADDER for notice in shared.notices
+    )
+    assert any(
+        notice.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
+        for notice in intrinsic.notices
+    )
+    assert residual_to_plain(shared)["fo2_mode"] == "shared_ladder"
+    assert residual_to_plain(intrinsic)["fo2_mode"] == "engine_intrinsic"
+    assert any(
+        notice.get("fo2_mode") == "shared_ladder"
+        for notice in residual_to_plain(shared)["notices"]
+    )
+    assert any(
+        notice.get("fo2_mode") == "engine_intrinsic"
+        for notice in residual_to_plain(intrinsic)["notices"]
+    )
+
+    scored, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    paired = [
+        item for item in scored if item.reference == observation.observation_id
+    ]
+    assert {item.fo2_mode for item in paired} == {
+        Fo2Mode.ENGINE_INTRINSIC,
+        Fo2Mode.SHARED_LADDER,
+    }
+
+
 def test_tier1_printed_identity_pascal_stays_pa_over_1e5() -> None:
     experiment, bench, observation = _feo_case()
     observation = replace(
@@ -202,6 +301,13 @@ def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
         pressure_bar=1.0,
     )
     assert payload["fO2_log"] == expected
+    resolved = resolve_row_fo2(experiment, bench, observation)
+    changed = resolve_row_fo2(
+        experiment,
+        bench,
+        replace(observation, value=Value.point_of(observation.value.point * Decimal("1.7"))),
+    )
+    assert _fo2_input(changed) == _fo2_input(resolved)
 
 
 def test_tier2_kress_inverse_uses_banded_identity_nominal_pressure() -> None:
@@ -268,11 +374,12 @@ def test_tier3_buffer_matches_the_oxygen_condition_point() -> None:
     assert payload["fO2_log"] == float(selected.value.point)
 
 
-def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> None:
-    from simulator.battery.consumer_inputs import collect_consumer_inputs
-    from simulator.battery.generators.bench import melt_activity_requests
+def test_basu_metal_saturation_activity_targets_are_refused() -> None:
     from pathlib import Path
 
+    from simulator.battery.consumer_inputs import collect_consumer_inputs
+    from simulator.battery.fo2_ladder import metal_saturation_activity_refusal
+    from simulator.battery.generators.bench import melt_activity_requests
     from simulator.battery.migrate import Migrator
 
     root = Path(__file__).resolve().parents[2]
@@ -281,228 +388,117 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         root / "data/literature/extracts/basu-2008-feo-steelmaking.yaml"
     )
     migrator.finalize()
-    experiments = migrator.result.experiments
-    observations = migrator.result.observations
-    observation = observations[
-        "basu-2008-feo-steelmaking::basu_2008_tii_s01_a_feo_1873k"
+    activity_targets = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "basu-2008-feo-steelmaking"
+        and observation.identity.species.formula.strip().casefold() == "feo"
+        and observation.identity.species.phase is not None
+        and observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.L
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
     ]
-    experiment = experiments[observation.experiment_id]
-    bench = migrator.result.benches[experiment.bench_id]
-    composition = observation.identity.composition
-    assert composition.is_unknown
-    assert "kept sum=94.18 wt% is below 95 wt%" in composition.reason
-    resolved = resolve_row_fo2(experiment, bench, observation)
-    assert resolved is not None
-    assert resolved.tier == 3
-    assert resolved.route == (
-        "metal_saturation; fo2 from printed a_FeO (circular for a_FeO rows)"
-    )
-    assert resolved.log10_fO2_bar == pytest.approx(-9.68612316558128, abs=1e-12)
-    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
-    assert "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
-    assert notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-    assert flagged_strata((notice,)) == ()
+    assert len(activity_targets) == 108
 
-    partial_inputs = collect_consumer_inputs(experiment, bench, observation)
-    partial_waypoint = partial_inputs.waypoints["normalized_composition"]
-    assert partial_waypoint.selected is None
-    assert partial_waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-    requests = melt_activity_requests(
-        partial_inputs,
-        experiment=experiment,
-        bench=bench,
-        observation=observation,
+    by_id = migrator.result.observations
+    for observation in activity_targets:
+        experiment = migrator.result.experiments[observation.experiment_id]
+        bench = migrator.result.benches[experiment.bench_id]
+        refusal_notice = metal_saturation_activity_refusal(
+            experiment, observation
+        )
+        assert refusal_notice is not None
+        assert refusal_notice.kind is NoticeKind.INPUT_OMITTED
+        assert "d-305" in refusal_notice.reason
+        assert "target cannot supply its own fO2" in refusal_notice.reason
+
+        changed = replace(
+            observation, value=Value.point_of(observation.value.point * Decimal("1.7"))
+        )
+        assert resolve_row_fo2(experiment, bench, observation) is None
+        assert resolve_row_fo2(experiment, bench, changed) is None
+
+    # Exercise engine readiness in both modes on incomplete and closed
+    # compositions; every extracted row above shares the same source form.
+    for observation_id in (
+        "basu-2008-feo-steelmaking::basu_2008_tii_s01_a_feo_1873k",
+        "basu-2008-feo-steelmaking::basu_2008_tii_s02_a_feo_1873k",
+    ):
+        observation = by_id[observation_id]
+        experiment = migrator.result.experiments[observation.experiment_id]
+        bench = migrator.result.benches[experiment.bench_id]
+        inputs = collect_consumer_inputs(experiment, bench, observation)
+        for fo2_mode in (Fo2Mode.SHARED_LADDER, Fo2Mode.ENGINE_INTRINSIC):
+            requests = melt_activity_requests(
+                inputs,
+                experiment=experiment,
+                bench=bench,
+                observation=observation,
+                fo2_mode=fo2_mode,
+            )
+            blocked = [
+                item for item in requests
+                if item.readiness.engine in _COMPARABLE
+            ]
+            assert {item.readiness.engine for item in blocked} == set(_COMPARABLE)
+            assert all(item.payload is None for item in blocked)
+            applicable = [
+                item
+                for item in blocked
+                if item.readiness.status is not ReadinessStatus.NOT_APPLICABLE
+            ]
+            assert applicable
+            assert all(
+                any(
+                    gap.waypoint == "metal_saturation_condition"
+                    and gap.reason is GapReason.MISSING_EVIDENCE
+                    and any("d-305" in detail for detail in gap.missing)
+                    for gap in item.readiness.gaps
+                )
+                for item in applicable
+            )
+
+        for fo2_mode in (Fo2Mode.SHARED_LADDER, Fo2Mode.ENGINE_INTRINSIC):
+            prediction = predict_with_engine(
+                Engine.INTERNAL_ANALYTICAL,
+                observation,
+                experiment=experiment,
+                bench=bench,
+                isolated=False,
+                fo2_mode=fo2_mode,
+            )
+            assert prediction.value is None
+            assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert "d-305" in str(prediction.refusal_detail)
+
+
+def test_plante_target_derived_oxygen_is_not_a_fixed_condition() -> None:
+    from simulator.battery.fo2_ladder import derived_fo2_condition
+
+    context = load_score_context(sources=("kems-042-plante-1979",))
+    observation = context.observations[
+        "kems-042-plante-1979::plante1979_table2_k2o_s1104_000_1302K"
+    ]
+    experiment = context.experiments[observation.experiment_id]
+    bench = context.benches[experiment.bench_id]
+    assert derived_fo2_condition(observation)
+
+    selected = resolve_row_fo2(
+        experiment, bench, observation, quantity=Quantity.P_PARTIAL
     )
-    blocked = [item for item in requests if item.readiness.engine in _COMPARABLE]
-    assert {item.readiness.engine for item in blocked} == set(_COMPARABLE)
-    assert all(item.payload is None for item in blocked)
-    expected_gaps = {
-        "alphamelts": ("reference_state", GapReason.REFERENCE_STATE_MISMATCH),
-        "thermoengine": ("reference_state", GapReason.REFERENCE_STATE_MISMATCH),
-        "openimcc": ("normalized_composition", GapReason.UNSUPPORTED_PRINT_FORM),
-        "internal-analytical": (
-            "normalized_composition",
-            GapReason.UNSUPPORTED_PRINT_FORM,
+    changed = resolve_row_fo2(
+        experiment,
+        bench,
+        replace(
+            observation,
+            value=Value.point_of(observation.value.point * Decimal("1.7")),
         ),
-    }
-    for item in blocked:
-        waypoint, reason = expected_gaps[item.readiness.engine]
-        assert any(
-            gap.waypoint == waypoint and gap.reason is reason
-            for gap in item.readiness.gaps
-        ), (item.readiness.engine, item.readiness.gaps)
-
-    unavailable = replace(
-        observation,
-        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="test row without a_FeO"),
+        quantity=Quantity.P_PARTIAL,
     )
-    assert resolve_row_fo2(experiment, bench, unavailable) is None
-
-    # The printed bulk map totals 94.18 wt%, below b-704's 95 wt% floor.
-    # Metal saturation still resolves from the printed activity above, but an
-    # activity engine also needs the whole melt and must retain that refusal.
-    prediction = predict_with_engine(
-        Engine.INTERNAL_ANALYTICAL,
-        observation,
-        experiment=experiment,
-        bench=bench,
-        isolated=False,
-    )
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.INVALID_SOURCE
-
-    context = ScoreContext(
-        works=migrator.result.works,
-        experiments=experiments,
-        observations=observations,
-        extract_review={observation.source_id: "reviewed"},
-        hostname="test",
-        benches=migrator.result.benches,
-        root=root,
-    )
-
-    # Solution 1's source-grounded print is below the b-704 closure floor.
-    # Keep the scoring-mode and notice integration pins on Solution 2, whose
-    # own Table II oxide map closes at 99.58 wt%.
-    closed_observation = observations[
-        "basu-2008-feo-steelmaking::basu_2008_tii_s02_a_feo_1873k"
-    ]
-    closed_experiment = experiments[closed_observation.experiment_id]
-    closed_bench = migrator.result.benches[closed_experiment.bench_id]
-    closed_printed = closed_observation.point_conditions["printed_composition"]
-    assert closed_printed.state.is_value
-    printed_total = sum(
-        (Decimal(str(amount)) for amount in closed_printed.state.value.values()),
-        Decimal("0"),
-    )
-    assert printed_total == Decimal("99.58")
-    closed_composition = closed_observation.identity.composition
-    assert closed_composition is not None and closed_composition.is_value
-
-    closed_resolved = resolve_row_fo2(
-        closed_experiment, closed_bench, closed_observation
-    )
-    assert closed_resolved is not None
-    assert "fo2 from printed a_FeO (circular for a_FeO rows)" in closed_resolved.route
-    closed_requests = melt_activity_requests(
-        collect_consumer_inputs(
-            closed_experiment, closed_bench, closed_observation
-        ),
-        experiment=closed_experiment,
-        bench=closed_bench,
-        observation=closed_observation,
-    )
-    comparable = [
-        item
-        for item in closed_requests
-        if item.readiness.engine in _COMPARABLE and item.payload is not None
-    ]
-    assert comparable
-    assert all(not item.readiness.flags for item in comparable)
-    assert {item.payload["fO2_log"] for item in comparable} == {
-        closed_resolved.log10_fO2_bar
-    }
-    assert {item.payload["fO2_route"] for item in comparable} == {
-        closed_resolved.route
-    }
-
-    closed_prediction = predict_with_engine(
-        Engine.INTERNAL_ANALYTICAL,
-        closed_observation,
-        experiment=closed_experiment,
-        bench=closed_bench,
-        isolated=False,
-    )
-    assert closed_prediction.value is not None, closed_prediction.refusal_detail
-    shared, _candidate = compile_residual(
-        closed_observation,
-        Engine.INTERNAL_ANALYTICAL,
-        context=context,
-        prediction=closed_prediction,
-    )
-    assert shared.numeric is not None, shared.refusal
-    assert any(
-        "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
-        for notice in shared.notices
-    )
-    assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND not in flagged_strata(
-        shared.notices
-    )
-
-    intrinsic, _candidate = compile_residual(
-        closed_observation,
-        Engine.INTERNAL_ANALYTICAL,
-        context=context,
-        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
-    )
-    assert intrinsic.numeric is not None, intrinsic.refusal
-    assert intrinsic.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
-    assert shared.fo2_mode is Fo2Mode.SHARED_LADDER
-    assert shared.key != intrinsic.key
-    assert not any(
-        "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
-        for notice in intrinsic.notices
-    )
-    assert any(
-        notice.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
-        for notice in intrinsic.notices
-    )
-    assert any(
-        notice.fo2_mode is Fo2Mode.SHARED_LADDER for notice in shared.notices
-    )
-    assert residual_to_plain(intrinsic)["fo2_mode"] == "engine_intrinsic"
-    assert residual_to_plain(shared)["fo2_mode"] == "shared_ladder"
-    assert any(
-        notice.get("fo2_mode") == "engine_intrinsic"
-        for notice in residual_to_plain(intrinsic)["notices"]
-    )
-    assert any(
-        notice.get("fo2_mode") == "shared_ladder"
-        for notice in residual_to_plain(shared)["notices"]
-    )
-
-    from simulator.battery.generators.bench import activity_request_for_engine
-
-    intrinsic_request = activity_request_for_engine(
-        closed_experiment,
-        closed_observation,
-        Engine.INTERNAL_ANALYTICAL.value,
-        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
-    )
-    assert intrinsic_request is not None and intrinsic_request.payload is not None
-    assert "fO2_log" not in intrinsic_request.payload
-
-    scored, _candidates = score_store(
-        context,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
-        rail=Rail.MELT_ACTIVITY,
-    )
-    paired = [
-        item for item in scored if item.reference == closed_observation.observation_id
-    ]
-    assert {item.fo2_mode for item in paired} == {
-        Fo2Mode.ENGINE_INTRINSIC,
-        Fo2Mode.SHARED_LADDER,
-    }
-
-    borrowed_notice = fo2_tier_notice(
-        Quantity.ACTIVITY,
-        ResolvedFo2(-9.0, 4, "intrinsic_melt_fO2", True),
-    )
-    assert borrowed_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-    assert borrowed_notice.authority is Authority.BRIDGE
-    borrowed_residual, _candidate = compile_residual(
-        observation,
-        Engine.INTERNAL_ANALYTICAL,
-        context=context,
-        prediction=replace(
-            prediction,
-            notices=(*prediction.notices, borrowed_notice),
-        ),
-    )
-    assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(
-        borrowed_residual.notices
-    )
+    assert selected is not None and selected.closure
+    assert selected.po2_bar is None
+    assert _fo2_input(changed) == _fo2_input(selected)
 
 
 def test_steurer_effusion_row_has_a_numeric_internal_residual() -> None:
@@ -570,6 +566,13 @@ def test_tier4_borrowed_intrinsic_is_the_same_on_every_engine() -> None:
     assert payload["fO2_tier"] == 4
     assert payload["fO2_route"] == "intrinsic_melt_fO2"
     assert payload["fO2_borrowed"] is True
+    resolved = resolve_row_fo2(experiment, bench, observation)
+    changed = resolve_row_fo2(
+        experiment,
+        bench,
+        replace(observation, value=Value.point_of(observation.value.point * Decimal("1.7"))),
+    )
+    assert _fo2_input(changed) == _fo2_input(resolved)
 
 
 def test_unresolved_tier_refuses_every_engine_alike() -> None:
@@ -796,6 +799,19 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     assert printed is not None
     assert printed.route == "identity_fO2_Pa"
     assert printed.po2_bar == float(printed_pa / Decimal("100000"))
+    changed_target = replace(
+        observation, value=Value.point_of(observation.value.point * Decimal("1.7"))
+    )
+    changed_printed = resolve_row_fo2(
+        experiment,
+        bench,
+        replace(changed_target, identity=printed_row.identity),
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    assert _fo2_input(changed_printed) == _fo2_input(printed)
 
     buffer_experiment = replace(
         experiment,
@@ -822,6 +838,16 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     assert buffer is not None
     assert buffer.route == selected.route == "buffer_relation"
     assert buffer.log10_fO2_bar == float(selected.value.point)
+    changed_buffer = resolve_row_fo2(
+        buffer_experiment,
+        bench,
+        changed_target,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    assert _fo2_input(changed_buffer) == _fo2_input(buffer)
 
     linked = resolve_row_fo2(
         experiment,
@@ -835,6 +861,16 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     assert linked is not None
     assert linked.route == "source_linked_oxygen_condition"
     assert linked.po2_bar == linked_bar
+    changed_linked = resolve_row_fo2(
+        experiment,
+        bench,
+        changed_target,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    assert _fo2_input(changed_linked) == _fo2_input(linked)
 
     balanced = resolve_row_fo2(
         experiment,
@@ -846,6 +882,15 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     )
     assert balanced is not None and balanced.closure
     assert balanced.route == "effusion_oxygen_balance"
+    changed_balanced = resolve_row_fo2(
+        experiment,
+        bench,
+        changed_target,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert _fo2_input(changed_balanced) == _fo2_input(balanced)
 
 
 @pytest.mark.parametrize("missing", ("composition", "temperature"))
@@ -894,13 +939,26 @@ def test_knudsen_missing_balance_input_refuses_before_vacuum_bound(missing) -> N
         quantity=Quantity.P_PARTIAL,
     )
     assert resolved is None
+    changed_target = replace(
+        observation, value=Value.point_of(observation.value.point * Decimal("1.7"))
+    )
+    changed = resolve_row_fo2(
+        experiment,
+        bench,
+        changed_target,
+        composition=composition,
+        temperature_K=temperature,
+        oxygen=oxygen,
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert _fo2_input(changed) == _fo2_input(resolved)
 
 
 def test_supported_engines_receive_the_same_effusion_condition(monkeypatch) -> None:
     from simulator.battery.enums import CellMaterial
     from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
 
-    seen: dict[str, tuple[object, object]] = {}
+    seen: dict[str, tuple[object, object, object]] = {}
 
     def _open(name):
         return type("Handle", (), {
@@ -910,7 +968,11 @@ def test_supported_engines_receive_the_same_effusion_condition(monkeypatch) -> N
         })()
 
     def _cell(handle, _pot, *, po2, **_kwargs):
-        seen[str(handle.name)] = (po2.mode, po2.cell_material)
+        seen[str(handle.name)] = (
+            po2.mode,
+            po2.po2_bar,
+            po2.cell_material,
+        )
         return type("Cell", (), {
             "status": "refusal",
             "refusal_reason": "census_stop",
@@ -932,13 +994,34 @@ def test_supported_engines_receive_the_same_effusion_condition(monkeypatch) -> N
         _cell,
     )
     observation, experiment = _kems_partial(cell_material=None)
+    observation = replace(
+        observation,
+        source_id="rys-2007-alkali-oxide-thermodynamics",
+    )
     bench = _cell_material_bench((CellMaterial.MO,))
-    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
-        predict_with_engine(
-            engine, observation, experiment=experiment, bench=bench, isolated=False,
+
+    def engine_conditions(target):
+        seen.clear()
+        for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+            predict_with_engine(
+                engine,
+                target,
+                experiment=experiment,
+                bench=bench,
+                isolated=False,
+            )
+        return dict(seen)
+
+    original = engine_conditions(observation)
+    changed = engine_conditions(
+        replace(
+            observation,
+            value=Value.point_of(observation.value.point * Decimal("1.7")),
         )
-    assert seen["openimcc"] == ("oxygen_balance_effusion", "Mo")
-    assert seen["internal-analytical"] == seen["openimcc"]
+    )
+    assert original["openimcc"] == ("oxygen_balance_effusion", None, "Mo")
+    assert original["internal-analytical"] == original["openimcc"]
+    assert changed == original
 
 
 def test_magemin_and_thermoengine_borrow_one_internal_closure(monkeypatch) -> None:

@@ -6,7 +6,6 @@ import atexit
 import json
 import math
 import multiprocessing
-import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
@@ -1350,7 +1349,6 @@ def _make_residue_pressure_model(
         for species, reaction in gas_channels
     }
     if engine == "openimcc":
-        from openimcc import evaluate_gas
         from openimcc.kernel import ImccNonconvergenceError
 
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -1374,14 +1372,30 @@ def _make_residue_pressure_model(
                     oxide: amount for oxide, amount in key if amount > 0.0
                 }
                 try:
-                    state = _evaluate_openimcc_isolated(
-                        openimcc_bridge.evaluate,
-                        timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
-                        composition_mol=current_composition,
-                        temperature_K=temperature_K,
-                        allow_extrapolation=True,
-                        allow_out_of_envelope=True,
+                    timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
+                    from simulator.engine_cache import cached_engine_call
+                    from simulator.melt_backend.openimcc_bridge import (
+                        OpenImccBridgeResult,
                     )
+
+                    state_payload = cached_engine_call(
+                        "openimcc",
+                        openimcc_bridge._evaluate_request_vector(
+                            composition_mol=current_composition,
+                            temperature_K=temperature_K,
+                            allow_extrapolation=True,
+                            allow_out_of_envelope=True,
+                        ),
+                        lambda: _evaluate_openimcc_isolated(
+                            openimcc_bridge._evaluate_uncached,
+                            timeout_s=timeout_s,
+                            composition_mol=current_composition,
+                            temperature_K=temperature_K,
+                            allow_extrapolation=True,
+                            allow_out_of_envelope=True,
+                        ).to_hot(),
+                    )
+                    state = OpenImccBridgeResult.from_hot(state_payload)
                 except ImccNonconvergenceError as exc:
                     raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                 except TimeoutError as exc:
@@ -1401,13 +1415,16 @@ def _make_residue_pressure_model(
                         "openimcc_version": state.openimcc_version,
                     }
                 )
-                base_pressure_bar = evaluate_gas(
+                base_pressure_bar = openimcc_bridge.evaluate_gas(
                     state.parent_oxide_activities,
                     temperature_K,
                     1.0,
                     gas_pack,
                     parent_oxides=state.parent_oxides,
                     allow_extrapolation=True,
+                    gas_pack_selection=(
+                        openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+                    ),
                 )
                 pressure_state_cache[key] = base_pressure_bar
             pO2_bar = 10.0**float(log10_pO2_bar)
@@ -1429,7 +1446,7 @@ def _make_residue_pressure_model(
             _InternalAnalyticalInputRefusal,
             _OxygenBalanceRefusal,
             _gas_formula_for_oxygen_balance,
-            _internal_analytical_vapor_pressure_adapter,
+            internal_analytical_residue_vapor_pressure,
             _new_internal_analytical_core,
         )
         from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
@@ -1456,7 +1473,7 @@ def _make_residue_pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
         ) -> Mapping[str, float]:
             try:
-                response = _internal_analytical_vapor_pressure_adapter(
+                response = internal_analytical_residue_vapor_pressure(
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
                     pressure_bar=total_pressure_Pa / PA_PER_BAR,
@@ -1471,7 +1488,7 @@ def _make_residue_pressure_model(
                 )
             except _InternalAnalyticalInputRefusal as exc:
                 raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
-            pressures = {}
+            pressures: dict[str, float] = {}
             for channel, pressure in response.vapor_pressures_Pa.items():
                 try:
                     formula = _gas_formula_for_oxygen_balance(channel)
@@ -2909,9 +2926,9 @@ def _predict_hashimoto_residue_cohort(
     runtime_catalog: Mapping[str, Any],
     *,
     preform_dimensions_mm: Mapping[str, float],
-    code_revision: str,
     engine: str = "openimcc",
     selected_experiment_ids: frozenset[str] | None = None,
+    _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce both alpha arms and geometry bands, without reading residues."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -2922,7 +2939,7 @@ def _predict_hashimoto_residue_cohort(
     if (
         not experiments
         or len(experiment_ids) != len(experiments)
-        or len(experiments) != 24
+        or (len(experiments) != 24 and not _allow_partial_cohort_for_test)
     ):
         raise ResidueInventoryRefusal(
             "hashimoto_cohort_invalid", "R2 requires 24 distinct physical runs"
@@ -2934,9 +2951,6 @@ def _predict_hashimoto_residue_cohort(
             "hashimoto_experiment_selection_invalid",
             "selected runs must be a non-empty subset of the validated cohort",
         )
-    if not code_revision.strip():
-        raise ResidueInventoryRefusal("hashimoto_code_revision_missing")
-
     try:
         import openimcc
         from openimcc import load_gas_datapack
@@ -3107,14 +3121,12 @@ def _predict_hashimoto_residue_cohort(
             refinement_steps_by_geometry: dict[str, tuple[int, ...]] = {}
             refinement_differences_by_geometry: dict[str, tuple[dict[str, float | int], ...]] = {}
             refinement_status_by_geometry: dict[str, str] = {}
-            refinement_cpu_seconds_by_geometry: dict[str, float] = {}
             refinement_accepted_steps_by_geometry: dict[str, int] = {}
             refinement_notices: list[dict[str, str]] = []
             for geometry in _HASHIMOTO_GEOMETRIES:
                 steps = initial_steps
                 tried_steps: list[int] = []
                 level_differences: list[dict[str, float | int]] = []
-                cpu_seconds = 0.0
                 previous_values: dict[str, float] | None = None
                 values: dict[str, float] = {}
                 pO2_steps: tuple[float, ...] = ()
@@ -3124,7 +3136,6 @@ def _predict_hashimoto_residue_cohort(
                 pO2_balance_floor: dict[str, float | int | None] = {}
                 refinement_status = "unconverged_at_cap"
                 while True:
-                    started_cpu = time.process_time()
                     integration_result = _hashimoto_integrate_geometry(
                         run_initial_mol,
                         channels,
@@ -3151,7 +3162,6 @@ def _predict_hashimoto_residue_cohort(
                         if isinstance(integrated_inventory, Mapping)
                         else None
                     )
-                    cpu_seconds += time.process_time() - started_cpu
                     tried_steps.append(steps)
                     if refusal is not None:
                         refinement_status = "engine_nonconvergence"
@@ -3185,7 +3195,6 @@ def _predict_hashimoto_residue_cohort(
                 refinement_steps_by_geometry[geometry] = tuple(tried_steps)
                 refinement_differences_by_geometry[geometry] = tuple(level_differences)
                 refinement_status_by_geometry[geometry] = refinement_status
-                refinement_cpu_seconds_by_geometry[geometry] = cpu_seconds
                 refinement_accepted_steps_by_geometry[geometry] = tried_steps[-1]
                 geometry_predictions[geometry] = values
                 geometry_exhaustions[geometry] = exhaustions
@@ -3328,7 +3337,6 @@ def _predict_hashimoto_residue_cohort(
                     else {}
                 ),
                 "openimcc_pin": openimcc_bridge.OPENIMCC_RECORDED_PIN,
-                "code_revision": code_revision,
                 "integration": {
                     "steps": refinement_accepted_steps_by_geometry[primary_geometry],
                     "steps_tried_by_geometry": refinement_steps_by_geometry,
@@ -3336,8 +3344,6 @@ def _predict_hashimoto_residue_cohort(
                     "accepted_steps_by_geometry": refinement_accepted_steps_by_geometry,
                     "refinement_status_by_geometry": refinement_status_by_geometry,
                     "refinement_status": refinement_status_by_geometry[primary_geometry],
-                    "process_cpu_seconds_by_geometry": refinement_cpu_seconds_by_geometry,
-                    "process_cpu_seconds": math.fsum(refinement_cpu_seconds_by_geometry.values()),
                     "refinement_notices": tuple(refinement_notices),
                     "substep_duration_s": duration_s
                     / refinement_accepted_steps_by_geometry[primary_geometry],
@@ -3661,7 +3667,6 @@ def _predict_sossi_residue_cohort(
     *,
     starting_trace_ppm_by_experiment: Mapping[str, Mapping[str, float]],
     buffered_fO2_log_by_experiment: Mapping[str, float],
-    code_revision: str,
     engine: str,
     selected_experiment_ids: frozenset[str] | None = None,
 ) -> tuple[_SossiResiduePrediction, ...]:
@@ -3695,7 +3700,7 @@ def _predict_sossi_residue_cohort(
     if engine == "openimcc":
         try:
             import openimcc
-            from openimcc import evaluate_gas, load_gas_datapack
+            from openimcc import load_gas_datapack
             from openimcc.kernel import ImccNonconvergenceError
             from simulator.melt_backend import openimcc_bridge
         except ImportError as exc:
@@ -3838,14 +3843,30 @@ def _predict_sossi_residue_cohort(
                             openimcc_bridge._cleaned_melt_policy(composition)
                         )
                         melt_activity_input_policy.update(activity_input_policy)
-                        state = _evaluate_openimcc_isolated(
-                            openimcc_bridge.evaluate,
-                            timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
-                            composition_mol=activity_composition,
-                            temperature_K=temperature_K,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
+                        timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
+                        from simulator.engine_cache import cached_engine_call
+                        from simulator.melt_backend.openimcc_bridge import (
+                            OpenImccBridgeResult,
                         )
+
+                        state_payload = cached_engine_call(
+                            "openimcc",
+                            openimcc_bridge._evaluate_request_vector(
+                                composition_mol=activity_composition,
+                                temperature_K=temperature_K,
+                                allow_extrapolation=True,
+                                allow_out_of_envelope=True,
+                            ),
+                            lambda: _evaluate_openimcc_isolated(
+                                openimcc_bridge._evaluate_uncached,
+                                timeout_s=timeout_s,
+                                composition_mol=activity_composition,
+                                temperature_K=temperature_K,
+                                allow_extrapolation=True,
+                                allow_out_of_envelope=True,
+                            ).to_hot(),
+                        )
+                        state = OpenImccBridgeResult.from_hot(state_payload)
                     except ImccNonconvergenceError as exc:
                         raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                     except TimeoutError as exc:
@@ -3897,13 +3918,16 @@ def _predict_sossi_residue_cohort(
                                 "activity_provenance": mno_activity.provenance(),
                             },
                         )
-                    gas_result = evaluate_gas(
+                    gas_result = openimcc_bridge.evaluate_gas(
                         gas_parent_oxide_activities,
                         temperature_K,
                         1.0,
                         gas_pack,
                         parent_oxides=gas_parent_oxides,
                         allow_extrapolation=True,
+                        gas_pack_selection=(
+                            openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+                        ),
                     )
                     melt_pack_identity.update(
                         {
@@ -3927,7 +3951,7 @@ def _predict_sossi_residue_cohort(
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 PO2_COMMANDED,
                 Po2Request,
-                _internal_analytical_vapor_pressure_adapter,
+                internal_analytical_residue_vapor_pressure,
                 _new_internal_analytical_core,
             )
 
@@ -3936,7 +3960,7 @@ def _predict_sossi_residue_cohort(
             def pressure_model(
                 composition: Mapping[str, float], log10_pO2_bar: float
             ) -> Mapping[str, float]:
-                response = _internal_analytical_vapor_pressure_adapter(
+                response = internal_analytical_residue_vapor_pressure(
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
                     pressure_bar=total_pressure_Pa / PA_PER_BAR,
@@ -4135,7 +4159,6 @@ def _predict_sossi_residue_cohort(
                     "source_id": _SOSSI_SOURCE_ID,
                     "experiment_id": experiment_id,
                     "engine": engine,
-                    "code_revision": code_revision,
                     "sample_mass_kg": sample_mass_kg,
                     "total_pressure_Pa": total_pressure_Pa,
                     "temperature_K": temperature_K,
