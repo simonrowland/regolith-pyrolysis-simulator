@@ -3832,6 +3832,12 @@ _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
+_BANYA_FETO_ACTIVITY_SOURCES = frozenset(
+    {
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron",
+        "banya-hino-takezoe-1985-na-fe-silicate-redox",
+    }
+)
 _TOTAL_IRON_BASIS_RELATION = "total_iron_basis"
 _SOLID_WUSTITE_REFERENCE_UNGROUNDED = (
     "solid_wustite_reference_conversion_not_grounded"
@@ -4065,6 +4071,87 @@ def _feo_reference_factor(
     return (
         (delta_g - delta_f_g) / (JANAF_R_J_PER_MOL_K * temperature_K)
     ).exp()
+
+
+def _banya_feto_to_feo_rs_factor(temperature_K: Decimal) -> Decimal:
+    """Convert Ban-ya's iron-saturated liquid Fe_tO activity to FeO(R.S.).
+
+    Premise: the source reaction is Fe_tO(l) + (1-t) Fe(s,l) = FeO(R.S.),
+    and at iron saturation a_Fe = 1. Thus K = a_FeO /
+    (a_FetO * a_Fe**(1-t)) = exp(-ΔG19 / RT), giving
+    log10(a_FeO) = log10(a_FetO) - ΔG19[J/mol] / (R T ln 10).
+    Ban-ya, Hino & Takezoe 1985 prints this relation as Eq. 23 (p. 1770;
+    controller physics ruling d-432 calls it Eq. 19); the 1980 set uses the
+    same Fe-saturated Fe_tO reference. The printed ΔG is
+    -2040 + 1.707 T cal/mol.
+    Convert with 4.184 J/cal; T is K and R = 8.3144626 J/(mol K), so the
+    exponent is dimensionless. At 1673.15 K, ΔG19 is
+    816.1 cal/mol and the log10 shift is -0.1066 dex (a_FeO = 0.7824
+    a_FetO); ΔG19 = 0 gives equal activities. This relation already performs
+    the reference change and must not receive the D&G/JANAF or N0 factors.
+    """
+
+    delta_g_cal = Decimal("-2040") + Decimal("1.707") * temperature_K
+    delta_g_J = Decimal("4.184") * delta_g_cal
+    gas_constant_J_per_mol_K = Decimal("8.3144626")
+    return (-delta_g_J / (gas_constant_J_per_mol_K * temperature_K)).exp()
+
+
+def _banya_feto_activity_comparison(
+    reference: Observation,
+    *,
+    identity: Identity,
+    standard_state: StandardState,
+    quantity: Quantity,
+    temperature_K: Decimal,
+) -> Observation:
+    factor = _banya_feto_to_feo_rs_factor(temperature_K)
+    converted = reference.value.point * factor
+    conversion_notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(quantity,),
+        reason=(
+            "source_relation=Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770; "
+            "Fe_tO(l) + (1-t) Fe(s,l) = FeO(R.S.); "
+            "source_standard=Fe_tO(l), Fe-saturated; "
+            "destination_standard=FeO(R.S.); "
+            f"source_value={reference.value.point}; "
+            f"converted_value={converted}; "
+            f"factor={_display_decimal(factor, '0.001')}; "
+            f"T={temperature_K} K"
+        ),
+        origin=reference.observation_id,
+    )
+    assumption_notice = Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(quantity,),
+        reason=(
+            "model_basis_assumption: FeO(l) D&G/Masson is treated as "
+            "identical to source FeO(R.S.) for prediction"
+        ),
+        origin=reference.observation_id,
+    )
+    notices: tuple[Notice, ...] = (conversion_notice, assumption_notice)
+    row_band = _printed_uncertainty_band(
+        quantity,
+        reference.uncertainty,
+        reference.value.point,
+        source_observation=reference,
+    )
+    if row_band.notice is not None:
+        notices += (row_band.notice,)
+    stoichiometric = _stoichiometric_standard(standard_state)
+    if identity.species.formula == "Fe_tO":
+        identity = replace(
+            identity,
+            species=replace(identity.species, formula=_FEO_STOICHIOMETRIC_FORMULA),
+        )
+    return replace(
+        reference,
+        identity=replace(identity, reference_state=State.of(stoichiometric)),
+        value=replace(reference.value, point=converted),
+        notices=union_notices(reference.notices, notices),
+    )
 
 
 def _feo_jackknife_factors(
@@ -4401,9 +4488,10 @@ def _iron_saturated_feo_calibration() -> tuple[
 def _iron_saturated_feo_comparison(
     reference: Observation, *, engine: Engine | None
 ) -> Observation | None:
-    """Retag iron-saturated Fe(1-x)O(l) onto the comparison FeO frame.
+    """Retag iron-saturated wüstite activity onto the comparison FeO frame.
 
-    An iron-saturated Fe(1-x)O standard has chemical potential
+    Ban-ya's Fe_tO sources use their printed Fe_tO(l) -> FeO(R.S.) relation.
+    Other iron-saturated Fe(1-x)O sources have chemical potential
     mu_FeO = mu_Fe + mu_O; a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
     carries that partial onto JANAF Fe-019. iron_saturation_composition owns
     the typed saturation composition and its comparison band; N0 is not a
@@ -4440,10 +4528,21 @@ def _iron_saturated_feo_comparison(
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
     standard_state = identity.reference_state.value
+    banya_source_relation = reference.source_id in _BANYA_FETO_ACTIVITY_SOURCES
+    species_formulas = (
+        {_FEO_STOICHIOMETRIC_FORMULA, "Fe_tO"}
+        if banya_source_relation
+        else {_FEO_STOICHIOMETRIC_FORMULA}
+    )
+    standard_formulas = (
+        {_FEO_WUSTITE_FORMULA, "Fe_tO"}
+        if banya_source_relation
+        else {_FEO_WUSTITE_FORMULA}
+    )
     if (
-        identity.species.formula != _FEO_STOICHIOMETRIC_FORMULA
-        or standard_state.endmember.formula != _FEO_WUSTITE_FORMULA
-        or standard_state.component_basis != _FEO_WUSTITE_FORMULA
+        identity.species.formula not in species_formulas
+        or standard_state.endmember.formula not in standard_formulas
+        or standard_state.component_basis != standard_state.endmember.formula
         or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
         or phase_token(standard_state.endmember) is not Phase.L
         or reference.value.kind is not ValueKind.POINT
@@ -4468,9 +4567,22 @@ def _iron_saturated_feo_comparison(
                 "has no temperature_K"
             ),
             origin=reference.observation_id,
-            band="Darken & Gurry iron-boundary conversion requires temperature_K",
+            band=(
+                "Ban-ya Fe_tO to FeO(R.S.) conversion requires temperature_K"
+                if banya_source_relation
+                else "Darken & Gurry iron-boundary conversion requires temperature_K"
+            ),
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    if banya_source_relation:
+        return _banya_feto_activity_comparison(
+            reference,
+            identity=identity,
+            standard_state=standard_state,
+            quantity=quantity,
+            temperature_K=temperature_K,
+        )
+
     composition_decision = iron_saturation_composition(reference)
     composition_notice = _composition_notice(
         reference, composition_decision, quantity
@@ -4582,11 +4694,12 @@ def fusion_comparison_reference(
     """Single owner of reference-state selection for the scorer and the melt benchmark.
 
     Crystal activities move onto the liquid endmember by the JANAF fusion
-    energy. Iron-saturated Fe(1-x)O(l) activities, including Distin's
-    tabulated oxygen ratio, move onto stoichiometric FeO(l) by the Darken
-    & Gurry factor f alone (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)
-    from the measured Fe/oxide equilibrium and JANAF). N0 parameterises the
-    iron-saturation composition and its d-333 band; it is not a second divisor.
+    energy. Ban-ya Fe_tO activities use the source's Fe_tO(l) -> FeO(R.S.)
+    relation. Other iron-saturated Fe(1-x)O(l) activities, including Distin's
+    oxygen ratio, use the Darken & Gurry factor f to reach stoichiometric
+    FeO(l) (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)). N0
+    parameterises the other sources' iron-saturation composition and band; it
+    is not an additional activity factor.
     """
 
     iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
