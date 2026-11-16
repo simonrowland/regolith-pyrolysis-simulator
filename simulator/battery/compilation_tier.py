@@ -25,7 +25,7 @@ import subprocess
 import tempfile
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
-from decimal import Decimal
+from decimal import Decimal, ROUND_FLOOR
 from functools import lru_cache
 from fractions import Fraction
 from pathlib import Path
@@ -430,6 +430,40 @@ def _decimal_token(value: Decimal) -> str:
     if text == "-0":
         return "0"
     return text
+
+
+_NASA9_FIT_GRID_RULE = (
+    "Tmin, Tmax, and every interior 100 K multiple; when that yields more than "
+    "11 points, use 11 evenly spaced points including both endpoints"
+)
+
+
+def _nasa9_fit_temperature_grid(
+    valid_min: Decimal, valid_max: Decimal
+) -> tuple[Decimal, ...]:
+    """Return the declared bounded grid for a range-only NASA-9 fit."""
+
+    if valid_min > valid_max:
+        return ()
+    points = [valid_min]
+    # Floor then advance selects the first strict interior multiple; an exact
+    # lower-bound multiple is already included as Tmin.
+    next_multiple = (valid_min / Decimal("100")).to_integral_value(
+        rounding=ROUND_FLOOR
+    ) + 1
+    interior = next_multiple * Decimal("100")
+    while interior < valid_max:
+        points.append(interior)
+        interior += Decimal("100")
+    if valid_max != valid_min:
+        points.append(valid_max)
+    if len(points) <= 11:
+        return tuple(points)
+
+    # The convention caps dense ranges at 11 samples, preserving both printed
+    # limits and dividing the entire validity span into ten equal intervals.
+    interval = (valid_max - valid_min) / Decimal("10")
+    return tuple(valid_min + interval * index for index in range(11))
 
 
 def _is_decimal_token(text: str) -> bool:
@@ -4375,7 +4409,10 @@ def _write_compilation_comparisons_jsonl(
 ) -> int:
     """Write comparison rows for the selected engine execution policy."""
 
-    from simulator.battery.score import _observation_matches_run_filters
+    from simulator.battery.score import (
+        _observation_matches_run_filters,
+        to_plain,
+    )
 
     from simulator.diagnostic_helpers.species_rail_differential import (
         COMPILATION_JANAF,
@@ -4541,6 +4578,7 @@ def _write_compilation_comparisons_jsonl(
                     "refusal_detail": (
                         {} if refusal is None else dict(refusal.detail)
                     ),
+                    "notices": [to_plain(notice) for notice in residual.notices],
                 }
                 stream.write(
                     json.dumps(
@@ -4733,6 +4771,7 @@ def _nasa9_fit_comparisons_with_bound_lineage(
         load_sidecar,
         sidecar_element_reference_curves,
     )
+    from simulator.battery.generators.janaf import _formation_basis_at_temperature
     from simulator.battery.score import (
         _compile_residual_with_lineage,
         _observation_matches_run_filters,
@@ -4770,6 +4809,32 @@ def _nasa9_fit_comparisons_with_bound_lineage(
     fit_evaluation_cache: dict[
         tuple[object, ...], tuple[float | None, str | None]
     ] = {}
+
+    def evaluate_cached_fit(
+        record: Mapping[str, object],
+        quantity: Quantity,
+        temperature_K: float,
+        fit_settings: tuple[object, ...] | None,
+        h_anchor_kJ_mol: float | None,
+    ) -> tuple[float | None, str | None]:
+        evaluation_key = (
+            fit_settings,
+            quantity,
+            temperature_K,
+            h_anchor_kJ_mol,
+        )
+        if evaluation_key not in fit_evaluation_cache:
+            # ``reference_curves`` and accepted status are fixed for this
+            # invocation; the key carries every other evaluator input.
+            fit_evaluation_cache[evaluation_key] = evaluate_sidecar_fit(
+                record,
+                quantity,
+                temperature_K,
+                reference_curves=reference_curves,
+                formation_enthalpy_anchor_kJ_mol=h_anchor_kJ_mol,
+            )
+        return fit_evaluation_cache[evaluation_key]
+
     for record in records:
         if record.get("status") != "accepted":
             continue
@@ -4873,6 +4938,9 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                     and point_quantity == quantity.value
                 ]
 
+            passing_points: list[
+                tuple[Decimal, Observation | _CompilationSeriesCell]
+            ] = []
             for temperature, point in sorted(fit_points, key=lambda item: item[0]):
                 temperature_K = float(temperature)
                 if temperature_K < valid_min or temperature_K > valid_max:
@@ -4896,23 +4964,13 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                         bool(record.get("is_element_reference")),
                         repr(record.get("reference_pressure_Pa")),
                     )
-                evaluation_key = (
-                    fit_settings,
+                fit_value, refusal = evaluate_cached_fit(
+                    record,
                     quantity,
                     temperature_K,
+                    fit_settings,
                     h_anchor_kJ_mol,
                 )
-                if evaluation_key not in fit_evaluation_cache:
-                    # ``reference_curves`` and accepted status are fixed for this
-                    # invocation; the key carries every other evaluator input.
-                    fit_evaluation_cache[evaluation_key] = evaluate_sidecar_fit(
-                        record,
-                        quantity,
-                        temperature_K,
-                        reference_curves=reference_curves,
-                        formation_enthalpy_anchor_kJ_mol=h_anchor_kJ_mol,
-                    )
-                fit_value, refusal = fit_evaluation_cache[evaluation_key]
                 if refusal is not None or fit_value is None:
                     continue
                 printed_value = float(as_decimal(point.value.point))
@@ -4921,18 +4979,126 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                 # still reproduces the value resolved from JANAF at read time.
                 if abs(fit_value - printed_value) > gate_tolerance:
                     continue
-                source_observation = (
-                    point.parent if isinstance(point, _CompilationSeriesCell) else point
+                passing_points.append((temperature, point))
+
+            if not passing_points:
+                continue
+            anchor = passing_points[0][1]
+            source_observation = (
+                anchor.parent if isinstance(anchor, _CompilationSeriesCell) else anchor
+            )
+            grid = _nasa9_fit_temperature_grid(
+                as_decimal(validity["T_min_K"]), as_decimal(validity["T_max_K"])
+            )
+            if not grid:
+                continue
+            formation_frames: dict[
+                Decimal, tuple[object, Observation]
+            ] = {}
+            if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+                product = source_observation.identity.species
+                if product is None:
+                    continue
+                for temperature in grid:
+                    basis = _formation_basis_at_temperature(
+                        formula, product, temperature
+                    )
+                    frame_points = [
+                        (source_temperature, source_point)
+                        for (
+                            source_formula,
+                            source_phase,
+                            source_quantity,
+                            source_temperature,
+                        ), source_point in table_points.items()
+                        if source_formula == formula
+                        and source_phase == phase
+                        and source_quantity == quantity.value
+                        and source_point.identity.reaction == basis.reaction
+                        and source_point.identity.formation_elements
+                        == basis.formation_elements
+                    ]
+                    if not frame_points:
+                        formation_frames.clear()
+                        break
+                    _source_temperature, source_point = min(
+                        frame_points,
+                        key=lambda item: (
+                            abs(item[0] - temperature),
+                            item[0],
+                        ),
+                    )
+                    frame_observation = (
+                        source_point.parent
+                        if isinstance(source_point, _CompilationSeriesCell)
+                        else source_point
+                    )
+                    formation_frames[temperature] = (basis, frame_observation)
+                if len(formation_frames) != len(grid):
+                    continue
+            fit_series_id = f"nasa9-fit::{record_id}::{quantity.value}"
+            grid_values: list[tuple[Decimal, Decimal]] = []
+            for temperature in grid:
+                temperature_K = float(temperature)
+                if temperature_K < valid_min or temperature_K > valid_max:
+                    continue
+                fit_value, refusal = evaluate_cached_fit(
+                    record,
+                    quantity,
+                    temperature_K,
+                    fit_settings,
+                    h_anchor_kJ_mol,
                 )
-                fit_reference_id = (
-                    f"nasa9-fit::{record_id}::{quantity.value}::"
-                    f"T={_decimal_token(temperature)}"
-                )
+                if refusal is not None or fit_value is None:
+                    continue
+                grid_values.append((temperature, as_decimal(fit_value)))
+            if len(grid_values) != len(grid):
+                continue
+
+            fit_notice = Notice(
+                kind=NoticeKind.EVALUATED_FROM_FIT_ON_DECLARED_GRID,
+                affected_quantities=(quantity,),
+                reason=(
+                    f"fit_record_id={record_id}; validity_range_K="
+                    f"[{_decimal_token(as_decimal(validity['T_min_K']))}, "
+                    f"{_decimal_token(as_decimal(validity['T_max_K']))}]; "
+                    f"grid_rule={_NASA9_FIT_GRID_RULE}"
+                ),
+                origin=record_id,
+            )
+            fit_series = replace(
+                source_observation,
+                observation_id=fit_series_id,
+                identity=anchor.identity,
+                value=Value(kind=ValueKind.SERIES, series=tuple(grid_values)),
+                notices=source_observation.notices + (fit_notice,),
+            )
+            for point in _iter_compilation_series_cells(fit_series):
+                if not isinstance(point, _CompilationSeriesCell):
+                    continue
+                temperature = point.identity.temperature_K
+                if not isinstance(temperature, State) or not temperature.is_value:
+                    continue
+                if temperature.value is None or point.value.point is None:
+                    continue
+                frame_observation = source_observation
+                identity = point.identity
+                if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+                    basis, frame_observation = formation_frames[
+                        as_decimal(temperature.value)
+                    ]
+                    identity = replace(
+                        frame_observation.identity,
+                        temperature_K=State.of(as_decimal(temperature.value)),
+                        reaction=basis.reaction,
+                        formation_elements=basis.formation_elements,
+                    )
                 fit_reference = replace(
-                    source_observation,
-                    observation_id=fit_reference_id,
-                    identity=point.identity,
-                    value=Value.point_of(as_decimal(fit_value)),
+                    frame_observation,
+                    observation_id=point.observation_id,
+                    identity=identity,
+                    value=point.value,
+                    notices=frame_observation.notices + (fit_notice,),
                 )
                 for engine in _compilation_engines_for_pair(engines, point.identity):
                     attempt = predict_thermo_attempt(
@@ -4948,15 +5114,15 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                         engine,
                         context=context,
                         prediction=prediction,
-                        comparison_ids={source_observation.observation_id},
-                        lineage_observation_id=source_observation.observation_id,
+                        comparison_ids={frame_observation.observation_id},
+                        lineage_observation_id=frame_observation.observation_id,
                         _validation_indexes=_validation_indexes,
                     )
                     comparisons.append(
                         _Nasa9FitComparison(
                             record=record,
                             quantity=quantity,
-                            temperature_K=temperature,
+                            temperature_K=as_decimal(temperature.value),
                             engine=engine,
                             reference=fit_reference,
                             residual=residual,
