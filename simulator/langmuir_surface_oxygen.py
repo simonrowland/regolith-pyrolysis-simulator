@@ -204,6 +204,10 @@ _RESIDUAL_CLOSE_MAX = 1.0e-4
 _METAL_RAILS = frozenset({"gas_fugacity", "condensed_raoult_psat"})
 
 
+class _SurfaceOxygenBalanceNoRoot(ValueError):
+    """A valid oxygen-balance solve has no root in its declared bracket."""
+
+
 @dataclass(frozen=True)
 class LangmuirTransport:
     """Publisher knobs that set species conductance for one partial vector.
@@ -1278,7 +1282,7 @@ def _solve_net_surface_balance(
         root = low
         bracket = "lower"
     elif f_low < 0.0 and f_high < 0.0:
-        raise ValueError(
+        raise _SurfaceOxygenBalanceNoRoot(
             "vacuum oxygen balance has no root in the declared pO2 bracket"
         )
     else:
@@ -1503,6 +1507,11 @@ def _solve_or_refuse(
             persisted,
             detail=str(exc),
             extra_refused=refused,
+            refusal_code=(
+                LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED
+                if isinstance(exc, _SurfaceOxygenBalanceNoRoot)
+                else None
+            ),
             capacity_negligible=capacity_negligible,
             eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
