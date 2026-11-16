@@ -4596,7 +4596,6 @@ class MigrationResult:
     observations_by_source: dict[str, list[str]] = field(
         default_factory=lambda: defaultdict(list)
     )
-    extract_paths_by_source: dict[str, str] = field(default_factory=dict)
     # d-032: extract ``context`` rows carried verbatim per work. They are
     # experiment context, never Observation records (that is the ruling).
     context_by_work: dict[str, list[dict[str, Any]]] = field(
@@ -25290,7 +25289,6 @@ class Migrator:
             source = {}
         citation = str(source.get("citation") or "")
         source_id = str(doc.get("source_id") or path.stem)
-        self.result.extract_paths_by_source[source_id] = rel
         source_method_uncertainty = None
         if source.get("method_uncertainty") is not None:
             source_method_uncertainty = _source_method_uncertainty_from_plain(
@@ -28048,7 +28046,6 @@ class Migrator:
         ambient_pressure_notices = (
             () if ambient_pressure_notice is None else (ambient_pressure_notice,)
         )
-        oxygen_applied = False
         refreshed_oxygen = _refresh_buffer_decision(
             oxygen_decision,
             _positive_pressure_pa(ident_kwargs.get("total_pressure_Pa")),
@@ -33618,17 +33615,14 @@ class Migrator:
             validation.notices,
         )
         hard_issues = initial_validation.hard_issues
+        hard_issues_by_observation = initial_validation.hard_issues_by_observation
         batch_admitted = False
-        for source_id, observation_ids in self.result.observations_by_source.items():
-            extract_path = self.result.extract_paths_by_source.get(source_id)
+        for source_key, observation_ids in self.result.observations_by_source.items():
             source_experiment_ids = {
                 self.result.observations[item].experiment_id for item in observation_ids
             }
             source_hard_issue = any(
-                (
-                    extract_path is not None
-                    and issue.path.startswith(f"extract[{extract_path}]")
-                )
+                issue.path.startswith(f"extract[{source_key}]")
                 or any(
                     issue.path.startswith(f"experiment[{experiment_id}]")
                     for experiment_id in source_experiment_ids
@@ -33642,6 +33636,8 @@ class Migrator:
                     experiment is None
                     or experiment.kind is not ExperimentKind.LITERATURE
                     or observation.admission.status is not AdmissionStatus.PENDING
+                    or observation.admission.decided_by is not None
+                    or observation.admission.reason not in _DEFAULTABLE_PENDING_REASONS
                     or not observation.identity.quantity.is_value
                     or not _value_has_numeric_value(observation.value)
                     or not observation.evidence.class_.is_value
@@ -33649,9 +33645,11 @@ class Migrator:
                     or observation.locator is None
                 ):
                     continue
-                row_hard_issue = any(
-                    issue.path.startswith(f"observation[{observation_id}]")
-                    or issue.path.startswith(f"observation[{observation_id},")
+                row_hard_issue = bool(
+                    hard_issues_by_observation.get(observation_id)
+                ) or any(
+                    issue.path.startswith(f"observation[{observation_id},")
+                    or issue.path.startswith(f"observations.{observation_id}.")
                     for issue in hard_issues
                 )
                 if row_hard_issue or source_hard_issue:

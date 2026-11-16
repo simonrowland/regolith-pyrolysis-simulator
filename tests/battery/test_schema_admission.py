@@ -45,6 +45,22 @@ def _migrate(tmp_path, rows):
     return M.migrate(_write_min_tree(tmp_path, extract), write=False)
 
 
+def _finalize_with_admissions(tmp_path, rows, admissions, *, extract_updates=None):
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["species"]["Na"]["observations"] = rows
+    if extract_updates:
+        extract.update(extract_updates)
+    migrator = M.Migrator(_write_min_tree(tmp_path, extract))
+    migrator.migrate_extracts()
+    for name, admission in admissions.items():
+        observation = _child(migrator.result, name)
+        migrator.result.observations[observation.observation_id] = replace(
+            observation, admission=admission
+        )
+    migrator.finalize()
+    return migrator.result
+
+
 def _child(result, name="child"):
     return next(o for key, o in result.observations.items()
                 if key == f"fixture-source::{name}" or key.startswith(f"fixture-source::{name}::"))
@@ -72,10 +88,102 @@ def test_d413_batch_admission_is_scoped_to_measured_classes(
 ):
     row = _row(method, method, relation=None)
     row["values"]["admission_status"] = "parked"
-    observation = _child(_migrate(tmp_path, [row]), method)
+    result = _finalize_with_admissions(
+        tmp_path,
+        [row],
+        {
+            method: M.Admission(
+                status=AdmissionStatus.PENDING,
+                reason=M._NO_ADMISSION_STATUS_REASON,
+            )
+        },
+    )
+    observation = _child(result, method)
     assert observation.admission.status is expected
     if expected is AdmissionStatus.ADMITTED:
         assert observation.admission.decided_by.worker == "d-413-batch-literature"
+
+
+@pytest.mark.parametrize(
+    "admission",
+    [
+        M.Admission(
+            status=AdmissionStatus.PENDING,
+            reason="initial composition is not a run-temperature mass-loss measurement",
+        ),
+        M.Admission(
+            status=AdmissionStatus.PENDING,
+            reason=(
+                "Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints "
+                "0.16/0.37; both left as printed"
+            ),
+        ),
+        M.Admission(
+            status=AdmissionStatus.PENDING,
+            reason=M._NO_ADMISSION_STATUS_REASON,
+            decided_by=M.AdmissionDecision(
+                worker="another-owner",
+                date="2026-10-01",
+                evidence=F.loc(),
+            ),
+        ),
+        M.Admission(
+            status=AdmissionStatus.REJECTED,
+            reason="source refusal remains authoritative",
+        ),
+    ],
+)
+def test_d413_batch_admission_preserves_existing_decisions(tmp_path, admission):
+    row = _row("held", "measured_direct", relation=None)
+    row["values"]["admission_status"] = "parked"
+    result = _finalize_with_admissions(
+        tmp_path, [row], {"held": admission}
+    )
+
+    assert _child(result, "held").admission == admission
+
+
+@pytest.mark.parametrize(
+    "issue_kind", ["extract", "annotation"]
+)
+def test_d413_batch_admission_skips_hard_source_and_annotation_issues(
+    tmp_path, issue_kind
+):
+    row = _row("measured", "measured_direct", relation=None)
+    row["values"]["admission_status"] = "parked"
+    extract_updates = {}
+    if issue_kind == "extract":
+        extract_updates["phase_field_records"] = {
+            "liquidus": [{"id": "incomplete-record"}]
+        }
+    else:
+        row["values"]["derived_from"] = [None]
+
+    result = _finalize_with_admissions(
+        tmp_path,
+        [row],
+        {
+            "measured": M.Admission(
+                status=AdmissionStatus.PENDING,
+                reason=M._NO_ADMISSION_STATUS_REASON,
+            )
+        },
+        extract_updates=extract_updates,
+    )
+    observation = _child(result, "measured")
+    assert observation.admission.status is AdmissionStatus.PENDING
+    if issue_kind == "extract":
+        assert any(
+            issue.path.startswith("extract[")
+            and issue.path.endswith(".phase_field_records")
+            for issue in result.validation.hard_issues
+        )
+    else:
+        assert any(
+            issue.reason is RefusalReason.INVALID_SOURCE
+            and issue.path == "observations.fixture-source::measured.derived_from"
+            for issue in result.validation.hard_issues
+        )
 
 
 def test_d413_batch_admission_covers_measured_reduced_and_validator_mutation(tmp_path):
@@ -85,7 +193,16 @@ def test_d413_batch_admission_covers_measured_reduced_and_validator_mutation(tmp
     )
     direct["values"]["admission_status"] = "admitted"
     reduced["values"]["admission_status"] = "parked"
-    result = _migrate(tmp_path, [direct, reduced])
+    result = _finalize_with_admissions(
+        tmp_path,
+        [direct, reduced],
+        {
+            "reduced": M.Admission(
+                status=AdmissionStatus.PENDING,
+                reason=M._NO_ADMISSION_STATUS_REASON,
+            )
+        },
+    )
     admitted = _child(result, "reduced")
     assert admitted.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     assert admitted.admission.status is AdmissionStatus.ADMITTED
