@@ -5,6 +5,7 @@ The operator split is first order; Richardson differences must decrease on
 halving dt. Equal segmentation uses the same internal mesh throughout.
 """
 import math
+from types import SimpleNamespace
 
 import pytest
 import simulator.step_clock as step_clock
@@ -24,6 +25,15 @@ def _isothermal_session(dt_hr):
     session = run._start_session()
     session.simulator.melt.temperature_C = 1450.0
     return session
+
+
+def test_melt_clock_advance_preserves_existing_whole_and_fractional_values():
+    melt = SimpleNamespace(hour=0.0, campaign_hour=4.0)
+
+    assert step_clock.advance_melt_clock(melt, 1.0) == 4.0
+    assert (melt.hour, melt.campaign_hour) == (1.0, 5.0)
+    assert step_clock.advance_melt_clock(melt, 0.25) == 5.0
+    assert (melt.hour, melt.campaign_hour) == (1.25, 5.25)
 
 
 @pytest.mark.parametrize("seconds", [77.4, 1002.0])
