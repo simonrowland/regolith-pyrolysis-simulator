@@ -377,6 +377,25 @@ def test_engine_cache_key_preserves_exact_float_values() -> None:
     )
 
 
+def test_hot_round_trip_preserves_float_hex_exactly(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "hex.sqlite"))
+    pins = (
+        "0x0.0p+0", "-0x0.0p+0", "0x0.0000000000001p-1022",
+        "0x1.0000000000001p+0", "0x1.fffffffffffffp+1023",
+    )
+    expected = {str(index): float.fromhex(pin) for index, pin in enumerate(pins)}
+    request = {"call": "float-hex-pin"}
+    cold = engine_cache.cached_engine_call("openimcc", request, lambda: expected)
+    engine_cache._MEMORY_CACHE.clear()
+    warm = engine_cache.cached_engine_call(
+        "openimcc", request, lambda: pytest.fail("expected disk hit"),
+    )
+    for result in (cold, warm):
+        assert tuple(result[str(index)].hex() for index in range(len(pins))) == pins
+
+
 def test_engine_cache_json_matches_shared_canonical_encoder() -> None:
     from simulator.canonical import canonical_json_dumps
 
