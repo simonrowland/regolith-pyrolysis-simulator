@@ -1740,6 +1740,20 @@ def test_al091_h_minus_h298_fit_restores_all_qualified_comparisons() -> None:
         Engine.NASA_CEA_9
     }
 
+    internal_comparisons = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        invoke_pure_phase=False,
+        fit_records=(record,),
+    )
+    internal_h_comparisons = [
+        comparison
+        for comparison in internal_comparisons
+        if comparison.quantity is Quantity.H_MINUS_H298
+    ]
+    # Liquid H−H298 is not routed to the crystal-only JANAF evaluators.
+    assert internal_h_comparisons == []
+
 
 def test_nasa9_fit_census_is_separate_and_lists_regolith_species() -> None:
     from simulator.battery.compilation_tier import compilation_tier_census
