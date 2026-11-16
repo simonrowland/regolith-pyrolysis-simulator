@@ -664,12 +664,15 @@ def _well_formed_disclosure(item: Any) -> dict[str, Any] | None:
         and len(band) == 2
     ):
         lo_value = band[0]
-        hi_value = band[1]
         try:
             lo = finite_builtin_number(lo_value)
+        except (TypeError, ValueError):
+            lo = None
+        hi_value = band[1]
+        try:
             hi = finite_builtin_number(hi_value)
         except (TypeError, ValueError):
-            return None
+            hi = None
         if lo is None or hi is None:
             return None
         certified = [lo, hi]

@@ -196,6 +196,27 @@ def test_stored_disclosure_band_indexing_error_propagates() -> None:
         parse_stored_disclosure_field([record], present=True)
 
 
+def test_stored_disclosure_converts_band_endpoints_independently() -> None:
+    class BadFloat(float):
+        def __float__(self):
+            raise TypeError("bad float conversion")
+
+    record = {
+        "law_id": "law",
+        "provenance": "fixture",
+        "authority": "diagnostic/extrapolated",
+        "certified_band_K": None,
+        "anchor_gaps_dex": {},
+        "closer": "",
+        "certification_route": [],
+        "evaluation_count": 1,
+    }
+    for band in ([BadFloat(1.0), 10**400], [10**400, BadFloat(1.0)]):
+        record["certified_band_K"] = band
+        with pytest.raises(OverflowError):
+            parse_stored_disclosure_field([record], present=True)
+
+
 def test_ellingham_float_registers_fe_law_once() -> None:
     """The bare-float helper publishes no notice. The run disclosure does."""
 
