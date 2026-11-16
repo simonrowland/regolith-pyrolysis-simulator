@@ -9679,6 +9679,20 @@ def test_as_printed_provenance_echo_conversion_is_pinned() -> None:
     assert _is_as_printed_provenance_echo(EchoName())
 
 
+def test_observation_point_condition_mapping_order_is_pinned() -> None:
+    observation = F.observation(
+        "point-condition-order",
+        "point-condition-order-experiment",
+        F.pref_identity(),
+        Decimal("1"),
+    )
+
+    decoded = observation_from_plain(to_plain(observation))
+
+    assert tuple(decoded.point_conditions) == tuple(observation.point_conditions)
+    assert decoded.point_conditions == observation.point_conditions
+
+
 def test_j01_declared_quantity_refuses_area_normalized_rate_without_area() -> None:
     selection = select_declared_source(
         Quantity.EVAPORATION_RATE,
