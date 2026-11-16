@@ -104,17 +104,10 @@ TABLE1_RECORD_ID = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 TABLE2_RECORD_ID = "robie-hemingway-fisher-1978-usgs-b1452-0002"
 REFERENCE_TEMPERATURE_K = Decimal("298.15")
 B1452_RECORD_POLYMORPHS = {
-    # Printed p. 301 is aragonite; the captured heading is OCR-damaged.
-    f"{SOURCE_ID}-0275": Polymorph.ARAGONITE,
-    # Printed folio 346 (PDF p. 352) names Mullite (3-2); the captured name
-    # OCRs the initial M as f, leaving its crystal polymorph unresolved.
-    f"{SOURCE_ID}-0320": Polymorph.MULLITE,
     # Printed pp. 405–406 split KAlSiO4 into low and high kaliophillite.
     f"{SOURCE_ID}-0379": Polymorph.KALIOPHILLITE_LOW,
     # Printed p. 405 gives the high form from 810 to 1800 K.
     f"{SOURCE_ID}-0379-phase-02": Polymorph.KALIOPHILLITE_HIGH,
-    f"{SOURCE_ID}-0380": Polymorph.KALIOPHILLITE_LOW,
-    f"{SOURCE_ID}-0380-phase-02": Polymorph.KALIOPHILLITE_HIGH,
 }
 B1452_ROW_POLYMORPHS = {
     # Printed p. 28 summary's 298.15 K value matches the low-form interval on p. 405.
@@ -127,189 +120,878 @@ B1452_ROW_POLYMORPHS = {
 B1452_FORMULA_CORRECTIONS = {
     f"{SOURCE_ID}-0368": "Ca2Mg5[Si8O22](OH)2",
 }
+# Record + field corrections transcribed from rendered B1452 pages.
 B1452_SOURCE_TEXT_CORRECTIONS = {
     # Physical PDF p. 36 / folio 30.
     f"{SOURCE_ID}-0004-phase-02": {
-        "phase_as_published": (('LiqYid', 'Liquid'),),
+        "phase_as_published": (
+            ('LiqYid', 'Liquid'),
+        ),
     },
     # Physical PDF p. 40 / folio 34.
     f"{SOURCE_ID}-0008-phase-02": {
-        "phase_as_published": (('LiquJ.d', 'Liquid'),),
+        "phase_as_published": (
+            ('LiquJ.d', 'Liquid'),
+        ),
+    },
+    # Physical PDF p. 72 / folio 66.
+    f"{SOURCE_ID}-0040-phase-02": {
+        "phase_as_published": (
+            ('L~quid', 'Liquid'),
+        ),
     },
     # Physical PDF p. 74 / folio 68.
     f"{SOURCE_ID}-0042-phase-04": {
-        "phase_as_published": (('Liguid', 'Liquid'),),
+        "phase_as_published": (
+            ('Liguid', 'Liquid'),
+        ),
     },
     # Physical PDF p. 78 / folio 72.
     f"{SOURCE_ID}-0046": {
-        "phase_as_published": (('98(J', '980'),),
+        "phase_as_published": (
+            ('98(J', '980'),
+        ),
     },
     # Physical PDF p. 78 / folio 72.
     f"{SOURCE_ID}-0046-phase-02": {
-        "phase_as_published": (('13&u', '1360'),),
+        "phase_as_published": (
+            ('13&u', '1360'),
+        ),
     },
     # Physical PDF p. 89 / folio 83.
     f"{SOURCE_ID}-0057-phase-02": {
-        "phase_as_published": (('Liguid', 'Liquid'),),
+        "phase_as_published": (
+            ('Liguid', 'Liquid'),
+        ),
     },
     # Physical PDF p. 120 / folio 114.
     f"{SOURCE_ID}-0088-phase-03": {
-        "phase_as_published": (('Liqu1.d', 'Liquid'),),
+        "phase_as_published": (
+            ('Liqu1.d', 'Liquid'),
+        ),
     },
     # Physical PDF p. 128 / folio 122.
     f"{SOURCE_ID}-0096": {
-        "phase_as_published": (('O~tho~hombic', 'Orthorhombic'), ('c~ystals', 'crystals')),
+        "phase_as_published": (
+            ('O~tho~hombic', 'Orthorhombic'),
+            ('c~ystals', 'crystals'),
+        ),
     },
     # Physical PDF p. 128 / folio 122.
     f"{SOURCE_ID}-0096-phase-02": {
-        "phase_as_published": (('O~tho~hombic', 'Orthorhombic'), ('c~ystals', 'crystals')),
+        "phase_as_published": (
+            ('O~tho~hombic', 'Orthorhombic'),
+            ('c~ystals', 'crystals'),
+        ),
     },
     # Physical PDF p. 128 / folio 122.
     f"{SOURCE_ID}-0096-phase-03": {
-        "phase_as_published": (('O~tho~hombic', 'Orthorhombic'), ('c~ystals', 'crystals')),
+        "phase_as_published": (
+            ('O~tho~hombic', 'Orthorhombic'),
+            ('c~ystals', 'crystals'),
+        ),
     },
     # Physical PDF p. 213 / folio 207.
     f"{SOURCE_ID}-0181-phase-03": {
-        "phase_as_published": (('Liguid', 'Liquid'),),
+        "phase_as_published": (
+            ('Liguid', 'Liquid'),
+        ),
+    },
+    # Physical PDF p. 260 / folio 254.
+    f"{SOURCE_ID}-0228": {
+        "name_as_published": (
+            ('PEROVSKITE', 'Perovskite'),
+        ),
+        "phase_as_published": (
+            ('Alpha crystals (orthorhoabic) 298.15 to 1530 K.                        Beta crystals (cubic)\n              1530 to 1800 K.', 'Alpha crystals (orthorhombic) 298.15 to 1530 K. Beta crystals (cubic) 1530 to 1800 K.'),
+        ),
+    },
+    # Physical PDF p. 260 / folio 254.
+    f"{SOURCE_ID}-0228-phase-02": {
+        "name_as_published": (
+            ('PEROVSKITE', 'Perovskite'),
+        ),
+        "phase_as_published": (
+            ('Alpha crystals (orthorhoabic) 298.15 to 1530 K.                        Beta crystals (cubic)\n              1530 to 1800 K.', 'Alpha crystals (orthorhombic) 298.15 to 1530 K. Beta crystals (cubic) 1530 to 1800 K.'),
+        ),
     },
     # Physical PDF p. 264 / folio 258.
     f"{SOURCE_ID}-0232": {
-        "phase_as_published": (('1&40', '1640'),),
+        "name_as_published": (
+            ('ILIIEHITE', 'Ilmenite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to melting point 1&40 K.                     Liquid 1&40 to 1800 K.', 'Crystals 298.15 to melting point 1640 K. Liquid 1640 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN BEFEBEVCE STATE OXIDES\n  FEO •••••••• ft. P. 1650 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nFeO M. P. 1650 K.'),
+        ),
     },
     # Physical PDF p. 264 / folio 258.
     f"{SOURCE_ID}-0232-phase-02": {
-        "phase_as_published": (('1&40', '1640'),),
+        "name_as_published": (
+            ('ILIIEHITE', 'Ilmenite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to melting point 1&40 K.                     Liquid 1&40 to 1800 K.', 'Crystals 298.15 to melting point 1640 K. Liquid 1640 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN BEFEBEVCE STATE OXIDES\n  FEO •••••••• ft. P. 1650 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nFeO M. P. 1650 K.'),
+        ),
+    },
+    # Physical PDF p. 273 / folio 267.
+    f"{SOURCE_ID}-0241": {
+        "name_as_published": (
+            ('GEIKELITE', 'Geikelite'),
+        ),
     },
     # Physical PDF p. 286 / folio 280.
     f"{SOURCE_ID}-0254": {
-        "phase_as_published": (('Liqaid', 'Liquid'),),
+        "phase_as_published": (
+            ('Liqaid', 'Liquid'),
+        ),
     },
     # Physical PDF p. 286 / folio 280.
     f"{SOURCE_ID}-0254-phase-02": {
-        "phase_as_published": (('Liqaid', 'Liquid'),),
+        "phase_as_published": (
+            ('Liqaid', 'Liquid'),
+        ),
+    },
+    # Physical PDF p. 305 / folio 299.
+    f"{SOURCE_ID}-0273": {
+        "name_as_published": (
+            ('WITHERITE', 'Witherite'),
+        ),
+        "phase_as_published": (
+            ('orthorhombic crystals .298.15 to 1079 K.               Tetragonal crystals 1079 to\n             1241 K.     Cubic crystals 1241 to 1600 K.', 'Orthorhombic crystals 298.15 to 1079 K. Tetragonal crystals 1079 to 1241 K. Cubic crystals 1241 to 1600 K.'),
+        ),
+    },
+    # Physical PDF p. 305 / folio 299.
+    f"{SOURCE_ID}-0273-phase-02": {
+        "name_as_published": (
+            ('WITHERITE', 'Witherite'),
+        ),
+        "phase_as_published": (
+            ('orthorhombic crystals .298.15 to 1079 K.               Tetragonal crystals 1079 to\n             1241 K.     Cubic crystals 1241 to 1600 K.', 'Orthorhombic crystals 298.15 to 1079 K. Tetragonal crystals 1079 to 1241 K. Cubic crystals 1241 to 1600 K.'),
+        ),
+    },
+    # Physical PDF p. 305 / folio 299.
+    f"{SOURCE_ID}-0273-phase-03": {
+        "name_as_published": (
+            ('WITHERITE', 'Witherite'),
+        ),
+        "phase_as_published": (
+            ('orthorhombic crystals .298.15 to 1079 K.               Tetragonal crystals 1079 to\n             1241 K.     Cubic crystals 1241 to 1600 K.', 'Orthorhombic crystals 298.15 to 1079 K. Tetragonal crystals 1079 to 1241 K. Cubic crystals 1241 to 1600 K.'),
+        ),
+    },
+    # Physical PDF p. 307 / folio 301.
+    f"{SOURCE_ID}-0275": {
+        "name_as_published": (
+            ('lRlGOliiTE', 'Aragonite'),
+        ),
+    },
+    # Physical PDF p. 309 / folio 303.
+    f"{SOURCE_ID}-0277": {
+        "name_as_published": (
+            ('CALCITE', 'Calcite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298. 15 to 140v K.', 'Crystals 298.15 to 1400 K.'),
+        ),
+    },
+    # Physical PDF p. 311 / folio 305.
+    f"{SOURCE_ID}-0279": {
+        "name_as_published": (
+            ('DOLO!ITI', 'Dolomite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to 1000 1.', 'Crystals 298.15 to 1000 K.'),
+        ),
+    },
+    # Physical PDF p. 313 / folio 307.
+    f"{SOURCE_ID}-0281": {
+        "name_as_published": (
+            ('ftAGI!IBSITE', 'Magnesite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to 1000 K.', 'Crystals 298.15 to 1000 K.'),
+        ),
+    },
+    # Physical PDF p. 316 / folio 310.
+    f"{SOURCE_ID}-0284": {
+        "name_as_published": (
+            ('STROIITUHITE', 'Strontianite'),
+        ),
+        "phase_as_published": (
+            ('orthorhoabic crystals 298.15 to 1197 K.               Hexaqonal crystals 1197 to\n            1500 K.', 'Orthorhombic crystals 298.15 to 1197 K. Hexagonal crystals 1197 to 1500 K.'),
+        ),
+    },
+    # Physical PDF p. 316 / folio 310.
+    f"{SOURCE_ID}-0284-phase-02": {
+        "name_as_published": (
+            ('STROIITUHITE', 'Strontianite'),
+        ),
+        "phase_as_published": (
+            ('orthorhoabic crystals 298.15 to 1197 K.               Hexaqonal crystals 1197 to\n            1500 K.', 'Orthorhombic crystals 298.15 to 1197 K. Hexagonal crystals 1197 to 1500 K.'),
+        ),
     },
     # Physical PDF p. 319 / folio 313.
     f"{SOURCE_ID}-0287": {
-        "phase_as_published": (('Bhoabohedral', 'Rhombohedral'), ('~rystals', 'crystals'), ('1101', '401'), ('Liqlli.d', 'Liquid')),
+        "phase_as_published": (
+            ('Bhoabohedral', 'Rhombohedral'),
+            ('~rystals', 'crystals'),
+            ('1101', '401'),
+            ('Liqlli.d', 'Liquid'),
+        ),
     },
     # Physical PDF p. 319 / folio 313.
     f"{SOURCE_ID}-0287-phase-02": {
-        "phase_as_published": (('Bhoabohedral', 'Rhombohedral'), ('~rystals', 'crystals'), ('1101', '401'), ('Liqlli.d', 'Liquid')),
+        "phase_as_published": (
+            ('Bhoabohedral', 'Rhombohedral'),
+            ('~rystals', 'crystals'),
+            ('1101', '401'),
+            ('Liqlli.d', 'Liquid'),
+        ),
     },
     # Physical PDF p. 319 / folio 313.
     f"{SOURCE_ID}-0287-phase-03": {
-        "phase_as_published": (('Bhoabohedral', 'Rhombohedral'), ('~rystals', 'crystals'), ('1101', '401'), ('Liqlli.d', 'Liquid')),
+        "phase_as_published": (
+            ('Bhoabohedral', 'Rhombohedral'),
+            ('~rystals', 'crystals'),
+            ('1101', '401'),
+            ('Liqlli.d', 'Liquid'),
+        ),
     },
     # Physical PDF p. 328 / folio 322.
     f"{SOURCE_ID}-0296-phase-03": {
-        "phase_as_published": (('Ligaid', 'Liquid'),),
+        "phase_as_published": (
+            ('Ligaid', 'Liquid'),
+        ),
+    },
+    # Physical PDF p. 339 / folio 333.
+    f"{SOURCE_ID}-0307": {
+        "name_as_published": (
+            ('IIBITLOCKIT!', 'Whitlockite'),
+        ),
+        "phase_as_published": (
+            ('Bhoabohedral crystals 298.15 to 1373 1.                !onoclinic crystals 1373\n                     to 1600 1.', 'Rhombohedral crystals 298.15 to 1373 K. Monoclinic crystals 1373 to 1600 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nP2O5 M. P. 842 K.'),
+        ),
+    },
+    # Physical PDF p. 339 / folio 333.
+    f"{SOURCE_ID}-0307-phase-02": {
+        "name_as_published": (
+            ('IIBITLOCKIT!', 'Whitlockite'),
+        ),
+        "phase_as_published": (
+            ('Bhoabohedral crystals 298.15 to 1373 1.                !onoclinic crystals 1373\n                     to 1600 1.', 'Rhombohedral crystals 298.15 to 1373 K. Monoclinic crystals 1373 to 1600 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nP2O5 M. P. 842 K.'),
+        ),
     },
     # Physical PDF p. 346 / folio 340.
     f"{SOURCE_ID}-0314": {
-        "name_as_published": (('KUIITI', 'Kyanite'),),
+        "name_as_published": (
+            ('KUIITI', 'Kyanite'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIOIS II BBPEREICE STATE OXIDES\n  SiOz••••••• ALPHA- BETA TBAISITIOI 844 lt.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 348 / folio 342.
     f"{SOURCE_ID}-0316": {
-        "name_as_published": (('.lJDlLUSIT!', 'Andalusite'),),
+        "name_as_published": (
+            ('.lJDlLUSIT!', 'Andalusite'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TBAISITIOIS II RBFBBBICB STATE OIID!S\n  SiOz••••••• ALPHA- BETA TBAISITIOI 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 350 / folio 344.
     f"{SOURCE_ID}-0318": {
-        "name_as_published": (('SILLUliiTI', 'Sillimanite'),),
+        "name_as_published": (
+            ('SILLUliiTI', 'Sillimanite'),
+        ),
+        "phase_as_published": (
+            ('crrstals 298.15 to 1800 l.', 'Crystals 298.15 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 352 / folio 346.
+    f"{SOURCE_ID}-0320": {
+        "name_as_published": (
+            ('ftULLITE ( 3-2)', 'Mullite (3-2)'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to aeltinq point 2133 K.', 'Crystals 298.15 to melting point 2133 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN REFERENCE STATE OXIDES\n  Si0 2 • • • • • • • ALPHA - BETA TRANSITION 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 354 / folio 348.
     f"{SOURCE_ID}-0322": {
-        "name_as_published": (('LlRNITE', 'Larnite'),),
+        "name_as_published": (
+            ('LlRNITE', 'Larnite'),
+        ),
+        "phase_as_published": (
+            ("Crystals 298o15 to 970 Ko               a' crystals (bredigite} 970 to 1710 Ko\n                   « crystals 1710 to 1800 Ko", 'Crystals 298.15 to 970 K. alpha prime crystals (bredigite) 970 to 1710 K. alpha crystals 1710 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TBlRSITIOBS II BEPEBEIICE STATE OXIDES\n   SiOzo•o o o o o ALPHA - BETA TBABSITIOW 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 354 / folio 348.
     f"{SOURCE_ID}-0322-phase-02": {
-        "name_as_published": (('LlRNITE', 'Larnite'),),
+        "name_as_published": (
+            ('LlRNITE', 'Larnite'),
+        ),
+        "phase_as_published": (
+            ("Crystals 298o15 to 970 Ko               a' crystals (bredigite} 970 to 1710 Ko\n                   « crystals 1710 to 1800 Ko", 'Crystals 298.15 to 970 K. alpha prime crystals (bredigite) 970 to 1710 K. alpha crystals 1710 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TBlRSITIOBS II BEPEBEIICE STATE OXIDES\n   SiOzo•o o o o o ALPHA - BETA TBABSITIOW 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 354 / folio 348.
     f"{SOURCE_ID}-0322-phase-03": {
-        "name_as_published": (('LlRNITE', 'Larnite'),),
+        "name_as_published": (
+            ('LlRNITE', 'Larnite'),
+        ),
+        "phase_as_published": (
+            ("Crystals 298o15 to 970 Ko               a' crystals (bredigite} 970 to 1710 Ko\n                   « crystals 1710 to 1800 Ko", 'Crystals 298.15 to 970 K. alpha prime crystals (bredigite) 970 to 1710 K. alpha crystals 1710 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TBlRSITIOBS II BEPEBEIICE STATE OXIDES\n   SiOzo•o o o o o ALPHA - BETA TBABSITIOW 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 356 / folio 350.
     f"{SOURCE_ID}-0324": {
-        "name_as_published": (('CALCIU!I OLIVINE', 'Calcium olivine'),),
+        "name_as_published": (
+            ('CALCIU!I OLIVINE', 'Calcium olivine'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to 1120 K.               Calcium oliYine is the stable fora of\n              dicalci~•     silicate below 1120 K.', 'Crystals 298.15 to 1120 K. Calcium olivine is the stable form of dicalcium silicate below 1120 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN REFERENCE STATE OIIDES\n  SiOz••••••• ALPHA- BETA TRANSITIOH 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 358 / folio 352.
+    f"{SOURCE_ID}-0326": {
+        "name_as_published": (
+            ('GEHLENITE', 'Gehlenite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298. 15 to aelting point 1863 K.', 'Crystals 298.15 to melting point 1863 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN REFERENCE STATE OXIDES\n  SiOz•• •••••    ALPHA -     BETA TRANSITION 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 360 / folio 354.
     f"{SOURCE_ID}-0328": {
-        "name_as_published": (('GBOSSOI.ll', 'Grossular'),),
+        "name_as_published": (
+            ('GBOSSOI.ll', 'Grossular'),
+        ),
+        "phase_as_published": (
+            ('a=••aa.-a:a•aaa=•=-=•=z=========-======•==za::====•======-================\n                          CrJstals 298.15 to 1200 1.', 'Crystals 298.15 to 1200 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 362 / folio 356.
     f"{SOURCE_ID}-0330": {
-        "phase_as_published": (('.altinq point 18118', 'melting point 1848'),),
+        "name_as_published": (
+            ('IIIBIIIIITB', 'Merwinite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to incongruent .altinq point 18118 K.', 'Crystals 298.15 to incongruent melting point 1848 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 364 / folio 358.
     f"{SOURCE_ID}-0332": {
-        "phase_as_published": (('aeltiag poiat', 'melting point'),),
+        "name_as_published": (
+            ('AUIIIliiT!', 'Akermanite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to aeltiag poiat 1727 K.', 'Crystals 298.15 to melting point 1727 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRlNSITIONS II BEl"EBEJCE STATE OXIDES\n  Si0 2 ••••••• ALPHA -      BETA TBAISITIOI 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 366 / folio 360.
+    f"{SOURCE_ID}-0334": {
+        "name_as_published": (
+            ('TITliiTI ( SPREIE)', 'Titanite (sphene)'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to aelting polDt 1670 1.                 Liquid 1670 to 1800 1.', 'Crystals 298.15 to melting point 1670 K. Liquid 1670 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUATION', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUATION'),
+        ),
+    },
+    # Physical PDF p. 366 / folio 360.
+    f"{SOURCE_ID}-0334-phase-02": {
+        "name_as_published": (
+            ('TITliiTI ( SPREIE)', 'Titanite (sphene)'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to aelting polDt 1670 1.                 Liquid 1670 to 1800 1.', 'Crystals 298.15 to melting point 1670 K. Liquid 1670 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUATION', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUATION'),
+        ),
+    },
+    # Physical PDF p. 368 / folio 362.
+    f"{SOURCE_ID}-0336": {
+        "name_as_published": (
+            ('FAYALITE', 'Fayalite'),
+        ),
+        "phase_as_published": (
+            ('Ct"ystals 298.15 to aeltinq point 1490 K.                   Liquid 1490 to 1800 K.', 'Crystals 298.15 to melting point 1490 K. Liquid 1490 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN REFERENCE STATE OXIDES\n  FeO •••••••• !. P. 1650 K.\n  Si0 2 • • • • • • • ALPHA -   BETA TRANSITION 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nFeO M. P. 1650 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 368 / folio 362.
+    f"{SOURCE_ID}-0336-phase-02": {
+        "name_as_published": (
+            ('FAYALITE', 'Fayalite'),
+        ),
+        "phase_as_published": (
+            ('Ct"ystals 298.15 to aeltinq point 1490 K.                   Liquid 1490 to 1800 K.', 'Crystals 298.15 to melting point 1490 K. Liquid 1490 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN REFERENCE STATE OXIDES\n  FeO •••••••• !. P. 1650 K.\n  Si0 2 • • • • • • • ALPHA -   BETA TRANSITION 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nFeO M. P. 1650 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 370 / folio 364.
     f"{SOURCE_ID}-0338": {
-        "phase_as_published": (('298. 15', '298.15'), ('.elting point', 'melting point')),
+        "name_as_published": (
+            ('FORSTERITE', 'Forsterite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298. 15 to .elting point 2163 K.', 'Crystals 298.15 to melting point 2163 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRAHSITIOBS IN REFERENCE STATE OIIDES\n  Si0 2 • • • • • • • ALPHA- BETA TBAHSITION 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 372 / folio 366.
+    f"{SOURCE_ID}-0340": {
+        "name_as_published": (
+            ('PDOPE', 'Pyrope'),
+        ),
+        "phase_as_published": (
+            ('aaaz====-================•=====-=\n                        CrJstals 298.15 to 1200 1.', 'Crystals 298.15 to 1200 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 374 / folio 368.
+    f"{SOURCE_ID}-0342": {
+        "name_as_published": (
+            ('CORDIERITE', 'Cordierite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to 1700 K.', 'Crystals 298.15 to 1700 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUATION', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUATION'),
+        ),
+    },
+    # Physical PDF p. 376 / folio 370.
+    f"{SOURCE_ID}-0344": {
+        "name_as_published": (
+            ('TEPBBOITE', 'Tephroite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to aelting point 1620 K.                  Liquid 1620 to 1800 K.', 'Crystals 298.15 to melting point 1620 K. Liquid 1620 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUATIOH', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUATIOH'),
+        ),
+    },
+    # Physical PDF p. 376 / folio 370.
+    f"{SOURCE_ID}-0344-phase-02": {
+        "name_as_published": (
+            ('TEPBBOITE', 'Tephroite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to aelting point 1620 K.                  Liquid 1620 to 1800 K.', 'Crystals 298.15 to melting point 1620 K. Liquid 1620 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUATIOH', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUATIOH'),
+        ),
+    },
+    # Physical PDF p. 378 / folio 372.
+    f"{SOURCE_ID}-0346": {
+        "name_as_published": (
+            ('ZIRCOI', 'Zircon'),
+        ),
+        "phase_as_published": (
+            ('Tetragonal crystals 298.15 to 1800 1.               lote zircon decoaposes to\n               ZrOz and SiOz at approzi•ately 1949 K.', 'Tetragonal crystals 298.15 to 1800 K. Note zircon decomposes to ZrO2 and SiO2 at approximately 1949 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUATION', 'TRANSITIONS IN REFERENCE STATE OXIDES\nZrO2 MONOCLINIC TO TETRAGONAL CRYSTAL 1478 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUATION'),
+        ),
     },
     # Physical PDF p. 380 / folio 374.
     f"{SOURCE_ID}-0348": {
-        "phase_as_published": (('11t00', '1400'),),
-        "name_as_published": (("lOLLI STOll 'lB", 'Wollastonite'),),
+        "name_as_published": (
+            ("lOLLI STOll 'lB", 'Wollastonite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to 11t00 K.               Pseudowollastonite is the stable phase\n            aboYe 1398 K.', 'Crystals 298.15 to 1400 K. Pseudowollastonite is the stable phase above 1398 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ("TRANSITIONS IB BEP'EBEBCE STATE OXIDES\n  Si0 2 • • • • • • • ALPHA- BETA TBAISITIOI 844 I.", 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 382 / folio 376.
     f"{SOURCE_ID}-0350": {
-        "name_as_published": (('PSBUDOiOLLlSTOIITI', 'Pseudowollastonite'),),
+        "name_as_published": (
+            ('PSBUDOiOLLlSTOIITI', 'Pseudowollastonite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to •eltiag poiDt 1817 I.', 'Crystals 298.15 to melting point 1817 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 384 / folio 378.
     f"{SOURCE_ID}-0352": {
-        "auxiliary_lines_as_published": (('lLPBl', 'ALPHA'), ('BBTl', 'BETA'), ('841t', '844')),
-        "name_as_published": (('Ca-ll PIBOIDB', 'Ca-Al pyroxene'),),
+        "name_as_published": (
+            ('Ca-ll PIBOIDB', 'Ca-Al pyroxene'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to 1700 1.', 'Crystals 298.15 to 1700 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('BB Lft IG POI IT                                         BOILIIG PODT                                    I', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nBB Lft IG POI IT                                         BOILIIG PODT                                    I'),
+        ),
     },
     # Physical PDF p. 386 / folio 380.
     f"{SOURCE_ID}-0354": {
-        "phase_as_published": (('11:', 'K'),),
+        "name_as_published": (
+            ('DIOPSIDE', 'Diopside'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to aelting point 1664 11:.', 'Crystals 298.15 to melting point 1664 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQOATIOM', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQOATIOM'),
+        ),
     },
     # Physical PDF p. 388 / folio 382.
     f"{SOURCE_ID}-0356": {
-        "auxiliary_lines_as_published": (('.lLPH.l', 'ALPHA'),),
+        "name_as_published": (
+            ('cr-SPODUftEIE', 'alpha Spodumene'),
+        ),
+        "phase_as_published": (
+            ('======================================================================~==~======\n                         Crystals 298.15 to 1200 K.', 'Crystals 298.15 to 1200 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TBAIISITIOIIS Ill REPEBEHCE STATE OXIDES\n  Si0 2 • • • • • • • .lLPH.l -    BETA TBAIISITIOII 844 ft •', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 390 / folio 384.
+    f"{SOURCE_ID}-0358": {
+        "name_as_published": (
+            ('j;-S PODUKEN E', 'beta Spodumene'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN REFERENCE STATE OIIDES\n  Si0 2 ••••••• ALPHA -        BETA TRAISITIOIII 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 392 / folio 386.
     f"{SOURCE_ID}-0360": {
-        "phase_as_published": (('cr Eucr:rptite', 'alpha Eucryptite'), ('Bucr:rptite', 'beta Eucryptite')),
-        "auxiliary_lines_as_published": (('81111', '844'),),
+        "name_as_published": (
+            ('EOCBYPTITI!', 'Eucryptite'),
+        ),
+        "phase_as_published": (
+            ('cr Eucr:rptite 298.15 to 1300 K.               Bucr:rptite 1300 to 1600 K.', 'alpha Eucryptite 298.15 to 1300 K. beta Eucryptite 1300 to 1600 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IN BEFEREIIICE STATE OIIDES\n  Si0 2 ••••••• ALPHA - BETA TRANSITION 81111                J(.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 394 / folio 388.
     f"{SOURCE_ID}-0362": {
-        "name_as_published": (('CLIIOBISTATITE', 'Clinoenstatite'),),
+        "name_as_published": (
+            ('CLIIOBISTATITE', 'Clinoenstatite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to aelting point 1830 K.', 'Crystals 298.15 to melting point 1830 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TBANSITIOIS IN BEPEBEliiCE STATE OXIDES\n  SiOz••••••• ALPHA- BETA TRlliiSITIOlll 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 396 / folio 390.
     f"{SOURCE_ID}-0364": {
-        "phase_as_published": (('•eltiog poi.Dt 1564 lt', 'melting point 1564 K'),),
+        "name_as_published": (
+            ('BHODOIIITE', 'Rhodonite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to •eltiog poi.Dt 1564 lt.', 'Crystals 298.15 to melting point 1564 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TBA NSI TI ONS II REFERENCE STATE OXIDES\n  Si0 2 • • • • • • • ALPHA - BETA TBANSITIOI 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 398 / folio 392.
+    f"{SOURCE_ID}-0366": {
+        "name_as_published": (
+            ('JADEITE', 'Jadeite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to 1300 K.', 'Crystals 298.15 to 1300 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUlTIOli', 'TRANSITIONS IN REFERENCE STATE OXIDES\nNa2O M. P. 1193 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUlTIOli'),
+        ),
+    },
+    # Physical PDF p. 400 / folio 394.
+    f"{SOURCE_ID}-0368": {
+        "name_as_published": (
+            ("TREI'IOLITE", 'Tremolite'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS IH REFERENCE STATE OXIDES\n  Si0 2 • • • • • • • ALPHA - BETA TRANSITIOII 844 K.\n  H 2 0 •• ••• •••    B.   P.   373. 15 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nH2O B. P. 373.15 K.'),
+        ),
+    },
+    # Physical PDF p. 402 / folio 396.
+    f"{SOURCE_ID}-0370": {
+        "name_as_published": (
+            ('ABOBTBITI', 'Anorthite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to •elting point 1830 K.', 'Crystals 298.15 to melting point 1830 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 404 / folio 398.
+    f"{SOURCE_ID}-0372": {
+        "name_as_published": (
+            ("!'OBIIOLl 11BlGBr", 'CaAl2Si2O8 glass'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 406 / folio 400.
+    f"{SOURCE_ID}-0374": {
+        "name_as_published": (
+            ('!ICROCLili E', 'Microcline'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to 1400 K.', 'Crystals 298.15 to 1400 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TBAISITIOIS IN        BE~EREICE    STATE OXIDES\n  K2 0 •••••••• DECOIIPOS!S ABOVE 1154 K.\n  SiOz•••• ••• ALPHA -       BETA TBAIISITIOII 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 408 / folio 402.
+    f"{SOURCE_ID}-0376": {
+        "name_as_published": (
+            ('HIGH SANIDIRE', 'High sanidine'),
+        ),
+        "phase_as_published": (
+            ('crystals 298.15 to melting point 1473 K.', 'Crystals 298.15 to melting point 1473 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('TRANSITIONS II REFERENCE STATE OXIDES\n  K 2 0 ••••••••   DECOMPOSES ABOVE 1154 K.\n SiOz••••••• ALPHA- BETA TBANSITIOI 844 K.', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 410 / folio 404.
+    f"{SOURCE_ID}-0378": {
+        "name_as_published": (
+            ('Kl1Si 3 0e', 'KAlSi3O8 glass'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY      ~UATIOII', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY      ~UATIOII'),
+        ),
     },
     # Physical PDF p. 411 / folio 405.
     f"{SOURCE_ID}-0379": {
-        "phase_as_published": (('~', 'K'),),
+        "phase_as_published": (
+            ('~', 'K'),
+        ),
     },
     # Physical PDF p. 411 / folio 405.
     f"{SOURCE_ID}-0379-phase-02": {
-        "phase_as_published": (('~', 'K'),),
+        "phase_as_published": (
+            ('~', 'K'),
+        ),
     },
     # Physical PDF p. 412 / folio 406.
     f"{SOURCE_ID}-0380": {
-        "phase_as_published": (('~', 'K'),),
+        "name_as_published": (
+            ('Kl LI OPBILLITE', 'Kaliophillite'),
+        ),
+        "phase_as_published": (
+            ('Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.', 'Low kaliophillite 298.15 to 810 K. High kaliophillite 810 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQ UlTION', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQ UlTION'),
+        ),
     },
     # Physical PDF p. 412 / folio 406.
     f"{SOURCE_ID}-0380-phase-02": {
-        "phase_as_published": (('~', 'K'),),
+        "name_as_published": (
+            ('Kl LI OPBILLITE', 'Kaliophillite'),
+        ),
+        "phase_as_published": (
+            ('Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.', 'Low kaliophillite 298.15 to 810 K. High kaliophillite 810 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQ UlTION', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQ UlTION'),
+        ),
+    },
+    # Physical PDF p. 414 / folio 408.
+    f"{SOURCE_ID}-0382": {
+        "name_as_published": (
+            ('LEU CITE', 'Leucite'),
+        ),
+        "phase_as_published": (
+            ('Tetraqonal crystals 298.15 to 955 K.                   Cubic crystals 955 to 1800 K.', 'Tetragonal crystals 298.15 to 955 K. Cubic crystals 955 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUATIOIS', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUATIOIS'),
+        ),
+    },
+    # Physical PDF p. 414 / folio 408.
+    f"{SOURCE_ID}-0382-phase-02": {
+        "name_as_published": (
+            ('LEU CITE', 'Leucite'),
+        ),
+        "phase_as_published": (
+            ('Tetraqonal crystals 298.15 to 955 K.                   Cubic crystals 955 to 1800 K.', 'Tetragonal crystals 298.15 to 955 K. Cubic crystals 955 to 1800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('HEAT CAPACITY EQUATIOIS', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nHEAT CAPACITY EQUATIOIS'),
+        ),
+    },
+    # Physical PDF p. 417 / folio 411.
+    f"{SOURCE_ID}-0385": {
+        "name_as_published": (
+            ('LOI ALBITE', 'Low albite'),
+        ),
+        "phase_as_published": (
+            ('crystals 298. 15 to 11100 It.', 'Crystals 298.15 to 1400 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nNa2O M. P. 1193 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 419 / folio 413.
+    f"{SOURCE_ID}-0387": {
+        "name_as_published": (
+            ('AIIALBITE', 'Analbite'),
+        ),
+        "phase_as_published": (
+            ('Crystals 298.15 to 1400 K.\n                                                                 FORIIATION PRO!! THE O.IIDES\n                                                                               GIBBS\nTEftP.   <H;-a~98 )IT      ST\n                             0\n                                    -(G;-H;ga )/T      cop     ENTHALPY     FREE ENERGY     Log Kf\n  K         J;aol•K     Jjaol•K       Jjaol•K       Jjaol• K         kJ/aol          kJ;aol', 'Crystals 298.15 to 1400 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('ftELTING POINT              1391                    BOlLING POUT                                       K', 'TRANSITIONS IN REFERENCE STATE OXIDES\nNa2O M. P. 1193 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nftELTING POINT              1391                    BOlLING POUT                                       K'),
+        ),
+    },
+    # Physical PDF p. 421 / folio 415.
+    f"{SOURCE_ID}-0389": {
+        "name_as_published": (
+            ('', 'NaAlSi3O8 glass'),
+        ),
+        "phase_as_published": (
+            ('Glass 298.15 to 1200 1.', 'Glass 298.15 to 1200 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nNa2O M. P. 1193 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
+    },
+    # Physical PDF p. 423 / folio 417.
+    f"{SOURCE_ID}-0391": {
+        "name_as_published": (
+            ('NEPHELINE', 'Nepheline'),
+        ),
+        "phase_as_published": (
+            ("Crystals 298.15 to 1521 K.             carnegieite is the stable phase aboYe\n               1521 K.\n                                                                 FOR!lriOII FROB THE Oil DES\n                                                                               GIBBS\nTE!P.   ( a;-H~98 )1'1'     so\n                             T      -(G;-H~ 98 )/T      co\n                                                         p     ENTHALPY     FREE EIIERGI   Log If\n  K         Jjaol•K       Jjaol•K     Jjaol•l        Jjaol•K        kJ/aol         kJ/aol", 'Crystals 298.15 to 1521 K. Carnegieite is the stable phase above 1521 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nNa2O M. P. 1193 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.'),
+        ),
     },
     # Physical PDF p. 425 / folio 419.
     f"{SOURCE_ID}-0393": {
-        "phase_as_published": (('Crysta~s', 'Crystals'),),
+        "name_as_published": (
+            ('!USCOUTB', 'Muscovite'),
+        ),
+        "phase_as_published": (
+            ('Crysta~s        298.15 to 1500 K.', 'Crystals 298.15 to 1500 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nK2O DECOMPOSES ABOVE 1154 K.\nSiO2 ALPHA - BETA TRANSITION 844 K.\nH2O B. P. 373.15 K.'),
+        ),
     },
     # Physical PDF p. 426 / folio 420.
     f"{SOURCE_ID}-0394": {
-        "phase_as_published": (('.alting point', 'melting point'), ('Liq•id', 'Liquid')),
+        "phase_as_published": (
+            ('.alting point', 'melting point'),
+            ('Liq•id', 'Liquid'),
+        ),
+    },
+    # Physical PDF p. 428 / folio 422.
+    f"{SOURCE_ID}-0396": {
+        "name_as_published": (
+            ('!lLC', 'Talc'),
+        ),
+        "phase_as_published": (
+            ("crystals 298.15 to 1100 1.\n                                                                    POIIlUOI PBOI 'rHB OXIDES\n                                                                                GIBBS\nTBIIP.    (a;-a; 98 )/'r     so      -ca;-&2 98 )/T      cop     IITB.li.P!  Pill IIIIGf    Loq It\n  I         J/1101•1\n                              '\n                          J/aol•l      ol/aol•l       J/aol•l           lr.J/aol          lr.J/aol", 'Crystals 298.15 to 1100 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nH2O B. P. 373.15 K.'),
+        ),
     },
     # Physical PDF p. 430 / folio 424.
     f"{SOURCE_ID}-0398": {
-        "name_as_published": (('PIBOPBILLITB', 'Pyrophyllite'),),
+        "name_as_published": (
+            ('PIBOPBILLITB', 'Pyrophyllite'),
+        ),
+        "phase_as_published": (
+            ("Crrstals 298.15 to 800 K.\n                                                                     FOR!lTIOtt FROB THE OIIDIS\n                                                                                   GIBBS\n1'!11P.   (a;-a; 98 )/T        so'l    -(s;-a; 98 )/T      cop     BITHlLPY     Pill BURGI    Log 't", 'Crystals 298.15 to 800 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nH2O B. P. 373.15 K.'),
+        ),
+    },
+    # Physical PDF p. 432 / folio 426.
+    f"{SOURCE_ID}-0400": {
+        "name_as_published": (
+            ('CHBlSOTILE', 'Chrysotile'),
+        ),
+        "phase_as_published": (
+            ("crystals 298.15 to 900 K.\n                                                                        !'OBI!A TIOII PBOI! THE OXIDES\n                                                                                         GIBBS\nTEIIP.       (a;-a~ 98 )/T       so\n                                  T      -(G;-a~ 98 )/T      co\n                                                              p       EITHlLPl        FBEE EUBGY     Log        Kf\n  K            J/8ol•lt       J/80l•K      J/8ol• K       J/8ol•K           kJ/801         kJ/801", 'Crystals 298.15 to 900 K.'),
+        ),
+        "auxiliary_lines_as_published": (
+            ('', 'TRANSITIONS IN REFERENCE STATE OXIDES\nSiO2 ALPHA - BETA TRANSITION 844 K.\nH2O B. P. 373.15 K.'),
+        ),
     },
 }
 B1452_CRYSTALLINE_PRODUCT_RECORDS = frozenset(
@@ -1433,6 +2115,10 @@ def _phase_from_text(text: str) -> tuple[State[Phase], State[Polymorph]]:
 
 def _normalized_phase_text(record: Mapping[str, Any]) -> str:
     text = str(record.get("phase_as_published") or "")
+    if _formation_basis_for_record(record) == "from_the_oxides":
+        return _corrected_source_text(record, text, "phase_as_published")
+    # Preserve the existing non-oxide tables; the audited oxide tables above
+    # resolve only their explicit record/field transcriptions.
     text = re.sub(r"(?<=\d)[oO](?=\d)", ".", text)
     text = re.sub(r'(?i)\bct"ystals\b', "Crystals", text)
     text = re.sub(r"(?i)\b(?:crrstals|crjstals)\b", "Crystals", text)
@@ -1450,7 +2136,10 @@ def _corrected_source_text(
     for captured, printed in B1452_SOURCE_TEXT_CORRECTIONS.get(
         str(record.get("record_id") or ""), {}
     ).get(field, ()):
-        text = text.replace(captured, printed)
+        if captured:
+            text = text.replace(captured, printed)
+        elif not text:
+            text = printed
     return text
 
 
@@ -1484,6 +2173,9 @@ def _polymorph_from_text(text: str) -> State[Polymorph]:
 def _polymorph_for_phase_window(
     record: Mapping[str, Any], label: str
 ) -> State[Polymorph]:
+    oxide_basis = _formation_basis_for_record(record) == "from_the_oxides"
+    if oxide_basis and re.search(r"(?:\balpha|α)\s*(?:prime|['′])", label, re.I):
+        return State.unknown("printed alpha-prime (bredigite) needs vocabulary t-1860")
     qualifier = re.search(r"\b(alpha|beta|gamma|delta)\b|[αβγδ]", label, re.I)
     if qualifier:
         token = resolve_printed_name_polymorph(qualifier.group(0))
@@ -1503,6 +2195,11 @@ def _polymorph_for_phase_window(
             )
         return resolution
 
+    if oxide_basis:
+        printed_label = _polymorph_from_text(label)
+        if printed_label.is_value and printed_label.value is not Polymorph.REFERENCE:
+            return printed_label
+
     record_id = str(record.get("record_id") or "")
     override = B1452_RECORD_POLYMORPHS.get(record_id)
     if override is not None:
@@ -1515,9 +2212,10 @@ def _polymorph_for_phase_window(
         return named
     if record_id in B1452_CRYSTALLINE_PRODUCT_RECORDS and "crystal" in label.lower():
         return State.of(Polymorph.CRYSTALLINE)
-    return State.unknown(
-        f"phase window {label!r} does not name a closed crystal polymorph"
-    )
+    reason = f"phase window {label!r} does not name a closed crystal polymorph"
+    if oxide_basis:
+        reason += "; vocabulary deferred to t-1860"
+    return State.unknown(reason)
 
 
 def _phase_state(
@@ -1635,16 +2333,12 @@ B1452_OXIDE_POLYMORPH_NAMES = {
 }
 _OXIDE_REFERENCE_FORMULAS = frozenset((*B1452_OXIDE_POLYMORPH_NAMES, "K2O", "H2O"))
 _OXIDE_TRANSITION_FORMULAS = {
-    "Al2O3": re.compile(r"\bAl\s*2\s*[O0]\s*3\b", re.I),
-    "SiO2": re.compile(r"\bSi\s*[O0]\s*(?:2|[zZ])\s*[oO]?\b", re.I),
-    "CaO": re.compile(r"\bCa\s*[O0]\b", re.I),
-    "MgO": re.compile(r"\bMg\s*[O0]\b", re.I),
-    "TiO2": re.compile(r"\bTi\s*[O0]\s*2\b", re.I),
-    "FeO": re.compile(r"\bFe\s*[O0]\b", re.I),
-    "Na2O": re.compile(r"\bNa\s*2\s*[O0]\b", re.I),
-    "K2O": re.compile(r"\bK\s*2\s*[O0]\b", re.I),
-    "H2O": re.compile(r"\bH\s*2\s*[O0]\b", re.I),
+    formula: re.compile(r"\b" + formula + r"\b", re.I)
+    for formula in (*_OXIDE_REFERENCE_FORMULAS, "P2O5", "ZrO2")
 }
+_OXIDES_REQUIRING_PRINTED_TRANSITIONS = frozenset(
+    {"SiO2", "FeO", "Na2O", "K2O", "H2O", "P2O5", "ZrO2"}
+)
 
 
 def _reference_oxide_transition(
@@ -1654,24 +2348,26 @@ def _reference_oxide_transition(
     if pattern is None:
         return State.not_applicable(f"no reference transition rule for oxide {formula}")
     raw_lines = record.get("auxiliary_lines_as_published") or ()
-    lines = (raw_lines,) if isinstance(raw_lines, str) else raw_lines
-    for line in lines:
-        text = _corrected_source_text(
-            record, str(line), "auxiliary_lines_as_published"
-        )
+    raw_text = raw_lines if isinstance(raw_lines, str) else "\n".join(raw_lines)
+    text = _corrected_source_text(record, raw_text, "auxiliary_lines_as_published")
+    for text in text.splitlines():
         if pattern.search(text) is None:
             continue
-        alpha_beta = re.search(r"\balpha\b.*?\bbeta\b", text, re.I)
+        alpha_beta = re.search(r"\balpha\s*-\s*beta\s+transition\b", text, re.I)
         if alpha_beta is not None:
             kind = "alpha_beta"
-        elif re.search(r"(?:m|!|ft)\s*\.?\s*p\s*\.?", text, re.I):
+        elif re.search(r"\bm\.\s*p\.", text, re.I):
             kind = "melting"
-        elif re.search(r"\bb\s*\.?\s*p\s*\.?", text, re.I):
+        elif re.search(r"\bb\.\s*p\.", text, re.I):
             kind = "boiling"
-        elif re.search(r"(?:decomposes|decoiipos!s)\s+above\b", text, re.I):
+        elif re.search(r"\bdecomposes\s+above\b", text, re.I):
             kind = "decomposition"
+        elif re.search(r"\bmonoclinic to tetragonal\b", text, re.I):
+            kind = "monoclinic_tetragonal"
         else:
-            continue
+            return State.unknown(
+                f"{record.get('record_id')}: printed {formula} transition is unreadable"
+            )
         numeric_text = text[alpha_beta.end() :] if alpha_beta is not None else text
         numbers = re.findall(r"(?<![\w.])\d+(?:\.\s*\d+)?", numeric_text)
         if not numbers:
@@ -1682,9 +2378,10 @@ def _reference_oxide_transition(
             return State.unknown(reason)
         boundary = Decimal(re.sub(r"\s+", "", numbers[-1]))
         return State.of((kind, boundary))
-    return State.not_applicable(
-        f"{record.get('record_id')}: no printed reference transition for oxide {formula}"
-    )
+    reason = f"{record.get('record_id')}: no printed reference transition for oxide {formula}"
+    if formula in _OXIDES_REQUIRING_PRINTED_TRANSITIONS:
+        return State.unknown(reason)
+    return State.not_applicable(reason)
 
 
 def _oxide_species(
@@ -1749,8 +2446,17 @@ def _oxide_species(
             return make_species(
                 formula, Phase.CR, State.of(transition_polymorph), charge=0
             )
-    # Without a printed transition, B1452 keeps the oxide's named reference
-    # phase throughout the table's stated temperature range.
+        if kind == "monoclinic_tetragonal":
+            polymorph = (
+                State.of(Polymorph.MONOCLINIC) if temperature < boundary
+                else State.unknown("printed tetragonal ZrO2 needs vocabulary t-1860")
+            )
+            return make_species(formula, Phase.CR, polymorph, charge=0)
+    if token is None:
+        reason = f"{formula}: reference phase is not printed or closed; vocabulary t-1860"
+        return make_species(formula, State.unknown(reason), polymorph, charge=0)
+    # Al2O3, CaO, MgO and TiO2 retain their named reference phase where the
+    # record prints no transition. Phase-changing references refuse above.
     return make_species(formula, phase, polymorph, charge=0)
 
 
@@ -1850,7 +2556,7 @@ def _reaction_with_pure_endmember_states(
     unresolved: list[str] = []
     for term in reaction.terms:
         species = term.species
-        if term.coefficient < 0 and species.formula in _OXIDE_REFERENCE_FORMULAS:
+        if term.coefficient < 0:
             species = _oxide_species(
                 species.formula, record=record, temperature=temperature
             )
@@ -1861,6 +2567,8 @@ def _reaction_with_pure_endmember_states(
             reason = (
                 phase_state.reason
                 if isinstance(phase_state, State) and phase_state.is_unknown
+                else f"{species.formula} gas reference standard state is not closed; t-1860"
+                if phase is Phase.G
                 else f"{species.formula} has no resolved condensed phase"
             )
             terms.append(

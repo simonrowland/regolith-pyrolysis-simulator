@@ -474,7 +474,11 @@ def test_tridymite_is_a_closed_polymorph_token() -> None:
 
 
 def test_b1452_ocr_spellings_are_not_global_mineral_vocabulary() -> None:
-    for name in ("pibopbillitb", "kuiiti", ".ljdllusit!", "llrnite"):
+    for name in (
+        "pibopbillitb", "kuiiti", ".ljdllusit!", "silluliiti", "llrnite",
+        "calciu!i olivine", "gbossoi.ll", "lolli stoll 'lb",
+        "psbudoiolllstoiiti", "ca-ll piboidb", "cliiobistatite",
+    ):
         assert name not in POLYMORPH_ALIASES
         with pytest.raises(ValueError):
             coerce_polymorph_token(name)

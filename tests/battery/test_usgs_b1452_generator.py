@@ -1788,15 +1788,17 @@ def test_unreadable_printed_silica_transition_refuses_generated_reaction() -> No
     assert silica_term.standard_state.is_unknown
 
 
-def test_unlisted_silica_transition_keeps_reference_quartz_state() -> None:
-    record = _load("robie-hemingway-fisher-1978-usgs-b1452-0398")
-    transition = generator._reference_oxide_transition(record, "SiO2")
+def test_unlisted_corundum_transition_keeps_the_named_reference_state() -> None:
+    # PDF 352 / folio 346 prints only SiO2's transition in the mullite footer.
+    record = _load("robie-hemingway-fisher-1978-usgs-b1452-0320")
+    transition = generator._reference_oxide_transition(record, "Al2O3")
     assert transition.is_not_applicable
-    silica = generator._oxide_species(
-        "SiO2", record=record, temperature=Decimal("900")
+    corundum = generator._oxide_species(
+        "Al2O3", record=record, temperature=Decimal("900")
     )
-    assert silica.phase.value is Phase.CR
-    assert silica.polymorph is not None and silica.polymorph.value is Polymorph.QUARTZ
+    assert corundum.phase.value is Phase.CR
+    assert corundum.polymorph is not None
+    assert corundum.polymorph.value is Polymorph.CORUNDUM
 
 
 def test_pyrophyllite_ocr_name_keeps_its_printed_oxide_reaction() -> None:
@@ -1828,7 +1830,7 @@ def test_pyrophyllite_ocr_name_keeps_its_printed_oxide_reaction() -> None:
     }
     assert oxide_polymorphs == {
         "Al2O3": Polymorph.CORUNDUM,
-        "SiO2": Polymorph.QUARTZ,
+        "SiO2": Polymorph.ALPHA_QUARTZ,
     }
 
 
@@ -1860,7 +1862,7 @@ def test_ocr_damaged_manganese_bounds_keep_printed_phase(
     [
         # Physical PDF p. 362 / folio 356, merwinite.
         ("robie-hemingway-fisher-1978-usgs-b1452-0330", "298.15", Decimal("43.303"), None),
-        # Physical PDF p. 364 / folio 358, arcanite.
+        # Physical PDF p. 364 / folio 358, akermanite.
         ("robie-hemingway-fisher-1978-usgs-b1452-0332", "298.15", Decimal("33.344"), None),
         # Physical PDF p. 392 / folio 386 prints alpha- and beta-eucryptite.
         ("robie-hemingway-fisher-1978-usgs-b1452-0360", "298.15", Decimal("14.152"), Polymorph.ALPHA),
@@ -2554,3 +2556,234 @@ def test_full_census_closes() -> None:
     assert "delta_fH" in quantity_counts
     assert "delta_fG" in quantity_counts
     assert "log10_Kf" in quantity_counts
+
+
+# Independent transcription of the rendered oxide-table captions. Each entry is
+# (physical PDF page, (closing T, phase, existing polymorph or None) per segment).
+# None means that the printed product needs vocabulary deferred to t-1860.
+CHECKED_OXIDE_PRODUCTS = {
+    '0228': (260, ((1530, Phase.CR, Polymorph.ALPHA), (1800, Phase.CR, Polymorph.BETA))),
+    '0232': (264, ((1640, Phase.CR, None), (1800, Phase.L, None))),
+    '0241': (273, ((1800, Phase.CR, None),)),
+    '0273': (305, ((1079, Phase.CR, Polymorph.ORTHORHOMBIC), (1241, Phase.CR, None), (1600, Phase.CR, None))),
+    '0275': (307, ((1000, Phase.CR, Polymorph.ARAGONITE),)),
+    '0277': (309, ((1400, Phase.CR, None),)),
+    '0279': (311, ((1000, Phase.CR, None),)),
+    '0281': (313, ((1000, Phase.CR, None),)),
+    '0284': (316, ((1197, Phase.CR, Polymorph.ORTHORHOMBIC), (1500, Phase.CR, None))),
+    '0307': (339, ((1373, Phase.CR, None), (1600, Phase.CR, Polymorph.MONOCLINIC))),
+    '0314': (346, ((1800, Phase.CR, Polymorph.KYANITE),)),
+    '0316': (348, ((1800, Phase.CR, Polymorph.ANDALUSITE),)),
+    '0318': (350, ((1800, Phase.CR, Polymorph.SILLIMANITE),)),
+    '0320': (352, ((2133, Phase.CR, Polymorph.MULLITE),)),
+    '0322': (354, ((970, Phase.CR, Polymorph.LARNITE), (1710, Phase.CR, None), (1800, Phase.CR, Polymorph.ALPHA))),
+    '0324': (356, ((1120, Phase.CR, Polymorph.CALCIUM_OLIVINE),)),
+    '0326': (358, ((1863, Phase.CR, Polymorph.GEHLENITE),)),
+    '0328': (360, ((1200, Phase.CR, Polymorph.GROSSULAR),)),
+    '0330': (362, ((1848, Phase.CR, None),)),
+    '0332': (364, ((1727, Phase.CR, None),)),
+    '0334': (366, ((1670, Phase.CR, None), (1800, Phase.L, None))),
+    '0336': (368, ((1490, Phase.CR, Polymorph.CRYSTALLINE), (1800, Phase.L, None))),
+    '0338': (370, ((2163, Phase.CR, Polymorph.FORSTERITE),)),
+    '0340': (372, ((1200, Phase.CR, None),)),
+    '0342': (374, ((1700, Phase.CR, None),)),
+    '0344': (376, ((1620, Phase.CR, None), (1800, Phase.L, None))),
+    '0346': (378, ((1800, Phase.CR, None),)),
+    '0348': (380, ((1398, Phase.CR, Polymorph.WOLLASTONITE), (1400, Phase.CR, Polymorph.PSEUDOWOLLASTONITE))),
+    '0350': (382, ((1817, Phase.CR, Polymorph.PSEUDOWOLLASTONITE),)),
+    '0352': (384, ((1700, Phase.CR, Polymorph.CA_AL_PYROXENE),)),
+    '0354': (386, ((1664, Phase.CR, Polymorph.DIOPSIDE),)),
+    '0356': (388, ((1200, Phase.CR, Polymorph.ALPHA),)),
+    '0358': (390, ((1700, Phase.CR, Polymorph.BETA),)),
+    '0360': (392, ((1300, Phase.CR, Polymorph.ALPHA), (1600, Phase.CR, Polymorph.BETA))),
+    '0362': (394, ((1830, Phase.CR, Polymorph.CLINOENSTATITE),)),
+    '0364': (396, ((1564, Phase.CR, None),)),
+    '0366': (398, ((1300, Phase.CR, None),)),
+    '0368': (400, ((1100, Phase.CR, None),)),
+    '0370': (402, ((1830, Phase.CR, Polymorph.ANORTHITE),)),
+    '0372': (404, ((1500, Phase.GLASS, None),)),
+    '0374': (406, ((1400, Phase.CR, None),)),
+    '0376': (408, ((1473, Phase.CR, Polymorph.SANIDINE_HIGH),)),
+    '0378': (410, ((1300, Phase.GLASS, None),)),
+    '0380': (412, ((810, Phase.CR, Polymorph.KALIOPHILLITE_LOW), (1800, Phase.CR, Polymorph.KALIOPHILLITE_HIGH))),
+    '0382': (414, ((955, Phase.CR, None), (1800, Phase.CR, None))),
+    '0385': (417, ((1400, Phase.CR, None),)),
+    '0387': (419, ((1400, Phase.CR, None),)),
+    '0389': (421, ((1200, Phase.GLASS, None),)),
+    '0391': (423, ((1521, Phase.CR, None),)),
+    '0393': (425, ((1500, Phase.CR, None),)),
+    '0396': (428, ((1100, Phase.CR, None),)),
+    '0398': (430, ((800, Phase.CR, Polymorph.PYROPHYLLITE),)),
+    '0400': (432, ((900, Phase.CR, None),)),
+}
+
+
+@pytest.mark.parametrize('record_id', OXIDE_BASIS_RECORDS)
+def test_every_audited_oxide_record_has_its_printed_product_segments(record_id: str) -> None:
+    suffix = record_id.removeprefix(generator.SOURCE_ID + '-')
+    page, segments = CHECKED_OXIDE_PRODUCTS[suffix.split('-')[0]]
+    record = _load(record_id)
+    ordinal = record['phase_segment']['ordinal']
+    for row in _generation(record_id).observations:
+        species = row.identity.species
+        if species is None and row.identity.reaction is not None and row.identity.reaction.is_value:
+            species = next(t.species for t in row.identity.reaction.value.terms if t.coefficient > 0)
+        if species is None:
+            continue
+        assert row.locator.pdf_page_index == page
+        assert row.locator.published_page == page - 6
+        temperature = row.identity.temperature_K.value
+        lo = Decimal('298.15')
+        matches = []
+        for index, (hi, phase, polymorph) in enumerate(segments, 1):
+            if lo <= temperature <= hi:
+                matches.append((index, phase, polymorph))
+            lo = Decimal(hi)
+        if not matches:
+            assert species.phase.is_unknown, (record_id, temperature)
+            continue
+        expected = matches[0] if len(matches) == 1 else next(m for m in matches if m[0] == ordinal)
+        _, phase, polymorph = expected
+        assert species.phase.is_value and species.phase.value is phase, (record_id, temperature)
+        if phase is not Phase.CR:
+            assert species.polymorph.is_not_applicable
+        elif polymorph is None:
+            assert species.polymorph.is_unknown, (record_id, temperature, species.polymorph)
+        else:
+            assert species.polymorph.is_value and species.polymorph.value is polymorph, (record_id, temperature)
+
+
+@pytest.mark.parametrize('record_id', OXIDE_BASIS_RECORDS)
+def test_every_audited_silicate_binds_its_printed_silica_transition(record_id: str) -> None:
+    # Every silicate page in the audited population prints the same 844 K line;
+    # the assertions run on every generated term, including refused reactions.
+    for row in _generation(record_id).observations:
+        if ':log10_K_reaction:' not in row.observation_id:
+            continue
+        reaction = row.identity.reaction
+        if not reaction.is_value:
+            continue
+        for term in reaction.value.terms:
+            if term.coefficient >= 0 or term.species.formula != 'SiO2':
+                continue
+            expected = Polymorph.ALPHA_QUARTZ if row.identity.temperature_K.value < 844 else Polymorph.BETA
+            assert term.species.phase.value is Phase.CR
+            assert term.species.polymorph.value is expected, (record_id, row.observation_id)
+
+
+@pytest.mark.parametrize('suffix,page', [('0368',400), ('0393',425), ('0396',428), ('0398',430), ('0400',432)])
+def test_every_hydrous_record_binds_water_and_refuses_hot_gas_standard_states(suffix: str, page: int) -> None:
+    for row in _generation(generator.SOURCE_ID + '-' + suffix).observations:
+        if ':log10_K_reaction:' not in row.observation_id or not row.identity.reaction.is_value:
+            continue
+        assert row.locator.pdf_page_index == page
+        water = next(t for t in row.identity.reaction.value.terms if t.species.formula == 'H2O')
+        if row.identity.temperature_K.value < Decimal('373.15'):
+            assert water.species.phase.value is Phase.L
+            assert water.standard_state.is_value
+        else:
+            assert water.species.phase.value is Phase.G
+            assert water.standard_state.is_unknown
+            assert row.identity.quantity.is_unknown
+
+
+def test_potassium_ocr_caption_binds_the_printed_liquid_entropy() -> None:
+    row, = _observations_for(_generation(generator.SOURCE_ID + '-0040-phase-02'), Quantity.S, temperature='400')
+    assert row.value.point == Decimal('80.83')
+    assert row.locator.pdf_page_index == 72
+    assert row.identity.species.phase.value is Phase.L
+
+
+def test_missing_water_transition_refuses_instead_of_assuming_liquid(monkeypatch) -> None:
+    record = _load(generator.SOURCE_ID + '-0398')
+    # Model the actual loss of the source footer before its record correction.
+    monkeypatch.delitem(generator.B1452_SOURCE_TEXT_CORRECTIONS[record['record_id']], 'auxiliary_lines_as_published')
+    row, = _formation_observations(generator.generate_record(record), basis='from_the_oxides', quantity=Quantity.LOG10_K_REACTION, temperature='400')
+    assert row.value.point == Decimal('1.706')
+    assert row.identity.quantity.is_unknown
+    water = next(t for t in row.identity.reaction.value.terms if t.species.formula == 'H2O')
+    assert water.species.phase.is_unknown
+    assert water.standard_state.is_unknown
+    assert 'no printed reference transition' in water.species.phase.reason
+
+
+def test_removing_record_corrections_refuses_named_ocr_records(monkeypatch) -> None:
+    monkeypatch.setattr(generator, 'B1452_SOURCE_TEXT_CORRECTIONS', {})
+    for suffix in ('0314', '0316', '0318', '0324', '0350', '0356', '0358', '0376', '0398'):
+        rows = _formation_observations(_generation(generator.SOURCE_ID + '-' + suffix), basis='from_the_oxides', quantity=Quantity.LOG10_K_REACTION)
+        assert rows and all(row.identity.quantity.is_unknown for row in rows), suffix
+
+
+def test_missing_water_assumption_mutation_is_detected(monkeypatch) -> None:
+    original = generator._oxide_species
+    def assume_liquid(formula, *, record=None, temperature=None):
+        if formula == 'H2O':
+            return generator.make_species('H2O', Phase.L, generator.State.not_applicable('not crystal'), charge=0)
+        return original(formula, record=record, temperature=temperature)
+    with monkeypatch.context() as patch:
+        patch.setattr(generator, '_oxide_species', assume_liquid)
+        with pytest.raises(AssertionError):
+            test_missing_water_transition_refuses_instead_of_assuming_liquid(monkeypatch)
+
+
+
+@pytest.mark.parametrize('record_id', OXIDE_BASIS_RECORDS)
+def test_all_generated_reference_oxides_follow_the_audited_transitions(record_id: str) -> None:
+    for row in _generation(record_id).observations:
+        if ':log10_K_reaction:' not in row.observation_id or not row.identity.reaction.is_value:
+            continue
+        temperature = row.identity.temperature_K.value
+        for term in row.identity.reaction.value.terms:
+            if term.coefficient >= 0:
+                continue
+            species = term.species
+            if species.formula in {'FeO', 'Na2O', 'P2O5'}:
+                # PDFs 264/368: FeO; 398/417/419/421/423: Na2O; 339: P2O5.
+                boundary = {'FeO': 1650, 'Na2O': 1193, 'P2O5': 842}[species.formula]
+                assert species.phase.value is (Phase.CR if temperature < boundary else Phase.L)
+            elif species.formula == 'K2O' and temperature > 1154:
+                # PDFs 406/408/410/412/414/425 print decomposition above 1154 K.
+                assert species.phase.is_unknown
+                assert 'decomposes above 1154' in species.phase.reason
+                assert term.standard_state.is_unknown
+            elif species.formula == 'ZrO2':
+                # PDF 378 / folio 372 prints monoclinic -> tetragonal at 1478 K.
+                assert species.phase.value is Phase.CR
+                if temperature < 1478:
+                    assert species.polymorph.value is Polymorph.MONOCLINIC
+                else:
+                    assert species.polymorph.is_unknown
+                    assert term.standard_state.is_unknown
+
+
+def test_audited_oxide_log_k_census_has_only_source_verified_refusal_classes() -> None:
+    from collections import Counter
+
+    classes = Counter()
+    for record_id in OXIDE_BASIS_RECORDS:
+        for row in _generation(record_id).observations:
+            if ':log10_K_reaction:' not in row.observation_id:
+                continue
+            assert row.value.point is not None
+            if row.identity.quantity.is_value:
+                classes['resolved'] += 1
+                continue
+            assert row.identity.quantity.is_unknown and row.identity.quantity.reason
+            reaction = row.identity.reaction
+            if not reaction.is_value:
+                classes['carbonate_reaction'] += 1
+                continue
+            product = next(t.species for t in reaction.value.terms if t.coefficient > 0)
+            if product.phase.is_value and product.phase.value is Phase.CR and product.polymorph.is_unknown:
+                classes['new_product_vocabulary'] += 1
+            else:
+                classes['reference_vocabulary_or_unprinted_state'] += 1
+    # Rendered examples: Geikelite/Merwinite PDFs 273/362 (new product);
+    # Witherite/Dolomite PDFs 305/311 (carbonate gas reference not closed);
+    # alpha/beta spodumene PDFs 388/390 and pyrophyllite 430 (reference state).
+    assert classes == {
+        'resolved': 221,
+        'new_product_vocabulary': 234,
+        'carbonate_reaction': 56,
+        'reference_vocabulary_or_unprinted_state': 88,
+    }
