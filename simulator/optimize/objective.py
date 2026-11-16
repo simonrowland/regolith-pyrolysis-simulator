@@ -2798,11 +2798,6 @@ def _tap_coating_product_summary(
     priced_deposit = booked["deposit"]
     availability = booked["availability_authority"]
     notice = booked["notice_authority"]
-    lifetime = _coating_lifetime_projection(
-        priced_deposit,
-        campaigns_elapsed=campaigns_elapsed,
-        authority=availability,
-    )
     booking_fields = _wall_supply_booking_fields(booked)
     if not priced_deposit:
         return MappingProxyType(
@@ -2810,7 +2805,6 @@ def _tap_coating_product_summary(
                 "wall_deposit_kg_by_segment_species": MappingProxyType({}),
                 "wall_deposit_kg_by_zone_species": MappingProxyType({}),
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
-                **lifetime,
                 **_furnace_lifespan_cost_summary_from_raw(
                     priced_deposit,
                     campaigns_elapsed=campaigns_elapsed,
@@ -2853,7 +2847,6 @@ def _tap_coating_product_summary(
                 })
                 for segment, species_map in remobilization.items()
             }),
-            **lifetime,
             **_furnace_lifespan_cost_summary_from_raw(
                 priced_deposit,
                 campaigns_elapsed=campaigns_elapsed,
@@ -5003,12 +4996,6 @@ def _coating_product_summary(
         cumulative_deposits_kg=known_priced,
     )
     campaigns_elapsed = _campaigns_elapsed(run_execution)
-    lifetime = _coating_lifetime_projection(
-        priced_deposit,
-        campaigns_elapsed=campaigns_elapsed,
-        authority=booked["availability_authority"],
-        coating_margin=coating_margin,
-    )
     summary: dict[str, Any] = {
         "wall_deposit_kg_by_segment_species": by_segment,
         "wall_deposit_kg_by_zone_species": MappingProxyType({
@@ -5022,7 +5009,6 @@ def _coating_product_summary(
             })
             for segment, species_map in remobilization.items()
         }),
-        **lifetime,
         **_furnace_lifespan_cost_summary_from_raw(
             priced_deposit,
             campaigns_elapsed=campaigns_elapsed,
@@ -6298,6 +6284,7 @@ def _furnace_lifespan_cost_summary_from_raw(
         lifetime["has_positive_qualified_fouling"] is None
     )
     summary: dict[str, Any] = {
+        **lifetime,
         "furnace_lifespan_consumed_fraction": None,
         "lifespan_cost_status": (
             "wall_deposit_unavailable"
@@ -7072,20 +7059,13 @@ def _depreciation_expense_per_run_summary(
         return MappingProxyType(payload)
     threshold = summary.get("resinter_threshold_kg")
     wall_load = _finite_float(summary.get("wall_deposit_total_kg", 0.0), "wall_deposit_total_kg")
-    availability = wall_deposit_figure_availability(
-        has_positive_deposit=wall_load > 0.0,
-        refusal=summary.get("wall_deposit_refusal"),
-    )
     if threshold is not None:
-        threshold_kg = _finite_float(threshold, "resinter_threshold_kg")
-        if threshold_kg <= 0.0:
-            raise ObjectiveComputationError("resinter_threshold_kg must be positive")
-        if availability.status == "measured_empty":
+        if not summary["has_positive_qualified_fouling"]:
             campaigns_to_resinter = None
             depreciation = 0.0
             status = "no_wall_deposit"
         else:
-            campaigns_to_resinter = threshold_kg / wall_load
+            campaigns_to_resinter = summary["aggregate_campaigns_to_resinter"]
             if campaigns_to_resinter <= 0.0:
                 raise ObjectiveComputationError(
                     "aggregate campaigns_to_resinter must be positive"
