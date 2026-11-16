@@ -739,6 +739,43 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
     assert fit_row["refusal_detail"] == {}
 
 
+def test_nasa9_fit_duplicate_records_preserve_comparison_order(monkeypatch) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    from simulator.battery.compilation_tier import ThermoAttempt, _nasa9_fit_comparisons
+    from simulator.battery.enums import QUANTITY_UNITS
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+
+    def echo_fit(engine, observation, **_kwargs):
+        return ThermoAttempt(
+            value=observation.value.point,
+            unit=QUANTITY_UNITS[Quantity.CP],
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="duplicate-fit-pin",
+            coefficient_sources=(),
+        )
+
+    monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", echo_fit)
+    single = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+        fit_records=(record,),
+    )
+    repeated = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+        fit_records=(record, record),
+    )
+
+    assert single
+    assert repeated == [*single, *single]
+
+
 def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> None:
     from simulator.battery.compilation_tier import _compilation_engines_for_pair
     from simulator.battery.score import SCORE_ENGINE_SET

@@ -10978,6 +10978,65 @@ def _count_work_input_lookups(
     return work_expansions, registered_lookup_walks
 
 
+def test_indexed_work_inputs_match_independent_per_work_resolution() -> None:
+    """The once-built work index preserves each standalone ancestry result."""
+
+    import simulator.battery.validate as validate
+
+    first_work = F.work("indexed-work-a")
+    second_work = F.work("indexed-work-b")
+    first_experiment = F.tabulation_experiment(
+        experiment_id="indexed-exp-a", work_id=first_work.work_id
+    )
+    second_experiment = F.tabulation_experiment(
+        experiment_id="indexed-exp-b", work_id=second_work.work_id
+    )
+    first_observation = F.observation(
+        "indexed-observation-a",
+        first_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    second_observation = F.observation(
+        "indexed-observation-b",
+        second_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    works = {
+        first_work.work_id: first_work,
+        second_work.work_id: second_work,
+    }
+    observations = {
+        first_observation.observation_id: first_observation,
+        second_observation.observation_id: second_observation,
+    }
+    experiments = {
+        first_experiment.experiment_id: first_experiment,
+        second_experiment.experiment_id: second_experiment,
+    }
+    indexes = validate._build_validation_indexes(works, observations, experiments)
+
+    expected = {
+        work.work_id: validate._inputs_for_work(
+            work,
+            observations,
+            experiments,
+            indexes.table_ids,
+            asset_ids=indexes.asset_ids,
+        )
+        for work in works.values()
+    }
+
+    assert validate._index_work_inputs(
+        works, observations, experiments, indexes
+    ) == expected
+    assert expected[first_work.work_id].ids == {first_observation.observation_id}
+    assert expected[second_work.work_id].ids == {second_observation.observation_id}
+
+
 def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
