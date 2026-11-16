@@ -844,10 +844,11 @@ def test_nasa9_fit_does_not_reuse_values_for_a_different_coefficient_set(
     assert len(set(coefficient_sets)) == 2
 
 
-def test_nasa9_fit_cache_parses_all_segment_fields_before_validation() -> None:
+def test_nasa9_fit_cache_validates_before_parsing_later_segment() -> None:
     from copy import deepcopy
 
     from simulator.battery.compilation_tier import _nasa9_fit_comparisons
+    from simulator.vapour_rail.nasa_cea import NasaCeaSegmentError
 
     record, context, _printed_cell = _nasa9_fit_test_case()
     malformed = deepcopy(record)
@@ -858,7 +859,7 @@ def test_nasa9_fit_cache_parses_all_segment_fields_before_validation() -> None:
     del second_segment["b2"]
     malformed["thermo_record"]["segments"] = [first_segment, second_segment]
 
-    with pytest.raises(KeyError) as exc_info:
+    with pytest.raises(NasaCeaSegmentError) as exc_info:
         _nasa9_fit_comparisons(
             context,
             engines=(),
@@ -866,8 +867,9 @@ def test_nasa9_fit_cache_parses_all_segment_fields_before_validation() -> None:
             fit_records=(malformed,),
         )
 
-    assert exc_info.value.args == ("b2",)
-    assert str(exc_info.value) == "'b2'"
+    assert str(exc_info.value) == (
+        "NASA-9 segment requires T_min_K > 0 K; got -1.0"
+    )
 
 
 def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> None:
