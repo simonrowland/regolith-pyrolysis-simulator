@@ -89,7 +89,7 @@ def _render_pins(document: dict) -> None:
         assert values["Fe2O3_wt_percent_as_printed"] == fe2o3
         assert row["locator"]["page"] == 2
         assert row["locator"]["table"] == "1"
-        assert row["standard_state"]["state"]["value"]["endmember"]["formula"] == "Fe_tO"
+        assert row["standard_state"]["state"]["value"]["endmember"]["formula"] == "Fe(1-x)O"
         assert row["standard_state"]["state"]["value"]["endmember"]["phase"]["value"] == "l"
         assert redox_row["values"]["quantity"] == "fe3_fe2_ratio"
         assert redox_row["values"]["method_class"] == "measured_tabulated"
@@ -144,7 +144,9 @@ def test_isolated_migration_binds_table_rows_and_keeps_unprinted_pressure_unknow
         assert observation.identity.quantity is not None
         assert observation.identity.quantity.is_value
         assert observation.identity.quantity.value is Quantity.ACTIVITY
-        assert observation.identity.species.formula == "Fe_tO"
+        assert observation.identity.species.formula == "FeO"
+        assert observation.identity.reference_state.value.endmember.formula == "Fe(1-x)O"
+        assert observation.uncertainty.derivation.relation == "total_iron_basis"
         assert observation.identity.species.phase.is_value
         assert observation.identity.species.phase.value is Phase.L
         assert observation.evidence.class_.is_value
