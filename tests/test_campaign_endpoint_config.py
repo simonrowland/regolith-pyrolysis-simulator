@@ -566,6 +566,10 @@ def test_c4_na_endpoint_uses_005_percent_of_feedstock_and_additive_na() -> None:
     ) is True
 
     termination = manager.last_c4_termination
+    assert manager.last_campaign_stop == {
+        "stop_reason": "endpoint_met",
+        "detail": "na_residual",
+    }
     assert termination["outcome"] == "endpoint_met"
     assert termination["stop_reason"] == "endpoint_met"
     assert termination["feed_na_atom_mol"] == pytest.approx(1000.0)
@@ -732,6 +736,10 @@ def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
     assert manager.last_c4_termination["acquisition_opportunity_hr"] == 4.0
     assert manager.last_c4_termination["completed_campaign_hour"] == 4.0
     assert manager.last_c4_termination["residual_melt"]["flag"] == "time_cap"
+    assert manager.last_campaign_stop == {
+        "stop_reason": "time_cap",
+        "detail": "c4_target_window_not_acquired",
+    }
 
 
 def test_c4_post_acquisition_process_wall_is_a_time_cap() -> None:
@@ -1472,6 +1480,10 @@ def test_c4_permanent_transport_hold_ends_on_time_cap() -> None:
     assert manager.last_c4_termination["stop_reason"] == "time_cap"
     assert manager.last_c4_termination["acquisition_opportunity_hr"] == 0.0
     assert manager.last_c4_termination["residual_melt"]["flag"] == "time_cap"
+    assert manager.last_campaign_stop == {
+        "stop_reason": "time_cap",
+        "detail": "c4_preheat_wall_clock_exhausted",
+    }
 
 
 def test_c6_at_hold_target_none_is_not_at_hold() -> None:

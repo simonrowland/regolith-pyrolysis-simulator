@@ -3352,7 +3352,7 @@ class CampaignManager:
                     'completed_window_hr': completed_window_hr,
                     **residual_fields('endpoint_met'),
                 }
-                return True
+                return self._end_at("endpoint_met", detail="na_residual")
             window_low_C, window_high_C = self._c4_temperature_window()
             requested_window_C = [window_low_C, window_high_C]
             acquisition_limit_hr, acquisition_limit_source = (
@@ -3424,7 +3424,9 @@ class CampaignManager:
                         )
                     diagnostic.update(residual_fields('time_cap'))
                     self.last_c4_termination = diagnostic
-                    return True
+                    return self._end_at(
+                        "time_cap", detail=C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON,
+                    )
                 if acquisition_elapsed_hr >= acquisition_limit_hr:
                     diagnostic = {
                         'outcome': C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON,
@@ -3444,7 +3446,9 @@ class CampaignManager:
                         )
                     diagnostic.update(residual_fields('time_cap'))
                     self.last_c4_termination = diagnostic
-                    return True
+                    return self._end_at(
+                        "time_cap", detail=C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON,
+                    )
                 return False
 
             current_in_window = (
