@@ -151,7 +151,7 @@ def test_table2_valence_cells_render_pins_and_migrate_with_conditions() -> None:
         assert resolution.band is not None and resolution.band.value > 0
         assert resolution.band.band_basis == "row_printed"
         assert resolution.notice is not None
-        assert resolution.notice.reason == "confidence_level_not_stated"
+        assert resolution.notice.reason == "uncertainty_confidence_level_assumed_1sigma"
 
     esr_observations = [
         observation for observation in observations

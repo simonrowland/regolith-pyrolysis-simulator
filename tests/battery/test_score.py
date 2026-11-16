@@ -1503,10 +1503,10 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
         "redox-field-uncertainty",
         "redox-field-experiment",
         identity,
-        Decimal("0.72"),
+        Decimal("18") / Decimal("7"),
         evidence=EvidenceClass.MEASURED_REDUCED,
         derivation=Derivation(
-            relation="Fe3_over_FeT to Fe3+/Fe2+",
+            relation=score_mod.FERRIC_FRACTION_RELATION,
             inputs=("redox-source-row",),
             parameters=(("original_Fe3_over_FeT", F.located(Decimal("0.72"))),),
             output_unit="dimensionless",
@@ -1520,14 +1520,20 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     printed = _printed_uncertainty_band(
         Quantity.FE3_FE2_RATIO,
         uncertainty,
-        Decimal("0.72"),
+        Decimal("18") / Decimal("7"),
         source_observation=observation,
     )
 
     assert printed.refusal is None
     assert printed.band is not None
     assert printed.band.band_basis == "row_printed"
-    assert printed.band.value == Decimal("0.01223445641701162951905623210")
+    expected_sigma_log10_ratio = Decimal("0.02") / (
+        Decimal(10).ln() * Decimal("0.72") * Decimal("0.28")
+    )
+    assert abs(
+        printed.band.value
+        - expected_sigma_log10_ratio * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    ) < Decimal("1e-20")
 
     unparseable = _printed_uncertainty_band(
         Quantity.FE3_FE2_RATIO,
@@ -1541,6 +1547,47 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert unparseable.band is None
     assert unparseable.refusal is not None
     assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
+
+    near_one = F.observation(
+        "redox-near-one-uncertainty",
+        "redox-near-one-experiment",
+        identity,
+        Decimal("99"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derivation=Derivation(
+            relation=score_mod.FERRIC_FRACTION_RELATION,
+            inputs=("redox-source-row",),
+            parameters=(("original_Fe3_over_FeT", F.located(Decimal("0.99"))),),
+            output_unit="dimensionless",
+        ),
+    )
+    near_one_band = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        uncertainty,
+        Decimal("99"),
+        source_observation=near_one,
+    )
+    assert near_one_band.band is None
+    assert near_one_band.refusal is not None
+    assert near_one_band.refusal["reason"] == (
+        "ferric_fraction_uncertainty_linearization_invalid"
+    )
+
+    from simulator.battery.score_metrics import populate_numeric
+
+    numeric, reason, _ = populate_numeric(
+        quantity=Quantity.FE3_FE2_RATIO,
+        candidate=Decimal("100"),
+        reference=Decimal("99"),
+        source_relation=SourceRelation.UNKNOWN,
+        printed_refusal=near_one_band.refusal,
+        operation_override=MetricOperation.DEX,
+        band_operation=MetricOperation.DEX,
+    )
+    assert reason is None
+    assert numeric is not None
+    assert numeric.value.is_finite()
+    assert numeric.decision_band is None
 
 
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:
@@ -7568,6 +7615,91 @@ def test_unstated_printed_uncertainty_sets_a_band_and_notice() -> None:
         notice.reason == "confidence_level_not_stated"
         and "field=sigma" in notice.band
         and "printed_width=0.02" in notice.band
+        for notice in residual.notices
+    )
+
+
+def test_assumed_one_sigma_notice_reports_flipped_two_sigma_verdict() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    ref = replace(
+        F.observation(
+            "na-psat-unstated-plus-minus",
+            exp.experiment_id,
+            ident,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 0.01 Pa",
+        ),
+    )
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("1.015"), ident))
+
+    assert residual.numeric is not None
+    assert residual.refusal is None
+    assert residual.status is ResidualStatus.MATCH
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+    )
+    assert notice.band is not None
+    assert "two_sigma_reading_verdict=mismatch" in notice.band
+
+
+def test_source_method_confidence_level_overrides_assumption() -> None:
+    from simulator.battery.records import Locator, SourceMethodUncertainty
+
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    ref = replace(
+        F.observation(
+            "na-psat-method-two-sigma",
+            exp.experiment_id,
+            ident,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 0.01 Pa",
+        ),
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal("0.01"),
+        meaning="two_sigma",
+        quantity=Quantity.P_SAT,
+        basis="absolute",
+        quantity_basis="partial pressure in Pa",
+        locator=Locator(
+            page=2,
+            paragraph="Methods",
+            note="Reported ± uncertainties are two standard deviations.",
+        ),
+    )
+    work = replace(
+        F.work(), source_method_uncertainties={"work-1": method_uncertainty}
+    )
+    context = _context(work, exp, ref)
+
+    residual, _ = compile_residual(
+        ref,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={ref.observation_id},
+        prediction=_predict(Decimal("1.015"), ident),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.rule.startswith("printed_2sigma:")
+    assert not any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
         for notice in residual.notices
     )
 
@@ -14314,6 +14446,26 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
 ) -> None:
     from simulator.battery import score as score_module
 
+    original_combine = getattr(
+        score_module, "_combine_independent_standard_uncertainties", None
+    )
+    combine_calls = []
+    combined_by_measurement = {}
+
+    def capture_combine(measurement_sigma, conversion_sigma):
+        combine_calls.append((measurement_sigma, conversion_sigma))
+        if original_combine is None:
+            return Decimal(0)
+        combined = original_combine(measurement_sigma, conversion_sigma)
+        combined_by_measurement[measurement_sigma] = combined
+        return combined
+
+    monkeypatch.setattr(
+        score_module,
+        "_combine_independent_standard_uncertainties",
+        capture_combine,
+        raising=False,
+    )
     temperature = Decimal("2000")
     composition = Composition(
         basis="printed_mole_fraction",
@@ -14342,7 +14494,7 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
         ),
         uncertainty=Uncertainty(
             kind=UncertaintyKind.PRINTED,
-            verbatim="±0.10 standard deviation of log10(a) as printed",
+            verbatim="±0.10 dex",
             locator=F.loc(page=4, table="2"),
         ),
     )
@@ -14370,17 +14522,37 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
         reference,
         Engine.INTERNAL_ANALYTICAL,
         context=_context(F.work(), experiment, reference, review="reviewed"),
-        prediction=_predict(converted.value.point, converted.identity),
+        prediction=_predict(
+            converted.value.point * Decimal("1.4125375446227544"),
+            converted.identity,
+        ),
     )
 
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
+    assert residual.status is ResidualStatus.MATCH
     band = residual.numeric.decision_band
     assert band.band_basis == "fusion_combined_row_printed"
     assert band.value > Decimal("0.10") * score_module.NORMAL_95_TICKET_MULTIPLIER
     # sigma_conv = 1 kJ/mol * 1000 J/kJ / (8.31441 J/(mol K) * 2000 K * ln(10));
     # sigma_total = sqrt(0.10^2 + sigma_conv^2) dex; ticket = 1.959963984540054 * sigma_total.
     assert band.value.quantize(Decimal("0.00001")) == Decimal("0.20257")
+    # The two-sigma reading treats the same printed width as 0.05 dex.
+    # With the same JANAF conversion sigma its ticket is 0.11056 dex.
+    assert [measurement for measurement, _conversion in combine_calls] == [
+        Decimal("0.10"),
+        Decimal("0.05"),
+    ]
+    assert combine_calls[0][1] == combine_calls[1][1]
+    assert (
+        score_module.NORMAL_95_TICKET_MULTIPLIER
+        * combined_by_measurement[Decimal("0.05")]
+    ).quantize(Decimal("0.00001")) == Decimal("0.11056")
+    assert any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+        and "two_sigma_reading_verdict=mismatch" in (notice.band or "")
+        for notice in residual.notices
+    )
     assert any(
         item.reason.startswith("reference_converted_via_fusion;")
         for item in residual.notices
