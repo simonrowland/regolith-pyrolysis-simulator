@@ -38,9 +38,12 @@ DISCLOSURE_CARRYING = frozenset({
     "attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache",
     "store:simulator/battery/residue.py:pressure_cache",
     "store:simulator/battery/residue.py:pressure_state_cache",
+    "store:simulator/battery/score_run.py:residue_prediction_cache",
     "store:simulator/battery/score.py:residue_prediction_cache",
     "store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE",
     "store:simulator/diagnostic_helpers/kems.py:_surface_cache",
+    "store:simulator/engine_cache.py:_MEMORY_CACHE",
+    "sqlite:simulator/engine_cache.py:engine_outputs",
 })
 
 
@@ -163,9 +166,109 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
                     "attr",
                     node.value,
                 )
+        if rel == "simulator/engine_cache.py":
+            for node in tree.body:
+                if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+                    value = node.value
+                    if (
+                        node.target.id == "_MEMORY_CACHE"
+                        and isinstance(value, ast.Call)
+                        and isinstance(value.func, ast.Name)
+                        and value.func.id == "OrderedDict"
+                    ):
+                        add(
+                            f"store:{rel}:_MEMORY_CACHE",
+                            rel,
+                            node.lineno,
+                            "store",
+                            "_MEMORY_CACHE",
+                        )
+                if isinstance(node, ast.FunctionDef) and node.name == "_initialize_cache":
+                    source = ast.get_source_segment(
+                        path.read_text(encoding="utf-8"), node
+                    ) or ""
+                    if "CREATE TABLE IF NOT EXISTS {_TABLE}" in source:
+                        add(
+                            f"sqlite:{rel}:engine_outputs",
+                            rel,
+                            node.lineno,
+                            "sqlite",
+                            "engine_outputs",
+                        )
+        if rel == "simulator/battery/score.py":
+            for node in tree.body:
+                if (
+                    isinstance(node, ast.FunctionDef)
+                    and node.name == "_residue_prediction_cache_entry"
+                ):
+                    # The scorer owns the disclosure-aware cache access path;
+                    # score_run owns the mapping instance passed into it.
+                    add(
+                        f"store:{rel}:residue_prediction_cache",
+                        rel,
+                        node.lineno,
+                        "store",
+                        "residue_prediction_cache",
+                    )
     return found
 
 CACHE_SITES: dict[str, dict[str, Any]] = {
+    'lru:simulator/engine_cache.py:_string_bytes': {
+        "path": 'simulator/engine_cache.py',
+        "line": 97,
+        "kind": 'lru',
+        "name": '_string_bytes',
+        "carries_disclosure": False,
+        "how": 'Memoized HOT key string encoding. It returns bytes, not an evaluated vapour-law result.',
+    },
+    'lru:simulator/engine_cache.py:_key_float_bytes': {
+        "path": 'simulator/engine_cache.py',
+        "line": 107,
+        "kind": 'lru',
+        "name": '_key_float_bytes',
+        "carries_disclosure": False,
+        "how": 'Memoized HOT key float encoding. It returns bytes, not an evaluated vapour-law result.',
+    },
+    'lru:simulator/engine_cache.py:runtime_identity': {
+        "path": 'simulator/engine_cache.py',
+        "line": 810,
+        "kind": 'lru',
+        "name": 'runtime_identity',
+        "carries_disclosure": False,
+        "how": 'Memoizes diagnostic engine identity metadata. It does not cache chemistry outputs or skip a law execution.',
+    },
+    'store:simulator/battery/score_run.py:residue_prediction_cache': {
+        "path": 'simulator/battery/score_run.py',
+        "line": 430,
+        "kind": 'store',
+        "name": 'residue_prediction_cache',
+        "carries_disclosure": True,
+        "how": 'Per score-run residue prediction cache keyed by source, engine, and selected rows. Scorer readers accept stored disclosures before returning predictions.',
+    },
+    'store:simulator/battery/score.py:residue_prediction_cache': {
+        "path": 'simulator/battery/score.py',
+        "line": 15762,
+        "kind": 'store',
+        "name": 'residue_prediction_cache',
+        "carries_disclosure": True,
+        "how": 'Scorer cache access path over the mapping owned by score_run. Hashimoto, Knudsen, and Sossi cache readers call accept_stored_memo before returning rows.',
+    },
+    'store:simulator/engine_cache.py:_MEMORY_CACHE': {
+        "path": 'simulator/engine_cache.py',
+        "line": 388,
+        "kind": 'store',
+        "name": '_MEMORY_CACHE',
+        "carries_disclosure": True,
+        "how": 'Process LRU keyed by cache path, engine/version/request digest, and readonly mode. Residue-pressure values carry law_disclosures and hits call accept_stored_memo.',
+    },
+    'sqlite:simulator/engine_cache.py:engine_outputs': {
+        "path": 'simulator/engine_cache.py',
+        "line": 929,
+        "kind": 'sqlite',
+        "name": 'engine_outputs',
+        "carries_disclosure": True,
+        "how": 'Persistent HOT SQLite rows keyed by engine/version/request digest. Internal-analytical residue-pressure values carry law_disclosures and hits call accept_stored_memo.',
+    },
     'attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache': {
         "path": 'simulator/evaporation.py',
         "line": 2418,
@@ -782,14 +885,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Local scratch for rates, equilibrium constants, metadata, or validation. It does not store a vapour-law disclosure.',
     },
-    'store:simulator/battery/score.py:residue_prediction_cache': {
-        "path": 'simulator/battery/score.py',
-        "line": 14124,
-        "kind": 'store',
-        "name": 'residue_prediction_cache',
-        "carries_disclosure": True,
-        "how": 'Hashimoto cohorts, Knudsen results, and Sossi rows carry law_disclosures. _cached_hashimoto_cohort, _cached_knudsen_result, and _cached_sossi_prediction are the only reads and each calls accept_stored_memo. A physics entry with no field is dropped and recomputed.',
-    },
     'store:simulator/battery/validate.py:_cache': {
         "path": 'simulator/battery/validate.py',
         "line": 1948,
@@ -1292,6 +1387,28 @@ def _extra_cache_line(
             "Integer LRU bound. Not a cached vapour pressure.",
             None,
         )
+    if path == "simulator/battery/score.py" and any(
+        token in stripped
+        for token in (
+            "_residue_prediction_cache_key",
+            "_residue_prediction_cache_entry",
+        )
+    ):
+        return _classification_of(
+            "store:simulator/battery/score.py:residue_prediction_cache"
+        )
+    if path == "simulator/engine_cache.py":
+        return (
+            "inert",
+            "Engine-cache configuration, key encoding, or schema wiring. Cached engine values are stored in _MEMORY_CACHE or engine_outputs.",
+            None,
+        )
+    if path == "simulator/melt_backend/base.py":
+        return (
+            "inert",
+            "HOT projection or notice-code schema. It does not store or return a cached vapour-law result.",
+            None,
+        )
     if path == "simulator/yaml_cache.py":
         return (
             "inert",
@@ -1409,8 +1526,18 @@ def classify_controller_cache_line(
             matches.append((name, site_id))
     # A shared helper's parameter is the pressure-cache gate even though the
     # line does not repeat the store's name.
-    if path == "simulator/battery/score.py" and re.search(r"\bcache\s*:\s*dict\b", text):
-        return _classification_of("store:simulator/battery/score.py:residue_prediction_cache")
+    if path == "simulator/battery/score.py" and re.search(
+        r"\bcache\s*:\s*dict\b", text
+    ):
+        return _classification_of(
+            "store:simulator/battery/score.py:residue_prediction_cache"
+        )
+    if path == "simulator/battery/score_run.py" and re.search(
+        r"\bcache\s*:\s*dict\b", text
+    ):
+        return _classification_of(
+            "store:simulator/battery/score_run.py:residue_prediction_cache"
+        )
     if path == "simulator/battery/residue.py" and re.search(r"\bcache\s*:\s*dict\b", text):
         return _classification_of("store:simulator/battery/residue.py:pressure_cache")
     if path == "simulator/diagnostic_helpers/kems.py" and re.search(
