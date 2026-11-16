@@ -2656,12 +2656,10 @@ def test_every_audited_oxide_record_has_its_printed_product_segments(record_id: 
 @pytest.mark.parametrize('record_id', OXIDE_BASIS_RECORDS)
 def test_every_audited_silicate_binds_its_printed_silica_transition(record_id: str) -> None:
     # Every silicate page in the audited population prints the same 844 K line;
-    # the assertions run on every generated term, including refused reactions.
+    # the assertions run on every generated term, including refused quantities.
     for row in _generation(record_id).observations:
-        if ':log10_K_reaction:' not in row.observation_id:
-            continue
         reaction = row.identity.reaction
-        if not reaction.is_value:
+        if reaction is None or not reaction.is_value:
             continue
         for term in reaction.value.terms:
             if term.coefficient >= 0 or term.species.formula != 'SiO2':
@@ -2674,7 +2672,7 @@ def test_every_audited_silicate_binds_its_printed_silica_transition(record_id: s
 @pytest.mark.parametrize('suffix,page', [('0368',400), ('0393',425), ('0396',428), ('0398',430), ('0400',432)])
 def test_every_hydrous_record_binds_water_and_refuses_hot_gas_standard_states(suffix: str, page: int) -> None:
     for row in _generation(generator.SOURCE_ID + '-' + suffix).observations:
-        if ':log10_K_reaction:' not in row.observation_id or not row.identity.reaction.is_value:
+        if row.identity.reaction is None or not row.identity.reaction.is_value:
             continue
         assert row.locator.pdf_page_index == page
         water = next(t for t in row.identity.reaction.value.terms if t.species.formula == 'H2O')
@@ -2730,7 +2728,7 @@ def test_missing_water_assumption_mutation_is_detected(monkeypatch) -> None:
 @pytest.mark.parametrize('record_id', OXIDE_BASIS_RECORDS)
 def test_all_generated_reference_oxides_follow_the_audited_transitions(record_id: str) -> None:
     for row in _generation(record_id).observations:
-        if ':log10_K_reaction:' not in row.observation_id or not row.identity.reaction.is_value:
+        if row.identity.reaction is None or not row.identity.reaction.is_value:
             continue
         temperature = row.identity.temperature_K.value
         for term in row.identity.reaction.value.terms:

@@ -2674,6 +2674,11 @@ def _observation(
     }
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
         known["reaction"], known["formation_elements"] = _basis_states(species, basis)
+        if basis == "from_the_oxides" and known["reaction"].is_value:
+            reaction, _ = _reaction_with_pure_endmember_states(
+                known["reaction"].value, record=record, temperature=temperature
+            )
+            known["reaction"] = State.of(reaction)
     identity_quantity: Quantity | State[Quantity] = quantity
     if (
         basis == "from_the_oxides"
