@@ -2079,9 +2079,13 @@ def _trace_with_optimizer_coating_report(
             authority=booked["availability_authority"],
         )
         report.update(booking_fields)
-        report["campaigns_to_resinter_worst_segment"] = lifetime[
-            "campaigns_to_resinter_worst_segment"
-        ]
+        for key in (
+            "campaigns_to_resinter",
+            "aggregate_campaigns_to_resinter",
+            "campaigns_to_resinter_worst_segment",
+        ):
+            report[key] = lifetime[key]
+        report["campaigns_to_resinter_total"] = lifetime["aggregate_campaigns_to_resinter"]
     return _TraceAttributeOverlay(trace, {"wall_fouling_report": report})
 
 

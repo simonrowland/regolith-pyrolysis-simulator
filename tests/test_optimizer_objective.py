@@ -13796,6 +13796,10 @@ def test_unlocated_supply_bounds_the_worst_physical_wall_without_booking_zones(
     # reads 1.25, while every furnace-wide cost above reads aggregate 1.35.
     constraints = physics_module.PhysicsConstraintSet(active_gates=("coating",))
     overlay = _trace_with_optimizer_coating_report(execution, constraints)
+    report = overlay.wall_fouling_report
+    assert report["campaigns_to_resinter_worst_segment"] == pytest.approx(3.2 * campaigns_elapsed)
+    assert report["aggregate_campaigns_to_resinter"] == pytest.approx(2.962962962962963 * campaigns_elapsed)
+    assert report["campaigns_to_resinter_total"] == report["aggregate_campaigns_to_resinter"]
     margin = constraints.coating(overlay)
     assert margin.status_payload[flag_key] == flag
     assert margin.status_payload["upstream_wall_deposit_upper_bound_kg_per_campaign"] == pytest.approx(
