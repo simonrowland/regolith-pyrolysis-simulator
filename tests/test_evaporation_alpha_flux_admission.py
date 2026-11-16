@@ -1,6 +1,7 @@
 """Broad-proxy and absent-alpha evaporation predictions carry their authority."""
 
 from pathlib import Path
+import json
 
 import pytest
 import yaml
@@ -108,6 +109,37 @@ def test_absent_alpha_predicts_explicit_upper_bound_by_default():
     evaluation = result.diagnostic["alpha_s_evaluation_by_species"]["CrO2"]
     assert evaluation["alpha_authority_status"] == "analytical_upper_bound"
     assert "upper bound" in evaluation["source"]
+
+
+@pytest.mark.parametrize("spec", [0.3, {"form": "scalar", "value": 0.3}])
+def test_declared_alpha_without_authority_reaches_published_honesty(spec):
+    from simulator.fidelity_vocabulary import EvidenceClass
+    from simulator.optimize.honesty import optimizer_tier_label
+
+    result = _alpha_witness("CrO2", {"CrO2": spec})
+    assert result.status == "ok"
+    diagnostic = json.loads(json.dumps(dict(result.diagnostic)))
+    assert diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
+    assert diagnostic["alpha_used_by_species"]["CrO2"] == 0.3
+    assert diagnostic["alpha_authority_status_by_species"] == {"CrO2": "unavailable"}
+    evaluation = diagnostic["alpha_s_evaluation_by_species"]["CrO2"]
+    assert evaluation["authority_status"] == "unavailable"
+    assert evaluation["alpha_authority_status"] == "unavailable"
+    assert not evaluation.get("source")
+
+    reference = {
+        "cache_state": "live_fill",
+        "backend_name": "alphamelts",
+        "backend_status": "ok",
+        "backend_authoritative": True,
+        "evidence_class": EvidenceClass.MELTS.value,
+    }
+    assert optimizer_tier_label(reference, {})["certification_allowed"] is True
+    label = optimizer_tier_label(reference, {"run_metadata": diagnostic})
+    assert label["alpha_authority_status_by_species"] == {"CrO2": "unavailable"}
+    assert label["certification_allowed"] is False
+    assert label["canonical"]["certification_allowed"] is False
+    assert label["ux_label"] == "UNVERIFIED"
 
 
 def test_measured_alpha_witness_unchanged():

@@ -94,7 +94,7 @@ def optimizer_tier_label(
     )
     ceiling_species = alpha_ceiling_species({"alpha_authority_status_by_species": authority_statuses})
     noncertifying_alpha = any(
-        status in {ANALYTICAL_UPPER_BOUND_ALPHA_STATUS, PROXY_BRIDGE_ALPHA_STATUS}
+        status in {ANALYTICAL_UPPER_BOUND_ALPHA_STATUS, PROXY_BRIDGE_ALPHA_STATUS, "unavailable"}
         for status in authority_statuses.values()
     )
     certification_allowed = bool(canonical.get("certification_allowed", False))
