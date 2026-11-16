@@ -617,31 +617,31 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             "internal-analytical default",
             "internal-analytical",
             None,
-            "cf35124a3cfe5211638829e1ef5d1b63e68cca41ae28b97e87f195d6d73d08a0",
+            "0200010008018b0800",
         ),
         (
             "openimcc default",
             "openimcc",
             None,
-            "93f61bb559c3e9da6e4efb18f9aaf33129539a364de31d313cd100175765d3b3",
+            "0100010008018b080205086761735f7061636b050764656661756c7405096d656c745f7061636b050764656661756c74",
         ),
         (
             "AlphaMELTS default",
             "alphamelts",
             None,
-            "bc6e37a3acac7c543ac5b2487ee01442f52ba4405aa1edab44990c8c60d54bf4",
+            "050002ff7708a47acb6e5ca7dafe87caabd285f5",
         ),
         (
             "AlphaMELTS Python API default model",
             "alphamelts",
             {"transport": "python_api"},
-            "bc6e37a3acac7c543ac5b2487ee01442f52ba4405aa1edab44990c8c60d54bf4",
+            "050002ff7708a47acb6e5ca7dafe87caabd285f5",
         ),
         (
             "ThermoEngine default",
             "thermoengine",
             None,
-            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc",
+            "060002ff2330afdabce1130820fde70d072941aa",
         ),
         (
             "ThermoEngine explicit None defaults",
@@ -651,13 +651,13 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
                 "configured_vapor_transport_pO2_bar": None,
                 "configured_vapor_transport_floor_bar": None,
             },
-            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc",
+            "060002ff2330afdabce1130820fde70d072941aa",
         ),
         (
             "VapoRock default",
             "vaporock",
             None,
-            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b",
+            "0300010008018b0803050e70726573737572655f756e6974730503626172051174656d70657261747572655f756e69747305014305147661706f725f70726573737572655f756e6974730503626172",
         ),
         (
             "VapoRock explicit None units",
@@ -667,13 +667,13 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
                 "pressure_units": None,
                 "vapor_pressure_units": None,
             },
-            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b",
+            "0300010008018b0803050e70726573737572655f756e6974730503626172051174656d70657261747572655f756e69747305014305147661706f725f70726573737572655f756e6974730503626172",
         ),
         (
             "MAGEMin default",
             "magemin",
             None,
-            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27",
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d",
         ),
         (
             "MAGEMin explicit None defaults",
@@ -684,7 +684,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
                 "python_bridge": None,
                 "fO2_buffer": None,
             },
-            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27",
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d",
         ),
     )
     mismatches = {}
@@ -700,58 +700,58 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
 
     case_key_hex = {
         "AlphaMELTS transport mode": (
-            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252"
+            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS model": (
-            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252"
+            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS Python API model": (
-            "bc6e37a3acac7c543ac5b2487ee01442f52ba4405aa1edab44990c8c60d54bf4"
+            "050002ff7708a47acb6e5ca7dafe87caabd285f5"
         ),
         "AlphaMELTS redox buffer": (
-            "b963906c30e04848c0feb614ba3bf7472597260d9b165365c7cd8e25349edfbe"
+            "050002ff84021d1fcf18c54719c9792ae3309859"
         ),
         "AlphaMELTS fO2 offset": (
-            "8fc865d19b400e65d5fa735e82d16ddc1bb69579908b98c50dafbd9a5efa2e96"
+            "050002ff8b7a9acff52ddfac563117c0e162ab62"
         ),
         "AlphaMELTS Fe3+/Fet ratio": (
-            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252"
+            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS configured vapor pO2": (
-            "e8dd75150df9161e2ed3bf18e27b6c05d821708c074e3907f0c1ec72cfde287f"
+            "050002ffed5e2dd0542d245c6de74c7e5b9191bb"
         ),
         "AlphaMELTS configured vapor floor": (
-            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252"
+            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "MAGEMin database": (
-            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27"
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
         ),
         "MAGEMin worker fO2 buffer": (
-            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27"
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
         ),
         "MAGEMin bridge selection": (
-            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27"
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
         ),
         "ThermoEngine transport model": (
-            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc"
+            "060002ff2330afdabce1130820fde70d072941aa"
         ),
         "ThermoEngine vapor transport pO2": (
-            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc"
+            "060002ff2330afdabce1130820fde70d072941aa"
         ),
         "ThermoEngine vapor transport floor": (
-            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc"
+            "060002ff2330afdabce1130820fde70d072941aa"
         ),
         "OpenIMCC loaded cell pack": (
-            "64c9cbd3a7d499a665a83a620a31dda97ca2c045571779c7db51d3f2aa70db26"
+            "0100010008018b080205086761735f7061636b050764656661756c7405096d656c745f7061636b050f6f70656e696d63632d76312e302e32"
         ),
         "VapoRock temperature units": (
-            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b"
+            "0300010008018b0803050e70726573737572655f756e6974730503626172051174656d70657261747572655f756e69747305014305147661706f725f70726573737572655f756e6974730503626172"
         ),
         "VapoRock pressure units": (
-            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b"
+            "0300010008018b0803050e70726573737572655f756e6974730503626172051174656d70657261747572655f756e69747305014305147661706f725f70726573737572655f756e6974730503626172"
         ),
         "VapoRock vapor pressure units": (
-            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b"
+            "0300010008018b0803050e70726573737572655f756e6974730503626172051174656d70657261747572655f756e69747305014305147661706f725f70726573737572655f756e6974730503626172"
         ),
     }
     for case in _setting_cases():
