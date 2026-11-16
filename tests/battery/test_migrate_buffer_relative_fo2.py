@@ -17,6 +17,8 @@ from simulator.battery.migrate import (
     _classify_buffer_phrase,
     _printed_fo2_interval,
     _point_condition_from_plain,
+    _relative_buffer_for_field,
+    _scoped_oxygen_decision,
     printed_oxygen_decision,
 )
 from simulator.battery.records import Located, Value
@@ -28,7 +30,7 @@ from simulator.oxygen_buffers import (
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def _decision(raw: dict, *, temperature_K: int = 1000, **kwargs):
+def _decision(raw: dict, *, temperature_K: int | Decimal = 1000, **kwargs):
     return printed_oxygen_decision(
         PrintedOxygenFacts(),
         raw_item=raw,
@@ -143,6 +145,126 @@ def test_numeric_buffer_distances_are_exact_point_offsets() -> None:
         assert decision is not None and decision.kind == "buffer"
         assert decision.state.is_value
         assert decision.state.value == expected.state.value
+
+
+def test_dfmq_row_refusal_must_block_parent_fallback() -> None:
+    control = "DFMQ = +1.85"
+    decision, inherited = _scoped_oxygen_decision(
+        facts=PrintedOxygenFacts(log_fO2=Located(State.of(Decimal("-9")))),
+        from_fallback=True,
+        raw_item={"fO2_control": control},
+        row_point_conditions={"fO2_control": Located(State.of(control))},
+        run_temperature_K=Decimal("1588.15"),
+        source_id="jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation",
+    )
+    expected = _decision(
+        {"fO2_control": "FMQ = +1.85"},
+        temperature_K=Decimal("1588.15"),
+        source_id="jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation",
+    )
+
+    assert decision is not None and decision.kind == "buffer"
+    assert decision.state.is_value
+    assert expected is not None and expected.state.is_value
+    assert decision.state.value == expected.state.value
+    assert decision.state.value != Decimal("0.0001")
+    assert not inherited
+
+
+def test_unresolved_prefixed_buffer_control_keeps_typed_row_refusal() -> None:
+    control = "DFMQ = +not-a-number"
+    decision, inherited = _scoped_oxygen_decision(
+        facts=PrintedOxygenFacts(log_fO2=Located(State.of(Decimal("-9")))),
+        from_fallback=True,
+        raw_item={"fO2_control": control},
+        row_point_conditions={"fO2_control": Located(State.of(control))},
+        run_temperature_K=Decimal("1588.15"),
+    )
+
+    assert decision is not None and decision.kind == "refusal"
+    assert decision.state.is_unknown
+    assert "buffer-relative fO2" in decision.state.reason
+    assert not inherited
+
+
+@pytest.mark.parametrize(
+    ("printed_buffer", "family"),
+    (
+        ("IW", "IW"),
+        ("FMQ", "QFM"),
+        ("NNO", "NNO"),
+        ("Mo-MoO2", "Mo-MoO2"),
+        ("M-H", "MH"),
+        ("MW", "MW"),
+        ("CO-CO2", "CO-CO2"),
+    ),
+)
+def test_glued_relative_markers_use_the_canonicalizer_for_every_buffer_family(
+    printed_buffer: str, family: str
+) -> None:
+    canonical = _decision({"fO2_control": f"{printed_buffer} = +1.25"})
+    assert canonical is not None
+
+    markers = (
+        ("D", True),
+        ("d", True),
+        ("Δ", True),
+        ("∆", True),
+        ("delta", True),
+        ("delta-", True),
+        ("log", True),
+        ("dlog", True),
+        ("D", False),
+        ("d", False),
+        ("Δ", False),
+        ("∆", False),
+        ("delta", False),
+        ("log", False),
+        ("dlog", False),
+    )
+    for marker, prefix in markers:
+        phrase = (
+            f"{marker}{printed_buffer} = +1.25"
+            if prefix
+            else f"{printed_buffer}{marker} = +1.25"
+        )
+        parsed_family, offset, _printed, is_prose = _classify_buffer_phrase(phrase)
+        decision = _decision({"fO2_control": phrase})
+
+        assert (parsed_family, offset, is_prose) == (
+            family,
+            Decimal("1.25"),
+            False,
+        )
+        assert decision is not None
+        assert decision.state == canonical.state
+
+
+@pytest.mark.parametrize(
+    ("field_name", "family"),
+    (
+        ("DFMQ", "QFM"),
+        ("dFMQ", "QFM"),
+        ("ΔFMQ", "QFM"),
+        ("∆FMQ", "QFM"),
+        ("delta-FMQ", "QFM"),
+        ("logFMQ", "QFM"),
+        ("dlogFMQ", "QFM"),
+        ("FMQD", "QFM"),
+        ("FMQd", "QFM"),
+        ("FMQΔ", "QFM"),
+        ("FMQ∆", "QFM"),
+        ("FMQdelta", "QFM"),
+        ("FMQlog", "QFM"),
+        ("FMQdlog", "QFM"),
+        ("fO2_delta_FMQ", "QFM"),
+        ("log_fO2_as_delta_IW", "IW"),
+    ),
+)
+def test_glued_delta_field_names_use_the_buffer_canonicalizer(
+    field_name: str, family: str
+) -> None:
+    assert _relative_buffer_for_field(field_name) == family
 
 
 @pytest.mark.parametrize(

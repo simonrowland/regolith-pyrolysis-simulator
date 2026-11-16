@@ -19842,14 +19842,18 @@ class PrintedOxygenFacts:
     bare_log: bool = False
 
 
-# Tokens the buffer owner can evaluate. Longer tokens are first so the
-# alternation cannot take a prefix. Any other non-empty
-# oxygen_buffer_as_published string, including CO-CO2 with no ratio, stays
-# a typed missing-input refusal. The curve is not applied to a bounded or
-# approximate print.
+# Longer tokens are first so the alternation cannot take a prefix. CO-CO2 is
+# recognized as a family, but still refuses without the ratio it requires.
+# The curve is not applied to a bounded or approximate print.
+_BUFFER_RELATIVE_MARKERS = ("delta", "dlog", "log", "d", "Δ", "∆")
+_BUFFER_RELATIVE_MARKER = (
+    rf"(?:{'|'.join(re.escape(item) for item in _BUFFER_RELATIVE_MARKERS)})"
+)
 _BUFFER_TOKEN = (
-    r"magnetite[- ]hematite|iron[- ]w[uü]stite(?:\s+buffer)?|"
-    r"mo-moo2|m-h|fmq|qfm|nno|mh|mw|iw"
+    rf"(?:{_BUFFER_RELATIVE_MARKER}[-_ ]*)?"
+    r"(?:magnetite[- ]hematite|iron[- ]w[uü]stite(?:\s+buffer)?|"
+    r"mo-moo2|co[-–]co2|m-h|fmq|qfm|nno|mh|mw|iw)"
+    rf"(?:[-_ ]*{_BUFFER_RELATIVE_MARKER})?"
 )
 _BOUNDED_FO2_REASON = (
     "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
@@ -20548,7 +20552,7 @@ def _printed_oxygen_buffer_text(
 
 
 _BUFFER_OFFSET_TEXT_RE = re.compile(
-    rf"^\s*(?:Δ\s*)?(CO[-–]CO2|{_BUFFER_TOKEN})"
+    rf"^\s*({_BUFFER_TOKEN})"
     r"\s*([+−-])\s*((?:\d+(?:\.\d*)?|\.\d+))\s*$",
     re.IGNORECASE,
 )
@@ -20556,7 +20560,7 @@ _BUFFER_OFFSET_TEXT_RE = re.compile(
 # pressure. log10(bar) and log10(atm) stay absolute frames.
 _LOG_BUFFER_UNITS_RE = re.compile(
     r"^\s*log(?:10)?\s*\(\s*"
-    rf"(CO[-–]CO2|{_BUFFER_TOKEN})"
+    rf"({_BUFFER_TOKEN})"
     r"\s*\)\s*$",
     re.IGNORECASE,
 )
@@ -20569,7 +20573,13 @@ def _canonical_buffer_name(text: str) -> str:
     lowered = text.casefold().replace("−", "-").replace("–", "-")
     match = _BUFFER_TOKEN_RE.search(lowered)
     if match is not None:
-        token = match.group("buf").casefold().replace("ü", "u")
+        token = re.sub(
+            rf"^(?:{_BUFFER_RELATIVE_MARKER})[-_ ]*|[-_ ]*(?:{_BUFFER_RELATIVE_MARKER})$",
+            "",
+            match.group("buf"),
+            flags=re.IGNORECASE,
+        )
+        token = token.casefold().replace("ü", "u")
         token = re.sub(r"\s+", "-", token)
         return _BUFFER_FAMILY[token]
     if "co-co2" in lowered or "coco2" in re.sub(r"[^a-z0-9]", "", lowered):
@@ -20589,13 +20599,36 @@ def _buffer_named_by_log_units(units: object) -> str | None:
 
 
 def _relative_buffer_for_field(name: str) -> str | None:
-    normalized = re.sub(r"[^a-z0-9]", "", name.casefold())
-    prefixes = ("delta", "d", "fo2delta", "logfo2asdelta")
-    for token in _BUFFER_FAMILY:
-        suffix = re.sub(r"[^a-z0-9]", "", token.casefold())
-        if any(normalized in {f"{prefix}{suffix}", f"{prefix}{suffix}asprinted"} for prefix in prefixes):
-            return _canonical_buffer_name(token)
-    return None
+    normalized_markers = {
+        re.sub(
+            r"[^a-z0-9]",
+            "",
+            marker.casefold().replace("δ", "delta").replace("∆", "delta"),
+        )
+        for marker in _BUFFER_RELATIVE_MARKERS
+    }
+    match = _BUFFER_TOKEN_RE.search(name)
+    if match is None:
+        return None
+    token = match.group("buf")
+    compact_token = re.sub(
+        r"[^a-z0-9]",
+        "",
+        token.casefold().replace("δ", "delta").replace("∆", "delta"),
+    )
+    if not any(
+        compact_token.startswith(marker) or compact_token.endswith(marker)
+        for marker in normalized_markers
+    ):
+        return None
+    prefix = re.sub(r"[^a-z0-9]", "", name[: match.start()].casefold())
+    suffix = re.sub(r"[^a-z0-9]", "", name[match.end() :].casefold())
+    if prefix not in {"", "fo2", "fo2log", "logfo2as"}:
+        return None
+    if suffix not in {"", "asprinted"}:
+        return None
+    family = _canonical_buffer_name(token)
+    return family if family in set(_BUFFER_FAMILY.values()) else None
 
 
 def _relative_offset_value(raw: object) -> tuple[Decimal, str] | None:
@@ -21102,16 +21135,16 @@ _BUFFER_FAMILY = {
     "m-h": "MH",
     "mw": "MW",
 }
-_DELTA_FIELD_FAMILY = {
-    "fO2_delta_IW": "IW",
-    "delta_IW": "IW",
-    "fO2_delta_QFM": "QFM",
-    "delta_QFM": "QFM",
-    "fO2_delta_FMQ": "QFM",
-    "delta_FMQ": "QFM",
-    "fO2_delta_NNO": "NNO",
-    "delta_NNO": "NNO",
-}
+_DELTA_FIELD_KEYS = (
+    "fO2_delta_IW",
+    "delta_IW",
+    "fO2_delta_QFM",
+    "delta_QFM",
+    "fO2_delta_FMQ",
+    "delta_FMQ",
+    "fO2_delta_NNO",
+    "delta_NNO",
+)
 _CALIBRATION_TEXT_FIELDS = (
     "buffer_calibration",
     "buffer_calibration_as_published",
@@ -21449,11 +21482,15 @@ def _buffer_request_from_row(
                 units,
                 bare_name=False,
             )
-        for key, family in _DELTA_FIELD_FAMILY.items():
+        for key in _DELTA_FIELD_KEYS:
             if key not in mapping:
                 continue
-            payload = _condition_payload(mapping.get(key))
-            oxygen_text.extend(_text_pieces(mapping.get(key)))
+            family = _relative_buffer_for_field(str(key))
+            if family is None:
+                continue
+            raw = mapping[key]
+            payload = _condition_payload(raw)
+            oxygen_text.extend(_text_pieces(raw))
             raw_delta: object = payload
             if isinstance(payload, Mapping):
                 raw_delta = payload.get("delta_as_published", payload.get("delta"))
@@ -21574,6 +21611,14 @@ def _decision_for_buffer(
             "refusal",
             State.unknown(
                 "Bischof ΔIW has no cited buffer calibration; no fO2_Pa assigned"
+            ),
+        )
+    if request.buffer == "CO-CO2":
+        return PrintedOxygenDecision(
+            "refusal",
+            State.unknown(
+                "CO-CO2 buffer-relative fO2 requires the printed CO/CO2 ratio; "
+                "no fO2_Pa assigned"
             ),
         )
     pressure_bar = (
