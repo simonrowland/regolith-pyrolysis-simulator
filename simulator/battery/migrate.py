@@ -20099,6 +20099,11 @@ def _bare_log_frame_decision(
     """
 
     candidates = tuple(item.strip() for item in printed_atmospheres if item.strip())
+    explicit_mix_candidates = tuple(
+        atmosphere
+        for atmosphere in candidates
+        if _printed_sccm_gas_mixture(atmosphere) is not None
+    )
     has_total_pressure = (
         total_pressure_pa is not None
         and total_pressure_pa.is_finite()
@@ -20107,10 +20112,18 @@ def _bare_log_frame_decision(
     pressure_bar = (
         total_pressure_pa / _BAR_PA
         if has_total_pressure
-        else (_ATM_BAR if candidates else Decimal(1))
+        else (
+            None
+            if explicit_mix_candidates
+            else (_ATM_BAR if candidates else Decimal(1))
+        )
     )
-    ceiling = pressure_bar.ln() / Decimal(10).ln()
-    if log10_fO2 > ceiling:
+    ceiling = (
+        pressure_bar.ln() / Decimal(10).ln()
+        if pressure_bar is not None
+        else None
+    )
+    if ceiling is not None and log10_fO2 > ceiling:
         reason = (
             "bare log fO2 exceeds the total-pressure pO2 ceiling: "
             f"printed={_dec_str(log10_fO2)} log10(bar), "
@@ -20131,10 +20144,6 @@ def _bare_log_frame_decision(
         state, notice = _bare_log_convention(log10_fO2, temperature_K)
     else:
         state, notice = State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)), None
-    explicit_mix_candidates = any(
-        _printed_sccm_gas_mixture(atmosphere) is not None
-        for atmosphere in candidates
-    )
     if state.is_value and not explicit_mix_candidates:
         return PrintedOxygenDecision("log", state, notice_reason=notice)
 
@@ -20175,6 +20184,26 @@ def _bare_log_frame_decision(
         if kind is None:
             parsed_mix = _printed_sccm_gas_mixture(atmosphere)
             if parsed_mix is not None:
+                if not has_total_pressure:
+                    pressure_reason = (
+                        "gas-mixture consistency check unavailable: total pressure "
+                        "is missing, unknown, or invalid; printed fO2 identity is "
+                        "retained under its existing reference convention"
+                    )
+                    return PrintedOxygenDecision(
+                        "log" if state.is_value else "refusal",
+                        state,
+                        notice_reason="; ".join(
+                            part for part in (notice, pressure_reason) if part
+                        ),
+                        notice_kind=NoticeKind.INPUT_OMITTED,
+                        notices=(
+                            PrintedOxygenNotice(
+                                kind=NoticeKind.INPUT_OMITTED,
+                                reason=pressure_reason,
+                            ),
+                        ),
+                    )
                 (
                     evaluation_temperature_K,
                     evaluation_notice_reason,
@@ -20228,6 +20257,7 @@ def _bare_log_frame_decision(
                     ValueError,
                 ) as exc:
                     thermo_missing_reason = str(exc)
+                assert pressure_bar is not None
                 try:
                     resolution, _cea_log_fO2, full_balance_band = (
                         _full_balance_fo2_with_janaf_band(

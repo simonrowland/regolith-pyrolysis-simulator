@@ -58,7 +58,7 @@ def _resolution(
     )
 
 
-def test_sossi_and_doyle_real_rows_reach_bare_log_admission_with_pins() -> None:
+def test_sossi_and_doyle_real_rows_respect_total_pressure_availability() -> None:
     sossi = _source_doc("sossi-2020-magma-ocean-redox.yaml")
     sossi_experiment = next(
         experiment
@@ -98,7 +98,13 @@ def test_sossi_and_doyle_real_rows_reach_bare_log_admission_with_pins() -> None:
         printed_atmospheres=(doyle_mix,),
     )
     assert doyle_decision.state.is_value
-    assert doyle_decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert doyle_decision.state.value == log10_fo2_to_pa(Decimal("-11.92"))
+    assert doyle_decision.notice_kind is NoticeKind.INPUT_OMITTED
+    assert "total pressure" in doyle_decision.notice_reason
+    assert not any(
+        notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+        for notice in doyle_decision.notices
+    )
     assert Decimal(str(doyle_result.log10_fO2)).quantize(Decimal("0.0001")) == Decimal("-11.9193")
     assert Decimal(str(doyle_band)).quantize(Decimal("0.0001")) == Decimal("0.0004")
 
@@ -298,6 +304,7 @@ def test_real_sossi_and_doyle_migrations_preserve_gas_fugacity_identity() -> Non
         values = doyle_contexts[context_id]["values"]
         printed_log_fO2 = -Decimal(str(values["minus_log10_fO2_as_printed"]))
         assert observation.identity.temperature_K.value == Decimal("1600")
+        assert observation.identity.total_pressure_Pa.is_unknown
         assert observation.identity.fO2_Pa.value == log10_fo2_to_pa(printed_log_fO2)
         assert any(
             notice.kind is NoticeKind.INPUT_OMITTED
@@ -375,7 +382,7 @@ def test_n2_dilution_only_cancels_when_dissociation_is_negligible_and_ratio_move
     )
 
 
-def test_jayasuriya_fev15_precision_band_admits_printed_value() -> None:
+def test_jayasuriya_fev15_full_balance_band_at_explicit_pressure() -> None:
     jayasuriya = _source_doc("jayasuriya-2004-iron-mossbauer.yaml")
     observation = next(
         item
@@ -514,7 +521,7 @@ def test_real_sossi_record_oxygen_balance_fails_when_free_o2_term_is_dropped() -
     ("sample", "expected_log_fO2"),
     [("FeV15", "-3.9489"), ("FeV19", "-12.9442")],
 )
-def test_real_jayasuriya_mixtures_use_full_balance(
+def test_jayasuriya_full_balance_pins_do_not_certify_missing_pressure(
     sample: str, expected_log_fO2: str
 ) -> None:
     jayasuriya = _source_doc("jayasuriya-2004-iron-mossbauer.yaml")
@@ -531,7 +538,7 @@ def test_real_jayasuriya_mixtures_use_full_balance(
     atmosphere = point["gas_mix_as_printed"]
     printed = Decimal(str(point["log_fO2_as_published"]))
     temperature_K = Decimal(str(point["T_C"])) + Decimal("273.15")
-    result, _cea, _band = _resolution(atmosphere, temperature_K)
+    result, _cea, _band = _resolution(atmosphere, temperature_K, 1.01325)
 
     decision = _bare_log_frame_decision(
         printed,

@@ -1006,8 +1006,8 @@ def _extrapolated_direct_gas_couple_fo2(
 ) -> _ElementBalanceFO2 | None:
     """Resolve one printed gas couple outside CEA's declared temperature range.
 
-    A single CO2/CO ratio directly imposes fO2. Mixed C-H-O feeds still
-    require the full JANAF/CEA balance and do not use this fallback.
+    A single CO2/CO or H2O/H2 ratio directly imposes fO2. Mixed C-H-O feeds
+    still require the full JANAF/CEA balance and do not use this fallback.
     """
 
     try:
@@ -1020,11 +1020,19 @@ def _extrapolated_direct_gas_couple_fo2(
     if any(not math.isfinite(value) or value < 0.0 for value in amounts.values()):
         return None
     active = {name for name, amount in amounts.items() if amount > 0.0}
-    pair = {"CO2", "CO"}
-    if not pair <= active or not active <= pair | {"N2", "AR"}:
+    couple = next(
+        (
+            name
+            for name, records in _COUPLE_RECORDS.items()
+            if set(records[:2]) <= active
+            and active <= set(records[:2]) | {"N2", "AR"}
+        ),
+        None,
+    )
+    if couple is None:
         return None
 
-    couple = "CO"
+    oxidised, reduced, _oxygen = _COUPLE_RECORDS[couple]
     T = _coerce_T_K(T_K)
     lo, hi = _effective_domain_K(polynomials, _COUPLE_RECORDS[couple])
     if lo <= T <= hi:
@@ -1033,14 +1041,14 @@ def _extrapolated_direct_gas_couple_fo2(
         polynomials, couple, T, allow_extrapolation=True
     )
     log10_fO2 = _couple_log10_fO2(
-        amounts["CO2"] / amounts["CO"], log10_k
+        amounts[oxidised] / amounts[reduced], log10_k
     )
     return _ElementBalanceFO2(
         log10_fO2,
         {},
         (
             "direct printed gas-couple CEA extrapolation: "
-            f"CO2/CO couple at {T!r} K is outside [{lo!r}, {hi!r}] K",
+            f"{oxidised}/{reduced} couple at {T!r} K is outside [{lo!r}, {hi!r}] K",
         ),
     )
 
