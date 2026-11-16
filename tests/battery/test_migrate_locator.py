@@ -195,10 +195,6 @@ def test_series_child_ids_survive_locator_validation_without_coordinate_gain(
     expected_column: str | None,
 ) -> None:
     extract = _extract_with_series_points(locator_fields)
-    validator = Migrator(root=tmp_path, index={}, aliases={})
-    validator._validate_extract_locators(extract, source_key="fixture-source.yaml")
-    assert validator.result.registry_issues == []
-
     children = _assert_series_child_ids_unchanged_by_validation(
         tmp_path, monkeypatch, extract
     )
@@ -259,8 +255,6 @@ def test_series_child_id_pin_detects_locator_canonicalization_mutation(
 ) -> None:
     from simulator.battery.migrate import _locator_from_plain, to_plain
 
-    extract = _extract_with_series_points({"table_id": "I"})
-
     def canonicalizing_validator(
         migrator: Migrator, document: dict, *, source_key: str
     ) -> None:
@@ -285,8 +279,8 @@ def test_series_child_id_pin_detects_locator_canonicalization_mutation(
             Migrator, "_validate_extract_locators", canonicalizing_validator
         )
         with pytest.raises(AssertionError):
-            _assert_series_child_ids_unchanged_by_validation(
-                tmp_path, monkeypatch, extract
+            test_series_child_ids_survive_locator_validation_without_coordinate_gain(
+                tmp_path, monkeypatch, {"table_id": "I"}, None, None
             )
 
 
@@ -325,14 +319,26 @@ def _assert_series_child_ids_unchanged_by_validation(
     monkeypatch: pytest.MonkeyPatch,
     extract: dict,
 ) -> dict:
-    validated = _migrate_series_children(tmp_path, extract, "validated")
+    baseline_extract = copy.deepcopy(extract)
     with monkeypatch.context() as baseline:
         baseline.setattr(
             Migrator,
             "_validate_extract_locators",
             lambda _migrator, _document, *, source_key: None,
         )
-        unnormalized = _migrate_series_children(tmp_path, extract, "unnormalized")
+        unnormalized = _migrate_series_children(
+            tmp_path, baseline_extract, "unnormalized"
+        )
+
+    validated_extract = copy.deepcopy(extract)
+    validator = Migrator(root=tmp_path / "validation", index={}, aliases={})
+    validator._validate_extract_locators(
+        validated_extract, source_key="fixture-source.yaml"
+    )
+    assert validator.result.registry_issues == []
+    validated = _migrate_series_children(
+        tmp_path, validated_extract, "validated"
+    )
     assert validated
     assert set(validated) == set(unnormalized)
     return validated
