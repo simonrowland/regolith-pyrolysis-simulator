@@ -2,14 +2,24 @@ from __future__ import annotations
 
 import os
 from collections.abc import Mapping
-from dataclasses import fields, is_dataclass
+from dataclasses import dataclass, fields, is_dataclass
+from decimal import Decimal
+from fractions import Fraction
 from pathlib import Path
 import sys
 
 import pytest
 
 from simulator.battery import migrate
+from simulator.battery.enums import Quantity
 from simulator.yaml_cache import load_cached_decoded_record
+
+
+@dataclass(frozen=True)
+class _TypedCacheProbe:
+    quantity: Quantity
+    amount: Decimal
+    ratio: Fraction
 
 
 def _decode_store_file(path: Path, *, work_file: bool) -> object:
@@ -118,7 +128,12 @@ def test_store_record_decode_reads_only_store_file_and_python_sources(
         captured.clear()
         capture_reads = True
         try:
-            _decode_store_file(store_path, work_file=work_file)
+            decoder = (
+                migrate._decode_work_store_file
+                if work_file
+                else migrate._decode_observation_store_file
+            )
+            migrate._load_decoded_store_file(store_path, decoder)
         finally:
             capture_reads = False
 
@@ -161,6 +176,32 @@ def test_decoded_record_cache_preserves_sample_record_types_and_serialization(
         assert _serialized_plain(cold, tmp_path / f"cold-{index}.yaml") == (
             _serialized_plain(warm, tmp_path / f"warm-{index}.yaml")
         )
+
+
+def test_decoded_record_cache_preserves_enum_decimal_fraction_and_frozen_record(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "cache"))
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    expected = _TypedCacheProbe(
+        quantity=Quantity.ACTIVITY,
+        amount=Decimal("1.250"),
+        ratio=Fraction(2, 3),
+    )
+
+    cold = load_cached_decoded_record(
+        b"typed probe",
+        decoder_identity="typed-probe-v1",
+        decode=lambda: expected,
+    )
+    warm = load_cached_decoded_record(
+        b"typed probe",
+        decoder_identity="typed-probe-v1",
+        decode=lambda: pytest.fail("warm decode unexpectedly ran"),
+    )
+
+    _assert_typed_equal(expected, cold)
+    _assert_typed_equal(expected, warm)
 
 
 def test_decoded_record_cache_keys_content_and_decoder_identity(
