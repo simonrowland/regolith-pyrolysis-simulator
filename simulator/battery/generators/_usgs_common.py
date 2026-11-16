@@ -3,13 +3,107 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping, Sequence
+
+from simulator.battery.enums import Phase
+from simulator.battery.records import State
 
 
 LETTER_TAIL_RE = re.compile(r".*\d[A-Za-z]$")
 _NUMBER_RE = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$")
 MERGED_SPLIT_METHOD = "split_merged_value_uncertainty_by_column_grain"
+_PHASE_RANGE = re.compile(
+    r"(\d+(?:\.\d+)?)\.?\s*(?:K|X|It)?\s*(?:to|–|—|-)\s+"
+    r"(?:[A-Za-z~']+\s+){0,4}"
+    r"(\d+(?:\.\d+)?)\s*(?:K|X|It)\b",
+    re.IGNORECASE,
+)
+_CRYSTAL_WORD = re.compile(
+    r"crystal|cubic|rhombohedral|hexagonal|orthorhombic|monoclinic|"
+    r"triclinic|tetragonal|\bsolid\b",
+    re.IGNORECASE,
+)
+_LIQUID_WORD = re.compile(r"\bliquid\b", re.IGNORECASE)
+_GAS_WORD = re.compile(r"\bgas\b", re.IGNORECASE)
+
+
+@dataclass(frozen=True)
+class PhaseWindow:
+    index: int
+    lo: Decimal
+    hi: Decimal
+    label: str
+
+
+def phase_windows(text: str) -> tuple[PhaseWindow, ...]:
+    """Parse printed temperature windows in sentence order."""
+
+    windows: list[PhaseWindow] = []
+    previous = 0
+    for match in _PHASE_RANGE.finditer(text or ""):
+        lo = Decimal(match.group(1))
+        hi = Decimal(match.group(2))
+        if hi < lo:
+            previous = match.end()
+            continue
+        label = (text or "")[previous:match.start()]
+        label = " ".join(label.split())
+        if ":" in label:
+            label = label.split(":")[-1].strip()
+        label = label.strip(" .;,-")
+        windows.append(PhaseWindow(len(windows), lo, hi, label))
+        previous = match.end()
+    return tuple(windows)
+
+
+def phase_of_label(label: str) -> State[Phase]:
+    crystal = _CRYSTAL_WORD.search(label) is not None
+    liquid = _LIQUID_WORD.search(label) is not None
+    gas = _GAS_WORD.search(label) is not None
+    hits = [
+        phase
+        for phase, flag in ((Phase.CR, crystal), (Phase.L, liquid), (Phase.G, gas))
+        if flag
+    ]
+    if len(hits) != 1:
+        shown = label.strip() or "empty window label"
+        return State.unknown(
+            f"phase window {shown!r} does not name one of crystal, liquid, gas"
+        )
+    return State.of(hits[0])
+
+
+def assign_phase_windows(
+    temperatures: list[Decimal], windows: tuple[PhaseWindow, ...]
+) -> list[PhaseWindow | None]:
+    """Assign duplicate boundaries to their closing then opening windows."""
+
+    seen: dict[Decimal, int] = {}
+    assigned: list[PhaseWindow | None] = []
+    for temperature in temperatures:
+        hits = [window for window in windows if window.lo <= temperature <= window.hi]
+        occurrence = seen.get(temperature, 0)
+        seen[temperature] = occurrence + 1
+        if len(hits) == 1:
+            assigned.append(hits[0])
+        elif len(hits) > 1 and occurrence < len(hits):
+            assigned.append(hits[occurrence])
+        else:
+            assigned.append(None)
+    return assigned
+
+
+def phase_window_at(
+    temperature: Decimal, windows: tuple[PhaseWindow, ...]
+) -> PhaseWindow | None:
+    """Select the first printed window at a shared boundary temperature."""
+
+    return next(
+        (window for window in windows if window.lo <= temperature <= window.hi),
+        None,
+    )
 
 
 def _as_published_cell(cell: object) -> tuple[str, bool, tuple[str, ...]] | None:
