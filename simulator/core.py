@@ -14731,37 +14731,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         context = type(self).__new__(type(self))
         try:
-            # C0 forecasts sweep temperature on a detached copy of this same
-            # melt composition. Establish the owner's per-hour authority pin
-            # before copying state, so the forecast's existing redox lookup
-            # admits this record instead of dispatching another curve scan.
-            self._establish_melt_redox_gate_authority_for_current_hour()
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
-            gate_authority = getattr(
-                self,
-                '_melt_redox_gate_authority_this_tick',
-                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
-            )
-            if isinstance(gate_authority, Mapping):
-                # The forecast's temperature sweep does not change this
-                # composition-derived curve. Preserve the already-resolved
-                # record and curve through the existing deepcopy memo, so
-                # its origin, notices, and provider admission remain intact.
-                memo[id(gate_authority)] = gate_authority
-                gate_curve = gate_authority.get('curve')
-                if isinstance(gate_curve, Mapping):
-                    memo[id(gate_curve)] = gate_curve
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
-            sulfsat_gate = getattr(self, '_sulfsat_gate', None)
-            if sulfsat_gate is not None:
-                # Gate-curve memo admission compares this provider identity;
-                # forecast equilibrium skips the SulfSat computation hook.
-                memo[id(sulfsat_gate)] = sulfsat_gate
             if live_store is not None:
                 memo[id(live_store)] = forecast_store
             forecast_state = dict(self.__dict__)
+            forecast_state['_sulfsat_gate'] = None
             # The forecast gets independent provider registrations. Deep-copying
             # the live registry would traverse engine subprocess/warm pools;
             # sharing it would let forecast dispatch mutate live providers.

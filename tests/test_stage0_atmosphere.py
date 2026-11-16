@@ -296,6 +296,36 @@ def test_c0_forecast_context_does_not_retain_loaded_sulfsat_module():
     } == mutable_exports_before
 
 
+@pytest.mark.parametrize("backend_none", [False, True])
+def test_c0_forecast_construction_does_not_resolve_live_gate_authority(
+    monkeypatch, backend_none,
+):
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    if backend_none:
+        sim.backend = None
+    callers = []
+    original = PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour
+
+    def record_resolution(owner):
+        callers.append(owner)
+        return original(owner)
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_establish_melt_redox_gate_authority_for_current_hour",
+        record_resolution,
+    )
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert all(owner is not sim for owner in callers)
+
+
 def test_c0_forecast_rebuilds_registry_around_live_engine_pool_locks():
     feedstocks = yaml.safe_load(
         (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
