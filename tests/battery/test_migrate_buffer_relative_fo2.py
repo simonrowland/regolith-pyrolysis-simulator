@@ -124,17 +124,18 @@ def test_ambient_air_without_valid_total_pressure_stays_typed_unknown(
 
 
 def test_numeric_buffer_distances_are_exact_point_offsets() -> None:
-    for field, offset, phrase in (
-        ("delta_IW", "-2.0", "2 log units below IW"),
-        ("delta_NNO", "+5.0", "5 log units above NNO"),
+    for field, offset, phrase, buffer in (
+        ("delta_IW", "-2.0", "2 log units below IW", "IW; Frost (1991)"),
+        ("delta_IW", "-2.0", "2 below IW", "IW; Frost (1991)"),
+        ("delta_NNO", "+5.0", "5 log units above NNO", "NNO; Frost (1991)"),
     ):
         expected = _decision(
-            {field: offset, "oxygen_buffer_as_published": "Frost (1991)"}
+            {field: offset, "oxygen_buffer_as_published": buffer}
         )
         decision = _decision(
             {
                 "fO2_control": phrase,
-                "oxygen_buffer_as_published": "Frost (1991)",
+                "oxygen_buffer_as_published": buffer,
             }
         )
 
