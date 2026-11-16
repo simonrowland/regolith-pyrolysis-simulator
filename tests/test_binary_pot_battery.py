@@ -2752,6 +2752,51 @@ def test_internal_analytical_wall_backstop_refuses_a_blocked_child(
     assert raised.value.timeout_reason is None
 
 
+def test_internal_analytical_isolated_worker_does_not_cache_unknown_disclosures(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator import engine_cache
+    from simulator.engine_cache import _engine_cache_path_scope
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    worker = battery._IsolatedCellWorker("internal-analytical")
+    response = _ok_cell(engine="internal-analytical", gas={}).as_payload()
+    calls = {"n": 0}
+
+    def fake_call(_payload, *, timeout_s: float):
+        calls["n"] += 1
+        return dict(response)
+
+    monkeypatch.setattr(worker._worker, "call", fake_call)
+    request = {
+        "pot_id": "isolated-cell-disclosure-cache",
+        "temperature_K": 1700.0,
+        "po2": Po2Request(mode="engine_default", po2_bar=None).as_payload(),
+    }
+    try:
+        with _engine_cache_path_scope(tmp_path / "isolated-cell-disclosure.sqlite"):
+            with disclosure_scope(inherit=False) as disclosures:
+                first = worker.request(request, timeout_s=1.0)
+                second = worker.request(request, timeout_s=1.0)
+                assert disclosures.snapshot() == ()
+            counts = engine_cache.engine_cache_counters(reset=True)[
+                "internal-analytical"
+            ]
+    finally:
+        worker.close()
+
+    assert first["status"] == second["status"] == "ok"
+    assert calls["n"] == 2
+    assert counts["hits"] == 0
+    assert counts["stores"] == 0
+
+
 def test_internal_analytical_cpu_budget_tolerates_idle_wall_that_old_cap_refused(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

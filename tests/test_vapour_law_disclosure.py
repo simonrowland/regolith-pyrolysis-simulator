@@ -4920,44 +4920,103 @@ def _exercise_pressure_cache(_tmp_path, monkeypatch) -> None:
 def _exercise_engine_cache(
     tmp_path: Path, monkeypatch, *, persistent: bool
 ) -> None:
-    """Replay an executed-law record from the engine cache's RAM or SQLite store."""
+    """Replay engine-owned disclosures for both internal cache request shapes."""
 
     from simulator import engine_cache
-    from simulator.engine_cache import EngineCacheValue, _engine_cache_path_scope
+    from simulator.engine_cache import _engine_cache_path_scope
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
     engine_cache._MEMORY_CACHE.clear()
-    request = {"call": "residue_pressure", "probe": "disclosure-inventory"}
-    path = tmp_path / "engine-cache-disclosure.sqlite"
+    requests = (
+        (
+            "residue-pressure",
+            {"call": "residue_pressure", "temperature_C": 526.85},
+        ),
+        (
+            "cell-equilibrate",
+            {
+                "kwargs": {
+                    "temperature_K": 800.0,
+                    "po2_request": {"mode": "engine_default", "po2_bar": None},
+                },
+                "engine_settings": {"mode": "internal-analytical"},
+            },
+        ),
+    )
 
-    def solve():
-        with computation_disclosure() as computation:
-            pressure = _fe_pressure("FeO_association_gas")
-            disclosures = [dict(item) for item in computation.snapshot()]
-        return EngineCacheValue(
-            {"pressure_Pa": pressure, "law_disclosures": disclosures}
-        )
+    def solve_scoped(calls: dict[str, int]):
+        def solve():
+            calls["n"] += 1
+            with computation_disclosure():
+                pressure = _fe_pressure("FeO_association_gas")
+            return {"pressure_Pa": pressure}
 
-    with _engine_cache_path_scope(path):
-        with disclosure_scope(inherit=False) as cold:
-            cold_value = engine_cache.cached_engine_call(
-                "internal-analytical", request, solve
+        return solve
+
+    for label, request in requests:
+        calls = {"n": 0}
+        path = tmp_path / f"engine-cache-disclosure-{label}.sqlite"
+        with _engine_cache_path_scope(path):
+            with disclosure_scope(inherit=False) as cold:
+                cold_value = engine_cache.cached_engine_call(
+                    "internal-analytical", request, solve_scoped(calls)
+                )
+                cold_disclosures = cold.snapshot()
+            assert cold_disclosures
+            assert calls["n"] == 1
+
+            if persistent:
+                engine_cache._MEMORY_CACHE.clear()
+            with disclosure_scope(inherit=False) as warm:
+                warm_value = engine_cache.cached_engine_call(
+                    "internal-analytical",
+                    request,
+                    lambda: pytest.fail(f"warm {label} cache call recomputed"),
+                )
+                assert warm.snapshot() == cold_disclosures
+            assert warm_value == cold_value
+            assert calls["n"] == 1
+
+        # An unscoped cold write has unknown disclosures. A later scoped lookup
+        # must recompute rather than treating that unknown as a measured empty.
+        unknown_path = tmp_path / f"engine-cache-unknown-{label}.sqlite"
+        unknown_calls = {"n": 0}
+
+        def solve_unscoped():
+            unknown_calls["n"] += 1
+            return {"pressure_Pa": 123.0}
+
+        with _engine_cache_path_scope(unknown_path):
+            unscoped_value = engine_cache.cached_engine_call(
+                "internal-analytical", request, solve_unscoped
             )
-            cold_disclosures = cold.snapshot()
-        assert cold_disclosures
-        assert cold_value["law_disclosures"] == list(cold_disclosures)
+            assert unscoped_value == {"pressure_Pa": 123.0}
+            assert unknown_calls["n"] == 1
 
-        if persistent:
-            engine_cache._MEMORY_CACHE.clear()
-        with disclosure_scope(inherit=False) as warm:
-            warm_value = engine_cache.cached_engine_call(
-                "internal-analytical",
-                request,
-                lambda: pytest.fail("warm engine-cache call recomputed"),
-            )
-            assert warm.snapshot() == cold_disclosures
-        assert warm_value == cold_value
+            if persistent:
+                engine_cache._MEMORY_CACHE.clear()
+            with disclosure_scope(inherit=False) as recomputed:
+                scoped_value = engine_cache.cached_engine_call(
+                    "internal-analytical", request, solve_scoped(unknown_calls)
+                )
+                scoped_disclosures = recomputed.snapshot()
+            assert unknown_calls["n"] == 2
+            assert scoped_disclosures
+            assert scoped_value["pressure_Pa"] > 0.0
+            assert scoped_value != unscoped_value
+
+            if persistent:
+                engine_cache._MEMORY_CACHE.clear()
+            with disclosure_scope(inherit=False) as replayed:
+                replayed_value = engine_cache.cached_engine_call(
+                    "internal-analytical",
+                    request,
+                    lambda: pytest.fail(f"measured {label} cache row recomputed"),
+                )
+                assert replayed.snapshot() == scoped_disclosures
+            assert replayed_value == scoped_value
+            assert unknown_calls["n"] == 2
 
 
 def _exercise_engine_cache_memory(tmp_path, monkeypatch) -> None:
