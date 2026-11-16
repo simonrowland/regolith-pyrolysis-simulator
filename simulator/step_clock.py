@@ -71,8 +71,9 @@ def advance_melt_clock(melt, dt_hr: float) -> float:
 
     campaign_start_h = float(melt.campaign_hour)
     # Keep whole-hour serialization stable for existing campaign pins.
-    delta_h = 1 if dt_hr == 1.0 else dt_hr
-    melt.hour += delta_h
+    next_hour = next_melt_hour(melt, dt_hr)
+    delta_h = next_hour - melt.hour
+    melt.hour = next_hour
     melt.campaign_hour += delta_h
     return campaign_start_h
 

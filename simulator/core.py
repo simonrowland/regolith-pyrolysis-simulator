@@ -10327,7 +10327,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(self, '_last_backend_diagnostics', None),
             # The snapshot hour is assigned after this equilibrium, by
             # incrementing the pre-step hour.
-            hour=self.melt.hour + (1 if step_clock.dt_hr(self) == 1.0 else step_clock.dt_hr(self)),
+            hour=step_clock.next_melt_hour(self.melt, step_clock.dt_hr(self)),
         )
         if step is None:
             return
