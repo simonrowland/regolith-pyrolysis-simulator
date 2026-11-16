@@ -633,7 +633,7 @@ def _capped_trace(sim, store: PT0DeterminismStore, snapshots: list) -> dict:
     snapshot = snapshots[-1]
     curves = [
         entry["payload"]["curve"]
-        for entry in store.entries.values()
+        for entry in store._entries.values()
         if entry["artifact"] == "freeze_gate_curve"
     ]
     liquid_fraction_path = []
@@ -1216,6 +1216,77 @@ def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> No
     assert "engine_version" not in key["model"]
     assert "engine_version" not in key
     assert "total_submitted_amount_kg" not in key
+
+
+def test_magemin_freeze_gate_memo_key_preserves_domain_boundary_identity() -> None:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    sim = _build_pt0_sim(PT0DeterminismStore("capture"))
+    sim._liquid_fraction_provider = "magemin"
+    remainder = {
+        "Al2O3": 15.0,
+        "FeO": 10.0,
+        "MgO": 20.0,
+        "CaO": 20.0,
+        "Na2O": 5.0,
+    }
+
+    def key_for(sio2_wt_pct: float):
+        scale = (100.0 - sio2_wt_pct) / sum(remainder.values())
+        composition_wt_pct = {
+            "SiO2": sio2_wt_pct,
+            **{
+                species: amount * scale
+                for species, amount in remainder.items()
+            },
+        }
+        mol_by_species = {
+            species: amount
+            / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            "process.cleaned_melt",
+            mol_by_species,
+            source="b-1225 freeze-gate cache boundary pin",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        key, reason = sim._freeze_gate_cache_key_and_domain(
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+        )
+        return key, reason, composition_wt_pct
+
+    inside, inside_reason, _inside_composition = key_for(30.0)
+    # PT-0 capture uses six significant figures before the live provider and
+    # gate see this input. 29.999 remains below the inclusive 30.0 boundary
+    # at that precision while sharing the quantized cache composition key.
+    outside, outside_reason, outside_composition = key_for(29.999)
+
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    live_gate = MAGEMinBackend().equilibrate(
+        1500.0,
+        composition_kg=outside_composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    assert inside.composition_mol_fractions == outside.composition_mol_fractions
+    assert inside_reason is None
+    assert outside_reason == "silicate_window"
+    assert live_gate.status == "out_of_domain"
+    assert (
+        live_gate.diagnostics["backend_status_reason"] == outside_reason
+    )
+    assert inside == outside
 
 
 def test_amount_is_present_only_for_extensive_alphamelts_composite() -> None:
@@ -2037,6 +2108,7 @@ def test_pt0_gate_replay_separates_buffers_at_same_scalar_fO2(
         ),
         redox_state=state_a,
     )
+    record["law_disclosures"] = []
     capture_sim._freeze_gate_liquid_fraction_cache = {
         **record,
         "key": local_key,
@@ -2815,7 +2887,7 @@ def test_pt0_exact_route_refuses_dependency_vector_mismatch(
     sim, result = _pt0_equilibrium_capture_context(capture)
     capture.capture_equilibrium(sim, result)
     source_key = capture.capture_sequence[-1]["key"]
-    source_entry = capture.entries[_key_hash(source_key)]
+    source_entry = capture._entries[_key_hash(source_key)]
     query_key = copy.deepcopy(source_key)
     query_key["model"]["model"] = "different-admitted-model"
     monkeypatch.setattr(
@@ -2866,7 +2938,7 @@ def test_pt0_physics_ladder_route_refuses_dependency_vector_mismatch(
     capture.capture_equilibrium(sim, result)
     source_key = capture.capture_sequence[-1]["key"]
     source_hash = _key_hash(source_key)
-    source_entry = capture.entries[source_hash]
+    source_entry = capture._entries[source_hash]
     query_key = copy.deepcopy(source_key)
     query_key["model"]["model"] = "different-admitted-model"
     query_bucket = canonical_physics_bucket_key_from_replay_key(query_key)
@@ -2912,7 +2984,7 @@ def test_pt0_capture_refuses_dependency_vector_mismatch(
     capture.capture_equilibrium(sim, result)
 
     assert capture.capture_sequence == []
-    assert capture.entries == {}
+    assert capture._entries == {}
 
 
 def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
@@ -3247,6 +3319,9 @@ def test_pt1_persistent_store_round_trips_exact_payload(
         "repair_notices",
         "disposition",
         "provider_outcome",
+        # Measured empty. The fixture records that no flagged law ran.
+        # The payload bytes below stay the curve alone.
+        "law_disclosures",
     }
     assert runtime_record["provider_outcome"] is rrd.GateCurveProviderOutcome.PRODUCED
     assert set(runtime_record["origin"]) == {
@@ -4174,8 +4249,8 @@ def test_pt0_equilibrium_lookup_capture_and_replay_stay_receipt_gated(
     assert replay.mode == "replay"
     assert replay.persistent_path == db_path
     assert replay.persistent_store is not capture.persistent_store
-    assert replay.entries == capture.entries
-    assert replay.entries is not capture.entries
+    assert replay._entries == capture._entries
+    assert replay._entries is not capture._entries
     assert replay.capture_sequence == capture.capture_sequence
     assert replay.capture_sequence is not capture.capture_sequence
 

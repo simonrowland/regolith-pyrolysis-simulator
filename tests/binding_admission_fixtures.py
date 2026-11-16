@@ -164,6 +164,9 @@ def seed_gate_curve_memo_record(
         repair_notices,
         provider_outcome=GateCurveProviderOutcome.PRODUCED,
     )
+    # The fixture is a finished computation that ran no flagged law.
+    # An omitted field is unknown and both memo readers recompute.
+    record["law_disclosures"] = []
     sim._freeze_gate_liquid_fraction_cache = {
         **record,
         "key": key,

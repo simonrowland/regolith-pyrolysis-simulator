@@ -34,6 +34,16 @@ _ACCOUNT = {"FeO": 0.30, "MgO": 0.20, "SiO2": 0.50, "Na2O": 0.02}
 _T_K = 1700.0
 
 
+def _published_bodies(published: object) -> list[dict]:
+    """One extrapolation notice is a dict. Two or more are a list."""
+
+    if isinstance(published, dict):
+        return [published]
+    if isinstance(published, (list, tuple)):
+        return [item for item in published if isinstance(item, dict)]
+    return []
+
+
 def _yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
 
@@ -90,9 +100,13 @@ def test_b984_sio_uses_actual_oxygen_beyond_evaluator_band(observation):
 
     for oxygen, answer in receipts.items():
         provenance = answer.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
-        notice = provenance.get("extrapolation_notice")
+        published = provenance.get("extrapolation_notice")
         if oxygen in (1e-31, 1000.0):
-            assert notice["reason"] == "pO2_outside_evaluator_band"
+            notice = next(
+                item
+                for item in _published_bodies(published)
+                if item["reason"] == "pO2_outside_evaluator_band"
+            )
             assert notice["pO2_bar_used"] == oxygen
             assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
             assert notice["was_clamped"] is False
@@ -102,7 +116,7 @@ def test_b984_sio_uses_actual_oxygen_beyond_evaluator_band(observation):
                 for warning in answer.warnings
             )
         else:
-            assert notice is None
+            assert not published
 
 
 def test_helper_flags_floor_and_skips_positive_exponent() -> None:
@@ -193,9 +207,27 @@ def test_provider_flags_floor_inversion_and_completes() -> None:
         assert notice["was_clamped"] is True
         assert pressures[species] == pytest.approx(notice["pressure_Pa"])
         assert pressures[species] > 0.0
-        assert provenance[species]["floor_inversion_notice"] == notice
+        # Real provider dispatch. The typed field is a list of records.
+        # A restored singleton dict makes this loop yield string keys.
+        published = provenance[species]["floor_inversion_notice"]
+        assert isinstance(published, list)
+        assert published == [notice]
+        for record in published:
+            assert isinstance(record, dict)
+            assert record["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
         assert MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON in sources[species]
         assert _is_noncertifying_vapor_extrapolation(species, sources[species])
+
+    for species, row in provenance.items():
+        for key, value in row.items():
+            if not str(key).endswith("_notice"):
+                continue
+            assert isinstance(value, list), (species, key)
+            assert value, (species, key)
+            assert all(isinstance(record, dict) for record in value), (
+                species,
+                key,
+            )
 
     assert pressures["Si"] >= CATALOG_PHYSICAL_PRESSURE_CEILING_PA
     assert any(
@@ -262,7 +294,9 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["Si"]
     assert result.status == "ok"
     assert diagnostic["vapor_pressures_Pa"]["Si"] > 0.0
-    assert provenance["extrapolation_notice"] == notice
+    published_floor = provenance["extrapolation_notice"]
+    floor_bodies = _published_bodies(published_floor)
+    assert notice in floor_bodies
     assert notice["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
     assert notice["authority_level"] == "extrapolated"
     assert notice["certified_band"]["pO2_bar"] == (
@@ -270,16 +304,16 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
 
-    # Exact request.py copy: provenance extrapolation_notice (floor dual-write)
-    # lands on the public carrier extra that Pareto reads.
-    source_notice = provenance.get("extrapolation_notice")
-    evaluation_extra = {}
-    if source_notice is not None:
-        evaluation_extra["extrapolation_notice"] = dict(source_notice)
-    assert evaluation_extra["extrapolation_notice"]["reason"] == (
-        MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    # The typed carrier stores the floor notice as a list, including when
+    # it is the only notice. Pareto publishes that list under its own field.
+    copied_floor = dict(
+        next(
+            item
+            for item in floor_bodies
+            if item["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+        )
     )
-    assert evaluation_extra["extrapolation_notice"]["certified_band"]["pO2_bar"] == (
+    assert copied_floor["certified_band"]["pO2_bar"] == (
         MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
@@ -311,8 +345,12 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
     assert isinstance(answer.pressure, PressureValue)
     assert answer.pressure.pa > 0.0
     assert answer.is_flux_active
-    carrier_notice = answer.extra["extrapolation_notice"]
-    assert carrier_notice["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    carrier_notices = answer.extra["extrapolation_notice"]
+    carrier_notice = next(
+        item
+        for item in _published_bodies(carrier_notices)
+        if item["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    )
     assert carrier_notice["authority_level"] == "extrapolated"
     assert carrier_notice["certified_band"]["pO2_bar"] == (
         MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
@@ -324,12 +362,17 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
         by_species,
         {
             "vapour_carrier_authority_by_species": {
-                "Si": {"extra": {"extrapolation_notice": carrier_notice}},
+                "Si": {"extra": {"extrapolation_notice": carrier_notices}},
             }
         },
     )
-    pareto = by_species["Si"]["vapour_pressure_extrapolation_notice"]
-    assert pareto["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    pareto_notices = by_species["Si"]["vapour_pressure_extrapolation_notice"]
+    assert isinstance(pareto_notices, list)
+    pareto = next(
+        item
+        for item in pareto_notices
+        if item["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    )
     assert tuple(pareto["certified_band"]["pO2_bar"]) == (
         MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
         MELT_DISSOCIATION_PO2_MAX_BAR,
@@ -453,10 +496,13 @@ def test_early_floor_notice_survives_clean_timestep_wall_merge() -> None:
     extra = merged.wall_deposit_sticking_authority[
         "vapour_carrier_authority_by_species"
     ]["Si"]["extra"]
-    assert extra["extrapolation_notice"]["reason"] == (
+    published_coating = extra["extrapolation_notice"]
+    assert isinstance(published_coating, (list, tuple))
+    coating_notice = published_coating[0]
+    assert coating_notice["reason"] == (
         MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
     )
-    assert extra["extrapolation_notice"]["certified_band"]["pO2_bar"] == (
+    assert coating_notice["certified_band"]["pO2_bar"] == (
         MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
@@ -465,9 +511,11 @@ def test_early_floor_notice_survives_clean_timestep_wall_merge() -> None:
         by_species,
         merged.wall_deposit_sticking_authority,
     )
-    assert by_species["Si"]["vapour_pressure_extrapolation_notice"][
-        "reason"
-    ] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    pareto_coating = by_species["Si"]["vapour_pressure_extrapolation_notice"]
+    assert isinstance(pareto_coating, list)
+    assert pareto_coating[0]["reason"] == (
+        MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    )
 
 
 def test_lowest_catalog_body_floor_does_not_invert() -> None:

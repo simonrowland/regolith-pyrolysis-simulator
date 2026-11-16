@@ -2761,7 +2761,7 @@ def test_sio_oxide_vapor_extrapolation_predicts_with_certified_band(
     }
     assert diagnostic["vapor_pressure_numerator_provenance"]["SiO"][
         "extrapolation_notice"
-    ] == notice
+    ] == [notice]
     source = diagnostic["vapor_pressures_source"]["SiO"]
     assert source == (
         "builtin_extrapolation_limited:standard_reaction_term:"
@@ -2797,7 +2797,7 @@ def test_ca2_compiled_oxide_extrapolation_keeps_source_reason_and_certified_band
     )
     assert result.diagnostic["vapor_pressure_numerator_provenance"]["Ca2"][
         "extrapolation_notice"
-    ] == notice
+    ] == [notice]
 
 
 def test_compiled_source_activity_floor_is_reported_without_changing_pressure(
@@ -2840,10 +2840,15 @@ def test_compiled_source_activity_floor_is_reported_without_changing_pressure(
     out_of_band_provenance = out_of_band.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]["AlO"]
-    assert out_of_band_provenance["source_activity_floor_notice"]["reason"] == (
+    floor_items = out_of_band_provenance["source_activity_floor_notice"]
+    assert isinstance(floor_items, list)
+    assert floor_items[0]["reason"] == (
         vapor_pressure_module.COMPILED_SOURCE_ACTIVITY_FLOOR_REASON
     )
-    assert out_of_band_provenance["extrapolation_notice"] == out_of_band_notice
+    published_out = out_of_band_provenance["extrapolation_notice"]
+    assert isinstance(published_out, list)
+    assert out_of_band_notice in published_out
+    assert floor_items[0] in published_out
 
     in_band_temperature = 1836.58
     activity["value"] = 1.0e-310
@@ -2856,12 +2861,12 @@ def test_compiled_source_activity_floor_is_reported_without_changing_pressure(
     ]["AlO"]
     floor_notice = in_band_provenance["source_activity_floor_notice"]
     threshold = vapor_pressure_module.COMPILED_SOURCE_ACTIVITY_FLOOR
-    assert floor_notice == {
+    assert floor_notice == [{
         "authority_level": "extrapolated",
         "reason": vapor_pressure_module.COMPILED_SOURCE_ACTIVITY_FLOOR_REASON,
         "certified_band": {"source_activity": (threshold, 1.0)},
         "source_activity_used": 1.0e-310,
-    }
+    }]
     assert in_band_provenance["extrapolation_notice"] == floor_notice
     evaluator = provider._vapour_rail_catalog.evaluator_for_hot_train(
         "AlO", process_phase=None
@@ -2877,7 +2882,7 @@ def test_compiled_source_activity_floor_is_reported_without_changing_pressure(
     assert provider_pressure.hex() == floor_pressure.hex()
     assert provider_pressure.hex() != raw_pressure.hex()
     source = in_band.diagnostic["vapor_pressures_source"]["AlO"]
-    assert source.endswith(":" + floor_notice["reason"])
+    assert source.endswith(":" + floor_notice[0]["reason"])
     from simulator.grind_preflight import _is_noncertifying_vapor_extrapolation
 
     assert _is_noncertifying_vapor_extrapolation("AlO", source)
@@ -2937,13 +2942,13 @@ def test_sio_extrapolation_notice_reaches_public_numeric_answer(vapor_pressure_d
     assert answer.certification_ceiling == "never"
     assert answer.verdict_status == "status_bearing_non_authoritative"
     public = json.loads(json.dumps(serialize_vapour_answer(answer), allow_nan=False))
-    assert public["extra"]["extrapolation_notice"] == {
+    assert public["extra"]["extrapolation_notice"] == [{
         "temperature_K": 2473.15,
         "valid_range_K": [1400.0, 2273.15],
         "authority_level": "extrapolated",
         "certified_band": {"temperature_K": [1400.0, 2273.15]},
         "reason": "oxide_vapor_pressure_out_of_validated_range",
-    }
+    }]
 
 
 @pytest.mark.parametrize("temperature_K", [1900.0, 2473.15])

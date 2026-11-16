@@ -618,6 +618,7 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
+    law_disclosures: tuple[Mapping[str, object], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -11659,6 +11660,7 @@ def _predict_mass_loss_with_residue(
         ResidueInventoryRefusal,
         predict_mass_loss_fraction,
     )
+    from simulator.vapour_rail.run_disclosure import parse_stored_disclosure_field
 
     def omission_notices(payload: object) -> tuple[Notice, ...]:
         if not isinstance(payload, str) or not payload:
@@ -11704,6 +11706,12 @@ def _predict_mass_loss_with_residue(
             source_document=source_document,
             observation=observation,
         )
+        law_disclosures = parse_stored_disclosure_field(
+            result.engine_metadata.get("law_disclosures"),
+            present="law_disclosures" in result.engine_metadata,
+        )
+        if law_disclosures is None:
+            raise ResidueInventoryRefusal("law_disclosures_unknown", "incomplete")
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
         if reason in {
@@ -11800,6 +11808,7 @@ def _predict_mass_loss_with_residue(
         coefficient_sources=(*sources, *json.loads(result.engine_metadata.get("alpha_sources", "[]"))),
         lineage_complete=False,
         identity=identity,
+        law_disclosures=law_disclosures,
         version=(
             "method_class=calculated_residue_integrator; "
             "sourced_alpha; bounded_unsourced_channels_and_preheat; self_similar_printed_area"
@@ -12484,6 +12493,7 @@ def _catalog_prediction(
     certified_band: Mapping[str, tuple[Decimal, Decimal]] | None = None,
     call_evidence: str | None = None,
     version: str | None = None,
+    law_disclosures: tuple[Mapping[str, object], ...] = (),
 ) -> EnginePrediction:
     return EnginePrediction(
         engine=Engine.CATALOG_EVALUATOR,
@@ -12500,6 +12510,7 @@ def _catalog_prediction(
         refusal_detail=dict(detail or {}),
         identity=identity,
         version=version,
+        law_disclosures=law_disclosures,
     )
 
 
@@ -12896,12 +12907,25 @@ def _catalog_evaluated_prediction(
         )
     from simulator.vapour_rail.catalog import CatalogCompileError
 
+    from simulator.vapour_rail.run_disclosure import (
+        active_registry,
+        computation_disclosure,
+        disclosure_scope,
+    )
+
+    evaluation_scope = (
+        computation_disclosure()
+        if active_registry() is not None
+        else disclosure_scope(inherit=False)
+    )
     try:
-        evaluation = evaluator.evaluate(
-            float(temperature),
-            source_activity=source_activity,
-            pO2_bar=pO2_bar,
-        )
+        with evaluation_scope as registry:
+            evaluation = evaluator.evaluate(
+                float(temperature),
+                source_activity=source_activity,
+                pO2_bar=pO2_bar,
+            )
+            law_disclosures = registry.snapshot()
         value = Decimal(str(evaluation.pressure_pa))
     except (CatalogCompileError, InvalidOperation, OverflowError, ValueError) as exc:
         return _catalog_refuse(
@@ -12957,6 +12981,7 @@ def _catalog_evaluated_prediction(
         certified_band=certified_band,
         call_evidence=f"catalog_evaluator:{row.species_id}",
         version=evaluator.evaluator_family or None,
+        law_disclosures=law_disclosures,
     )
 
 
@@ -15324,6 +15349,12 @@ def candidate_observation(
             "physics_rung": selected_oxygen[2],
             "route": selected_oxygen[3],
         }
+    if prediction.law_disclosures:
+        if provenance is None:
+            provenance = {}
+        provenance["law_disclosures"] = [
+            dict(item) for item in prediction.law_disclosures
+        ]
     return Observation(
         observation_id=f"engine:{prediction.engine.value}:{reference.observation_id}",
         experiment_id=reference.experiment_id,
@@ -15437,6 +15468,20 @@ def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
     return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
 
 
+def _residue_prediction_cache_key(
+    source_id: str,
+    engine: Engine,
+    selected_experiment_ids: frozenset[str] | None = None,
+) -> tuple[str, Engine, frozenset[str] | None]:
+    """The one selection-scoped key for a residue cohort or Knudsen result.
+
+    Disclosure replay and the cache accessor both use this tuple. A second
+    copy would let a hit miss the run that must re-register the stored laws.
+    """
+
+    return (source_id, engine, selected_experiment_ids)
+
+
 def _residue_prediction_cache_entry(
     cache: dict[
         tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
@@ -15449,7 +15494,9 @@ def _residue_prediction_cache_entry(
 ) -> Mapping[str, object] | None:
     """Read or store the residue cache entry for one selection scope."""
 
-    key = (source_id, engine, selected_experiment_ids)
+    key = _residue_prediction_cache_key(
+        source_id, engine, selected_experiment_ids
+    )
     if value is not None:
         cache[key] = value
     return cache.get(key)
@@ -15481,6 +15528,80 @@ def _hashimoto_engine_floor_inversion_notices(
     return tuple(notices)
 
 
+def _cached_hashimoto_cohort(
+    cache: dict[tuple[str, Engine], Mapping[str, object]],
+    cache_key: tuple[str, Engine],
+    *selected_keys: str,
+) -> Mapping[str, object] | None:
+    """Only read of a cached Hashimoto cohort.
+
+    A cohort-error marker is returned as stored. Every physics row must carry
+    a measured ``law_disclosures`` list, the laws that arm executed. A row
+    with no field drops the cohort so the caller recomputes it. Only
+    ``selected_keys`` are re-registered. The other experiments stay in the
+    cohort and do not join this prediction.
+
+    Every selected arm is checked before any of them is registered. A valid
+    primary arm must not publish its count when the production arm is
+    unreadable: the caller recomputes both, and the early count would remain.
+    """
+
+    cohort = cache.get(cache_key)
+    if not isinstance(cohort, Mapping):
+        return None
+    if "__cohort_error__" in cohort:
+        return cohort
+    from simulator.vapour_rail.run_disclosure import (
+        accept_stored_memo,
+        stored_disclosures_known,
+    )
+
+    for row in cohort.values():
+        provenance = getattr(row, "provenance", None)
+        if not isinstance(provenance, Mapping) or "law_disclosures" not in provenance:
+            cache.pop(cache_key, None)
+            return None
+    if not selected_keys:
+        cache.pop(cache_key, None)
+        return None
+    selected_provenances: list[Mapping[str, object]] = []
+    for key in selected_keys:
+        row = cohort.get(key)
+        provenance = getattr(row, "provenance", None)
+        if not stored_disclosures_known(
+            provenance if isinstance(provenance, Mapping) else None
+        ):
+            cache.pop(cache_key, None)
+            return None
+        selected_provenances.append(provenance)
+    for provenance in selected_provenances:
+        if accept_stored_memo(provenance) is None:
+            cache.pop(cache_key, None)
+            return None
+    return cohort
+
+
+def _cached_knudsen_result(
+    cache: dict[tuple[str, Engine], Mapping[str, object]],
+    cache_key: tuple[str, Engine],
+) -> Mapping[str, object] | None:
+    """Only read of a cached Knudsen residue result.
+
+    No measured ``law_disclosures`` field drops the entry. The caller
+    recomputes it. A known field, including ``[]``, is re-registered first.
+    """
+
+    result = cache.get(cache_key)
+    if not isinstance(result, Mapping):
+        return None
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    if accept_stored_memo(result) is None:
+        cache.pop(cache_key, None)
+        return None
+    return result
+
+
 def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -15507,6 +15628,20 @@ def _hashimoto_residue_prediction(
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
+        primary_key = (
+            reference.experiment_id + "::alpha_common_unity_sensitivity"
+        )
+        production_key = reference.experiment_id + "::alpha_runtime_catalog"
+        cache_key = _residue_prediction_cache_key(
+            _HASHIMOTO_SOURCE_ID, engine, selected_experiment_ids
+        )
+        rows_by_key = (
+            _cached_hashimoto_cohort(
+                cache, cache_key, primary_key, production_key
+            )
+            if cache_key in cache
+            else None
+        )
         if rows_by_key is None:
             from simulator.battery.residue import (
                 ResidueInventoryRefusal,
@@ -15570,6 +15705,7 @@ def _hashimoto_residue_prediction(
                 _allow_partial_cohort_for_test=test_experiment_ids is not None,
                 selected_experiment_ids=cohort_selection,
             )
+            # Each row already carries the disclosure of its own arm.
             rows_by_key = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
             }
@@ -15580,12 +15716,13 @@ def _hashimoto_residue_prediction(
                 cohort_selection,
                 value=rows_by_key,
             )
+            rows_by_key = _cached_hashimoto_cohort(
+                cache, cache_key, primary_key, production_key
+            )
+            if rows_by_key is None:
+                raise ValueError("hashimoto_disclosure_unmeasured")
         if "__cohort_error__" in rows_by_key:
             raise ValueError(str(rows_by_key["__cohort_error__"]))
-        primary_key = (
-            reference.experiment_id + "::alpha_common_unity_sensitivity"
-        )
-        production_key = reference.experiment_id + "::alpha_runtime_catalog"
         primary = rows_by_key.get(primary_key)
         production = rows_by_key.get(production_key)
         if primary is None or production is None:
@@ -15780,6 +15917,7 @@ def _hashimoto_residue_prediction(
                 if is_retention
                 else primary_provenance
             ),
+            law_disclosures=tuple(primary_provenance.get("law_disclosures") or ()),
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
@@ -15872,14 +16010,13 @@ def _knudsen_residue_prediction(
             f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:"
             f"{printed_source_pressure(reference)}"
         )
-        cached_result = (
-            None
-            if cache is None
-            else _residue_prediction_cache_entry(cache, cache_source_id, engine)
+        cache_key = _residue_prediction_cache_key(cache_source_id, engine)
+        result = (
+            _cached_knudsen_result(cache, cache_key)
+            if cache is not None and cache_key in cache
+            else None
         )
-        if cached_result is not None:
-            result = cached_result
-        else:
+        if result is None:
             result = predict_knudsen_residue_composition(
                 engine.value, reference, experiment, context.observations.values(),
                 _bench_for_score(experiment, context.benches) if experiment is not None else None,
@@ -15888,6 +16025,20 @@ def _knudsen_residue_prediction(
                 _residue_prediction_cache_entry(
                     cache, cache_source_id, engine, value=result
                 )
+                result = _cached_knudsen_result(cache, cache_key)
+                if result is None:
+                    raise ResidueInventoryRefusal(
+                        "knudsen_disclosure_unmeasured",
+                        "cached Knudsen result has no measured law disclosure",
+                    )
+            else:
+                from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+                if accept_stored_memo(result) is None:
+                    raise ResidueInventoryRefusal(
+                        "knudsen_disclosure_unmeasured",
+                        "Knudsen result has no measured law disclosure",
+                    )
         provenance = {k: v for k, v in result.items() if k != "notices"}
         if is_retention:
             definition, definition_record = _printed_fm_definition(
@@ -15970,6 +16121,7 @@ def _knudsen_residue_prediction(
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
             notices=result["notices"], identity=reference.identity,
             refusal_detail=provenance,
+            law_disclosures=tuple(provenance.get("law_disclosures") or ()),
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         return EnginePrediction(
@@ -15980,6 +16132,45 @@ def _knudsen_residue_prediction(
             refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
             notices=getattr(exc, "notices", ()), identity=reference.identity,
         )
+
+
+def _accept_cached_sossi_row(row: object) -> object | None:
+    """Re-register one cached Sossi row, or refuse it as unknown."""
+
+    provenance = getattr(row, "provenance", None)
+    if not isinstance(provenance, Mapping):
+        return None
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    if accept_stored_memo(provenance) is None:
+        return None
+    return row
+
+
+def _cached_sossi_prediction(
+    cache: dict[tuple[str, Engine], Mapping[str, object]],
+    cache_key: tuple[str, Engine],
+    short_id: str,
+) -> object | None:
+    """Only read of a cached Sossi cohort row.
+
+    ``None`` means the caller computes, or the row is absent. A row whose
+    provenance has no readable ``law_disclosures`` is unknown: the cohort is
+    dropped so the caller recomputes it. A cohort error marker stays in the
+    cache for the caller to raise. Copying provenance onto an
+    ``EnginePrediction`` is not registration.
+    """
+
+    cohort = cache.get(cache_key)
+    if not isinstance(cohort, Mapping) or "__cohort_error__" in cohort:
+        return None
+    row = cohort.get(short_id)
+    if row is None:
+        return None
+    if _accept_cached_sossi_row(row) is None:
+        cache.pop(cache_key, None)
+        return None
+    return row
 
 
 def _sossi_residue_prediction(
@@ -16034,7 +16225,12 @@ def _sossi_residue_prediction(
 
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("sossi_engine_unsupported")
-        if cohort is None:
+        cache_key = _residue_prediction_cache_key(
+            _SOSSI_SOURCE_ID, engine, selected_experiment_ids
+        )
+        short_id = reference.experiment_id.rsplit("::", 1)[-1]
+        prediction = _cached_sossi_prediction(cache, cache_key, short_id)
+        if cache_key not in cache:
             live_rows = [
                 row
                 for row in context.observations.values()
@@ -16052,17 +16248,17 @@ def _sossi_residue_prediction(
             trace_ppm_by_experiment: dict[str, dict[str, float]] = {}
             buffered_fO2_by_experiment: dict[str, float] = {}
             for row in live_rows:
-                short_id = row.experiment_id.rsplit("::", 1)[-1]
-                experiments_by_run[short_id] = {}
+                run_id = row.experiment_id.rsplit("::", 1)[-1]
+                experiments_by_run[run_id] = {}
                 point = row.point_conditions or {}
                 oxygen = point.get("fO2_log")
                 if oxygen is not None and oxygen.state.is_value:
-                    buffered_fO2_by_experiment[short_id] = float(oxygen.state.value)
+                    buffered_fO2_by_experiment[run_id] = float(oxygen.state.value)
                 element = row.identity.species.formula
                 if element in {"Mn", "Ti"}:
                     trace = point.get("starting_component_ppm")
                     if trace is not None and trace.state.is_value:
-                        trace_ppm_by_experiment.setdefault(short_id, {})[
+                        trace_ppm_by_experiment.setdefault(run_id, {})[
                             element
                         ] = float(trace.state.value)
             expected_experiments = (
@@ -16120,10 +16316,10 @@ def _sossi_residue_prediction(
                 cohort_selection,
                 value=cohort,
             )
-        if "__cohort_error__" in cohort:
-            raise ValueError(str(cohort["__cohort_error__"]))
-        short_id = reference.experiment_id.rsplit("::", 1)[-1]
-        prediction = cohort.get(short_id)
+        if "__cohort_error__" in cache[cache_key]:
+            raise ValueError(str(cache[cache_key]["__cohort_error__"]))
+        if prediction is None:
+            prediction = _cached_sossi_prediction(cache, cache_key, short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
         run_refusal = prediction.provenance.get("run_refusal")
@@ -16283,6 +16479,7 @@ def _sossi_residue_prediction(
             notices=tuple(notices),
             identity=reference.identity,
             refusal_detail=provenance,
+            law_disclosures=tuple(provenance.get("law_disclosures") or ()),
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__

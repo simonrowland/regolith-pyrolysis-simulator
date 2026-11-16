@@ -1342,6 +1342,10 @@ def _buffer_conversion_notices(
 
 
 def to_plain(obj: object) -> object:
+    return _to_plain(obj, preserve_json_numbers=False)
+
+
+def _to_plain(obj: object, *, preserve_json_numbers: bool) -> object:
     if obj is None:
         return None
     if isinstance(obj, Enum):
@@ -1355,7 +1359,9 @@ def to_plain(obj: object) -> object:
     if isinstance(obj, State):
         payload: dict[str, object] = {"tag": obj.tag.value}
         if obj.value is not None:
-            payload["value"] = to_plain(obj.value)
+            payload["value"] = _to_plain(
+                obj.value, preserve_json_numbers=preserve_json_numbers
+            )
         if obj.reason is not None:
             payload["reason"] = obj.reason
         if obj.rejection_kind is not None:
@@ -1368,17 +1374,38 @@ def to_plain(obj: object) -> object:
             if value is None:
                 continue
             key = "class" if item.name == "class_" else item.name
-            out[key] = to_plain(value)
+            out[key] = _to_plain(
+                value,
+                preserve_json_numbers=(
+                    preserve_json_numbers or key == "law_disclosures"
+                ),
+            )
         return out
     if isinstance(obj, Mapping):
-        return {str(k): to_plain(v) for k, v in obj.items()}
+        return {
+            str(k): _to_plain(
+                v,
+                preserve_json_numbers=(
+                    preserve_json_numbers or str(k) == "law_disclosures"
+                ),
+            )
+            for k, v in obj.items()
+        }
     if isinstance(obj, tuple):
-        return [to_plain(v) for v in obj]
+        return [
+            _to_plain(v, preserve_json_numbers=preserve_json_numbers)
+            for v in obj
+        ]
     if isinstance(obj, list):
-        return [to_plain(v) for v in obj]
+        return [
+            _to_plain(v, preserve_json_numbers=preserve_json_numbers)
+            for v in obj
+        ]
     if isinstance(obj, (str, int, bool)):
         return obj
     if isinstance(obj, float):
+        if preserve_json_numbers:
+            return obj
         return _dec_str(as_decimal(obj))
     return obj
 
