@@ -487,6 +487,9 @@ def test_magemin_diagnostic_gap_survives_scored_prediction(
         "_equilibrate_body",
         lambda *_args, **_kwargs: bare_failure,
     )
+    # This uninitialized backend is an intentional in-process fake. Keep the
+    # supplied handle live so scoring does not retire it and reopen MAGEMin.
+    monkeypatch.setattr(backend, "is_available", lambda: True)
     handle = EngineHandle(
         name=Engine.MAGEMIN.value,
         backend=backend,

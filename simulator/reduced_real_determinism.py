@@ -3003,7 +3003,6 @@ _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "magemin_untyped_failure",
     "missing_binary",
     "nonzero_exit",
-    "parse_empty_output",
     "subprocess_died",
     "subprocess_fe_free_absolute_fo2_crash",
     "system_output_missing",
@@ -3079,12 +3078,17 @@ def gate_curve_provider_outcome_for_status(
 
     normalized_status = str(status).strip().lower()
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+    # MAGEMinOutputError is unusable solver output; keep its flagged fallback.
+    # Other providers' parse-empty contract failures remain fail-closed below.
+    magemin_invalid_output = "mageminoutputerror" in reasons
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
     if any(reason in {
         "missing_input", "invalid_input", "invalid_fo2_log",
         "invalid_pressure_bar", "non_finite_composition",
     } for reason in reasons):
+        return GateCurveProviderOutcome.FAILED
+    if "parse_empty_output" in reasons and not magemin_invalid_output:
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",
@@ -3125,6 +3129,7 @@ def gate_curve_provider_outcome_for_status(
     if (
         GateCurveProviderOutcome.NUMERICAL_FAILURE in nested_outcomes
         or normalized_status == "not_converged"
+        or magemin_invalid_output
         or any(reason in numerical_reasons for reason in reasons)
     ):
         return GateCurveProviderOutcome.NUMERICAL_FAILURE

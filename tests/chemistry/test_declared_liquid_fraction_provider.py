@@ -730,6 +730,11 @@ def test_magemin_launch_programming_errors_still_propagate(
 @pytest.mark.parametrize('nested, expected', [
     ({'backend_status': 'unavailable'}, 'failed'),
     ({'backend_status': 'not_converged'}, 'numerical_failure'),
+    ({'backend_status': 'not_converged',
+      'backend_status_reason': 'parse_empty_output',
+      'backend_failure_exception': 'MAGEMinOutputError'}, 'numerical_failure'),
+    ({'backend_status': 'not_converged',
+      'backend_status_reason': 'parse_empty_output'}, 'failed'),
     ({'backend_status_reason': 'engine_worker_timeout'}, 'failed'),
     ({'projected_liquidus_status': 'unavailable'}, 'numerical_failure'),
     ({'projected_liquidus_status': 'not_converged'}, 'numerical_failure'),
