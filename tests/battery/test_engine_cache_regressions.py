@@ -20,6 +20,36 @@ def test_every_normalized_prediction_setting_changes_the_key(engine):
         assert engine_cache.engine_cache_key(engine, engine_cache.ENGINE_CHEMISTRY_VERSION[engine], {"engine_settings": changed}) != original, name
 
 
+@pytest.mark.parametrize("engine", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
+def test_isolated_request_keys_cover_all_consumed_physics_inputs(engine, monkeypatch):
+    keys = []
+
+    def capture(name, request, solve):
+        keys.append(engine_cache.engine_cache_key(name, engine_cache.ENGINE_CHEMISTRY_VERSION[name], request))
+        return {"status": "refusal", "refusal_reason": "unavailable"}
+
+    monkeypatch.setattr(engine_cache, "cached_engine_call", capture)
+    worker = object.__new__(battery._IsolatedCellWorker)
+    worker.engine = engine
+    worker.engine_settings = battery.normalize_engine_settings(engine, None)
+    request = {
+        "temperature_K": 1700.0, "composition_wt_pct": {"SiO2": 60.0, "MgO": 40.0},
+        "physical_pressure_bar": 1e-6,
+        "po2": {"mode": "commanded", "po2_bar": 1e-8, "cell_material": "W"},
+    }
+    worker.request(request, timeout_s=5)
+    for name, changed in (
+        ("temperature_K", 1701.0),
+        ("composition_wt_pct", {"SiO2": 61.0, "MgO": 39.0}),
+        ("physical_pressure_bar", 1e-5),
+        ("po2", {**request["po2"], "po2_bar": 1e-7}),
+        ("po2", {**request["po2"], "mode": "oxygen_balance_effusion"}),
+        ("po2", {**request["po2"], "cell_material": "Mo"}),
+    ):
+        worker.request({**request, name: changed}, timeout_s=5)
+        assert keys[-1] != keys[0], (engine, name)
+
+
 @pytest.mark.parametrize("seam", ["inline", "isolated"])
 def test_analytical_oxygen_pack_changes_each_key(seam, tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
