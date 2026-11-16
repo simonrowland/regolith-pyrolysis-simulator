@@ -428,6 +428,8 @@ class EquilibrateCell:
     # Copied from the equilibrium result. The scorer owns the battery ratio.
     liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
     fe_redox_split: dict[str, float] = field(default_factory=dict)
+    # In-process score handoff; deliberately omitted from the battery payload.
+    backend_failure_exception: str | None = None
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -4524,6 +4526,11 @@ def equilibrate_cell(
             refusal_reason=refusal,
             engine_status=str(getattr(result, "status", None) or status),
             engine_reason=engine_reason,
+            backend_failure_exception=(
+                str(diagnostics["backend_failure_exception"])
+                if diagnostics.get("backend_failure_exception") is not None
+                else None
+            ),
             engine_annotation=engine_annotation,
             melt_activities=activities,
             activities_standard_state=activity_standard_state,

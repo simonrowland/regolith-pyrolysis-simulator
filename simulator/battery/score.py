@@ -10385,7 +10385,6 @@ _ENGINE_WORKER_LIFECYCLE_FAILURES = (
     "EngineWorkerPoolLifecycleError",
 )
 _MAGEMIN_WORKER_LIFECYCLE_REASONS = frozenset({
-    "engine_crash",
     "magemin_subprocess_slot_timeout",
     "magemin_subprocess_slot_unavailable",
     "magemin_aggregate_budget_timeout",
@@ -10404,6 +10403,8 @@ def _engine_worker_lifecycle_failure(
         if isinstance(diagnostics, Mapping)
         else None
     )
+    if failure not in _ENGINE_WORKER_LIFECYCLE_FAILURES:
+        failure = getattr(result, "backend_failure_exception", None)
     if failure in _ENGINE_WORKER_LIFECYCLE_FAILURES:
         return {"backend_failure_exception": failure}
 

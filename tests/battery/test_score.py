@@ -16490,7 +16490,6 @@ def test_magemin_native_activity_failure_keeps_typed_cause(
 @pytest.mark.parametrize(
     ("backend_reason", "expected_reason"),
     (
-        ("engine_crash", "engine_transport_error:magemin"),
         (
             "magemin_subprocess_slot_timeout",
             "engine_transport_error:magemin",
@@ -16581,6 +16580,99 @@ def test_magemin_typed_lifecycle_reason_survives_battery_score(
         assert prediction.refusal_detail["backend_status_reason"] == backend_reason
 
 
+def test_magemin_bridge_runtime_error_stays_engine_defect_in_score(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from functools import wraps
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    def bridge_failure(**_kwargs):
+        raise RuntimeError("injected bridge failure")
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "pymagemin"
+    backend._binary_path = None
+    backend._magemin_module = SimpleNamespace(minimize=bridge_failure)
+    results = []
+    equilibrate = backend.equilibrate
+
+    @wraps(equilibrate)
+    def capture_result(*args, **kwargs):
+        result = equilibrate(*args, **kwargs)
+        results.append(result)
+        return result
+
+    backend.equilibrate = capture_result
+    cells = []
+    equilibrate_cell = binary_pot_battery.equilibrate_cell
+
+    def capture_cell(*args, **kwargs):
+        cell = equilibrate_cell(*args, **kwargs)
+        cells.append(cell)
+        return cell
+
+    monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", capture_cell)
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "magemin-bridge-runtime-error-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id="magemin-bridge-runtime-error-source",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={
+            "magemin": EngineHandle(
+                "magemin", backend, True, None, False, False
+            )
+        },
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert backend._binary_path is None
+    assert len(results) == len(cells) == 1
+    assert results[0].status == "not_converged"
+    assert results[0].diagnostics["backend_status_reason"] == "engine_crash"
+    assert results[0].diagnostics["backend_failure_exception"] == "RuntimeError"
+    assert cells[0].backend_failure_exception == "RuntimeError"
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == "engine_not_converged"
+    assert prediction.refusal_detail["engine_reason"] == "engine_crash"
+
+
 def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -16622,6 +16714,15 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
 
     backend.equilibrate = capture_result
     handle = EngineHandle("magemin", backend, True, None, False, False)
+    cells = []
+    equilibrate_cell = binary_pot_battery.equilibrate_cell
+
+    def capture_cell(*args, **kwargs):
+        cell = equilibrate_cell(*args, **kwargs)
+        cells.append(cell)
+        return cell
+
+    monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", capture_cell)
     experiment = F.kems_experiment()
     work = F.work(experiment.work_id)
     identity = _with_activity_reference_polymorph(
@@ -16674,11 +16775,12 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
         comparison_ids={reference.observation_id},
     )
 
-    assert len(results) == 1
+    assert len(results) == len(cells) == 1
     assert results[0].status == "not_converged"
     assert (
         results[0].diagnostics["backend_failure_exception"] == "EngineWorkerDied"
     )
+    assert cells[0].backend_failure_exception == "EngineWorkerDied"
     assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
     assert (
         prediction.refusal_detail["reason"] == "engine_transport_error:magemin"
