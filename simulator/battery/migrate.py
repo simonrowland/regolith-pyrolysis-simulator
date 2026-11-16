@@ -1847,9 +1847,13 @@ def _validate_persisted_locator_mappings(payload: object) -> None:
             for key, value in current.items():
                 name = str(key)
                 child_path = f"{path}.{name}" if path else name
-                if name in {"locator", "source_locator"} and isinstance(
-                    value, Mapping
-                ):
+                is_admission_evidence = (
+                    name == "evidence"
+                    and child_path.endswith("admission.decided_by.evidence")
+                )
+                if (
+                    name in {"locator", "source_locator"} or is_admission_evidence
+                ) and isinstance(value, Mapping):
                     unknown = _locator_mapping_first_unsupported_key(value)
                     if unknown is not None:
                         raise _InvalidLocator(
@@ -9095,10 +9099,10 @@ def _printed_oxide_map_locator(values: object) -> Locator | None:
 
 def _row_phase_label(row: Mapping[str, Any]) -> str:
     parts = [str(row.get("observation_id") or "")]
-    locator = row.get("locator")
-    if isinstance(locator, Mapping):
+    locator = _locator_from_plain(row.get("locator"))
+    if locator is not None:
         for key in ("row", "note"):
-            raw = locator.get(key)
+            raw = getattr(locator, key)
             if raw not in (None, ""):
                 parts.append(str(raw))
     return " ".join(parts)
@@ -9145,10 +9149,8 @@ def _same_run_initial_melts(
         if not any(token in units for token in ("wt", "weight", "mass")):
             continue
         experiment = str(row.get("experiment") or "")
-        locator = row.get("locator")
-        table = ""
-        if isinstance(locator, Mapping) and locator.get("table") not in (None, ""):
-            table = str(locator.get("table"))
+        locator = _locator_from_plain(row.get("locator"))
+        table = "" if locator is None or locator.table is None else str(locator.table)
         if not experiment or not table:
             continue
         oxide = _canonical_printed_oxide_name(str(formula).strip())
@@ -9179,10 +9181,8 @@ def _bind_same_run_initial_composition(
     if not label_marks_final(_row_phase_label(obs)):
         return None
     experiment = str(obs.get("experiment") or "")
-    locator = obs.get("locator")
-    table = ""
-    if isinstance(locator, Mapping) and locator.get("table") not in (None, ""):
-        table = str(locator.get("table"))
+    locator = _locator_from_plain(obs.get("locator"))
+    table = "" if locator is None or locator.table is None else str(locator.table)
     if not experiment or not table:
         return None
     melts = context.get("same_run_initial_melts")
@@ -15168,9 +15168,11 @@ def _enthalpy_increment_subtype(
                 zero_anchors.add(temperature)
 
     labels = [
-        (obs.get("locator") or {}).get("column")
-        if isinstance(obs.get("locator"), Mapping)
-        else None,
+        (
+            locator.column
+            if (locator := _locator_from_plain(obs.get("locator"))) is not None
+            else None
+        ),
         obs.get("units"),
         values.get("quantity_as_printed"),
         values.get("printed_relation"),
@@ -23446,12 +23448,12 @@ def _same_row_composition_closure_components(
         if experiment not in (None, ""):
             return ("experiment", str(experiment))
         sample_id = values.get("sample_id") if isinstance(values, Mapping) else None
-        locator = observation.get("locator")
-        if isinstance(locator, Mapping) and locator.get("table") and locator.get("row"):
+        locator = _locator_from_plain(observation.get("locator"))
+        if locator is not None and locator.table and locator.row:
             return (
                 "table-row",
-                str(locator["table"]),
-                str(locator["row"]),
+                str(locator.table),
+                str(locator.row),
                 str(sample_id or ""),
             )
         if sample_id not in (None, ""):
@@ -25051,7 +25053,7 @@ class Migrator:
     def _validate_extract_locators(
         self, doc: Mapping[str, Any], *, source_key: str
     ) -> None:
-        """Report invalid locators and canonicalize accepted spellings at ingest."""
+        """Report invalid locators without rewriting the printed source payload."""
         pending: list[tuple[object, str]] = [(doc, "")]
         while pending:
             current, path = pending.pop()
@@ -25066,7 +25068,9 @@ class Migrator:
                         # Preserve legacy annotations used by value inference.
                         continue
                     try:
-                        locator = _locator_from_plain(raw_locator, refuse_invalid=True)
+                        _locator_from_plain(
+                            raw_locator, refuse_invalid=True
+                        )
                     except _InvalidLocator as exc:
                         locator_path = (
                             f"{path}.{field_name}" if path else field_name
@@ -25078,9 +25082,6 @@ class Migrator:
                                 detail=str(exc),
                             )
                         )
-                    else:
-                        if locator is not None:
-                            current[field_name] = to_plain(locator)
                 for key, value in current.items():
                     child_path = f"{path}.{key}" if path else str(key)
                     pending.append((value, child_path))
@@ -25552,12 +25553,8 @@ class Migrator:
                 enriched.append(experiment)
                 continue
             experiment = dict(experiment)
-            experiment_locator = experiment.get("locator") or {}
-            row_name = (
-                experiment_locator.get("row")
-                if isinstance(experiment_locator, Mapping)
-                else None
-            )
+            experiment_locator = _locator_from_plain(experiment.get("locator"))
+            row_name = None if experiment_locator is None else experiment_locator.row
             measurement = samples.get(str(row_name))
             if measurement is not None:
                 mass_mg, area_mm2, source_locator = measurement
@@ -25978,15 +25975,15 @@ class Migrator:
             if observation.get("type") != "transition_point":
                 continue
             values = observation.get("values")
-            raw_locator = observation.get("locator")
-            if not isinstance(values, Mapping) or not isinstance(raw_locator, Mapping):
+            locator = _locator_from_plain(observation.get("locator"))
+            if not isinstance(values, Mapping) or locator is None:
                 continue
             quantity, _reason = map_quantity(
                 "transition_point", values, units=observation.get("units"), row=observation
             )
             if not quantity.is_value or quantity.value is not Quantity.TRANSITION_TEMPERATURE:
                 continue
-            table, row = raw_locator.get("table"), raw_locator.get("row")
+            table, row = locator.table, locator.row
             if table in (None, "") or row in (None, ""):
                 continue
             key = (formula, str(table), str(row))
@@ -26579,9 +26576,9 @@ class Migrator:
             and t_sel.field_name is None
             and not t_sel.condition_ranges
         ):
-            raw_locator = obs.get("locator")
-            if isinstance(raw_locator, Mapping):
-                table, row = raw_locator.get("table"), raw_locator.get("row")
+            raw_locator = _locator_from_plain(obs.get("locator"))
+            if raw_locator is not None:
+                table, row = raw_locator.table, raw_locator.row
                 if table not in (None, "") and row not in (None, ""):
                     transition_rows = (fusion_transition_rows or {}).get(
                         (formula, str(table), str(row))
@@ -32742,6 +32739,21 @@ class Migrator:
                 for row in rows:
                     if isinstance(row, Mapping):
                         require_rail_if_stated(row)
+        loc_raw = doc.get("source_locator")
+        unknown_locator_key = _locator_mapping_first_unsupported_key(loc_raw)
+        if unknown_locator_key is not None:
+            exc = _InvalidLocator(
+                f"unknown locator key {unknown_locator_key!r}"
+            )
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"compilation[{rel}].source_locator",
+                    reason=exc.reason,
+                    detail=str(exc),
+                )
+            )
+            return
+        if table is not None:
             if _is_nist_janaf_table(path, doc):
                 self._lift_janaf_from_generator(work, source_id, rel, count, doc)
                 return
@@ -32781,7 +32793,7 @@ class Migrator:
             phase, _unmapped = map_phase("(c)")
         loc_raw = doc.get("source_locator")
         try:
-            locator = _locator_from_plain(loc_raw, refuse_invalid=True)
+            source_locator = _locator_from_plain(loc_raw, refuse_invalid=True)
         except _InvalidLocator as exc:
             self.result.registry_issues.append(
                 ValidationIssue(
@@ -32791,7 +32803,7 @@ class Migrator:
                 )
             )
             return
-        locator = locator or Locator(record=record_id)
+        locator = source_locator or Locator(record=record_id)
         if not locator.source_path:
             locator = replace(locator, source_path=rel)
         t = _compilation_temperature_state(doc)

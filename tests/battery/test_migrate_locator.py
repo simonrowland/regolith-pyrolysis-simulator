@@ -474,18 +474,19 @@ def test_compilation_generator_refusal_mutation_is_detected_for_every_route(
     import importlib
 
     migrate_module = importlib.import_module("simulator.battery.migrate")
-    decode = migrate_module._locator_from_plain
+    find_unknown = migrate_module._locator_mapping_first_unsupported_key
 
-    def tolerate_unknown(payload: object, *, refuse_invalid: bool = False):
-        try:
-            return decode(payload, refuse_invalid=refuse_invalid)
-        except ValueError as exc:
-            if refuse_invalid and "unknown locator key" in str(exc):
-                return decode(payload)
-            raise
+    def ignore_unknown(payload: object) -> str | None:
+        if isinstance(payload, dict) and "unreviewed_locator_axis" in payload:
+            return None
+        return find_unknown(payload)
 
     with monkeypatch.context() as mutation:
-        mutation.setattr(migrate_module, "_locator_from_plain", tolerate_unknown)
+        mutation.setattr(
+            migrate_module,
+            "_locator_mapping_first_unsupported_key",
+            ignore_unknown,
+        )
         for relative_path, _expected_count in _COMPILATION_GENERATOR_RECORDS:
             with pytest.raises(AssertionError):
                 _assert_compilation_generator_refuses_unknown_locator(
