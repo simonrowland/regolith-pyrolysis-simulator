@@ -30,6 +30,7 @@ from simulator.battery.migrate import (
     iter_observation_store_paths,
     observation_from_plain,
 )
+from simulator.battery.polymorph_dictionary import resolve_printed_name_polymorph
 from simulator.battery.validate import reaction_atom_balance
 from tests.battery import compilation_shard_observation_count
 
@@ -72,6 +73,58 @@ TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
 FAYALITE_ELEMENTS = "robie-hemingway-fisher-1978-usgs-b1452-0335"
 FAYALITE_OXIDES = "robie-hemingway-fisher-1978-usgs-b1452-0336"
+REVIEWED_OXIDE_SAMPLES = {
+    "robie-hemingway-fisher-1978-usgs-b1452-0314": (
+        "kyanite",
+        "Al2SiO5",
+        Decimal("0.484"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0316": (
+        "andalusite",
+        "Al2SiO5",
+        Decimal("0.241"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0318": (
+        "sillimanite",
+        "Al2SiO5",
+        Decimal("0.083"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0322": (
+        "larnite",
+        "Ca2SiO4",
+        Decimal("22.425"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0324": (
+        "calcium olivine",
+        "Ca2SiO4",
+        Decimal("23.918"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0328": (
+        "grossular",
+        "Ca3Al2Si3O12",
+        Decimal("56.029"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0348": (
+        "wollastonite",
+        "CaSiO3",
+        Decimal("15.790"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0350": (
+        "pseudowollastonite",
+        "CaSiO3",
+        Decimal("14.923"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0352": (
+        "ca-al pyroxene",
+        "CaAl2SiO6",
+        Decimal("10.821"),
+    ),
+    "robie-hemingway-fisher-1978-usgs-b1452-0362": (
+        "clinoenstatite",
+        "MgSiO3",
+        Decimal("6.202"),
+    ),
+}
 OXIDE_HEADING_RECORDS = (
     "robie-hemingway-fisher-1978-usgs-b1452-0232",
     "robie-hemingway-fisher-1978-usgs-b1452-0232-phase-02",
@@ -983,6 +1036,19 @@ def test_every_b1452_oxide_basis_record_keeps_oxide_log_k_reactions(
             if term.standard_state is None or not term.standard_state.is_value
         ]
         if unresolved_terms:
+            if record_id in REVIEWED_OXIDE_SAMPLES:
+                expected_name, _formula, _value = REVIEWED_OXIDE_SAMPLES[record_id]
+                expected_polymorph = resolve_printed_name_polymorph(expected_name)
+                product = next(
+                    term
+                    for term in reaction_state.value.terms
+                    if term.coefficient > 0
+                )
+                assert expected_polymorph is not None
+                assert product.species.phase.value is Phase.CR
+                assert product.species.polymorph is not None
+                assert product.species.polymorph.is_value
+                assert product.species.polymorph.value is expected_polymorph
             assert row.identity.quantity.is_unknown
             continue
         assert row.identity.quantity.is_value
@@ -1080,36 +1146,123 @@ def test_fayalite_oxide_log_k_is_a_reaction_with_term_standard_states() -> None:
         generated,
         basis="from_the_oxides",
         quantity=Quantity.LOG10_K_REACTION,
-        temperature="298.15",
     )
-    assert len(observations) == 1
-    observation = observations[0]
-    assert observation.value.point == Decimal("3.640")
-    assert quantity_token(observation.identity) is Quantity.LOG10_K_REACTION
-    assert observation.identity.species is None
-    assert observation.identity.per is not None
-    assert observation.identity.per.is_not_applicable
-    assert observation.identity.standard_pressure_Pa is not None
-    assert observation.identity.standard_pressure_Pa.is_not_applicable
-    assert identity_equal(observation.identity, observation.identity).kind is IdentityEqualKind.EQUAL
-    reaction_state = observation.identity.reaction
-    assert reaction_state is not None and reaction_state.is_value
-    assert [
-        (term.species.formula, term.coefficient)
-        for term in reaction_state.value.terms
-    ] == [
-        ("Fe2SiO4", Decimal("1")),
-        ("SiO2", Decimal("-1")),
-        ("FeO", Decimal("-2")),
-    ]
-    assert reaction_atom_balance(reaction_state.value) == {}
-    for term in reaction_state.value.terms:
-        assert term.standard_state is not None and term.standard_state.is_value
-        standard = term.standard_state.value
-        assert standard.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
-        assert standard.endmember == term.species
-        assert standard.component_basis == term.species.formula
-        assert standard.reference_pressure_bar == Decimal("1")
+    printed_log_k = {
+        "298.15": Decimal("3.640"),
+        "1490": Decimal("-0.038"),
+        "1500": Decimal("-0.024"),
+        "1600": Decimal("0.125"),
+        "1700": Decimal("0.096"),
+        "1800": Decimal("0.151"),
+    }
+    observations_by_temperature = {
+        str(observation.identity.temperature_K.value): observation
+        for observation in observations
+    }
+    assert {
+        temperature: observations_by_temperature[temperature].value.point
+        for temperature in printed_log_k
+    } == printed_log_k
+
+    for temperature, observation in observations_by_temperature.items():
+        if temperature not in printed_log_k:
+            continue
+        assert quantity_token(observation.identity) is Quantity.LOG10_K_REACTION
+        assert observation.identity.species is None
+        assert observation.identity.per is not None
+        assert observation.identity.per.is_not_applicable
+        assert observation.identity.standard_pressure_Pa is not None
+        assert observation.identity.standard_pressure_Pa.is_not_applicable
+        assert identity_equal(observation.identity, observation.identity).kind is IdentityEqualKind.EQUAL
+        reaction_state = observation.identity.reaction
+        assert reaction_state is not None and reaction_state.is_value
+        assert [
+            (term.species.formula, term.coefficient)
+            for term in reaction_state.value.terms
+        ] == [
+            ("Fe2SiO4", Decimal("1")),
+            ("SiO2", Decimal("-1")),
+            ("FeO", Decimal("-2")),
+        ]
+        assert reaction_atom_balance(reaction_state.value) == {}
+        product = reaction_state.value.terms[0]
+        expected_product_phase = Phase.CR if Decimal(temperature) <= Decimal("1490") else Phase.L
+        assert product.species.phase.value is expected_product_phase
+        for term in reaction_state.value.terms:
+            assert term.standard_state is not None and term.standard_state.is_value
+            standard = term.standard_state.value
+            assert standard.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            assert standard.endmember == term.species
+            assert standard.component_basis == term.species.formula
+            assert standard.reference_pressure_bar == Decimal("1")
+        feo = next(term for term in reaction_state.value.terms if term.species.formula == "FeO")
+        assert feo.species.phase.value is (
+            Phase.CR if Decimal(temperature) < Decimal("1650") else Phase.L
+        )
+
+
+@pytest.mark.parametrize(
+    ("temperature", "expected_phase"),
+    [
+        (Decimal("298.15"), Phase.CR),
+        (Decimal("1490"), Phase.CR),
+        (Decimal("1500"), Phase.L),
+    ],
+)
+def test_fayalite_product_phase_uses_its_printed_temperature_window(
+    temperature: Decimal, expected_phase: Phase
+) -> None:
+    phase, polymorph = generator._phase_state(
+        _load(FAYALITE_OXIDES), name="FAYALITE", temperature=temperature
+    )
+    assert phase.is_value and phase.value is expected_phase
+    if expected_phase is Phase.CR:
+        assert polymorph.is_value and polymorph.value is Polymorph.CRYSTALLINE
+    else:
+        assert polymorph.is_not_applicable
+
+
+def test_reference_oxide_transition_boundaries_follow_the_printed_source() -> None:
+    record = _load(FAYALITE_OXIDES)
+    for temperature, expected_phase in (
+        (Decimal("1600"), Phase.CR),
+        (Decimal("1649"), Phase.CR),
+        (Decimal("1650"), Phase.L),
+        (Decimal("1700"), Phase.L),
+    ):
+        species = generator._oxide_species(
+            "FeO", record=record, temperature=temperature
+        )
+        assert species.phase.value is expected_phase
+
+
+def test_reviewed_oxide_basis_names_resolve_from_the_polymorph_owner() -> None:
+    for record_id, (printed_name, formula, log_k) in REVIEWED_OXIDE_SAMPLES.items():
+        expected_polymorph = resolve_printed_name_polymorph(printed_name)
+        assert expected_polymorph is not None
+        record = _load(record_id)
+        actual = generator._polymorph_from_text(str(record["name_as_published"]))
+        assert actual.is_value and actual.value is expected_polymorph
+
+        observations = _formation_observations(
+            _generation(record_id),
+            basis="from_the_oxides",
+            quantity=Quantity.LOG10_K_REACTION,
+            temperature="298.15",
+        )
+        assert len(observations) == 1
+        observation = observations[0]
+        assert observation.value.point == log_k
+        assert observation.identity.quantity.is_value
+        assert observation.identity.quantity.value is Quantity.LOG10_K_REACTION
+        reaction = observation.identity.reaction
+        assert reaction is not None and reaction.is_value
+        product = next(term for term in reaction.value.terms if term.coefficient > 0)
+        assert product.species.formula == formula
+        assert product.species.phase.value is Phase.CR
+        assert product.species.polymorph is not None
+        assert product.species.polymorph.is_value
+        assert product.species.polymorph.value is expected_polymorph
 
 
 def test_b1452_element_reference_follows_the_janaf_state_at_temperature() -> None:
