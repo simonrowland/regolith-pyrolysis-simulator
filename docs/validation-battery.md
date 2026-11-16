@@ -41,6 +41,28 @@ Each scoring run writes `data/battery/residuals.jsonl` afresh; it is generated, 
 The migrator never invents a value: an unprinted pressure, phase or method stays unknown, and
 absence is never stored as a measured zero.
 
+## Quoted records and inherited values
+
+An experiment may carry a `quoted_from` citation link with a `target_kind` of `observation` or
+`experiment` and the target record's exact `target_id`. An observation target resolves to its
+owning experiment when inherited experiment fields are checked. An unresolved target is refused
+with `REFERENTIAL_INTEGRITY`; a target owned by the quoting experiment is refused with
+`CONDITIONAL_FIELD`.
+
+`method_inherited_from: true` declares that the quoting experiment's method is inherited from the
+cited experiment. `sample.initial_composition_inherited_from: true` makes the same declaration for
+the sample's initial composition. Each inherited value must be present as a typed value on both
+experiments and equal to the cited primary's value. A missing or conflicting value is refused with
+`CONDITIONAL_FIELD`; the flags do not supply or copy values during validation. When a cited source
+value is unavailable, scoring ancestry remains incomplete rather than treating the quote as
+independent.
+
+`quoted_from` is citation and scoring-dependence metadata. It does not describe a transformation
+and must not be copied into `derived_from`, which continues to describe how an observation was
+derived from its inputs. Quoted observations are suppressed from independent comparison scoring
+and retained as typed duplicate refusals; only the cited primary can contribute a numeric
+comparison.
+
 ## Running it
 
 Apply and check the engine patches first, so the scores describe the engines the simulator loads:

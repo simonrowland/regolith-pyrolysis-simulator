@@ -156,7 +156,10 @@ def _prepare_score_run(
                 refs.append(obs)
                 seen.add(obs.observation_id)
     for obs in context.observations.values():
-        if _has_duplicate_observation_link(obs) and obs.observation_id not in seen:
+        if (
+            _has_duplicate_observation_link(obs, context.experiments)
+            and obs.observation_id not in seen
+        ):
             refs.append(obs)
             seen.add(obs.observation_id)
     if measured_only:
@@ -439,11 +442,7 @@ def _score_store_with_decisions(
         ):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
-                duplicate_detail = (
-                    _duplicate_observation_refusal_detail(context, obs)
-                    if _has_duplicate_observation_link(obs)
-                    else None
-                )
+                duplicate_detail = _duplicate_observation_refusal_detail(context, obs)
                 for point_index, point in enumerate(
                     _iter_compilation_series_cells(obs, origin)
                 ):
@@ -590,24 +589,6 @@ def _score_store_with_decisions(
                         ):
                             prediction = _knudsen_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
-                            )
-                        if duplicate_detail is not None:
-                            prediction = EnginePrediction(
-                                engine=engine,
-                                channel=ENGINE_CHANNELS[engine],
-                                execution=Execution(
-                                    state=ExecutionState.NOT_PROBED
-                                ),
-                                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[
-                                    engine
-                                ],
-                                refusal_reason=RefusalReason.REFERENTIAL_INTEGRITY,
-                                refusal_detail=duplicate_detail,
-                                identity=(
-                                    point.identity
-                                    if isinstance(point.identity, Identity)
-                                    else None
-                                ),
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
                             engine, point
