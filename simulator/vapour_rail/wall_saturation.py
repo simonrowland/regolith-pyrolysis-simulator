@@ -31,11 +31,13 @@ available; otherwise it refuses wall_pO2_required.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+from simulator.reference_data import janaf
+from simulator.reference_data.janaf import TABLES_DIR
 from simulator.reference_data.nasa_glenn import COMPILATION_ROOT, load_record_document
 from simulator.vapour_rail.nasa_cea import (
     R_J_PER_MOL_K,
@@ -121,10 +123,9 @@ def janaf_record_g_over_rt(table_id: str, T_K: float) -> float:
 
     ``formation_gibbs_energy`` is kJ/mol. ``G/(R T) = (kJ/mol · 1000) / (R T)``
     with ``R`` in J/(mol·K) and ``T`` in kelvin, so the ratio is dimensionless
-    in the JANAF 0.1 MPa standard state. The bracket is the nearest published
-    rows that carry a value. Outside that span the nearest pair is linearly
-    continued and marked extrapolated. This is not
-    ``janaf._interpolate_formation_gibbs``, which is tied to the fusion tables.
+    in the JANAF 0.1 MPa standard state. The checked JANAF owner refuses
+    missing interior nodes. Outside the printed span the wall path explicitly
+    requests that owner's endpoint continuation and marks it extrapolated.
     """
 
     g_over_rt, _phase, _authority, _valid_range = _janaf_record_state(table_id, T_K)
@@ -591,45 +592,22 @@ def _nasa_record_data(
 def _janaf_record_data(
     path: Path,
     _version: tuple[int, int, int, int],
-) -> tuple[str, tuple[tuple[float, float], ...]]:
-    """Prepared rows keyed by the source path and its file version."""
+) -> tuple[str, tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]:
+    """Checked owner rows keyed by the source path and its file version."""
 
-    document = load_table_document(path)
-    table = document.get("table")
-    if not isinstance(table, Mapping):
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            f"{path.stem} has no table",
+    try:
+        table, _digest = janaf._checked_compiled_table_document(
+            path.stem,
+            document_loader=lambda _path: janaf.load_table_document(path),
         )
+        points, missing = janaf._formation_gibbs_rows_from_table(path.stem, table)
+    except (ValueError, OSError) as exc:
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing", f"{path.stem}: {exc}",
+        ) from exc
     index = table.get("index_entry")
-    state = ""
-    if isinstance(index, Mapping) and index.get("state") is not None:
-        state = str(index.get("state"))
-    phase = _janaf_phase(state, path.stem)
-    rows = table.get("values")
-    if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            f"{path.stem} has no values",
-        )
-    points: list[tuple[float, float]] = []
-    for row in rows:
-        if not isinstance(row, Mapping):
-            continue
-        temperature = row.get("temperature")
-        gibbs = row.get("formation_gibbs_energy")
-        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
-            continue
-        if temperature.get("value") is None or gibbs.get("value") is None:
-            continue
-        points.append((float(temperature["value"]), float(gibbs["value"])))
-    if len(points) < 2:
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            f"{path.stem} has fewer than two formation-Gibbs rows",
-        )
-    points.sort()
-    return phase, tuple(points)
+    state = str(index.get("state") or "") if isinstance(index, Mapping) else ""
+    return _janaf_phase(state, path.stem), points, missing
 
 
 def _nasa_record_state(
@@ -725,51 +703,21 @@ def _janaf_state_for_source(
     version: tuple[int, int, int, int],
     T_K: float,
 ) -> tuple[float, str, str, tuple[float, float]]:
-    phase, points = _janaf_record_data(path, version)
-    valid_range = (points[0][0], points[-1][0])
-    authority = (
-        "extrapolated"
-        if T_K < points[0][0] or T_K > points[-1][0]
-        else "authoritative"
-    )
-    g_kJ = _linear_bracket(points, T_K, path.stem)
+    phase, points, missing = _janaf_record_data(path, version)
+    valid_range = (float(points[0][0]), float(points[-1][0]))
+    temperature = Decimal(str(T_K))
+    extrapolated = temperature < points[0][0] or temperature > points[-1][0]
+    try:
+        g_kJ = janaf._interpolate_formation_gibbs(
+            points, temperature, missing, extrapolate=extrapolated,
+        )
+    except ValueError as exc:
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing", f"{path.stem}: {exc}",
+        ) from exc
     # kJ/mol → dimensionless G/(RT). 1000 J/kJ. R is J/(mol·K). T is K.
-    g_over_rt = (g_kJ * 1000.0) / (R_J_PER_MOL_K * T_K)
-    return g_over_rt, phase, authority, valid_range
-
-
-def _linear_bracket(
-    points: Sequence[tuple[float, float]],
-    temperature_K: float,
-    table_id: str,
-) -> float:
-    if temperature_K < points[0][0]:
-        left, right = points[0], points[1]
-    elif temperature_K > points[-1][0]:
-        left, right = points[-2], points[-1]
-    else:
-        bracket = next((
-            (left, right)
-            for left, right in zip(points, points[1:])
-            if left[0] <= temperature_K <= right[0]
-        ), None)
-        if bracket is None:
-            raise WallSaturationLawRefusal(
-                "wall_condensation_thermo_out_of_interval",
-                f"{table_id} formation Gibbs does not cover {temperature_K} K",
-            )
-        left, right = bracket
-    left_T, left_g = left
-    right_T, right_g = right
-    if right_T == left_T:
-        return left_g
-    # Premise: adjacent published ΔfG rows supply the local slope. Algebra
-    # continues G(T)=G0+(G1-G0)(T-T0)/(T1-T0), in kJ/mol; the caller converts
-    # kJ/mol to dimensionless G/(RT). The temperature ratio is unitless. At
-    # T0 the result equals G0; outside the pair it is a flagged prediction.
-    return left_g + (right_g - left_g) * (temperature_K - left_T) / (
-        right_T - left_T
-    )
+    g_over_rt = (float(g_kJ) * 1000.0) / (R_J_PER_MOL_K * T_K)
+    return g_over_rt, phase, "extrapolated" if extrapolated else "authoritative", valid_range
 
 
 def _janaf_phase(state: str, table_id: str) -> str:

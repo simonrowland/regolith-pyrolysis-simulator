@@ -1204,6 +1204,10 @@ def _interpolate_table_points(
             for a, b in zip(points, points[1:])
             if a[0] <= temperature_K <= b[0]
         )
+    # Adjacent printed G points define the chord: G(T)=G0+(G1-G0)
+    # *(T-T0)/(T1-T0). The K/K ratio is dimensionless, leaving kJ/mol;
+    # at either endpoint this returns the printed G. Extrapolation uses
+    # that same slope and the caller must retain its authority flag.
     return left[1] + (right[1] - left[1]) * (temperature_K - left[0]) / (
         right[0] - left[0]
     )
@@ -1264,19 +1268,33 @@ def _interpolate_formation_gibbs(
     points: Sequence[tuple[Decimal, Decimal]],
     temperature_K: Decimal,
     missing_temperatures: Sequence[Decimal] = (),
+    *,
+    extrapolate: bool = False,
 ) -> Decimal:
-    """Interpolate printed JANAF ΔfG° without extrapolating or crossing a missing node."""
-    if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+    """Interpolate printed ΔfG°; endpoint continuation requires explicit opt-in.
+
+    The wall-law caller flags an extrapolated result. Existing callers keep
+    strict in-range admission. Both paths use this owner's one chord law.
+    """
+    outside = temperature_K < points[0][0] or temperature_K > points[-1][0]
+    if outside and not extrapolate:
         raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+    # For endpoint continuation the active chord must itself be complete.
+    # Checking its midpoint subjects it to the same missing-node rule as
+    # an interior query, rather than bridging a gap past the printed band.
+    check_temperature = temperature_K
+    if outside:
+        left, right = points[:2] if temperature_K < points[0][0] else points[-2:]
+        check_temperature = (left[0] + right[0]) / 2
     missing_node = _missing_node_for_interpolation(
-        points, missing_temperatures, temperature_K
+        points, missing_temperatures, check_temperature
     )
     if missing_node is not None:
         raise ValueError(
             f"JANAF formation Gibbs interpolation spans missing grid node "
             f"{missing_node} K at {temperature_K} K"
         )
-    return _interpolate_table_points(points, temperature_K)
+    return _interpolate_table_points(points, temperature_K, extrapolate=extrapolate)
 
 
 def table_delta_fh_298_uncertainty_kj_per_mol(
@@ -1384,6 +1402,17 @@ def _formation_gibbs_rows_kj_per_mol(
 ) -> tuple[tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]:
     """Return printed ΔfG° points and missing nodes, in kJ/mol."""
     table, _digest = _checked_compiled_table_document(table_id)
+    return _formation_gibbs_rows_from_table(table_id, table)
+
+
+def _formation_gibbs_rows_from_table(
+    table_id: str, table: Mapping[str, Any],
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]:
+    """Prepare printed cells from a checked table, retaining missing nodes.
+
+    Shared by the table-id reader and the wall reader, whose existing
+    source-path/file-version cache supplies the checked table.
+    """
     units = table.get("units_as_published")
     if (
         not isinstance(units, Mapping)

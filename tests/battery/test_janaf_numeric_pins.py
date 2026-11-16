@@ -34,6 +34,29 @@ def test_janaf_interpolation_refuses_declared_missing_grid_node() -> None:
         )
 
 
+def test_janaf_endpoint_continuation_requires_explicit_opt_in() -> None:
+    points = ((Decimal("300"), Decimal("-1")), (Decimal("400"), Decimal("-2")))
+    with pytest.raises(ValueError, match="outside the JANAF table range"):
+        _interpolate_formation_gibbs(points, Decimal("450"))
+    # Endpoint chord: -2 - (50/100) = -2.5 kJ/mol. The same chord
+    # below the first point gives -1 + (50/100) = -0.5 kJ/mol.
+    assert _interpolate_formation_gibbs(
+        points, Decimal("450"), extrapolate=True,
+    ) == Decimal("-2.5")
+    assert _interpolate_formation_gibbs(
+        points, Decimal("250"), extrapolate=True,
+    ) == Decimal("-0.5")
+
+
+def test_janaf_endpoint_continuation_does_not_bridge_missing_node() -> None:
+    points = ((Decimal("300"), Decimal("-1")), (Decimal("500"), Decimal("-3")))
+    for temperature in (Decimal("250"), Decimal("550")):
+        with pytest.raises(ValueError, match="missing grid node 400 K"):
+            _interpolate_formation_gibbs(
+                points, temperature, (Decimal("400"),), extrapolate=True,
+            )
+
+
 def test_mgo_janaf_fusion_enthalpy_uses_printed_3000_k_values() -> None:
     # Mg-008/Mg-009 print −709.524/−632.496 kJ/mol at 3000 K.
     enthalpy, *_ = janaf_fusion_enthalpy("MgO", Decimal("3000"))

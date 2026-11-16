@@ -19,7 +19,8 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+from simulator.reference_data import janaf
+from simulator.reference_data.janaf import TABLES_DIR
 from simulator.reference_data.nasa_glenn import COMPILATION_ROOT, load_record_document
 from simulator.vapour_rail.catalog import (
     HotTrainInapplicable,
@@ -374,23 +375,8 @@ def _covering_nasa_record(record_ids: list[str], temperature_K: float) -> tuple[
 
 
 def _janaf_g_over_rt(table_id: str, temperature_K: float) -> float:
-    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
-    points: list[tuple[float, float]] = []
-    for row in document["table"]["values"]:
-        temperature = row.get("temperature") or {}
-        gibbs = row.get("formation_gibbs_energy") or {}
-        if temperature.get("value") is None or gibbs.get("value") is None:
-            continue
-        points.append((float(temperature["value"]), float(gibbs["value"])))
-    points.sort()
-    for (left_T, left_g), (right_T, right_g) in zip(points, points[1:]):
-        if left_T <= temperature_K <= right_T:
-            span = right_T - left_T
-            g_kJ = left_g if span == 0.0 else left_g + (right_g - left_g) * (
-                temperature_K - left_T
-            ) / span
-            return (g_kJ * 1000.0) / (R_J_PER_MOL_K * temperature_K)
-    raise AssertionError(f"{table_id} does not cover {temperature_K} K")
+    g_kJ = janaf._formation_gibbs_energy_kj_per_mol_at(table_id, temperature_K)
+    return (float(g_kJ) * 1000.0) / (R_J_PER_MOL_K * temperature_K)
 
 
 def _independent_operative(row: dict, temperature_K: float, pO2_Pa: float | None):
@@ -656,7 +642,8 @@ def test_record_state_cache_tracks_path_and_file_version(
     shutil.copy2(source_path, target_b)
 
     loader_name = "load_record_document" if thermo == "nasa" else "load_table_document"
-    original_loader = getattr(wall_module, loader_name)
+    loader_owner = wall_module if thermo == "nasa" else janaf
+    original_loader = getattr(loader_owner, loader_name)
     loaded_paths: list[Path] = []
     polynomial_calls = []
     polynomial_evaluations = []
@@ -685,19 +672,19 @@ def test_record_state_cache_tracks_path_and_file_version(
             wall_module.Nasa9Segment, "evaluate_ratios", counted_segment_evaluate
         )
     else:
-        original_linear_bracket = wall_module._linear_bracket
+        original_interpolate = janaf._interpolate_formation_gibbs
 
-        def counted_linear_bracket(points, temperature_K: float, table_id: str):
-            thermo_evaluations.append(temperature_K)
-            return original_linear_bracket(points, temperature_K, table_id)
+        def counted_interpolate(points, temperature_K, *args, **kwargs):
+            thermo_evaluations.append(float(temperature_K))
+            return original_interpolate(points, temperature_K, *args, **kwargs)
 
-        monkeypatch.setattr(wall_module, "_linear_bracket", counted_linear_bracket)
+        monkeypatch.setattr(janaf, "_interpolate_formation_gibbs", counted_interpolate)
 
     def counted_loader(path: Path) -> dict[str, object]:
         loaded_paths.append(path)
         return original_loader(path)
 
-    monkeypatch.setattr(wall_module, loader_name, counted_loader)
+    monkeypatch.setattr(loader_owner, loader_name, counted_loader)
     monkeypatch.setattr(wall_module, root_name, root_a)
 
     def evaluate(temperature_K: float) -> float:
@@ -755,9 +742,12 @@ def test_record_state_cache_tracks_path_and_file_version(
                 float(item["temperature"]["value"]) - first_temperature_K
             ),
         )
-        row["formation_gibbs_energy"]["value"] = (
-            float(row["formation_gibbs_energy"]["value"]) + 1.0
-        )
+        # The checked owner consumes printed cells, not a second numeric
+        # projection. Change the printed value and its projection together.
+        from decimal import Decimal
+        changed = Decimal(str(row["formation_gibbs_energy"]["as_published"])) + 1
+        row["formation_gibbs_energy"]["as_published"] = str(changed)
+        row["formation_gibbs_energy"]["value"] = float(changed)
         target_b.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
     os.utime(
         target_b,
@@ -960,9 +950,6 @@ def _install_janaf_wall_mutation(monkeypatch, table_id, document):
     def loader(path):
         return document if path.stem == table_id else original(path)
     monkeypatch.setattr(janaf, "load_table_document", loader)
-    # Also exercise the pre-fix reader in the baseline regression run.
-    if hasattr(wall, "load_table_document"):
-        monkeypatch.setattr(wall, "load_table_document", loader)
     wall._janaf_record_data.cache_clear()
     wall._janaf_state_for_source.cache_clear()
     return wall
@@ -1000,6 +987,23 @@ def test_every_janaf_wall_resolver_propagates_checked_refusal(monkeypatch, speci
     finally:
         wall._janaf_record_data.cache_clear()
         wall._janaf_state_for_source.cache_clear()
+
+
+@pytest.mark.parametrize("table_id", _JANAF_WALL_TABLES)
+def test_janaf_wall_endpoint_continuation_retains_extrapolated_authority(table_id):
+    from decimal import Decimal
+    from simulator.vapour_rail import wall_saturation as wall
+
+    table, _digest = janaf._checked_compiled_table_document(table_id)
+    points, missing = janaf._formation_gibbs_rows_from_table(table_id, table)
+    for temperature in (points[0][0] - Decimal("1"), points[-1][0] + Decimal("1")):
+        expected = janaf._interpolate_formation_gibbs(
+            points, temperature, missing, extrapolate=True,
+        )
+        g_over_rt, _phase, authority, band = wall._janaf_record_state(table_id, float(temperature))
+        assert authority == "extrapolated"
+        assert band == (float(points[0][0]), float(points[-1][0]))
+        assert g_over_rt == (float(expected) * 1000.0) / (R_J_PER_MOL_K * float(temperature))
 
 
 @pytest.mark.parametrize("temperature_index,temperature_K", [(0, 1323.15), (1, 1500.0)])
