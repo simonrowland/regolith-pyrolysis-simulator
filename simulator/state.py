@@ -21,6 +21,7 @@ from simulator.condensation_routing import (
     K_TRAP_SUB_ORDER,
     NA_COLLECTOR_STAGE_KEY,
     STAGE3_BYPASS_SEGMENT_NAME,
+    pipe_segment_name,
     target_species_for_stage_key,
     target_species_for_stage_number,
 )
@@ -770,9 +771,12 @@ class CondensationStage:
 
 
 PIPE_SEGMENT_NAMES = tuple(
-    f'stage_{stage_number}_to_stage_{stage_number + 1}'
+    pipe_segment_name(stage_number, stage_number + 1)
     for stage_number in range(7)
 ) + (STAGE3_BYPASS_SEGMENT_NAME,)
+# A refusal without segment-specific wall evidence is booked as upstream;
+# its physical wall is the declared hot duct before Stage 1.
+UPSTREAM_WALL_DEPOSIT_SEGMENT = 'upstream'
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX = 'process.wall_deposit_segment_'
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS = tuple(
     f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{name}'

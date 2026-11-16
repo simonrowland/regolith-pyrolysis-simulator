@@ -72,7 +72,9 @@ The Fe → SiO separation (Stage 1 → Stage 3):
 from __future__ import annotations
 
 from simulator.condensation_routing import (
-    STAGE3_BYPASS_SEGMENT_NAME, active_collector_stage_number,
+    STAGE3_BYPASS_SEGMENT_NAME,
+    active_collector_stage_number,
+    pipe_segment_name,
 )
 
 import copy
@@ -3438,9 +3440,8 @@ class CondensationModel:
         for upstream, downstream in zip(stages, stages[1:]):
             downstream_material = _stage_material_config(downstream, self.materials)
             segments.append(PipeSegment(
-                name=(
-                    f'stage_{upstream.stage_number}'
-                    f'_to_stage_{downstream.stage_number}'
+                name=pipe_segment_name(
+                    upstream.stage_number, downstream.stage_number
                 ),
                 upstream_stage=f'stage_{upstream.stage_number}',
                 downstream_stage=f'stage_{downstream.stage_number}',

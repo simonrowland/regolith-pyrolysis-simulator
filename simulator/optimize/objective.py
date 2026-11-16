@@ -70,6 +70,7 @@ from simulator.diagnostics import (
     wall_deposit_remobilization_by_segment_species,
     wall_deposit_sticking_authority_status,
 )
+from simulator.state import UPSTREAM_WALL_DEPOSIT_SEGMENT
 from simulator.trace import _priced_wall_deposit_kg, wall_deposit_kg_by_zone_species
 from simulator.optimize.backend_status import (
     backend_statuses_from_carrier as _backend_statuses_from_carrier,
@@ -5570,7 +5571,7 @@ def _refusal_candidate_segments(
         by_segment = records.get(species)
         if isinstance(by_segment, Mapping) and by_segment:
             return tuple(sorted(str(segment) for segment in by_segment))
-    return ("upstream",)
+    return (UPSTREAM_WALL_DEPOSIT_SEGMENT,)
 
 
 def _refusal_reason(
@@ -5688,7 +5689,7 @@ def _assign_refused_supplies_at_binding_load(
             )
         )
         if not candidates:
-            candidates = ("upstream",)
+            candidates = (UPSTREAM_WALL_DEPOSIT_SEGMENT,)
         normalized[species] = candidates
         for segment in candidates:
             closed_form.setdefault(segment, float(existing_loads.get(segment, 0.0)))

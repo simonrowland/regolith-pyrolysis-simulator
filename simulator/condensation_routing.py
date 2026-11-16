@@ -9,6 +9,12 @@ STAGE3_ROUTES = ('divert', 'through')
 STAGE3_BYPASS_SEGMENT_NAME = 'stage_2_to_stage_4_bypass'
 
 
+def pipe_segment_name(upstream_stage_number: int, downstream_stage_number: int) -> str:
+    return (
+        f'stage_{upstream_stage_number}_to_stage_{downstream_stage_number}'
+    )
+
+
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
     1: 'stage_1_fe_condenser',
     2: 'stage_2_cr_oxide_harvest',
