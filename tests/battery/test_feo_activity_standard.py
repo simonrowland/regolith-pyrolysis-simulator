@@ -401,7 +401,9 @@ def test_redox_hot_round_trip_preserves_melt_binding_for_cache_off_feo_normaliza
     from simulator.melt_backend.openimcc_bridge import OpenImccRedoxResult
 
     result = captured["result"]
-    decoded = OpenImccRedoxResult.from_hot(result.to_hot())
+    decoded = OpenImccRedoxResult.from_hot(
+        engine_cache.live_hot(result.to_hot())
+    )
     assert decoded.melt_pack_binding_digest == result.melt_pack_binding_digest
     assert decoded.melt_pack_binding_digest
 
