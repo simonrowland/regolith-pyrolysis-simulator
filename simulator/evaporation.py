@@ -2257,9 +2257,6 @@ class EvaporationMixin:
                 # stay covered at the classifier. This return does not
                 # stamp one.
                 return flux
-            vapor_pressure_diagnostic = dict(
-                getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
-            )
             equilibrium_diagnostic = dict(
                 getattr(equilibrium, 'diagnostics', {}) or {}
             )
@@ -2296,17 +2293,23 @@ class EvaporationMixin:
             surface = getattr(self, '_last_langmuir_surface_oxygen', {}) or {}
             driving_forces = {}
             if surface.get('applied') and surface.get('surface_pO2_bar') is None:
-                from simulator.langmuir_surface_oxygen import _condensed_cap
+                from simulator.langmuir_surface_oxygen import (
+                    LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+                    _condensed_cap,
+                )
 
                 provenance = vapor_pressure_diagnostic.get(
                     'vapor_pressure_numerator_provenance', {}
                 ) or {}
                 selected = flux_overlay_report.get('selected_runtime_pa_by_species', {})
                 partials = surface.get('overhead_partials_Pa', {})
-                for species, refusal in surface.get('refused_species', {}).items():
+                refusal_codes = surface.get('refusal_codes_by_species')
+                for species in surface.get('refused_species', {}):
                     if (
                         channel_states.get(species) != 'eligible'
-                        or 'oxygen balance did not close' not in refusal
+                        or not isinstance(refusal_codes, Mapping)
+                        or refusal_codes.get(species)
+                        != LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED
                     ):
                         continue
                     pressure = selected.get(species)
@@ -2393,6 +2396,7 @@ class EvaporationMixin:
                 'evaporation_flux_kg_hr': {},
                 'vapour_batch_flux_overlay': flux_overlay_report,
                 'vapour_batch': batch_report,
+                'net_driving_force_by_species': driving_forces,
             }
             self._last_evaporation_flux_diagnostic = diagnostic
             raise EvaporationFluxRefusal(

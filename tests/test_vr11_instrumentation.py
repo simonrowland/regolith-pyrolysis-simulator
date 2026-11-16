@@ -947,8 +947,15 @@ def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
 def test_unclosed_surface_requires_nonpositive_capped_drive_for_empty_flux(
     headspace_pressure, missing_input,
 ) -> None:
+    from simulator.langmuir_surface_oxygen import (
+        LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+    )
+
     model = SimpleNamespace(
         melt=SimpleNamespace(temperature_C=950.0), setpoints={},
+        _last_vapor_pressure_diagnostic={
+            "vapor_pressure_numerator_provenance": {},
+        },
     )
     batch = _toy_batch({"Fe"}, pressures={"Fe": 1.0})
 
@@ -958,10 +965,15 @@ def test_unclosed_surface_requires_nonpositive_capped_drive_for_empty_flux(
             "surface_pO2_bar": None,
             "refused_species": {"Fe": (
                 "missing pO2 reference" if missing_input else
-                "oxygen balance did not close (relative_residual=1, bracket=lower)"
+                "surface closure refusal"
             )},
+            "refusal_codes_by_species": (
+                {} if missing_input else {
+                    "Fe": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+                }
+            ),
             "overhead_partials_Pa": {"Fe": headspace_pressure},
-            "warning": "oxygen balance did not close (relative_residual=1, bracket=lower)",
+            "warning": "surface closure refusal",
         }
         return (
             {},
@@ -981,11 +993,26 @@ def test_unclosed_surface_requires_nonpositive_capped_drive_for_empty_flux(
         with pytest.raises(EvaporationFluxRefusal) as error:
             EvaporationMixin._calculate_evaporation(model, equilibrium)
         assert error.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+        if missing_input:
+            assert "Fe" not in error.value.diagnostic["net_driving_force_by_species"]
+        else:
+            drive = error.value.diagnostic["net_driving_force_by_species"]["Fe"]
+            assert drive["capped_equilibrium_pressure_Pa"] == 1.0
+            assert drive["headspace_partial_pressure_Pa"] == headspace_pressure
+            assert drive["driving_force_Pa"] == 0.5
     else:
         flux = EvaporationMixin._calculate_evaporation(model, equilibrium)
         assert flux.species_kg_hr == {}
         assert model._last_evaporation_flux_diagnostic["batch_channel_states"] == {
             "Fe": "zero_by_physics",
+        }
+        assert model._last_evaporation_flux_diagnostic[
+            "net_driving_force_by_species"]["Fe"]["driving_force_Pa"] == (
+                1.0 - headspace_pressure
+            )
+        assert flux.carrier_authority_by_species["Fe"]["pressure"] == {
+            "kind": "zero_by_physics",
+            "evidence_ref": "non_positive_capped_net_driving_force",
         }
 
 

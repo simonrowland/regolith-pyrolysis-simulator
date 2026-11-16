@@ -1372,6 +1372,15 @@ def test_failed_open_gate_refuses_every_melt_surface_carrier(case: str) -> None:
     assert notice["applied"] is True
     assert notice["surface_pO2_bar"] is None
     assert set(notice["refused_species"]) == set(participants)
+    if case == "open-inband-overhead":
+        from simulator.langmuir_surface_oxygen import (
+            LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+        )
+
+        assert notice["refusal_codes_by_species"] == {
+            species: LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED
+            for species in participants
+        }
     for species in participants:
         assert species not in resolved
         reason = notice["refused_species"][species]

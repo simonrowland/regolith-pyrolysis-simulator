@@ -197,6 +197,9 @@ from simulator.accounting.formulas import (
 LANGMUIR_SURFACE_PO2_REASON = (
     "langmuir_surface_pO2_from_evaporative_oxygen_balance"
 )
+LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED = (
+    "langmuir_surface_oxygen_balance_not_closed"
+)
 _RESIDUAL_CLOSE_MAX = 1.0e-4
 _METAL_RAILS = frozenset({"gas_fugacity", "condensed_raoult_psat"})
 
@@ -240,6 +243,7 @@ class LangmuirSurfaceOxygen:
     capacity_negligible: bool = False
     eval_pO2_below_physical_floor: bool = False
     overhead_bounded: bool = False
+    refusal_codes_by_species: Mapping[str, str] = field(default_factory=dict)
     # Species whose published pressure is the IEEE floor, not a computed
     # power. Empty when every published log-pressure was representable.
     pressure_continuations: Mapping[str, str] = field(default_factory=dict)
@@ -253,6 +257,7 @@ class LangmuirSurfaceOxygen:
             "relative_residual": self.relative_residual,
             "warning": self.warning,
             "refused_species": dict(self.refused_species),
+            "refusal_codes_by_species": dict(self.refusal_codes_by_species),
             "persisted_pO2_bar_by_species": dict(
                 self.persisted_pO2_bar_by_species
             ),
@@ -1518,6 +1523,7 @@ def _solve_or_refuse(
                 f"(relative_residual={residual:.3e}, "
                 f"bracket={balance.bracket_boundary})"
             ),
+            refusal_code=LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
             extra_refused=refused,
             capacity_negligible=capacity_negligible,
             eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
@@ -1703,6 +1709,7 @@ def _refuse_unclosed_surface(
     *,
     detail: str,
     extra_refused: Mapping[str, str] | None = None,
+    refusal_code: str | None = None,
     capacity_negligible: bool = False,
     eval_pO2_below_physical_floor: bool = False,
 ) -> LangmuirSurfaceOxygen:
@@ -1736,6 +1743,11 @@ def _refuse_unclosed_surface(
         refused=refused,
         detail=detail,
     )
+    refusal_codes_by_species = {
+        species: refusal_code
+        for species in refused
+        if refusal_code is not None and species not in (extra_refused or {})
+    }
     warning = (
         f"{LANGMUIR_SURFACE_PO2_REASON}: surface_pO2_unavailable "
         f"refused={','.join(sorted(refused)) or 'none'} detail={detail}"
@@ -1750,4 +1762,5 @@ def _refuse_unclosed_surface(
         persisted_pO2_bar_by_species=dict(persisted),
         capacity_negligible=capacity_negligible,
         eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
+        refusal_codes_by_species=refusal_codes_by_species,
     )
