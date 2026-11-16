@@ -942,6 +942,53 @@ def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
     )
 
 
+@pytest.mark.parametrize("headspace_pressure", [0.5, 1.0, 2.0])
+@pytest.mark.parametrize("missing_input", [False, True])
+def test_unclosed_surface_requires_nonpositive_capped_drive_for_empty_flux(
+    headspace_pressure, missing_input,
+) -> None:
+    model = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=950.0), setpoints={},
+    )
+    batch = _toy_batch({"Fe"}, pressures={"Fe": 1.0})
+
+    def resolve(_equilibrium, **_kwargs):
+        model._last_langmuir_surface_oxygen = {
+            "applied": True,
+            "surface_pO2_bar": None,
+            "refused_species": {"Fe": (
+                "missing pO2 reference" if missing_input else
+                "oxygen balance did not close (relative_residual=1, bracket=lower)"
+            )},
+            "overhead_partials_Pa": {"Fe": headspace_pressure},
+            "warning": "oxygen balance did not close (relative_residual=1, bracket=lower)",
+        }
+        return (
+            {},
+            {"batch_channel_states": {"Fe": "eligible"},
+             "selected_runtime_pa_by_species": {"Fe": 1.0}},
+            batch, {},
+            {"vapor_pressure_numerator_provenance": {"Fe": {
+                "pressure_rail": "condensed_raoult_psat", "activity_factor": 1.0,
+                "raw_metal_activity_root": 2.0, "P_reference_Antoine_Pa": 1.0,
+            }}},
+            SimpleNamespace(physical_zero_reason=None),
+        )
+
+    model._resolve_evaporation_batch_flux_state = resolve
+    equilibrium = SimpleNamespace(liquid_fraction=1.0, diagnostics={})
+    if missing_input or headspace_pressure < 1.0:
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            EvaporationMixin._calculate_evaporation(model, equilibrium)
+        assert error.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+    else:
+        flux = EvaporationMixin._calculate_evaporation(model, equilibrium)
+        assert flux.species_kg_hr == {}
+        assert model._last_evaporation_flux_diagnostic["batch_channel_states"] == {
+            "Fe": "zero_by_physics",
+        }
+
+
 def test_evaporation_healthy_empty_batch_at_900c_keeps_cheap_zero() -> None:
     model = SimpleNamespace(
         melt=SimpleNamespace(temperature_C=900.0),

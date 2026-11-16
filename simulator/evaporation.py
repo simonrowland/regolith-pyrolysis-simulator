@@ -2293,10 +2293,62 @@ class EvaporationMixin:
             channel_states = dict(
                 flux_overlay_report.get('batch_channel_states', {}) or {}
             )
-            if channel_states and all(
-                state == 'zero_by_physics' for state in channel_states.values()
-            ):
-                return flux
+            surface = getattr(self, '_last_langmuir_surface_oxygen', {}) or {}
+            driving_forces = {}
+            if surface.get('applied') and surface.get('surface_pO2_bar') is None:
+                from simulator.langmuir_surface_oxygen import _condensed_cap
+
+                provenance = vapor_pressure_diagnostic.get(
+                    'vapor_pressure_numerator_provenance', {}
+                ) or {}
+                selected = flux_overlay_report.get('selected_runtime_pa_by_species', {})
+                partials = surface.get('overhead_partials_Pa', {})
+                for species, refusal in surface.get('refused_species', {}).items():
+                    if (
+                        channel_states.get(species) != 'eligible'
+                        or 'oxygen balance did not close' not in refusal
+                    ):
+                        continue
+                    pressure = selected.get(species)
+                    headspace = partials.get(species)
+                    if not all(
+                        isinstance(value, Real) and not isinstance(value, bool)
+                        and math.isfinite(value) and value > 0.0
+                        for value in (pressure, headspace)
+                    ):
+                        continue
+                    _capped, _activity, cap = _condensed_cap(
+                        provenance.get(species, {}), pressure,
+                    )
+                    if cap is None:
+                        continue
+                    drive = cap - headspace
+                    driving_forces[species] = {
+                        'capped_equilibrium_pressure_Pa': cap,
+                        'headspace_partial_pressure_Pa': headspace,
+                        'driving_force_Pa': drive,
+                        'driving_force_sign': 'non_positive' if drive <= 0.0 else 'positive',
+                        'closure_bracket_state': surface.get('warning'),
+                    }
+                    # J = alpha*(P_eq - P_h)/sqrt(2*pi*M*R*T). The
+                    # positive denominator makes J <= 0 when P_h >= the
+                    # pure-component cap (Pa). Net condensation into the
+                    # melt is disabled, so this is zero outward flux at
+                    # every possible surface pO2, even without a root.
+                    if drive <= 0.0:
+                        channel_states[species] = 'zero_by_physics'
+                        channel = flux.carrier_authority_by_species[species]
+                        channel['pressure'] = {
+                            'kind': 'zero_by_physics',
+                            'evidence_ref': 'non_positive_capped_net_driving_force',
+                        }
+                        channel['extra'] = {
+                            **channel.get('extra', {}),
+                            'net_driving_force': driving_forces[species],
+                        }
+            if driving_forces:
+                flux_overlay_report['net_driving_force_by_species'] = driving_forces
+                flux_overlay_report['batch_channel_states'] = channel_states
             # When every channel is a typed non-debit outcome (genuine bound,
             # zero, dormant) and none is refused / eligible / missing-seam,
             # empty flux is authorized, not an empty-provider false zero.
@@ -2322,6 +2374,7 @@ class EvaporationMixin:
                         'empty flux is authorized'
                     ),
                     'batch_channel_states': channel_states,
+                    'net_driving_force_by_species': driving_forces,
                     'evaporation_flux_kg_hr': {},
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
