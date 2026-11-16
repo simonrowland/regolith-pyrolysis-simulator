@@ -2012,7 +2012,9 @@ def test_reviewed_oxide_basis_names_resolve_from_the_polymorph_owner() -> None:
         expected_polymorph = resolve_printed_name_polymorph(printed_name)
         assert expected_polymorph is not None
         record = _load(record_id)
-        actual = generator._polymorph_from_text(str(record["name_as_published"]))
+        actual = generator._polymorph_from_text(generator._corrected_source_text(
+            record, str(record["name_as_published"]), "name_as_published"
+        ))
         assert actual.is_value and actual.value is expected_polymorph
 
         observations = _formation_observations(
