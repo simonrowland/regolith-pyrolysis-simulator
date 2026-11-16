@@ -14779,8 +14779,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 '_melt_redox_gate_authority_tick_hour',
                 None,
             )
+            # Admission rebuilds producer configuration, whose key helper
+            # registers the gate provider lazily. A present fallback makes
+            # that existing registration path return without writing.
+            gate_provider_registered = (
+                self._chem_registry.fallback_for(
+                    ChemistryIntent.GATE_LIQUID_FRACTION
+                )
+                is not None
+            )
             reuse_gate_authority = (
-                gate_authority_hour == current_hour
+                gate_provider_registered
+                and gate_authority_hour == current_hour
                 and isinstance(gate_authority, Mapping)
                 and self._melt_redox_gate_record_is_admitted(gate_authority)
             )
