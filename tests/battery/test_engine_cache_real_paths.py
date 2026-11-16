@@ -919,7 +919,7 @@ def test_default_engine_cache_settings_match_across_call_paths(
     )
     assert len(requests) == expected_request_count
     if engine == "internal-analytical":
-        assert expected_projection["oxygen_balance_backend"] == normalized["oxygen_balance_backend"]
+        assert expected_projection["oxygen_balance_backend"] == normalized["oxygen_balance_backend"]["pack"]
         assert len(projection_inputs) == 2
 
     for request in requests:

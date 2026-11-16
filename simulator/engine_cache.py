@@ -551,7 +551,10 @@ def _tuple_to_list_if_needed(value: Any) -> Any:
 
 
 _ENGINE_CACHE_SETTINGS_PROJECTIONS: dict[str, dict[str, Any]] = {
-    "internal-analytical": {"oxygen_balance_backend": None, "high_t_melt_activity": None},
+    "internal-analytical": {
+        "oxygen_balance_backend": lambda settings: settings["pack"],
+        "high_t_melt_activity": None,
+    },
     "openimcc": {"pack": "melt_pack", "gas_pack": None},
     "alphamelts": {
         "transport": "transport_mode",
