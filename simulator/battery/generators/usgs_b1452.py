@@ -48,6 +48,9 @@ from simulator.battery.generators._usgs_common import (
     _published_decimal,
     _reconstruction_coarser_than_column,
     _value_grain,
+    phase_of_label,
+    phase_window_at,
+    phase_windows,
 )
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
@@ -119,6 +122,12 @@ B1452_ROW_POLYMORPHS = {
         f"{SOURCE_ID}-0003",
         "KALIOPHILLITE $KAlSiO_{4}$",
     ): Polymorph.KALIOPHILLITE_LOW,
+}
+B1452_PHASE_TEXT_CORRECTIONS = {
+    # PDF p. 264 prints the ilmenite melting point as 1640 K.
+    f"{SOURCE_ID}-0232": (("1&40", "1640"),),
+    # PDF p. 380 prints the wollastonite bound as 1400 K.
+    f"{SOURCE_ID}-0348": (("11t00", "1400"),),
 }
 
 # Page-header units. Captured units_as_published on B1452 are OCR-destroyed
@@ -1213,6 +1222,23 @@ def _phase_from_text(text: str) -> tuple[State[Phase], State[Polymorph]]:
     return State.of(Phase.CR), _polymorph_from_text(text)
 
 
+def _normalized_phase_text(record: Mapping[str, Any]) -> str:
+    text = str(record.get("phase_as_published") or "")
+    text = re.sub(r"(?<=\d)[oO](?=\d)", ".", text)
+    text = re.sub(r'(?i)\bct"ystals\b', "Crystals", text)
+    text = re.sub(r"(?i)\b(?:crrstals|crjstals)\b", "Crystals", text)
+    text = re.sub(r"(?i)\baelt(?:inq|ing)\b", "melting", text)
+    text = re.sub(r"(?i)•eltiag\b", "melting", text)
+    text = re.sub(
+        r"(?<=\d)\s+(?:K[o0]|[lI1]\.)", " K", text, flags=re.IGNORECASE
+    )
+    for captured, printed in B1452_PHASE_TEXT_CORRECTIONS.get(
+        str(record.get("record_id") or ""), ()
+    ):
+        text = text.replace(captured, printed)
+    return text
+
+
 def _polymorph_from_text(text: str) -> State[Polymorph]:
     stripped = _LATEX_MATH_RE.sub("", text)
     stripped = re.sub(r"\s+", " ", stripped).strip()
@@ -1240,26 +1266,87 @@ def _polymorph_from_text(text: str) -> State[Polymorph]:
     )
 
 
+def _polymorph_for_phase_window(
+    record: Mapping[str, Any], label: str
+) -> State[Polymorph]:
+    explicit_parenthetical = re.search(r"\(([^)]+)\)", label)
+    if explicit_parenthetical:
+        resolution = _polymorph_from_text(explicit_parenthetical.group(1))
+        if resolution.is_unknown:
+            return State.unknown(
+                f"printed phase window {label!r}: {resolution.reason}"
+            )
+        return resolution
+
+    qualifier = re.search(r"\b(alpha|beta|gamma|delta)\b|[αβγδ]", label, re.I)
+    if qualifier:
+        token = resolve_printed_name_polymorph(qualifier.group(0))
+        if token is not None:
+            return State.of(token)
+        return State.unknown(
+            "printed phase window polymorph qualifier "
+            f"{qualifier.group(0)!r} is not closed"
+        )
+
+    record_id = str(record.get("record_id") or "")
+    override = B1452_RECORD_POLYMORPHS.get(record_id)
+    if override is not None:
+        return State.of(override)
+    name = str(record.get("name_as_published") or "")
+    named = _polymorph_from_text(name)
+    if named.is_value:
+        return named
+    if "crystal" in label.lower():
+        return State.of(Polymorph.CRYSTALLINE)
+    return State.unknown(
+        f"phase window {label!r} does not name a closed crystal polymorph"
+    )
+
+
 def _phase_state(
-    record: Mapping[str, Any], *, name: str | None = None, row_index: int | None = None
+    record: Mapping[str, Any],
+    *,
+    name: str | None = None,
+    row_index: int | None = None,
+    temperature: Decimal | None = None,
 ) -> tuple[State[Phase], State[Polymorph]]:
     record_id = str(record.get("record_id") or "")
     row_polymorph = B1452_ROW_POLYMORPHS.get((record_id, name or ""))
     if row_polymorph is not None:
         return State.of(Phase.CR), State.of(row_polymorph)
-    if record_id in B1452_RECORD_POLYMORPHS:
-        return State.of(Phase.CR), State.of(B1452_RECORD_POLYMORPHS[record_id])
     kind = _table_kind(record)
     if kind == "table_298k":
         return _phase_from_text(name or "")
-    phase_text = str(record.get("phase_as_published") or "")
-    name_text = str(record.get("name_as_published") or "")
-    phase, polymorph = _phase_from_text(phase_text or name_text)
-    if phase.is_value and phase.value is Phase.CR:
-        named = _polymorph_from_text(name_text)
-        if named.is_value:
-            polymorph = named
-    return phase, polymorph
+    if temperature is None:
+        reason = (
+            f"{record_id}: row temperature is unavailable for printed phase windows"
+        )
+        return State.unknown(reason), State.unknown(reason)
+
+    text = _normalized_phase_text(record)
+    windows = phase_windows(text)
+    if not windows:
+        reason = f"{record_id}: printed phase ranges are not parseable: {text!r}"
+        return State.unknown(reason), State.unknown(reason)
+    if (
+        record_id == f"{SOURCE_ID}-0348"
+        and temperature > Decimal("1398")
+        and "pseudowollastonite is the stable phase" in text.lower()
+    ):
+        return State.of(Phase.CR), State.of(Polymorph.PSEUDOWOLLASTONITE)
+    window = phase_window_at(temperature, windows)
+    if window is None:
+        reason = (
+            f"{record_id}: {temperature} K is outside every printed phase window"
+        )
+        return State.unknown(reason), State.unknown(reason)
+
+    phase = phase_of_label(window.label)
+    if not phase.is_value:
+        return phase, State.unknown(phase.reason or "printed phase is unresolved")
+    if phase.value is not Phase.CR:
+        return phase, State.not_applicable("not crystal")
+    return phase, _polymorph_for_phase_window(record, window.label)
 
 
 def _parse_counts(formula: str) -> dict[str, Fraction] | None:
@@ -1301,16 +1388,61 @@ def reference_enthalpy_zero_is_ideal_gas(formula: str) -> bool:
     return phase_token(species) is Phase.G and species.formula == formula
 
 
-def _oxide_species(formula: str) -> Species:
+B1452_OXIDE_POLYMORPH_NAMES = {
+    "Al2O3": "corundum",
+    "SiO2": "quartz",
+    "CaO": "lime",
+    "MgO": "periclase",
+    "TiO2": "rutile",
+    "FeO": "wustite",
+}
+_OXIDE_REFERENCE_FORMULAS = frozenset((*B1452_OXIDE_POLYMORPH_NAMES, "H2O"))
+_OXIDE_TRANSITION_FORMULAS = {
+    "Al2O3": re.compile(r"\bAl\s*2\s*[O0]\s*3\b", re.I),
+    "SiO2": re.compile(r"\bSi\s*[O0]\s*2\b", re.I),
+    "CaO": re.compile(r"\bCa\s*[O0]\b", re.I),
+    "MgO": re.compile(r"\bMg\s*[O0]\b", re.I),
+    "TiO2": re.compile(r"\bTi\s*[O0]\s*2\b", re.I),
+    "FeO": re.compile(r"\bFe\s*[O0]\b", re.I),
+    "H2O": re.compile(r"\bH\s*2\s*[O0]\b", re.I),
+}
+
+
+def _reference_oxide_transition(
+    record: Mapping[str, Any], formula: str
+) -> tuple[str, Decimal] | None:
+    pattern = _OXIDE_TRANSITION_FORMULAS.get(formula)
+    if pattern is None:
+        return None
+    raw_lines = record.get("auxiliary_lines_as_published") or ()
+    lines = (raw_lines,) if isinstance(raw_lines, str) else raw_lines
+    for line in lines:
+        text = str(line)
+        if pattern.search(text) is None:
+            continue
+        if re.search(r"\balpha\b.*\bbeta\b.*\btransition\b", text, re.I):
+            kind = "alpha_beta"
+        elif re.search(r"(?:m|!|ft)\s*\.?\s*p\s*\.?", text, re.I):
+            kind = "melting"
+        elif re.search(r"\bb\s*\.?\s*p\s*\.?", text, re.I):
+            kind = "boiling"
+        else:
+            continue
+        numbers = re.findall(r"(?<![\w.])\d+(?:\.\s*\d+)?", text)
+        if not numbers:
+            continue
+        return kind, Decimal(re.sub(r"\s+", "", numbers[-1]))
+    return None
+
+
+def _oxide_species(
+    formula: str,
+    *,
+    record: Mapping[str, Any] | None = None,
+    temperature: Decimal | None = None,
+) -> Species:
     token = resolve_printed_name_polymorph(
-        {
-            "Al2O3": "corundum",
-            "SiO2": "quartz",
-            "CaO": "lime",
-            "MgO": "periclase",
-            "TiO2": "rutile",
-            "FeO": "wustite",
-        }.get(formula, "")
+        B1452_OXIDE_POLYMORPH_NAMES.get(formula, "")
     )
     polymorph = (
         State.of(token)
@@ -1320,7 +1452,46 @@ def _oxide_species(formula: str) -> Species:
     phase = Phase.L if formula == "H2O" else Phase.CR
     if phase is Phase.L:
         polymorph = State.not_applicable("not crystal")
-    return make_species(formula, phase, polymorph, charge=0)
+    if record is None or temperature is None:
+        return make_species(formula, phase, polymorph, charge=0)
+
+    transition = _reference_oxide_transition(record, formula)
+    if transition is not None:
+        kind, boundary = transition
+        if kind == "melting":
+            if temperature >= boundary:
+                return make_species(
+                    formula, Phase.L, State.not_applicable("not crystal"), charge=0
+                )
+            return make_species(formula, Phase.CR, polymorph, charge=0)
+        if kind == "boiling":
+            if temperature >= boundary:
+                return make_species(
+                    formula, Phase.G, State.not_applicable("not crystal"), charge=0
+                )
+            return make_species(
+                formula, Phase.L, State.not_applicable("not crystal"), charge=0
+            )
+        if kind == "alpha_beta":
+            transition_polymorph = (
+                Polymorph.ALPHA_QUARTZ
+                if temperature < boundary
+                else Polymorph.BETA
+            )
+            return make_species(
+                formula, Phase.CR, State.of(transition_polymorph), charge=0
+            )
+    if temperature == REFERENCE_TEMPERATURE_K:
+        return make_species(formula, phase, polymorph, charge=0)
+
+    reason = (
+        f"{record.get('record_id')}: source does not state the "
+        f"{formula} reference-oxide "
+        f"phase at {temperature} K"
+    )
+    return make_species(
+        formula, State.unknown(reason), State.unknown(reason), charge=0
+    )
 
 
 def _formation_identity(
@@ -1409,19 +1580,32 @@ def _basis_states(
 
 def _reaction_with_pure_endmember_states(
     reaction: Reaction,
+    *,
+    record: Mapping[str, Any],
+    temperature: Decimal,
 ) -> tuple[Reaction, str | None]:
     """Attach the printed pure-phase standard state to each condensed term."""
 
     terms: list[ReactionTerm] = []
     unresolved: list[str] = []
     for term in reaction.terms:
-        phase = phase_token(term.species)
-        polymorph = term.species.polymorph
+        species = term.species
+        if term.coefficient < 0 and species.formula in _OXIDE_REFERENCE_FORMULAS:
+            species = _oxide_species(
+                species.formula, record=record, temperature=temperature
+            )
+        phase = phase_token(species)
+        polymorph = species.polymorph
         if phase not in {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}:
-            reason = f"{term.species.formula} has no resolved condensed phase"
+            phase_state = species.phase
+            reason = (
+                phase_state.reason
+                if isinstance(phase_state, State) and phase_state.is_unknown
+                else f"{species.formula} has no resolved condensed phase"
+            )
             terms.append(
                 ReactionTerm(
-                    term.species,
+                    species,
                     term.coefficient,
                     State.unknown(reason),
                 )
@@ -1436,7 +1620,7 @@ def _reaction_with_pure_endmember_states(
             )
             terms.append(
                 ReactionTerm(
-                    term.species,
+                    species,
                     term.coefficient,
                     State.unknown(reason),
                 )
@@ -1445,13 +1629,13 @@ def _reaction_with_pure_endmember_states(
             continue
         terms.append(
             ReactionTerm(
-                term.species,
+                species,
                 term.coefficient,
                 State.of(
                     StandardState(
                         convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
-                        endmember=term.species,
-                        component_basis=term.species.formula,
+                        endmember=species,
+                        component_basis=species.formula,
                         reference_pressure_bar=Decimal("1"),
                     )
                 ),
@@ -1506,7 +1690,12 @@ def _observation(
     reconstruction: Mapping[str, Any] | None = None,
 ) -> Observation:
     record_id = str(record["record_id"])
-    phase, polymorph = _phase_state(record, name=name, row_index=token.row_index)
+    phase, polymorph = _phase_state(
+        record,
+        name=name,
+        row_index=token.row_index,
+        temperature=temperature,
+    )
     charge = _charge_for_name(name or str(record.get("name_as_published") or ""))
     species = make_species(formula, phase, polymorph, charge=charge)
     basis = token.formation_basis
@@ -1539,7 +1728,9 @@ def _observation(
         )
         if reaction_state.is_value:
             reaction, unresolved_reason = _reaction_with_pure_endmember_states(
-                reaction_state.value
+                reaction_state.value,
+                record=record,
+                temperature=temperature,
             )
             known["reaction"] = State.of(reaction)
             if unresolved_reason:

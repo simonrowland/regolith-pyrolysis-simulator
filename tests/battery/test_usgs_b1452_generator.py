@@ -1035,15 +1035,27 @@ def test_every_b1452_oxide_basis_record_keeps_oxide_log_k_reactions(
             for term in reaction_state.value.terms
             if term.standard_state is None or not term.standard_state.is_value
         ]
+        product = next(
+            term
+            for term in reaction_state.value.terms
+            if term.coefficient > 0
+        )
+        source_name_token = resolve_printed_name_polymorph(
+            str(record.get("name_as_published") or "")
+        )
+        if (
+            source_name_token is not None
+            and product.species.phase.value is Phase.CR
+            and product.species.polymorph is not None
+            and product.species.polymorph.is_unknown
+        ):
+            assert (product.species.polymorph.reason or "").startswith(
+                "printed phase window"
+            ), f"named crystal {record_id} did not map through the polymorph owner"
         if unresolved_terms:
             if record_id in REVIEWED_OXIDE_SAMPLES:
                 expected_name, _formula, _value = REVIEWED_OXIDE_SAMPLES[record_id]
                 expected_polymorph = resolve_printed_name_polymorph(expected_name)
-                product = next(
-                    term
-                    for term in reaction_state.value.terms
-                    if term.coefficient > 0
-                )
                 assert expected_polymorph is not None
                 assert product.species.phase.value is Phase.CR
                 assert product.species.polymorph is not None
@@ -1173,7 +1185,10 @@ def test_fayalite_oxide_log_k_is_a_reaction_with_term_standard_states() -> None:
         assert observation.identity.per.is_not_applicable
         assert observation.identity.standard_pressure_Pa is not None
         assert observation.identity.standard_pressure_Pa.is_not_applicable
-        assert identity_equal(observation.identity, observation.identity).kind is IdentityEqualKind.EQUAL
+        assert (
+            identity_equal(observation.identity, observation.identity).kind
+            is IdentityEqualKind.EQUAL
+        )
         reaction_state = observation.identity.reaction
         assert reaction_state is not None and reaction_state.is_value
         assert [
@@ -1186,7 +1201,9 @@ def test_fayalite_oxide_log_k_is_a_reaction_with_term_standard_states() -> None:
         ]
         assert reaction_atom_balance(reaction_state.value) == {}
         product = reaction_state.value.terms[0]
-        expected_product_phase = Phase.CR if Decimal(temperature) <= Decimal("1490") else Phase.L
+        expected_product_phase = (
+            Phase.CR if Decimal(temperature) <= Decimal("1490") else Phase.L
+        )
         assert product.species.phase.value is expected_product_phase
         for term in reaction_state.value.terms:
             assert term.standard_state is not None and term.standard_state.is_value
@@ -1195,7 +1212,11 @@ def test_fayalite_oxide_log_k_is_a_reaction_with_term_standard_states() -> None:
             assert standard.endmember == term.species
             assert standard.component_basis == term.species.formula
             assert standard.reference_pressure_bar == Decimal("1")
-        feo = next(term for term in reaction_state.value.terms if term.species.formula == "FeO")
+        feo = next(
+            term
+            for term in reaction_state.value.terms
+            if term.species.formula == "FeO"
+        )
         assert feo.species.phase.value is (
             Phase.CR if Decimal(temperature) < Decimal("1650") else Phase.L
         )
@@ -1234,6 +1255,60 @@ def test_reference_oxide_transition_boundaries_follow_the_printed_source() -> No
             "FeO", record=record, temperature=temperature
         )
         assert species.phase.value is expected_phase
+    silica_alpha = generator._oxide_species(
+        "SiO2", record=record, temperature=Decimal("843")
+    )
+    silica_beta = generator._oxide_species(
+        "SiO2", record=record, temperature=Decimal("844")
+    )
+    assert silica_alpha.phase.value is Phase.CR
+    assert (
+        silica_alpha.polymorph is not None
+        and silica_alpha.polymorph.value is Polymorph.ALPHA_QUARTZ
+    )
+    assert silica_beta.phase.value is Phase.CR
+    assert silica_beta.polymorph is not None and silica_beta.polymorph.value is Polymorph.BETA
+
+
+def test_ilmenite_uses_its_melting_point_and_refuses_unprinted_tio2_state() -> None:
+    record_id = "robie-hemingway-fisher-1978-usgs-b1452-0232"
+    generated = _generation(record_id)
+    observations = _formation_observations(
+        generated,
+        basis="from_the_oxides",
+        quantity=Quantity.LOG10_K_REACTION,
+    )
+    by_temperature = {
+        str(observation.identity.temperature_K.value): observation
+        for observation in observations
+    }
+    assert by_temperature["1640"].value.point == Decimal("0.336")
+    assert by_temperature["1700"].value.point == Decimal("0.369")
+    crystal = by_temperature["1640"].identity.reaction
+    assert crystal is not None and crystal.is_value
+    ilmenite = next(
+        term for term in crystal.value.terms if term.species.formula == "FeTiO3"
+    )
+    feo = next(
+        term for term in crystal.value.terms if term.species.formula == "FeO"
+    )
+    assert ilmenite.species.phase.value is Phase.CR
+    assert feo.species.phase.value is Phase.CR
+
+    hot = by_temperature["1700"]
+    assert hot.identity.quantity.is_unknown
+    assert hot.value.point == Decimal("0.369")
+    reaction = hot.identity.reaction
+    assert reaction is not None and reaction.is_value
+    feo = next(
+        term for term in reaction.value.terms if term.species.formula == "FeO"
+    )
+    tio2 = next(
+        term for term in reaction.value.terms if term.species.formula == "TiO2"
+    )
+    assert feo.species.phase.value is Phase.L
+    assert tio2.species.phase.is_unknown
+    assert tio2.standard_state is not None and tio2.standard_state.is_unknown
 
 
 def test_reviewed_oxide_basis_names_resolve_from_the_polymorph_owner() -> None:
