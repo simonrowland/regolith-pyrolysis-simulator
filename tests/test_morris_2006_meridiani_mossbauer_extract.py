@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from simulator.battery.enums import ValueKind
 from simulator.battery.migrate import Migrator
 
@@ -53,6 +53,10 @@ RENDER_GRID = {
         "T_low_K": "210", "T_high_K": "270", "pdf_page": 9,
     },
 }
+
+
+def _require_table_asset(corpus_root: Path, filename: str) -> None:
+    require_corpus_files((corpus_root / "tables" / SID / filename,))
 
 
 @pytest.mark.skipif(not PDF.is_file(), reason=f"corpus PDF is unavailable: {PDF}")
@@ -105,8 +109,8 @@ def test_all_tables_have_a_disposition_and_figures_are_deferred_without_points()
         assert all(isinstance(count, int) or isinstance(count, str) for count in values["marker_count_per_series"])
 
 
-@pytest.mark.skipif(not TABLES.is_dir(), reason=f"corpus table assets are unavailable: {TABLES}")
 def test_derived_class_means_remain_context_linked_to_registered_tables():
+    _require_table_asset(CORPUS, "table-9.csv")
     source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     context = source["species"]["Fe"]["context"]
     table7 = next(
@@ -140,6 +144,15 @@ def test_derived_class_means_remain_context_linked_to_registered_tables():
         csv_row = next(row for row in csv.DictReader(table_file) if row["quantity_as_printed"] == "Fe3+/FeT")
     page_cell = "0.39 ± 0.03"
     assert csv_row["Martian_Dust_average_percent_as_printed"] == page_cell
+
+
+def test_partial_corpus_skips_when_required_table_csv_is_missing(tmp_path: Path):
+    corpus_root = tmp_path / "regolith-corpus"
+    corpus_root.mkdir()
+    missing = corpus_root / "tables" / SID / "table-9.csv"
+
+    with pytest.raises(pytest.skip.Exception, match=str(missing)):
+        _require_table_asset(corpus_root, "table-9.csv")
 
 
 @pytest.mark.skipif(not PDF.is_file() or not TEXT.is_file(), reason=f"corpus source is unavailable: {SID}")

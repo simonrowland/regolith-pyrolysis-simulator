@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from tools import mineru_table_draft as draft
 from tools import validate_literature_extracts as validator
 
@@ -591,13 +591,18 @@ def test_emit_refuses_a_pdftotext_only_table_and_a_csv_without_flags(
     ) == 2
 
 
-def _mineru_dir(source_id: str) -> Path:
-    if not CORPUS_ROOT.is_dir():
-        pytest.skip(f"regolith-corpus checkout is absent: {CORPUS_ROOT}")
-    root = CORPUS_ROOT / "text" / source_id / "mineru"
-    if not root.is_dir():
-        pytest.skip(f"MinerU draft source is not on disk: {root}")
+def _mineru_dir(source_id: str, corpus_root: Path = CORPUS_ROOT) -> Path:
+    root = corpus_root / "text" / source_id / "mineru"
+    require_corpus_files((root / "**" / "*content_list.json",))
     return root
+
+
+def test_partial_corpus_skips_when_mineru_content_list_is_missing(tmp_path: Path) -> None:
+    corpus_root = tmp_path / "regolith-corpus"
+    corpus_root.mkdir()
+
+    with pytest.raises(pytest.skip.Exception, match="missing-source"):
+        _mineru_dir("missing-source", corpus_root)
 
 
 def _reviewed(source_id: str) -> dict:

@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from simulator.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import require_corpus_files
 
 
 def test_regolith_corpus_root_uses_override_and_home_default(monkeypatch, tmp_path):
@@ -14,6 +15,18 @@ def test_regolith_corpus_root_uses_override_and_home_default(monkeypatch, tmp_pa
     monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
     assert regolith_corpus_root() == tmp_path / "Repos/regolith-corpus"
+
+
+def test_partial_corpus_skips_with_first_missing_required_file(tmp_path):
+    corpus = tmp_path / "regolith-corpus"
+    corpus.mkdir()
+    present = corpus / "raw" / "seeded-source" / "seeded-source.pdf"
+    present.parent.mkdir(parents=True)
+    present.write_bytes(b"seed")
+    missing = corpus / "tables" / "required-source" / "table-5.csv"
+
+    with pytest.raises(pytest.skip.Exception, match=str(missing)):
+        require_corpus_files((present, missing))
 
 
 def test_regolith_corpus_ctl_root_uses_configured_root_or_legacy_default(

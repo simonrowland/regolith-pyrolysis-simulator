@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from simulator.battery.enums import ValueKind
 from simulator.battery.migrate import Migrator
 
@@ -42,6 +42,10 @@ RENDER_GRID = {
         "Fe3_over_FeT_as_printed": "0.23", "T_low_K": "210", "T_high_K": "270", "pdf_page": 9,
     },
 }
+
+
+def _require_table_asset(corpus_root: Path, filename: str) -> None:
+    require_corpus_files((corpus_root / "tables" / SID / filename,))
 
 
 @pytest.mark.skipif(not PDF.is_file(), reason=f"corpus PDF is unavailable: {PDF}")
@@ -106,8 +110,8 @@ def test_all_tables_have_dispositions_and_all_figures_are_deferred_without_point
     assert "210–270 K" in figure2["values"]["temperature_as_printed"]
 
 
-@pytest.mark.skipif(not TABLES.is_dir(), reason=f"corpus table asset is unavailable: {TABLES}")
 def test_derived_class_means_remain_context_with_printed_footnote():
+    _require_table_asset(CORPUS, "table-5.csv")
     source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     context = source["species"]["Fe"]["context"]
     for table_number in (6, 7):
@@ -131,6 +135,15 @@ def test_derived_class_means_remain_context_with_printed_footnote():
     page_cell = RENDER_GRID[("A510RB0", "Backstay_Scuppler")]["Ol_area_pct"]
     assert page_cell == "35"
     assert csv_row["Ol_area_percent_as_printed"] == page_cell
+
+
+def test_partial_corpus_skips_when_required_table_csv_is_missing(tmp_path: Path):
+    corpus_root = tmp_path / "regolith-corpus"
+    corpus_root.mkdir()
+    missing = corpus_root / "tables" / SID / "table-5.csv"
+
+    with pytest.raises(pytest.skip.Exception, match=str(missing)):
+        _require_table_asset(corpus_root, "table-5.csv")
 
 
 @pytest.mark.skipif(not PDF.is_file() or not TEXT.is_file(), reason=f"corpus source is unavailable: {SID}")

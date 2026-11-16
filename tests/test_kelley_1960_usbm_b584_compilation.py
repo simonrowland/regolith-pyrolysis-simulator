@@ -5,11 +5,13 @@ import inspect
 import json
 import runpy
 import re
+from pathlib import Path
 
 import pytest
 import yaml
 
 from simulator.reference_data import kelley_1960_usbm_b584_loader as loader
+from tests.helpers.corpus_paths import require_corpus_files
 from simulator.reference_data.kelley_1960_usbm_b584_loader import (
     COMPILATION_ROOT,
     OCRSuspectRow,
@@ -485,12 +487,30 @@ def test_punctuation_anomaly_class_has_image_verified_corrections():
     assert flagged == corrected
 
 
+def _require_kelley_mineru_inputs(mineru_root: Path, cached: list[dict]) -> None:
+    chunks = sorted({Path(block["image_path"]).parts[0] for block in cached})
+    required_paths = [
+        mineru_root / chunk / "*content_list_v2.json" for chunk in chunks
+    ]
+    required_paths.extend(mineru_root / block["image_path"] for block in cached)
+    require_corpus_files(required_paths)
+
+
+def test_partial_corpus_skips_kelley_at_missing_content_list(tmp_path: Path) -> None:
+    mineru_root = tmp_path / "regolith-corpus" / "text" / "kelley" / "mineru"
+    mineru_root.mkdir(parents=True)
+    cached = [{"image_path": "chunk-p001-p040/images/table.jpg"}]
+    missing = mineru_root / "chunk-p001-p040" / "*content_list_v2.json"
+
+    with pytest.raises(pytest.skip.Exception, match=re.escape(str(missing))):
+        _require_kelley_mineru_inputs(mineru_root, cached)
+
+
 def test_cached_source_matches_original_mineru_decode():
     harvest = runpy.run_path(str(COMPILATION_ROOT / "harvest.py"))
-    if not harvest["MINERU_ROOT"].exists():
-        pytest.skip("read-only regolith corpus is not mounted")
-    live = harvest["mineru_blocks"]()
     cached = [json.loads(line) for line in (COMPILATION_ROOT / "source/mineru-tables.jsonl").read_text().splitlines()]
+    _require_kelley_mineru_inputs(harvest["MINERU_ROOT"], cached)
+    live = harvest["mineru_blocks"]()
     assert [{key: value for key, value in block.items() if key != "raster_ocr"} for block in cached] == live
 
 

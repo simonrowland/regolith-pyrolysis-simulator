@@ -11,6 +11,7 @@ import os
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import require_corpus_files
 from tools import mineru_table_draft as draft
 
 
@@ -35,7 +36,23 @@ def _source_dir(corpus_root: Path, raw_root: Path, source_id: str) -> Path:
         raw_root / source_id / "ocr-mineru",
         corpus_root / "text" / source_id / "mineru",
     )
-    return next((candidate for candidate in candidates if candidate.is_dir()), candidates[0])
+    for candidate in candidates:
+        content_files = tuple(
+            path for path in candidate.glob("**/*content_list.json") if path.is_file()
+        )
+        if content_files:
+            require_corpus_files(content_files)
+            return candidate
+    require_corpus_files((candidates[0] / "**" / "*content_list.json",))
+    return candidates[0]
+
+
+def test_partial_corpus_skips_when_source_content_list_is_missing(tmp_path: Path) -> None:
+    corpus_root = tmp_path / "regolith-corpus"
+    corpus_root.mkdir()
+
+    with pytest.raises(pytest.skip.Exception, match="missing-source"):
+        _source_dir(corpus_root, corpus_root / "raw", "missing-source")
 
 
 def _convert_source(
@@ -49,16 +66,7 @@ def _convert_source(
         for content_list in full_content_lists:
             (alias / content_list.name).symlink_to(content_list)
         source = alias.parents[1]
-    try:
-        return draft.convert_source(
-            source, out_dir / "converted", corpus_root=raw_root
-        )
-    except FileNotFoundError as exc:
-        if str(exc).startswith("no MinerU content-list JSON found"):
-            pytest.skip(
-                f"corpus MinerU content-list JSON is absent for {source_id}: {source}"
-            )
-        raise
+    return draft.convert_source(source, out_dir / "converted", corpus_root=raw_root)
 
 
 def _decimal(value: object) -> Decimal | None:
@@ -941,14 +949,9 @@ def test_committed_emit_mappings_reproduce_landed_decimal_cells(
     mapping_path: Path, tmp_path: Path
 ) -> None:
     corpus_root, raw_root = _corpus_roots()
-    if not corpus_root.is_dir() or not raw_root.is_dir():
-        pytest.skip(f"regolith-corpus checkout is absent: {corpus_root}")
-
     mapping = yaml.safe_load(mapping_path.read_text(encoding="utf-8"))
     source_id = mapping["source_id"]
     source = _source_dir(corpus_root, raw_root, source_id)
-    if not source.is_dir():
-        pytest.skip(f"corpus MinerU source directory is absent for {source_id}: {source}")
     draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
     output_path = tmp_path / f"{source_id}.yaml"
     if not mapping.get("tables"):
@@ -1100,8 +1103,6 @@ def test_shornikov_2016_spanning_headers_resolve_each_gibbs_column(
     corpus_root, raw_root = _corpus_roots()
     source_id = mapping["source_id"]
     source = _source_dir(corpus_root, raw_root, source_id)
-    if not source.is_dir():
-        pytest.skip(f"MinerU source directory is absent for {source_id}: {source}")
     draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
     document = draft.emit_extract(
         draft_dir, mapping_path, tmp_path / "shornikov-2016.yaml"
@@ -1134,8 +1135,6 @@ def test_van_limpt_extract_column_swap_fails_by_row_and_header(
     corpus_root, raw_root = _corpus_roots()
     source_id = mapping["source_id"]
     source = _source_dir(corpus_root, raw_root, source_id)
-    if not source.is_dir():
-        pytest.skip(f"MinerU source directory is absent for {source_id}: {source}")
     draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
     document = draft.emit_extract(draft_dir, mapping_path, tmp_path / "van-limpt.yaml")
     extract = yaml.safe_load(
@@ -1175,8 +1174,6 @@ def test_van_limpt_numeric_header_values_compare_to_their_cells(
     corpus_root, raw_root = _corpus_roots()
     source_id = mapping["source_id"]
     source = _source_dir(corpus_root, raw_root, source_id)
-    if not source.is_dir():
-        pytest.skip(f"MinerU source directory is absent for {source_id}: {source}")
     draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
     extract = {"species": {"Na": {"observations": [
         {

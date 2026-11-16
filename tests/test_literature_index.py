@@ -9,10 +9,10 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import pytest
 import re
 import yaml
-import pytest
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 from simulator.reference_data.janaf import load_manifest as load_janaf_manifest
 
@@ -948,16 +948,20 @@ def test_source_files_do_not_register_absent_layers():
     assert {asset.asset_id for asset in files.files} == {"unknown:fixture-source"}
 
 
-def _nist_janaf_txt_corpus_absent() -> bool:
-    """The NIST .txt cache is an external snapshot, not a checked-in fixture."""
-    corpus = regolith_corpus_root()
-    return not (corpus / "raw" / "janaf-nist-txt").is_dir()
+def _require_nist_janaf_source_files(corpus_root: Path, table_ids: set[str]) -> None:
+    txt_dir = corpus_root / "raw" / "janaf-nist-txt"
+    require_corpus_files(txt_dir / f"{table_id}.txt" for table_id in sorted(table_ids))
 
 
-@pytest.mark.skipif(
-    _nist_janaf_txt_corpus_absent(),
-    reason="NIST-JANAF txt corpus is an external snapshot, not a checked-in fixture",
-)
+def test_partial_nist_janaf_corpus_skips_at_missing_source_file(tmp_path: Path) -> None:
+    corpus_root = tmp_path / "regolith-corpus"
+    corpus_root.mkdir()
+    missing = corpus_root / "raw" / "janaf-nist-txt" / "K-001.txt"
+
+    with pytest.raises(pytest.skip.Exception, match=re.escape(str(missing))):
+        _require_nist_janaf_source_files(corpus_root, {"K-001"})
+
+
 def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
     """The compilation's INDEX tables asset is raw/janaf-nist-txt, not an empty convention path.
 
@@ -970,15 +974,17 @@ def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
     from simulator.battery.migrate import choose_read_from, source_files_for, unmatched_read_from_reason
     from simulator.battery.records import Locator, Work
 
+    expected_table_ids = {
+        entry["table_id"] for entry in load_janaf_manifest()["entries"]
+    }
+    configured_corpus_root = regolith_corpus_root()
+    _require_nist_janaf_source_files(configured_corpus_root, expected_table_ids)
     index = builder.build_index(REPO_ROOT)
     rows = {row["source_id"]: row for row in index["sources"]}
     row = rows["nist-janaf-4th"]
     tables = row["corpus"]["tables"]
     corpus_root = Path(index["scan"]["corpus_root"])
     txt_dir = corpus_root / "raw" / "janaf-nist-txt"
-    expected_table_ids = {
-        entry["table_id"] for entry in load_janaf_manifest()["entries"]
-    }
     actual_table_ids = {path.stem for path in txt_dir.glob("*.txt")}
     assert_named_rows(
         {table_id: None for table_id in actual_table_ids},

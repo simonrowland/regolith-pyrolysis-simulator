@@ -9,7 +9,7 @@ import subprocess
 from functools import lru_cache
 
 import pytest
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     COMPILATION_ROOT,
     ROLE,
@@ -59,9 +59,18 @@ def _robie_source_layout_unavailable() -> bool:
     return (not SOURCE_PDF.is_file()) or (shutil.which("pdftotext") is None)
 
 
-def _robie_mineru_unavailable() -> bool:
-    """True when the private MinerU extraction tree is missing."""
-    return not MINERU_ROOT.is_dir()
+def _require_mineru_content_list(chunk, root=MINERU_ROOT):
+    chunk_root = root / chunk
+    files = tuple(
+        path
+        for path in chunk_root.glob("*_content_list.json")
+        if "v2" not in path.name and path.is_file()
+    )
+    if files:
+        require_corpus_files(files)
+        return files
+    require_corpus_files((chunk_root / "*_content_list.json",))
+    return ()
 
 IMAGE_VERIFIED_CORRECTIONS = (
     (f"{SOURCE_ID}-0040-phase-02", 24, "formation_enthalpy", ".1100", ".000", 0.0, 72),
@@ -127,14 +136,7 @@ def mineru_chunk_for_pdf_page(pdf_page: int) -> tuple[str, int]:
 
 @lru_cache(maxsize=None)
 def load_mineru_content_list(chunk: str) -> list:
-    if _robie_mineru_unavailable():
-        pytest.skip("regolith-corpus MinerU tree for B1452 is absent")
-    files = [
-        path
-        for path in (MINERU_ROOT / chunk).glob("*_content_list.json")
-        if "v2" not in path.name
-    ]
-    assert files, chunk
+    files = _require_mineru_content_list(chunk)
     return json.loads(files[0].read_text(encoding="utf-8"))
 
 
@@ -879,6 +881,11 @@ def test_robie_b1452_source_layout_gate_skips_without_private_pdf() -> None:
     assert SOURCE_PDF.is_file() is False
 
 
-def test_robie_b1452_mineru_gate_skips_without_private_tree() -> None:
-    assert _robie_mineru_unavailable() is True
-    assert MINERU_ROOT.is_dir() is False
+def test_robie_b1452_mineru_gate_skips_without_private_tree(tmp_path) -> None:
+    corpus_root = tmp_path / "regolith-corpus"
+    mineru_root = corpus_root / "text" / SOURCE_ID / "mineru"
+    mineru_root.mkdir(parents=True)
+    missing = mineru_root / "chunk-p001-p090" / "*_content_list.json"
+
+    with pytest.raises(pytest.skip.Exception, match=re.escape(str(missing))):
+        _require_mineru_content_list("chunk-p001-p090", mineru_root)
