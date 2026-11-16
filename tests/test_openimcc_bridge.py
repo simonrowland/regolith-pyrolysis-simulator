@@ -28,6 +28,7 @@ from simulator.melt_backend.openimcc_bridge import (
     imported_openimcc_commit,
 )
 from simulator.state import MOLAR_MASS
+from tests.helpers.regression import assert_regression_raises_assertion_without_skip
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -523,8 +524,10 @@ def test_openimcc_activity_parity_fails_when_ln_k_is_scaled(
         )
 
     monkeypatch.setattr(kernel_module, "active_residual_jacobian", scale_ln_k)
-    with pytest.raises(AssertionError, match="frozen-oracle bound"):
-        test_openimcc_parent_activity_parity("published-core")
+    assert_regression_raises_assertion_without_skip(
+        lambda: test_openimcc_parent_activity_parity("published-core"),
+        match="frozen-oracle bound",
+    )
 
 
 def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
