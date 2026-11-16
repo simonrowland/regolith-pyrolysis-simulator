@@ -1945,39 +1945,19 @@ def load_sidecar(path: Path = DEFAULT_SIDECAR_PATH) -> list[dict[str, Any]]:
     return records
 
 
-_SidecarNasa9SegmentSettings = tuple[
-    float, float, tuple[float, ...], float, float
-]
-
-
-def _decode_sidecar_nasa9_segment(
-    item: Mapping[str, Any],
-) -> _SidecarNasa9SegmentSettings:
-    return (
-        float(item["T_min_K"]),
-        float(item["T_max_K"]),
-        tuple(float(value) for value in item["a_coefficients"]),
-        float(item["b1"]),
-        float(item["b2"]),
-    )
-
-
-def _sidecar_nasa9_segment(
-    settings: _SidecarNasa9SegmentSettings,
-) -> Nasa9Segment:
-    T_min_K, T_max_K, coefficients, b1, b2 = settings
+def _decode_sidecar_nasa9_segment(item: Mapping[str, Any]) -> Nasa9Segment:
     return Nasa9Segment(
-        T_min_K=T_min_K,
-        T_max_K=T_max_K,
-        coefficients=coefficients,
-        b1=b1,
-        b2=b2,
+        T_min_K=float(item["T_min_K"]),
+        T_max_K=float(item["T_max_K"]),
+        coefficients=tuple(float(value) for value in item["a_coefficients"]),
+        b1=float(item["b1"]),
+        b2=float(item["b2"]),
     )
 
 
-def _sidecar_fit_segment_settings(
+def _sidecar_fit_segments(
     thermo: Mapping[str, Any],
-) -> tuple[_SidecarNasa9SegmentSettings, ...]:
+) -> tuple[Nasa9Segment, ...]:
     return tuple(
         _decode_sidecar_nasa9_segment(item)
         for item in thermo.get("segments", ())
@@ -2010,7 +1990,7 @@ def sidecar_element_reference_curves(
         # Reference curves decode every segment entry; malformed entries still
         # fail here instead of being filtered out.
         segments = tuple(
-            _sidecar_nasa9_segment(_decode_sidecar_nasa9_segment(item))
+            _decode_sidecar_nasa9_segment(item)
             for item in thermo.get("segments", ())
         )
         if not segments:
@@ -2055,11 +2035,7 @@ def evaluate_sidecar_fit(
         return None, "fit_validity_missing"
     if temperature_K < lo or temperature_K > hi:
         return None, "outside_validity"
-    segments = tuple(
-        _sidecar_nasa9_segment(_decode_sidecar_nasa9_segment(item))
-        for item in thermo.get("segments", ())
-        if isinstance(item, Mapping)
-    )
+    segments = _sidecar_fit_segments(thermo)
     segment = next(
         (
             item
