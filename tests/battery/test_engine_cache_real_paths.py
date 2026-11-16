@@ -613,8 +613,9 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         "_run_alphamelts_subprocess",
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
     )
-    # The leading version bytes are chemistry cache invalidation pins; b267's
-    # internal-analytical v2 and MAGEMin v3 intentionally update their keys.
+    # The leading version bytes are chemistry cache invalidation pins; b267
+    # moves internal-analytical to v2, MAGEMin to v3, and AlphaMELTS and
+    # ThermoEngine to v3 for executed-law disclosure replay.
     snapshots = (
         (
             "internal-analytical default",
@@ -632,19 +633,19 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             "AlphaMELTS default",
             "alphamelts",
             None,
-            "050002ff7708a47acb6e5ca7dafe87caabd285f5",
+            "050003ff7708a47acb6e5ca7dafe87caabd285f5",
         ),
         (
             "AlphaMELTS Python API default model",
             "alphamelts",
             {"transport": "python_api"},
-            "050002ff7708a47acb6e5ca7dafe87caabd285f5",
+            "050003ff7708a47acb6e5ca7dafe87caabd285f5",
         ),
         (
             "ThermoEngine default",
             "thermoengine",
             None,
-            "060002ff2330afdabce1130820fde70d072941aa",
+            "060003ff2330afdabce1130820fde70d072941aa",
         ),
         (
             "ThermoEngine explicit None defaults",
@@ -654,7 +655,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
                 "configured_vapor_transport_pO2_bar": None,
                 "configured_vapor_transport_floor_bar": None,
             },
-            "060002ff2330afdabce1130820fde70d072941aa",
+            "060003ff2330afdabce1130820fde70d072941aa",
         ),
         (
             "VapoRock default",
@@ -703,28 +704,28 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
 
     case_key_hex = {
         "AlphaMELTS transport mode": (
-            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
+            "050003ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS model": (
-            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
+            "050003ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS Python API model": (
-            "050002ff7708a47acb6e5ca7dafe87caabd285f5"
+            "050003ff7708a47acb6e5ca7dafe87caabd285f5"
         ),
         "AlphaMELTS redox buffer": (
-            "050002ff84021d1fcf18c54719c9792ae3309859"
+            "050003ff84021d1fcf18c54719c9792ae3309859"
         ),
         "AlphaMELTS fO2 offset": (
-            "050002ff8b7a9acff52ddfac563117c0e162ab62"
+            "050003ff8b7a9acff52ddfac563117c0e162ab62"
         ),
         "AlphaMELTS Fe3+/Fet ratio": (
-            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
+            "050003ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS configured vapor pO2": (
-            "050002ffed5e2dd0542d245c6de74c7e5b9191bb"
+            "050003ffed5e2dd0542d245c6de74c7e5b9191bb"
         ),
         "AlphaMELTS configured vapor floor": (
-            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
+            "050003ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "MAGEMin database": (
             "0400030008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
@@ -736,13 +737,13 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             "0400030008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
         ),
         "ThermoEngine transport model": (
-            "060002ff2330afdabce1130820fde70d072941aa"
+            "060003ff2330afdabce1130820fde70d072941aa"
         ),
         "ThermoEngine vapor transport pO2": (
-            "060002ff2330afdabce1130820fde70d072941aa"
+            "060003ff2330afdabce1130820fde70d072941aa"
         ),
         "ThermoEngine vapor transport floor": (
-            "060002ff2330afdabce1130820fde70d072941aa"
+            "060003ff2330afdabce1130820fde70d072941aa"
         ),
         "OpenIMCC loaded cell pack": (
             "0100010008018b080205086761735f7061636b050764656661756c7405096d656c745f7061636b050f6f70656e696d63632d76312e302e32"

@@ -259,7 +259,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "kind": 'store',
         "name": '_MEMORY_CACHE',
         "carries_disclosure": True,
-        "how": 'Process LRU keyed by cache path, engine/version/request digest, and readonly mode. Residue-pressure values carry law_disclosures and hits call accept_stored_memo.',
+        "how": 'Process LRU keyed by cache path, engine/version/request digest, and readonly mode. Values for every disclosure-carrying engine include measured or unknown law_disclosures, replayed by accept_stored_memo on hits.',
     },
     'sqlite:simulator/engine_cache.py:engine_outputs': {
         "path": 'simulator/engine_cache.py',
@@ -267,7 +267,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "kind": 'sqlite',
         "name": 'engine_outputs',
         "carries_disclosure": True,
-        "how": 'Persistent HOT SQLite rows keyed by engine/version/request digest. Internal-analytical residue-pressure values carry law_disclosures and hits call accept_stored_memo.',
+        "how": 'Persistent HOT SQLite rows keyed by engine/version/request digest. Values for every disclosure-carrying engine include measured or unknown law_disclosures, replayed by accept_stored_memo on hits.',
     },
     'attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache': {
         "path": 'simulator/evaporation.py',

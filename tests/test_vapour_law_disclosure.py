@@ -86,6 +86,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator import engine_cache
 from simulator.chemistry.ellingham_graph import effective_equilibrium_pressure_Pa
 from simulator.corpus_version import current_corpus_version
 from simulator.optimize.evalspec import cache_key
@@ -5025,6 +5026,124 @@ def _exercise_engine_cache_memory(tmp_path, monkeypatch) -> None:
 
 def _exercise_engine_cache_sqlite(tmp_path, monkeypatch) -> None:
     _exercise_engine_cache(tmp_path, monkeypatch, persistent=True)
+
+
+def test_every_engine_cache_engine_has_a_law_disclosure_classification() -> None:
+    from simulator.engine_cache import (
+        ENGINE_CACHE_DISCLOSURE_ENGINES,
+        ENGINE_CACHE_NO_DISCLOSURE_ENGINES,
+        ENGINE_CHEMISTRY_VERSION,
+    )
+
+    carrying = set(ENGINE_CACHE_DISCLOSURE_ENGINES)
+    non_carrying = set(ENGINE_CACHE_NO_DISCLOSURE_ENGINES)
+    assert carrying.isdisjoint(non_carrying)
+    assert carrying | non_carrying == set(ENGINE_CHEMISTRY_VERSION)
+    assert all(ENGINE_CACHE_NO_DISCLOSURE_ENGINES.values())
+
+
+@pytest.mark.parametrize(
+    "engine",
+    sorted(engine_cache.ENGINE_CACHE_DISCLOSURE_ENGINES),
+)
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "sqlite"))
+def test_engine_equilibrate_disclosures_replay_for_every_carrying_engine(
+    engine: str,
+    persistent: bool,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    """Stub equilibrates execute the production law and the cache replays it."""
+
+    from types import SimpleNamespace
+
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.engine_cache import _engine_cache_path_scope
+    from simulator.melt_backend.base import EquilibriumResult
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    settings = battery.normalize_engine_settings(engine, {})
+    backend = SimpleNamespace(
+        _core=SimpleNamespace(_high_t_melt_activity="openimcc")
+    )
+    handle = SimpleNamespace(
+        name=engine,
+        backend=backend,
+        engine_settings=settings,
+    )
+    kwargs = {
+        "temperature_C": 1526.85,
+        "composition_mol": {"FeO": 1.0},
+        "composition_kg": None,
+        "pressure_bar": 1.0e-6,
+        "fO2_log": -9.0,
+    }
+    calls = {"n": 0}
+
+    def equilibrate() -> EquilibriumResult:
+        calls["n"] += 1
+        pressure = _fe_pressure("FeO_association_gas")
+        return EquilibriumResult(
+            status="ok",
+            liquid_fraction=0.5,
+            activity_coefficients={"FeO": pressure},
+            vapor_pressures_Pa={"FeO(g)": pressure},
+        )
+
+    backend.equilibrate = equilibrate
+
+    def cached(solve=None):
+        return battery._call_cached_backend_equilibrate(
+            handle, kwargs, backend.equilibrate if solve is None else solve
+        )
+
+    path = tmp_path / f"{engine}-measured.sqlite"
+    with _engine_cache_path_scope(path):
+        with disclosure_scope(inherit=False) as cold:
+            cold_value = cached()
+            cold_disclosures = cold.snapshot()
+        assert cold_disclosures
+        assert calls["n"] == 1
+
+        if persistent:
+            engine_cache._MEMORY_CACHE.clear()
+        with disclosure_scope(inherit=False) as warm:
+            warm_value = cached(
+                lambda: pytest.fail(f"warm {engine} cache call recomputed")
+            )
+            assert warm.snapshot() == cold_disclosures
+        assert warm_value.liquid_fraction == cold_value.liquid_fraction
+        assert warm_value.vapor_pressures_Pa == cold_value.vapor_pressures_Pa
+        assert calls["n"] == 1
+
+    engine_cache._MEMORY_CACHE.clear()
+    calls["n"] = 0
+    unknown_path = tmp_path / f"{engine}-unknown.sqlite"
+    with _engine_cache_path_scope(unknown_path):
+        unscoped_value = cached()
+        assert calls["n"] == 1
+
+        if persistent:
+            engine_cache._MEMORY_CACHE.clear()
+        with disclosure_scope(inherit=False) as recomputed:
+            scoped_value = cached()
+            scoped_disclosures = recomputed.snapshot()
+        assert calls["n"] == 2
+        assert scoped_disclosures
+        assert scoped_value.vapor_pressures_Pa == unscoped_value.vapor_pressures_Pa
+
+        if persistent:
+            engine_cache._MEMORY_CACHE.clear()
+        with disclosure_scope(inherit=False) as replayed:
+            replayed_value = cached(
+                lambda: pytest.fail(f"measured {engine} cache row recomputed")
+            )
+            assert replayed.snapshot() == scoped_disclosures
+        assert replayed_value.vapor_pressures_Pa == scoped_value.vapor_pressures_Pa
+        assert calls["n"] == 2
 
 
 def _exercise_pressure_state_cache(_tmp_path, monkeypatch) -> None:

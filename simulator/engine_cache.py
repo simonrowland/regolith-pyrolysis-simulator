@@ -310,16 +310,18 @@ ENGINE_CHEMISTRY_VERSION = {
     "internal-analytical": 2,
     "vaporock": 1,
     "magemin": 3,
-    "alphamelts": 2,
-    "thermoengine": 2,
+    "alphamelts": 3,
+    "thermoengine": 3,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
 # diagnostic and never participates in the cache key.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
 # alphamelts v2: 2026-11-11 alphaMELTS 2.3.1, b257r landing 982a8d9fa - canonical activity labels, oxide-vapour projection and typed missing-pO2 refusal (18be4a5cd, b4e6e0dda, 959731207)
+# alphamelts v3: 2026-11-16 alphaMELTS binary pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay
 # thermoengine v1: 2026-11-08 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache version
 # thermoengine v2: 2026-11-11 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - apply configured redox buffer, fO2 offset and Fe3Fet ratio during backend initialization (bd99e209c)
+# thermoengine v3: 2026-11-16 ThermoEngine pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay
 # magemin v1: 2026-11-08 MAGEMin commit 40ed109d07d4246001cab59382596d33fed79086 - initial cache version
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # magemin v3: 2026-11-16 MAGEMin binary pin unchanged, b267 bugs stack - b-1225 typed silicate-window refusal for SiO2-poor bulks
@@ -898,14 +900,35 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
         _MEMORY_CACHE.popitem(last=False)
 
 
-_LAW_DISCLOSURE_ENGINE = "internal-analytical"
+# These cached engines can execute compiled vapour laws:
+# - internal-analytical: residue pressure and inline cell equilibration use the
+#   internal analytical vapour-pressure adapter.
+# - alphamelts: subprocess equilibrium calls
+#   _builtin_vapor_projection_for_subprocess; the Antoine/catalog fallback
+#   also evaluates compiled laws.
+# - thermoengine: the Antoine/catalog fallback runs when VapoRock is absent or
+#   returns no pressures.
+ENGINE_CACHE_DISCLOSURE_ENGINES = frozenset({
+    "internal-analytical",
+    "alphamelts",
+    "thermoengine",
+})
+
+# These cacheable engines have no live path through register_executed_law.
+# OpenIMCC's gas path goes through its bridge; VapoRock does not evaluate
+# compiled laws; MAGEMin solves phase equilibrium without the vapour evaluator.
+ENGINE_CACHE_NO_DISCLOSURE_ENGINES = {
+    "openimcc": "gas evaluations use openimcc_bridge, not the vapour-law evaluator",
+    "vaporock": "equilibrate does not call register_executed_law",
+    "magemin": "phase equilibrium does not call the compiled vapour evaluator",
+}
 _ENGINE_CACHE_VALUE_KEY = "_engine_cache_value"
 
 
 def _accept_cached_engine_disclosures(engine_id: str, value: Any) -> bool:
     """Replay a measured engine disclosure before returning a cache hit."""
 
-    if engine_id != _LAW_DISCLOSURE_ENGINE:
+    if engine_id not in ENGINE_CACHE_DISCLOSURE_ENGINES:
         return True
     if not isinstance(value, Mapping) or _ENGINE_CACHE_VALUE_KEY not in value:
         return False
@@ -922,7 +945,7 @@ def _accept_cached_engine_disclosures(engine_id: str, value: Any) -> bool:
 
 def _unwrap_engine_cache_value(engine_id: str, value: Any) -> Any:
     if (
-        engine_id == _LAW_DISCLOSURE_ENGINE
+        engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES
         and isinstance(value, Mapping)
         and _ENGINE_CACHE_VALUE_KEY in value
     ):
@@ -1178,7 +1201,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     memory_key = (path_value, cache_key, readonly)
     disclosure_registry = None
     disclosure_before: tuple[dict[str, Any], ...] = ()
-    if engine_id == _LAW_DISCLOSURE_ENGINE:
+    if engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES:
         from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot
 
         disclosure_registry = active_registry()
@@ -1223,7 +1246,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                     _remember_memory_value(memory_key, result)
                     return _unwrap_engine_cache_value(engine_id, result)
                 row = None
-                if engine_id == _LAW_DISCLOSURE_ENGINE and not readonly:
+                if engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES and not readonly:
                     try:
                         connection.execute(
                             f"DELETE FROM {_TABLE} WHERE key=?", (cache_key,)
@@ -1241,7 +1264,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         return hot
     memory_value = hot
     storage_value = solved.hot if isinstance(solved, EngineCacheValue) else solved
-    if engine_id == _LAW_DISCLOSURE_ENGINE:
+    if engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES:
         from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot, disclosure_delta
 
         disclosures = None
