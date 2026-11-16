@@ -4,8 +4,8 @@ rows in: 93335
 records out (observations): 191609
 works: 852
 experiments: 8040
-queue size: 124683
-queue backlog: 97994
+queue size: 124457
+queue backlog: 97768
 reference inputs: 26689
 identical-payload dedupe aliases: 342
 metadata files: 50
@@ -31,11 +31,11 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status, caption, axes_as_printed, temperature_as_printed, note` | 11 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K, gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K, composition_mol` | 11 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid, gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K, composition_mol` | 11 |
-| `unavailable_missing_input:declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number` | 10 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'quadratic_formalism_interaction_energy_alpha_H_i'; refusing to pick a number` | 10 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'quadratic_formalism_interaction_energy_alpha_ij'; refusing to pick a number` | 10 |
 | `unavailable_missing_input:pressure value is not numeric` | 10 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'apparent_enthalpy_entropy_of_degassing'; refusing to pick a number` | 9 |
+| `unavailable_missing_input:declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number` | 8 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick a number` | 7 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'vaporisation_enthalpy_per_mole_gas_unresolved_reaction'; refusing to pick a number` | 7 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing to pick a number` | 6 |
@@ -51,6 +51,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'thermodynamic_functions'; refusing to pick a number` | 3 |
 | `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: run, logfO2, time_min, element, D0_m2_s, D0_uncertainty_m2_s, f_surface, f_bulk, logKstar_surface, logKstar_bulk, tevap_s, delta66Zn_per_mil_calc, alpha_surface_assumed, alpha_bulk_calc` | 3 |
 | `unavailable_missing_input:sample_mass_not_printed` | 3 |
+| `unavailable_missing_input:No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.` | 2 |
 | `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1300, 1800] is a temperature domain, not the observable` | 2 |
 | `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1600, 2000] is a temperature domain, not the observable` | 2 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_coefficient_gamma_P2O5'; refusing to pick a number` | 2 |
@@ -19095,10 +19096,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` | 1 | 2 | 2 | 0 |
 | `data/literature/extracts/berman-1988-internally-consistent-mineral-thermodynamic-data.yaml` | 219 | 219 | 0 | 0 |
 | `data/literature/extracts/berry-2003-in-situ-cr-xanes-furnace.yaml` | 1 | 1 | 1 | 0 |
-| `data/literature/extracts/berry-2006-chromium-composition.yaml` | 32 | 89 | 39 | 0 |
+| `data/literature/extracts/berry-2006-chromium-composition.yaml` | 32 | 89 | 7 | 0 |
 | `data/literature/extracts/berry-2018-morb-iron-redox.yaml` | 10 | 58 | 27 | 0 |
-| `data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml` | 145 | 145 | 155 | 0 |
-| `data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml` | 75 | 545 | 99 | 0 |
+| `data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml` | 145 | 145 | 22 | 0 |
+| `data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml` | 75 | 545 | 87 | 0 |
 | `data/literature/extracts/beyer-brown-ferrante-1980-kalo2-thermodynamics.yaml` | 8 | 308 | 191 | 0 |
 | `data/literature/extracts/bielefeldt-2013-factsage-slag.yaml` | 0 | 0 | 1 | 0 |
 | `data/literature/extracts/bissbort-2026-depolymerized-silicate-glass-transition-viscosity.yaml` | 53 | 53 | 0 | 0 |
@@ -19135,7 +19136,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 | 0 |
 | `data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml` | 26 | 26 | 62 | 0 |
 | `data/literature/extracts/chaudary-1997-v-redox-binary-silicate.yaml` | 0 | 0 | 1 | 0 |
-| `data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml` | 33 | 760 | 33 | 0 |
+| `data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml` | 33 | 760 | 24 | 0 |
 | `data/literature/extracts/chen-2020-ce2o3-cmas-activity-phase-equilibria.yaml` | 259 | 259 | 349 | 0 |
 | `data/literature/extracts/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml` | 198 | 198 | 311 | 0 |
 | `data/literature/extracts/chen-2022-sio2-mno-slag-activities.yaml` | 222 | 222 | 222 | 0 |
@@ -19505,7 +19506,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 42 | 83 | 0 |
 | `data/literature/extracts/myers-jacobson-2015-volatile-metal-hydroxides-presentation.yaml` | 4 | 4 | 4 | 0 |
 | `data/literature/extracts/mysen-1984-alkaline-earth-redox.yaml` | 34 | 34 | 34 | 0 |
-| `data/literature/extracts/mysen-1985-cmas-redox.yaml` | 3 | 100 | 15 | 0 |
+| `data/literature/extracts/mysen-1985-cmas-redox.yaml` | 3 | 100 | 13 | 0 |
 | `data/literature/extracts/mysen-virgo-1989-nas-redox.yaml` | 53 | 53 | 53 | 0 |
 | `data/literature/extracts/naess-2014-liquid-silicon-oxidation-fume-flux.yaml` | 0 | 0 | 1 | 0 |
 | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` | 10 | 14 | 48 | 0 |
@@ -19550,7 +19551,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 16 | 0 |
 | `data/literature/extracts/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml` | 46 | 46 | 160 | 0 |
 | `data/literature/extracts/panda-2019-ten-oxide-thermodynamics.yaml` | 2 | 2 | 2 | 0 |
-| `data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml` | 83 | 186 | 211 | 0 |
+| `data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml` | 83 | 186 | 202 | 0 |
 | `data/literature/extracts/park-2021-vanadium-thermodynamics-thesis.yaml` | 14 | 14 | 0 | 0 |
 | `data/literature/extracts/park-min-2004-carbide-capacity-fluoride-soda-slags.yaml` | 111 | 111 | 0 | 0 |
 | `data/literature/extracts/park-morita-2025-vanadium-activity.yaml` | 56 | 56 | 0 | 0 |
@@ -19742,7 +19743,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2025-perovskite-condensation.yaml` | 54 | 54 | 56 | 0 |
 | `data/literature/extracts/shornikov-2025-saratov-alkali-evaporation.yaml` | 2 | 2 | 2 | 0 |
 | `data/literature/extracts/shornikov-2026-hatrurite-evaporation.yaml` | 10 | 134 | 2 | 0 |
-| `data/literature/extracts/shornikov-2026-wollastonite-kems.yaml` | 194 | 277 | 86 | 0 |
+| `data/literature/extracts/shornikov-2026-wollastonite-kems.yaml` | 194 | 277 | 78 | 0 |
 | `data/literature/extracts/shornikova-2019-perovskite-thermodynamics.yaml` | 119 | 119 | 201 | 0 |
 | `data/literature/extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml` | 46 | 46 | 46 | 0 |
 | `data/literature/extracts/shugurov-2024-gaseous-cerates-si.yaml` | 6 | 126 | 6 | 0 |
@@ -19803,7 +19804,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/tenkate-2010-vapor-instrument.yaml` | 0 | 0 | 1 | 0 |
 | `data/literature/extracts/terashima-2026-sro-slag-activity-preprint.yaml` | 119 | 119 | 37 | 0 |
 | `data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml` | 3 | 87 | 93 | 0 |
-| `data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml` | 11 | 111 | 134 | 0 |
+| `data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml` | 11 | 111 | 125 | 0 |
 | `data/literature/extracts/toguri-1961-mgo-silicon-reduction.yaml` | 0 | 0 | 1 | 0 |
 | `data/literature/extracts/tomioka-1991-nitride-capacity-cao-al2o3.yaml` | 8 | 37 | 42 | 0 |
 | `data/literature/extracts/tranell-1999-unsw-thesis.yaml` | 30 | 44 | 6 | 0 |
@@ -19841,12 +19842,12 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/wang-2009-cr-slag-kems-original.yaml` | 80 | 100 | 200 | 0 |
 | `data/literature/extracts/wang-2017-cao-sio2-vox-tables-s1-s32.yaml` | 516 | 516 | 516 | 0 |
 | `data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml` | 1 | 1 | 4 | 0 |
-| `data/literature/extracts/wang-seetharaman-2010-cr-oxidation-original.yaml` | 39 | 39 | 19 | 0 |
+| `data/literature/extracts/wang-seetharaman-2010-cr-oxidation-original.yaml` | 39 | 39 | 10 | 0 |
 | `data/literature/extracts/watne-1977-potassium-vapor-pressure-furnace.yaml` | 96 | 96 | 288 | 0 |
 | `data/literature/extracts/wetzel-2012-heidelberg-thesis.yaml` | 4 | 4 | 9 | 0 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 5 | 0 |
 | `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 59 | 0 |
-| `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 | 0 |
+| `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 63 | 0 |
 | `data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml` | 2 | 2 | 4 | 0 |
 | `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 66 | 0 |
 | `data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml` | 7 | 7 | 15 | 0 |
@@ -19889,7 +19890,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/zhang-2024-alkali-evaporation-ti-thesis.yaml` | 23 | 257 | 23 | 0 |
 | `data/literature/extracts/zhao-2019-ce2o3-ternary-thermodynamics.yaml` | 14 | 14 | 14 | 0 |
 | `data/literature/extracts/zhinkina-2024-ce-gd-kems-poster.yaml` | 0 | 0 | 1 | 0 |
-| `data/literature/extracts/zigo-1987-gehlenite-fusion.yaml` | 13 | 37 | 64 | 0 |
+| `data/literature/extracts/zigo-1987-gehlenite-fusion.yaml` | 13 | 37 | 62 | 0 |
 | `data/literature/gibbs_battery_residual_ledger.yaml` | 58 | 58 | 63 | 0 |
 | `data/literature/kems_measurements.yaml` | 6 | 6 | 18 | 0 |
 | `data/literature/langmuir_knudsen_flux_validation.yaml` | 3 | 3 | 6 | 0 |

@@ -1543,6 +1543,47 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
 
 
+def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:
+    quantity = Quantity.DELTA_FH
+    identity = Identity(
+        quantity=quantity,
+        species=Species("H2O", Phase.G),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": "0.25",
+            "units": QUANTITY_UNITS[quantity],
+            "confidence_level": "one_sigma",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "delta-fh-printed-width",
+            "delta-fh-printed-width-experiment",
+            identity,
+            Decimal("-241.826"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="delta-fh-printed-width-source",
+        ),
+        uncertainty=uncertainty,
+    )
+
+    printed = score_mod._printed_uncertainty_band(
+        quantity,
+        uncertainty,
+        Decimal("-241.826"),
+        source_observation=observation,
+    )
+
+    assert printed.refusal is None
+    assert printed.band is not None
+    assert printed.band.unit == QUANTITY_UNITS[quantity]
+    assert printed.band.value == (
+        Decimal("0.25") * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    )
+
+
 @pytest.mark.parametrize(
     ("subtype", "source_unit", "scale_unit", "quantity", "reference", "width"),
     (
@@ -12877,12 +12918,13 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
     )
     assert compilation["band_width_dex"] is None
     scale_stratum = next(
-        stratum
+        (stratum
         for row in summary["records"]
         for stratum in row.get("decision_strata", [])
-        if stratum["quantity"] == Quantity.S.value
+        if stratum["quantity"] == Quantity.S.value),
+        None,
     )
-    assert scale_stratum["max_abs_residual"] == "0.240"
+    assert scale_stratum is None
 
     old_report = score_mod.render_score_report(
         legacy_residuals,
@@ -12903,6 +12945,7 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
         _aggregate=metadata.aggregate,
     )
     assert streamed_report.encode("utf-8") == old_report.encode("utf-8")
+    assert "### Unrouted compilation engine pairs" in streamed_report
 
     rows = score_mod.load_residuals_jsonl(partial_path)
     assert any(
@@ -12911,14 +12954,14 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
         and row["numeric"].get("decision_band")
         for row in rows
     )
-    assert any(
+    assert not any(
         isinstance(row.get("numeric"), dict)
         and isinstance(row["numeric"].get("decision_band"), dict)
         and row["numeric"]["decision_band"].get("rule")
         .startswith("printed_1sigma:")
         for row in rows
     )
-    assert any(row.get("status") == ResidualStatus.NO_BAND.value for row in rows)
+    assert not any(row.get("status") == ResidualStatus.NO_BAND.value for row in rows)
     assert any(row.get("status") == ResidualStatus.REFUSED.value for row in rows)
 
 
@@ -12981,6 +13024,25 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     from simulator.battery.records import CandidateRequest, ResidualRefusal
 
     context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    context = replace(
+        context,
+        observations={
+            key: replace(
+                observation,
+                evidence=replace(
+                    observation.evidence,
+                    class_=State.of(EvidenceClass.MEASURED_DIRECT),
+                ),
+                admission=replace(
+                    observation.admission,
+                    status=AdmissionStatus.ADMITTED,
+                ),
+                source_id="fixture-score",
+            )
+            for key, observation in context.observations.items()
+        },
+        origins={},
+    )
     static_id = "fixture-measured-refusal"
     static_row = fixture_residuals[static_id]
     fixture_residuals[static_id] = replace(
@@ -13146,10 +13208,15 @@ def test_static_thermo_refusal_matches_compile_on_all_score_engines(
         score_mod, "_refusal_diagnostic_references", lambda _context: ()
     )
 
+    from simulator.battery.compilation_tier import _compilation_engines_for_pair
+
+    routed_engines = _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, identity
+    )
     compiled_rows = _assert_score_store_matches_compile_jsonl(
         context,
         reference,
-        engines=SCORE_ENGINE_SET,
+        engines=routed_engines,
     )
     assert all(
         residual.status is ResidualStatus.REFUSED

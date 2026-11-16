@@ -1,17 +1,52 @@
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 import yaml
 
+from simulator.battery import migrate as migrate_module
+from simulator.battery import schema_gap as schema_gap_module
 from simulator.battery.migrate import Migrator
+from simulator.battery.validate import validate_corpus
 
 ROOT = Path(__file__).resolve().parents[1]
+SC475_SOURCE_IDS = frozenset(
+    {
+        "shornikov-2008-mgo-aluminosilicate-melts",
+        "shornikov-2011-cao-mgo-alumina-melts",
+        "shornikov-2014-sodium-germanate-melts",
+        "shornikov-2017-spinel-thermodynamics",
+        "shornikova-2019-perovskite-thermodynamics",
+        "zaitsev-2006-magnesium-silicate-thermodynamics",
+        "beyer-1980-potassium-metasilicate-disilicate-ri8410",
+        "bennington-brown-1982-synthetic-acmite-ri8621",
+        "bennington-brown-beyer-1984-aegirine-ri8912",
+    }
+)
 FRAME_REASON = (
     "No quantity token represents formation from simple oxides; "
     "delta_fG denotes formation from the elements."
 )
+SC475_REJECTED_ROWS = {
+    "bennington-brown-1982-synthetic-acmite-ri8621": None,
+    "shornikov-2011-cao-mgo-alumina-melts": {
+        "shornikov_2011_text_minimum_delta_fG1960_melt",
+    },
+    "zaitsev-2006-magnesium-silicate-thermodynamics": None,
+}
+
+
+def _expected_sc475_admission(source_id, observation_id):
+    rejected_rows = SC475_REJECTED_ROWS.get(source_id, set())
+    return (
+        "rejected"
+        if rejected_rows is None or observation_id in rejected_rows
+        else "pending"
+    )
+
+
 S4_SHORNIKOV_ROWS = {
     "shornikov-2008-mgo-aluminosilicate-melts": {
         "shornikov_2008_fig1_d_marker_1": ("Gibbs energies of melt formation from oxides", "-23", 2, 148),
@@ -2679,6 +2714,9 @@ def _assert_stack_shornikov_rows(document, hit_rows):
 
 
 def test_increment_and_frame_repairs_migrate_unavailable():
+    assert schema_gap_module.SC475_SCHEMA_GAP_SOURCE_IDS == SC475_SOURCE_IDS
+    reason_mismatches = []
+    checked_sources = set()
     for source_id, expected in HIT_ROWS.items():
         path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
         document = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -2692,19 +2730,23 @@ def test_increment_and_frame_repairs_migrate_unavailable():
             assert values["schema_gap"]
             if printed_value is not None:
                 assert values["value_as_printed"] == printed_value
+            if observation_id == "bennington_1982_table6_log10_Kf":
+                assert values["quantity"] == "log10_formation_from_oxides_as_printed"
         migrator = Migrator(root=ROOT, index={}, aliases={})
         migrator._migrate_extract(path)
         migrator.finalize()
+        migrated_by_id = {}
         for observation_id in expected:
+            source_row = rows[observation_id]
+            values = source_row["values"]
             migrated = [
                 row
                 for key, row in migrator.result.observations.items()
                 if key == f"{source_id}::{observation_id}"
                 or key.startswith(f"{source_id}::{observation_id}::")
             ]
+            migrated_by_id[observation_id] = migrated
             if not migrated:
-                source_row = rows[observation_id]
-                values = source_row["values"]
                 assert (
                     source_row.get("type") in {"figure_record", "figure"}
                     or "deferred" in str(values.get("digitisation", ""))
@@ -2713,6 +2755,65 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 continue
             assert all(not row.identity.quantity.is_value for row in migrated)
             assert all(row.value.kind.value == "unavailable" for row in migrated)
+            if source_id in SC475_SOURCE_IDS:
+                expected_status = _expected_sc475_admission(source_id, observation_id)
+                assert all(
+                    row.admission.status.value == expected_status for row in migrated
+                ), (source_id, observation_id)
+        checked_sources.add(source_id)
+        if source_id not in SC475_SOURCE_IDS:
+            continue
+        for observation_id in expected:
+            source_row = rows[observation_id]
+            values = rows[observation_id]["values"]
+            migrated = migrated_by_id[observation_id]
+            if not migrated:
+                continue
+            if observation_id == "bey80_k2si2o5_reference_glass_S_table6":
+                assert source_row["type"] == "heat_capacity_and_heat_content_series"
+                assert values["reference_state_as_printed"] == (
+                    "entropy increment from 298.15 K"
+                )
+            declared_reason = values["schema_gap"]
+            actual_reasons = [row.value.unavailable_reason for row in migrated]
+            print(
+                f"SC-475 reason {observation_id}: expected={declared_reason!r}; "
+                f"actual={actual_reasons!r}"
+            )
+            if any(reason != declared_reason for reason in actual_reasons):
+                reason_mismatches.append(
+                    f"{observation_id}: expected={declared_reason!r}; "
+                    f"actual={actual_reasons!r}"
+                )
+            if any(row.admission.status.value == "admitted" for row in migrated):
+                reason_mismatches.append(
+                    f"{observation_id}: a typed refusal was admitted"
+                )
+    assert checked_sources == set(HIT_ROWS), (
+        "legacy unavailable migration checks skipped HIT sources: "
+        f"{sorted(set(HIT_ROWS) - checked_sources)}"
+    )
+    assert not reason_mismatches, "SC-475 reason mismatches:\n" + "\n".join(
+        reason_mismatches
+    )
+
+
+def test_increment_reason_assertions_catch_entropy_increment_mutation(monkeypatch):
+    select_declared_source = migrate_module.select_declared_source
+
+    def drop_entropy_increment_schema_gap(declared, units, payload):
+        if (
+            isinstance(payload, dict)
+            and "entropy increment from 298.15 K" in str(payload.get("schema_gap", ""))
+        ):
+            payload = {key: value for key, value in payload.items() if key != "schema_gap"}
+        return select_declared_source(declared, units, payload)
+
+    monkeypatch.setattr(
+        migrate_module, "select_declared_source", drop_entropy_increment_schema_gap
+    )
+    with pytest.raises(AssertionError, match="SC-475 reason mismatches"):
+        test_increment_and_frame_repairs_migrate_unavailable()
 
 
 def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows():
@@ -2744,6 +2845,90 @@ def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows()
                 ), observation_id
 
 
+def _source_observation_count(source_row):
+    values = source_row["values"]
+    for key in ("points", "series"):
+        points = values.get(key)
+        if isinstance(points, list):
+            return len(points)
+    return 1
+
+
+def _assert_schema_gap_refusals(
+    migrator, source_id, source_rows, expected_reasons, *, report
+):
+    validator_observation_ids = []
+    for observation_id, expected_reason in expected_reasons.items():
+        migrated = [
+            row
+            for key, row in migrator.result.observations.items()
+            if key == f"{source_id}::{observation_id}"
+            or key.startswith(f"{source_id}::{observation_id}::")
+        ]
+        expected_count = _source_observation_count(source_rows[observation_id])
+        assert len(migrated) == expected_count, observation_id
+        actual_reasons = [row.value.unavailable_reason for row in migrated]
+        admissions = [row.admission.status.value for row in migrated]
+        validator_observation_ids.extend(row.observation_id for row in migrated)
+        if report:
+            print(
+                f"SC-475 class reason {source_id}::{observation_id}: "
+                f"expected={expected_reason!r}; actual={actual_reasons!r}; "
+                f"admission={admissions!r}"
+            )
+        assert all(not row.identity.quantity.is_value for row in migrated)
+        assert all(row.value.kind.value == "unavailable" for row in migrated)
+        assert all(reason == expected_reason for reason in actual_reasons), observation_id
+        expected_status = _expected_sc475_admission(source_id, observation_id)
+        assert all(status == expected_status for status in admissions), observation_id
+        assert all(
+            row.admission.status.value != "rejected"
+            or row.admission.decided_by is not None
+            for row in migrated
+        ), observation_id
+    validation = validate_corpus(
+        migrator.result.works,
+        migrator.result.experiments,
+        migrator.result.observations,
+        residuals=None,
+    )
+    decision_paths = {
+        f"observation[{observation_id}].admission.decided_by"
+        for observation_id in validator_observation_ids
+    }
+    assert not [
+        issue for issue in validation.hard_issues if issue.path in decision_paths
+    ]
+
+
+def _migrate_shornikov_rows(source_id, hit_rows, *, report):
+    path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    expected_reasons = {
+        observation_id: _records(document)[observation_id]["values"]["schema_gap"]
+        for observation_id in hit_rows
+    }
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    _assert_schema_gap_refusals(
+        migrator, source_id, _records(document), expected_reasons, report=report
+    )
+
+
+def _install_schema_gap_loss_mutation(monkeypatch, should_drop):
+    select_declared_source = migrate_module.select_declared_source
+
+    def drop_declared_reason(declared, units, payload):
+        if isinstance(payload, dict) and should_drop(payload):
+            payload = {key: value for key, value in payload.items() if key != "schema_gap"}
+        return select_declared_source(declared, units, payload)
+
+    monkeypatch.setattr(
+        migrate_module, "select_declared_source", drop_declared_reason
+    )
+
+
 def test_stack_shornikov_frame_rows_keep_printed_evidence_and_locator_pins():
     for source_id, hit_rows in S4_SHORNIKOV_ROWS.items():
         path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
@@ -2756,22 +2941,26 @@ def test_stack_shornikov_frame_rows_keep_printed_evidence_and_locator_pins():
         with pytest.raises(AssertionError):
             _assert_stack_shornikov_rows(mutated, hit_rows)
 
-        migrator = Migrator(root=ROOT, index={}, aliases={})
-        migrator._migrate_extract(path)
-        migrator.finalize()
-        for observation_id in hit_rows:
-            migrated = [
-                row
-                for key, row in migrator.result.observations.items()
-                if key == f"{source_id}::{observation_id}"
-                or key.startswith(f"{source_id}::{observation_id}::")
-            ]
-            assert len(migrated) == 1
-            assert not migrated[0].identity.quantity.is_value
-            assert migrated[0].value.kind.value == "unavailable"
+        _migrate_shornikov_rows(source_id, hit_rows, report=True)
 
 
-def test_stack_zaitsev_table4_from_oxides_rows_remain_unavailable():
+def test_shornikov_reason_assertions_catch_reason_loss_mutation(monkeypatch):
+    _install_schema_gap_loss_mutation(
+        monkeypatch,
+        lambda payload: payload.get("schema_gap") == FRAME_REASON
+        and payload.get("quantity_as_printed")
+        in {
+            printed
+            for hit_rows in S4_SHORNIKOV_ROWS.values()
+            for printed, _, _, _ in hit_rows.values()
+        },
+    )
+    with pytest.raises(AssertionError):
+        for source_id, hit_rows in S4_SHORNIKOV_ROWS.items():
+            _migrate_shornikov_rows(source_id, hit_rows, report=False)
+
+
+def _migrate_zaitsev_rows(*, report):
     source_id = "zaitsev-2006-magnesium-silicate-thermodynamics"
     path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
     document = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -2791,7 +2980,88 @@ def test_stack_zaitsev_table4_from_oxides_rows_remain_unavailable():
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(path)
     migrator.finalize()
-    for observation_id in ZAITSEV_HIT_ROWS:
-        row = migrator.result.observations[f"{source_id}::{observation_id}"]
-        assert not row.identity.quantity.is_value
-        assert row.value.kind.value == "unavailable"
+    _assert_schema_gap_refusals(
+        migrator,
+        source_id,
+        rows,
+        {
+            observation_id: rows[observation_id]["values"]["schema_gap"]
+            for observation_id in ZAITSEV_HIT_ROWS
+        },
+        report=report,
+    )
+    return migrator
+
+
+def test_stack_zaitsev_table4_from_oxides_rows_remain_unavailable():
+    _migrate_zaitsev_rows(report=True)
+
+
+def test_zaitsev_reason_assertions_catch_reason_loss_mutation(monkeypatch):
+    _install_schema_gap_loss_mutation(
+        monkeypatch,
+        lambda payload: payload.get("schema_gap") == FRAME_REASON
+        and payload.get("quantity_as_printed") == "ΔfG(298 K)"
+        and payload.get("reference_state_as_printed")
+        == "formation from crystalline MgO and β-cristobalite",
+    )
+    with pytest.raises(AssertionError):
+        _migrate_zaitsev_rows(report=False)
+
+
+def test_schema_gap_rejection_decided_by_remains_validator_required():
+    migrator = _migrate_zaitsev_rows(report=False)
+    observation_id = (
+        "zaitsev-2006-magnesium-silicate-thermodynamics::"
+        f"{next(iter(ZAITSEV_HIT_ROWS))}"
+    )
+    observation = migrator.result.observations[observation_id]
+    assert observation.admission.status.value == "rejected"
+    assert observation.admission.decided_by is not None
+
+    mutated_observations = dict(migrator.result.observations)
+    mutated_observations[observation_id] = replace(
+        observation,
+        admission=replace(observation.admission, decided_by=None),
+    )
+    validation = validate_corpus(
+        migrator.result.works,
+        migrator.result.experiments,
+        mutated_observations,
+        residuals=None,
+    )
+    assert any(
+        issue.path == f"observation[{observation_id}].admission.decided_by"
+        and issue.reason.value == "conditional_field"
+        for issue in validation.hard_issues
+    )
+
+
+def test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path):
+    source_id = "kelley-1953-alkali-aluminosilicate-thermodynamics"
+    observation_id = "kelley_1953_table25_s51_extrapolated_albite"
+    extract_path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    source_row = _records(extract)[observation_id]
+    assert source_row["type"] == "heat_capacity_and_heat_content_series"
+    assert source_row["values"]["schema_gap"]
+
+    migrator = Migrator(root=ROOT)
+    migrator._migrate_extract(extract_path)
+    migrator.finalize()
+    migrated = [
+        row
+        for key, row in migrator.result.observations.items()
+        if key == f"{source_id}::{observation_id}"
+        or key.startswith(f"{source_id}::{observation_id}::")
+    ]
+    assert migrated
+    assert all(row.value.kind.value == "unavailable" for row in migrated)
+    assert all(row.admission.decided_by is None for row in migrated)
+
+    migrate_module.write_outputs(migrator.result, root=tmp_path)
+    migrated_store = (
+        tmp_path / "data/literature/extracts-v2" / f"{source_id}.yaml"
+    )
+    green_store = ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml"
+    assert migrated_store.read_bytes() == green_store.read_bytes()

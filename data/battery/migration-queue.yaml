@@ -2,6 +2,118 @@ schema_version: battery_migration_queue.v2
 entries:
 - work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
   source: data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml
+  why: No exact quantity token represents log Kf for the printed oxide-formation reaction; simulator/battery/enums.py::Quantity.LOG10_KF
+    is the elements-frame formation constant, and simulator/battery/enums.py::Quantity.LOG10_K_REACTION does not preserve
+    this formation frame.
+  axes:
+  - quantity
+  observations:
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=1000.00:row=15:h=20c224cd480c
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=all 15 printed rows
+- work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
+  source: data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml
+  why: No exact quantity token represents log Kf for the printed oxide-formation reaction; simulator/battery/enums.py::Quantity.LOG10_KF
+    is the elements-frame formation constant, and simulator/battery/enums.py::Quantity.LOG10_K_REACTION does not preserve
+    this formation frame.
+  axes:
+  - value
+  observations:
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=1000.00:row=15:h=20c224cd480c
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=15; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=1100.00:row=16:h=c0d19fb782be
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=16; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=1200.00:row=17:h=62c98bf1a335
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=17; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=298.15:row=3:h=5c553324d161
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=3; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=300.00:row=4:h=7410d7962357
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=4; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=400.00:row=5:h=378951cf2f54
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=5; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=500.00:row=6:h=b20108a42324
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=6; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=600.00:row=7:h=451ac56267d7
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=7; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=700.00:row=8:h=7a5077e46b28
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=8; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=800.00:row=9:h=51b018068941
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=9; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=847.00:row=10:h=20aa97d4f50f
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=10; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=847.00:row=11:h=5ed7984bc663
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=11; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=900.00:row=12:h=9d4b4e285a43
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=12; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=960.00:row=13:h=5a807424b300
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=13; column=8
+  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=960.00:row=14:h=b79de7dabe64
+    locator:
+      page: 18
+      published_page: 13
+      table: '9'
+      note: row=14; column=8
+- work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
+  source: data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml
   why: declared quantity is unknown; refusing to pick a number
   axes:
   - value
@@ -1458,96 +1570,6 @@ entries:
       published_page: 13
       table: '9'
       note: row=14; column=6
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=1000.00:row=15:h=20c224cd480c
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=15; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=1100.00:row=16:h=c0d19fb782be
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=16; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=1200.00:row=17:h=62c98bf1a335
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=17; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=298.15:row=3:h=5c553324d161
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=3; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=300.00:row=4:h=7410d7962357
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=4; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=400.00:row=5:h=378951cf2f54
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=5; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=500.00:row=6:h=b20108a42324
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=6; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=600.00:row=7:h=451ac56267d7
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=7; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=700.00:row=8:h=7a5077e46b28
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=8; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=800.00:row=9:h=51b018068941
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=9; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=847.00:row=10:h=20aa97d4f50f
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=10; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=847.00:row=11:h=5ed7984bc663
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=11; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=900.00:row=12:h=9d4b4e285a43
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=12; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=960.00:row=13:h=5a807424b300
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=13; column=8
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=960.00:row=14:h=b79de7dabe64
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=14; column=8
   - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_negative_gibbs_function_over_T_from_H298::T=1000.00:row=15:h=c3f381e255b8
     locator:
       page: 18
@@ -2095,18 +2117,6 @@ entries:
       page: 12
       published_page: 7
       note: row=reaction 10 correction paragraph
-- work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
-  source: data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml
-  why: unsupported quantity 'log10_K_from_oxides'
-  axes:
-  - quantity
-  observations:
-  - observation_id: bennington-brown-beyer-1984-aegirine-ri8912::aegirine_table9_log10_Kf::T=1000.00:row=15:h=20c224cd480c
-    locator:
-      page: 18
-      published_page: 13
-      table: '9'
-      note: row=all 15 printed rows
 - work_id: 0001d88bf7689334d1d1ee82b39243fc3234b318cf40c97b8e15316a5a0ac605
   source: data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml
   why: unsupported quantity 'negative_gibbs_function_over_T_from_H0'
@@ -7986,7 +7996,61 @@ entries:
       equation: '10'
 - work_id: 07f09a909c4033fe08154b5f77e6ac909a5122a63b154c18c4acabea1733c5ee
   source: data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml
-  why: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
+  axes:
+  - quantity
+  observations:
+  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_1
+    locator:
+      page: 2
+      published_page: 148
+      pdf_page_index: 1
+      figure: '1'
+      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
+  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_2
+    locator:
+      page: 2
+      published_page: 148
+      pdf_page_index: 1
+      figure: '1'
+      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
+  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_3
+    locator:
+      page: 2
+      published_page: 148
+      pdf_page_index: 1
+      figure: '1'
+      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
+  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_4
+    locator:
+      page: 2
+      published_page: 148
+      pdf_page_index: 1
+      figure: '1'
+      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
+  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_5
+    locator:
+      page: 2
+      published_page: 148
+      pdf_page_index: 1
+      figure: '1'
+      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
+  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_6
+    locator:
+      page: 2
+      published_page: 148
+      pdf_page_index: 1
+      figure: '1'
+      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
+  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_prose_cordierite_minimum_delta_fg
+    locator:
+      page: 1
+      published_page: 147
+      pdf_page_index: 0
+      note: Prose states ΔfG2050 = -26.9 kJ/mole at cordierite concentration.
+- work_id: 07f09a909c4033fe08154b5f77e6ac909a5122a63b154c18c4acabea1733c5ee
+  source: data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
   axes:
   - value
   observations:
@@ -8080,60 +8144,6 @@ entries:
       pdf_page_index: 1
       figure: '1'
       note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; curve=8
-- work_id: 07f09a909c4033fe08154b5f77e6ac909a5122a63b154c18c4acabea1733c5ee
-  source: data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml
-  why: row type is a curation label, not a statement of the observable
-  axes:
-  - quantity
-  observations:
-  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_1
-    locator:
-      page: 2
-      published_page: 148
-      pdf_page_index: 1
-      figure: '1'
-      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
-  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_2
-    locator:
-      page: 2
-      published_page: 148
-      pdf_page_index: 1
-      figure: '1'
-      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
-  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_3
-    locator:
-      page: 2
-      published_page: 148
-      pdf_page_index: 1
-      figure: '1'
-      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
-  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_4
-    locator:
-      page: 2
-      published_page: 148
-      pdf_page_index: 1
-      figure: '1'
-      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
-  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_5
-    locator:
-      page: 2
-      published_page: 148
-      pdf_page_index: 1
-      figure: '1'
-      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
-  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_fig1_d_marker_6
-    locator:
-      page: 2
-      published_page: 148
-      pdf_page_index: 1
-      figure: '1'
-      note: Caption printed as unnumbered Fig.; numbered 1 as the paper's only figure.; panel=d; marker_symbol=4
-  - observation_id: shornikov-2008-mgo-aluminosilicate-melts::shornikov_2008_prose_cordierite_minimum_delta_fg
-    locator:
-      page: 1
-      published_page: 147
-      pdf_page_index: 0
-      note: Prose states ΔfG2050 = -26.9 kJ/mole at cordierite concentration.
 - work_id: 07f09a909c4033fe08154b5f77e6ac909a5122a63b154c18c4acabea1733c5ee
   source: data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml
   why: source does not state method
@@ -107008,75 +107018,6 @@ entries:
       equation: '24'
 - work_id: 10.1007/s11663-010-9383-3
   source: data/literature/extracts/wang-seetharaman-2010-cr-oxidation-original.yaml
-  why: regime 'Cr K-edge XANES end-member mixture fit' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_08d_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=3; table_column_number=5; row_label=08D
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_10b_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=4; table_column_number=5; row_label=10B
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_10c_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=5; table_column_number=5; row_label=10C
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_12a_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=6; table_column_number=5; row_label=12A
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_12d_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=7; table_column_number=5; row_label=12D
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_21a_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=8; table_column_number=5; row_label=21A
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_21b_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=9; table_column_number=5; row_label=21B
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_21c_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=10; table_column_number=5; row_label=21C
-  - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_21d_xcro_over_xcro15_xanes
-    locator:
-      page: 5
-      published_page: 950
-      pdf_page_index: 4
-      table: III
-      note: table_row_number=11; table_column_number=5; row_label=21D
-- work_id: 10.1007/s11663-010-9383-3
-  source: data/literature/extracts/wang-seetharaman-2010-cr-oxidation-original.yaml
   why: regime 'Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)' is not a closed method token (kems_effusion
     alone is insufficient)
   axes:
@@ -157135,66 +157076,6 @@ entries:
       section: 2. Experimental procedure
 - work_id: 10.1016/j.gca.2020.11.018
   source: data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml
-  why: regime 'high_pressure_anhydrous_piston_cylinder' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure3_time_series::point:0
-    locator:
-      published_page: 7
-      pdf_page_index: 8
-      figure: '3'
-      section: Results
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure4_fugacity_series::point:0
-    locator:
-      published_page: 7
-      pdf_page_index: 8
-      figure: '4'
-      section: Results
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure5_oxygen_series::point:0
-    locator:
-      published_page: 8
-      pdf_page_index: 9
-      figure: '5'
-      section: Results
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:0
-    locator:
-      published_page: 9
-      pdf_page_index: 10
-      figure: '6'
-      section: Results
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure7_temperature_series::point:0
-    locator:
-      published_page: 9
-      pdf_page_index: 10
-      figure: '7'
-      section: Results
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure8_pressure_speciation::point:0
-    locator:
-      published_page: 10
-      pdf_page_index: 11
-      figure: '8'
-      section: Volcanic gas implications
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure9_fugacity_speciation::point:0
-    locator:
-      published_page: 10
-      pdf_page_index: 11
-      figure: '9'
-      section: Volcanic gas implications
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table1_compositions::rows:row=cmas-an50di28fo22:h=6ded3df9fa24
-    locator:
-      published_page: 3
-      pdf_page_index: 4
-      table: '1'
-      section: 2. Experimental procedure
-  - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1473.15:row=agi/cl-045:h=9e96f97a0ca9
-    locator:
-      published_page: 6
-      pdf_page_index: 7
-      table: '2'
-      section: Experimental results
-- work_id: 10.1016/j.gca.2020.11.018
-  source: data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml
   why: regime 'high_pressure_hydrous_basalt_comparison' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -167559,18 +167440,6 @@ entries:
       note: Icarus journal pre-proof; no printed pagination.
 - work_id: 10.1016/j.icarus.2023.115577
   source: data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml
-  why: regime 'mossbauer_room_temperature' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table1_mossbauer_metallic_fe_arh2
-    locator:
-      pdf_page_index: 8
-      table: '1'
-      section: Table 1 Mössbauer
-      note: Icarus journal pre-proof; no printed pagination.
-- work_id: 10.1016/j.icarus.2023.115577
-  source: data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml
   why: regime 'post_heat_treatment_powder_characterization' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -168788,67 +168657,6 @@ entries:
       page: 13
       section: 5.2 Results
       equation: theoretical Cp regression
-- work_id: 10.1016/j.jct.2018.08.026
-  source: data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml
-  why: regime 'Physical Properties Measurement System (PPMS) heat-capacity measurement' is not a closed method token (kems_effusion
-    alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table10_sample248_cp::T=1.8329:h=741426bd8e9d
-    locator:
-      page: 7
-      pdf_page_index: 6
-      table: '10'
-      note: 'row=a-Si(O)CH #248; column=measured molar heat capacity'
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table11_sample149_cp::T=1.8307:h=869e464f370a
-    locator:
-      page: 7
-      pdf_page_index: 6
-      table: '11'
-      note: 'row=a-Si(O)CH #149; column=measured molar heat capacity'
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table12_sample659_cp::T=1.8304:h=69ba5b1fea92
-    locator:
-      page: 8
-      pdf_page_index: 7
-      table: '12'
-      note: 'row=a-Si(O)CH #659; column=measured molar heat capacity'
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table5_sampleR337_cp::T=1.8308:h=38f92055587c
-    locator:
-      page: 4
-      pdf_page_index: 3
-      table: '5'
-      note: 'row=a-Si(O)CH #R337; column=measured molar heat capacity'
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table5_sampleR337_cp_continued::T=59.314:h=768601f450c8
-    locator:
-      page: 5
-      pdf_page_index: 4
-      table: '5'
-      note: 'row=a-SiCH #R337 (continued); column=measured molar heat capacity'
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table6_sample300_cp::T=1.8416:h=2558b7505848
-    locator:
-      page: 5
-      pdf_page_index: 4
-      table: '6'
-      note: 'row=a-Si(O)CH #300; column=measured molar heat capacity'
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table7_sample844_cp::T=1.8276:h=8f96c8148b99
-    locator:
-      page: 5
-      pdf_page_index: 4
-      table: '7'
-      note: 'row=a-Si(O)CH #844; column=measured molar heat capacity'
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table8_sample539_cp::T=1.8686:h=5405a9e20264
-    locator:
-      page: 6
-      pdf_page_index: 5
-      table: '8'
-      note: 'row=a-Si(O)CH #539; column=measured molar heat capacity'
-  - observation_id: chen-2019-sioch-cp-entropy-gibbs::chen2019_table9_sample338_cp::T=1.8169:h=9151b2981d11
-    locator:
-      page: 6
-      pdf_page_index: 5
-      table: '9'
-      note: 'row=a-Si(O)CH #338; column=measured molar heat capacity'
 - work_id: 10.1016/j.jct.2018.08.026
   source: data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml
   why: source does not state method
@@ -220579,80 +220387,6 @@ entries:
       note: row=7; column_header=Tm, K
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: regime 'Drop calorimetry' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_09_heat_of_fusion
-    locator:
-      page: 16
-      published_page: 623
-      pdf_page_index: 15
-      table: '7'
-      note: row=9; column_header=ΔHm, kJ/mol
-  - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_09_melting_temperature
-    locator:
-      page: 16
-      published_page: 623
-      pdf_page_index: 15
-      table: '7'
-      note: row=9; column_header=Tm, K
-- work_id: 10.1134/s0016702926700035
-  source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: regime 'HF solution calorimetry' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_02_heat_of_fusion
-    locator:
-      page: 16
-      published_page: 623
-      pdf_page_index: 15
-      table: '7'
-      note: row=2; column_header=ΔHm, kJ/mol
-  - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_02_melting_temperature
-    locator:
-      page: 16
-      published_page: 623
-      pdf_page_index: 15
-      table: '7'
-      note: row=2; column_header=Tm, K
-  - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_06_heat_of_fusion
-    locator:
-      page: 16
-      published_page: 623
-      pdf_page_index: 15
-      table: '7'
-      note: row=6; column_header=ΔHm, kJ/mol
-  - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_06_melting_temperature
-    locator:
-      page: 16
-      published_page: 623
-      pdf_page_index: 15
-      table: '7'
-      note: row=6; column_header=Tm, K
-- work_id: 10.1134/s0016702926700035
-  source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: regime 'HF/HNO3 solution calorimetry' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_08_heat_of_fusion
-    locator:
-      page: 16
-      published_page: 623
-      pdf_page_index: 15
-      table: '7'
-      note: row=8; column_header=ΔHm, kJ/mol
-  - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_08_melting_temperature
-    locator:
-      page: 16
-      published_page: 623
-      pdf_page_index: 15
-      table: '7'
-      note: row=8; column_header=Tm, K
-- work_id: 10.1134/s0016702926700035
-  source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: regime 'Ice calorimetry' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -222264,148 +221998,7 @@ entries:
       equation: (8), (9)
 - work_id: 10.1134/s0036024417020303
   source: data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
-  why: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1863k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1477.4, 958.6), page pixel (2818, 1394). Unrounded
-        read 1862.89 K and −21.154 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. The fit line passes below the centre.
-        The centre is in the open interior.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1950k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1576.4, 1002.1), page pixel (2917, 1437). Unrounded
-        read 1949.65 K and −22.071 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. The centre is in the open interior.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2004k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1638.4, 1013.8). Unrounded read 2003.94 K and
-        −22.318 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. Neighbouring outlines touch the corners. The centre is in
-        the open interior.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2050k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
-        435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
-        949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
-        ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
-        at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
-        of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
-        This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2102k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1749.8, 1032.1). Unrounded read 2101.58 K and
-        −22.703 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2160k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1816.3, 1042.2). Unrounded read 2159.85 K and
-        −22.915 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2210k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: Series 16. Same tick calibration as the 2050 K point. 600 dpi crop centre (1873.1, 1068.5), page pixel (3214,
-        1504). Unrounded read 2209.62 K and −23.469 kJ/mol. The 1200 dpi render of PDF page 3 puts the white centroid at page
-        pixel (6428, 3007), which is crop (1873.0, 1068.2) in the 600 dpi frame, 2209.49 K and −23.464 kJ/mol. The two reads
-        agree inside the ±10 K and ±0.30 kJ/mol uncertainty. The next outline meets the tip. The centre stays in the open
-        interior.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2252k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: Series 16. Same tick calibration as the 2050 K point. 600 dpi crop centre (1921.5, 1064.6), page pixel (3263,
-        1500). Unrounded read 2252.04 K and −23.387 kJ/mol. The 1200 dpi white centroid is page pixel (6521, 2999), crop (1919.6,
-        1064.5) in the 600 dpi frame, 2250.32 K and −23.385 kJ/mol. The next outline meets the tip. The centre is in the open
-        interior.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2302k
-    locator:
-      page: 3
-      published_page: 289
-      pdf_page_index: 2
-      figure: '2'
-      equation: '18'
-      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1978.6, 1075.1). Unrounded read 2302.09 K and
-        −23.608 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fH
-    locator:
-      page: 6
-      published_page: 292
-      pdf_page_index: 5
-      paragraph: liquid-state formation
-      equation: '19'
-      note: 'Prose, not a table cell. 600 dpi render of PDF page 6: ΔH_T(MgAl2O4) = 43.79 ± 4.84 kJ/mol and ΔS_T(MgAl2O4)
-        = 28.09 ± 1.64 J/(mol K), liquid state, equation (19).'
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
-    locator:
-      page: 2
-      published_page: 288
-      pdf_page_index: 1
-      table: '1'
-      note: MinerU CSV row 29. 600 dpi render of PDF page 2 shows Knudsen mass spectrometry, 1851–2298, −12.02 ± 1.14, 5.03
-        ± 0.56, This work. pdftotext uses U+2013 before 12.02. MinerU stored an ASCII hyphen. The emitted column header was
-        the LaTeX fragment; the caption header is written here.; row=29; column=3; row_label=This work; column_header=ΔH_T,
-        kJ/mol
-- work_id: 10.1134/s0036024417020303
-  source: data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
-  why: declared quantity is unknown; unsupported quantity 'delta_fS'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fS
-    locator:
-      page: 6
-      published_page: 292
-      pdf_page_index: 5
-      paragraph: liquid-state formation
-      equation: '19'
-      note: Same prose sentence as the liquid formation enthalpy. 600 dpi render of PDF page 6. The schema has no formation-entropy
-        token.
-  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
-    locator:
-      page: 2
-      published_page: 288
-      pdf_page_index: 1
-      table: '1'
-      note: Same Table 1 this-work row as the enthalpy. 600 dpi render of PDF page 2. The schema has no formation-entropy
-        token.; row=29; column=4; row_label=This work; column_header=ΔS_T, J/(mol K)
-- work_id: 10.1134/s0036024417020303
-  source: data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
-  why: row type is a curation label, not a statement of the observable
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
   axes:
   - quantity
   observations:
@@ -222502,6 +222095,111 @@ entries:
       equation: '18'
       note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1978.6, 1075.1). Unrounded read 2302.09 K and
         −23.608 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+- work_id: 10.1134/s0036024417020303
+  source: data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
+  axes:
+  - value
+  observations:
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1863k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1477.4, 958.6), page pixel (2818, 1394). Unrounded
+        read 1862.89 K and −21.154 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. The fit line passes below the centre.
+        The centre is in the open interior.
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1950k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1576.4, 1002.1), page pixel (2917, 1437). Unrounded
+        read 1949.65 K and −22.071 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. The centre is in the open interior.
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2004k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1638.4, 1013.8). Unrounded read 2003.94 K and
+        −22.318 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. Neighbouring outlines touch the corners. The centre is in
+        the open interior.
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2050k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+        435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+        949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+        ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+        at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+        of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+        This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2102k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1749.8, 1032.1). Unrounded read 2101.58 K and
+        −22.703 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2160k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1816.3, 1042.2). Unrounded read 2159.85 K and
+        −22.915 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2210k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: Series 16. Same tick calibration as the 2050 K point. 600 dpi crop centre (1873.1, 1068.5), page pixel (3214,
+        1504). Unrounded read 2209.62 K and −23.469 kJ/mol. The 1200 dpi render of PDF page 3 puts the white centroid at page
+        pixel (6428, 3007), which is crop (1873.0, 1068.2) in the 600 dpi frame, 2209.49 K and −23.464 kJ/mol. The two reads
+        agree inside the ±10 K and ±0.30 kJ/mol uncertainty. The next outline meets the tip. The centre stays in the open
+        interior.
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2252k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: Series 16. Same tick calibration as the 2050 K point. 600 dpi crop centre (1921.5, 1064.6), page pixel (3263,
+        1500). Unrounded read 2252.04 K and −23.387 kJ/mol. The 1200 dpi white centroid is page pixel (6521, 2999), crop (1919.6,
+        1064.5) in the 600 dpi frame, 2250.32 K and −23.385 kJ/mol. The next outline meets the tip. The centre is in the open
+        interior.
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2302k
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      equation: '18'
+      note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1978.6, 1075.1). Unrounded read 2302.09 K and
+        −23.608 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+- work_id: 10.1134/s0036024417020303
+  source: data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
+  why: No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.
+  axes:
+  - quantity
+  observations:
   - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fH
     locator:
       page: 6
@@ -222521,6 +222219,54 @@ entries:
         ± 0.56, This work. pdftotext uses U+2013 before 12.02. MinerU stored an ASCII hyphen. The emitted column header was
         the LaTeX fragment; the caption header is written here.; row=29; column=3; row_label=This work; column_header=ΔH_T,
         kJ/mol
+- work_id: 10.1134/s0036024417020303
+  source: data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
+  why: No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.
+  axes:
+  - value
+  observations:
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+    locator:
+      page: 6
+      published_page: 292
+      pdf_page_index: 5
+      paragraph: liquid-state formation
+      equation: '19'
+      note: 'Prose, not a table cell. 600 dpi render of PDF page 6: ΔH_T(MgAl2O4) = 43.79 ± 4.84 kJ/mol and ΔS_T(MgAl2O4)
+        = 28.09 ± 1.64 J/(mol K), liquid state, equation (19).'
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+    locator:
+      page: 2
+      published_page: 288
+      pdf_page_index: 1
+      table: '1'
+      note: MinerU CSV row 29. 600 dpi render of PDF page 2 shows Knudsen mass spectrometry, 1851–2298, −12.02 ± 1.14, 5.03
+        ± 0.56, This work. pdftotext uses U+2013 before 12.02. MinerU stored an ASCII hyphen. The emitted column header was
+        the LaTeX fragment; the caption header is written here.; row=29; column=3; row_label=This work; column_header=ΔH_T,
+        kJ/mol
+- work_id: 10.1134/s0036024417020303
+  source: data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
+  why: declared quantity is unknown; unsupported quantity 'delta_fS'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fS
+    locator:
+      page: 6
+      published_page: 292
+      pdf_page_index: 5
+      paragraph: liquid-state formation
+      equation: '19'
+      note: Same prose sentence as the liquid formation enthalpy. 600 dpi render of PDF page 6. The schema has no formation-entropy
+        token.
+  - observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
+    locator:
+      page: 2
+      published_page: 288
+      pdf_page_index: 1
+      table: '1'
+      note: Same Table 1 this-work row as the enthalpy. 600 dpi render of PDF page 2. The schema has no formation-entropy
+        token.; row=29; column=4; row_label=This work; column_header=ΔS_T, J/(mol K)
 - work_id: 10.1134/s0036024417020303
   source: data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
   why: source T_range_K [1851, 2298]; no midpoint invented
@@ -222695,7 +222441,220 @@ entries:
         series=3; marker_symbol=open circle'
 - work_id: 10.1134/s0036024419080284
   source: data/literature/extracts/shornikova-2019-perovskite-thermodynamics.yaml
-  why: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number
+  why: No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.
+  axes:
+  - quantity
+  observations:
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r03_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=298; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r04_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=298; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r05_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=298; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r06_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=298; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r07_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=298; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r08_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=888–972; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r09_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=900–1250; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r10_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=973; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r11_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=975; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r12_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=975; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r13_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=976; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r14_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1046; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r15_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1068 ± 2; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r16_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1073; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r17_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1074; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r18_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1078; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r19_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1180–1290; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r21_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1600–1800; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r22_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1600–2100; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r23_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1600–2100; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r24_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1740 ± 20; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=1791–2241; column_header=$\Delta H_T$
+  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03
+    locator:
+      page: 2
+      published_page: 1429
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
+        row_label=2241–2398; column_header=$\Delta H_T$
+- work_id: 10.1134/s0036024419080284
+  source: data/literature/extracts/shornikova-2019-perovskite-thermodynamics.yaml
+  why: No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.
   axes:
   - value
   observations:
@@ -223167,219 +223126,6 @@ entries:
       note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
         pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
         row_label=1740 ± 20; column_header=$\Delta H_T$
-- work_id: 10.1134/s0036024419080284
-  source: data/literature/extracts/shornikova-2019-perovskite-thermodynamics.yaml
-  why: row type is a curation label, not a statement of the observable
-  axes:
-  - quantity
-  observations:
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r03_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=298; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r04_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=298; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r05_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=298; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r06_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=298; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r07_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=298; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r08_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=888–972; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r09_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=900–1250; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r10_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=973; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r11_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=975; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r12_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=975; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r13_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=976; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r14_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1046; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r15_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1068 ± 2; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r16_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1073; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r17_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1074; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r18_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1078; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r19_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1180–1290; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r21_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1600–1800; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r22_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1600–2100; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r23_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1600–2100; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r24_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1740 ± 20; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=1791–2241; column_header=$\Delta H_T$
-  - observation_id: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03
-    locator:
-      page: 2
-      published_page: 1429
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
-        pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.;
-        row_label=2241–2398; column_header=$\Delta H_T$
 - work_id: 10.1134/s0036024419080284
   source: data/literature/extracts/shornikova-2019-perovskite-thermodynamics.yaml
   why: source T_range_K [1180.0, 1290.0]; no midpoint invented
@@ -248894,205 +248640,6 @@ entries:
       pdf_page_index: 1
       table: '1'
       note: Table 1 row 25 CAS–3
-- work_id: 10.2138/am.2006.2097
-  source: data/literature/extracts/berry-2006-chromium-composition.yaml
-  why: regime 'Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench' is not a closed method token
-    (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_01_measured::T=1673.15:row=ad:h=3404793e21f6
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 1 AD
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_01_quoted_berry_oneill_2004::T=1673.15:row=ad:h=10b2110a2e84
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 1 AD
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_02_measured::T=1673.15:row=ad+fo:h=37a43fc1e15d
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 2 AD+Fo
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_02_quoted_berry_oneill_2004::T=1673.15:row=ad+fo:h=5a0d9d51b48d
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 2 AD+Fo
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_03_measured::T=1673.15:row=ad+wo:h=2d16ae34257b
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 3 AD+Wo
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_03_quoted_berry_oneill_2004::T=1673.15:row=ad+wo:h=426bb5c34ba2
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 3 AD+Wo
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_04_measured::T=1673.15:row=ad+en:h=2335d974ad19
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 4 AD+En
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_04_quoted_berry_oneill_2004::T=1673.15:row=ad+en:h=089ac9b72147
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 4 AD+En
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_05_measured::T=1673.15:row=ad+qz:h=4de3dfa0c551
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 5 AD+Qz
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_05_quoted_berry_oneill_2004::T=1673.15:row=ad+qz:h=13e1577aec0b
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 5 AD+Qz
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_06_measured::T=1673.15:row=longhi1:h=43981050e7cf
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 6 Longhi1
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_07_measured::T=1673.15:row=longhi2:h=128edd56ebec
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 7 Longhi2
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_08_measured::T=1673.15:row=longhi3:h=139cebfa5efc
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 8 Longhi3
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_09_measured::T=1673.15:row=longhi4:h=03656f335332
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 9 Longhi4
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_10_measured::T=1673.15:row=longhi5:h=01b107edf9fb
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 10 Longhi5
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_11_measured::T=1673.15:row=longhi6:h=5c588c18298f
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 11 Longhi6
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_12_measured::T=1673.15:row=osborn1:h=484f8c199932
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 12 Osborn1
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_13_measured::T=1673.15:row=osborn2:h=1018d2892423
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 13 Osborn2
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_14_measured::T=1673.15:row=osborn3:h=0b4503f19045
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 14 Osborn3
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_15_measured::T=1673.15:row=osborn4:h=a1dc6fad0886
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 15 Osborn4
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_16_measured::T=1673.15:row=osborn5:h=124275d06a90
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 16 Osborn5
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_17_measured::T=1673.15:row=osborn6:h=2cb9b7f9ac59
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 17 Osborn6
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_18_measured::T=1673.15:row=cmas–a:h=7cbc7446d9b3
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 18 CMAS–A
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_19_measured::T=1673.15:row=cmas–b:h=5fadcea619e4
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 19 CMAS–B
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_20_measured::T=1673.15:row=cmas–c:h=258870b447ed
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 20 CMAS–C
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_21_measured::T=1673.15:row=cmas–e:h=5984f75962fe
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 21 CMAS–E
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_22_measured::T=1673.15:row=cmas–f:h=177039f3c927
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 22 CMAS–F
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_23_measured::T=1673.15:row=cmas–g:h=1f1995797696
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 23 CMAS–G
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_24_measured::T=1673.15:row=cas–2:h=68618a5132ef
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 24 CAS–2
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_25_measured::T=1673.15:row=cas–3:h=162b4b0181f5
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 25 CAS–3
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_26_measured::T=1673.15:row=cas–4:h=24d8746e2c6d
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 26 CAS–4
-  - observation_id: berry-2006-chromium-composition::berry_2006_table1_row_27_measured::T=1673.15:row=mas–1:h=1c2a4a41bc4e
-    locator:
-      published_page: 1902
-      pdf_page_index: 1
-      table: '1'
-      note: Table 1 row 27 MAS–1
 - work_id: 10.2138/am.2012.3750
   source: data/literature/extracts/ozawa-2012-forsterite-vacuum-evaporation.yaml
   why: unmapped evaporation rate unit 'm/s as printed'
@@ -253344,7 +252891,47 @@ entries:
       note: Figure 3 caption and accompanying prose; plotted composition trajectories are not digitized.
 - work_id: 10.2205/2011nz000230
   source: data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml
-  why: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
+  axes:
+  - quantity
+  observations:
+  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_01
+    locator:
+      page: 2
+      pdf_page_index: 1
+      figure: '1'
+      note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233); plotted ordinate
+        22.6214 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
+  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_02
+    locator:
+      page: 2
+      pdf_page_index: 1
+      figure: '1'
+      note: '600 dpi centre reads: fresh crop 1 page pixel (2722.5, 5065.5), fresh crop 2 page pixel (2722.56, 5064.95); plotted
+        ordinate 24.250232 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
+  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_03
+    locator:
+      page: 2
+      pdf_page_index: 1
+      figure: '1'
+      note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736); plotted ordinate
+        27.4466 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
+  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_04
+    locator:
+      page: 2
+      pdf_page_index: 1
+      figure: '1'
+      note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503); plotted ordinate
+        29.7087 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
+  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_text_minimum_delta_fG1960_melt
+    locator:
+      page: 2
+      pdf_page_index: 1
+      section: Results
+      note: 'Final paragraph: ΔfG1960 = −31.5 kJ/mole at 45 mole % Al2O3, closed to liquidus line.'
+- work_id: 10.2205/2011nz000230
+  source: data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
   axes:
   - value
   observations:
@@ -253629,46 +253216,6 @@ entries:
       pdf_page_index: 1
       figure: '1'
       note: Figure 1 d model curve; no data markers digitized.; panel=d; series=3
-- work_id: 10.2205/2011nz000230
-  source: data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml
-  why: row type is a curation label, not a statement of the observable
-  axes:
-  - quantity
-  observations:
-  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_01
-    locator:
-      page: 2
-      pdf_page_index: 1
-      figure: '1'
-      note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233); plotted ordinate
-        22.6214 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
-  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_02
-    locator:
-      page: 2
-      pdf_page_index: 1
-      figure: '1'
-      note: '600 dpi centre reads: fresh crop 1 page pixel (2722.5, 5065.5), fresh crop 2 page pixel (2722.56, 5064.95); plotted
-        ordinate 24.250232 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
-  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_03
-    locator:
-      page: 2
-      pdf_page_index: 1
-      figure: '1'
-      note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736); plotted ordinate
-        27.4466 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
-  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_04
-    locator:
-      page: 2
-      pdf_page_index: 1
-      figure: '1'
-      note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503); plotted ordinate
-        29.7087 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
-  - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_text_minimum_delta_fG1960_melt
-    locator:
-      page: 2
-      pdf_page_index: 1
-      section: Results
-      note: 'Final paragraph: ΔfG1960 = −31.5 kJ/mole at 45 mole % Al2O3, closed to liquidus line.'
 - work_id: 10.2205/2011nz000230
   source: data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml
   why: source does not state method
@@ -412878,810 +412425,6 @@ entries:
       record: Table 4 row AD + Wo n/4 slope
 - work_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2
   source: data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml
-  why: regime 'Cr K-edge XANES silicate glass redox' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r01::T=1673.15:h=e8911c511b79
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -0.68*; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r02::T=1673.15:h=a58dd6c49b95
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.0†; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r03::T=1673.15:h=7d7f83abae98
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.5†; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r04::T=1673.15:h=f80f4476c687
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -2.0†; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r06::T=1673.15:h=d5930a5490b4
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -3.0‡; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r07::T=1673.15:h=8c63787a8e9f
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -4.0; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r08::T=1673.15:h=e9a55662e469
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -5.0; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r09::T=1673.15:h=031dbf7bd164
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.0; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r10::T=1673.15:h=c2f5e3e444f4
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.5; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r11::T=1673.15:h=9bd9a3d7334e
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.0; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r12::T=1673.15:h=44371771fd97
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.5; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r13::T=1673.15:h=a59168790c50
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.0; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r14::T=1673.15:h=b992b9b4eb3a
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.5; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r15::T=1673.15:h=4f666deafd70
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -9.0; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r16::T=1673.15:h=fd60838812a2
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -10.0; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r17::T=1673.15:h=bd416ad8e08d
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -11.0 (replicate 1); AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r18_rep2::T=1673.15:h=b65631e14a04
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 2); AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r19_rep3::T=1673.15:h=ac73e542873c
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 3); AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r20::T=1673.15:h=a61075b21441
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.0; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r21::T=1673.15:h=2f10055abee4
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.7#; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r22_rep2::T=1673.15:h=45b9ed7f7790
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃#; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r23::T=1673.15:h=a09abe224e4d
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -13.75#; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r25::T=1673.15:h=700ef3c65d6a
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -16.13||; AD + En; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r01::T=1673.15:h=c866abbb5ced
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -0.68*; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r02::T=1673.15:h=acbb6a938b55
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.0†; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r03::T=1673.15:h=99cc3cdf57c1
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.5†; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r04::T=1673.15:h=5afc82310494
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -2.0†; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r06::T=1673.15:h=2dd06ea1d5f9
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -3.0‡; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r07::T=1673.15:h=4c8a1a3c5601
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -4.0; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r09::T=1673.15:h=f19022736b33
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.0; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r10::T=1673.15:h=e3663d0bc692
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.5; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r11::T=1673.15:h=7f41c025f891
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.0; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r12::T=1673.15:h=d17f0f4ce502
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.5; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r13::T=1673.15:h=846f8e8a8e20
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.0; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r14::T=1673.15:h=e9b92753be9e
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.5; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r15::T=1673.15:h=989aa7b7179c
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -9.0; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r16::T=1673.15:h=d484f60419de
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -10.0; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r17::T=1673.15:h=d0f64c4eb4b8
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -11.0 (replicate 1); AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r18_rep2::T=1673.15:h=f3cc11b1bb96
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 2); AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r19_rep3::T=1673.15:h=77d4bd34a1f0
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 3); AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r20::T=1673.15:h=37610e3165ec
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.0; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r21::T=1673.15:h=2c2adbc7a2e4
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.7#; AD + Fo column; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r23::T=1673.15:h=c191058cab2c
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -13.75#; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r25::T=1673.15:h=2c08df0bc7fd
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -16.13||; AD + Fo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r01::T=1673.15:h=75ac8c0e5d25
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -0.68*; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r02::T=1673.15:h=710b20d32581
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.0†; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r03::T=1673.15:h=d3524f469fc6
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.5†; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r04::T=1673.15:h=28f454b9e1ab
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -2.0†; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r06::T=1673.15:h=9d1521c7a5cb
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -3.0‡; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r07::T=1673.15:h=b7c2c3258cea
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -4.0; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r09::T=1673.15:h=6b54cc193fbe
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.0; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r10::T=1673.15:h=9be955b0a519
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.5; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r11::T=1673.15:h=0d6f3a8d3638
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.0; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r12::T=1673.15:h=d677dedf605f
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.5; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r13::T=1673.15:h=0e921698a390
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.0; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r14::T=1673.15:h=741d93d76326
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.5; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r15::T=1673.15:h=235008763e08
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -9.0; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r16::T=1673.15:h=86ca4c541bb5
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -10.0; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r17::T=1673.15:h=3f216050412f
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -11.0 (replicate 1); AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r18_rep2::T=1673.15:h=29bf23807a82
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 2); AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r19_rep3::T=1673.15:h=34b397320e29
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 3); AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r20::T=1673.15:h=57e1c921051e
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.0; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r21::T=1673.15:h=3613f89bba88
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.7#; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r23::T=1673.15:h=f0cd97307dfc
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -13.75#; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r24::T=1673.15:h=5a62631ebad6
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -14.5§; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r25::T=1673.15:h=42834e735fd6
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -16.13||; AD + Qz; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r01::T=1673.15:h=060692e77de3
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -0.68*; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r02::T=1673.15:h=d37ee6575c8b
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.0†; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r03::T=1673.15:h=88bfefe79d5f
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.5†; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r04::T=1673.15:h=d84ba5fdbe9a
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -2.0†; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r06::T=1673.15:h=63553af3d351
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -3.0‡; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r07::T=1673.15:h=a75189082a20
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -4.0; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r08::T=1673.15:h=8cb55e3691b4
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -5.0; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r09::T=1673.15:h=0a2a922ff1c8
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.0; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r10::T=1673.15:h=d9d54342adb7
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.5; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r11::T=1673.15:h=14a88de5679a
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.0; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r12::T=1673.15:h=f7e92f10ad5b
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.5; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r13::T=1673.15:h=8faba743e87a
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.0; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r14::T=1673.15:h=a3e3fc77ba05
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.5; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r15::T=1673.15:h=aa3437dcf042
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -9.0; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r17::T=1673.15:h=d018aeb4866c
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -11.0 (replicate 1); AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r18_rep2::T=1673.15:h=0a4e2caa1a6e
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 2); AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r19_rep3::T=1673.15:h=c56b9c7fddcd
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 3); AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r20::T=1673.15:h=b08e3a9ff974
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.0; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r21::T=1673.15:h=2ff90a69c4c9
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.7#; AD column; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r23::T=1673.15:h=5a8aac385aeb
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -13.75#; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r24::T=1673.15:h=2ca7ea95d3fe
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -14.5§; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r25::T=1673.15:h=f2ee7db36dd4
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -16.13||; AD; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r01::T=1673.15:h=5957a79077ac
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -0.68*; AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r08::T=1673.15:h=1047e693428b
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -5.0; AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r11::T=1673.15:h=bf271de7047f
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.0; AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r15::T=1673.15:h=4936ea9e4d3b
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -9.0; AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r17::T=1673.15:h=f495ac7a6a84
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -11.0 (replicate 1); AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r18_rep2::T=1673.15:h=60507b420f70
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 2); AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r20::T=1673.15:h=9ea63b3164fd
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.0; AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r21::T=1673.15:h=3040db8d5b16
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.7#; AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt10_r22_rep2::T=1673.15:h=d0cdf39f5f71
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃#; AD + Rt (10%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r02::T=1673.15:h=e4cf35ec3cc9
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.0†; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r03::T=1673.15:h=1764ea72329a
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.5†; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r04::T=1673.15:h=5f278a05b00b
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -2.0†; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r05_rep2::T=1673.15:h=2e90a19957d9
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃† (second measurement); AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r06::T=1673.15:h=35c6b64f5ed8
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -3.0‡; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r07::T=1673.15:h=c91730dae585
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -4.0; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r09::T=1673.15:h=8483c488226b
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.0; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r10::T=1673.15:h=ca77ca7f9b67
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.5; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r12::T=1673.15:h=83eafbd08aea
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.5; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r14::T=1673.15:h=34355b6934c5
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.5; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r16::T=1673.15:h=b1b986aeac32
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -10.0; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r23::T=1673.15:h=b5e332746fca
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -13.75#; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_rt20_r24::T=1673.15:h=8f924334fce7
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -14.5§; AD + Rt (20%); Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r01::T=1673.15:h=18b82da73cb0
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -0.68*; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r02::T=1673.15:h=c6735c00efc4
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.0†; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r03::T=1673.15:h=ac199c1d0ef9
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -1.5†; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r04::T=1673.15:h=6130204455e6
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -2.0†; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r06::T=1673.15:h=9c40edaa7a2f
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -3.0‡; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r07::T=1673.15:h=15d62ee796f8
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -4.0; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r08::T=1673.15:h=102c092aee71
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -5.0; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r09::T=1673.15:h=6981d60cbf59
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.0; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r10::T=1673.15:h=21523c26d31d
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -6.5; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r11::T=1673.15:h=4462b7868c9f
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.0; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r12::T=1673.15:h=b8064f124c07
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -7.5; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r13::T=1673.15:h=6650bdbf6d96
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.0; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r14::T=1673.15:h=6453e631e349
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -8.5; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r15::T=1673.15:h=b4af16457095
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -9.0; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r16::T=1673.15:h=cab1780502f8
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -10.0; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r17::T=1673.15:h=6d89f0bbe680
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -11.0 (replicate 1); AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r18_rep2::T=1673.15:h=3a3795e802e2
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 2); AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r19_rep3::T=1673.15:h=664603f22a38
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row 〃 (replicate 3); AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r20::T=1673.15:h=f66bc6182f77
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.0; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r21::T=1673.15:h=4774433ea4b8
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -12.7#; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r23::T=1673.15:h=ea7859a8e9fe
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -13.75#; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r24::T=1673.15:h=009f66bc5944
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -14.5§; AD + Wo; Cr2+/SumCr cell
-  - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r25::T=1673.15:h=8100eac1a67c
-    locator:
-      published_page: 794
-      pdf_page_index: 5
-      table: '3'
-      record: Table 3 row -16.13||; AD + Wo; Cr2+/SumCr cell
-- work_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2
-  source: data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml
   why: regime 'Table 4 redox fit' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -432438,6 +431181,141 @@ entries:
       source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
 - work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
   source: data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml
+  why: No quantity token represents formation from simple oxides; log10_Kf denotes formation from the elements. simulator/battery/enums.py::FORMATION_QUANTITIES
+    includes Quantity.LOG10_KF; simulator/battery/identity.py::profile_for assigns formation quantities to elements-frame
+    identities.
+  axes:
+  - quantity
+  observations:
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1000:h=dc9496d13b08
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6, Log Kf column
+- work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source: data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml
+  why: No quantity token represents formation from simple oxides; log10_Kf denotes formation from the elements. simulator/battery/enums.py::FORMATION_QUANTITIES
+    includes Quantity.LOG10_KF; simulator/battery/identity.py::profile_for assigns formation quantities to elements-frame
+    identities.
+  axes:
+  - value
+  observations:
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1000:h=dc9496d13b08
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 1000, Log Kf column; table_row_number=15; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1100:h=36cd13095d25
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 1100, Log Kf column; table_row_number=16; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1200:h=2f6bf6a1a660
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 1200, Log Kf column; table_row_number=17; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1263:h=1477b6986685
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 1263, Log Kf column; table_row_number=18; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=298.15:h=7a73883521da
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 298.15, Log Kf column; table_row_number=3; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=300:h=8d72c450a364
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 300, Log Kf column; table_row_number=4; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=400:h=e85b1e90446d
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 400, Log Kf column; table_row_number=5; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=500:h=3c8c89eca64e
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 500, Log Kf column; table_row_number=6; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=600:h=ed3dc079a3a2
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 600, Log Kf column; table_row_number=7; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=700:h=efef91561951
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 700, Log Kf column; table_row_number=8; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=800:h=3456fb413436
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 800, Log Kf column; table_row_number=9; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=847:h=149910258c61
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 847, Log Kf column; table_row_number=10; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=847:h=1b8848f9c89d
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 847, Log Kf column; table_row_number=11; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=900:h=6ea115ead2d9
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 900, Log Kf column; table_row_number=12; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=960:h=533da3894079
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 960, Log Kf column; table_row_number=14; table_column_number=8
+  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=960:h=ee90d9fa3f0f
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: '6'
+      note: Table 6 row 960, Log Kf column; table_row_number=13; table_column_number=8
+- work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
+  source: data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml
   why: The reaction process has reactants at 25°C and reaction products at 73.7°C; no single measurement temperature is printed.
   axes:
   - temperature_K
@@ -433379,118 +432257,6 @@ entries:
       pdf_page_index: 14
       table: '6'
       note: Table 6 row 960, ΔHf° column; table_row_number=14; table_column_number=6
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1000:h=dc9496d13b08
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 1000, Log Kf column; table_row_number=15; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1100:h=36cd13095d25
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 1100, Log Kf column; table_row_number=16; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1200:h=2f6bf6a1a660
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 1200, Log Kf column; table_row_number=17; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1263:h=1477b6986685
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 1263, Log Kf column; table_row_number=18; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=298.15:h=7a73883521da
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 298.15, Log Kf column; table_row_number=3; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=300:h=8d72c450a364
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 300, Log Kf column; table_row_number=4; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=400:h=e85b1e90446d
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 400, Log Kf column; table_row_number=5; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=500:h=3c8c89eca64e
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 500, Log Kf column; table_row_number=6; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=600:h=ed3dc079a3a2
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 600, Log Kf column; table_row_number=7; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=700:h=efef91561951
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 700, Log Kf column; table_row_number=8; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=800:h=3456fb413436
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 800, Log Kf column; table_row_number=9; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=847:h=149910258c61
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 847, Log Kf column; table_row_number=10; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=847:h=1b8848f9c89d
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 847, Log Kf column; table_row_number=11; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=900:h=6ea115ead2d9
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 900, Log Kf column; table_row_number=12; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=960:h=533da3894079
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 960, Log Kf column; table_row_number=14; table_column_number=8
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=960:h=ee90d9fa3f0f
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6 row 960, Log Kf column; table_row_number=13; table_column_number=8
   - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_negative_gibbs_function::T=1000:h=97c1aa332c7e
     locator:
       page: 15
@@ -434265,19 +433031,6 @@ entries:
       pdf_page_index: 10
       table: '2'
       note: Table 2 reaction 6, mean row; table_row_number=12; table_column_number=6
-- work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
-  source: data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml
-  why: unsupported quantity 'log10_formation_from_oxides_as_printed'
-  axes:
-  - quantity
-  observations:
-  - observation_id: bennington-brown-1982-synthetic-acmite-ri8621::bennington_1982_table6_log10_Kf::T=1000:h=dc9496d13b08
-    locator:
-      page: 15
-      published_page: 9
-      pdf_page_index: 14
-      table: '6'
-      note: Table 6, Log Kf column
 - work_id: 5ffa478cc515b4f5ca984237955503914598f4474576fad22803d4829683015d
   source: data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml
   why: unsupported quantity 'negative_gibbs_energy_function_as_printed'
@@ -531449,6 +530202,74 @@ entries:
         headed.
 - work_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245
   source: data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
+  axes:
+  - quantity
+  observations:
+  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_calculated_delta_fG
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      note: table_row_number=13; table_column_number=4; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Calculated
+  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      note: table_row_number=13; table_column_number=3; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Experimental
+  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_calculated_delta_fG
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      note: table_row_number=53; table_column_number=4; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Calculated
+  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      note: table_row_number=53; table_column_number=3; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Experimental
+- work_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245
+  source: data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
+  axes:
+  - value
+  observations:
+  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_calculated_delta_fG
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      note: table_row_number=13; table_column_number=4; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Calculated
+  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      note: table_row_number=13; table_column_number=3; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Experimental
+  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_calculated_delta_fG
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      note: table_row_number=53; table_column_number=4; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Calculated
+  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      note: table_row_number=53; table_column_number=3; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Experimental
+- work_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245
+  source: data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
   why: declared quantity is unknown; no observable selected; T_range_K [1571, 1824] is a temperature domain, not the observable
   axes:
   - value
@@ -531486,40 +530307,6 @@ entries:
       pdf_page_index: 2
       table: '1'
       note: row=MgO + Mg2SiO4
-- work_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245
-  source: data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
-  why: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_calculated_delta_fG
-    locator:
-      page: 7
-      published_page: 341
-      pdf_page_index: 6
-      table: '4'
-      note: table_row_number=13; table_column_number=4; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Calculated
-  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
-    locator:
-      page: 7
-      published_page: 341
-      pdf_page_index: 6
-      table: '4'
-      note: table_row_number=13; table_column_number=3; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Experimental
-  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_calculated_delta_fG
-    locator:
-      page: 7
-      published_page: 341
-      pdf_page_index: 6
-      table: '4'
-      note: table_row_number=53; table_column_number=4; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Calculated
-  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
-    locator:
-      page: 7
-      published_page: 341
-      pdf_page_index: 6
-      table: '4'
-      note: table_row_number=53; table_column_number=3; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Experimental
 - work_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245
   source: data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
   why: declared quantity is unknown; unsupported quantity 'gibbs_energy_of_formation_temperature_function_coefficients'; refusing
@@ -531570,40 +530357,6 @@ entries:
       published_page: 337
       pdf_page_index: 2
       equation: '7'
-- work_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245
-  source: data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
-  why: row type is a curation label, not a statement of the observable
-  axes:
-  - quantity
-  observations:
-  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_calculated_delta_fG
-    locator:
-      page: 7
-      published_page: 341
-      pdf_page_index: 6
-      table: '4'
-      note: table_row_number=13; table_column_number=4; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Calculated
-  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
-    locator:
-      page: 7
-      published_page: 341
-      pdf_page_index: 6
-      table: '4'
-      note: table_row_number=13; table_column_number=3; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Experimental
-  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_calculated_delta_fG
-    locator:
-      page: 7
-      published_page: 341
-      pdf_page_index: 6
-      table: '4'
-      note: table_row_number=53; table_column_number=4; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Calculated
-  - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
-    locator:
-      page: 7
-      published_page: 341
-      pdf_page_index: 6
-      table: '4'
-      note: table_row_number=53; table_column_number=3; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Experimental
 - work_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245
   source: data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
   why: source T_range_K [1571, 1824]; no midpoint invented
@@ -533338,83 +532091,6 @@ entries:
       pdf_page_index: 8
       table: '1'
       note: row=Na4CaSi3O9; column=measured analysis
-- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
-  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
-  why: regime 'Copper-block drop calorimetry; Table 2 measured value not included in a printed equation fit range.' is not
-    a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table2_measured_outside_fit_range::T=1309.0:h=54959b8eac14
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: measured point outside every printed fit range; row=Na2CaSiO4
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table2_measured_outside_fit_range::T=1300.3:h=1765674b3cde
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: measured point outside every printed fit range; row=Na2Ca2Si2O7
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table2_measured_outside_fit_range::T=1504.4:h=34a57912b8b7
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: measured point outside every printed fit range; row=Na2Ca2Si3O9
-- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
-  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
-  why: regime 'Copper-block drop calorimetry; Table 2 measured values.' is not a closed method token (kems_effusion alone
-    is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table2_measured::T=395.1:h=7e40d822682b
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: fit-input subset 298–830 K; row=Na2CaSiO4
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table2_measured::T=1003.0:h=8b2f70bb6943
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: fit-input subset 830–1300 K; row=Na2CaSiO4
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table2_measured::T=1001.3:h=64459c9ced29
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: fit-input subset 298–1300 K; row=Na2Ca2Si2O7
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table2_measured::T=405.0:h=5c591b3a16a2
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: fit-input subset 298–750 K; row=Na2Ca2Si3O9
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table2_measured::T=1001.3:h=eae498b572ed
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: fit-input subset 750–1500 K; row=Na2Ca2Si3O9
-  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table2_measured::T=1008.3:h=d7bd1ca48a14
-    locator:
-      page: 10
-      published_page: 3
-      pdf_page_index: 9
-      table: '2'
-      note: fit-input subset 298–1400 K; row=Na4CaSi3O9
 - work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
   source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
   why: regime 'Theoretical percentages printed in parentheses in Table 1.' is not a closed method token (kems_effusion alone
@@ -638014,25 +636690,6 @@ entries:
       table: '1'
 - work_id: e35dc43f8288099ecbdb320a551b3f70774f457f1902fdcf3dd7a3eca655edff
   source: data/literature/extracts/mysen-1985-cmas-redox.yaml
-  why: regime '57Fe Mössbauer spectroscopy; Fe3+/ΣFe is reduced from the relative areas of fitted ferric and ferrous doublets.'
-    is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: mysen-1985-cmas-redox::mysen_1985_table1_mossbauer_fe3_sumfe::points:h=5ba22cedfc27
-    locator:
-      page: 4
-      published_page: 320
-      pdf_page_index: 3
-      table: '1'
-  - observation_id: mysen-1985-cmas-redox::mysen_1985_table2_mossbauer_fe3_sumfe::T=1673.15:h=1f2d127fcf5a
-    locator:
-      page: 6
-      published_page: 322
-      pdf_page_index: 5
-      table: '2'
-- work_id: e35dc43f8288099ecbdb320a551b3f70774f457f1902fdcf3dd7a3eca655edff
-  source: data/literature/extracts/mysen-1985-cmas-redox.yaml
   why: regime 'Wet-chemical iron-redox analysis, as attributed in the Table 1 footnote.' is not a closed method token (kems_effusion
     alone is insufficient)
   axes:
@@ -684808,7 +683465,41 @@ entries:
       note: Printed before/after weights for 12 experimental aliquots.
 - work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
   source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
+  axes:
+  - quantity
+  observations:
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_g_table10
+    locator:
+      page: 19
+      published_page: 15
+      pdf_page_index: 18
+      table: '10'
+      note: row=K2Si2O5 crystal from oxides; column=Gr
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_g_table10_867_printed_minus_78_8
+    locator:
+      page: 19
+      published_page: 15
+      pdf_page_index: 18
+      table: '10'
+      note: row=K2Si2O5 crystal from oxides; column=Gr
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_g_table12
+    locator:
+      page: 19
+      published_page: 15
+      pdf_page_index: 18
+      table: '12'
+      note: row=K2Si2O5 glass from oxides; column=Gr
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_oxide_formation_g_table8
+    locator:
+      page: 18
+      published_page: 14
+      pdf_page_index: 17
+      table: '8'
+      note: row=K2SiO3 from oxides; column=Gr
+- work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
+  source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
+  why: No quantity token represents formation from simple oxides; delta_fG denotes formation from the elements.
   axes:
   - value
   observations:
@@ -684833,6 +683524,19 @@ entries:
       pdf_page_index: 18
       table: '12'
       note: row=K2Si2O5 glass from oxides; column=Gr
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_oxide_formation_g_table8
+    locator:
+      page: 18
+      published_page: 14
+      pdf_page_index: 17
+      table: '8'
+      note: row=K2SiO3 from oxides; column=Gr
+- work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
+  source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
+  why: No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.
+  axes:
+  - quantity
+  observations:
   - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_h_table10
     locator:
       page: 19
@@ -684847,13 +683551,6 @@ entries:
       pdf_page_index: 18
       table: '12'
       note: row=K2Si2O5 glass from oxides; column=Hr
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_oxide_formation_g_table8
-    locator:
-      page: 18
-      published_page: 14
-      pdf_page_index: 17
-      table: '8'
-      note: row=K2SiO3 from oxides; column=Gr
   - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_oxide_formation_h_table8
     locator:
       page: 18
@@ -684863,41 +683560,34 @@ entries:
       note: row=K2SiO3 from oxides; column=Hr
 - work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
   source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+  why: No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.
   axes:
   - value
   observations:
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_reference_glass_S_table6
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_h_table10
     locator:
-      page: 15
-      published_page: 11
-      pdf_page_index: 14
-      table: '6'
-      note: row=K2Si2O5 glass; column=S
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_t6_glass_extrapolated_s_800
+      page: 19
+      published_page: 15
+      pdf_page_index: 18
+      table: '10'
+      note: row=K2Si2O5 crystal from oxides; column=Hr
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_h_table12
     locator:
-      page: 15
-      published_page: 11
-      pdf_page_index: 14
-      table: '6'
-      note: row=K2Si2O5 glass; column=S
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_t6_glass_extrapolated_s_850
+      page: 19
+      published_page: 15
+      pdf_page_index: 18
+      table: '12'
+      note: row=K2Si2O5 glass from oxides; column=Hr
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_oxide_formation_h_table8
     locator:
-      page: 15
-      published_page: 11
-      pdf_page_index: 14
-      table: '6'
-      note: row=K2Si2O5 glass; column=S
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_t6_glass_extrapolated_s_900
-    locator:
-      page: 15
-      published_page: 11
-      pdf_page_index: 14
-      table: '6'
-      note: row=K2Si2O5 glass; column=S
+      page: 18
+      published_page: 14
+      pdf_page_index: 17
+      table: '8'
+      note: row=K2SiO3 from oxides; column=Hr
 - work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
   source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: missing quantity
+  why: No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.
   axes:
   - quantity
   observations:
@@ -684931,178 +683621,38 @@ entries:
       note: row=K2Si2O5 glass; column=S
 - work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
   source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: regime "Copper-block drop calorimetry above 298.15 K; merged with Stull's low-temperature heat capacities for the smooth
-    table." is not a closed method token (kems_effusion alone is insufficient)
+  why: No quantity token represents the printed entropy increment from 298.15 K; S denotes absolute entropy.
   axes:
-  - method
+  - value
   observations:
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_heat_content_direct::T=1019.4:h=80e89e83fd13
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_reference_glass_S_table6
     locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2SiO3 crystal; column=H_T-H_298
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_possible_melting_onset_1195::T=1195.0:h=f3cbafcc3b5d
+      page: 15
+      published_page: 11
+      pdf_page_index: 14
+      table: '6'
+      note: row=K2Si2O5 glass; column=S
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_t6_glass_extrapolated_s_800
     locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2SiO3 crystal; column=H_T-H_298
-- work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
-  source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: regime 'Adiabatic calorimetry; experimental low-temperature heat capacities.' is not a closed method token (kems_effusion
-    alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_cp_low_table1::T=10.17:h=c3e2e5ac94d1
+      page: 15
+      published_page: 11
+      pdf_page_index: 14
+      table: '6'
+      note: row=K2Si2O5 glass; column=S
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_t6_glass_extrapolated_s_850
     locator:
-      page: 8
-      published_page: 4
-      pdf_page_index: 7
-      table: '1'
-      note: row=K2Si2O5 crystal; column=Cp
-- work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
-  source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: regime 'Copper-block drop calorimetry above the melting point; enthalpy reference is the glass at 298.15 K.' is not
-    a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_heat_content_liquid_table3::T=1363.0:h=b945764a4f5b
+      page: 15
+      published_page: 11
+      pdf_page_index: 14
+      table: '6'
+      note: row=K2Si2O5 glass; column=S
+  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_t6_glass_extrapolated_s_900
     locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 liquid
-- work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
-  source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: regime 'Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.' is
-    not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_glass_partial_805_4::T=805.4:h=0d1f0e962ec7
-    locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 glass
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_glass_partial_903_2::T=903.2:h=9a6d37cffd99
-    locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 glass
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_glass_partial_956_0::T=956.0:h=526de758343b
-    locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 glass
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_heat_content_glass_table3::T=403.3:h=1eb3986e073b
-    locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 glass
-- work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
-  source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: regime 'Copper-block drop calorimetry; table marks pretransition and possible melting onset.' is not a closed method
-    token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_crystal_onset_1309_1::T=1309.1:h=5b8f938f4875
-    locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 crystal
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_crystal_pretransition_503::T=503.0:h=3595102e063e
-    locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 crystal
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_crystal_pretransition_852_6::T=852.6:h=033210d08851
-    locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 crystal
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_heat_content_crystal_table3::T=1018.8:h=6b429e135c64
-    locator:
-      page: 12
-      published_page: 8
-      pdf_page_index: 11
-      table: '3'
-      note: row=K2Si2O5 crystal
-- work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
-  source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
-  why: row type is a curation label, not a statement of the observable
-  axes:
-  - quantity
-  observations:
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_g_table10
-    locator:
-      page: 19
-      published_page: 15
-      pdf_page_index: 18
-      table: '10'
-      note: row=K2Si2O5 crystal from oxides; column=Gr
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_g_table10_867_printed_minus_78_8
-    locator:
-      page: 19
-      published_page: 15
-      pdf_page_index: 18
-      table: '10'
-      note: row=K2Si2O5 crystal from oxides; column=Gr
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_g_table12
-    locator:
-      page: 19
-      published_page: 15
-      pdf_page_index: 18
-      table: '12'
-      note: row=K2Si2O5 glass from oxides; column=Gr
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_h_table10
-    locator:
-      page: 19
-      published_page: 15
-      pdf_page_index: 18
-      table: '10'
-      note: row=K2Si2O5 crystal from oxides; column=Hr
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2si2o5_oxide_formation_h_table12
-    locator:
-      page: 19
-      published_page: 15
-      pdf_page_index: 18
-      table: '12'
-      note: row=K2Si2O5 glass from oxides; column=Hr
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_oxide_formation_g_table8
-    locator:
-      page: 18
-      published_page: 14
-      pdf_page_index: 17
-      table: '8'
-      note: row=K2SiO3 from oxides; column=Gr
-  - observation_id: beyer-1980-potassium-metasilicate-disilicate-ri8410::bey80_k2sio3_oxide_formation_h_table8
-    locator:
-      page: 18
-      published_page: 14
-      pdf_page_index: 17
-      table: '8'
-      note: row=K2SiO3 from oxides; column=Hr
+      page: 15
+      published_page: 11
+      pdf_page_index: 14
+      table: '6'
+      note: row=K2Si2O5 glass; column=S
 - work_id: eed1613738b896c987048f6a206c5429a5737b67b2fc37b7bd64b817429b73d8
   source: data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml
   why: source does not state a numeric total_pressure_Pa
@@ -706944,19 +705494,6 @@ entries:
       table: '4'
 - work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
   source: data/literature/extracts/zigo-1987-gehlenite-fusion.yaml
-  why: regime 'impurity_corrected_solution_calorimetry_at_298_K' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_corrected
-    locator:
-      page: 6
-      pdf_page_index: 5
-      table: '2'
-      equation: '3'
-      note: equation_result=4
-- work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
-  source: data/literature/extracts/zigo-1987-gehlenite-fusion.yaml
   why: regime 'least_squares_fit_to_drop_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -706968,18 +705505,6 @@ entries:
       pdf_page_index: 3
       table: '1'
       equation: '2'
-- work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
-  source: data/literature/extracts/zigo-1987-gehlenite-fusion.yaml
-  why: regime 'solution_calorimetry_at_298_K' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_calorimetry
-    locator:
-      page: 5
-      published_page: 175
-      pdf_page_index: 4
-      table: '2'
 - work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
   source: data/literature/extracts/zigo-1987-gehlenite-fusion.yaml
   why: source T_range_K [1519, 1799]; no midpoint invented
@@ -824810,7 +823335,133 @@ entries:
       note: Average SiO2/Na2O molar ratio by atomic absorption analysis.
 - work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
   source: data/literature/extracts/shornikov-2014-sodium-germanate-melts.yaml
-  why: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number
+  why: No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.
+  axes:
+  - quantity
+  observations:
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1300_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na2Ge4O9; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1400_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na2Ge4O9; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1450_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na2Ge4O9; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1300_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na2GeO3; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1400_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na2GeO3; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1450_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na2GeO3; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1450b_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na2GeO3; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1300_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na4Ge9O20; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1400_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na4Ge9O20; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1450_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na4Ge9O20; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1450b_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na4Ge9O20; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4GeO4_1400_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na4GeO4; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1300_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na6Ge2O7; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1400_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na6Ge2O7; column_header=ΔH_T, kJ/mole
+  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1450_dfH
+    locator:
+      page: 2
+      published_page: 52
+      pdf_page_index: 1
+      table: '1'
+      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+        row_label=Na6Ge2O7; column_header=ΔH_T, kJ/mole
+- work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source: data/literature/extracts/shornikov-2014-sodium-germanate-melts.yaml
+  why: No quantity token represents formation from simple oxides; delta_fH denotes formation from the elements.
   axes:
   - value
   observations:
@@ -825357,132 +824008,6 @@ entries:
   why: missing phase
   axes:
   - phase
-  observations:
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1300_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na2Ge4O9; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1400_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na2Ge4O9; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1450_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na2Ge4O9; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1300_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na2GeO3; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1400_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na2GeO3; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1450_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na2GeO3; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1450b_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na2GeO3; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1300_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na4Ge9O20; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1400_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na4Ge9O20; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1450_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na4Ge9O20; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1450b_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na4Ge9O20; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4GeO4_1400_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na4GeO4; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1300_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na6Ge2O7; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1400_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na6Ge2O7; column_header=ΔH_T, kJ/mole
-  - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1450_dfH
-    locator:
-      page: 2
-      published_page: 52
-      pdf_page_index: 1
-      table: '1'
-      note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
-        row_label=Na6Ge2O7; column_header=ΔH_T, kJ/mole
-- work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
-  source: data/literature/extracts/shornikov-2014-sodium-germanate-melts.yaml
-  why: row type is a curation label, not a statement of the observable
-  axes:
-  - quantity
   observations:
   - observation_id: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1300_dfH
     locator:
