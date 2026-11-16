@@ -243,6 +243,13 @@ def magemin_openmpi_tmpdir(
 
 
 @pytest.fixture(autouse=True)
+def _box_for_test_owned_engine_caches(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Give test-created caches an explicit range without configuring a live cache."""
+    if not os.environ.get("REGOLITH_ENGINE_CACHE") and "REGOLITH_ENGINE_CACHE_BOX" not in os.environ:
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+
+
+@pytest.fixture(autouse=True)
 def _isolate_vapor_payload_cache_between_tests():
     module = sys.modules.get("engines.builtin.foulant_disposition")
     if module is not None:

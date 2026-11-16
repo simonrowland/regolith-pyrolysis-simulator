@@ -89,6 +89,10 @@ _ENGINE_NUMBERS = {
     ), start=1)
 }
 _NATURAL_KEY_LIMIT = 128
+ENGINE_CACHE_BOX_RANGES = {
+    box: (index * 1_000_000_000_000 + 1, (index + 1) * 1_000_000_000_000 + 1)
+    for index, box in enumerate(("laptop", "s1", "s2", "s3", "rpp"))
+}
 _TIMEOUT_MS = 60_000
 _LOCK = threading.RLock()
 _CONNECTIONS: dict[tuple[str, bool], sqlite3.Connection] = {}
@@ -622,6 +626,12 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
             "CREATE TABLE IF NOT EXISTS provenance (id INTEGER PRIMARY KEY, value BLOB NOT NULL UNIQUE)"
         )
         connection.execute(
+            "CREATE TABLE IF NOT EXISTS box_sequences (source_box TEXT PRIMARY KEY, next_seq INTEGER NOT NULL) WITHOUT ROWID"
+        )
+        connection.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS engine_outputs_box_seq ON engine_outputs(source_box, row_seq)"
+        )
+        connection.execute(
             "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
             "ON engine_outputs(engine, chem_version)"
         )
@@ -690,12 +700,15 @@ def _insert_cache_row_if_absent(
         connection.execute("INSERT OR IGNORE INTO provenance(value) VALUES (?)", (provenance,))
         provenance_id = connection.execute("SELECT id FROM provenance WHERE value=?", (provenance,)).fetchone()[0]
     if row_seq is None:
-        row_seq = int(
-            connection.execute(
-                "SELECT COALESCE(MAX(row_seq), 0) + 1 "
-                "FROM engine_outputs WHERE source_box=?",
-                (source_box,),
-            ).fetchone()[0]
+        row_seq = _next_row_seq(connection, source_box)
+    elif source_box in ENGINE_CACHE_BOX_RANGES:
+        first, stop = ENGINE_CACHE_BOX_RANGES[source_box]
+        if not first <= row_seq < stop:
+            raise ValueError(f"row sequence is outside the {source_box!r} range")
+        connection.execute("INSERT OR IGNORE INTO box_sequences VALUES (?,?)", (source_box, first))
+        connection.execute(
+            "UPDATE box_sequences SET next_seq=CASE WHEN next_seq<=? THEN ? ELSE next_seq END WHERE source_box=?",
+            (row_seq, row_seq + 1, source_box),
         )
     connection.execute(
         f"INSERT INTO {_TABLE} "
@@ -712,6 +725,18 @@ def _insert_cache_row_if_absent(
         ),
     )
     return True, False
+
+
+def _next_row_seq(connection: sqlite3.Connection, source_box: str) -> int:
+    first, stop = ENGINE_CACHE_BOX_RANGES[source_box]
+    connection.execute("INSERT OR IGNORE INTO box_sequences VALUES (?,?)", (source_box, first))
+    row = connection.execute(
+        "UPDATE box_sequences SET next_seq=next_seq+1 WHERE source_box=? AND next_seq<? RETURNING next_seq-1",
+        (source_box, stop),
+    ).fetchone()
+    if row is None:
+        raise ValueError(f"row sequence range exhausted for {source_box!r}")
+    return int(row[0])
 
 
 def _read_provenance(connection: sqlite3.Connection, provenance_id: int) -> bytes:
@@ -753,6 +778,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     if mode not in {"", "readonly"}:
         raise ValueError(f"unknown engine cache mode {mode!r}")
     readonly = mode == "readonly"
+    source_box = _cache_environment_setting("REGOLITH_ENGINE_CACHE_BOX", "") or ""
+    if not readonly:
+        if not source_box.strip():
+            raise ValueError("REGOLITH_ENGINE_CACHE_BOX must be set in read-write mode")
+        if source_box not in ENGINE_CACHE_BOX_RANGES:
+            raise ValueError(f"engine cache box {source_box!r} has no configured row range")
     path = Path(path_value).expanduser()
     chem_version = ENGINE_CHEMISTRY_VERSION[engine_id]
     cache_key = engine_cache_key(engine_id, chem_version, request)
@@ -800,7 +831,6 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             name = f"uncacheable:{type(hot).__name__}"
             counts[name] = counts.get(name, 0) + 1
         return hot
-    source_box = _cache_environment_setting("REGOLITH_ENGINE_CACHE_BOX", "") or ""
     try:
         with _LOCK:
             connection.execute("BEGIN IMMEDIATE")

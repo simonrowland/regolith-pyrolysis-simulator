@@ -317,7 +317,7 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         tables = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
-        assert tables == [("engine_outputs",), ("provenance",)]
+        assert tables == [("engine_outputs",), ("provenance",), ("box_sequences",)]
         columns = connection.execute("PRAGMA table_info(engine_outputs)").fetchall()
         assert [column[1] for column in columns] == [
             "key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"
@@ -345,7 +345,7 @@ def test_engine_cache_writes_only_the_hot_database(
         tables = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
-    assert tables == [("engine_outputs",), ("provenance",)]
+    assert tables == [("engine_outputs",), ("provenance",), ("box_sequences",)]
 
 
 def test_schema_mismatch_refuses_without_deleting_rows(
@@ -980,7 +980,7 @@ def test_native_identity_hashes_once_per_process_without_a_stat_pin(
     assert hashes == [binary]
 
 
-def test_local_cache_rows_are_unrecorded_without_an_explicit_box(
+def test_local_cache_rows_require_an_explicit_configured_box(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -989,10 +989,11 @@ def test_local_cache_rows_are_unrecorded_without_an_explicit_box(
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE_BOX", raising=False)
     engine_cache._MEMORY_CACHE.clear()
 
-    engine_cache.cached_engine_call(
-        "openimcc", {"call": "unrecorded-box"}, lambda: {"answer": 42}
-    )
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "studio-box")
+    with pytest.raises(ValueError, match="REGOLITH_ENGINE_CACHE_BOX"):
+        engine_cache.cached_engine_call(
+            "openimcc", {"call": "unrecorded-box"}, lambda: {"answer": 42}
+        )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     engine_cache.cached_engine_call(
         "openimcc", {"call": "recorded-box"}, lambda: {"answer": 43}
     )
@@ -1001,7 +1002,7 @@ def test_local_cache_rows_are_unrecorded_without_an_explicit_box(
         boxes = connection.execute(
             "SELECT source_box FROM engine_outputs ORDER BY key"
         ).fetchall()
-    assert {row[0] for row in boxes} == {"", "studio-box"}
+    assert {row[0] for row in boxes} == {"laptop"}
 
 
 def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
