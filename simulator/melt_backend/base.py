@@ -497,6 +497,39 @@ def equilibrium_cache_value(
         hot.append(metadata)
     return hot
 
+
+_EQUILIBRIUM_COLD_FIELDS = (
+    'system_enthalpy', 'system_entropy', 'system_volume', 'system_heat_capacity_Cp',
+    'system_dVdP', 'system_dVdT', 'system_fO2_delta_QFM',
+    'system_solid_density_rhos', 'system_phi', 'system_chisqr',
+    'chem_potentials', 'phase_affinities', 'phase_thermo',
+    'phase_compositions', 'phase_masses_kg', 'solid_composition_wt_pct',
+    'bulk_composition_wt_pct',
+)
+
+
+def _cold_numbers(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            str(name): numeric for name, item in value.items()
+            if (numeric := _cold_numbers(item)) is not None
+        } or None
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return value if math.isfinite(value) else None
+    return None
+
+
+def equilibrium_to_hot(values: Mapping[str, Any], *, engine_id: str | None = None) -> Any:
+    from simulator.engine_cache_binary import EngineCacheValue
+
+    return EngineCacheValue(
+        equilibrium_cache_value(values, engine_id=engine_id),
+        {
+            name: numeric for name in _EQUILIBRIUM_COLD_FIELDS
+            if (numeric := _cold_numbers(values.get(name))) is not None
+        },
+    )
+
 # More than one oxidation state in silicate melts over the fO2 range these
 # engines are asked to run. The melt-backend contract owns this eligibility
 # rule so scorers and backend calls use the same component test.
@@ -1289,6 +1322,13 @@ class EquilibriumResult:
     def to_engine_cache_value(self, *, engine_id: str | None = None) -> Any:
         """Return the compact scorer-consumed equilibrium payload."""
         return equilibrium_cache_value(vars(self), engine_id=engine_id)
+
+    def to_hot(self, *, engine_id: str | None = None) -> Any:
+        return equilibrium_to_hot(vars(self), engine_id=engine_id)
+
+    @classmethod
+    def from_hot(cls, payload: Any, *, engine_id: str | None = None) -> EquilibriumResult:
+        return cls.from_engine_cache_value(payload, engine_id=engine_id)
 
     @classmethod
     def from_engine_cache_value(

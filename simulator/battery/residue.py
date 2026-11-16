@@ -1393,9 +1393,9 @@ def _make_residue_pressure_model(
                             temperature_K=temperature_K,
                             allow_extrapolation=True,
                             allow_out_of_envelope=True,
-                        ).to_transport(),
+                        ).to_hot(),
                     )
-                    state = OpenImccBridgeResult.from_transport(state_payload)
+                    state = OpenImccBridgeResult.from_hot(state_payload)
                 except ImccNonconvergenceError as exc:
                     raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                 except TimeoutError as exc:
@@ -3864,9 +3864,9 @@ def _predict_sossi_residue_cohort(
                                 temperature_K=temperature_K,
                                 allow_extrapolation=True,
                                 allow_out_of_envelope=True,
-                            ).to_transport(),
+                            ).to_hot(),
                         )
-                        state = OpenImccBridgeResult.from_transport(state_payload)
+                        state = OpenImccBridgeResult.from_hot(state_payload)
                     except ImccNonconvergenceError as exc:
                         raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                     except TimeoutError as exc:

@@ -1383,11 +1383,11 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     monkeypatch.setattr(
         openimcc_bridge,
         "_evaluate_uncached",
-        lambda **_kwargs: SimpleNamespace(to_transport=lambda: {"ok": True}),
+        lambda **_kwargs: SimpleNamespace(to_hot=lambda: {"ok": True}),
     )
     monkeypatch.setattr(
         OpenImccBridgeResult,
-        "from_transport",
+        "from_hot",
         classmethod(lambda _cls, payload: payload),
     )
 

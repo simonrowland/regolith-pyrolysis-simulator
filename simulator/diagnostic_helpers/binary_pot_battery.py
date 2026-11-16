@@ -350,7 +350,7 @@ def _call_cached_backend_equilibrate(
     from simulator.melt_backend.base import (
         EquilibriumResult,
         equilibrium_cache_from_value,
-        equilibrium_cache_value,
+        equilibrium_to_hot,
     )
 
     def solve_cache_value() -> Any:
@@ -358,11 +358,11 @@ def _call_cached_backend_equilibrate(
         if _is_refusal(result):
             return result
         if isinstance(result, EquilibriumResult):
-            return result.to_engine_cache_value(engine_id=handle.name)
+            return result.to_hot(engine_id=handle.name)
         if isinstance(result, SimpleNamespace):
-            return equilibrium_cache_value(vars(result), engine_id=handle.name)
+            return equilibrium_to_hot(vars(result), engine_id=handle.name)
         if isinstance(result, Mapping):
-            return equilibrium_cache_value(result, engine_id=handle.name)
+            return equilibrium_to_hot(result, engine_id=handle.name)
         return result
 
     adapter_settings = engine_cache_settings(
@@ -383,7 +383,7 @@ def _call_cached_backend_equilibrate(
     if isinstance(payload, Mapping):
         if handle.name == "internal-analytical":
             return SimpleNamespace(**payload)
-        return EquilibriumResult.from_engine_cache_value(
+        return EquilibriumResult.from_hot(
             payload, engine_id=handle.name
         )
     return payload
@@ -783,6 +783,18 @@ class EquilibrateCell:
             self.backend_failure_disposition,
         ]
         return [*projection, flags]
+
+    def to_hot(self) -> Any:
+        from simulator.engine_cache_binary import EngineCacheValue, Provenance
+
+        payload = self.to_engine_cache_value()
+        if self.model_id is not None:
+            payload[11][8] = Provenance(self.model_id)
+        return EngineCacheValue(payload)
+
+    @classmethod
+    def from_hot(cls, payload: Any) -> "EquilibrateCell":
+        return cls.from_engine_cache_value(payload)
 
     @classmethod
     def from_engine_cache_value(cls, payload: Any) -> "EquilibrateCell":
@@ -4527,7 +4539,7 @@ class _IsolatedCellWorker:
                     return result
             if self.engine == "internal-analytical":
                 return result
-            return EquilibrateCell.from_payload(result).to_engine_cache_value()
+            return EquilibrateCell.from_payload(result).to_hot()
 
         if self.engine == "internal-analytical":
             result = solve()
@@ -4557,7 +4569,7 @@ class _IsolatedCellWorker:
             )
             result = cached_engine_call(self.engine, request, solve)
         if isinstance(result, list):
-            result = EquilibrateCell.from_engine_cache_value(result).as_payload()
+            result = EquilibrateCell.from_hot(result).as_payload()
         if not isinstance(result, dict):
             raise _IsolatedCellWorkerFailure(
                 detail="isolated worker response was not an object"

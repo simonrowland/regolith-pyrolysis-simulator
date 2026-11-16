@@ -39,6 +39,16 @@ def _engine_cache_counters(*, reset: bool = False):
     return counters(reset=reset)
 
 
+def _stored_hot(path: Path):
+    with sqlite3.connect(path) as connection:
+        row = connection.execute(
+            "SELECT e.value, COALESCE(p.value, X'') FROM engine_outputs e "
+            "LEFT JOIN provenance p ON p.id=e.provenance_id LIMIT 1"
+        ).fetchone()
+    assert row is not None
+    return engine_cache._decode_hot(row[0], row[1])
+
+
 def test_engine_cache_path_scope_overrides_without_mutating_environment(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -307,10 +317,10 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         tables = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
-        assert tables == [("engine_outputs",)]
+        assert tables == [("engine_outputs",), ("provenance",)]
         columns = connection.execute("PRAGMA table_info(engine_outputs)").fetchall()
         assert [column[1] for column in columns] == [
-            "key", "value", "engine", "chem_version", "source_box", "row_seq"
+            "key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"
         ]
         schema = connection.execute(
             "SELECT sql FROM sqlite_master WHERE name='engine_outputs'"
@@ -335,7 +345,7 @@ def test_engine_cache_writes_only_the_hot_database(
         tables = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
-    assert tables == [("engine_outputs",)]
+    assert tables == [("engine_outputs",), ("provenance",)]
 
 
 def test_schema_mismatch_refuses_without_deleting_rows(
@@ -396,20 +406,21 @@ def test_hot_round_trip_preserves_float_hex_exactly(
         assert tuple(result[str(index)].hex() for index in range(len(pins))) == pins
 
 
-def test_engine_cache_json_matches_shared_canonical_encoder() -> None:
-    from simulator.canonical import canonical_json_dumps
+def test_engine_cache_binary_matches_shared_canonical_encoder() -> None:
+    from simulator.engine_cache_binary import pack
 
     values = (
         ["openimcc", 1, {"temperature_K": 1700.0000000000002}],
         {"nested": {"z": (1, 2.5), "a": "café"}, "flag": True},
     )
     for value in values:
-        cache_bytes = engine_cache._canonical_json_dumps(value).encode("utf-8")
-        canonical_bytes = canonical_json_dumps(value).encode("utf-8")
-        assert cache_bytes == canonical_bytes
+        cache_bytes, provenance = engine_cache._encode_hot(value)
+        assert cache_bytes == pack(value)
+        assert not provenance
+        assert engine_cache._decode_hot(cache_bytes) == value
 
 
-def test_raw_key_hot_json_compression_and_exact_round_trip(
+def test_raw_key_hot_binary_and_exact_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -437,7 +448,7 @@ def test_raw_key_hot_json_compression_and_exact_round_trip(
             "FROM engine_outputs"
         ).fetchone()
     assert row[0] == digest
-    assert json.loads(zlib.decompress(row[1])) == {
+    assert _stored_hot(database) == {
         "activity": 0.12345678901234566,
         "status": "ok",
     }
@@ -493,7 +504,7 @@ def test_memory_hit_does_not_compute_runtime_identity(
     ) == {"ok": 1}
 
 
-def test_recursive_simple_namespace_hot_value_round_trips_without_projection(
+def test_recursive_simple_namespace_is_an_uncacheable_shape_without_projection(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -519,7 +530,7 @@ def test_recursive_simple_namespace_hot_value_round_trips_without_projection(
     warm = engine_cache.cached_engine_call(
         "openimcc",
         {"call": "generic namespace"},
-        lambda: pytest.fail("expected recursive namespace cache hit"),
+        lambda: expected,
     )
 
     assert cold == expected
@@ -527,12 +538,13 @@ def test_recursive_simple_namespace_hot_value_round_trips_without_projection(
     assert isinstance(warm, SimpleNamespace)
     assert isinstance(warm.diagnostics, SimpleNamespace)
     assert _engine_cache_counters(reset=True)["openimcc"] == {
-        "hits": 1,
-        "misses": 1,
-        "stores": 1,
+        "hits": 0,
+        "misses": 2,
+        "stores": 0,
         "store_error": 0,
         "read_error": 0,
         "conflicts": 0,
+        "uncacheable:SimpleNamespace": 2,
     }
 
 
@@ -1091,7 +1103,8 @@ def test_mapping_equilibrium_result_uses_compact_projection(
         stored = connection.execute(
             "SELECT value FROM engine_outputs"
         ).fetchone()[0]
-    assert isinstance(json.loads(zlib.decompress(stored)), list)
+    assert isinstance(_stored_hot(database), list)
+    assert isinstance(stored, bytes)
     assert cold.activity_coefficients == warm.activity_coefficients == {"FeO": 0.75}
     assert cold.diagnostics == warm.diagnostics == {
         "backend_status_reason": "unused diagnostic prose"
@@ -1170,10 +1183,8 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
 
     with sqlite3.connect(database) as connection:
         hot_value = connection.execute("SELECT value FROM engine_outputs").fetchone()[0]
-    hot_json = zlib.decompress(hot_value)
-    assert isinstance(json.loads(hot_json), list)
-    assert len(hot_value) <= 400
-    assert "verbose engine diagnostic" not in hot_json.decode("ascii")
+    assert isinstance(_stored_hot(database), list)
+    assert b"verbose engine diagnostic" not in hot_value
     assert cold["pot_id"] == warm["pot_id"] == "caller-pot"
     assert cold["melt_activities"] == warm["melt_activities"] == {"SiO2": 0.5}
     assert cold["gas_partial_pressures_Pa"] == warm["gas_partial_pressures_Pa"] == {
@@ -1250,7 +1261,7 @@ def test_equilibrium_cache_value_contains_only_scoring_inputs() -> None:
     assert restored.phase_masses_kg == {}
 
 
-def test_openimcc_hot_json_compresses_to_400_bytes() -> None:
+def test_openimcc_hot_binary_preserves_all_pressure_values() -> None:
     result = EquilibriumResult(
         liquid_fraction=1.0,
         activity_coefficients={
@@ -1304,9 +1315,11 @@ def test_openimcc_hot_json_compresses_to_400_bytes() -> None:
     }
 
     hot = result.to_engine_cache_value()
-    raw = json.dumps(hot, separators=(",", ":"), ensure_ascii=True).encode("ascii")
-
-    assert len(zlib.compress(raw, level=6)) <= 400
+    raw, provenance = engine_cache._encode_hot(hot)
+    restored = EquilibriumResult.from_hot(engine_cache._decode_hot(raw, provenance))
+    assert {name: value.hex() for name, value in restored.vapor_pressures_Pa.items()} == {
+        name: value.hex() for name, value in result.vapor_pressures_Pa.items()
+    }
 
 
 def test_bulk_loader_is_idempotent_and_chemistry_version_can_be_dropped(
@@ -1348,7 +1361,7 @@ def test_bulk_loader_counts_conflicts_without_replacing_existing_bytes(
         stored = connection.execute(
             "SELECT value FROM engine_outputs WHERE key=?", (digest,)
         ).fetchone()[0]
-    assert json.loads(zlib.decompress(stored)) == {"answer": "first"}
+    assert engine_cache._decode_hot(stored) == {"answer": "first"}
 
 
 def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
@@ -1503,20 +1516,14 @@ def test_concurrent_cache_writer_counts_different_bytes_without_replacing(
 
     def solve() -> dict[str, str]:
         connection = engine_cache._CONNECTIONS[(str(database), False)]
-        existing_json = json.dumps(
-            {"answer": "existing"},
-            sort_keys=True,
-            separators=(",", ":"),
-            ensure_ascii=True,
-            allow_nan=False,
-        ).encode("ascii")
+        existing_value, _provenance = engine_cache._encode_hot({"answer": "existing"})
         connection.execute(
             "INSERT INTO engine_outputs "
             "(key, value, engine, chem_version, source_box, row_seq) "
             "VALUES (?, ?, ?, ?, ?, ?)",
             (
                 digest,
-                sqlite3.Binary(zlib.compress(existing_json, level=6)),
+                sqlite3.Binary(existing_value),
                 "openimcc",
                 "1",
                 "existing-box",
@@ -1541,7 +1548,7 @@ def test_concurrent_cache_writer_counts_different_bytes_without_replacing(
         stored = connection.execute(
             "SELECT value FROM engine_outputs WHERE key=?", (digest,)
         ).fetchone()[0]
-    assert json.loads(zlib.decompress(stored)) == {"answer": "existing"}
+    assert engine_cache._decode_hot(stored) == {"answer": "existing"}
 
 
 def test_store_encoding_failure_returns_live_value_and_counts_error(
@@ -1564,9 +1571,10 @@ def test_store_encoding_failure_returns_live_value_and_counts_error(
         "hits": 0,
         "misses": 1,
         "stores": 0,
-        "store_error": 1,
+        "store_error": 0,
         "read_error": 0,
         "conflicts": 0,
+        "uncacheable:object": 1,
     }
     with sqlite3.connect(database) as connection:
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0

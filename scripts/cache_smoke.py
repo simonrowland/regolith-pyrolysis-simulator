@@ -174,12 +174,20 @@ def _cache_storage_report(path: Path) -> list[str]:
         return []
     with sqlite3.connect(path) as connection:
         rows = connection.execute(
-            "SELECT engine, length(value) FROM engine_outputs"
+            "SELECT engine, key, length(value) FROM engine_outputs"
         ).fetchall()
 
+    cold_path = Path(str(path) + ".cold")
+    cold_sizes = {}
+    if cold_path.exists():
+        with sqlite3.connect(cold_path) as connection:
+            cold_sizes = dict(connection.execute("SELECT key,length(value) FROM engine_values"))
+
     sizes: dict[str, list[int]] = {}
-    for engine, hot_bytes in rows:
+    cold_by_engine: dict[str, list[int]] = {}
+    for engine, key, hot_bytes in rows:
         sizes.setdefault(str(engine), []).append(int(hot_bytes))
+        cold_by_engine.setdefault(str(engine), []).append(int(cold_sizes.get(key, 0)))
     report = []
     for engine in ENGINE_ORDER:
         values = sizes.get(engine.value, [])
@@ -187,11 +195,16 @@ def _cache_storage_report(path: Path) -> list[str]:
             report.append(f"cache-size {engine.value}=rows:0")
             continue
         hot = sorted(values)
+        cold = sorted(cold_by_engine[engine.value])
         p95_index = (95 * len(values) + 99) // 100 - 1
         report.append(
             f"cache-size {engine.value}=rows:{len(values)}"
             f"/hot_value_mean_B:{sum(hot) / len(hot):.1f}"
             f"/hot_value_p95_B:{hot[p95_index]}"
+            f"/hot_value_max_B:{max(hot)}"
+            f"/cold_value_mean_B:{sum(cold) / len(cold):.1f}"
+            f"/cold_value_p95_B:{cold[p95_index]}"
+            f"/cold_value_max_B:{max(cold)}"
         )
     file_bytes = sum(
         candidate.stat().st_size
@@ -203,11 +216,16 @@ def _cache_storage_report(path: Path) -> list[str]:
         if candidate.exists()
     )
     if rows:
-        mean_hot_row = sum(int(row[1]) + 32 for row in rows) / len(rows)
+        mean_hot_row = sum(len(row[1]) + int(row[2]) for row in rows) / len(rows)
+        mean_cold_row = sum(cold_sizes.get(row[1], 0) for row in rows) / len(rows)
         report.append(
             f"cache-size observed_hot_payload_projection_B="
             f"1M:{mean_hot_row * 1_000_000:.0f}"
             f"/10M:{mean_hot_row * 10_000_000:.0f}"
+            f"/100M:{mean_hot_row * 100_000_000:.0f}"
+            f" cold_value_projection_B=1M:{mean_cold_row * 1_000_000:.0f}"
+            f"/10M:{mean_cold_row * 10_000_000:.0f}"
+            f"/100M:{mean_cold_row * 100_000_000:.0f}"
             f" observed_file_bytes:{file_bytes}"
         )
     return report

@@ -25,11 +25,10 @@ from contextvars import ContextVar
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Any, cast
 from urllib.parse import quote
 
-from simulator.engine_cache_binary import pack
+from simulator.engine_cache_binary import EngineCacheValue, live_hot, pack, pack_hot, unpack_hot
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
@@ -194,15 +193,6 @@ class EngineCacheSettingsError(ValueError):
             f"fields {self.missing_fields!r}; pass normalize_engine_settings(...) "
             "output"
         )
-
-
-def _canonical_json_dumps(value: Any) -> str:
-    return json.dumps(
-        value,
-        allow_nan=False,
-        separators=(",", ":"),
-        sort_keys=True,
-    )
 
 
 def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> bytes:
@@ -528,40 +518,12 @@ def engine_cache_runtime_identities(*, reset: bool = False) -> dict[str, str]:
     return identities
 
 
-_NAMESPACE_TAG = "__engine_cache_simple_namespace__"
-_TUPLE_TAG = "__engine_cache_tuple__"
+def _encode_hot(value: Any) -> tuple[bytes, bytes]:
+    return pack_hot(value)
 
 
-def _encode_hot(value: Any) -> Any:
-    if isinstance(value, SimpleNamespace):
-        return {
-            _NAMESPACE_TAG: {
-                key: _encode_hot(item) for key, item in vars(value).items()
-            }
-        }
-    if isinstance(value, Mapping):
-        return {str(key): _encode_hot(item) for key, item in value.items()}
-    if isinstance(value, tuple):
-        return {_TUPLE_TAG: [_encode_hot(item) for item in value]}
-    if isinstance(value, list):
-        return [_encode_hot(item) for item in value]
-    return value
-
-
-def _decode_hot(value: Any) -> Any:
-    if isinstance(value, dict):
-        fields = value.get(_NAMESPACE_TAG)
-        if isinstance(fields, dict) and len(value) == 1:
-            return SimpleNamespace(
-                **{key: _decode_hot(item) for key, item in fields.items()}
-            )
-        items = value.get(_TUPLE_TAG)
-        if isinstance(items, list) and len(value) == 1:
-            return tuple(_decode_hot(item) for item in items)
-        return {key: _decode_hot(item) for key, item in value.items()}
-    if isinstance(value, list):
-        return [_decode_hot(item) for item in value]
-    return value
+def _decode_hot(value: bytes, provenance: bytes = b"") -> Any:
+    return unpack_hot(value, provenance)
 
 
 def _close_connections() -> None:
@@ -635,7 +597,7 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
                     raise
                 time.sleep(0.01)
     table = _TABLE
-    expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq"]
+    expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
     columns = connection.execute(f"PRAGMA table_info({table})").fetchall()
     found = [row[1] for row in columns]
     if columns and found != expected:
@@ -653,7 +615,10 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
             f"CREATE TABLE IF NOT EXISTS {table} "
             "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
             "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
-            "row_seq INTEGER NOT NULL) WITHOUT ROWID"
+            "row_seq INTEGER NOT NULL, provenance_id INTEGER NOT NULL DEFAULT 0) WITHOUT ROWID"
+        )
+        connection.execute(
+            "CREATE TABLE IF NOT EXISTS provenance (id INTEGER PRIMARY KEY, value BLOB NOT NULL UNIQUE)"
         )
         connection.execute(
             "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
@@ -709,13 +674,20 @@ def _insert_cache_row_if_absent(
     chem_version: str,
     source_box: str,
     row_seq: int | None = None,
+    *,
+    provenance: bytes = b"",
 ) -> tuple[bool, bool]:
     """Insert one output only when absent; report whether existing bytes conflict."""
     row = connection.execute(
-        f"SELECT value FROM {_TABLE} WHERE key=?", (digest,)
+        f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (digest,)
     ).fetchone()
     if row is not None:
-        return False, bytes(row[0]) != bytes(value)
+        existing_provenance = _read_provenance(connection, row[1])
+        return False, bytes(row[0]) != bytes(value) or existing_provenance != provenance
+    provenance_id = 0
+    if provenance:
+        connection.execute("INSERT OR IGNORE INTO provenance(value) VALUES (?)", (provenance,))
+        provenance_id = connection.execute("SELECT id FROM provenance WHERE value=?", (provenance,)).fetchone()[0]
     if row_seq is None:
         row_seq = int(
             connection.execute(
@@ -726,8 +698,8 @@ def _insert_cache_row_if_absent(
         )
     connection.execute(
         f"INSERT INTO {_TABLE} "
-        "(key, value, engine, chem_version, source_box, row_seq) "
-        "VALUES (?, ?, ?, ?, ?, ?)",
+        "(key, value, engine, chem_version, source_box, row_seq, provenance_id) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
         (
             digest,
             sqlite3.Binary(value),
@@ -735,9 +707,35 @@ def _insert_cache_row_if_absent(
             chem_version,
             source_box,
             row_seq,
+            provenance_id,
         ),
     )
     return True, False
+
+
+def _read_provenance(connection: sqlite3.Connection, provenance_id: int) -> bytes:
+    if not provenance_id:
+        return b""
+    row = connection.execute("SELECT value FROM provenance WHERE id=?", (provenance_id,)).fetchone()
+    if row is None:
+        raise ValueError("missing cache provenance")
+    return bytes(row[0])
+
+
+def _store_cold(path: Path, key: bytes, values: Mapping[str, Any]) -> None:
+    if not values:
+        return
+    cold_path = str(path) + ".cold"
+    connection_key = (cold_path, False)
+    connection = _CONNECTIONS.get(connection_key)
+    if connection is None:
+        connection = sqlite3.connect(cold_path, timeout=_TIMEOUT_MS / 1000, check_same_thread=False)
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("CREATE TABLE IF NOT EXISTS engine_values (key BLOB PRIMARY KEY, value BLOB NOT NULL) WITHOUT ROWID")
+        _CONNECTIONS[connection_key] = connection
+    value = zlib.compress(pack(values), level=6)
+    connection.execute("INSERT OR IGNORE INTO engine_values VALUES (?,?)", (key, value))
+    connection.commit()
 
 
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
@@ -746,10 +744,10 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         # direct cache-helper caller must execute the live solve.
         return solve()
     if _CACHE_BYPASSED.get():
-        return solve()
+        return live_hot(solve())
     path_value = _configured_engine_cache_path()
     if not path_value:
-        return solve()
+        return live_hot(solve())
     mode = (_cache_environment_setting("REGOLITH_ENGINE_CACHE_MODE", "") or "").lower()
     if mode not in {"", "readonly"}:
         raise ValueError(f"unknown engine cache mode {mode!r}")
@@ -770,12 +768,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     connection = _connect(path, readonly=readonly)
     with _LOCK:
         row = None if connection is None else connection.execute(
-            f"SELECT value FROM {_TABLE} WHERE key=?", (cache_key,)
+            f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (cache_key,)
         ).fetchone()
         if row is not None:
             try:
-                result = _decode_hot(json.loads(zlib.decompress(row[0])))
-            except (TypeError, UnicodeDecodeError, json.JSONDecodeError, zlib.error):
+                result = _decode_hot(row[0], _read_provenance(connection, row[1]))
+            except (TypeError, ValueError, UnicodeDecodeError):
                 counts["read_error"] += 1
                 row = None
             else:
@@ -784,18 +782,22 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 return result
         counts["misses"] += 1
 
-    hot = solve()
+    solved = solve()
+    hot = live_hot(solved)
     if _is_refusal(hot) or readonly or connection is None:
         return hot
     try:
-        stored_hot = _encode_hot(hot)
-        hot_value = zlib.compress(
-            _canonical_json_dumps(stored_hot).encode("ascii"),
-            level=6,
-        )
-    except Exception:
+        if not isinstance(solved, EngineCacheValue) and (
+            isinstance(hot, Mapping) and any(isinstance(item, (Mapping, list, tuple)) for item in hot.values())
+            or isinstance(hot, (list, tuple))
+        ):
+            raise TypeError("result has no declared HOT projection")
+        hot_value, provenance = _encode_hot(solved.hot if isinstance(solved, EngineCacheValue) else solved)
+    except (TypeError, ValueError):
         with _LOCK:
-            _counter_bucket(engine_id)["store_error"] += 1
+            counts = _counter_bucket(engine_id)
+            name = f"uncacheable:{type(hot).__name__}"
+            counts[name] = counts.get(name, 0) + 1
         return hot
     source_box = _cache_environment_setting("REGOLITH_ENGINE_CACHE_BOX", "") or ""
     try:
@@ -808,8 +810,11 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 engine_id,
                 str(chem_version),
                 source_box,
+                provenance=provenance,
             )
             connection.commit()
+            if inserted and isinstance(solved, EngineCacheValue):
+                _store_cold(path, cache_key, solved.cold)
             counts = _counter_bucket(engine_id)
             if inserted:
                 counts["stores"] += 1
@@ -851,27 +856,25 @@ def load_cache_rows(
             raise ValueError("cache keys must be natural packed keys or 16-byte request digests")
         if engine not in ENGINE_CHEMISTRY_VERSION:
             raise ValueError(f"unknown engine {engine!r}")
+        payload = hot.hot if isinstance(hot, EngineCacheValue) else hot
+        encoded, provenance = _encode_hot(payload)
         values.append(
             (
                 digest,
-                sqlite3.Binary(
-                    zlib.compress(
-                        _canonical_json_dumps(hot).encode("ascii"),
-                        level=6,
-                    )
-                ),
+                encoded,
                 engine,
                 str(version),
                 source_box,
                 int(row_seq),
+                provenance,
             )
         )
-    before = connection.total_changes
+    inserted_count = 0
     conflicts: dict[str, int] = {}
     connection.execute("BEGIN IMMEDIATE")
     try:
-        for digest, value, engine, version, source_box, row_seq in values:
-            _, conflict = _insert_cache_row_if_absent(
+        for digest, value, engine, version, source_box, row_seq, provenance in values:
+            inserted, conflict = _insert_cache_row_if_absent(
                 connection,
                 digest,
                 value,
@@ -879,7 +882,9 @@ def load_cache_rows(
                 version,
                 source_box,
                 row_seq,
+                provenance=provenance,
             )
+            inserted_count += int(inserted)
             if conflict:
                 conflicts[engine] = conflicts.get(engine, 0) + 1
         connection.commit()
@@ -890,7 +895,7 @@ def load_cache_rows(
         _record_engine_cache_counters(
             {engine: {"conflicts": count} for engine, count in conflicts.items()}
         )
-    return connection.total_changes - before
+    return inserted_count
 
 
 def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:

@@ -208,7 +208,7 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
         return {species: 1.0e-6 for species in selected}
 
     def isolated(_evaluate, **_kwargs):
-        return SimpleNamespace(to_transport=lambda: {"fixture": True})
+        return SimpleNamespace(to_hot=lambda: {"fixture": True})
 
     def no_evaporation(inventory, *_args, **_kwargs):
         return SimpleNamespace(
@@ -222,7 +222,7 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
     monkeypatch.setattr(openimcc, "evaluate_gas", evaluate_gas)
     monkeypatch.setattr(
         OpenImccBridgeResult,
-        "from_transport",
+        "from_hot",
         classmethod(lambda _cls, _payload: state),
     )
     monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
