@@ -3222,15 +3222,17 @@ def test_qualification_inline_adapter_gate_is_gate_refused_in_adapter() -> None:
     assert "fe_free" in (cell.engine_reason or "")
 
 
-def test_classify_subprocess_died_is_engine_crash() -> None:
+@pytest.mark.parametrize(
+    "reason_code",
+    ("subprocess_died", "magemin_engine_worker_died"),
+)
+def test_classify_worker_process_death_is_engine_crash(reason_code: str) -> None:
     status, reason, engine_reason = classify_equilibrate_outcome(
         SimpleNamespace(
             status="out_of_domain",
             diagnostics={
-                "backend_status_reason": "subprocess_died",
-                "backend_failure_reason_code": "subprocess_died",
-                "backend_failure_category": "engine_crash",
-                "subprocess_failure": {"returncode": -6, "signal": "SIGABRT"},
+                "backend_status_reason": reason_code,
+                "backend_failure_reason_code": reason_code,
             },
             warnings=["AlphaMELTS subprocess exited before producing a result"],
             activity_coefficients={},

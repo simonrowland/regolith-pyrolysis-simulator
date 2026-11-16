@@ -403,7 +403,7 @@ _MAGEMIN_FAILURE_REASON_BY_EXCEPTION = {
     'MAGEMinSubprocessSlotUnavailable': 'magemin_subprocess_slot_unavailable',
     # Existing gate and battery readers classify on the ``timeout`` token.
     'MAGEMinAggregateBudgetExceeded': 'magemin_aggregate_budget_timeout',
-    'EngineWorkerDied': 'engine_crash',
+    'EngineWorkerDied': 'magemin_engine_worker_died',
     'EngineWorkerPoolLifecycleError': (
         'magemin_engine_worker_unavailable'
     ),

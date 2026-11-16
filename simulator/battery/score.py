@@ -10389,6 +10389,7 @@ _MAGEMIN_WORKER_LIFECYCLE_REASONS = frozenset({
     "magemin_subprocess_slot_unavailable",
     "magemin_aggregate_budget_timeout",
     "magemin_engine_worker_unavailable",
+    "magemin_engine_worker_died",
 })
 
 
@@ -10403,8 +10404,6 @@ def _engine_worker_lifecycle_failure(
         if isinstance(diagnostics, Mapping)
         else None
     )
-    if failure not in _ENGINE_WORKER_LIFECYCLE_FAILURES:
-        failure = getattr(result, "backend_failure_exception", None)
     if failure in _ENGINE_WORKER_LIFECYCLE_FAILURES:
         return {"backend_failure_exception": failure}
 
@@ -14589,7 +14588,11 @@ def _predict_with_engine(
                 "imcc_sp_extension_required",
             )
         )
-        if typed in {REFUSAL_ENGINE_CRASH, "subprocess_died"} or getattr(cell, "exit_signal", None):
+        if typed in {
+            REFUSAL_ENGINE_CRASH,
+            "magemin_engine_worker_died",
+            "subprocess_died",
+        } or getattr(cell, "exit_signal", None):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,

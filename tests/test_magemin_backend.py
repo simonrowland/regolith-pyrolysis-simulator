@@ -1116,7 +1116,9 @@ def test_magemin_worker_exit_returns_typed_not_converged():
 
     assert result.status == 'not_converged'
     assert result.diagnostics['backend_status'] == result.status
-    assert result.diagnostics['backend_status_reason'] == 'engine_crash'
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_engine_worker_died'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'EngineWorkerDied'
     )
@@ -1333,7 +1335,7 @@ _MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS = (
         'not_converged',
         'magemin_aggregate_budget_timeout',
     ),
-    ('worker_died', 'not_converged', 'engine_crash'),
+    ('worker_died', 'not_converged', 'magemin_engine_worker_died'),
     (
         'worker_pool_lifecycle',
         'not_converged',
@@ -1603,6 +1605,7 @@ def test_public_magemin_equilibrate_normalizes_bare_failure_result(monkeypatch):
         ('magemin_aggregate_budget_timeout', 'engine_timeout', True),
         ('magemin_untyped_failure', 'diagnostic_gap', False),
         ('engine_crash', 'engine_crash', False),
+        ('magemin_engine_worker_died', 'engine_crash', False),
         ('magemin_engine_worker_unavailable', 'unavailable', False),
     ),
 )

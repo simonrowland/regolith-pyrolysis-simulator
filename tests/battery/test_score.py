@@ -16506,6 +16506,10 @@ def test_magemin_native_activity_failure_keeps_typed_cause(
             "magemin_engine_worker_unavailable",
             "engine_transport_error:magemin",
         ),
+        (
+            "magemin_engine_worker_died",
+            "engine_transport_error:magemin",
+        ),
         ("magemin_subprocess_timeout", "engine_timeout"),
     ),
 )
@@ -16589,7 +16593,10 @@ def test_magemin_bridge_runtime_error_stays_engine_defect_in_score(
     from simulator.battery.generators import bench as bench_module
     from simulator.battery.score import predict_with_engine
     from simulator.diagnostic_helpers import binary_pot_battery
-    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
     from simulator.melt_backend.magemin import MAGEMinBackend
 
     def bridge_failure(**_kwargs):
@@ -16667,10 +16674,34 @@ def test_magemin_bridge_runtime_error_stays_engine_defect_in_score(
     assert results[0].status == "not_converged"
     assert results[0].diagnostics["backend_status_reason"] == "engine_crash"
     assert results[0].diagnostics["backend_failure_exception"] == "RuntimeError"
-    assert cells[0].backend_failure_exception == "RuntimeError"
+    assert cells[0].engine_reason == "engine_crash"
     assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_detail["reason"] == "engine_not_converged"
     assert prediction.refusal_detail["engine_reason"] == "engine_crash"
+
+    replayed_cell = EquilibrateCell.from_payload(cells[0].as_payload())
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: replayed_cell,
+    )
+    replayed_prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={
+            "magemin": EngineHandle(
+                "magemin", backend, True, None, False, False
+            )
+        },
+        experiment=experiment,
+        isolated=False,
+    )
+    assert replayed_prediction.refusal_detail["reason"] == "engine_not_converged"
+    assert replayed_prediction.refusal_detail["engine_reason"] == "engine_crash"
+    assert replayed_prediction.refusal_detail["reason"] == (
+        prediction.refusal_detail["reason"]
+    )
+    assert replayed_prediction.refusal_reason is prediction.refusal_reason
 
 
 def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
@@ -16683,7 +16714,10 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
 
     from simulator.battery.generators import bench as bench_module
     from simulator.diagnostic_helpers import binary_pot_battery
-    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
     from simulator.engine_pool import EngineWorkerDied
     from simulator.melt_backend.magemin import MAGEMinBackend
 
@@ -16777,10 +16811,13 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
 
     assert len(results) == len(cells) == 1
     assert results[0].status == "not_converged"
+    assert results[0].diagnostics["backend_status_reason"] == (
+        "magemin_engine_worker_died"
+    )
     assert (
         results[0].diagnostics["backend_failure_exception"] == "EngineWorkerDied"
     )
-    assert cells[0].backend_failure_exception == "EngineWorkerDied"
+    assert cells[0].engine_reason == "magemin_engine_worker_died"
     assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
     assert (
         prediction.refusal_detail["reason"] == "engine_transport_error:magemin"
@@ -16793,6 +16830,27 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
         residual.refusal.detail["reason"] == "engine_transport_error:magemin"
     )
     assert not residual.score_eligible
+
+    replayed_cell = EquilibrateCell.from_payload(cells[0].as_payload())
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: replayed_cell,
+    )
+    replayed_prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+    assert replayed_prediction.refusal_detail["reason"] == (
+        "engine_transport_error:magemin"
+    )
+    assert replayed_prediction.refusal_detail["reason"] == (
+        prediction.refusal_detail["reason"]
+    )
+    assert replayed_prediction.refusal_reason is prediction.refusal_reason
 
 
 def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
