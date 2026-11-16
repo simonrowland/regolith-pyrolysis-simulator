@@ -22,11 +22,12 @@ Ambiguity resolutions:
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal, localcontext
 from enum import StrEnum
 from fractions import Fraction
-from typing import Any, Generic, Mapping, TypeVar
+from typing import Any, Generic, TypeVar
 
 from simulator.battery.enums import (
     AdmissionStatus,

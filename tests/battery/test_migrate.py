@@ -9628,6 +9628,71 @@ def test_residue_point_condition_values_keep_their_printed_types() -> None:
     assert condition.state.value == nominal_pressure
 
 
+def test_mapping_runtime_checks_accept_mapping_proxy_inputs() -> None:
+    from types import MappingProxyType
+
+    from simulator.battery.migrate import _point_condition_from_plain
+    from simulator.battery.records import nominal_pressure_pa
+    from simulator.battery.validate import _index_unique
+
+    condition = _point_condition_from_plain(
+        MappingProxyType(
+            {"state": MappingProxyType({"tag": "value", "value": "held"})}
+        ),
+        key="quench_state",
+    )
+    assert condition.state.is_value
+    assert condition.state.value == "held"
+
+    assert nominal_pressure_pa(
+        MappingProxyType({"tag": "value", "value": "100000"})
+    ) == Decimal("100000")
+
+    sentinel = object()
+    assert _index_unique(
+        MappingProxyType({"row": sentinel}), "id", "row", []
+    ) == {"row": sentinel}
+
+
+def test_point_condition_reserved_scalar_reason_is_pinned() -> None:
+    from simulator.battery.migrate import _point_condition_from_plain
+
+    condition = _point_condition_from_plain(
+        {"state": Decimal("2")}, key="printed_composition"
+    )
+
+    assert condition.state.is_unknown
+    assert condition.state.reason == (
+        "composition map has a scalar value under reserved key 'state'"
+    )
+
+
+def test_as_printed_provenance_echo_conversion_is_pinned() -> None:
+    from simulator.battery.migrate import _is_as_printed_provenance_echo
+
+    class EchoName:
+        def __str__(self) -> str:
+            return "value_as_printed"
+
+    assert _is_as_printed_provenance_echo("value_as_printed")
+    assert not _is_as_printed_provenance_echo("value_as_digitized")
+    assert _is_as_printed_provenance_echo(EchoName())
+
+
+def test_observation_point_condition_mapping_order_is_pinned() -> None:
+    observation = F.observation(
+        "point-condition-order",
+        "point-condition-order-experiment",
+        F.pref_identity(),
+        Decimal("1"),
+    )
+
+    decoded = observation_from_plain(to_plain(observation))
+
+    assert tuple(decoded.point_conditions) == tuple(observation.point_conditions)
+    assert decoded.point_conditions == observation.point_conditions
+
+
 def test_j01_declared_quantity_refuses_area_normalized_rate_without_area() -> None:
     selection = select_declared_source(
         Quantity.EVAPORATION_RATE,
