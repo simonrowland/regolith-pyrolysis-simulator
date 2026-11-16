@@ -8531,6 +8531,29 @@ def _call_ranker(
 
 
 @pytest.mark.parametrize("ranker", _RANKER_NAMES)
+@pytest.mark.parametrize("unpriced", (False, True))
+def test_furnace_homogeneous_population_numeric_pin(ranker, unpriced):
+    """Pre-d-429 pins: identical physical points, penalties one and three."""
+    summaries = [
+        {
+            "furnace_amortization_status": "batch_cost_unavailable" if unpriced else "available",
+            "furnace_amortization_batch_cost_equivalents": None if unpriced else penalty,
+            "lifespan_cost_status": "wall_deposit_unavailable" if unpriced else "available",
+        }
+        for penalty in (1.0, 3.0)
+    ]
+    scores = [_call_ranker(ranker, _ranker_scored(True, summary)) for summary in summaries]
+    # Exact binary values from the shipped transform: 10/2, 10/4;
+    # minimize energy 1 costs 2 and 4. Unpriced points retain 10 and 1.
+    expected = [(10.0, -1.0), (10.0, -1.0)] if unpriced else [(5.0, -2.0), (2.5, -4.0)]
+    if ranker == "bayesian":
+        expected = [(oxygen, -energy) for oxygen, energy in expected]
+    assert scores == expected
+    native = [(row[0], -row[1] if ranker == "bayesian" else row[1]) for row in scores]
+    assert sorted(range(2), key=lambda index: tuple(-v for v in native[index])) == [0, 1]
+
+
+@pytest.mark.parametrize("ranker", _RANKER_NAMES)
 @pytest.mark.parametrize("lifespan_status", ["threshold_unavailable", "wall_deposit_unavailable"])
 def test_unpriced_lifespan_keeps_other_objectives_rankable(ranker, lifespan_status):
     summary = {
