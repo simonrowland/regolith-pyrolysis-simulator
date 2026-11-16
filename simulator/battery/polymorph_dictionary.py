@@ -212,6 +212,7 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "gibbsite": Polymorph.GIBBSITE,
     "kaolinite": Polymorph.KAOLINITE,
     "pyrophyllite": Polymorph.PYROPHYLLITE,
+    "pibopbillitb": Polymorph.PYROPHYLLITE,
     "aragonite": Polymorph.ARAGONITE,
     "low kaliophillite": Polymorph.KALIOPHILLITE_LOW,
     "kaliophillite low": Polymorph.KALIOPHILLITE_LOW,

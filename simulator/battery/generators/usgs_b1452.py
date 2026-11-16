@@ -132,7 +132,47 @@ _SULFUR_PHASE_TEXT_CORRECTIONS = (
     ("O~tho~hombic", "Orthorhombic"),
     ("c~ystals", "crystals"),
 )
-B1452_PHASE_TEXT_CORRECTIONS = {
+_NITER_PHASE_TEXT_CORRECTIONS = (
+    ("Bhoabohedral", "Rhombohedral"),
+    ("~rystals", "crystals"),
+    ("1101", "401"),
+    ("Liqlli.d", "Liquid"),
+)
+B1452_SOURCE_TEXT_CORRECTIONS = {
+    # Physical PDF p. 36 / folio 30 prints liquid silver from 1234 to 1800 K.
+    f"{SOURCE_ID}-0004-phase-02": (("LiqYid", "Liquid"),),
+    # Physical PDF p. 40 / folio 34 prints liquid gold from 1336.15 to 1800 K.
+    f"{SOURCE_ID}-0008-phase-02": (("LiquJ.d", "Liquid"),),
+    # Physical PDF p. 74 / folio 68 prints liquid lanthanum from 1193 to 1800 K.
+    f"{SOURCE_ID}-0042-phase-04": (("Liguid", "Liquid"),),
+    # Physical PDF p. 78 / folio 72 prints alpha-Mn through 980 K and beta-Mn to 1360 K.
+    f"{SOURCE_ID}-0046": (("98(J", "980"),),
+    f"{SOURCE_ID}-0046-phase-02": (("13&u", "1360"),),
+    # Physical PDF p. 89 / folio 83 prints liquid lead from 600.6 K.
+    f"{SOURCE_ID}-0057-phase-02": (("Liguid", "Liquid"),),
+    # Physical PDF p. 120 / folio 114 prints liquid yttrium from 1799 K.
+    f"{SOURCE_ID}-0088-phase-03": (("Liqu1.d", "Liquid"),),
+    # Physical PDF p. 213 / folio 207 prints liquid lead monoxide from 1170 K.
+    f"{SOURCE_ID}-0181-phase-03": (("Liguid", "Liquid"),),
+    # Physical PDF p. 319 / folio 313 prints liquid niter from 610 to 700 K.
+    f"{SOURCE_ID}-0287": _NITER_PHASE_TEXT_CORRECTIONS,
+    f"{SOURCE_ID}-0287-phase-02": _NITER_PHASE_TEXT_CORRECTIONS,
+    f"{SOURCE_ID}-0287-phase-03": _NITER_PHASE_TEXT_CORRECTIONS,
+    # PDF p. 384 / folio 378 prints the SiO2 alpha-beta transition at 844 K.
+    f"{SOURCE_ID}-0352": (("lLPBl", "ALPHA"), ("BBTl", "BETA"), ("841t", "844")),
+    # PDF p. 388 / folio 382 prints the SiO2 alpha-beta transition at 844 K.
+    f"{SOURCE_ID}-0356": ((".lLPH.l", "ALPHA"),),
+    # PDF p. 392 / folio 386 prints Eucryptite's phase names and SiO2 transition at 844 K.
+    f"{SOURCE_ID}-0360": (
+        ("81111", "844"),
+        ("cr Eucr:rptite", "alpha Eucryptite"),
+        ("Bucr:rptite", "beta Eucryptite"),
+    ),
+    # Physical PDF p. 426 / folio 420 prints liquid fluorphlogopite from 1670 K.
+    f"{SOURCE_ID}-0394": (
+        (".alting point", "melting point"),
+        ("Liq•id", "Liquid"),
+    ),
     # PDF p. 264 prints the ilmenite melting point as 1640 K.
     f"{SOURCE_ID}-0232": (("1&40", "1640"),),
     f"{SOURCE_ID}-0232-phase-02": (("1&40", "1640"),),
@@ -157,11 +197,6 @@ B1452_PHASE_TEXT_CORRECTIONS = {
     f"{SOURCE_ID}-0354": (("11:", "K"),),
     # Physical PDF p. 396 / folio 390 prints rhodonite melting at 1564 K.
     f"{SOURCE_ID}-0364": (("•eltiog poi.Dt 1564 lt", "melting point 1564 K"),),
-    # Physical PDF p. 392 / folio 386 prints alpha- and beta-eucryptite.
-    f"{SOURCE_ID}-0360": (
-        ("cr Eucr:rptite", "alpha Eucryptite"),
-        ("Bucr:rptite", "beta Eucryptite"),
-    ),
     # Physical PDF p. 425 / folio 419 prints muscovite crystals through 1500 K.
     f"{SOURCE_ID}-0393": (("Crysta~s", "Crystals"),),
     # The two kaliophillite records OCR the unit K as a tilde.
@@ -1299,7 +1334,11 @@ def _normalized_phase_text(record: Mapping[str, Any]) -> str:
     text = re.sub(
         r"(?<=\d)\s+(?:K[o0]|[lI1]\.)", " K", text, flags=re.IGNORECASE
     )
-    for captured, printed in B1452_PHASE_TEXT_CORRECTIONS.get(
+    return _corrected_source_text(record, text)
+
+
+def _corrected_source_text(record: Mapping[str, Any], text: str) -> str:
+    for captured, printed in B1452_SOURCE_TEXT_CORRECTIONS.get(
         str(record.get("record_id") or ""), ()
     ):
         text = text.replace(captured, printed)
@@ -1420,13 +1459,18 @@ def _phase_state(
         return State.unknown(reason), State.unknown(reason)
 
     phase = phase_of_label(window.label)
-    if phase.is_unknown and _polymorph_for_phase_window(record, window.label).is_value:
+    polymorph = _polymorph_for_phase_window(record, window.label)
+    if (
+        phase.is_unknown
+        and polymorph.is_value
+        and polymorph.value is not Polymorph.REFERENCE
+    ):
         phase = State.of(Phase.CR)
     if not phase.is_value:
         return phase, State.unknown(phase.reason or "printed phase is unresolved")
     if phase.value is not Phase.CR:
         return phase, State.not_applicable("not crystal")
-    return phase, _polymorph_for_phase_window(record, window.label)
+    return phase, polymorph
 
 
 def _parse_counts(formula: str) -> dict[str, Fraction] | None:
@@ -1481,7 +1525,7 @@ B1452_OXIDE_POLYMORPH_NAMES = {
 _OXIDE_REFERENCE_FORMULAS = frozenset((*B1452_OXIDE_POLYMORPH_NAMES, "K2O", "H2O"))
 _OXIDE_TRANSITION_FORMULAS = {
     "Al2O3": re.compile(r"\bAl\s*2\s*[O0]\s*3\b", re.I),
-    "SiO2": re.compile(r"\bSi\s*[O0]\s*2\b", re.I),
+    "SiO2": re.compile(r"\bSi\s*[O0]\s*(?:2|[zZ])\s*[oO]?\b", re.I),
     "CaO": re.compile(r"\bCa\s*[O0]\b", re.I),
     "MgO": re.compile(r"\bMg\s*[O0]\b", re.I),
     "TiO2": re.compile(r"\bTi\s*[O0]\s*2\b", re.I),
@@ -1494,17 +1538,18 @@ _OXIDE_TRANSITION_FORMULAS = {
 
 def _reference_oxide_transition(
     record: Mapping[str, Any], formula: str
-) -> tuple[str, Decimal] | None:
+) -> State[tuple[str, Decimal]]:
     pattern = _OXIDE_TRANSITION_FORMULAS.get(formula)
     if pattern is None:
-        return None
+        return State.not_applicable(f"no reference transition rule for oxide {formula}")
     raw_lines = record.get("auxiliary_lines_as_published") or ()
     lines = (raw_lines,) if isinstance(raw_lines, str) else raw_lines
     for line in lines:
-        text = str(line)
+        text = _corrected_source_text(record, str(line))
         if pattern.search(text) is None:
             continue
-        if re.search(r"\balpha\b.*\bbeta\b.*\btransition\b", text, re.I):
+        alpha_beta = re.search(r"\balpha\b.*?\bbeta\b", text, re.I)
+        if alpha_beta is not None:
             kind = "alpha_beta"
         elif re.search(r"(?:m|!|ft)\s*\.?\s*p\s*\.?", text, re.I):
             kind = "melting"
@@ -1514,11 +1559,19 @@ def _reference_oxide_transition(
             kind = "decomposition"
         else:
             continue
-        numbers = re.findall(r"(?<![\w.])\d+(?:\.\s*\d+)?", text)
+        numeric_text = text[alpha_beta.end() :] if alpha_beta is not None else text
+        numbers = re.findall(r"(?<![\w.])\d+(?:\.\s*\d+)?", numeric_text)
         if not numbers:
-            continue
-        return kind, Decimal(re.sub(r"\s+", "", numbers[-1]))
-    return None
+            reason = (
+                f"{record.get('record_id')}: printed {formula} {kind} transition "
+                f"has no readable boundary in {text!r}"
+            )
+            return State.unknown(reason)
+        boundary = Decimal(re.sub(r"\s+", "", numbers[-1]))
+        return State.of((kind, boundary))
+    return State.not_applicable(
+        f"{record.get('record_id')}: no printed reference transition for oxide {formula}"
+    )
 
 
 def _oxide_species(
@@ -1541,9 +1594,17 @@ def _oxide_species(
     if record is None or temperature is None:
         return make_species(formula, phase, polymorph, charge=0)
 
-    transition = _reference_oxide_transition(record, formula)
-    if transition is not None:
-        kind, boundary = transition
+    transition_state = _reference_oxide_transition(record, formula)
+    if transition_state.is_unknown:
+        reason = transition_state.reason or f"{formula} reference transition is unreadable"
+        return make_species(
+            formula,
+            State.unknown(reason),
+            State.unknown(reason),
+            charge=0,
+        )
+    if transition_state.is_value:
+        kind, boundary = transition_state.value
         if kind == "melting":
             if temperature >= boundary:
                 return make_species(

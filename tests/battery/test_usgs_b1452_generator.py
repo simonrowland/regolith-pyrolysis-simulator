@@ -1421,13 +1421,19 @@ def test_all_multisegment_b1452_duplicate_boundaries_follow_their_segment() -> N
                 temperature=temperature,
             )
             expected_phase = generator.phase_of_label(expected.label)
+            expected_polymorph = generator._polymorph_for_phase_window(
+                record, expected.label
+            )
             if expected_phase.is_value:
                 assert phase.is_value and phase.value is expected_phase.value, (
                     record_id,
                     temperature,
                     ordinal,
                 )
-            elif generator._polymorph_for_phase_window(record, expected.label).is_value:
+            elif (
+                expected_polymorph.is_value
+                and expected_polymorph.value is not Polymorph.REFERENCE
+            ):
                 assert phase.is_value and phase.value is Phase.CR, (
                     record_id,
                     temperature,
@@ -1496,6 +1502,340 @@ def test_ocr_damaged_crystal_ranges_keep_printed_log_k_identity(
     product = reaction.value.terms[0].species
     assert product.phase.value is Phase.CR
     assert product.polymorph is not None and product.polymorph.value is polymorph
+
+
+@pytest.mark.parametrize(
+    ("record_id", "temperature", "printed_value", "quantity", "phase", "pdf_page"),
+    [
+        # PDF p. 36 / folio 30, liquid silver.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0004-phase-02", "1300", "92.52", Quantity.S, Phase.L, 36),
+        # PDF p. 40 / folio 34, liquid gold.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0008-phase-02", "1400", "32.75", Quantity.CP, Phase.L, 40),
+        # PDF p. 74 / folio 68, liquid lanthanum.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0042-phase-04", "1300", "109.29", Quantity.S, Phase.L, 74),
+        # PDF p. 120 / folio 114, the 1799 K liquid yttrium row.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0088-phase-03", "1799", "43.10", Quantity.CP, Phase.L, 120),
+        # PDF p. 213 / folio 207, liquid lead monoxide.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0181-phase-03", "1300", "168.38", Quantity.S, Phase.L, 213),
+        # PDF p. 319 / folio 313, niter's closing crystal/liquid boundary.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0287", "298.15", "133.09", Quantity.S, Phase.CR, 319),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0287-phase-02", "610", "228.73", Quantity.S, Phase.CR, 319),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0287-phase-03", "610", "245.28", Quantity.S, Phase.L, 319),
+        # Existing OCR corrections in the same liquid-caption class.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0254-phase-02", "1000", "257.19", Quantity.S, Phase.L, 286),
+        # PDF p. 328 / folio 322, arcanite after the printed 1342 K melt point.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0296-phase-03", "1400", "197.61", Quantity.CP, Phase.L, 328),
+    ],
+)
+def test_ocr_liquid_phase_captions_keep_generated_row_identity(
+    record_id: str,
+    temperature: str,
+    printed_value: str,
+    quantity: Quantity,
+    phase: Phase,
+    pdf_page: int,
+) -> None:
+    rows = [
+        observation
+        for observation in _observations_for(_generation(record_id), quantity)
+        if observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == Decimal(temperature)
+    ]
+    assert len(rows) == 1
+    observation = rows[0]
+    assert observation.value.point == Decimal(printed_value)
+    assert observation.locator is not None
+    assert observation.locator.pdf_page_index == pdf_page
+    assert observation.identity.species.phase.value is phase
+    assert observation.identity.species.polymorph is not None
+    if phase is Phase.L:
+        assert observation.identity.species.polymorph.is_not_applicable
+    else:
+        assert observation.identity.species.polymorph.is_unknown
+
+
+def test_unknown_phase_label_does_not_inherit_reference_heading_crystal() -> None:
+    record = _load("robie-hemingway-fisher-1978-usgs-b1452-0004-phase-02")
+    record["phase_as_published"] = "Unrecognized phase 1234 to 1800 K."
+    generated = generator.generate_record(record)
+    rows = _observations_for(generated, Quantity.S, temperature="1300")
+    assert len(rows) == 1
+    assert rows[0].value.point == Decimal("92.52")
+    assert rows[0].identity.species.phase.is_unknown
+    assert rows[0].identity.species.polymorph.is_unknown
+
+
+@pytest.mark.parametrize(
+    ("record_id", "temperature"),
+    [
+        # These printed grid coordinates are OCR-suspect and are refused by the
+        # generator; the source-backed phase captions still resolve directly.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0057-phase-02", "700"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0296-phase-03", "1342"),
+    ],
+)
+def test_source_backed_liquid_captions_resolve_without_an_admissible_grid_row(
+    record_id: str, temperature: str
+) -> None:
+    phase, polymorph = generator._phase_state(
+        _load(record_id), temperature=Decimal(temperature)
+    )
+    assert phase.is_value and phase.value is Phase.L
+    assert polymorph.is_not_applicable
+
+
+def test_ocr_liquid_without_a_grid_row_resolves_the_printed_phase() -> None:
+    # Physical PDF p. 426 / folio 420 prints liquid fluorphlogopite from 1670 K.
+    record = _load("robie-hemingway-fisher-1978-usgs-b1452-0394")
+    phase, polymorph = generator._phase_state(record, temperature=Decimal("1671"))
+    assert phase.value is Phase.L
+    assert polymorph.is_not_applicable
+
+
+def test_clean_gas_control_keeps_gas_phase_and_no_polymorph() -> None:
+    # PDF p. 38 / folio 32, argon's entropy at the reference temperature.
+    rows = _observations_for(
+        _generation("robie-hemingway-fisher-1978-usgs-b1452-0006"),
+        Quantity.S,
+        temperature="298.15",
+    )
+    assert len(rows) == 1
+    assert rows[0].value.point == Decimal("154.84")
+    assert rows[0].locator is not None and rows[0].locator.pdf_page_index == 38
+    assert rows[0].identity.species.phase.value is Phase.G
+    assert rows[0].identity.species.polymorph.is_not_applicable
+
+
+@pytest.mark.parametrize(
+    ("record_id", "pdf_page", "printed_log_k"),
+    [
+        # Each value is the printed 900 K log K cell beside the SiO2 footnote.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0314", 346, "-0.168"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0316", 348, "0.074"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0320", 352, "-0.543"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0322", 354, "7.738"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0324", 356, "7.898"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0332", 364, "11.719"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0336", 368, "0.621"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0338", 370, "3.231"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0348", 380, "5.292"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0352", 384, "4.414"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0356", 388, "5.561"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0358", 390, "5.331"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0360", 392, "5.371"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0362", 394, "1.964"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0364", 396, "1.418"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0368", 400, "22.447"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0374", 406, "13.019"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0376", 408, "13.574"),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0387", 419, "10.355"),
+    ],
+)
+def test_silica_alpha_beta_captions_bind_generated_beta_reactant(
+    record_id: str, pdf_page: int, printed_log_k: str
+) -> None:
+    record = _load(record_id)
+    transition = generator._reference_oxide_transition(record, "SiO2")
+    assert transition.is_value
+    assert transition.value == ("alpha_beta", Decimal("844"))
+    rows = _formation_observations(
+        _generation(record_id),
+        basis="from_the_oxides",
+        quantity=Quantity.LOG10_K_REACTION,
+        temperature="900",
+    )
+    assert len(rows) == 1
+    row = rows[0]
+    assert row.value.point == Decimal(printed_log_k)
+    assert row.locator is not None and row.locator.pdf_page_index == pdf_page
+    if record_id == "robie-hemingway-fisher-1978-usgs-b1452-0338":
+        assert row.identity.quantity.is_value
+    reaction = row.identity.reaction
+    assert reaction is not None and reaction.is_value
+    silica = next(
+        term.species
+        for term in reaction.value.terms
+        if term.species.formula == "SiO2" and term.coefficient < 0
+    )
+    assert silica.phase.value is Phase.CR
+    assert silica.polymorph is not None and silica.polymorph.value is Polymorph.BETA
+    silica_term = next(
+        term
+        for term in reaction.value.terms
+        if term.species.formula == "SiO2" and term.coefficient < 0
+    )
+    assert silica_term.standard_state is not None
+    assert silica_term.standard_state.is_value
+
+
+@pytest.mark.parametrize(
+    "record_id",
+    [
+        "robie-hemingway-fisher-1978-usgs-b1452-0314",
+        "robie-hemingway-fisher-1978-usgs-b1452-0316",
+        "robie-hemingway-fisher-1978-usgs-b1452-0320",
+        "robie-hemingway-fisher-1978-usgs-b1452-0322",
+        "robie-hemingway-fisher-1978-usgs-b1452-0324",
+        "robie-hemingway-fisher-1978-usgs-b1452-0326",
+        "robie-hemingway-fisher-1978-usgs-b1452-0332",
+        "robie-hemingway-fisher-1978-usgs-b1452-0336",
+        "robie-hemingway-fisher-1978-usgs-b1452-0338",
+        "robie-hemingway-fisher-1978-usgs-b1452-0348",
+        "robie-hemingway-fisher-1978-usgs-b1452-0352",
+        "robie-hemingway-fisher-1978-usgs-b1452-0356",
+        "robie-hemingway-fisher-1978-usgs-b1452-0358",
+        "robie-hemingway-fisher-1978-usgs-b1452-0360",
+        "robie-hemingway-fisher-1978-usgs-b1452-0362",
+        "robie-hemingway-fisher-1978-usgs-b1452-0364",
+        "robie-hemingway-fisher-1978-usgs-b1452-0368",
+        "robie-hemingway-fisher-1978-usgs-b1452-0374",
+        "robie-hemingway-fisher-1978-usgs-b1452-0376",
+        "robie-hemingway-fisher-1978-usgs-b1452-0387",
+    ],
+)
+def test_every_silica_caption_selects_its_phase_at_the_transition_boundary(
+    record_id: str,
+) -> None:
+    record = _load(record_id)
+    transition = generator._reference_oxide_transition(record, "SiO2")
+    assert transition.is_value
+    assert transition.value == ("alpha_beta", Decimal("844"))
+    for temperature, polymorph in (
+        (Decimal("843"), Polymorph.ALPHA_QUARTZ),
+        (Decimal("844"), Polymorph.BETA),
+    ):
+        silica = generator._oxide_species(
+            "SiO2", record=record, temperature=temperature
+        )
+        assert silica.phase.value is Phase.CR
+        assert silica.polymorph is not None and silica.polymorph.value is polymorph
+
+
+def test_silica_transition_record_with_unusable_900k_row_keeps_generated_600k_identity() -> None:
+    # Physical PDF p. 358 / folio 352 marks the 900 K coordinate OCR-suspect;
+    # the source row is refused, while the admissible 600 K row is emitted.
+    record_id = "robie-hemingway-fisher-1978-usgs-b1452-0326"
+    rows = _formation_observations(
+        _generation(record_id),
+        basis="from_the_oxides",
+        quantity=Quantity.LOG10_K_REACTION,
+        temperature="600",
+    )
+    assert len(rows) == 1
+    row = rows[0]
+    assert row.value.point == Decimal("15.231")
+    assert row.locator is not None and row.locator.pdf_page_index == 358
+    reaction = row.identity.reaction
+    assert reaction is not None and reaction.is_value
+    silica = next(
+        term.species
+        for term in reaction.value.terms
+        if term.species.formula == "SiO2" and term.coefficient < 0
+    )
+    assert silica.phase.value is Phase.CR
+    assert silica.polymorph is not None
+    assert silica.polymorph.value is Polymorph.ALPHA_QUARTZ
+
+
+def test_unreadable_printed_silica_transition_refuses_generated_reaction() -> None:
+    record = _load("robie-hemingway-fisher-1978-usgs-b1452-0338")
+    record["auxiliary_lines_as_published"] = [
+        line.replace("844", "") for line in record["auxiliary_lines_as_published"]
+    ]
+    transition = generator._reference_oxide_transition(record, "SiO2")
+    assert transition.is_unknown and transition.reason
+    silica = generator._oxide_species(
+        "SiO2", record=record, temperature=Decimal("900")
+    )
+    assert silica.phase.is_unknown and silica.phase.reason
+    generated = generator.generate_record(record)
+    rows = _formation_observations(
+        generated,
+        basis="from_the_oxides",
+        quantity=Quantity.LOG10_K_REACTION,
+        temperature="900",
+    )
+    assert len(rows) == 1
+    row = rows[0]
+    assert row.value.point == Decimal("3.231")
+    assert row.identity.quantity.is_unknown
+    assert row.identity.reaction is not None and row.identity.reaction.is_value
+    silica_term = next(
+        term
+        for term in row.identity.reaction.value.terms
+        if term.species.formula == "SiO2"
+    )
+    assert silica_term.species.phase.is_unknown
+    assert silica_term.standard_state is not None
+    assert silica_term.standard_state.is_unknown
+
+
+def test_unlisted_silica_transition_keeps_reference_quartz_state() -> None:
+    record = _load("robie-hemingway-fisher-1978-usgs-b1452-0398")
+    transition = generator._reference_oxide_transition(record, "SiO2")
+    assert transition.is_not_applicable
+    silica = generator._oxide_species(
+        "SiO2", record=record, temperature=Decimal("900")
+    )
+    assert silica.phase.value is Phase.CR
+    assert silica.polymorph is not None and silica.polymorph.value is Polymorph.QUARTZ
+
+
+def test_pyrophyllite_ocr_name_keeps_its_printed_oxide_reaction() -> None:
+    # Physical PDF p. 430 / folio 424 names pyrophyllite; its row prints log K = 3.743.
+    record_id = "robie-hemingway-fisher-1978-usgs-b1452-0398"
+    rows = _formation_observations(
+        _generation(record_id),
+        basis="from_the_oxides",
+        quantity=Quantity.LOG10_K_REACTION,
+        temperature="298.15",
+    )
+    assert len(rows) == 1
+    row = rows[0]
+    assert row.value.point == Decimal("3.743")
+    assert row.locator is not None and row.locator.pdf_page_index == 430
+    assert row.identity.quantity.is_value
+    reaction = row.identity.reaction
+    assert reaction is not None and reaction.is_value
+    product = next(term.species for term in reaction.value.terms if term.coefficient > 0)
+    assert product.phase.value is Phase.CR
+    assert product.polymorph is not None
+    assert product.polymorph.value is Polymorph.PYROPHYLLITE
+    oxide_polymorphs = {
+        term.species.formula: term.species.polymorph.value
+        for term in reaction.value.terms
+        if term.coefficient < 0
+        and term.species.polymorph is not None
+        and term.species.polymorph.is_value
+    }
+    assert oxide_polymorphs == {
+        "Al2O3": Polymorph.CORUNDUM,
+        "SiO2": Polymorph.QUARTZ,
+    }
+
+
+@pytest.mark.parametrize(
+    ("record_id", "temperature", "printed_entropy", "polymorph"),
+    [
+        # PDF p. 78 / folio 72, alpha manganese at 298.15 K.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0046", "298.15", "32.01", Polymorph.ALPHA),
+        # PDF p. 78 / folio 72, beta manganese at the 980 K boundary.
+        ("robie-hemingway-fisher-1978-usgs-b1452-0046-phase-02", "980", "71.40", Polymorph.BETA),
+    ],
+)
+def test_ocr_damaged_manganese_bounds_keep_printed_phase(
+    record_id: str, temperature: str, printed_entropy: str, polymorph: Polymorph
+) -> None:
+    rows = _observations_for(_generation(record_id), Quantity.S, temperature=temperature)
+    assert len(rows) == 1
+    observation = rows[0]
+    assert observation.value.point == Decimal(printed_entropy)
+    assert observation.locator is not None
+    assert observation.locator.pdf_page_index == 78
+    assert observation.identity.species.phase.value is Phase.CR
+    assert observation.identity.species.polymorph is not None
+    assert observation.identity.species.polymorph.value is polymorph
 
 
 @pytest.mark.parametrize(
