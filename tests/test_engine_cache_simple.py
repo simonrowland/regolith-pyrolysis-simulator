@@ -432,10 +432,11 @@ def test_raw_key_hot_binary_and_exact_round_trip(
     _engine_cache_counters(reset=True)
     hot = {"status": "ok", "activity": 0.12345678901234566}
     request = {"temperature_K": 1700.0}
-    digest = engine_cache_key("openimcc", "1", request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    digest = engine_cache_key("openimcc", version, request)
 
     assert isinstance(digest, bytes) and 4 <= len(digest) <= 128
-    assert digest[:3] == bytes((1, 0, 1))
+    assert digest[:3] == bytes((1, 0, version))
     assert engine_cache.cached_engine_call(
         "openimcc", request, lambda: hot
     ) == hot
@@ -454,7 +455,7 @@ def test_raw_key_hot_binary_and_exact_round_trip(
         "activity": 0.12345678901234566,
         "status": "ok",
     }
-    assert row[2:4] == ("openimcc", "1")
+    assert row[2:4] == ("openimcc", str(version))
 
 
 def test_sqlite_hit_populates_bounded_memory_cache_and_next_hit_skips_sqlite(
@@ -1519,7 +1520,8 @@ def test_concurrent_cache_writer_counts_different_bytes_without_replacing(
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     engine_cache.engine_cache_counters(reset=True)
     request = {"call": "conflicting-writer"}
-    digest = engine_cache.engine_cache_key("openimcc", 1, request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    digest = engine_cache.engine_cache_key("openimcc", version, request)
 
     def solve() -> dict[str, str]:
         connection = engine_cache._CONNECTIONS[(str(database), False)]
@@ -1532,7 +1534,7 @@ def test_concurrent_cache_writer_counts_different_bytes_without_replacing(
                 digest,
                 sqlite3.Binary(existing_value),
                 "openimcc",
-                "1",
+                str(version),
                 "existing-box",
                 1,
             ),
@@ -1600,7 +1602,8 @@ def test_malformed_hot_value_is_a_counted_conflict_and_not_replaced(
 
     connection = engine_cache._connect(database, readonly=False)
     assert connection is not None
-    digest = engine_cache_key("openimcc", 1, request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    digest = engine_cache_key("openimcc", version, request)
     connection.execute(
         "UPDATE engine_outputs SET value=? WHERE key=?",
         (sqlite3.Binary(b"not-zlib"), digest),
@@ -1985,3 +1988,57 @@ def test_equilibrate_cell_hot_reuses_cell_certified_band_for_notices() -> None:
     )
     restored = EquilibrateCell.from_engine_cache_value(hot)
     assert restored.notices[0]["certified_band"] == band
+
+
+def test_internal_analytical_hot_cache_preserves_provenance_version_reason(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cell.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    reason = json.dumps(
+        {
+            "phase_basis_source": (
+                "freeze_gate_authority:gate_liquid_fraction:fallback:"
+                "magemin-shadow:composition_projected"
+            ),
+        },
+        separators=(",", ":"),
+    )
+    cell = EquilibrateCell(
+        pot_id="phase-basis-cache",
+        engine="internal-analytical",
+        temperature_K=1800.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+        vapor_pressure_backend_status_reason=reason,
+    )
+    request = {"call": "internal-analytical phase-basis provenance"}
+
+    cold_payload = engine_cache.cached_engine_call(
+        "internal-analytical", request, cell.to_hot
+    )
+    warm_payload = engine_cache.cached_engine_call(
+        "internal-analytical",
+        request,
+        lambda: pytest.fail("expected the warmed cell HOT cache result"),
+    )
+
+    assert (
+        EquilibrateCell.from_hot(cold_payload).vapor_pressure_backend_status_reason
+        == reason
+    )
+    assert (
+        EquilibrateCell.from_hot(warm_payload).vapor_pressure_backend_status_reason
+        == reason
+    )
