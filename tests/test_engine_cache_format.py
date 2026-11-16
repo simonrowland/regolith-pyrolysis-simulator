@@ -32,6 +32,16 @@ def test_long_natural_key_uses_only_a_16_byte_request_digest() -> None:
     assert key != engine_cache.engine_cache_key("openimcc", 1, {**request, "temperature_K": 1700.0})
 
 
+def test_natural_key_wire_pin_and_signed_zero_survive_repeated_builds() -> None:
+    # 1700 = 0x1.a9p+10: frexp exponent 11, significand 0x1a900000000000.
+    expected = bytes.fromhex("010001000801840901043d001a900000000000")
+    for _ in range(3):
+        assert engine_cache.engine_cache_key("openimcc", 1, {"temperature_K": 1700.0}) == expected
+        negative = engine_cache.engine_cache_key("openimcc", 1, {"temperature_K": -0.0})
+        positive = engine_cache.engine_cache_key("openimcc", 1, {"temperature_K": 0.0})
+        assert negative != positive
+
+
 def test_key_namespace_is_explicit_and_store_is_without_rowid(tmp_path: Path, monkeypatch) -> None:
     path = tmp_path / "cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
