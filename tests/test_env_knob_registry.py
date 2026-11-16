@@ -22,10 +22,11 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
-# Current production token count after consolidating process-group handoffs in
-# simulator.engine_pool and removing two local aliases from scripts/grind_home.py.
-# t-1747's two reviewed sites remain accounted for in this 93-token ceiling.
-ENV_ACCESS_TOKEN_CEILING = 93
+# The b266 base has 96 production tokens. The port removes one in
+# scripts/grid_pregrind.py; the process-group handoff moves a token from
+# simulator/optimize/pool.py to simulator/engine_pool.py without changing the
+# total. The t-1747 reviewed sites remain included in this 95-token ceiling.
+ENV_ACCESS_TOKEN_CEILING = 95
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep
