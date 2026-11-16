@@ -173,16 +173,28 @@ NIGHTLY_YIELD_HEAVY_ROSTER = frozenset(
 )
 
 
-def _nightly_yield_violations() -> list[str]:
-    yield_module = import_module("tests.test_yield_root_cause")
+def _tier_marker_violations() -> list[str]:
+    required = [
+        ("tests.test_yield_root_cause", name, True)
+        for _, name in sorted(NIGHTLY_YIELD_HEAVY_ROSTER)
+    ] + [
+        ("tests.perf.test_perf_ratchet", "test_optimizer_60h_stage_records_real_cold_work", True),
+        ("tests.perf.test_perf_ratchet", "test_perf_ratchet_guards_call_volume_and_cpu_cost", True),
+        ("tests.test_literature_extracts", "test_pilot_extract_count_exact_and_merge_smoke", True),
+        ("tests.test_literature_extracts", "test_coverage_pending_stubs_not_found", True),
+        ("tests.test_literature_extracts", "test_pilot_extract_count_exact", False),
+        ("tests.test_literature_extracts", "test_coverage_payload_aware", False),
+    ]
     violations = []
-    for relpath, name in sorted(NIGHTLY_YIELD_HEAVY_ROSTER):
-        test_function = getattr(yield_module, name, None)
+    for module_name, name, should_be_nightly in required:
+        module = import_module(module_name)
+        test_function = getattr(module, name, None)
         marks = getattr(test_function, "pytestmark", ())
-        if not any(mark.name == "nightly" for mark in marks):
+        is_nightly = any(mark.name == "nightly" for mark in marks)
+        if is_nightly != should_be_nightly:
+            expected = "nightly" if should_be_nightly else "PR-tier"
             violations.append(
-                f"{relpath}::{name}: yield full-track node must be marked "
-                "nightly to stay out of the PR tier"
+                f"{module_name}::{name}: expected {expected} tier marker"
             )
     return violations
 
@@ -297,7 +309,7 @@ def pytest_collection_finish(session: pytest.Session) -> None:
         check_phantoms=full_suite,
     )
     if full_suite:
-        violations.extend(_nightly_yield_violations())
+        violations.extend(_tier_marker_violations())
         collected_groups = {
             group
             for item in items
