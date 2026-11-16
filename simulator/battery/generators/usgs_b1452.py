@@ -721,6 +721,11 @@ B1452_SOURCE_TEXT_CORRECTIONS = {
     },
     # Physical PDF p. 392 / folio 386.
     f"{SOURCE_ID}-0360": {
+        # The single 1300 K row starts the beta segment after the printed rule;
+        # PDF 391 / folio 385 explicitly names beta in the parallel elements table.
+        "phase_segment.ordinal": (
+            ('1', '2'),
+        ),
         "name_as_published": (
             ('EOCBYPTITI!', 'Eucryptite'),
         ),
@@ -2256,7 +2261,11 @@ def _phase_state(
     segment_ordinal = (
         segment.get("ordinal") if isinstance(segment, Mapping) else None
     )
-    if not isinstance(segment_ordinal, int):
+    if isinstance(segment_ordinal, int):
+        segment_ordinal = int(_corrected_source_text(
+            record, str(segment_ordinal), "phase_segment.ordinal"
+        ))
+    else:
         segment_ordinal = None
     window = phase_window_at(
         temperature, windows, segment_ordinal=segment_ordinal

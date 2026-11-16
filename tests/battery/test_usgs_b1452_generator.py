@@ -2625,6 +2625,9 @@ def test_every_audited_oxide_record_has_its_printed_product_segments(record_id: 
     page, segments = CHECKED_OXIDE_PRODUCTS[suffix.split('-')[0]]
     record = _load(record_id)
     ordinal = record['phase_segment']['ordinal']
+    # PDF 392's sole 1300 K row is below the rule, in the opening beta segment.
+    if suffix == '0360':
+        ordinal = 2
     for row in _generation(record_id).observations:
         species = row.identity.species
         if species is None and row.identity.reaction is not None and row.identity.reaction.is_value:
@@ -2787,3 +2790,18 @@ def test_audited_oxide_log_k_census_has_only_source_verified_refusal_classes() -
         'carbonate_reaction': 56,
         'reference_vocabulary_or_unprinted_state': 88,
     }
+
+
+def test_eucryptite_single_boundary_row_is_the_printed_beta_segment() -> None:
+    generated = _generation(generator.SOURCE_ID + '-0360')
+    for quantity, printed in ((Quantity.S, '336.34'), (Quantity.CP, '191.20')):
+        row, = _observations_for(generated, quantity, temperature='1300')
+        assert row.value.point == Decimal(printed)
+        assert row.locator.pdf_page_index == 392
+        assert row.identity.species.phase.value is Phase.CR
+        assert row.identity.species.polymorph.value is Polymorph.BETA
+    row, = _formation_observations(generated, basis='from_the_oxides', quantity=Quantity.LOG10_K_REACTION, temperature='1300')
+    assert row.value.point == Decimal('4.033')
+    product = next(t.species for t in row.identity.reaction.value.terms if t.coefficient > 0)
+    assert product.polymorph.value is Polymorph.BETA
+    assert row.identity.quantity.is_unknown  # Li2O reference vocabulary remains deferred.
