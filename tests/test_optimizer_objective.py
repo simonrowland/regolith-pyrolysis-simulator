@@ -935,7 +935,9 @@ def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
         ("hot_duct", "SiO"): 8.0,
         ("cold_duct", "Na"): 0.8,
     }
-    sim = SimpleNamespace()
+    sim = SimpleNamespace(
+        energy_cumulative_breakdown_kWh={"electrical": 0.0, "evaporation_thermal": 0.0},
+    )
     run_execution = SimpleNamespace(
         simulator=sim,
         campaigns_elapsed=4.0,
@@ -981,6 +983,14 @@ def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
     assert depreciation["depreciation_expense_per_run_usd"].hex() == (
         "0x1.6000000000001p+4"
     )
+    # Baseline before consolidating lifetime consumers: no bound, 8 / 4 =
+    # 2 kg/campaign on the worst wall, versus 8.8 / 4 = 2.2 kg/campaign total.
+    lifetime = objective_module._coating_lifetime_projection(deposits, campaigns_elapsed=4.0)
+    assert lifetime["campaigns_to_resinter_worst_segment"].hex() == "0x1.4000000000000p+2"
+    marginal = objective_module._marginal_extraction_cost_summary(
+        sim, {}, run_execution=run_execution, cost_parameters=cost_parameters,
+    )
+    assert marginal["marginal_cost_usd"].hex() == "0x1.6000000000001p+4"
 
 
 def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() -> None:
