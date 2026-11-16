@@ -1576,6 +1576,17 @@ def _solve_or_refuse(
         refused=refused,
         detail="open-gate carrier was not on the solved surface",
     )
+    for species in adjusted:
+        if species not in alpha_authorities:
+            _alpha, _source, status = _flux_alpha(
+                species, alphas, temperature_K,
+                allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
+                unmeasured_alpha_fallback_species_allowlist=(
+                    unmeasured_alpha_fallback_species_allowlist
+                ),
+            )
+            if status:
+                alpha_authorities[species] = status
     continuations = {
         species: status
         for species, status in continuations.items()

@@ -3107,7 +3107,7 @@ def test_every_species_uses_the_publisher_alpha_policy(
         status = decision.evaluation["authority_status"]
         assert evaluations[species]["authority_status"] == status
         assert series[species]["authority_status"] == status
-        if gate == "open" and exponent != 0.0:
+        if gate == "open":
             assert notice["alpha_authority_status_by_species"][species] == status
         flagged = decision.unmeasured or decision.evaluation.get(
             "alpha_authority_status"

@@ -61,7 +61,7 @@ OTHER_PROXY_TAG_STILL_ADMITTED = {
 }
 
 
-def _alpha_witness(species, alpha):
+def _alpha_witness(species, alpha, **extra_controls):
     return BuiltinEvaporationFluxProvider().dispatch(IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -82,6 +82,7 @@ def _alpha_witness(species, alpha):
             "available_oxide_kg": {species: 10.0},
             "melt_surface_area_m2": 0.2,
             "alpha": alpha,
+            **extra_controls,
         },
     ))
 
@@ -118,6 +119,7 @@ def test_measured_alpha_witness_unchanged():
     assert "unmeasured_alpha_fallback_species" not in result.diagnostic
 
 
+@pytest.mark.parametrize("hkl_upper_bound", [False, True])
 @pytest.mark.parametrize("species,alpha,status", [
     ("K", {"K": 0.13}, "measured"),
     ("CrO2", {}, "analytical_upper_bound"),
@@ -126,7 +128,7 @@ def test_measured_alpha_witness_unchanged():
         "alpha_authority_status": "proxy/bridge",
     }}, "analytical_upper_bound"),
 ])
-def test_publisher_rows_carry_the_decision_authority(species, alpha, status):
+def test_publisher_rows_carry_the_decision_authority(species, alpha, status, hkl_upper_bound):
     from engines.builtin.evaporation_flux import publisher_effective_alpha
 
     decision = publisher_effective_alpha(
@@ -134,7 +136,10 @@ def test_publisher_rows_carry_the_decision_authority(species, alpha, status):
         allow_unmeasured_alpha_fallback=False,
         unmeasured_alpha_fallback_species_allowlist=None,
     )
-    result = _alpha_witness(species, alpha)
+    result = _alpha_witness(
+        species, alpha,
+        hkl_upper_bound_transport_species=(species,) if hkl_upper_bound else (),
+    )
     evaluation = result.diagnostic["alpha_s_evaluation_by_species"][species]
     assert evaluation["authority_status"] == status
     assert evaluation["authority_status"] == decision.evaluation["authority_status"]

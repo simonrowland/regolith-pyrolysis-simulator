@@ -1958,7 +1958,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 series_diagnostic["gas_transport_model"] = (
                     "hkl_kinetic_upper_bound_no_chapman_enskog"
                 )
-                series_diagnostic["authority_status"] = (
+                series_diagnostic["gas_transport_authority_status"] = (
                     "analytical_upper_bound_status_bearing_cannot_certify"
                 )
             series_diagnostic.update(
