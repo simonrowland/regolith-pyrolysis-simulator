@@ -88,8 +88,9 @@ def test_sossi_fegley_2018_added_numeric_rows_are_pinned() -> None:
     ]
 
     assert len(rows) == 44
-    # SC-456 36db9c3f0 removes non-source metadata from the reviewed row pin.
-    assert _sha256(rows) == "09e1242d0f0e4624d52a02dd40eab1947d2e72dad81f1d3797c91465dcdd4ba6"
+    # The digest moved because the loaded type changed from str to float
+    # (values unchanged).
+    assert _sha256(rows) == "38fb38087e00c64f9465a4f51838d42b714d8ec90ff8a4ac0a7d507e95b52b8b"
     assert all(
         not {"standard_state_as_printed", "notes_as_printed"}.intersection(row)
         for species in doc["species"].values()
