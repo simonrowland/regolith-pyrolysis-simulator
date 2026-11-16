@@ -7036,6 +7036,7 @@ def cell_notices(
     from simulator.diagnostic_helpers.binary_pot_battery import (
         AUTHORITY_EXTRAPOLATED,
         AUTHORITY_FALLBACK,
+        REFUSAL_DIAGNOSTIC_GAP,
         _FLOOR_INVERSION_REASON,
     )
 
@@ -7144,6 +7145,17 @@ def cell_notices(
                     kind=NoticeKind.INPUT_OMITTED,
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
+        elif kind == REFUSAL_DIAGNOSTIC_GAP:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=json.dumps(
+                        dict(row), sort_keys=True, separators=(",", ":")
+                    ),
                     origin=f"engine:{engine.value}",
                 )
             )
@@ -13136,6 +13148,7 @@ def _predict_with_engine(
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
         PO2_OXYGEN_BALANCE_EFFUSION,
+        REFUSAL_DIAGNOSTIC_GAP,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
@@ -14495,7 +14508,13 @@ def _predict_with_engine(
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
             cell_status = str(getattr(cell, "engine_status", "") or "")
             worker_failure = _engine_worker_lifecycle_failure(cell)
-            if typed in {"out_of_domain", "out_of_basis"} or cell_status == "out_of_domain":
+            if typed == REFUSAL_DIAGNOSTIC_GAP:
+                refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+                typed_reason = REFUSAL_DIAGNOSTIC_GAP
+            elif (
+                typed in {"out_of_domain", "out_of_basis"}
+                or cell_status == "out_of_domain"
+            ):
                 refusal_reason = RefusalReason.METRIC_DOMAIN
                 typed_reason = "out_of_domain"
             elif worker_failure is not None:
@@ -14575,6 +14594,9 @@ def _predict_with_engine(
         if typed == REFUSAL_TIMEOUT:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
             reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+        elif typed == REFUSAL_DIAGNOSTIC_GAP:
+            exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
+            reason = RefusalReason.ATTEMPTED_UNAVAILABLE
         elif typed == REFUSAL_UNAVAILABLE:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
             reason = RefusalReason.ATTEMPTED_UNAVAILABLE
@@ -14608,6 +14630,11 @@ def _predict_with_engine(
             refusal_detail={
                 "refusal_reason": typed,
                 "engine_reason": engine_side_reason,
+                **(
+                    {"reason": REFUSAL_DIAGNOSTIC_GAP}
+                    if typed == REFUSAL_DIAGNOSTIC_GAP
+                    else {}
+                ),
                 **(
                     {"reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value}
                     if openimcc_outside_species

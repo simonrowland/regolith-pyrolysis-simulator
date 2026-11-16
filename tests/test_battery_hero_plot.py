@@ -293,6 +293,34 @@ def test_refusal_status_legacy_spellings_are_counted(tmp_path: Path) -> None:
     }
 
 
+def test_diagnostic_gap_detail_is_listed_in_refusal_summary(tmp_path: Path) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    row = _record(
+        engine="magemin",
+        experiment="diagnostic-gap",
+        formula="SiO2",
+        temperature_K=1500,
+        residual=None,
+        rail="melt_activity",
+    )
+    row["status"] = "refused"
+    row["refusal"] = {
+        "reason": "attempted_unavailable",
+        "detail": {"reason": "diagnostic_gap"},
+    }
+    residuals.write_text(
+        json.dumps({"kind": "battery_store_stamp", "revision": "test-store"})
+        + "\n"
+        + json.dumps(row)
+        + "\n",
+        encoding="utf-8",
+    )
+
+    data = read_scores(residuals)
+
+    assert data.summaries["magemin"].refusals == {"diagnostic_gap": 1}
+
+
 def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) -> None:
     residuals = tmp_path / "residuals.jsonl"
     _score_file(residuals)
