@@ -16690,18 +16690,20 @@ def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
     ):
         return None, "ferric_fraction_uncertainty_input_invalid"
     gap = Decimal(1) - r
-    if Decimal(2) * sigma_r >= gap:
+    two_sigma = Decimal(2) * sigma_r
+    if two_sigma >= r or two_sigma >= gap:
         return None, "ferric_fraction_uncertainty_linearization_invalid"
 
     # Premise: the print gives r = Fe3+/sumFe, while the stored value is
     # R = Fe3+/Fe2+ = r/(1-r). Algebra: dR/dr = 1/(1-r)^2, so
-    # sigma_R = sigma_r/(1-r)^2; the dex scorer uses
-    # sigma_log10R = sigma_R/(R*ln(10)) = sigma_r/(ln(10)*r*(1-r)).
+    # sigma_R = sigma_r/(1-r)^2. The scorer uses log10(R), whose derivative
+    # is d(log10R)/dr = (1/r + 1/(1-r))/ln(10), hence
+    # sigma_log10R = sigma_r * (1/r + 1/(1-r))/ln(10).
     # Unit check: r, R, sigma_r and sigma_R are dimensionless ratios, so both
     # sides are dimensionless (the final uncertainty is in dex). Sanity:
     # r=0.5 gives R=1 and sigma_R=4*sigma_r; as r->0, sigma_R->sigma_r.
-    # Refuse when a two-sigma span reaches the pole at r=1; linearisation
-    # there cannot represent the printed uncertainty without inventing a band.
+    # Refuse when a two-sigma span reaches either endpoint: log10(R) diverges
+    # at r=0 and r=1, so linearisation cannot represent that printed interval.
     sigma_log10_r = sigma_r / (Decimal(10).ln() * r * gap)
     if not sigma_log10_r.is_finite():
         return None, "ferric_fraction_uncertainty_input_invalid"
