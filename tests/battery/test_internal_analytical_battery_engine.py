@@ -1058,7 +1058,7 @@ def test_internal_analytical_battery_score_records_vapour_phase_basis(
         None,
     )
     assert scored_row is not None
-    assert scored_row["status"] == "no_band"
+    assert scored_row["status"] == "no_band", scored_row.get("refusal")
     candidate = scored_row["candidate_observation"]
     assert isinstance(candidate, dict)
     engine = candidate["engine"]
