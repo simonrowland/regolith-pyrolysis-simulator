@@ -1873,6 +1873,7 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "d207.sqlite"))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
     provider_notice = _openimcc_vapour_phase_signal_notice("missing")
     assert provider_notice is not None
     diagnostics = {
