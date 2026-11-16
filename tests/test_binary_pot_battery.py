@@ -2752,7 +2752,7 @@ def test_internal_analytical_wall_backstop_refuses_a_blocked_child(
     assert raised.value.timeout_reason is None
 
 
-def test_internal_analytical_isolated_worker_does_not_cache_unknown_disclosures(
+def test_internal_analytical_isolated_worker_keeps_disclosures_unknown(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2781,9 +2781,10 @@ def test_internal_analytical_isolated_worker_does_not_cache_unknown_disclosures(
     }
     try:
         with _engine_cache_path_scope(tmp_path / "isolated-cell-disclosure.sqlite"):
+            first = worker.request(request, timeout_s=1.0)
             with disclosure_scope(inherit=False) as disclosures:
-                first = worker.request(request, timeout_s=1.0)
                 second = worker.request(request, timeout_s=1.0)
+                third = worker.request(request, timeout_s=1.0)
                 assert disclosures.snapshot() == ()
             counts = engine_cache.engine_cache_counters(reset=True)[
                 "internal-analytical"
@@ -2791,10 +2792,10 @@ def test_internal_analytical_isolated_worker_does_not_cache_unknown_disclosures(
     finally:
         worker.close()
 
-    assert first["status"] == second["status"] == "ok"
-    assert calls["n"] == 2
+    assert first["status"] == second["status"] == third["status"] == "ok"
+    assert calls["n"] == 3
     assert counts["hits"] == 0
-    assert counts["stores"] == 0
+    assert counts["stores"] == 1
 
 
 def test_internal_analytical_cpu_budget_tolerates_idle_wall_that_old_cap_refused(
