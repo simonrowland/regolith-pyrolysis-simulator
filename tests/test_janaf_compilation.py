@@ -18,8 +18,7 @@ import json
 import pytest
 
 import yaml
-
-from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root, require_corpus_files
 from tests.helpers.named_manifests import assert_named_rows
 from simulator.yaml_cache import load_cached_safe_yaml
 import simulator.reference_data.janaf as janaf_reference
@@ -587,6 +586,7 @@ def test_opposite_sign_enthalpy_neighbors_do_not_restore_tail(
     """Opposite-sign DfH brackets cannot establish a repaired sign."""
 
     source_path = janaf_source_dir / f"{table_id}.txt"
+    require_corpus_files((source_path,))
     lines = source_path.read_text(encoding="utf-8").splitlines()
     target_index = next(
         index
@@ -710,11 +710,6 @@ def _assert_source_round_trip(document, source_path):
 
 @pytest.fixture(scope="module")
 def janaf_source_dir() -> Path:
-    if not JANAF_SOURCE_DIR.is_dir():
-        pytest.skip(
-            f"janaf_source_directory_absent: {JANAF_SOURCE_DIR}; "
-            "source fidelity NOT VERIFIED"
-        )
     return JANAF_SOURCE_DIR
 
 
@@ -723,7 +718,7 @@ def test_source_txt_round_trip(path, manifest_entries, janaf_source_dir):
     document = load_table_document(path)
     extraction = document["extraction"]
     source_path = janaf_source_dir / f"{path.stem}.txt"
-    assert source_path.is_file(), f"corpus source missing: {source_path}"
+    require_corpus_files((source_path,))
     assert hashlib.sha256(source_path.read_bytes()).hexdigest() == extraction["source_sha256"]
     _assert_source_round_trip(document, source_path)
     manifest_entry = manifest_entries[path.stem]
@@ -815,7 +810,7 @@ def test_all_41_molecular_ions_keep_atom_counts(case, manifest_entries):
 def test_mutated_real_source_token_fails(tmp_path, janaf_source_dir):
     document = load_table_document(TABLES_DIR / "Al-006.yaml")
     source_path = janaf_source_dir / "Al-006.txt"
-    assert source_path.is_file(), f"corpus source missing: {source_path}"
+    require_corpus_files((source_path,))
     _assert_source_round_trip(document, source_path)
     original = source_path.read_text()
     assert "20.786" in original
@@ -823,6 +818,15 @@ def test_mutated_real_source_token_fails(tmp_path, janaf_source_dir):
     scratch.write_text(original.replace("20.786", "999.999", 1))
     with pytest.raises(AssertionError, match="stale harvest"):
         _assert_source_round_trip(document, scratch)
+
+
+def test_partial_corpus_skips_source_round_trip_at_missing_table_file(tmp_path):
+    corpus_root = tmp_path / "regolith-corpus"
+    corpus_root.mkdir()
+    missing = corpus_root / "raw" / "janaf-nist-txt" / "Al-006.txt"
+
+    with pytest.raises(pytest.skip.Exception, match=str(missing)):
+        require_corpus_files((missing,))
 
 
 def test_header_refusal_is_listed_in_manifest(tmp_path, monkeypatch):

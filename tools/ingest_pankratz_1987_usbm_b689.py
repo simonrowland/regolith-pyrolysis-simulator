@@ -183,9 +183,29 @@ def _advance_access_status_date(access, date):
     access["updated"] = max(access.get("updated", ""), date)
 
 
-def build(corpus):
+def _b689_source_inputs(
+    corpus: Path,
+) -> tuple[Path, Path, tuple[tuple[int, int, str, Path], ...]]:
     pdf = corpus / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
-    sidecar = yaml.safe_load((pdf.parent / "sidecar.yaml").read_text())
+    chunks = []
+    for first in range(1, 433, 40):
+        last = min(first + 39, 432)
+        chunk = f"p{first:03d}-p{last:03d}"
+        source_path = (
+            corpus
+            / "text"
+            / SOURCE_ID
+            / "mineru"
+            / f"chunk-{chunk}"
+            / f"{SOURCE_ID}-{chunk}_content_list.json"
+        )
+        chunks.append((first, last, chunk, source_path))
+    return pdf, pdf.parent / "sidecar.yaml", tuple(chunks)
+
+
+def build(corpus):
+    pdf, sidecar_path, source_chunks = _b689_source_inputs(corpus)
+    sidecar = yaml.safe_load(sidecar_path.read_text())
     if sha256(pdf) != sidecar["sha256"]:
         raise ValueError("source PDF differs from acquisition checksum")
     audits = [json.loads(line) for line in (DEST / "source/formula-audit.jsonl").read_text().splitlines()]
@@ -197,10 +217,7 @@ def build(corpus):
         raise ValueError("identity audit page and record locators disagree")
     source_paths = []
     pages = []
-    for first in range(1, 433, 40):
-        last = min(first + 39, 432)
-        chunk = f"p{first:03d}-p{last:03d}"
-        source_path = corpus / "text" / SOURCE_ID / f"mineru/chunk-{chunk}" / f"{SOURCE_ID}-{chunk}_content_list.json"
+    for first, last, chunk, source_path in source_chunks:
         content = json.loads(source_path.read_text())
         # PDF432 is the blank terminal scan and has no MinerU items.
         if {item["page_idx"] for item in content} != set(range(min(last, 431) - first + 1)):
