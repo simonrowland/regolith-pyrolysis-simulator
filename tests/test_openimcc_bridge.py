@@ -1492,6 +1492,7 @@ def test_openimcc_canonical_predictions_match_chemistry_version_pin(
         canonical_json_dumps(predictions).encode("ascii")
     ).hexdigest()
 
+    # Measured 2026-11-16 on Mac-Studio-256-3 with OpenIMCC 9c327c2.
     assert digest == engine_cache.OPENIMCC_CANONICAL_OUTPUT_SHA256, (
         "OpenIMCC predictions changed: bump ENGINE_CHEMISTRY_VERSION[openimcc] "
         "and re-pin"
