@@ -4403,12 +4403,13 @@ def cost_adjusted_objective_scores(
     scores = objective_scores(objectives, definitions)
     summary = product_summary or {}
     status = summary.get("furnace_amortization_status")
-    if status == FURNACE_AMORTIZATION_STATUS_UNGROUNDED:
-        # The liner threshold is null, so a positive deposit cannot
-        # become a campaign count. That is a typed gap in the furnace
-        # penalty, not a missing objective. Physical scores stay. No
-        # campaign count is invented. The status stays on the product
-        # summary. Other non-available statuses still refuse below.
+    if status == FURNACE_AMORTIZATION_STATUS_UNGROUNDED or summary.get(
+        "lifespan_cost_status"
+    ) in {"threshold_unavailable", "wall_deposit_unavailable"}:
+        # d-367/d-412: an unavailable lifespan is unpriced and flagged,
+        # whether the threshold or wall figure is missing. Keep other
+        # objectives rankable; objective_scores retains None for a
+        # requested unavailable lifespan objective.
         return scores
     if status != "available":
         raise ObjectiveComputationError(

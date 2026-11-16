@@ -8530,6 +8530,26 @@ def _call_ranker(
     raise AssertionError(ranker)
 
 
+@pytest.mark.parametrize("ranker", _RANKER_NAMES)
+@pytest.mark.parametrize("lifespan_status", ["threshold_unavailable", "wall_deposit_unavailable"])
+def test_unpriced_lifespan_keeps_other_objectives_rankable(ranker, lifespan_status):
+    summary = {
+        "furnace_amortization_status": "batch_cost_unavailable",
+        "furnace_amortization_batch_cost_equivalents": None,
+        "lifespan_cost_status": lifespan_status,
+        "furnace_lifespan_consumed_fraction": None,
+    }
+    scored = _ranker_scored(True, summary)
+    expected = (10.0, 1.0) if ranker == "bayesian" else (10.0, -1.0)
+    assert _call_ranker(ranker, scored) == expected
+    lifespan = "furnace_lifespan_consumed_fraction"
+    assert cost_adjusted_objective_scores(
+        {lifespan: None},
+        (ObjectiveDefinition(metric=lifespan, sense="minimize"),),
+        product_summary=summary,
+    ) == (None,)
+
+
 def _oracle_ranker_scores(
     ranker: str,
     status: str,
