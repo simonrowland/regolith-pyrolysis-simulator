@@ -722,6 +722,26 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
     assert reason == "no_liquid"
 
 
+def test_classify_missing_binary_as_unavailable_from_backend_reason() -> None:
+    status, reason, engine_reason = classify_equilibrate_outcome(
+        SimpleNamespace(
+            status="not_converged",
+            diagnostics={
+                "backend_status": "not_converged",
+                "backend_status_reason": "missing_binary",
+            },
+            warnings=[],
+            activity_coefficients={},
+            vapor_pressures_Pa={},
+            liquid_fraction=None,
+        )
+    )
+
+    assert status == "refusal"
+    assert reason == REFUSAL_UNAVAILABLE
+    assert engine_reason == "missing_binary"
+
+
 def test_classify_thermoengine_nonfinite_keeps_field_detail() -> None:
     class NonFiniteField(ValueError):
         backend_status_reason = "thermoengine_nonfinite_field"

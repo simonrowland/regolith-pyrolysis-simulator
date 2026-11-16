@@ -2997,6 +2997,8 @@ class GateCurveProviderOutcome(str, Enum):
 _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "engine_crash",
     "engine_worker_unavailable",
+    "magemin_subprocess_slot_unavailable",
+    "magemin_engine_worker_unavailable",
     "missing_binary",
     "nonzero_exit",
     "parse_empty_output",
