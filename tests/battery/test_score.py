@@ -11048,8 +11048,14 @@ def test_indexed_work_inputs_match_independent_per_work_resolution() -> None:
     )
     assert indexed == expected
     assert experiments.lookups == len(observations)
-    assert expected[first_work.work_id].ids == {first_observation.observation_id}
-    assert expected[second_work.work_id].ids == {second_observation.observation_id}
+    assert expected[first_work.work_id].ids == {
+        first_observation.observation_id,
+        "nasa-cea-thermo",
+    }
+    assert expected[second_work.work_id].ids == {
+        second_observation.observation_id,
+        "nasa-cea-thermo",
+    }
 
 
 def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(

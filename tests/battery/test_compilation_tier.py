@@ -723,6 +723,10 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
     )
     output_path = tmp_path / "compilation-comparisons.jsonl"
     assert write_compilation_comparisons_jsonl(context, output_path) == len(comparisons)
+    import hashlib
+    assert hashlib.sha256(output_path.read_bytes()).hexdigest() == (
+        "2cf216e2ca3d477b87d2f2738e8c1a0e8f52b8ccba53ac4172aaee67c035bf97"
+    )
     assert len(expanded_observations) == len(context.observations)
     written = tuple(iter_compilation_comparisons_jsonl(output_path))
     fit_row = next(

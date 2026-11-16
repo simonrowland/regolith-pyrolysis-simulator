@@ -497,7 +497,7 @@ def test_source_band_catalog_preserves_series_cell_alignment_groups(
     assert len(expected_tokens) == 2
     assert len(group_key_calls) == len(series_rows)
     assert set(bands) == expected_tokens
-    assert [record["aligned_T_K"] for record in records] == [1000, 1100]
+    assert [record["aligned_T_K"] for record in records] == ["1000", "1100"]
     assert all(band.value == _Z95 * _MAD_NORMAL_SCALE for band in bands.values())
 
 
