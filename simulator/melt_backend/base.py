@@ -20,6 +20,7 @@ import threading
 from typing import Any, Callable, ClassVar, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
+from engines.engine_commissioning import COMMISSIONING_NOTICE_KIND
 from simulator.melt_regime import liquid_fraction_invalidity
 from simulator.scalar_boundary import finite_float
 
@@ -93,6 +94,9 @@ ENGINE_CACHE_NOTICE_CODE_TABLE = (
     ('magemin', 2, 'engine_model_caveat', 'MAGEMin reported a model caveat.'),
     ('magemin', 3, 'input_omitted', 'MAGEMin omitted an input.'),
     ('magemin', 90, 'warning_text', 'MAGEMin warning text used by cell classification.'),
+    ('alphamelts', 5, COMMISSIONING_NOTICE_KIND, 'AlphaMELTS commissioning assessment.'),
+    ('thermoengine', 5, COMMISSIONING_NOTICE_KIND, 'ThermoEngine commissioning assessment.'),
+    ('vaporock', 2, COMMISSIONING_NOTICE_KIND, 'VapoRock commissioning assessment.'),
 )
 _ENGINE_NOTICE_BY_CODE = {
     (engine, code): number
