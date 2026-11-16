@@ -14767,22 +14767,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # melt composition. Establish the owner's per-hour authority pin
             # before copying state, so the forecast's existing redox lookup
             # admits this record instead of dispatching another curve scan.
-            gate_provider = (
-                self._chem_registry.authoritative_for(
-                    ChemistryIntent.GATE_LIQUID_FRACTION
-                )
-                or self._chem_registry.fallback_for(
-                    ChemistryIntent.GATE_LIQUID_FRACTION
-                )
-            )
-            gate_backend = getattr(gate_provider, '_backend', None)
-            if gate_backend is None or callable(
-                getattr(gate_backend, 'equilibrate', None)
-            ):
+            try:
                 self._establish_melt_redox_gate_authority_for_current_hour()
-            # A pre-initialized registry facade without the gate's
-            # equilibrate contract cannot resolve the curve. Let the normal
-            # gate owner handle it later, with its existing failure notices.
+            except Exception:
+                # This is only a cache warm-up. The forecast still builds;
+                # the normal gate-owner lookup records any refusal when used.
+                pass
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
             # A copied registry would record forecast evaluations on an

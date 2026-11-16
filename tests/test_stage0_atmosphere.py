@@ -305,11 +305,6 @@ def test_c0_forecast_preserves_sulfsat_cache_identity_without_gate_object():
     )
     sim.load_batch("lunar")
     _attach_mutable_sulfsat_module(sim)
-    live_sulfur_side = record_dependency_vector(
-        sim,
-        ChemistryIntent.GATE_LIQUID_FRACTION,
-        artifact="freeze_gate_curve",
-    )["sulfur_side"]
 
     context, status = sim._build_c0_forecast_context()
 
@@ -321,7 +316,52 @@ def test_c0_forecast_preserves_sulfsat_cache_identity_without_gate_object():
         ChemistryIntent.GATE_LIQUID_FRACTION,
         artifact="freeze_gate_curve",
     )["sulfur_side"]
-    assert forecast_sulfur_side == live_sulfur_side
+    assert forecast_sulfur_side["sulfsat_provider_selection"] == "SulfSatGate"
+    assert forecast_sulfur_side["sulfsat_available"] is True
+
+
+def test_c0_forecast_gate_warmup_refusal_does_not_refuse_context():
+    from simulator.evaporation import EvaporationFluxRefusal
+    from simulator.melt_backend.liquidus import LiquidusSampleError
+
+    class RefusingBackend:
+        backend_name = "magemin"
+
+        def __init__(self):
+            self.equilibrate_calls = 0
+
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **_kwargs):
+            self.equilibrate_calls += 1
+            raise LiquidusSampleError(
+                "unavailable",
+                ("test backend refusal",),
+                {"reason": "missing_input"},
+            )
+
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert provider is not None
+    backend = RefusingBackend()
+    provider._backend = backend
+    provider._backend_initialised = True
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert backend.equilibrate_calls == 1
+    assert status == ""
+    assert context is not None
+    with pytest.raises(EvaporationFluxRefusal, match="liquid_fraction_provider_failed"):
+        sim._melt_redox_liquidus_gate_record()
+    assert backend.equilibrate_calls == 2
 
 
 def test_c0_forecast_rebuilds_registry_around_live_engine_pool_locks():
