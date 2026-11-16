@@ -22,7 +22,7 @@ import time
 import zlib
 from collections import OrderedDict
 from collections.abc import Iterable, Iterator, Mapping
-from contextlib import contextmanager
+from contextlib import ExitStack, closing, contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -892,6 +892,42 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
         _MEMORY_CACHE.popitem(last=False)
 
 
+def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> None:
+    expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
+    found = [row[1] for row in connection.execute(f"PRAGMA table_info({_TABLE})")]
+    if not found and allow_empty:
+        return
+    if found != expected:
+        raise EngineCacheSchemaMismatch(_TABLE, expected, found)
+    namespace = connection.execute("PRAGMA user_version").fetchone()[0]
+    if namespace != _CACHE_SCHEMA_VERSION:
+        raise EngineCacheSchemaMismatch("user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),))
+
+
+def _initialize_cache(connection: sqlite3.Connection) -> None:
+    connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
+    connection.execute(
+        f"CREATE TABLE IF NOT EXISTS {_TABLE} "
+        "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
+        "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
+        "row_seq INTEGER NOT NULL, provenance_id INTEGER NOT NULL DEFAULT 0) WITHOUT ROWID"
+    )
+    connection.execute(
+        "CREATE TABLE IF NOT EXISTS provenance (id INTEGER PRIMARY KEY, value BLOB NOT NULL UNIQUE)"
+    )
+    connection.execute(
+        "CREATE TABLE IF NOT EXISTS box_sequences (source_box TEXT PRIMARY KEY, next_seq INTEGER NOT NULL) WITHOUT ROWID"
+    )
+    connection.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS engine_outputs_box_seq ON engine_outputs(source_box, row_seq)"
+    )
+    connection.execute(
+        "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
+        "ON engine_outputs(engine, chem_version)"
+    )
+    connection.commit()
+
+
 def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
     global _CONNECTION_PID, _CONNECTION_PATH, _CONNECTION_READONLY
     pid = os.getpid()
@@ -935,41 +971,13 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
                     connection.close()
                     raise
                 time.sleep(0.01)
-    table = _TABLE
-    expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
-    columns = connection.execute(f"PRAGMA table_info({table})").fetchall()
-    found = [row[1] for row in columns]
-    if columns and found != expected:
+    try:
+        _check_cache_schema(connection, allow_empty=True)
+        if not readonly:
+            _initialize_cache(connection)
+    except Exception:
         connection.close()
-        raise EngineCacheSchemaMismatch(table, expected, found)
-    namespace = connection.execute("PRAGMA user_version").fetchone()[0]
-    if columns and namespace != _CACHE_SCHEMA_VERSION:
-        connection.close()
-        raise EngineCacheSchemaMismatch(
-            "user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),)
-        )
-    if not readonly:
-        connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
-        connection.execute(
-            f"CREATE TABLE IF NOT EXISTS {table} "
-            "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
-            "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
-            "row_seq INTEGER NOT NULL, provenance_id INTEGER NOT NULL DEFAULT 0) WITHOUT ROWID"
-        )
-        connection.execute(
-            "CREATE TABLE IF NOT EXISTS provenance (id INTEGER PRIMARY KEY, value BLOB NOT NULL UNIQUE)"
-        )
-        connection.execute(
-            "CREATE TABLE IF NOT EXISTS box_sequences (source_box TEXT PRIMARY KEY, next_seq INTEGER NOT NULL) WITHOUT ROWID"
-        )
-        connection.execute(
-            "CREATE UNIQUE INDEX IF NOT EXISTS engine_outputs_box_seq ON engine_outputs(source_box, row_seq)"
-        )
-        connection.execute(
-            "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
-            "ON engine_outputs(engine, chem_version)"
-        )
-        connection.commit()
+        raise
     _CONNECTIONS[key] = connection
     _BLOOMS[connection] = _build_bloom(connection)
     return connection
