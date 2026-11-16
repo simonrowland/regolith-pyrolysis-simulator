@@ -45,6 +45,7 @@ from dataclasses import dataclass
 from typing import Mapping
 
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.scalar_boundary import require_finite_float
 
 _EQUATION = "browning_potter"
 
@@ -73,15 +74,6 @@ def sodium_saturation_block(row: Mapping[str, object] | None) -> Mapping[str, ob
     return None
 
 
-def _finite(value: object, field: str) -> float:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise SodiumSaturationError(f"{field} must be a finite number")
-    number = float(value)
-    if not math.isfinite(number):
-        raise SodiumSaturationError(f"{field} must be a finite number")
-    return number
-
-
 def sodium_saturation_pressure(
     block: Mapping[str, object],
     temperature_K: float,
@@ -104,9 +96,6 @@ def sodium_saturation_pressure(
     coefficients = block.get("ln_p_mpa")
     if not isinstance(coefficients, Mapping):
         raise SodiumSaturationError("ln_p_mpa is required")
-    intercept = _finite(coefficients.get("a"), "ln_p_mpa.a")
-    slope = _finite(coefficients.get("b"), "ln_p_mpa.b")
-    log_coefficient = _finite(coefficients.get("c"), "ln_p_mpa.c")
     certified_raw = block.get("certified_range_K")
     if (
         not isinstance(certified_raw, (list, tuple))
@@ -114,16 +103,33 @@ def sodium_saturation_pressure(
         or len(certified_raw) != 2
     ):
         raise SodiumSaturationError("certified_range_K must be [low, high]")
-    certified = (
-        _finite(certified_raw[0], "certified_range_K[0]"),
-        _finite(certified_raw[1], "certified_range_K[1]"),
+    inputs = {
+        "ln_p_mpa.a": coefficients.get("a"),
+        "ln_p_mpa.b": coefficients.get("b"),
+        "ln_p_mpa.c": coefficients.get("c"),
+        "certified_range_K[0]": certified_raw[0],
+        "certified_range_K[1]": certified_raw[1],
+        "melting_temperature_K": block.get("melting_temperature_K"),
+        "fusion_enthalpy_J_per_mol": block.get("fusion_enthalpy_J_per_mol"),
+    }
+    numbers: dict[str, float] = {}
+    for field, raw in inputs.items():
+        if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+            raise SodiumSaturationError(f"{field} must be a finite number")
+        try:
+            numbers[field] = require_finite_float(raw, field)
+        except ValueError as exc:
+            raise SodiumSaturationError(f"{field} must be a finite number") from exc
+    intercept, slope, log_coefficient = (
+        numbers["ln_p_mpa.a"], numbers["ln_p_mpa.b"], numbers["ln_p_mpa.c"],
     )
+    certified = (numbers["certified_range_K[0]"], numbers["certified_range_K[1]"])
     if certified[1] <= certified[0]:
         raise SodiumSaturationError("certified_range_K must be increasing")
-    melting = _finite(block.get("melting_temperature_K"), "melting_temperature_K")
+    melting = numbers["melting_temperature_K"]
     if melting <= 0.0:
         raise SodiumSaturationError("melting_temperature_K must be positive")
-    fusion = _finite(block.get("fusion_enthalpy_J_per_mol"), "fusion_enthalpy_J_per_mol")
+    fusion = numbers["fusion_enthalpy_J_per_mol"]
     if fusion <= 0.0:
         raise SodiumSaturationError("fusion_enthalpy_J_per_mol must be positive")
 
