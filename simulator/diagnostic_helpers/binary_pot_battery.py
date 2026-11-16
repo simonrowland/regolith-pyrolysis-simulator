@@ -4576,6 +4576,9 @@ class _IsolatedCellWorker:
         )
 
         def solve() -> Any:
+            from simulator.vapour_rail.run_disclosure import active_registry
+
+            scoped_run = active_registry() is not None
             with self._lock:
                 try:
                     result = self._worker.call(payload, timeout_s=timeout_s)
@@ -4614,9 +4617,13 @@ class _IsolatedCellWorker:
                     if not cacheable_refusal(result):
                         return result
             hot = EquilibrateCell.from_payload(result).to_hot()
-            if self.engine == "internal-analytical":
+            if self.engine == "internal-analytical" and scoped_run:
                 # The child process has no run-disclosure registry to attach to
-                # this value, so it cannot safely populate the parent cache.
+                # this value, so it cannot safely populate a scoped cache row.
+                if isinstance(hot, EngineCacheValue):
+                    return EngineCacheValue(
+                        hot.hot, hot.cold, cacheable=False
+                    )
                 return EngineCacheValue(hot, cacheable=False)
             return hot
 
