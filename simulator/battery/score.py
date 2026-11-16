@@ -915,6 +915,24 @@ class ScoreContext:
     hard_issues_by_observation: Mapping[str, tuple[ValidationIssue, ...]] = field(
         default_factory=dict
     )
+    _observations_by_experiment: Mapping[str, tuple[Observation, ...]] = field(
+        init=False, repr=False, compare=False
+    )
+
+    def __post_init__(self) -> None:
+        rows_by_experiment: dict[str, list[Observation]] = {}
+        for observation in self.observations.values():
+            rows_by_experiment.setdefault(observation.experiment_id, []).append(
+                observation
+            )
+        object.__setattr__(
+            self,
+            "_observations_by_experiment",
+            {
+                experiment_id: tuple(rows)
+                for experiment_id, rows in rows_by_experiment.items()
+            },
+        )
 
 
 @dataclass(frozen=True)
@@ -17095,7 +17113,8 @@ def _compile_residual_with_lineage(
     # prediction still converts the reference with the same map, so a raw
     # mole fraction is not compared with an engine wt%.
     phase_siblings, phase_sibling_refusal = _phase_mole_sibling_amounts(
-        context.observations.values(), reference
+        context._observations_by_experiment.get(reference.experiment_id, ()),
+        reference,
     )
     if (
         prediction is None and predict in (None, predict_with_engine)

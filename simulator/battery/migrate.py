@@ -1402,6 +1402,12 @@ def dump_yaml(payload: object, path: Path) -> None:
 _LOCATOR_FIELD_NAMES = {item.name for item in fields(Locator)}
 
 
+def _is_mapping(value: object) -> bool:
+    """Fast path YAML's built-in dicts while retaining Mapping support."""
+
+    return type(value) is dict or isinstance(value, Mapping)
+
+
 def _enum(enum_cls: type, value: object) -> object:
     if value is None:
         return None
@@ -1413,7 +1419,7 @@ def _enum(enum_cls: type, value: object) -> object:
 def _state_from_plain(payload: object, cast) -> State:
     if isinstance(payload, State):
         return payload
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         return State.of(cast(payload))
     tag = StateTag(str(payload.get("tag") or "value"))
     if tag is StateTag.VALUE:
@@ -1524,7 +1530,7 @@ def _locator_from_plain(payload: object) -> Locator | None:
         return None
     if isinstance(payload, Locator):
         return payload
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         return Locator(note=str(payload))
     kwargs = {k: v for k, v in payload.items() if k in _LOCATOR_FIELD_NAMES and v is not None}
     if not kwargs:
@@ -1648,15 +1654,15 @@ def _percent_to_fraction(amount: Decimal) -> Decimal:
 def _percent_pairs(
     payload: object, amount_basis: AmountBasis
 ) -> list[tuple[str, Decimal]] | None:
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         return None
     body: object = payload
     if "state" in payload:
         state = payload.get("state")
-        if not isinstance(state, Mapping) or str(state.get("tag") or "value") != "value":
+        if not _is_mapping(state) or str(state.get("tag") or "value") != "value":
             return None
         body = state.get("value")
-    if not isinstance(body, Mapping):
+    if not _is_mapping(body):
         return None
     basis = body.get("amount_basis")
     if isinstance(basis, AmountBasis):
@@ -1664,7 +1670,7 @@ def _percent_pairs(
     if str(basis or "") != amount_basis.value:
         return None
     components = body.get("components")
-    if isinstance(components, Mapping):
+    if _is_mapping(components):
         items = components.items()
     elif isinstance(components, (list, tuple)):
         items = components
@@ -1786,7 +1792,7 @@ def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
 
 def _component_entries(payload: Mapping[str, Any]) -> list[Any] | None:
     components = payload.get("components")
-    if isinstance(components, Mapping):
+    if _is_mapping(components):
         return list(components.items())
     if isinstance(components, (list, tuple)):
         return list(components)
@@ -1860,7 +1866,7 @@ def _ideal_gas_volume_rows(
 
 
 def _ideal_gas_volume_printed_bases(payload: object) -> tuple[str, ...] | None:
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         return None
     if _enum(AmountBasis, payload.get("amount_basis")) is not AmountBasis.MOLE_PERCENT:
         return None
@@ -2029,23 +2035,23 @@ def _composition_map_items_for_wrapper_check(
     payload: object,
 ) -> tuple[tuple[str, object], ...]:
     body = payload
-    if isinstance(body, Mapping) and isinstance(body.get("state"), Mapping):
+    if _is_mapping(body) and _is_mapping(body.get("state")):
         state = body["state"]
         if str(state.get("tag") or "value") != StateTag.VALUE.value:
             return ()
         body = state.get("value")
     elif (
-        isinstance(body, Mapping)
+        _is_mapping(body)
         and _is_known_state_tag(body.get("tag"))
         and "value" in body
     ):
         if body.get("tag") != StateTag.VALUE.value:
             return ()
         body = body.get("value")
-    if not isinstance(body, Mapping):
+    if not _is_mapping(body):
         return ()
     components = body.get("components")
-    if isinstance(components, Mapping):
+    if _is_mapping(components):
         return tuple(
             (str(key), value)
             for key, value in components.items()
@@ -2146,16 +2152,16 @@ def _slag_metal_charge_located(payload: object) -> Located[Composition] | None:
     to the oxide wt% converter.
     """
 
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         return None
     locator = _locator_from_plain(payload.get("locator")) if "state" in payload else None
     body: object = payload
     if "state" in payload:
         state = payload.get("state")
-        if not isinstance(state, Mapping) or str(state.get("tag") or "value") != "value":
+        if not _is_mapping(state) or str(state.get("tag") or "value") != "value":
             return None
         body = state.get("value")
-    if not isinstance(body, Mapping):
+    if not _is_mapping(body):
         return None
     try:
         composition = slag_metal_charge_from_mapping(body)
@@ -2170,18 +2176,18 @@ def _mass_percent_printed_from_plain(
     payload: object,
 ) -> Located[Mapping[str, Any]] | None:
     body: object = payload
-    if isinstance(payload, Mapping) and "state" in payload:
+    if _is_mapping(payload) and "state" in payload:
         state = payload.get("state")
         body = (
             state.get("value")
-            if isinstance(state, Mapping)
+            if _is_mapping(state)
             and str(state.get("tag") or "value") == "value"
             else None
         )
-    components = body.get("components") if isinstance(body, Mapping) else None
+    components = body.get("components") if _is_mapping(body) else None
     items = (
         tuple(components.items())
-        if isinstance(components, Mapping)
+        if _is_mapping(components)
         else tuple(components)
         if isinstance(components, (list, tuple))
         else ()
@@ -2199,17 +2205,17 @@ def _mass_percent_printed_from_plain(
     raw_components_are_unique = len(raw_components) == len(component_items)
     locator = (
         _locator_from_plain(payload.get("locator"))
-        if isinstance(payload, Mapping)
+        if _is_mapping(payload)
         else None
     )
 
     def preserved_envelope() -> Located[Mapping[str, Any]]:
-        if isinstance(payload, Mapping) and "state" in payload:
+        if _is_mapping(payload) and "state" in payload:
             return _located_from_plain(payload, lambda value: value)
         return located_value(body, locator)
 
     if (
-        isinstance(body, Mapping)
+        _is_mapping(body)
         and str(body.get("basis") or "").casefold() == "as printed"
     ):
         # This source envelope is intentionally typed provenance, not a plain
@@ -2218,7 +2224,7 @@ def _mass_percent_printed_from_plain(
 
     wt = _mass_percent_components(payload)
     if wt is None or any(not n.is_finite() or n < 0 for n in wt.values()) or sum(wt.values()) <= 0:
-        if isinstance(body, Mapping):
+        if _is_mapping(body):
             basis = body.get("amount_basis")
             if isinstance(basis, AmountBasis):
                 basis = basis.value
@@ -2267,24 +2273,24 @@ def _composition_located_from_plain(
     if charge is not None:
         return charge
     body: object = payload
-    if isinstance(payload, Mapping) and "state" in payload:
+    if _is_mapping(payload) and "state" in payload:
         state = payload.get("state")
-        if isinstance(state, Mapping):
+        if _is_mapping(state):
             state_tag = state.get("tag") or StateTag.VALUE.value
             if not _is_known_state_tag(state_tag):
                 return Located(
                     State.unknown("malformed composition state wrapper: invalid tag"),
                     locator=_locator_from_plain(payload.get("locator"))
-                    if isinstance(payload.get("locator"), Mapping)
+                    if _is_mapping(payload.get("locator"))
                     else None,
                 )
         body = (
             state.get("value")
-            if isinstance(state, Mapping)
+            if _is_mapping(state)
             and str(state.get("tag") or "value") == "value"
             else None
         )
-    elif isinstance(payload, Mapping) and "tag" in payload and "value" in payload:
+    elif _is_mapping(payload) and "tag" in payload and "value" in payload:
         state_tag = payload.get("tag")
         if not _is_known_state_tag(state_tag):
             return Located(
@@ -2293,11 +2299,11 @@ def _composition_located_from_plain(
         if state_tag == StateTag.VALUE.value:
             body = payload.get("value")
     elif (
-        isinstance(payload, Mapping)
+        _is_mapping(payload)
         and str(payload.get("tag") or "") == StateTag.VALUE.value
     ):
         body = payload.get("value")
-    if isinstance(body, Mapping) and isinstance(payload, Mapping):
+    if _is_mapping(body) and _is_mapping(payload):
         wrapper_metadata = {
             key: payload[key]
             for key in (
@@ -2314,27 +2320,26 @@ def _composition_located_from_plain(
     if reserved_reason is not None:
         locator = (
             _locator_from_plain(payload.get("locator"))
-            if isinstance(payload, Mapping)
-            and isinstance(payload.get("locator"), Mapping)
+            if _is_mapping(payload) and _is_mapping(payload.get("locator"))
             else None
         )
         return Located(State.unknown(reserved_reason), locator=locator)
     if (
-        isinstance(body, Mapping)
+        _is_mapping(body)
         and _enum(AmountBasis, body.get("amount_basis"))
         is AmountBasis.MOLE_PERCENT
     ):
         source_payload = payload
-        if isinstance(payload, Mapping) and "state" not in payload:
+        if _is_mapping(payload) and "state" not in payload:
             source_payload = {
                 **payload,
                 "state": {"tag": "value", "value": {}},
             }
         source = _located_from_plain(source_payload, lambda value: value)
         body: object = payload
-        if isinstance(body, Mapping) and "state" in body:
+        if _is_mapping(body) and "state" in body:
             state = body.get("state")
-            body = state.get("value") if isinstance(state, Mapping) else None
+            body = state.get("value") if _is_mapping(state) else None
         try:
             composition = _composition_from_plain(
                 body,
@@ -2364,7 +2369,7 @@ def _composition_located_from_plain(
     wt = _mass_percent_components(body)
     is_elemental_phase_vector = (
         wt is not None
-        and isinstance(body, Mapping)
+        and _is_mapping(body)
         and str(body.get("basis") or "") == "printed_phase_composition"
         and _uses_elemental_mass_percent_vocabulary(wt)
     )
@@ -2376,12 +2381,12 @@ def _composition_located_from_plain(
         or is_elemental_phase_vector
     ):
         serialized_inference = None
-        if isinstance(payload, Mapping) and "state" not in payload:
+        if _is_mapping(payload) and "state" not in payload:
             locator = _locator_from_plain(payload.get("locator"))
         else:
             source = _located_from_plain(payload, lambda value: value)
             locator = source.locator
-            if isinstance(payload, Mapping) and "inference" in payload:
+            if _is_mapping(payload) and "inference" in payload:
                 serialized_inference = source.inference
         try:
             declared_component_map = _declared_printed_composition_map(payload)
@@ -2462,7 +2467,7 @@ def _composition_located_from_plain(
             inference=derivation,
         )
     if (
-        isinstance(body, Mapping)
+        _is_mapping(body)
         and _enum(AmountBasis, body.get("amount_basis")) is AmountBasis.MASS_PERCENT
     ):
         source = _located_from_plain(payload, lambda value: value)
@@ -2480,7 +2485,7 @@ def _composition_located_from_plain(
             ),
             locator=source.locator,
         )
-    if isinstance(payload, Mapping) and "state" not in payload:
+    if _is_mapping(payload) and "state" not in payload:
         return located_value(
             _composition_from_plain(
                 payload,
@@ -2520,24 +2525,23 @@ def _point_condition_from_plain(
     if reserved_reason is not None:
         locator = (
             _locator_from_plain(payload.get("locator"))
-            if isinstance(payload, Mapping)
-            and isinstance(payload.get("locator"), Mapping)
+            if _is_mapping(payload) and _is_mapping(payload.get("locator"))
             else None
         )
         return Located(State.unknown(reserved_reason), locator=locator)
-    if isinstance(payload, Mapping) and isinstance(payload.get("state"), Mapping):
+    if _is_mapping(payload) and _is_mapping(payload.get("state")):
         state_tag = payload["state"].get("tag") or StateTag.VALUE.value
         if not _is_known_state_tag(state_tag):
             locator = (
                 _locator_from_plain(payload.get("locator"))
-                if isinstance(payload.get("locator"), Mapping)
+                if _is_mapping(payload.get("locator"))
                 else None
             )
             return Located(
                 State.unknown("malformed point-condition state wrapper: invalid tag"),
                 locator=locator,
             )
-    if isinstance(payload, Mapping) and "tag" in payload and "value" in payload:
+    if _is_mapping(payload) and "tag" in payload and "value" in payload:
         state_tag = payload.get("tag")
         if not _is_known_state_tag(state_tag):
             return Located(
@@ -2549,10 +2553,10 @@ def _point_condition_from_plain(
         return _located_from_plain(
             payload,
             lambda value: value
-            if isinstance(value, (str, Mapping))
+            if isinstance(value, str) or _is_mapping(value)
             else as_decimal(value),
         )
-    if isinstance(payload, Mapping) and isinstance(payload.get("state"), Mapping):
+    if _is_mapping(payload) and _is_mapping(payload.get("state")):
         state = payload["state"]
         raw_value = state.get("value")
         # Text labels (starting material, equilibrium boundary) stay strings.
@@ -2567,12 +2571,12 @@ def _point_condition_from_plain(
         return _located_from_plain(
             payload,
             lambda value: dict(value)
-            if isinstance(value, Mapping)
+            if _is_mapping(value)
             else value
             if isinstance(value, str)
             else as_decimal(value),
         )
-    if isinstance(payload, Mapping) and "state" not in payload:
+    if _is_mapping(payload) and "state" not in payload:
         if "kind" in payload:
             if _is_value_kind_wrapper(payload):
                 located = _located_from_plain(payload, _value_or_point_from_plain)
@@ -2583,7 +2587,7 @@ def _point_condition_from_plain(
                     f"{payload.get('kind')!r}"
                 ),
                 locator=_locator_from_plain(payload.get("locator"))
-                if isinstance(payload.get("locator"), Mapping)
+                if _is_mapping(payload.get("locator"))
                 else None,
             )
         if "amount_basis" in payload or "components" in payload:
@@ -2599,14 +2603,16 @@ def _point_condition_from_plain(
                 _printed_map_payload(payload, numeric_values_as="decimal"),
                 _locator_from_plain(payload.get("locator")),
             )
-    if not isinstance(payload, Mapping) or "state" not in payload:
+    if not _is_mapping(payload) or "state" not in payload:
         located = _located_from_plain(payload, as_decimal)
         return _pressure_condition_provenance(payload, key, located)
     state_payload = payload.get("state")
     value = (
-        state_payload.get("value") if isinstance(state_payload, Mapping) else None
+        state_payload.get("value")
+        if _is_mapping(state_payload)
+        else None
     )
-    if isinstance(value, Mapping) and (
+    if _is_mapping(value) and (
         "amount_basis" in value or "components" in value
     ):
         if key == "printed_composition":
@@ -2616,7 +2622,7 @@ def _point_condition_from_plain(
         return _composition_located_from_plain(
             payload, closure_context=closure_context
         )
-    if isinstance(value, Mapping) and "kind" in value:
+    if _is_mapping(value) and "kind" in value:
         if _is_value_kind_wrapper(value):
             return _located_from_plain(payload, _value_or_point_from_plain)
         return Located(
@@ -2628,14 +2634,14 @@ def _point_condition_from_plain(
         )
 
     def _as_printed_map(raw: object) -> dict[str, Any]:
-        assert isinstance(raw, Mapping)
+        assert _is_mapping(raw)
         out: dict[str, Any] = {}
         for key, item in raw.items():
             amount = _as_dec_or_none(item)
             out[str(key)] = as_decimal(amount) if amount is not None else item
         return out
 
-    if isinstance(value, Mapping):
+    if _is_mapping(value):
         return _located_from_plain(
             payload,
             (
@@ -2672,7 +2678,7 @@ def _pressure_condition_provenance(
 
 
 def _condition_value_from_plain(payload: object) -> object:
-    if isinstance(payload, Mapping) and payload.get("kind") is not None:
+    if _is_mapping(payload) and payload.get("kind") is not None:
         return _value_from_plain(payload)
     return as_decimal(payload)
 
@@ -2681,7 +2687,7 @@ def _inferred_derivation_from_plain(payload: Mapping[str, Any]) -> Derivation:
     raw_locator = payload.get("locator")
     locator_note = (
         raw_locator.get("note")
-        if isinstance(raw_locator, Mapping)
+        if _is_mapping(raw_locator)
         else None
     )
     detail = str(
@@ -2700,11 +2706,11 @@ def _inferred_derivation_from_plain(payload: Mapping[str, Any]) -> Derivation:
 def _located_from_plain(payload: object, cast) -> Located:
     if isinstance(payload, Located):
         return payload
-    if not isinstance(payload, Mapping) or "state" not in payload:
+    if not _is_mapping(payload) or "state" not in payload:
         return Located(_state_from_plain(payload, cast))
     inference = None
     raw_inference = payload.get("inference")
-    if isinstance(raw_inference, Mapping):
+    if _is_mapping(raw_inference):
         inference = _derivation_from_plain(
             raw_inference, allow_mapping_inputs=True
         )
@@ -2754,7 +2760,7 @@ def _charge_from_plain(value: object) -> int:
 
 
 def _species_from_plain(payload: object) -> Species:
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         raise TypeError(f"species payload must be a mapping, not {payload!r}")
     return migrate_species_payload(payload)
 
@@ -2773,7 +2779,7 @@ def migrate_species_payload(payload: Mapping[str, Any]) -> Species:
     polymorph_state: State[Polymorph] | None
     if polymorph is None:
         polymorph_state = None
-    elif isinstance(polymorph, Mapping) and str(polymorph.get("tag") or "") != "value":
+    elif _is_mapping(polymorph) and str(polymorph.get("tag") or "") != "value":
         polymorph_state = _polymorph_state_from_plain(polymorph)
     else:
         try:
@@ -2781,7 +2787,7 @@ def migrate_species_payload(payload: Mapping[str, Any]) -> Species:
         except ValueError:
             from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
 
-            raw = polymorph.get("value") if isinstance(polymorph, Mapping) else polymorph
+            raw = polymorph.get("value") if _is_mapping(polymorph) else polymorph
             polymorph_state = unrecognised_polymorph_state(raw)
     charge_payload = payload.get("charge")
     charge_state: State[int] | None
@@ -2808,7 +2814,7 @@ def _composition_from_plain(
     projection_quantity: Quantity | None = None,
     projection_origin: str | None = None,
 ) -> Composition:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     components = payload.get("components") or ()
     amount_basis = _enum(AmountBasis, payload.get("amount_basis"))
     metadata = {
@@ -2855,9 +2861,12 @@ def _composition_from_plain(
                 "mass-percent composition is not usable: "
             )
             raise ValueError(detail)
-        composition = replace(
-            result.composition,
-            **metadata,
+        # The converter already validated the Composition; only rebuild it
+        # when this row contributes non-default source metadata.
+        composition = (
+            result.composition
+            if not any(metadata.values())
+            else replace(result.composition, **metadata)
         )
         if projection_notice_sink is not None and result.dropped_components:
             derivation = _mass_percent_composition_derivation(
@@ -2949,10 +2958,10 @@ def _composition_state_from_plain(
 
 
 def _reaction_from_plain(payload: object) -> Reaction:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     terms = []
     for item in payload.get("terms") or ():
-        if not isinstance(item, Mapping):
+        if not _is_mapping(item):
             continue
         terms.append(
             ReactionTerm(
@@ -2975,7 +2984,7 @@ def _iron_saturation_composition_from_plain(
 ) -> IronSaturationComposition | None:
     if payload is None:
         return None
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         raise TypeError("iron_saturation_composition must be a mapping")
     locator = _locator_from_plain(payload.get("locator"))
     if locator is None:
@@ -2994,7 +3003,7 @@ def _iron_saturation_composition_from_plain(
 
 
 def _standard_state_from_plain(payload: object) -> StandardState:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     return StandardState(
         convention=_enum(ReferenceStateConvention, payload["convention"]),
         endmember=_species_from_plain(payload["endmember"]),
@@ -3099,7 +3108,7 @@ def _identity_total_pressure_from_plain(value: object) -> Decimal | ApproxPressu
     on the identity as a bare point.
     """
 
-    if isinstance(value, Mapping):
+    if _is_mapping(value):
         return approx_pressure_from_mapping(value)
     return as_decimal(value)
 
@@ -3110,7 +3119,7 @@ def _identity_from_plain(
     projection_notice_sink: list[Notice] | None = None,
     projection_origin: str | None = None,
 ) -> Identity:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     quantity = _state_from_plain(payload["quantity"], lambda v: Quantity(str(v)))
     kwargs: dict[str, Any] = {
         "quantity": quantity,
@@ -3193,7 +3202,7 @@ def _identity_from_plain(
 def _valence_basis_from_plain(payload: object) -> ValenceBasis:
     if isinstance(payload, ValenceBasis):
         return payload
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         raise IdentityRefusal(
             RefusalReason.INVALID_SOURCE,
             "valence_basis",
@@ -3256,7 +3265,7 @@ def _valence_basis_from_plain(payload: object) -> ValenceBasis:
 
 
 def _sweep_identity_from_plain(payload: object) -> SweepIdentity:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     return SweepIdentity(
         species=str(payload.get("species") or ""),
         flow_sccm=_state_from_plain(payload["flow_sccm"], as_decimal),
@@ -3265,7 +3274,7 @@ def _sweep_identity_from_plain(payload: object) -> SweepIdentity:
 
 
 def _exposure_from_plain(payload: object) -> Exposure:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     schedule = payload.get("schedule")
     return Exposure(
         area_m2=_state_from_plain(payload["area_m2"], as_decimal),
@@ -3275,7 +3284,7 @@ def _exposure_from_plain(payload: object) -> Exposure:
 
 
 def _wall_from_plain(payload: object) -> WallIdentity:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     area = payload.get("area_m2")
     location = payload.get("location")
     return WallIdentity(
@@ -3287,7 +3296,7 @@ def _wall_from_plain(payload: object) -> WallIdentity:
 
 
 def _value_from_plain(payload: object) -> Value:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     kind = ValueKind(str(payload["kind"]))
     kwargs: dict[str, Any] = {"kind": kind}
     if payload.get("point") is not None:
@@ -3337,7 +3346,7 @@ def _value_from_plain(payload: object) -> Value:
 def _value_or_point_from_plain(payload: object) -> Value:
     if isinstance(payload, Value):
         return payload
-    if isinstance(payload, Mapping) and payload.get("kind") is not None:
+    if _is_mapping(payload) and payload.get("kind") is not None:
         return _value_from_plain(payload)
     return _value_from_plain({"kind": ValueKind.POINT.value, "point": payload})
 
@@ -3348,7 +3357,7 @@ def _is_value_kind_wrapper(payload: Mapping[str, Any]) -> bool:
 
 
 def _uncertainty_from_plain(payload: object) -> Uncertainty:
-    if not isinstance(payload, Mapping):
+    if not _is_mapping(payload):
         return Uncertainty(kind=UncertaintyKind.NONE)
     value = payload.get("value")
     if isinstance(value, (list, tuple)) and len(value) == 2:
@@ -3369,7 +3378,7 @@ def _uncertainty_from_plain(payload: object) -> Uncertainty:
 
 
 def _evidence_from_plain(payload: object) -> Evidence:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     class_payload = payload.get("class") or payload.get("class_")
     return Evidence(
         class_=_state_from_plain(class_payload, lambda v: EvidenceClass(str(v))),
@@ -3455,10 +3464,10 @@ def _admission_legacy_notice(
 
 
 def _admission_from_plain(payload: object, *, value: Value) -> Admission:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     decided = None
     raw_decided = payload.get("decided_by")
-    if isinstance(raw_decided, Mapping):
+    if _is_mapping(raw_decided):
         decided = AdmissionDecision(
             worker=str(raw_decided.get("worker") or ""),
             date=str(raw_decided.get("date") or "unspecified"),
@@ -3493,7 +3502,7 @@ def _admission_from_plain(payload: object, *, value: Value) -> Admission:
 
 
 def _notice_from_plain(payload: object) -> Notice:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     affected = tuple(Quantity(str(q)) for q in (payload.get("affected_quantities") or ()))
     dropped = payload.get("dropped")
     return Notice(
@@ -3517,7 +3526,7 @@ def _notice_from_plain(payload: object) -> Notice:
 
 
 def _source_file_from_plain(payload: object) -> SourceFile:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     return SourceFile(
         asset_id=str(payload["asset_id"]),
         role=AssetRole(str(payload["role"])),
@@ -3548,7 +3557,7 @@ def _source_method_uncertainty_from_plain(
 
 
 def work_from_plain(payload: object) -> Work:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     files_payload = payload.get("source_files") or {}
     files = tuple(_source_file_from_plain(f) for f in (files_payload.get("files") or ()))
     commit = files_payload.get("corpus_commit")
@@ -3853,7 +3862,7 @@ def bench_from_plain(payload: object) -> Bench:
 
 
 def _any_from_plain(value: object) -> object:
-    if isinstance(value, Mapping):
+    if _is_mapping(value):
         return dict(value)
     amount = _as_dec_or_none(value)
     if amount is not None:
@@ -3936,7 +3945,7 @@ def _sweep_gas_from_plain(payload: object) -> object:
 
 
 def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     regime_raw = payload.get("regime") or {}
     note = payload.get("cell_internal_pressure_note")
     return PressureEnvironment(
@@ -4084,7 +4093,7 @@ def experiment_from_plain(payload: object) -> Experiment:
 def _experiment_from_plain(
     payload: object, *, registry_issues: list[ValidationIssue] | None
 ) -> Experiment:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
         try:
@@ -4160,7 +4169,7 @@ def _experiment_from_plain(
 
 
 def observation_from_plain(payload: object) -> Observation:
-    assert isinstance(payload, Mapping)
+    assert _is_mapping(payload)
     notices = tuple(_notice_from_plain(n) for n in (payload.get("notices") or ()))
     observation_id = str(payload["observation_id"])
     projection_notices: list[Notice] = []
@@ -4186,7 +4195,7 @@ def observation_from_plain(payload: object) -> Observation:
         notices += (legacy_notice,)
     point_conditions = None
     raw_pc = payload.get("point_conditions")
-    if isinstance(raw_pc, Mapping):
+    if _is_mapping(raw_pc):
         point_conditions = {}
         for key, raw_condition in raw_pc.items():
             name = str(key)
@@ -4196,7 +4205,7 @@ def observation_from_plain(payload: object) -> Observation:
     derived_from = payload.get("derived_from")
     annotations = None
     raw_annotations = payload.get("annotations")
-    if isinstance(raw_annotations, Mapping):
+    if _is_mapping(raw_annotations):
         annotations = Annotations(**{
             k: raw_annotations.get(k)
             for k in ("crystal_system", "space_group", "transition_note")
@@ -4214,7 +4223,7 @@ def observation_from_plain(payload: object) -> Observation:
         admission=admission,
         notices=notices,
         provenance=dict(raw_provenance)
-        if isinstance(raw_provenance, Mapping)
+        if _is_mapping(raw_provenance)
         else None,
         source_id=payload.get("source_id"),
         locator=_locator_from_plain(payload.get("locator")),
