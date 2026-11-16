@@ -3640,6 +3640,42 @@ def test_best_tap_selects_single_intermediate_hour_with_grade_report() -> None:
     ]
 
 
+def test_best_tap_preserves_fractional_snapshot_identity() -> None:
+    snapshots = (
+        _tap_snapshot(0.25, {"SiO2": 80.0, "CaO": 20.0}),
+        _tap_snapshot(0.5, {"SiO2": 50.0, "CaO": 50.0}),
+        _tap_snapshot(0.75, {"SiO2": 20.0, "CaO": 80.0}),
+    )
+    run = _tap_run(snapshots, configured_hours=1)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={
+            "best_tap": {
+                "enabled": True,
+                "tap_grid": "recorded_hours",
+                "tap_stability_hours": 2,
+            }
+        },
+    )
+    _set_profile_hours(profile, 1)
+
+    evidence = compute_objectives(profile, run).evidence[
+        "composition_target:pool-test"
+    ]["composition_target"]
+
+    assert [row["hour"] for row in evidence["tap_score_curve"]] == [
+        0.25,
+        0.5,
+        0.75,
+    ]
+    assert evidence["tap_hour"] == 0.5
+    assert evidence["pool_snapshot_hour"] == 0.5
+
+
 def test_best_tap_dwell_can_prefer_later_certified_tie() -> None:
     snapshots = (
         _tap_snapshot(1, {"SiO2": 50.0, "CaO": 50.0}),

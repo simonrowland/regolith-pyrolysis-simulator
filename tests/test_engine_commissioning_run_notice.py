@@ -10,6 +10,7 @@ from simulator.optimize.objective import compute_objectives
 from simulator.optimize.profiles import load_profile
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
+from simulator import step_clock
 
 _BAND = {
     "sio2_wt_pct": [30.0, 80.0],
@@ -109,6 +110,37 @@ def test_equilibrium_status_accumulates_only_out_of_band_steps() -> None:
     ]
     assert notice["notices"][1]["certified_band"] == _BAND
     assert "engine_commissioning_notice" not in sim.product_ledger()
+
+
+def test_commissioning_run_notice_keeps_fractional_step_times() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    sim = run._start_session().simulator
+    step_clock.set_dt_hr(sim, 0.25)
+
+    for _ in range(3):
+        sim._last_backend_diagnostics = {
+            "commissioning_notice": _step_notice(),
+        }
+        sim._note_engine_commissioning_from_last_diagnostics()
+        step_clock.advance_melt_clock(sim.melt, step_clock.dt_hr(sim))
+
+    notice = sim.engine_commissioning_run_notice()
+
+    assert [step["hour"] for step in sim._engine_commissioning_steps] == [
+        0.25,
+        0.5,
+        0.75,
+    ]
+    assert notice is not None
+    assert notice["first_hour"] == 0.25
+    assert notice["last_hour"] == 0.75
+    assert notice["count"] == 3
 
 
 def test_in_band_run_is_clean_and_the_notice_does_not_change_numbers() -> None:

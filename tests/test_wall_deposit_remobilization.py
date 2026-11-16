@@ -6,7 +6,10 @@ import pytest
 
 from simulator.run_executor import RunExecution
 from simulator.condensation import CONDENSATION_TEMPS_C
-from simulator.diagnostics import wall_deposit_remobilization_by_segment_species
+from simulator.diagnostics import (
+    _resolve_operating_history_hour,
+    wall_deposit_remobilization_by_segment_species,
+)
 from simulator.optimize.objective import _coating_product_summary
 
 
@@ -189,6 +192,44 @@ def test_through_hour_limits_later_temperature_window() -> None:
     assert row["later_max_T_C"] == pytest.approx(condensation_T_C - 5.0)
     assert row["thermal_remobilization_threshold_exceeded"] is False
     _assert_threshold_row_semantics(row)
+
+
+def test_fractional_deposit_and_operating_times_keep_remobilization_evidence() -> None:
+    segment = "stage_1_to_stage_2"
+    species = "Na"
+    condensation_T_C = float(CONDENSATION_TEMPS_C[species])
+    later_T_C = condensation_T_C + 25.0
+    sim = _sim(
+        snapshots=(
+            _snapshot(0.25, wall_delta={(segment, species): 0.02}),
+            _snapshot(0.5),
+            _snapshot(0.75),
+        ),
+        operating_history=[
+            {"hour": 0.25, "pipe_segment_temperatures_C": {segment: 400.0}},
+            {"hour": 0.5, "pipe_segment_temperatures_C": {segment: later_T_C}},
+            {"hour": 0.75, "pipe_segment_temperatures_C": {segment: later_T_C + 10.0}},
+        ],
+    )
+
+    row = wall_deposit_remobilization_by_segment_species(
+        sim,
+        through_hour=0.5,
+    )[segment][species]
+    cutoff_row = wall_deposit_remobilization_by_segment_species(
+        sim,
+        through_hour=0.25,
+    )[segment][species]
+
+    assert row["deposit_first_hour"] == 0.25
+    assert row["deposit_last_hour"] == 0.25
+    assert row["later_max_T_C"] == pytest.approx(later_T_C)
+    assert row["thermal_remobilization_threshold_exceeded"] is True
+    assert cutoff_row["later_max_T_C"] is None
+    assert cutoff_row["thermal_remobilization_threshold_exceeded"] is False
+    assert _resolve_operating_history_hour({"hour": 0.25}, 0, ()) == 0.25
+    assert _resolve_operating_history_hour({"campaign_hour": 0.5}, 0, ()) == 0.5
+    assert _resolve_operating_history_hour({}, 0, (0.25,)) == 0.25
 
 
 def test_pressure_knudsen_invariant_threshold_flag_is_temperature_only() -> None:

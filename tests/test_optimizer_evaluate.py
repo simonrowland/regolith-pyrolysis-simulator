@@ -4220,6 +4220,74 @@ def test_lab_schedule_best_tap_reports_window_semantics_and_sample_basis() -> No
     )
 
 
+def test_real_lab_schedule_fractional_snapshots_reach_best_tap_scoring() -> None:
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule
+
+    target_id = "pc-real-fractional-tap"
+    profile = _composition_eval_profile(
+        "residual_rump_at_stop",
+        target_id=target_id,
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+    )
+    schedule = dynamic_lab_schedule()
+    schedule["duration_h"] = 1.0
+    schedule["melt_temperature_C"] = [
+        {"t_h": 0.0, "value": 1050.0, "unit": "C"},
+        {"t_h": 0.25, "value": 1051.0, "unit": "C"},
+        {"t_h": 0.5, "value": 1052.0, "unit": "C"},
+        {"t_h": 1.0, "value": 1060.0, "unit": "C"},
+    ]
+    schedule["chamber_pressure_mbar"][-1]["t_h"] = 1.0
+    schedule.pop("surface_temperature_C", None)
+    profile["run"] = {
+        **profile["run"],
+        "campaign": "C2B",
+        "hours": 1,
+        "backend_name": "internal-analytical",
+        "lab_schedule": schedule,
+    }
+    profile["fidelities"] = {
+        "fast": {"backend_name": "internal-analytical", "hours": 1}
+    }
+    profile["objectives"][0]["target"]["maturity"] = {
+        "mode": "campaign_hours",
+        "campaign": "C2B",
+        "hours": 1,
+        "best_tap": {
+            "enabled": True,
+            "tap_grid": "recorded_hours",
+            "tap_stability_hours": 2,
+        },
+    }
+
+    _, spec, run_config = evaluate_module._build_eval_inputs_for_candidate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile,
+        RecipeSchema(),
+    )
+    execution = RunExecutor().execute(run_config)
+    assert execution.status == "ok", execution.error_message
+    assert spec.hours == 1
+    assert [snapshot.hour for snapshot in execution.snapshots] == [
+        0.25,
+        0.5,
+        1.0,
+    ]
+
+    objectives = objective_module.compute_objectives(profile, execution)
+    payload = objectives.evidence[f"composition_target:{target_id}"][
+        "composition_target"
+    ]
+
+    assert [row["hour"] for row in payload["tap_score_curve"]] == [
+        0.25,
+        0.5,
+        1.0,
+    ]
+
+
 def test_cold_best_tap_keeps_completed_run_without_preheat_metadata() -> None:
     target_id = "pc-cold-terminal"
     result = evaluate(
