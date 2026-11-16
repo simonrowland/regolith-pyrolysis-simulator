@@ -4745,12 +4745,12 @@ def product_summary(
                     getattr(coating_margin, "status_reason", "") or ""
                 )
     coating_status = str(summary.get("coating_status", ""))
-    lifetime = summary.get(
+    lifetime = summary.get("aggregate_campaigns_to_resinter", math.inf)
+    has_positive_fouling = summary.get("has_positive_qualified_fouling", False)
+    summary["campaigns_to_resinter_worst_segment"] = summary.get(
         "campaigns_to_resinter_worst_segment",
         summary.get("campaigns_to_resinter", math.inf),
     )
-    has_positive_fouling = summary.get("has_positive_qualified_fouling", False)
-    summary["campaigns_to_resinter_worst_segment"] = lifetime
     summary["has_positive_qualified_fouling"] = has_positive_fouling
     refusal = summary.get("wall_deposit_refusal")
     if cost_parameters is not None:
@@ -5645,8 +5645,9 @@ def _assign_refused_supplies_at_binding_load(
     worst_max_load. The smaller id breaks ties only. It is not a
     placement rule for every off-s* species.
 
-    The max-segment load is what campaigns-to-resinter uses. It is
-    maximised by concentrating every eligible supply into one segment.
+    The max-segment load governs per-segment coating limits, separately
+    from the aggregate furnace re-sinter capacity. It is maximised by
+    concentrating every eligible supply into one segment.
     Splitting a supply across segments never raises that maximum:
     segment s can receive at most the supplies eligible there, so no
     assignment exceeds the closed form, and putting every species
@@ -5738,6 +5739,11 @@ def _assign_refused_supplies_at_binding_load(
         "segment_loads_kg": segment_loads,
         "closed_form_kg": closed_form,
         "worst_max_load_kg": closed_form[binding_segment],
+        # d-431: the bound is an alternative upper-bound scenario, not booked
+        # mass. For a furnace-wide limit, sum_s(L_s) + U bounds the load
+        # wherever U lands; for a per-segment limit use max_s(L_s + U) above.
+        # Both are kg + kg = kg; U=0 recovers their respective booked loads.
+        "aggregate_potential_load_kg": sum(segment_loads.values()) + unlocated_bound,
         "unlocated_bound_kg": unlocated_bound,
         "unlocated_supply_kg_by_species": unlocated_supply,
     }
@@ -5938,6 +5944,7 @@ def _book_wall_deposits_at_vapour_supply(
                 "governing_segment": segment,
                 "governing_zone": zones[segment],
                 "potential_load_kg": assignment["worst_max_load_kg"],
+                "aggregate_potential_load_kg": assignment["aggregate_potential_load_kg"],
                 "campaigns_elapsed": window_campaigns_elapsed,
             }
     placements = (
@@ -6071,18 +6078,21 @@ def _coating_lifetime_projection(
         for species_kg in by_segment.values()
         if sum(species_kg.values()) > 0.0
     ]
-    by_species = _wall_deposit_by_species_summary(
-        wall_deposit_by_segment_species, authority=authority,
-    )
+    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
     unlocated = (authority or {}).get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
     if unlocated:
         segment_loads.append(float(unlocated["potential_load_kg"]) / elapsed)
-    aggregate_load = sum(by_species.values()) / elapsed
+    aggregate_load = (
+        float(unlocated["aggregate_potential_load_kg"])
+        if unlocated else sum(by_species.values())
+    ) / elapsed
+    threshold = _wall_resinter_threshold_kg()
+    if threshold is not None and threshold <= 0.0:
+        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
     if not segment_loads:
         campaigns_to_resinter: float | str = "infinite"
         aggregate_campaigns_to_resinter: float | str = "infinite"
     else:
-        threshold = _wall_resinter_threshold_kg()
         controlling_load = max(segment_loads)
         campaigns_to_resinter = (
             _ungrounded_campaigns_to_resinter(controlling_load)
@@ -6157,6 +6167,10 @@ def _coating_lifetime_projection(
         "aggregate_campaigns_to_resinter": aggregate_campaigns_to_resinter,
         "campaigns_to_resinter_worst_segment": lifetime,
         "has_positive_qualified_fouling": has_positive_fouling,
+        "resinter_threshold_kg": threshold,
+        "furnace_lifespan_consumed_fraction": (
+            None if unavailable or threshold is None else aggregate_load / threshold
+        ),
     }
     if availability.refusal is not None:
         result["wall_deposit_refusal"] = availability.refusal
@@ -6188,9 +6202,10 @@ def _campaigns_elapsed(run_execution: Any) -> float:
 
 def _wall_deposit_by_species_summary(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
-    *,
-    authority: Mapping[str, Any] | None = None,
 ) -> Mapping[str, float]:
+    # Booked totals contain only physical-segment entries. An unlocated supply
+    # bound predicts an alternative load; adding it here would report scenario
+    # kilograms as booked mass. Lifetime consumes the separate bound record.
     by_species: dict[str, float] = {}
     for key, kg in wall_deposit_by_segment_species.items():
         if not isinstance(key, tuple) or len(key) != 2:
@@ -6204,10 +6219,6 @@ def _wall_deposit_by_species_summary(
         priced = _priced_wall_deposit_kg(amount)
         if priced is not None:
             by_species[species] = by_species.get(species, 0.0) + priced
-    unlocated = (authority or {}).get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
-    if unlocated:
-        for species, kg in unlocated["supply_kg_by_species"].items():
-            by_species[species] = by_species.get(species, 0.0) + float(kg)
     return MappingProxyType(dict(sorted(by_species.items())))
 
 
@@ -6263,7 +6274,7 @@ def _furnace_lifespan_cost_summary_from_raw(
     if elapsed <= 0.0:
         raise ObjectiveComputationError("campaigns_elapsed must be positive")
     cumulative_by_species = _wall_deposit_by_species_summary(
-        wall_deposit_by_segment_species, authority=authority,
+        wall_deposit_by_segment_species,
     )
     cumulative_total_wall_load_kg = sum(cumulative_by_species.values())
     by_species = MappingProxyType({
@@ -6271,9 +6282,6 @@ def _furnace_lifespan_cost_summary_from_raw(
         for species, kg in cumulative_by_species.items()
     })
     total_wall_load_kg = cumulative_total_wall_load_kg / elapsed
-    threshold = _wall_resinter_threshold_kg()
-    if threshold is not None and threshold <= 0.0:
-        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
     lifetime = _coating_lifetime_projection(
         wall_deposit_by_segment_species,
         campaigns_elapsed=elapsed,
@@ -6283,9 +6291,9 @@ def _furnace_lifespan_cost_summary_from_raw(
     wall_deposit_unavailable = (
         lifetime["has_positive_qualified_fouling"] is None
     )
+    threshold = lifetime["resinter_threshold_kg"]
     summary: dict[str, Any] = {
         **lifetime,
-        "furnace_lifespan_consumed_fraction": None,
         "lifespan_cost_status": (
             "wall_deposit_unavailable"
             if wall_deposit_unavailable
@@ -6320,11 +6328,6 @@ def _furnace_lifespan_cost_summary_from_raw(
         return MappingProxyType(summary)
     if threshold is None:
         return MappingProxyType(summary)
-    unlocated = (authority or {}).get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
-    controlling_load = (
-        float(unlocated["potential_load_kg"]) / elapsed if unlocated else total_wall_load_kg
-    )
-    summary["furnace_lifespan_consumed_fraction"] = controlling_load / threshold
     summary["lifespan_cost_status"] = "available"
     summary["lifespan_cost_status_reason"] = ""
     return MappingProxyType(summary)
@@ -7077,7 +7080,7 @@ def _depreciation_expense_per_run_summary(
         campaigns_to_resinter = None
         depreciation = cost_parameters.depreciation_expense_per_run
         status = "configured_default"
-    return MappingProxyType({
+    payload = {
         "status": status,
         "furnace_resinter_cost_usd": cost_parameters.furnace_resinter_cost_usd,
         "depreciation_expense_per_run_usd": depreciation,
@@ -7087,7 +7090,10 @@ def _depreciation_expense_per_run_summary(
         "campaigns_to_resinter": campaigns_to_resinter,
         "resinter_threshold_kg": threshold,
         "wall_deposit_total_kg": wall_load,
-    })
+    }
+    if UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT in summary:
+        payload[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] = summary[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT]
+    return MappingProxyType(payload)
 
 
 def _objective_mapping(objectives: ObjectiveLike) -> Mapping[str, float | None]:

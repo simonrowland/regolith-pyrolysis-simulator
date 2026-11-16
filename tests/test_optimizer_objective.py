@@ -13674,7 +13674,10 @@ def test_source_carrier_refusal_requires_a_complete_supply_booking(
         assert booking["species"] == species
         assert booking["supply_upper_bound_kg"] == pytest.approx(bound[species])
         assert booking[SUPPLY_INTERVAL_UPPER_BOUND_USED] == 1
-        assert summary["wall_deposit_total_kg"] == pytest.approx(bound[species])
+        assert summary["wall_deposit_total_kg"] == 0.0
+        assert summary["wall_deposit_cumulative_total_kg"] == 0.0
+        assert summary["wall_deposit_kg_by_species"] == {}
+        assert summary["wall_deposit_cumulative_kg_by_species"] == {}
         assert summary["lifespan_cost_status"] == "threshold_unavailable"
         assert "wall_deposit_refusal" not in summary
         assert not summary["wall_deposit_kg_by_segment_species"]
@@ -13683,6 +13686,20 @@ def test_source_carrier_refusal_requires_a_complete_supply_booking(
             assert flag["bound_kg"] == pytest.approx(bound[species])
             assert flag["governing_segment"] in objective_module.PIPE_SEGMENT_NAMES
             assert flag["governing_zone"] == execution.trace.wall_zone_by_segment[flag["governing_segment"]]
+            # A qualified capacity must price a bound-only scenario even
+            # though its ordinary booked map and total are both empty.
+            monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.0)
+            priced = objective_module._furnace_lifespan_cost_summary(execution, execution.simulator)
+            depreciation = objective_module._depreciation_expense_per_run_summary(
+                execution, execution.simulator, cost_parameters=_furnace_test_cost_parameters(),
+            )
+            assert priced["wall_deposit_total_kg"] == 0.0
+            assert priced["lifespan_cost_status"] == "available"
+            assert priced["aggregate_campaigns_to_resinter"] == pytest.approx(4.0 / bound[species])
+            assert depreciation["status"] == "campaigns_to_resinter"
+            assert depreciation["campaigns_to_resinter"] == priced["aggregate_campaigns_to_resinter"]
+            assert depreciation["depreciation_expense_per_run_usd"] > 0.0
+            assert depreciation[objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] == flag
 
 
 @pytest.mark.parametrize("campaigns_elapsed", [1.0, 2.0])
@@ -13714,11 +13731,13 @@ def test_unlocated_supply_bounds_the_worst_physical_wall_without_booking_zones(
     summary = objective_module._coating_product_summary(execution)
     flag_key = objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT
     flag = summary[flag_key]
-    potential_kg = retained_kg + bound_kg
+    # Hand-built oracle: booked mass = 1.0 + 0.1 = 1.1 kg; the alternative
+    # worst-wall scenario = max(1.0 + 0.25, 0.1 + 0.25, 0 + 0.25) = 1.25 kg.
+    potential_kg = 1.25
     assert flag["bound_kg"] == pytest.approx(bound_kg)
     assert flag["governing_segment"] == duct
     assert flag["governing_zone"] == execution.trace.wall_zone_by_segment[duct]
-    assert flag["potential_load_kg"] == pytest.approx(potential_kg)
+    assert flag["potential_load_kg"] == pytest.approx(1.25)
     assert summary["wall_deposit_kg_by_segment_species"] == {
         duct: {"Fe": retained_kg}, cooler: {"Fe": other_kg},
     }
@@ -13726,19 +13745,55 @@ def test_unlocated_supply_bounds_the_worst_physical_wall_without_booking_zones(
     assert zones["Hottest"] == {"Fe": retained_kg}
     assert zones["Rest"] == {"Fe": other_kg}
     assert all(species not in by_species for by_species in zones.values())
+    assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(1.1)
     assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
-        retained_kg + other_kg + bound_kg
+        sum(sum(by_species.values()) for by_species in zones.values())
     )
-    assert summary["campaigns_to_resinter"] == pytest.approx(
-        threshold_kg / (potential_kg / campaigns_elapsed)
-    )
+    assert summary["wall_deposit_total_kg"] == pytest.approx(1.1 / campaigns_elapsed)
+    assert summary["wall_deposit_cumulative_kg_by_species"] == {"Fe": pytest.approx(1.1)}
+    assert summary["wall_deposit_kg_by_species"] == {"Fe": pytest.approx(1.1 / campaigns_elapsed)}
+    # The furnace-wide scenario is 1.0 + 0.1 + 0.25 = 1.35 kg, distinct
+    # from the 1.25 kg per-segment alternative and the 1.1 kg booked mass.
+    assert flag["aggregate_potential_load_kg"] == pytest.approx(1.35)
+    # 4 kg capacity / 1.25 kg per campaign = 3.2 campaigns. At elapsed=2
+    # the same cumulative mass has half the campaign rate and twice the life.
+    assert summary["campaigns_to_resinter"] == pytest.approx(3.2 * campaigns_elapsed)
     assert summary["campaigns_to_resinter_worst_segment"] == summary["campaigns_to_resinter"]
+    assert summary["aggregate_campaigns_to_resinter"] == pytest.approx(2.962962962962963 * campaigns_elapsed)
     assert summary["furnace_lifespan_consumed_fraction"] == pytest.approx(
-        1.0 / summary["campaigns_to_resinter"]
+        0.3375 / campaigns_elapsed
+    )
+    sim = execution.simulator
+    sim.energy_cumulative_breakdown_kWh = {"electrical": 0.0, "evaporation_thermal": 0.0}
+    costs = replace(
+        _furnace_test_cost_parameters(), furnace_resinter_cost_usd=100.0,
+        generic_reagent_cost_per_kg=0.0,
+    )
+    marginal = objective_module._marginal_extraction_cost_summary(
+        sim, {}, run_execution=execution, cost_parameters=costs,
+    )
+    depreciation = marginal["depreciation"]
+    assert depreciation["campaigns_to_resinter"] == pytest.approx(2.962962962962963 * campaigns_elapsed)
+    # d-431 aggregate capacity: 4 / 1.35 = 2.962962962962963 campaigns;
+    # 100 USD/resinter / that lifetime = 33.75 USD/campaign. The booked-only
+    # 1.1 kg or per-segment 1.25 kg would underprice this at 27.5 or 31.25 USD.
+    assert depreciation["depreciation_expense_per_run_usd"] == pytest.approx(33.75 / campaigns_elapsed)
+    assert marginal["marginal_cost_usd"] == pytest.approx(33.75 / campaigns_elapsed)
+    assert depreciation[flag_key] == flag
+    sim.record.cost_rollup = {"run_input_cost": {"owner_ratify_money_projection": 20.0}}
+    full_summary = product_summary(execution, {}, cost_parameters=costs)
+    assert full_summary["campaigns_to_resinter_worst_segment"] == pytest.approx(3.2 * campaigns_elapsed)
+    assert full_summary["aggregate_campaigns_to_resinter"] == pytest.approx(2.962962962962963 * campaigns_elapsed)
+    assert full_summary["furnace_amortization_cost_per_run_usd"] == pytest.approx(
+        furnace_amortization_cost_per_run(
+            20.0, 2.962962962962963 * campaigns_elapsed,
+            costs.furnace_lifetime_cost_multiplier, costs.min_fouling_penalty,
+            has_positive_fouling=True,
+        )
     )
 
-    # Exercise the real gate handoff: its margin uses the same alternative,
-    # rather than the sum of the two walls or a duplicated bound per zone.
+    # Scope guard through the real consumers: the per-segment coating check
+    # reads 1.25, while every furnace-wide cost above reads aggregate 1.35.
     constraints = physics_module.PhysicsConstraintSet(active_gates=("coating",))
     overlay = _trace_with_optimizer_coating_report(execution, constraints)
     margin = constraints.coating(overlay)
