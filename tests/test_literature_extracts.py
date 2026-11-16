@@ -5276,10 +5276,15 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # uncovered observations 48664 -> 50791, uncovered extracts 617 -> 639,
 # unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
 # fidelity regression in existing ones.
+# t-1859 recovery (2026-11-16): re-derived with vle.fidelity_source_warnings;
+# the Floss extract contributes 641 uncovered observations, 1 uncovered
+# extract, and 3 unattested samples. Existing extract counts are unchanged:
+# uncovered observations 50791 -> 51432, extracts 639 -> 640, samples
+# 3385 -> 3388.
 # Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 50791
-_UNCOVERED_EXTRACTS_CEILING = 639
-_UNATTESTED_SAMPLES_CEILING = 3385
+_UNCOVERED_OBSERVATIONS_CEILING = 51432
+_UNCOVERED_EXTRACTS_CEILING = 640
+_UNATTESTED_SAMPLES_CEILING = 3388
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
@@ -5407,6 +5412,19 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     uncovered_obs = unmounted["uncovered_observation"]
     uncovered_extracts = unmounted_extract_counts["uncovered_observation"]
     unattested_samples = unmounted["unattested_sample"]
+    floss_doc = next(
+        doc
+        for label, doc in documents
+        if label == "floss-1998-corundum-hibonite-evaporation-residues"
+    )
+    floss_warnings = Counter()
+    for warning in vle.fidelity_source_warnings(
+        floss_doc, label="floss-1998-corundum-hibonite-evaporation-residues"
+    ):
+        floss_warnings[warning.kind] += warning.count
+    assert floss_warnings == Counter(
+        {"uncovered_observation": 641, "unattested_sample": 3}
+    )
     pilot_pins = unmounted["auto_migrated_pilot_pin"]
     pilot_extracts = unmounted_extract_counts["auto_migrated_pilot_pin"]
     source_blind_pins = unmounted["source_blind_pin"]

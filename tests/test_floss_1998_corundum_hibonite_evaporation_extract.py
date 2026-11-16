@@ -303,11 +303,53 @@ def test_floss_1998_render_pins_conditions_and_run_count() -> None:
     assert mass_loss.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
     assert mass_loss.identity.temperature_K.value == Decimal("2373.15")
 
+    source_rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+    }
+    assert len(source_rows) == len(result.observations) == 641
     for observation in result.observations.values():
+        source_id = next(
+            source_id
+            for source_id in source_rows
+            if source_id in observation.observation_id
+        )
+        source_row = source_rows[source_id]
+        source_conditions = source_row.get("point_conditions")
+        if source_conditions is None:
+            source_series = source_row["values"]["series"]
+            assert len(source_series) == 1
+            source_conditions = source_series[0]["point_conditions"]
+        printed_temperature = source_conditions["temperature_C"]
+        assert printed_temperature["state"]["tag"] == "value"
+        assert printed_temperature["locator"]["table"]
+        assert printed_temperature["locator"]["page"]
+        assert printed_temperature["locator"]["row"]
+        assert "°C" in printed_temperature["locator"]["column"]
+        source_values = source_row["values"]
+        row_temperatures = [
+            source_values["T_C"]
+        ] if source_values.get("T_C") is not None else []
+        row_temperatures.extend(
+            point["T_C"]
+            for point in source_values.get("series", [])
+            if point.get("T_C") is not None
+        )
+        if row_temperatures:
+            assert all(
+                Decimal(row_temperature)
+                == Decimal(printed_temperature["state"]["value"])
+                for row_temperature in row_temperatures
+            )
+
         conditions = observation.point_conditions or {}
         temperature = conditions["temperature_K"]
         assert temperature.state.tag.value == "value"
         assert temperature.locator is not None
+        assert temperature.state.value == (
+            Decimal(printed_temperature["state"]["value"]) + Decimal("273.15")
+        )
         assert observation.identity.temperature_K.value == temperature.state.value
         duration = conditions["duration_min"]
         assert duration.state.tag.value == "unknown"
