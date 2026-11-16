@@ -613,6 +613,8 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         "_run_alphamelts_subprocess",
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
     )
+    # The leading version bytes are chemistry cache invalidation pins; b267's
+    # internal-analytical v2 and MAGEMin v3 intentionally update their keys.
     snapshots = (
         (
             "internal-analytical default",

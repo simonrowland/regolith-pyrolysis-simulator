@@ -3807,7 +3807,6 @@ def _sossi_openimcc_pressure_model(
     melt_activity_input_policy: dict[str, Any],
     melt_activity_extensions: dict[str, dict[str, Any]],
     openimcc_bridge: Any,
-    evaluate_gas: Callable[..., Mapping[str, float]],
     nonconvergence_error: type[BaseException],
 ) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
     """OpenIMCC Sossi pressure closure. Its cache is ``pressure_cache``.
@@ -3835,14 +3834,30 @@ def _sossi_openimcc_pressure_model(
                     openimcc_bridge._cleaned_melt_policy(composition)
                 )
                 melt_activity_input_policy.update(activity_input_policy)
-                state = _evaluate_openimcc_isolated(
-                    openimcc_bridge.evaluate,
-                    timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
-                    composition_mol=activity_composition,
-                    temperature_K=temperature_K,
-                    allow_extrapolation=True,
-                    allow_out_of_envelope=True,
+                from simulator.engine_cache import cached_engine_call
+                from simulator.melt_backend.openimcc_bridge import (
+                    OpenImccBridgeResult,
                 )
+
+                timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
+                state_payload = cached_engine_call(
+                    "openimcc",
+                    openimcc_bridge._evaluate_request_vector(
+                        composition_mol=activity_composition,
+                        temperature_K=temperature_K,
+                        allow_extrapolation=True,
+                        allow_out_of_envelope=True,
+                    ),
+                    lambda: _evaluate_openimcc_isolated(
+                        openimcc_bridge._evaluate_uncached,
+                        timeout_s=timeout_s,
+                        composition_mol=activity_composition,
+                        temperature_K=temperature_K,
+                        allow_extrapolation=True,
+                        allow_out_of_envelope=True,
+                    ).to_hot(),
+                )
+                state = OpenImccBridgeResult.from_hot(state_payload)
             except nonconvergence_error as exc:
                 raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
             except TimeoutError as exc:
@@ -3888,13 +3903,14 @@ def _sossi_openimcc_pressure_model(
                         "activity_provenance": mno_activity.provenance(),
                     },
                 )
-            gas_result = evaluate_gas(
+            gas_result = openimcc_bridge.evaluate_gas(
                 gas_parent_oxide_activities,
                 temperature_K,
                 1.0,
                 gas_pack,
                 parent_oxides=gas_parent_oxides,
                 allow_extrapolation=True,
+                gas_pack_selection=openimcc_bridge.DEFAULT_GAS_PACK_SELECTION,
             )
             melt_pack_identity.update(
                 {
@@ -3958,7 +3974,6 @@ def _predict_sossi_residue_cohort(
     engine_binding_identity: dict[str, str] | None = None
     if engine == "openimcc":
         try:
-            import openimcc
             from openimcc import load_gas_datapack
             from openimcc.kernel import ImccNonconvergenceError
             from simulator.melt_backend import openimcc_bridge
@@ -4092,122 +4107,19 @@ def _predict_sossi_residue_cohort(
                     parent == "MnO"
                     for _species, parent, _reaction_parent, _reaction_o2 in gas_channels
                 )
-
-                def pressure_model(
-                    composition: Mapping[str, float], log10_pO2_bar: float
-                ) -> Mapping[str, float]:
-                    key = tuple(sorted((str(k), float(v)) for k, v in composition.items()))
-                    base = pressure_cache.get(key)
-                    if base is None:
-                        try:
-                            activity_composition, activity_input_policy = (
-                                openimcc_bridge._cleaned_melt_policy(composition)
-                            )
-                            melt_activity_input_policy.update(activity_input_policy)
-                            timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
-                            from simulator.engine_cache import cached_engine_call
-                            from simulator.melt_backend.openimcc_bridge import (
-                                OpenImccBridgeResult,
-                            )
-
-                            state_payload = cached_engine_call(
-                                "openimcc",
-                                openimcc_bridge._evaluate_request_vector(
-                                    composition_mol=activity_composition,
-                                    temperature_K=temperature_K,
-                                    allow_extrapolation=True,
-                                    allow_out_of_envelope=True,
-                                ),
-                                lambda: _evaluate_openimcc_isolated(
-                                    openimcc_bridge._evaluate_uncached,
-                                    timeout_s=timeout_s,
-                                    composition_mol=activity_composition,
-                                    temperature_K=temperature_K,
-                                    allow_extrapolation=True,
-                                    allow_out_of_envelope=True,
-                                ).to_hot(),
-                            )
-                            state = OpenImccBridgeResult.from_hot(state_payload)
-                        except ImccNonconvergenceError as exc:
-                            raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
-                        except TimeoutError as exc:
-                            raise ResidueEngineNonconvergence(
-                                "openimcc",
-                                f"Sossi residue cohort OpenIMCC timeout: {exc}",
-                                reason="engine_timeout:openimcc:sossi_residue_cohort",
-                            ) from exc
-                        gas_parent_oxide_activities = dict(
-                            state.parent_oxide_activities
-                        )
-                        gas_parent_oxides = tuple(state.parent_oxides)
-                        if mno_channel_active:
-                            from simulator.chemistry.melt_activity import (
-                                melt_oxide_activity,
-                            )
-
-                            mno_activity = melt_oxide_activity(
-                                "MnO", composition, temperature_K=temperature_K
-                            )
-                            if mno_activity is None:
-                                raise ResidueInventoryRefusal(
-                                    "melt_activity_unavailable",
-                                    "OpenIMCC Mn gas channel needs a caller-supplied MnO activity",
-                                )
-                            mno_parent_activity = (
-                                mno_activity.thermodynamic_parent_activity()
-                            )
-                            if (
-                                not math.isfinite(mno_parent_activity)
-                                or mno_parent_activity < 0.0
-                            ):
-                                raise ResidueInventoryRefusal(
-                                    "melt_activity_invalid",
-                                    f"MnO activity extension returned {mno_parent_activity!r}",
-                                )
-                            gas_parent_oxide_activities["MnO"] = mno_parent_activity
-                            gas_parent_oxides += ("MnO",)
-                            melt_activity_extensions.setdefault(
-                                "MnO",
-                                {
-                                    "reason": (
-                                        "MnO is outside the IMCC-SF04 melt-activity domain; "
-                                        "the simulator constant-gamma extension supplies the "
-                                        "activity required by the new Mn gas channel"
-                                    ),
-                                    "authority_level": mno_activity.evidence_tier,
-                                    "certified_band_K": mno_activity.valid_range_K,
-                                    "activity_provenance": mno_activity.provenance(),
-                                },
-                            )
-                        gas_result = openimcc_bridge.evaluate_gas(
-                            gas_parent_oxide_activities,
-                            temperature_K,
-                            1.0,
-                            gas_pack,
-                            parent_oxides=gas_parent_oxides,
-                            allow_extrapolation=True,
-                            gas_pack_selection=(
-                                openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
-                            ),
-                        )
-                        melt_pack_identity.update(
-                            {
-                                "model_id": str(state.pack_model_id),
-                                "datapack_version": str(state.pack_version),
-                                "pack_digest": str(state.pack_digest),
-                                "openimcc_version": str(state.openimcc_version),
-                            }
-                        )
-                        base = dict(gas_result)
-                        pressure_cache[key] = base
-                    pO2_bar = 10.0**log10_pO2_bar
-                    return {
-                        species: float(base.get(species, 0.0))
-                        * pO2_bar ** pO2_exponents[species]
-                        * PA_PER_BAR
-                        for species, _parent, _n, _o2 in gas_channels
-                        if species in pO2_exponents
-                    }
+                pressure_model = _sossi_openimcc_pressure_model(
+                    pressure_cache,
+                    temperature_K=temperature_K,
+                    gas_channels=gas_channels,
+                    gas_pack=gas_pack,
+                    pO2_exponents=pO2_exponents,
+                    mno_channel_active=mno_channel_active,
+                    melt_pack_identity=melt_pack_identity,
+                    melt_activity_input_policy=melt_activity_input_policy,
+                    melt_activity_extensions=melt_activity_extensions,
+                    openimcc_bridge=openimcc_bridge,
+                    nonconvergence_error=ImccNonconvergenceError,
+                )
             else:
                 from simulator.diagnostic_helpers.binary_pot_battery import (
                     PO2_COMMANDED,
