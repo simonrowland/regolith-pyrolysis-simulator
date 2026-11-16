@@ -275,7 +275,10 @@ def _feasible_result(
 @pytest.mark.parametrize("unpriced_yield", (10.0, 9.0))
 def test_online_mixed_furnace_population_reprices_history_and_pending_trials(strategy_class, arrival, unpriced_yield):
     pytest.importorskip("optuna")
-    strategy = strategy_class(_simple_schema(), seed=4, objective_profile=PROFILE, budget=8)
+    strategy_options = {"budget": 8} if strategy_class is OptunaTPEStrategy else {}
+    strategy = strategy_class(
+        _simple_schema(), seed=4, objective_profile=PROFILE, **strategy_options
+    )
     a, b, pending = strategy.ask(3)
     priced = _feasible_result(a, 10.0, 1.0, furnace_penalty=1.0)
     unpriced = _feasible_result(b, unpriced_yield, 1.0)
