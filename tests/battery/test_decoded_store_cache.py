@@ -146,7 +146,11 @@ def test_decoded_record_cache_preserves_sample_record_types_and_serialization(
             else migrate._decode_observation_store_file
         )
         cold = migrate._load_decoded_store_file(store_path, decoder)
-        warm = migrate._load_decoded_store_file(store_path, decoder)
+
+        def unexpected_decode(_payload: bytes) -> object:
+            pytest.fail("warm typed-record cache unexpectedly decoded a store file")
+
+        warm = migrate._load_decoded_store_file(store_path, unexpected_decode)
 
         _assert_typed_equal(cold, warm)
         assert cold == warm
