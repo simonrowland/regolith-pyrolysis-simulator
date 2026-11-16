@@ -368,6 +368,53 @@ def test_openimcc_redox_refuses_a_v1_melt_standard_with_dg46_redox_row() -> None
     assert refusal.detail["reason"] == "openimcc_feo_redox_melt_standard_mismatch"
 
 
+def test_redox_hot_round_trip_preserves_melt_binding_for_cache_off_feo_normalization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    assert engine_cache._configured_engine_cache_path() is None
+
+    captured = {}
+    evaluate = openimcc_bridge.evaluate_redox
+
+    def record_result(*args, **kwargs):
+        result = evaluate(*args, **kwargs)
+        captured["result"] = result
+        return result
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate_redox", record_result)
+    _context, _experiment, observation, seed_prediction = _case(
+        Engine.OPENIMCC, (), temperature_K=Decimal("1700")
+    )
+    prediction = score_module._predict_distin_closed_feo_activity(
+        Engine.OPENIMCC,
+        observation,
+        seed_prediction.identity,
+        "openimcc",
+        (),
+    )
+
+    from simulator.melt_backend.openimcc_bridge import OpenImccRedoxResult
+
+    result = captured["result"]
+    decoded = OpenImccRedoxResult.from_hot(result.to_hot())
+    assert decoded.melt_pack_binding_digest == result.melt_pack_binding_digest
+    assert decoded.melt_pack_binding_digest
+
+    normalized = score_module._normalize_openimcc_feo_activity_prediction(
+        prediction
+    )
+    assert normalized.value is not None
+    assert normalized.refusal_reason is None
+    assert normalized.provenance["feo_standard_normalisation"][
+        "melt_pack_identity"
+    ]["binding_digest"] == decoded.melt_pack_binding_digest
+
+
 def test_openimcc_redox_feo_normalisation_flags_extrapolation() -> None:
     from openimcc.redox_pack import load_redox_pack
 
