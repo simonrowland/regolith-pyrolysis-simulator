@@ -3054,9 +3054,15 @@ def _tap_certification(
         return False, False, dwell_hours
     if stability <= 1:
         return True, False, dwell_hours
+    dwell_start = dwell_hours[0]
     dwell_pass = all(
-        _tap_trace_certifies(traces_by_hour.get(dwell_hour, {}))
+        dwell_hour in traces_by_hour
         for dwell_hour in dwell_hours
+    )
+    dwell_pass = dwell_pass and all(
+        _tap_trace_certifies(trace)
+        for snapshot_hour, trace in traces_by_hour.items()
+        if dwell_start <= snapshot_hour <= hour
     )
     return dwell_pass, not dwell_pass, dwell_hours
 

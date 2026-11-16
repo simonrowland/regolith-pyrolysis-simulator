@@ -3676,6 +3676,50 @@ def test_best_tap_preserves_fractional_snapshot_identity() -> None:
     assert evidence["pool_snapshot_hour"] == 0.5
 
 
+@pytest.mark.parametrize(
+    ("interrupted", "expected_certified"),
+    ((True, False), (False, True)),
+)
+def test_best_tap_fractional_dwell_checks_every_recorded_snapshot(
+    interrupted: bool,
+    expected_certified: bool,
+) -> None:
+    middle_composition = (
+        {"SiO2": 80.0, "CaO": 20.0}
+        if interrupted
+        else {"SiO2": 50.0, "CaO": 50.0}
+    )
+    snapshots = (
+        _tap_snapshot(0.25, {"SiO2": 50.0, "CaO": 50.0}),
+        _tap_snapshot(0.5, middle_composition),
+        _tap_snapshot(1.25, {"SiO2": 50.0, "CaO": 50.0}),
+    )
+    run = _tap_run(snapshots, configured_hours=2)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {
+            "enabled": True,
+            "tap_grid": "recorded_hours",
+            "tap_stability_hours": 2,
+        }},
+    )
+    _set_profile_hours(profile, 2)
+
+    evidence = compute_objectives(profile, run).evidence[
+        "composition_target:pool-test"
+    ]["composition_target"]
+    tap_rows = {row["hour"]: row for row in evidence["tap_score_curve"]}
+
+    assert evidence["tap_hour"] == (1.25 if expected_certified else 0.25)
+    assert tap_rows[1.25]["certified"] is expected_certified
+    assert evidence["certified"] is expected_certified
+    assert evidence["knife_edge"] is not expected_certified
+
+
 def test_best_tap_dwell_can_prefer_later_certified_tie() -> None:
     snapshots = (
         _tap_snapshot(1, {"SiO2": 50.0, "CaO": 50.0}),

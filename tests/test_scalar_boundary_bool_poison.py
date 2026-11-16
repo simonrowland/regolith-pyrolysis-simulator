@@ -115,7 +115,7 @@ from simulator.optimize.objective import (
     ObjectiveProfileError,
     _finite_float as objective_finite_float,
     _positive_profile_int,
-    _positive_runtime_int,
+    _positive_runtime_hour,
 )
 from simulator.optimize.physics import GATE_ORDER
 from simulator.optimize.profiles import (
@@ -129,7 +129,7 @@ from simulator.optimize.study import (
     StudyAbort,
     _finite as study_finite,
     _finite_or_infinite,
-    _positive_int as study_positive_int,
+    _positive_hour as study_positive_hour,
     _resolve_two_phase_config,
 )
 from simulator.overhead import (
@@ -754,11 +754,11 @@ HARD_CASES = (
     HardCase("cli_positive_float", _positive_float, argparse.ArgumentTypeError),
     HardCase("doe_optional_float", doe_optional_float, TypeError),
     HardCase("eval_mass", _positive_eval_mass_kg, EvaluationInputError),
-    HardCase("objective_runtime", lambda v: _positive_runtime_int(v, "runtime"), ObjectiveComputationError),
+    HardCase("objective_runtime", lambda v: _positive_runtime_hour(v, "runtime"), ObjectiveComputationError),
     HardCase("objective_finite", lambda v: objective_finite_float(v, "value"), ObjectiveComputationError),
     HardCase("study_finite", lambda v: study_finite(v, "value"), StudyAbort),
     HardCase("study_finite_or_infinite", lambda v: _finite_or_infinite(v, "value"), StudyAbort),
-    HardCase("study_positive_int", lambda v: study_positive_int(v, "value"), StudyAbort),
+    HardCase("study_positive_int", lambda v: study_positive_hour(v, "value"), StudyAbort),
     HardCase("two_phase_override_top_k", lambda v: _two_phase("override", "top_k", v), TypeError),
     HardCase("two_phase_override_threshold", lambda v: _two_phase("override", "disagreement_threshold", v), TypeError),
     HardCase("two_phase_profile_top_k", lambda v: _two_phase("profile", "top_k", v), TypeError),
