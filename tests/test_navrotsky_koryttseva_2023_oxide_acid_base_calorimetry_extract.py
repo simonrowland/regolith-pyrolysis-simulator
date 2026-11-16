@@ -7,6 +7,7 @@ import yaml
 from literature_extract_assertions import assert_all_physical_locators
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
+from tests.literature_extract_test_helpers import iter_locators
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -17,24 +18,6 @@ SOURCE_PATH = "tables/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry/cite
 
 def _document():
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-
-
-def _table_locators(value):
-    locators = []
-
-    def visit(item):
-        if isinstance(item, dict):
-            locator = item.get("locator")
-            if isinstance(locator, dict) and "table" in locator:
-                locators.append(locator)
-            for child in item.values():
-                visit(child)
-        elif isinstance(item, list):
-            for child in item:
-                visit(child)
-
-    visit(value)
-    return locators
 
 
 def test_table1_extrema_are_render_checked_and_table_text_is_in_corpus():
@@ -64,7 +47,9 @@ def test_table1_extrema_are_render_checked_and_table_text_is_in_corpus():
     assert tables["2"]["locator"]["page"] == 9
     assert all("printed_table_text" not in row["values"] for row in tables.values())
 
-    table_locators = _table_locators(document)
+    table_locators = [
+        locator for locator in iter_locators(document) if "table" in locator
+    ]
     assert table_locators
     assert all(locator["source_path"] == SOURCE_PATH for locator in table_locators)
     assert all(len(locator["source_sha256"]) == 64 for locator in table_locators)

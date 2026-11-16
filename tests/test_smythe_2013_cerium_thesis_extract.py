@@ -9,6 +9,7 @@ import yaml
 from literature_extract_assertions import assert_all_physical_locators
 from simulator.battery.enums import Phase, Quantity, ValenceValueForm, ValueKind
 from simulator.battery.migrate import Migrator
+from tests.literature_extract_test_helpers import iter_locators
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,20 +64,7 @@ def test_all_table_and_figure_locators_use_physical_pages():
     extract = yaml.safe_load(EXTRACT.read_text())
     assert_all_physical_locators(extract)
 
-    locators = []
-
-    def collect(value):
-        if isinstance(value, dict):
-            locator = value.get("locator")
-            if isinstance(locator, dict):
-                locators.append(locator)
-            for child in value.values():
-                collect(child)
-        elif isinstance(value, list):
-            for child in value:
-                collect(child)
-
-    collect(extract)
+    locators = list(iter_locators(extract))
     assert len(locators) == 327
     for locator in locators:
         assert locator["published_page"] == locator["page"] - 14

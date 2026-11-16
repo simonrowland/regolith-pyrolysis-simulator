@@ -2925,12 +2925,13 @@ species:
       - pretorius_muan_1992_chromium_oxide_activities_tii_r06_cro1_5_activity
       - pretorius_muan_1992_chromium_oxide_activities_tii_r06_cro1_5_mole_fraction
       derivation:
-        relation: The authors calculate the activity coefficient from the printed activity and mole fraction using Eq.
-          (8), a_i = gamma_i X_i; gamma_i = a_i/X_i.
+        relation: Eq. (8) links these printed cells, but their central values do not satisfy the stated identity; the gamma remains
+          as printed without recalculation. See the source-inconsistency notice.
         inputs:
         - pretorius_muan_1992_chromium_oxide_activities_tii_r06_cro1_5_activity
         - pretorius_muan_1992_chromium_oxide_activities_tii_r06_cro1_5_mole_fraction
         output_unit: dimensionless
+      reason: 'source_internally_inconsistent: Table II, CCrS 12 prints a(CrO1.5)=0.054, X(CrO1.5)=0.0005, and gamma=11.08. At published precision a/X=108, 9.75 times gamma (0.989 dex). The printed cells remain unchanged; likely a misprint in X or gamma, but which is unresolved.'
     - observation_id: pretorius_muan_1992_chromium_oxide_activities_tii_r06_cro_activity
       type: activity_coefficient
       rail: melt_activity

@@ -1,9 +1,11 @@
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
 from literature_extract_assertions import assert_all_physical_locators
+from simulator.battery.enums import UncertaintyKind
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -101,22 +103,22 @@ def test_table_2_glass_oxide_and_phase_specific_isotope_values_keep_temperature_
     metal_1450 = _observation(document, "cohen_2006_table_2_1450_metal_iron_isotope_delta")
     metal_1450_2 = _point(metal_1450, 1450, 2)
     assert metal_1450_2["isotope_delta_permil"] == "-0.31"
-    assert metal_1450_2["two_sigma_permil"] == "0.25"
+    assert metal_1450_2["sigma"] == "0.25"
     assert metal_1450_2["uncertainty_as_published"] == "2s = 0.25‰"
     metal_1450_10 = _point(metal_1450, 1450, 10)
     assert metal_1450_10["isotope_delta_permil"] == "-0.34"
-    assert metal_1450_10["two_sigma_permil"] == "0.25"
+    assert metal_1450_10["sigma"] == "0.25"
     assert metal_1450_10["uncertainty_as_published"] == "2s = 0.25‰"
     glass_1450 = _observation(document, "cohen_2006_table_2_1450_glass_iron_isotope_delta")
     assert all(point["duration_min"] != "2" for point in glass_1450["values"]["series"])
     assert _point(glass_1450, 1450, 20)["isotope_delta_permil"] == "-0.12"
-    assert _point(glass_1450, 1450, 20)["two_sigma_permil"] == "0.04"
+    assert _point(glass_1450, 1450, 20)["sigma"] == "0.04"
     glass_1500 = _observation(document, "cohen_2006_table_2_1500_glass_iron_isotope_delta")
     assert _point(glass_1500, 1500, 20)["isotope_delta_permil"] == "0.77"
-    assert "two_sigma_permil" not in _point(glass_1500, 1500, 20)
+    assert "sigma" not in _point(glass_1500, 1500, 20)
     glass_1540 = _observation(document, "cohen_2006_table_2_1540_glass_iron_isotope_delta")
     assert _point(glass_1540, 1540, 240)["isotope_delta_permil"] == "1.05"
-    assert "two_sigma_permil" not in _point(glass_1540, 1540, 240)
+    assert "sigma" not in _point(glass_1540, 1540, 240)
 
     for observation in composition + isotope:
         assert observation["locator"]["page"] == 3
@@ -136,6 +138,7 @@ def test_table_2_glass_oxide_and_phase_specific_isotope_values_keep_temperature_
 
 
 def test_isolated_migration_emits_every_typed_table_2_value_with_temperature_and_conditions():
+    document = _document()
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -162,6 +165,44 @@ def test_isolated_migration_emits_every_typed_table_2_value_with_temperature_and
             condition = observation.point_conditions[name]
             assert condition.state.is_value
             assert condition.locator.table == "2"
+
+    isotope_observations = [
+        row
+        for row in document["species"]["Fe"]["observations"]
+        if row["values"]["quantity"] == "isotope_delta"
+    ]
+    assert len(isotope_observations) == 6
+    assert sum(
+        "sigma" in point
+        for source_observation in isotope_observations
+        for point in source_observation["values"]["series"]
+    ) == 42
+    assert sum(
+        "sigma" not in point
+        for source_observation in isotope_observations
+        for point in source_observation["values"]["series"]
+    ) == 7
+    for source_observation in isotope_observations:
+        native_rows = [
+            row
+            for row in result.observations.values()
+            if source_observation["observation_id"] in row.observation_id
+        ]
+        assert len(native_rows) == len(source_observation["values"]["series"])
+        native_by_duration = {
+            Decimal(str(row.point_conditions["duration_min"].state.value)): row
+            for row in native_rows
+        }
+        for point in source_observation["values"]["series"]:
+            native = native_by_duration[Decimal(point["duration_min"])]
+            verbatim = native.uncertainty.verbatim
+            assert isinstance(verbatim, dict)
+            assert verbatim["confidence_level"] == "two_sigma"
+            if "sigma" in point:
+                assert native.uncertainty.kind is UncertaintyKind.PRINTED
+                assert Decimal(str(verbatim["sigma"])) == Decimal(point["sigma"])
+            else:
+                assert "sigma" not in verbatim
 
 
 def test_all_seven_figures_have_attributed_inventory_and_physical_locators():

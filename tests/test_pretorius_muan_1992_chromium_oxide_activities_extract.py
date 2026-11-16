@@ -1,10 +1,11 @@
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
 from literature_extract_assertions import assert_all_physical_locators
-from simulator.battery.enums import Phase
+from simulator.battery.enums import NoticeKind, Phase
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -22,6 +23,15 @@ def _observation(document, species, observation_id):
         row
         for row in document["species"][species]["observations"]
         if row["observation_id"] == observation_id
+    )
+
+
+def _printed_interval(value, *, scale=Decimal("1")):
+    printed = Decimal(str(value))
+    half_last_place = Decimal(1).scaleb(printed.as_tuple().exponent) / 2
+    return (
+        (printed - half_last_place) * scale,
+        (printed + half_last_place) * scale,
     )
 
 
@@ -116,6 +126,7 @@ def test_activity_tables_and_appendix_compositions_are_typed_and_located():
 
 
 def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugacity():
+    document = _document()
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -148,6 +159,74 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
         row.identity.species.formula for row in result.observations.values()
     }
     assert formulas >= {"CrO", "CrO1.5"}
+
+    observations = [
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+    ]
+    by_id = {row["observation_id"]: row for row in observations}
+    gamma_rows = [
+        row
+        for row in observations
+        if row.get("values", {}).get("method_class") == "measured_reduced"
+        and row.get("values", {}).get("quantity") == "activity_coefficient"
+    ]
+    assert len(gamma_rows) == 102
+    failures = []
+    for gamma in gamma_rows:
+        stem = gamma["observation_id"].removesuffix("_gamma")
+        activity = by_id[f"{stem}_activity"]
+        mole_fraction = by_id[f"{stem}_mole_fraction"]
+        activity_value = activity["values"].get(
+            "activity_as_published", activity["values"]["activity"]
+        )
+        mole_fraction_value = mole_fraction["values"]["value_as_published"]
+        scale_exponent = int(mole_fraction["values"]["scale_factor"]["exponent"])
+        scale = Decimal(1).scaleb(scale_exponent)
+        activity_interval = _printed_interval(activity_value)
+        mole_fraction_interval = _printed_interval(mole_fraction_value, scale=scale)
+        gamma_interval = _printed_interval(gamma["values"]["gamma_as_published"])
+        product_interval = (
+            gamma_interval[0] * mole_fraction_interval[0],
+            gamma_interval[1] * mole_fraction_interval[1],
+        )
+        if max(activity_interval[0], product_interval[0]) > min(
+            activity_interval[1], product_interval[1]
+        ):
+            failures.append((gamma, activity, mole_fraction))
+
+    assert [row[0]["observation_id"] for row in failures] == [
+        "pretorius_muan_1992_chromium_oxide_activities_tii_r06_cro1_5_gamma"
+    ]
+    gamma, activity, mole_fraction = failures[0]
+    assert activity["values"]["activity"] == "0.054"
+    assert mole_fraction["values"]["value"] == "0.0005"
+    assert mole_fraction["values"]["value_as_published"] == "0.05"
+    assert gamma["values"]["gamma"] == "11.08"
+    assert gamma["derived_from"] == [
+        activity["observation_id"],
+        mole_fraction["observation_id"],
+    ]
+    assert "central values do not satisfy" in gamma["derivation"]["relation"]
+    assert "remains as printed without recalculation" in gamma["derivation"]["relation"]
+    assert gamma["reason"].startswith("source_internally_inconsistent:")
+    ratio = Decimal(activity["values"]["activity"]) / Decimal(
+        mole_fraction["values"]["value"]
+    )
+    discrepancy_dex = (ratio / Decimal(gamma["values"]["gamma"])).log10()
+    assert ratio == Decimal("108")
+    assert abs(discrepancy_dex - Decimal("0.989")) < Decimal("0.001")
+
+    native = result.observations[
+        f"{document['source_id']}::{gamma['observation_id']}"
+    ]
+    notice = next(
+        notice
+        for notice in native.notices
+        if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+    )
+    assert notice.reason == gamma["reason"]
     by_formula = {}
     for row in result.observations.values():
         by_formula.setdefault(row.identity.species.formula, 0)

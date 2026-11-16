@@ -24,7 +24,7 @@ fidelity_samples:
     row: 1450 °C, 5 min
     column: SiO2
   note: Checked against the 600 dpi render of the printed Table 2 cell.
-- path: species.Fe.observations[cohen_2006_table_2_1450_metal_iron_isotope_delta].values.series[0].two_sigma_permil
+- path: species.Fe.observations[cohen_2006_table_2_1450_metal_iron_isotope_delta].values.series[0].sigma
   value: '0.25'
   locator:
     page: 3
@@ -48,7 +48,7 @@ fidelity_samples:
     row: 1450 °C, 10 min
     column: δ57Fe metal (‰)
   note: Checked against the 600 dpi render of the printed Table 2 cell.
-- path: species.Fe.observations[cohen_2006_table_2_1450_metal_iron_isotope_delta].values.series[1].two_sigma_permil
+- path: species.Fe.observations[cohen_2006_table_2_1450_metal_iron_isotope_delta].values.series[1].sigma
   value: '0.25'
   locator:
     page: 3
@@ -9312,12 +9312,14 @@ species:
       phase_as_published: metal
       regime: CO/CO2 reduction in a 1-atm vertical Deltech furnace
       units: per mil relative to IRMM-014
+      uncertainty:
+        confidence_level: two_sigma
       values:
         quantity: isotope_delta
         method_class: measured_direct
         isotope_ratio: 57Fe/54Fe
         reference_standard: IRMM-014
-        uncertainty_convention_as_published: 2s; per-point values are retained in two_sigma_permil
+        uncertainty_convention_as_published: 2s; per-point widths use sigma with parent confidence_level two_sigma
         furnace_as_printed: 1-atm vertical Deltech furnace
         atmosphere_as_printed: pure CO or a CO/CO2 mixture; the exact mixture by row is not printed
         oxygen_fugacity_buffer_as_printed: IW−0.5 (run reduction condition as printed)
@@ -9363,7 +9365,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id226
           locator: *id226
-          two_sigma_permil: '0.25'
+          sigma: '0.25'
           uncertainty_as_published: 2s = 0.25‰
         - sample: 1450 °C metal at 10 min
           T_C: '1450'
@@ -9404,7 +9406,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id227
           locator: *id227
-          two_sigma_permil: '0.25'
+          sigma: '0.25'
           uncertainty_as_published: 2s = 0.25‰
         - sample: 1450 °C metal at 20 min
           T_C: '1450'
@@ -9445,7 +9447,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id228
           locator: *id228
-          two_sigma_permil: '0.08'
+          sigma: '0.08'
           uncertainty_as_published: 2s = 0.08‰
         - sample: 1450 °C metal at 30 min
           T_C: '1450'
@@ -9486,7 +9488,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id229
           locator: *id229
-          two_sigma_permil: '0.10'
+          sigma: '0.10'
           uncertainty_as_published: 2s = 0.10‰
         - sample: 1450 °C metal at 40 min
           T_C: '1450'
@@ -9527,7 +9529,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id230
           locator: *id230
-          two_sigma_permil: '0.03'
+          sigma: '0.03'
           uncertainty_as_published: 2s = 0.03‰
         - sample: 1450 °C metal at 60 min
           T_C: '1450'
@@ -9568,7 +9570,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id231
           locator: *id231
-          two_sigma_permil: '0.10'
+          sigma: '0.10'
           uncertainty_as_published: 2s = 0.10‰
         - sample: 1450 °C metal at 90 min
           T_C: '1450'
@@ -9609,7 +9611,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id232
           locator: *id232
-          two_sigma_permil: '0.09'
+          sigma: '0.09'
           uncertainty_as_published: 2s = 0.09‰
         - sample: 1450 °C metal at 240 min
           T_C: '1450'
@@ -9650,7 +9652,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id233
           locator: *id233
-          two_sigma_permil: '0.03'
+          sigma: '0.03'
           uncertainty_as_published: 2s = 0.03‰
         - sample: 1450 °C metal at 360 min
           T_C: '1450'
@@ -9691,7 +9693,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id234
           locator: *id234
-          two_sigma_permil: '0.16'
+          sigma: '0.16'
           uncertainty_as_published: 2s = 0.16‰
     - observation_id: cohen_2006_table_2_1450_glass_iron_isotope_delta
       type: rate_series
@@ -9707,12 +9709,14 @@ species:
       phase_as_published: silicate glass
       regime: CO/CO2 reduction in a 1-atm vertical Deltech furnace
       units: per mil relative to IRMM-014
+      uncertainty:
+        confidence_level: two_sigma
       values:
         quantity: isotope_delta
         method_class: measured_direct
         isotope_ratio: 57Fe/54Fe
         reference_standard: IRMM-014
-        uncertainty_convention_as_published: 2s; per-point values are retained in two_sigma_permil
+        uncertainty_convention_as_published: 2s; per-point widths use sigma with parent confidence_level two_sigma
         furnace_as_printed: 1-atm vertical Deltech furnace
         atmosphere_as_printed: pure CO or a CO/CO2 mixture; the exact mixture by row is not printed
         oxygen_fugacity_buffer_as_printed: IW−0.5 (run reduction condition as printed)
@@ -9758,7 +9762,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id236
           locator: *id236
-          two_sigma_permil: '0.07'
+          sigma: '0.07'
           uncertainty_as_published: 2s = 0.07‰
         - sample: 1450 °C silicate glass at 20 min
           T_C: '1450'
@@ -9799,7 +9803,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id237
           locator: *id237
-          two_sigma_permil: '0.04'
+          sigma: '0.04'
           uncertainty_as_published: 2s = 0.04‰
         - sample: 1450 °C silicate glass at 30 min
           T_C: '1450'
@@ -9840,7 +9844,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id238
           locator: *id238
-          two_sigma_permil: '0.09'
+          sigma: '0.09'
           uncertainty_as_published: 2s = 0.09‰
         - sample: 1450 °C silicate glass at 40 min
           T_C: '1450'
@@ -9881,7 +9885,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id239
           locator: *id239
-          two_sigma_permil: '0.11'
+          sigma: '0.11'
           uncertainty_as_published: 2s = 0.11‰
         - sample: 1450 °C silicate glass at 60 min
           T_C: '1450'
@@ -9922,7 +9926,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id240
           locator: *id240
-          two_sigma_permil: '0.07'
+          sigma: '0.07'
           uncertainty_as_published: 2s = 0.07‰
         - sample: 1450 °C silicate glass at 90 min
           T_C: '1450'
@@ -9963,7 +9967,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id241
           locator: *id241
-          two_sigma_permil: '0.06'
+          sigma: '0.06'
           uncertainty_as_published: 2s = 0.06‰
         - sample: 1450 °C silicate glass at 240 min
           T_C: '1450'
@@ -10057,12 +10061,14 @@ species:
       phase_as_published: metal
       regime: CO/CO2 reduction in a 1-atm vertical Deltech furnace
       units: per mil relative to IRMM-014
+      uncertainty:
+        confidence_level: two_sigma
       values:
         quantity: isotope_delta
         method_class: measured_direct
         isotope_ratio: 57Fe/54Fe
         reference_standard: IRMM-014
-        uncertainty_convention_as_published: 2s; per-point values are retained in two_sigma_permil
+        uncertainty_convention_as_published: 2s; per-point widths use sigma with parent confidence_level two_sigma
         furnace_as_printed: 1-atm vertical Deltech furnace
         atmosphere_as_printed: pure CO or a CO/CO2 mixture; the exact mixture by row is not printed
         oxygen_fugacity_buffer_as_printed: IW−0.5 (run reduction condition as printed)
@@ -10108,7 +10114,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id244
           locator: *id244
-          two_sigma_permil: '0.12'
+          sigma: '0.12'
           uncertainty_as_published: 2s = 0.12‰
         - sample: 1500 °C metal at 10 min
           T_C: '1500'
@@ -10149,7 +10155,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id245
           locator: *id245
-          two_sigma_permil: '0.14'
+          sigma: '0.14'
           uncertainty_as_published: 2s = 0.14‰
         - sample: 1500 °C metal at 20 min
           T_C: '1500'
@@ -10190,7 +10196,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id246
           locator: *id246
-          two_sigma_permil: '0.13'
+          sigma: '0.13'
           uncertainty_as_published: 2s = 0.13‰
         - sample: 1500 °C metal at 30 min
           T_C: '1500'
@@ -10231,7 +10237,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id247
           locator: *id247
-          two_sigma_permil: '0.10'
+          sigma: '0.10'
           uncertainty_as_published: 2s = 0.10‰
         - sample: 1500 °C metal at 60 min
           T_C: '1500'
@@ -10272,7 +10278,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id248
           locator: *id248
-          two_sigma_permil: '0.05'
+          sigma: '0.05'
           uncertainty_as_published: 2s = 0.05‰
         - sample: 1500 °C metal at 90 min
           T_C: '1500'
@@ -10313,7 +10319,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id249
           locator: *id249
-          two_sigma_permil: '0.08'
+          sigma: '0.08'
           uncertainty_as_published: 2s = 0.08‰
         - sample: 1500 °C metal at 120 min
           T_C: '1500'
@@ -10354,7 +10360,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id250
           locator: *id250
-          two_sigma_permil: '0.08'
+          sigma: '0.08'
           uncertainty_as_published: 2s = 0.08‰
         - sample: 1500 °C metal at 240 min
           T_C: '1500'
@@ -10395,7 +10401,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id251
           locator: *id251
-          two_sigma_permil: '0.05'
+          sigma: '0.05'
           uncertainty_as_published: 2s = 0.05‰
         - sample: 1500 °C metal at 360 min
           T_C: '1500'
@@ -10436,7 +10442,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id252
           locator: *id252
-          two_sigma_permil: '0.06'
+          sigma: '0.06'
           uncertainty_as_published: 2s = 0.06‰
     - observation_id: cohen_2006_table_2_1500_glass_iron_isotope_delta
       type: rate_series
@@ -10452,12 +10458,14 @@ species:
       phase_as_published: silicate glass
       regime: CO/CO2 reduction in a 1-atm vertical Deltech furnace
       units: per mil relative to IRMM-014
+      uncertainty:
+        confidence_level: two_sigma
       values:
         quantity: isotope_delta
         method_class: measured_direct
         isotope_ratio: 57Fe/54Fe
         reference_standard: IRMM-014
-        uncertainty_convention_as_published: 2s; per-point values are retained in two_sigma_permil
+        uncertainty_convention_as_published: 2s; per-point widths use sigma with parent confidence_level two_sigma
         furnace_as_printed: 1-atm vertical Deltech furnace
         atmosphere_as_printed: pure CO or a CO/CO2 mixture; the exact mixture by row is not printed
         oxygen_fugacity_buffer_as_printed: IW−0.5 (run reduction condition as printed)
@@ -10503,7 +10511,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id253
           locator: *id253
-          two_sigma_permil: '0.20'
+          sigma: '0.20'
           uncertainty_as_published: 2s = 0.20‰
         - sample: 1500 °C silicate glass at 20 min
           T_C: '1500'
@@ -10583,7 +10591,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id255
           locator: *id255
-          two_sigma_permil: '0.18'
+          sigma: '0.18'
           uncertainty_as_published: 2s = 0.18‰
         - sample: 1500 °C silicate glass at 60 min
           T_C: '1500'
@@ -10624,7 +10632,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id256
           locator: *id256
-          two_sigma_permil: '0.32'
+          sigma: '0.32'
           uncertainty_as_published: 2s = 0.32‰
         - sample: 1500 °C silicate glass at 90 min
           T_C: '1500'
@@ -10665,7 +10673,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id257
           locator: *id257
-          two_sigma_permil: '0.11'
+          sigma: '0.11'
           uncertainty_as_published: 2s = 0.11‰
         - sample: 1500 °C silicate glass at 240 min
           T_C: '1500'
@@ -10759,12 +10767,14 @@ species:
       phase_as_published: metal
       regime: CO/CO2 reduction in a 1-atm vertical Deltech furnace
       units: per mil relative to IRMM-014
+      uncertainty:
+        confidence_level: two_sigma
       values:
         quantity: isotope_delta
         method_class: measured_direct
         isotope_ratio: 57Fe/54Fe
         reference_standard: IRMM-014
-        uncertainty_convention_as_published: 2s; per-point values are retained in two_sigma_permil
+        uncertainty_convention_as_published: 2s; per-point widths use sigma with parent confidence_level two_sigma
         furnace_as_printed: 1-atm vertical Deltech furnace
         atmosphere_as_printed: pure CO or a CO/CO2 mixture; the exact mixture by row is not printed
         oxygen_fugacity_buffer_as_printed: IW−0.5 (run reduction condition as printed)
@@ -10810,7 +10820,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id260
           locator: *id260
-          two_sigma_permil: '0.17'
+          sigma: '0.17'
           uncertainty_as_published: 2s = 0.17‰
         - sample: 1540 °C metal at 10 min
           T_C: '1540'
@@ -10851,7 +10861,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id261
           locator: *id261
-          two_sigma_permil: '0.17'
+          sigma: '0.17'
           uncertainty_as_published: 2s = 0.17‰
         - sample: 1540 °C metal at 20 min
           T_C: '1540'
@@ -10892,7 +10902,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id262
           locator: *id262
-          two_sigma_permil: '0.15'
+          sigma: '0.15'
           uncertainty_as_published: 2s = 0.15‰
         - sample: 1540 °C metal at 30 min
           T_C: '1540'
@@ -10933,7 +10943,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id263
           locator: *id263
-          two_sigma_permil: '0.13'
+          sigma: '0.13'
           uncertainty_as_published: 2s = 0.13‰
         - sample: 1540 °C metal at 60 min
           T_C: '1540'
@@ -10974,7 +10984,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id264
           locator: *id264
-          two_sigma_permil: '0.03'
+          sigma: '0.03'
           uncertainty_as_published: 2s = 0.03‰
         - sample: 1540 °C metal at 90 min
           T_C: '1540'
@@ -11015,7 +11025,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id265
           locator: *id265
-          two_sigma_permil: '0.06'
+          sigma: '0.06'
           uncertainty_as_published: 2s = 0.06‰
         - sample: 1540 °C metal at 240 min
           T_C: '1540'
@@ -11056,7 +11066,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id266
           locator: *id266
-          two_sigma_permil: '0.18'
+          sigma: '0.18'
           uncertainty_as_published: 2s = 0.18‰
         - sample: 1540 °C metal at 360 min
           T_C: '1540'
@@ -11097,7 +11107,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id267
           locator: *id267
-          two_sigma_permil: '0.02'
+          sigma: '0.02'
           uncertainty_as_published: 2s = 0.02‰
     - observation_id: cohen_2006_table_2_1540_glass_iron_isotope_delta
       type: rate_series
@@ -11113,12 +11123,14 @@ species:
       phase_as_published: silicate glass
       regime: CO/CO2 reduction in a 1-atm vertical Deltech furnace
       units: per mil relative to IRMM-014
+      uncertainty:
+        confidence_level: two_sigma
       values:
         quantity: isotope_delta
         method_class: measured_direct
         isotope_ratio: 57Fe/54Fe
         reference_standard: IRMM-014
-        uncertainty_convention_as_published: 2s; per-point values are retained in two_sigma_permil
+        uncertainty_convention_as_published: 2s; per-point widths use sigma with parent confidence_level two_sigma
         furnace_as_printed: 1-atm vertical Deltech furnace
         atmosphere_as_printed: pure CO or a CO/CO2 mixture; the exact mixture by row is not printed
         oxygen_fugacity_buffer_as_printed: IW−0.5 (run reduction condition as printed)
@@ -11164,7 +11176,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id268
           locator: *id268
-          two_sigma_permil: '0.08'
+          sigma: '0.08'
           uncertainty_as_published: 2s = 0.08‰
         - sample: 1540 °C silicate glass at 10 min
           T_C: '1540'
@@ -11205,7 +11217,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id269
           locator: *id269
-          two_sigma_permil: '0.07'
+          sigma: '0.07'
           uncertainty_as_published: 2s = 0.07‰
         - sample: 1540 °C silicate glass at 20 min
           T_C: '1540'
@@ -11246,7 +11258,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id270
           locator: *id270
-          two_sigma_permil: '0.08'
+          sigma: '0.08'
           uncertainty_as_published: 2s = 0.08‰
         - sample: 1540 °C silicate glass at 30 min
           T_C: '1540'
@@ -11287,7 +11299,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id271
           locator: *id271
-          two_sigma_permil: '0.10'
+          sigma: '0.10'
           uncertainty_as_published: 2s = 0.10‰
         - sample: 1540 °C silicate glass at 60 min
           T_C: '1540'
@@ -11328,7 +11340,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id272
           locator: *id272
-          two_sigma_permil: '0.03'
+          sigma: '0.03'
           uncertainty_as_published: 2s = 0.03‰
         - sample: 1540 °C silicate glass at 90 min
           T_C: '1540'
@@ -11369,7 +11381,7 @@ species:
                 value: IW−0.5 (run reduction condition as printed)
               locator: *id273
           locator: *id273
-          two_sigma_permil: '0.30'
+          sigma: '0.30'
           uncertainty_as_published: 2s = 0.30‰
         - sample: 1540 °C silicate glass at 240 min
           T_C: '1540'
