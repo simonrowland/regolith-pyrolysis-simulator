@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import subprocess
 import time
+from types import SimpleNamespace
 
 import pytest
 
@@ -580,18 +581,20 @@ def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
     assert len({owner_by_id[point.observation_id] for point in sossi}) == 1
 
 
+class _SortAggregate:
+    def __init__(self, *args, **kwargs) -> None:
+        self.tier_accumulator = SimpleNamespace(selected=None)
+
+    def add(self, _payload):
+        return None
+
+
 def test_jsonl_sort_preserves_append_order_for_tied_rows(
     tmp_path: Path, monkeypatch
 ) -> None:
-    class _Aggregate:
-        def __init__(self, *args, **kwargs) -> None:
-            pass
-
-        def add(self, _payload):
-            return None
-
-    monkeypatch.setattr("simulator.battery.score._ScorePayloadAccumulator", _Aggregate)
+    monkeypatch.setattr("simulator.battery.score._ScorePayloadAccumulator", _SortAggregate)
     stream = _ResidualJsonlStream(tmp_path / "tied.jsonl")
+    stream.selected_reference_ids.update({"observation-1", "selected-without-row"})
     try:
         payloads = [
             {
@@ -617,6 +620,9 @@ def test_jsonl_sort_preserves_append_order_for_tied_rows(
             context=_worker_fixture(),
             engines=(Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK),
         )
+        assert stream.report_aggregate.tier_accumulator.selected == {
+            "observation-1", "selected-without-row"
+        }
         rows = [
             json.loads(line)
             for line in stream.partial_path.read_text(encoding="utf-8").splitlines()[1:]
@@ -639,15 +645,9 @@ def test_jsonl_sort_preserves_append_order_for_tied_rows(
 def test_jsonl_sort_restores_serial_order_after_engine_shard_merge(
     tmp_path: Path, monkeypatch
 ) -> None:
-    class _Aggregate:
-        def __init__(self, *args, **kwargs) -> None:
-            pass
-
-        def add(self, _payload):
-            return None
-
-    monkeypatch.setattr("simulator.battery.score._ScorePayloadAccumulator", _Aggregate)
+    monkeypatch.setattr("simulator.battery.score._ScorePayloadAccumulator", _SortAggregate)
     stream = _ResidualJsonlStream(tmp_path / "sharded-ties.jsonl")
+    stream.selected_reference_ids.update({"observation-1", "selected-without-row"})
     try:
         merged_shard_rows = (
             ("point-0", Engine.INTERNAL_ANALYTICAL.value, ("observation-1", 0, 0, 0)),
@@ -671,6 +671,9 @@ def test_jsonl_sort_restores_serial_order_after_engine_shard_merge(
             context=_worker_fixture(),
             engines=(Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK),
         )
+        assert stream.report_aggregate.tier_accumulator.selected == {
+            "observation-1", "selected-without-row"
+        }
         rows = [
             json.loads(line)
             for line in stream.partial_path.read_text(encoding="utf-8").splitlines()[1:]
