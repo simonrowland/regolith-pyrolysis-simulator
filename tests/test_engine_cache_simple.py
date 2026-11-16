@@ -1868,7 +1868,7 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
     )
     from simulator.melt_backend.base import (
         equilibrium_cache_from_value,
-        equilibrium_cache_value,
+        equilibrium_to_hot,
     )
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "d207.sqlite"))
@@ -1888,7 +1888,7 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
     cold_hot = engine_cache.cached_engine_call(
         "internal-analytical",
         request,
-        lambda: equilibrium_cache_value(
+        lambda: equilibrium_to_hot(
             {"status": "ok", "diagnostics": diagnostics},
             engine_id="internal-analytical",
         ),
