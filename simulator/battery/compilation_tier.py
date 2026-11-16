@@ -4728,6 +4728,7 @@ def _nasa9_fit_comparisons_with_bound_lineage(
     """Score precision-qualified NASA-9 grid points with the shared residual owner."""
 
     from simulator.battery.generators.compilation_thermo_fits import (
+        _sidecar_fit_segments,
         evaluate_sidecar_fit,
         load_sidecar,
         sidecar_element_reference_curves,
@@ -4881,21 +4882,7 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                 if fit_settings is None:
                     thermo_record = record.get("thermo_record")
                     if isinstance(thermo_record, Mapping):
-                        raw_segments = thermo_record.get("segments", ())
-                        segment_settings = tuple(
-                            (
-                                float(segment["T_min_K"]),
-                                float(segment["T_max_K"]),
-                                tuple(
-                                    float(coefficient)
-                                    for coefficient in segment["a_coefficients"]
-                                ),
-                                float(segment["b1"]),
-                                float(segment["b2"]),
-                            )
-                            for segment in raw_segments
-                            if isinstance(segment, Mapping)
-                        )
+                        segment_settings = _sidecar_fit_segments(thermo_record)
                     else:
                         segment_settings = None
                     fit_settings = (
