@@ -152,16 +152,13 @@ PO2_OXYGEN_BALANCE_EFFUSION = "oxygen_balance_effusion"
 # multivalent element, is never rewritten as engine fO2 = -9.
 PO2_NOT_AN_INPUT = REDOX_MODE_NOT_AN_INPUT
 
-REFUSAL_OUT_OF_BASIS = "out_of_basis"
-REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
-REFUSAL_MAJOR_SUM = "sum_below_95_wt_pct"
-REFUSAL_NO_LIQUID = "no_liquid"
-REFUSAL_TIMEOUT = "engine_timeout"
-REFUSAL_ENGINE_CRASH = "engine_crash"
+from simulator.engine_refusals import (
+    REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
+    REFUSAL_NO_LIQUID, REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH,
+    REFUSAL_GATE_REFUSED_IN_ADAPTER, REFUSAL_UNAVAILABLE, REFUSAL_VALUE_IS_FLOOR,
+)
+
 ENGINE_ANNOTATION_CRASH_FLOOR = "sio2_below_observed_crash_floor"
-REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
-REFUSAL_UNAVAILABLE = "unavailable"
-REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 AUTHORITY_EXTRAPOLATED = "extrapolated"
 _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON = "oxygen_balance_no_admitted_bracket"
 # Token published by engines/builtin/vapor_pressure.py on pO2-floor inversion.

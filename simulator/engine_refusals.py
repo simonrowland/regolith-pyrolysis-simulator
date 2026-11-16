@@ -1,0 +1,11 @@
+"""Shared wire vocabulary for typed engine refusals."""
+
+REFUSAL_OUT_OF_BASIS = "out_of_basis"
+REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
+REFUSAL_MAJOR_SUM = "sum_below_95_wt_pct"
+REFUSAL_NO_LIQUID = "no_liquid"
+REFUSAL_TIMEOUT = "engine_timeout"
+REFUSAL_ENGINE_CRASH = "engine_crash"
+REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
+REFUSAL_UNAVAILABLE = "unavailable"
+REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
