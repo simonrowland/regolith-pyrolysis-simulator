@@ -18209,27 +18209,6 @@ def load_score_context(
     )
 
 
-def _is_compilation_thermo_reference(
-    observation: Observation, origin: str | None
-) -> bool:
-    evidence_class = observation.evidence.class_
-    quantity = (
-        quantity_token(observation.identity)
-        if isinstance(observation.identity, Identity)
-        else None
-    )
-    compilation = (
-        evidence_class.is_value
-        and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
-    ) or is_compilation_source(observation.source_id, origin)
-    return bool(
-        quantity in FORMATION_QUANTITIES | PURE_STANDARD_THERMO
-        and compilation
-        and not is_internal_consistency(origin)
-        and not is_sf04_workbook(observation)
-    )
-
-
 def _has_duplicate_observation_link(observation: Observation) -> bool:
     provenance = observation.provenance
     return (
@@ -18293,6 +18272,8 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     Quoted valence ratios are on that route so unsupported engine attempts
     remain counted refusals while the quoted evidence class stays unchanged.
     """
+
+    from simulator.battery.compilation_tier import _is_compilation_thermo_reference
 
     out: list[Observation] = []
     for obs in context.observations.values():
@@ -18774,6 +18755,7 @@ class _ResidualReportMetadata:
     shard_failures: tuple[Mapping[str, object], ...] = ()
     static_refusals: Sequence[Mapping[str, object]] = ()
     selected_reference_count: int = 0
+    selected_reference_ids: frozenset[str] | None = None
 
 
 class _ResidualJsonlRows:
@@ -18794,6 +18776,11 @@ class _ResidualJsonlRows:
         )
         self._typed_tier_band_values = (
             {} if metadata is None else metadata.tier_band_values
+        )
+        self.selected_reference_ids = (
+            None
+            if metadata is None
+            else getattr(metadata, "selected_reference_ids", None)
         )
 
     def __iter__(self) -> Iterable[dict[str, object]]:
@@ -22512,6 +22499,7 @@ def candidate_rail_census(
 class _ResidualRowsPayloadView:
     def __init__(self, residuals: Sequence[Residual], context: ScoreContext) -> None:
         self.residuals = residuals
+        self.selected = getattr(residuals, "selected", ())
         family_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         headline_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
         tier_values: dict[tuple[str, str, str, str, str, str], set[str]] = defaultdict(set)
@@ -22673,7 +22661,7 @@ def _render_score_report_from_payloads_legacy(
         e15_lines=_e15_report_lines(aggregate.e15_points, context.observations),
         flagged_rows=aggregate.flagged_records(),
         condition_lines=aggregate.condition_hull_lines(),
-        compilation_lines=aggregate.compilation_lines(),
+        compilation_lines=aggregate.compilation_lines(engines=engines),
         refusal_counts=aggregate.refusal_counts,
         pending=pending,
         admitted=admitted,
@@ -23093,7 +23081,7 @@ class _ResidualJsonlStream:
         ] = defaultdict(set)
         self.report_aggregate: _ScorePayloadAccumulator | None = None
         self.count = 0
-        self.selected_reference_count = 0
+        self.selected_reference_ids: set[str] = set()
         self._last_flush = time.monotonic()
 
     @property
@@ -23257,6 +23245,7 @@ class _ResidualJsonlStream:
             typed_headline_band_values=self.headline_band_values,
             typed_tier_band_values=self.tier_band_values,
         )
+        report_aggregate.tier_accumulator.selected = self.selected_reference_ids
         temporary_path: Path | None = None
         try:
             with tempfile.NamedTemporaryFile(
@@ -23741,16 +23730,17 @@ class _ScorePayloadAccumulator:
         context: ScoreContext,
         engines: Sequence[Engine],
     ) -> _ScorePayloadAccumulator:
-        aggregate = cls(
+        report = cls(
             context,
             engines,
             typed_family_band_values=getattr(rows, "_typed_family_band_values", None),
             typed_headline_band_values=getattr(rows, "_typed_headline_band_values", None),
             typed_tier_band_values=getattr(rows, "_typed_tier_band_values", None),
         )
+        report.tier_accumulator.selected.update(getattr(rows, "selected", ()))
         for row in rows:
-            aggregate.add(row)
-        return aggregate
+            report.add(row)
+        return report
 
     @staticmethod
     def _engine(row: Mapping[str, object]) -> str:
@@ -24265,10 +24255,19 @@ class _ScorePayloadAccumulator:
             }
         )
 
-    def compilation_lines(self) -> list[str]:
-        from simulator.battery.compilation_tier import _tier_markdown
+    def compilation_lines(
+        self, *, engines: Sequence[Engine] | None = None
+    ) -> list[str]:
+        from simulator.battery.compilation_tier import (
+            _compilation_tier_lines_from_accumulator,
+        )
 
-        return _tier_markdown((), accumulator=self.tier_accumulator)
+        return _compilation_tier_lines_from_accumulator(
+            self.tier_accumulator,
+            self.context.observations,
+            self.context.origins,
+            self.engines if engines is None else engines,
+        )
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
         return headline_summary_payload(
@@ -24398,7 +24397,7 @@ def render_score_report_from_payloads(
     if observations is not None:
         from simulator.battery.compilation_tier import (
             compilation_row_observation,
-            compilation_tier_lines_from_payloads,
+            _compilation_tier_report_lines_from_payloads,
         )
 
         def is_compilation(row: Mapping[str, object]) -> bool:
@@ -24416,8 +24415,8 @@ def render_score_report_from_payloads(
         # _ScorePayloadAccumulator._add_headline(tier="compilation"):
         # unflagged rows whose reference is a compilation observation.
         compilation_rows = _FilteredPayloadRows(unflagged_rows, is_compilation)
-        compilation_lines = compilation_tier_lines_from_payloads(
-            unflagged_rows, observations, origins
+        compilation_lines = _compilation_tier_report_lines_from_payloads(
+            rows, observations, origins, engines
         )
     all_numeric_records = all_numeric_payload_records(
         rows, engines=engines, observations=observations, origins=origins

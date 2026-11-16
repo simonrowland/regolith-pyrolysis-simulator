@@ -8044,7 +8044,8 @@ def test_t1569_distin_liquid_slag_phase_is_reviewed_identity() -> None:
 
 
 def test_t998_alkali_source_tokens_are_closed() -> None:
-    from simulator.battery.migrate import PHASE_MAP, REGIME_TO_METHOD
+    from simulator.battery.enums import METHOD_TOKEN_ALIASES
+    from simulator.battery.migrate import PHASE_MAP
 
     assert (
         QUANTITY_ALIASES["evaporation_coefficient_gamma_equals_alpha"]
@@ -8054,11 +8055,11 @@ def test_t998_alkali_source_tokens_are_closed() -> None:
     assert PHASE_MAP["basaltic_silicate_melt"] is Phase.L
     assert PHASE_MAP["silicate_melt_ferrobasalt_FCMAS"] is Phase.L
     assert (
-        REGIME_TO_METHOD["langmuir_free_evaporation"]
+        METHOD_TOKEN_ALIASES["langmuir_free_evaporation"]
         is MethodToken.LANGMUIR_FREE_EVAPORATION
     )
     assert (
-        REGIME_TO_METHOD["open_furnace_apparent"]
+        METHOD_TOKEN_ALIASES["open_furnace_apparent"]
         is MethodToken.LANGMUIR_FREE_EVAPORATION
     )
 

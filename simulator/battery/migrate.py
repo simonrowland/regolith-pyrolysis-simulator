@@ -77,6 +77,7 @@ import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import SOURCE_DECLARATIONS
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
@@ -137,6 +138,7 @@ from simulator.battery.enums import (
     KINETIC_YIELD_QUANTITIES,
     MEASURED_EVIDENCE,
     MELT_ACTIVITY_QUANTITIES,
+    METHOD_TOKEN_ALIASES,
     MethodToken,
     NoticeKind,
     PHASE_BASIS_TOKENS,
@@ -751,45 +753,6 @@ RAIL_MAP = {
     "redox": Rail.REDOX,
     "alkali shuttle": Rail.ALKALI_SHUTTLE,
     "alkali_shuttle": Rail.ALKALI_SHUTTLE,
-}
-
-METHOD_TOKENS = {m.value: m for m in MethodToken}
-REGIME_TO_METHOD = {
-    # Static, closed-vessel pressure measurements report equilibrium pressure;
-    # they do not use the Knudsen-effusion correction.
-    "static_capsule_vapor_pressure": MethodToken.STATIC_EQUILIBRIUM,
-    # These extract labels all describe the Knudsen-effusion mass-spectrometric
-    # pressure method; the closed schema token is KNUDSEN_EFFUSION.
-    "kems_effusion": MethodToken.KNUDSEN_EFFUSION,
-    "kems_effusion_compiled_experiment": MethodToken.KNUDSEN_EFFUSION,
-    "kems_effusion_method_context": MethodToken.KNUDSEN_EFFUSION,
-    "kems_effusion_review_compilation": MethodToken.KNUDSEN_EFFUSION,
-    "kems_effusion_ion_comparison": MethodToken.KNUDSEN_EFFUSION,
-    "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
-    "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
-    # Rys (2007) stores these source method descriptions under values.method.
-    "Knudsen-cell mass-spectrometric ion currents converted to partial pressures using the thesis calibration.": MethodToken.KNUDSEN_EFFUSION,
-    "KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).": MethodToken.KNUDSEN_EFFUSION,
-    "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
-    "free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
-    "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
-    "transpiration": MethodToken.TRANSPIRATION,
-    "tga": MethodToken.TGA,
-    "dta_dsc": MethodToken.DTA_DSC,
-    "evolved_gas_ms": MethodToken.EVOLVED_GAS_MS,
-    "solar_furnace_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_furnace": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_vacuum_pyrolysis_free_evaporation": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_fresnel_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "solar_fresnel_continuously_pumped_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
-    "vacuum_chamber_pyrolysis": MethodToken.VACUUM_CHAMBER_PYROLYSIS,
-    "emf_cell": MethodToken.EMF_CELL,
-    "quench_equilibration": MethodToken.QUENCH_EQUILIBRATION,
-    "melt_equilibration_quench": MethodToken.QUENCH_EQUILIBRATION,
-    "tabulation": MethodToken.TABULATION,
-    "engine_evaluation": MethodToken.ENGINE_EVALUATION,
-    "gas_standard_state_thermo": MethodToken.TABULATION,
 }
 
 LOCATOR_FIELDS = {
@@ -12109,9 +12072,7 @@ def map_quantity(
     if quantity_absent and obs_type in TYPE_QUANTITY:
         inferred = TYPE_QUANTITY[obs_type]
         if not _quantity_corroborated(inferred, values, units, row):
-            reason = (
-                "row type is a curation label, not a statement of the observable"
-            )
+            reason = "row type is a curation label, not a statement of the observable"
             contradiction = _quantity_contradiction(
                 inferred, obs_type, values, units, row
             )
@@ -12933,7 +12894,7 @@ def conditional_reduced_lineage_is_measured(
 def map_method(regime: object) -> State[MethodToken]:
     if not isinstance(regime, str) or not regime.strip():
         return State.unknown("source does not state method")
-    token = METHOD_TOKENS.get(regime) or REGIME_TO_METHOD.get(regime)
+    token = METHOD_TOKEN_ALIASES.get(regime)
     if token is None:
         return State.unknown(
             f"regime {regime!r} is not a closed method token "
@@ -17778,6 +17739,8 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if (gap_selection := sg.gap_selection(_unavailable_selection, declared, payload, condition_ranges, unused)) is not None:
+        return gap_selection
     if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
         oxide_fields, invalid_fields = _residue_component_field_sets(payload)
         for field in ("residue_ppm", *oxide_fields):
@@ -25382,6 +25345,7 @@ class Migrator:
                 if _row_is_phase_analysis(row):
                     phase_analysis_parent_ids.add(f"{source_id}::{record_id}")
         source_context = dict(pressure_identity_context or {})
+        source_context = sg.attach_extract_declarations(source_context, doc)
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["printed_atmospheres_for_set"] = (
             printed_atmospheres_for_set
@@ -25754,9 +25718,7 @@ class Migrator:
             else None
         )
         obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
-        quantity, q_reason = map_quantity(
-            obs_type, values, units=obs.get("units"), row=obs
-        )
+        quantity, q_reason, declared_schema_gap = sg.map_quantity(map_quantity, source_id, raw_obs_id, values, context, obs)
         q_token = quantity.value if quantity.is_value else None
         identity_profile_uses_composition = _composition_axis_is_required(
             q_token,
@@ -26700,6 +26662,7 @@ class Migrator:
                 else f"source admission_status={raw_source_admission}"
             )
             admission = Admission(status=AdmissionStatus.PENDING, reason=reason)
+        admission = sg.admission(admission, q_token, declared_schema_gap, value.kind.value, admission.status.value, admission_for, extraction, locator)
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (
@@ -28603,7 +28566,7 @@ class Migrator:
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
-                    parent_values=values,
+                    parent_values=sg.point_context(values, declared_schema_gap),
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
@@ -28802,11 +28765,7 @@ class Migrator:
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
-                        parent_values=(
-                            _values_without_row_lists(values)
-                            if non_yield_points
-                            else values
-                        ),
+                        parent_values=sg.point_context(values, declared_schema_gap, _values_without_row_lists if non_yield_points else None),
                         composition_datum_declared=declares_composition_datum,
                         provenance=observation_provenance,
                         parent_point_conditions=(
@@ -29777,7 +29736,7 @@ class Migrator:
                     **raw_item,
                     "gas_species": parent_values["gas_species"],
                 }
-            value_sel = select_declared_source(q_token, units, selection_payload)
+            value_sel = sg.point_value(select_declared_source, q_token, units, parent_values, selection_payload)
             provenance = _printed_scalar_provenance(
                 provenance, raw_item, value_sel
             )

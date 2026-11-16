@@ -81,7 +81,7 @@ def _report_selected_species_count(
     species_formulas: Sequence[str],
     stream: _ResidualJsonlStream,
 ) -> None:
-    stream.selected_reference_count = len(prepared.refs)
+    stream.selected_reference_ids.update(obs.observation_id for obs in prepared.refs)
     if species_formulas:
         print(
             f"species references selected={len(prepared.refs)} "
@@ -391,6 +391,8 @@ def _score_store_with_decisions(
     source_band_reasons = prepared.source_band_reasons
     kems_partial_pressure_band = prepared.kems_partial_pressure_band
     from simulator.battery.compilation_tier import (
+        _SelectedResiduals, _compilation_engines_for_scoring,
+        _is_compilation_thermo_reference,
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
@@ -496,7 +498,12 @@ def _score_store_with_decisions(
                     ):
                         derived_band = kems_partial_pressure_band
                         derived_band_reason = None
-                    for engine in engine_set:
+                    for engine in _compilation_engines_for_scoring(
+                        engine_set,
+                        point,
+                        point_origin,
+                        production_scoring=predict is None,
+                    ):
                         prediction = None
                         scoring_predict = (
                             partial(
@@ -755,7 +762,7 @@ def _score_store_with_decisions(
             r.key,
         )
     )
-    scored = tuple(residuals)
+    scored = _SelectedResiduals(residuals, (obs.observation_id for obs in refs))
     return scored, candidates, _compilation_decision_strata(scored, context)
 
 
@@ -1282,7 +1289,8 @@ def _score_store_to_jsonl(
             engine_cache_runtime_identities=cache_runtime_identities,
             shard_failures=tuple(shard_failures),
             static_refusals=stream.static_refusals,
-            selected_reference_count=stream.selected_reference_count,
+            selected_reference_count=len(stream.selected_reference_ids),
+            selected_reference_ids=frozenset(stream.selected_reference_ids),
         )
     finally:
         stream.close()

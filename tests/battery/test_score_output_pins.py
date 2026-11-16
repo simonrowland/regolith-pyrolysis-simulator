@@ -30,10 +30,19 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import Quantity, Rail
+from simulator.battery.enums import (
+    AdmissionStatus,
+    Engine,
+    EvidenceClass,
+    Phase,
+    Quantity,
+    Rail,
+    ResidualStatus,
+)
 from simulator.battery.identity import State
-from simulator.battery.records import CandidateRequest, Value
+from simulator.battery.records import CandidateRequest, Species, Value
 import simulator.battery.score as score_mod
+from tests.battery import factories as F
 from tests.battery.test_score import _streaming_score_fixture
 
 HEADING = "# Battery score report (schema v2.1)"
@@ -101,7 +110,24 @@ def _without_certified_counts(text: str) -> str:
 def _expected_fixture_certified_counts() -> tuple[
     dict[tuple[str, str], int], dict[tuple[str, str, str], int]
 ]:
+    from simulator.battery.compilation_tier import (
+        _compilation_engines_for_pair,
+        is_compilation_evidence,
+    )
+    from simulator.battery.score import is_compilation_source
+
     context, engine, fixture_residuals, _candidates = _streaming_score_fixture()
+    def reaches_score_engine(residual) -> bool:
+        observation = context.observations[residual.reference]
+        origin = context.origins.get(residual.reference)
+        if not (
+            is_compilation_evidence(observation)
+            or is_compilation_source(observation.source_id, origin)
+        ):
+            return True
+        identity = observation.identity
+        return engine in _compilation_engines_for_pair((engine,), identity)
+
     certified = {
         residual.reference
         for residual in score_mod._measured_residuals(
@@ -114,7 +140,9 @@ def _expected_fixture_certified_counts() -> tuple[
     numeric = [
         residual
         for residual in fixture_residuals.values()
-        if residual.numeric is not None and residual.rail is not None
+        if residual.numeric is not None
+        and residual.rail is not None
+        and reaches_score_engine(residual)
     ]
     aggregate_counts = {
         (rail.value, engine.value): sum(
@@ -228,27 +256,14 @@ def _assert_certified_counts_match_fixture(
     )
 
 
+# Route pin: gas ΔfG and entropy rows routed away from Internal Analytical are no longer emitted.
 PIN_RESIDUAL_JSONL = """\
 {"experiments":7001,"hard_issues":1685,"kind":"battery_store_stamp","observations":186648,"queue":124428,"revision":"2043bca61","rows_in":91208,"works":785}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-00::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"0"},"rail":"thermochemistry","reference":"fixture-derived-00","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-01::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"0"},"rail":"thermochemistry","reference":"fixture-derived-01","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-02::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"0"},"rail":"thermochemistry","reference":"fixture-derived-02","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-03::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"1"},"rail":"thermochemistry","reference":"fixture-derived-03","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-04::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"1"},"rail":"thermochemistry","reference":"fixture-derived-04","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-05::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"2"},"rail":"thermochemistry","reference":"fixture-derived-05","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-06::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"2"},"rail":"thermochemistry","reference":"fixture-derived-06","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-07::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"3"},"rail":"thermochemistry","reference":"fixture-derived-07","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-08::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"4"},"rail":"thermochemistry","reference":"fixture-derived-08","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-derived-09::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"50"},"rail":"thermochemistry","reference":"fixture-derived-09","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-no-band::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"7"},"rail":"thermochemistry","reference":"fixture-no-band","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-non-dex-dimensionless-band::internal-analytical","notices":[],"numeric":{"decision_band":{"band_basis":"derived_scatter","rule":"printed_1sigma: source-printed uncertainty","unit":"dimensionless","value":"0.231"},"operation":"absolute","unit":"dimensionless","value":"3"},"rail":"thermochemistry","reference":"fixture-non-dex-dimensionless-band","score_eligible":false,"source_relation":"unknown","status":"match"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-printed::internal-analytical","notices":[],"numeric":{"decision_band":{"band_basis":"derived_scatter","rule":"printed_1sigma: source-printed uncertainty","unit":"kJ_per_declared_mol_basis","value":"2"},"operation":"absolute","unit":"kJ_per_declared_mol_basis","value":"1"},"rail":"thermochemistry","reference":"fixture-printed","score_eligible":false,"source_relation":"unknown","status":"match"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-scaled-max-first::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"J_per_declared_mol_basis_per_K","value":"0.24"},"rail":"thermochemistry","reference":"fixture-scaled-max-first","score_eligible":false,"source_relation":"unknown","status":"no_band"}
-{"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-scaled-max-second::internal-analytical","notices":[],"numeric":{"operation":"absolute","unit":"J_per_declared_mol_basis_per_K","value":"-0.24"},"rail":"thermochemistry","reference":"fixture-scaled-max-second","score_eligible":false,"source_relation":"unknown","status":"no_band"}
 {"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-measured-refusal::internal-analytical","notices":[],"rail":"vapour","reference":"fixture-measured-refusal","refusal":{"check_refs":[],"detail":{"reason":"fixture_unavailable"},"reason":"unsupported"},"score_eligible":false,"source_relation":"unknown","status":"refused"}
 {"candidate":"fixture-vapour-candidate","candidate_observation":{"admission":{"decided_by":{"date":"2026-09-13","evidence":{"page":1,"table":"I"},"worker":"test"},"reason":"canonical","status":"admitted"},"derivation":{"inputs":["raw-1"],"output_unit":"Pa","parameters":[],"references":[],"relation":"model"},"derived_from":["raw-1"],"evidence":{"class":{"tag":"value","value":"model_derived"},"model":"gibbs-duhem"},"experiment_id":"exp-1","identity":{"composition":{"reason":"pure-component p_sat","tag":"not_applicable"},"exposure":{"reason":"pure-component p_sat","tag":"not_applicable"},"fO2_Pa":{"reason":"pure-component p_sat","tag":"not_applicable"},"formation_elements":{"reason":"pure-component p_sat","tag":"not_applicable"},"per":{"reason":"pure-component p_sat","tag":"not_applicable"},"quantity":{"tag":"value","value":"p_sat"},"reaction":{"reason":"pure-component p_sat","tag":"not_applicable"},"reference_state":{"reason":"pure-component p_sat","tag":"not_applicable"},"reservoir":{"tag":"value","value":{"charge":{"tag":"value","value":0},"formula":"Na","phase":{"tag":"value","value":"l"}}},"sample_mass_kg":{"reason":"pure-component p_sat","tag":"not_applicable"},"species":{"charge":{"tag":"value","value":0},"formula":"Na","phase":{"tag":"value","value":"g"}},"standard_pressure_Pa":{"reason":"pure-component p_sat","tag":"not_applicable"},"subtype":{"reason":"pure-component p_sat","tag":"not_applicable"},"sweep_gas":{"reason":"pure-component p_sat","tag":"not_applicable"},"temperature_K":{"tag":"value","value":"1156"},"total_pressure_Pa":{"reason":"pure-component p_sat","tag":"not_applicable"},"wall":{"reason":"pure-component p_sat","tag":"not_applicable"}},"locator":{"page":1,"table":"I"},"notices":[],"observation_id":"fixture-vapour-candidate","point_conditions":{"temperature_K":{"locator":{"page":1,"table":"I"},"state":{"tag":"value","value":"1156"}}},"read_from":"pdf-1","source_id":"work-1","uncertainty":{"kind":"none"},"value":{"approximate":false,"kind":"point","point":"0.6"}},"exclusions":[],"execution":{"state":"not_probed"},"key":"fixture::fixture-measured-vapour::internal-analytical","notices":[],"numeric":{"decision_band":{"band_basis":"derived_scatter","rule":"measured fixture band","unit":"dimensionless","value":"1"},"operation":"dex","unit":"dimensionless","value":"0.5"},"rail":"vapour","reference":"fixture-measured-vapour","score_eligible":true,"source_relation":"unknown","status":"match"}
 """
 
+# Route pin: routed-away compilation engine pairs are summarized, removing their refusal strata.
 PIN_SUMMARY_JSON = """\
 {
   "kind": "battery_headline_summary",
@@ -363,69 +378,20 @@ PIN_SUMMARY_JSON = """\
     },
     {
       "engine": "internal-analytical",
-      "flag_class_counts": {
-        "unflagged": 15
-      },
+      "flag_class_counts": {},
       "iqr_dex": null,
       "median_abs_dex": null,
       "median_dex": null,
-      "metric_strata": [
-        {
-          "iqr": "0.24000",
-          "label": "absolute (J_per_declared_mol_basis_per_K)",
-          "median": "0.000",
-          "median_abs": "0.240",
-          "n": 2,
-          "operation": "absolute",
-          "quantity": "quantity_unknown",
-          "rms": "0.240",
-          "unit": "J_per_declared_mol_basis_per_K"
-        },
-        {
-          "iqr": null,
-          "label": "absolute (dimensionless)",
-          "median": "3",
-          "median_abs": "3",
-          "n": 1,
-          "operation": "absolute",
-          "quantity": "quantity_unknown",
-          "rms": "3",
-          "unit": "dimensionless"
-        },
-        {
-          "iqr": "2.50",
-          "label": "absolute (kJ_per_declared_mol_basis)",
-          "median": "1.5",
-          "median_abs": "1.5",
-          "n": 12,
-          "operation": "absolute",
-          "quantity": "quantity_unknown",
-          "rms": "14.67707963685782644757773530",
-          "unit": "kJ_per_declared_mol_basis"
-        }
-      ],
-      "n": 15,
+      "metric_strata": [],
+      "n": 0,
       "n_dex": 0,
       "n_flagged": 0,
-      "n_inside_band": 2,
-      "n_no_band": 13,
+      "n_inside_band": 0,
+      "n_no_band": 0,
       "n_score_eligible": 0,
       "rail": "thermochemistry",
       "rms_dex": null,
-      "sources": [
-        {
-          "flag_class_counts": {},
-          "n_flagged": 0,
-          "n_numeric": 14,
-          "source_id": "nist-janaf-4th"
-        },
-        {
-          "flag_class_counts": {},
-          "n_flagged": 0,
-          "n_numeric": 1,
-          "source_id": "other-compilation"
-        }
-      ],
+      "sources": [],
       "tier": "all_numeric"
     },
     {
@@ -833,91 +799,21 @@ PIN_SUMMARY_JSON = """\
     {
       "band_width_dex": null,
       "data_scatter_ratio": null,
-      "decision_strata": [
-        {
-          "band_derived_n": null,
-          "band_kind": "no_band",
-          "band_value": [],
-          "bias_to_scatter_ratio": null,
-          "engine": "internal-analytical",
-          "family": "compilations-janaf",
-          "mad": "0.240",
-          "match_count": 0,
-          "max_abs_residual": "0.240",
-          "mismatch_count": 0,
-          "n": 2,
-          "no_band_count": 2,
-          "no_band_reason": null,
-          "quantity": "S",
-          "relation": "unknown",
-          "signed_median_residual": "0.000",
-          "tail_in_count": null,
-          "tail_out_count": null,
-          "unit": "J_per_declared_mol_basis_per_K"
-        },
-        {
-          "band_derived_n": null,
-          "band_kind": "printed_1sigma",
-          "band_value": [
-            "0.231",
-            "2"
-          ],
-          "bias_to_scatter_ratio": "1",
-          "engine": "internal-analytical",
-          "family": "compilations-janaf",
-          "mad": "1.5",
-          "match_count": 2,
-          "max_abs_residual": "50",
-          "mismatch_count": 0,
-          "n": 12,
-          "no_band_count": 10,
-          "no_band_reason": null,
-          "quantity": "delta_fG",
-          "relation": "unknown",
-          "signed_median_residual": "1.5",
-          "tail_in_count": null,
-          "tail_out_count": null,
-          "unit": [
-            "dimensionless",
-            "kJ_per_declared_mol_basis"
-          ]
-        },
-        {
-          "band_derived_n": null,
-          "band_kind": "no_band",
-          "band_value": [],
-          "bias_to_scatter_ratio": null,
-          "engine": "internal-analytical",
-          "family": "compilations-other",
-          "mad": "0",
-          "match_count": 0,
-          "max_abs_residual": "7",
-          "mismatch_count": 0,
-          "n": 1,
-          "no_band_count": 1,
-          "no_band_reason": null,
-          "quantity": "delta_fG",
-          "relation": "unknown",
-          "signed_median_residual": "7",
-          "tail_in_count": null,
-          "tail_out_count": null,
-          "unit": "kJ_per_declared_mol_basis"
-        }
-      ],
+      "decision_strata": [],
       "engine": "internal-analytical",
-      "match_rate": 1.0,
+      "match_rate": null,
       "match_rate_label": "band membership",
       "median_abs_dex": null,
       "median_dex": null,
-      "n": 15,
-      "n_candidates": 15,
-      "n_eligible_references": 15,
-      "n_inside_band": 2,
-      "n_match": 2,
-      "n_no_band": 13,
+      "n": 0,
+      "n_candidates": 0,
+      "n_eligible_references": 0,
+      "n_inside_band": 0,
+      "n_match": 0,
+      "n_no_band": 0,
       "n_refused": 0,
       "n_score_eligible": 0,
-      "n_scored": 15,
+      "n_scored": 0,
       "rail": "thermochemistry",
       "rms_dex": null,
       "rms_over_band": null,
@@ -984,6 +880,7 @@ PIN_SUMMARY_JSON = """\
 }
 """
 
+# Route pin: routed-away compilation engine pairs now appear once in the direct report summary.
 PIN_REPORT = """\
 # Battery score report (schema v2.1)
 
@@ -1040,7 +937,7 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 | pyrolysis_yield | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
 | redox | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
 | residue_composition | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
-| thermochemistry | internal-analytical | 15 | 0 | 0 | 0 | — | — | unflagged=15 | nist-janaf-4th(n=14,cert=0,flag=0), other-compilation(n=1,cert=0,flag=0) |
+| thermochemistry | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
 | vapour | internal-analytical | 1 | 1 | 0 | 1 | 0.5 | — | unflagged=1 | work-1(n=1,cert=1,flag=0) |
 | wall_deposition | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
 
@@ -1048,9 +945,6 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 
 | rail | engine | quantity | metric | n | median | IQR |
 |---|---|---|---|---:|---:|---:|
-| thermochemistry | internal-analytical | quantity_unknown | absolute (J_per_declared_mol_basis_per_K) | 2 | 0.000 | 0.24000 |
-| thermochemistry | internal-analytical | quantity_unknown | absolute (dimensionless) | 1 | 3 | — |
-| thermochemistry | internal-analytical | quantity_unknown | absolute (kJ_per_declared_mol_basis) | 12 | 1.5 | 2.50 |
 | vapour | internal-analytical | quantity_unknown | dex | 1 | 0.5 | — |
 
 ## Measured tier
@@ -1084,7 +978,6 @@ Min–max of the stored (T, P, composition) of the numeric rows behind each per 
 | tier / stratum | rail | engine | n | T K (n) | total P Pa (n) | composition (n) |
 |---|---|---|---:|---|---|---|
 | measured | vapour | internal-analytical | 1 | 1156 (1) | — (0) | — (0) |
-| compilation | thermochemistry | internal-analytical | 15 | 298.15 (15) | — (0) | — (0) |
 
 ## Compilation tier
 
@@ -1101,21 +994,25 @@ zero: |residual| ≤ ticket line.
 
 | compilation | rail | engine | relation | quantity | unit | n | signed median residual | MAD | bias-to-scatter ratio | max |residual| | median abs residual | RMS residual | band value | band kind | band source n | no-band reason | in-band | out-of-band | n no band | n same-source |
 |---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|
-| compilations-janaf | thermochemistry | internal-analytical | unknown | S | J_per_declared_mol_basis_per_K | 2 | 0.000 | 0.240 | — | 0.240 | 0.240 | 0.240 | — | no_band | — | — | no_band in-band=0 | no_band out-of-band=0 | 2 | 0 |
-| compilations-janaf | thermochemistry | internal-analytical | unknown | delta_fG | dimensionless | 1 | 3 | 0 | — | 3 | 3 | 3 | 0.231 | printed_1sigma | — | — | printed_1sigma in-band=1 | printed_1sigma out-of-band=0 | 0 | 0 |
-| compilations-janaf | thermochemistry | internal-analytical | unknown | delta_fG | kJ/mol | 11 | 1 | 1 | 1 | 50 | 1 | 15.18372334262760944930524278 | 2 | no_band,printed_1sigma | — | — | no_band in-band=0; printed_1sigma in-band=1 | no_band out-of-band=0; printed_1sigma out-of-band=0 | 10 | 0 |
-| compilations-other | thermochemistry | internal-analytical | unknown | delta_fG | kJ/mol | 1 | 7 | 0 | — | 7 | 7 | 7 | — | no_band | — | — | no_band in-band=0 | no_band out-of-band=0 | 1 | 0 |
+| (none) | (none) | (none) | (none) | (none) | (none) | 0 | — | — | — | — | — | — | — | — | — | — | — | 0 | 0 | 0 | 0 |
 
 | engine | comparisons | refused | numeric | same-source | independent | match same-source | match independent |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| internal-analytical | 15 | 0 | 15 | 0 | 0 | 0 | 0 |
+| (none) | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 | compilation | quantity | reachable | predicted | refused | median abs residual | uncertainty |
 |---|---|---:|---:|---:|---:|---|
-| `compilations-janaf` | `S` | 2 | 2 | 0 | 0.240 | none |
-| `compilations-janaf` | `delta_fG` | 12 | 12 | 0 | 1.5 | none |
-| `compilations-other` | `delta_fG` | 1 | 1 | 0 | 7 | none |
+| (none) |  | 0 | 0 | 0 | — |  |
 
+
+### Unrouted compilation engine pairs
+
+Each row summarizes compilation cells skipped before engine scoring.
+
+| engine | quantity | phase | skipped cells |
+|---|---|---|---:|
+| internal-analytical | S | g | 2 |
+| internal-analytical | delta_fG | g | 13 |
 
 ## Refusal census
 
@@ -1153,7 +1050,7 @@ not enter either headline tier. Compilation rows are scored in the
 compilation tier above, still COMPILATION_ASSESSED, and never added
 to the measured tier. Do not validate an engine against a compilation it consumes.
 
-Diagnostic residuals in this file: 15.
+Diagnostic residuals in this file: 0.
 
 ## Pin failures
 
@@ -1166,6 +1063,7 @@ No mapped outcome changes.
 All mapped legacy keys have a v2.1 comparison slot.
 """
 
+# Route pin: routed-away compilation engine pairs are summarized in payload output, removing their refusal strata.
 PIN_PAYLOAD_SUMMARY_JSON = """\
 {
   "kind": "battery_headline_summary",
@@ -1280,69 +1178,20 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
     },
     {
       "engine": "internal-analytical",
-      "flag_class_counts": {
-        "unflagged": 15
-      },
+      "flag_class_counts": {},
       "iqr_dex": null,
       "median_abs_dex": null,
       "median_dex": null,
-      "metric_strata": [
-        {
-          "iqr": "0.2400",
-          "label": "absolute (J_per_declared_mol_basis_per_K)",
-          "median": "0.00",
-          "median_abs": "0.24",
-          "n": 2,
-          "operation": "absolute",
-          "quantity": "quantity_unknown",
-          "rms": "0.24",
-          "unit": "J_per_declared_mol_basis_per_K"
-        },
-        {
-          "iqr": null,
-          "label": "absolute (dimensionless)",
-          "median": "3",
-          "median_abs": "3",
-          "n": 1,
-          "operation": "absolute",
-          "quantity": "quantity_unknown",
-          "rms": "3",
-          "unit": "dimensionless"
-        },
-        {
-          "iqr": "2.50",
-          "label": "absolute (kJ_per_declared_mol_basis)",
-          "median": "1.5",
-          "median_abs": "1.5",
-          "n": 12,
-          "operation": "absolute",
-          "quantity": "quantity_unknown",
-          "rms": "14.67707963685782644757773530",
-          "unit": "kJ_per_declared_mol_basis"
-        }
-      ],
-      "n": 15,
+      "metric_strata": [],
+      "n": 0,
       "n_dex": 0,
       "n_flagged": 0,
-      "n_inside_band": 2,
-      "n_no_band": 13,
+      "n_inside_band": 0,
+      "n_no_band": 0,
       "n_score_eligible": 0,
       "rail": "thermochemistry",
       "rms_dex": null,
-      "sources": [
-        {
-          "flag_class_counts": {},
-          "n_flagged": 0,
-          "n_numeric": 14,
-          "source_id": "nist-janaf-4th"
-        },
-        {
-          "flag_class_counts": {},
-          "n_flagged": 0,
-          "n_numeric": 1,
-          "source_id": "other-compilation"
-        }
-      ],
+      "sources": [],
       "tier": "all_numeric"
     },
     {
@@ -1735,90 +1584,20 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
     {
       "band_width_dex": null,
       "data_scatter_ratio": null,
-      "decision_strata": [
-        {
-          "band_derived_n": null,
-          "band_kind": "no_band",
-          "band_value": [],
-          "bias_to_scatter_ratio": null,
-          "engine": "internal-analytical",
-          "family": "compilations-janaf",
-          "mad": "0.24",
-          "match_count": 0,
-          "max_abs_residual": "0.24",
-          "mismatch_count": 0,
-          "n": 2,
-          "no_band_count": 2,
-          "no_band_reason": null,
-          "quantity": "S",
-          "relation": "unknown",
-          "signed_median_residual": "0.00",
-          "tail_in_count": null,
-          "tail_out_count": null,
-          "unit": "J_per_declared_mol_basis_per_K"
-        },
-        {
-          "band_derived_n": null,
-          "band_kind": "printed_1sigma",
-          "band_value": [
-            "0.231",
-            "2"
-          ],
-          "bias_to_scatter_ratio": "1",
-          "engine": "internal-analytical",
-          "family": "compilations-janaf",
-          "mad": "1.5",
-          "match_count": 2,
-          "max_abs_residual": "50",
-          "mismatch_count": 0,
-          "n": 12,
-          "no_band_count": 10,
-          "no_band_reason": null,
-          "quantity": "delta_fG",
-          "relation": "unknown",
-          "signed_median_residual": "1.5",
-          "tail_in_count": null,
-          "tail_out_count": null,
-          "unit": [
-            "dimensionless",
-            "kJ_per_declared_mol_basis"
-          ]
-        },
-        {
-          "band_derived_n": null,
-          "band_kind": "no_band",
-          "band_value": [],
-          "bias_to_scatter_ratio": null,
-          "engine": "internal-analytical",
-          "family": "compilations-other",
-          "mad": "0",
-          "match_count": 0,
-          "max_abs_residual": "7",
-          "mismatch_count": 0,
-          "n": 1,
-          "no_band_count": 1,
-          "no_band_reason": null,
-          "quantity": "delta_fG",
-          "relation": "unknown",
-          "signed_median_residual": "7",
-          "tail_in_count": null,
-          "tail_out_count": null,
-          "unit": "kJ_per_declared_mol_basis"
-        }
-      ],
+      "decision_strata": [],
       "engine": "internal-analytical",
-      "match_rate": 1.0,
+      "match_rate": null,
       "match_rate_label": "band membership",
       "median_abs_dex": null,
       "median_dex": null,
-      "n": 15,
-      "n_candidates": 15,
-      "n_inside_band": 2,
-      "n_match": 2,
-      "n_no_band": 13,
+      "n": 0,
+      "n_candidates": 0,
+      "n_inside_band": 0,
+      "n_match": 0,
+      "n_no_band": 0,
       "n_refused": 0,
       "n_score_eligible": 0,
-      "n_scored": 15,
+      "n_scored": 0,
       "rail": "thermochemistry",
       "rms_dex": null,
       "rms_over_band": null,
@@ -1883,6 +1662,7 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
 }
 """
 
+# Payload reports count routed-away pairs only for references present in their rows.
 PIN_PAYLOAD_REPORT = """\
 # Battery score report (schema v2.1)
 
@@ -1910,7 +1690,7 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 | pyrolysis_yield | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
 | redox | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
 | residue_composition | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
-| thermochemistry | internal-analytical | 15 | 0 | 0 | 0 | — | — | unflagged=15 | nist-janaf-4th(n=14,cert=0,flag=0), other-compilation(n=1,cert=0,flag=0) |
+| thermochemistry | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
 | vapour | internal-analytical | 1 | 1 | 0 | 1 | 0.5 | — | unflagged=1 | work-1(n=1,cert=1,flag=0) |
 | wall_deposition | internal-analytical | 0 | 0 | 0 | 0 | — | — | — | — |
 
@@ -1918,9 +1698,6 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 
 | rail | engine | quantity | metric | n | median | IQR |
 |---|---|---|---|---:|---:|---:|
-| thermochemistry | internal-analytical | quantity_unknown | absolute (J_per_declared_mol_basis_per_K) | 2 | 0.00 | 0.2400 |
-| thermochemistry | internal-analytical | quantity_unknown | absolute (dimensionless) | 1 | 3 | — |
-| thermochemistry | internal-analytical | quantity_unknown | absolute (kJ_per_declared_mol_basis) | 12 | 1.5 | 2.50 |
 | vapour | internal-analytical | quantity_unknown | dex | 1 | 0.5 | — |
 
 ## Measured tier
@@ -1954,7 +1731,6 @@ Min–max of the stored (T, P, composition) of the numeric rows behind each per 
 | tier / stratum | rail | engine | n | T K (n) | total P Pa (n) | composition (n) |
 |---|---|---|---:|---|---|---|
 | measured | vapour | internal-analytical | 1 | 1156 (1) | — (0) | — (0) |
-| compilation | thermochemistry | internal-analytical | 15 | 298.15 (15) | — (0) | — (0) |
 
 ## Compilation tier
 
@@ -1971,20 +1747,15 @@ zero: |residual| ≤ ticket line.
 
 | compilation | rail | engine | relation | quantity | unit | n | signed median residual | MAD | bias-to-scatter ratio | max |residual| | median abs residual | RMS residual | band value | band kind | band source n | no-band reason | in-band | out-of-band | n no band | n same-source |
 |---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|
-| compilations-janaf | thermochemistry | internal-analytical | unknown | S | J_per_declared_mol_basis_per_K | 2 | 0.00 | 0.24 | — | 0.24 | 0.24 | 0.24 | — | no_band | — | — | no_band in-band=0 | no_band out-of-band=0 | 2 | 0 |
-| compilations-janaf | thermochemistry | internal-analytical | unknown | delta_fG | dimensionless | 1 | 3 | 0 | — | 3 | 3 | 3 | 0.231 | printed_1sigma | — | — | printed_1sigma in-band=1 | printed_1sigma out-of-band=0 | 0 | 0 |
-| compilations-janaf | thermochemistry | internal-analytical | unknown | delta_fG | kJ/mol | 11 | 1 | 1 | 1 | 50 | 1 | 15.18372334262760944930524278 | 2 | no_band,printed_1sigma | — | — | no_band in-band=0; printed_1sigma in-band=1 | no_band out-of-band=0; printed_1sigma out-of-band=0 | 10 | 0 |
-| compilations-other | thermochemistry | internal-analytical | unknown | delta_fG | kJ/mol | 1 | 7 | 0 | — | 7 | 7 | 7 | — | no_band | — | — | no_band in-band=0 | no_band out-of-band=0 | 1 | 0 |
+| (none) | (none) | (none) | (none) | (none) | (none) | 0 | — | — | — | — | — | — | — | — | — | — | — | 0 | 0 | 0 | 0 |
 
 | engine | comparisons | refused | numeric | same-source | independent | match same-source | match independent |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| internal-analytical | 15 | 0 | 15 | 0 | 0 | 0 | 0 |
+| (none) | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 | compilation | quantity | reachable | predicted | refused | median abs residual | uncertainty |
 |---|---|---:|---:|---:|---:|---|
-| `compilations-janaf` | `S` | 2 | 2 | 0 | 0.24 | none |
-| `compilations-janaf` | `delta_fG` | 12 | 12 | 0 | 1.5 | none |
-| `compilations-other` | `delta_fG` | 1 | 1 | 0 | 7 | none |
+| (none) |  | 0 | 0 | 0 | — |  |
 
 
 ## Refusal census
@@ -2224,6 +1995,161 @@ def test_direct_and_streamed_score_outputs_match_byte_pins(
         _without_certified_counts(got["direct_report"]).encode("utf-8")
         == _without_certified_counts(PIN_REPORT).encode("utf-8")
     )
+
+
+def test_retained_nasa_liquid_thermo_rows_keep_numeric_output_and_bands(
+    tmp_path: Path,
+) -> None:
+    """All output writers retain real NASA-9 liquid Cp score rows and bands."""
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    identity = replace(
+        F.o2_identity(Decimal("298.15")),
+        quantity=Quantity.CP,
+        species=Species("H2O", Phase.L),
+        reaction=State.not_applicable("pure standard-state thermo"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    observations = tuple(
+        F.observation(
+            f"output-pin-h2o-liquid-cp-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            admission=AdmissionStatus.PENDING,
+            source_id=f"output-pin-source-{index}",
+        )
+        for index, value in enumerate(("75", "75.3", "76"))
+    )
+    context = score_mod.ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={row.observation_id: row for row in observations},
+        origins={
+            row.observation_id: f"compilations-janaf/{row.observation_id}.yaml"
+            for row in observations
+        },
+        extract_review={row.source_id: None for row in observations},
+        hostname="test",
+    )
+    bands, _band_records, _no_band_reasons = score_mod._source_band_catalog(
+        context, {}
+    )
+    assert len(bands) == 1
+    expected_band = next(iter(bands.values()))
+    engines = (Engine.NASA_CEA_9,)
+    residuals, candidates = score_mod.score_store(context, engines=engines)
+    expected_values = {
+        observations[0].observation_id: Decimal("0.35055745293062"),
+        observations[1].observation_id: Decimal("0.05055745293062"),
+        observations[2].observation_id: Decimal("-0.64944254706938"),
+    }
+    by_reference = {row.reference: row for row in residuals}
+    assert set(by_reference) == set(expected_values)
+    for reference, expected_value in expected_values.items():
+        residual = by_reference[reference]
+        assert residual.numeric is not None
+        assert residual.numeric.value == expected_value
+        assert residual.numeric.unit == "J_per_declared_mol_basis_per_K"
+        assert residual.numeric.decision_band is not None
+        assert residual.numeric.decision_band.rule.startswith("derived_scatter:")
+        assert residual.status is ResidualStatus.MATCH
+        assert score_mod.flagged_strata(residual.notices) == ()
+
+    root = score_mod.REPO_ROOT
+    direct_jsonl = tmp_path / "retained-direct.jsonl"
+    score_mod.write_residuals_jsonl(residuals, candidates, direct_jsonl, root=root)
+    streamed_jsonl = tmp_path / "retained-streamed.jsonl"
+    written, metadata = score_mod._score_store_to_jsonl(
+        context, streamed_jsonl, root=root, engines=engines
+    )
+    partial = streamed_jsonl.with_name(streamed_jsonl.name + ".partial")
+    assert written == 3
+    assert partial.read_bytes() == direct_jsonl.read_bytes()
+    jsonl_rows = [
+        json.loads(line)
+        for line in partial.read_text(encoding="utf-8").splitlines()
+    ]
+    numeric_rows = {
+        row["reference"]: row
+        for row in jsonl_rows
+        if row.get("reference") in expected_values
+    }
+    assert set(numeric_rows) == set(expected_values)
+    for reference, expected_value in expected_values.items():
+        row = numeric_rows[reference]
+        numeric = row["numeric"]
+        assert numeric["value"] == str(expected_value)
+        assert numeric["unit"] == "J_per_declared_mol_basis_per_K"
+        assert numeric["operation"] == "absolute"
+        assert numeric["decision_band"]["band_basis"] == "derived_scatter"
+        assert numeric["decision_band"]["unit"] == "J_per_declared_mol_basis_per_K"
+        assert numeric["decision_band"]["value"] == str(expected_band.value)
+        assert row["status"] == ResidualStatus.MATCH.value
+
+    stamp = score_mod.derive_store_stamp(root)
+    direct_summary = tmp_path / "retained-direct-summary.json"
+    streamed_summary = tmp_path / "retained-streamed-summary.json"
+    score_mod.write_headline_summary_json(
+        residuals, direct_summary, context=context, engines=engines, root=root
+    )
+    assert metadata.aggregate is not None
+    score_mod._write_headline_summary_from_accumulator_json(
+        metadata.aggregate, streamed_summary, store_stamp=stamp
+    )
+    assert direct_summary.read_bytes() == streamed_summary.read_bytes()
+    direct_report = score_mod.render_score_report(
+        residuals, context=context, engines=engines, root=root
+    )
+    streamed_report = score_mod._render_score_report_from_payloads_legacy(
+        score_mod._ResidualJsonlRows(partial, metadata=metadata),
+        context=context,
+        engines=engines,
+        store_stamp=stamp,
+        _aggregate=metadata.aggregate,
+    )
+    assert streamed_report == direct_report
+    payload_rows = score_mod._ResidualJsonlRows(partial)
+    payload_summary = tmp_path / "retained-payload-summary.json"
+    score_mod.write_headline_summary_from_payloads_json(
+        payload_rows,
+        payload_summary,
+        engines=engines,
+        observations=context.observations,
+        origins=context.origins,
+        store_stamp=stamp,
+    )
+    payload_report = score_mod.render_score_report_from_payloads(
+        payload_rows,
+        engines=engines,
+        hostname=context.hostname,
+        store_stamp=stamp,
+        observations=context.observations,
+        origins=context.origins,
+    )
+    for output in (
+        direct_report,
+        streamed_report,
+        payload_report,
+    ):
+        assert "0.05055745293062" in output
+        assert "nasa_cea_9" in output
+        assert "derived_scatter" in output
+        assert str(expected_band.value) in output
+    payload_summary_doc = json.loads(payload_summary.read_text(encoding="utf-8"))
+    direct_summary_doc = json.loads(direct_summary.read_text(encoding="utf-8"))
+    for summary in (payload_summary_doc, direct_summary_doc):
+        thermo_records = [
+            record
+            for record in summary["records"]
+            if record.get("tier") == "all_numeric"
+            and record.get("rail") == Rail.THERMOCHEMISTRY.value
+            and record.get("engine") == Engine.NASA_CEA_9.value
+        ]
+        assert thermo_records
+        assert sum(record["n"] for record in thermo_records) == 3
 
 
 def test_corrupt_certified_aggregates_miss_fixture_assertions(
