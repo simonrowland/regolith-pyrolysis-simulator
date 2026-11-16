@@ -86,7 +86,6 @@ import re
 from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
-from functools import lru_cache
 from typing import Any, Callable
 
 from simulator.battery.enums import (
@@ -902,7 +901,6 @@ def _parse_enthalpy_increment_subtype(
     )
 
 
-@lru_cache(maxsize=16384)
 def profile_for(identity: Identity) -> QuantityProfile:
     """Closed compared-axis profile for the declared quantity.
 
@@ -1536,7 +1534,6 @@ def _reaction_includes_redox(identity: Identity) -> bool:
     return any(term.species.formula == "O2" for term in reaction_state.value.terms)
 
 
-@lru_cache(maxsize=16384)
 def quantity_token(identity: Identity) -> Quantity | None:
     """Closed Quantity token when the axis is a value; None for unknown / n/a."""
 
@@ -1574,7 +1571,6 @@ def assumed_crystal_standard_pressure_Pa(identity: Identity) -> Decimal | None:
     return None
 
 
-@lru_cache(maxsize=16384)
 def _axis_state(identity: Identity, name: str) -> State[Any] | None:
     return getattr(identity, name)
 
@@ -2046,7 +2042,6 @@ def _quantity_state(identity: Identity) -> State[Quantity]:
     return State.of(q)
 
 
-@lru_cache(maxsize=16384)
 def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
     """Reject values on inapplicable axes; preserve optional p_partial metadata."""
 
