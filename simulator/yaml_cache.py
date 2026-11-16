@@ -1,8 +1,8 @@
-"""Process-shared cache for safely parsed YAML data files."""
+"""Process-shared cache for parsed YAML and decoded store records."""
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 import math
 import os
 from hashlib import sha256
@@ -10,7 +10,9 @@ from pathlib import Path
 import pickle
 import re
 import stat
+import sys
 import tempfile
+from functools import lru_cache
 from typing import Any
 
 import yaml
@@ -60,6 +62,28 @@ def _yaml12_safe_loader(base_loader: type) -> type:
 
 
 YAML12SafeLoader = _yaml12_safe_loader(_YAML_BASE_LOADER)
+
+
+@lru_cache(maxsize=1)
+def _simulator_decoder_identity() -> str:
+    """Fingerprint simulator code, Python, and pickle for typed decode caches."""
+
+    package_root = Path(__file__).resolve().parent
+    digest = sha256()
+    source_paths = sorted(
+        package_root.rglob("*.py"),
+        key=lambda path: path.relative_to(package_root).as_posix(),
+    )
+    for path in source_paths:
+        relative_path = path.relative_to(package_root).as_posix()
+        digest.update(relative_path.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    digest.update(sys.version.encode("utf-8"))
+    digest.update(b"\0")
+    digest.update(str(pickle.HIGHEST_PROTOCOL).encode("ascii"))
+    return digest.hexdigest()
 
 
 def _assert_type_exact_equal(left: object, right: object, seen=None) -> None:
@@ -263,6 +287,36 @@ def load_cached_safe_yaml(
     return parsed
 
 
+def load_cached_decoded_record(
+    payload: str | bytes,
+    *,
+    decoder_identity: str | Callable[[], str],
+    decode: Callable[[], Any],
+) -> Any:
+    """Load a typed record result from a content- and decoder-keyed cache."""
+
+    raw = payload.encode("utf-8") if isinstance(payload, str) else payload
+    digest = sha256(raw).hexdigest()
+    if not _cache_enabled():
+        return decode()
+
+    identity = (
+        decoder_identity() if callable(decoder_identity) else decoder_identity
+    )
+    max_bytes = _cache_max_bytes()
+    cache_path = _decoded_cache_path(digest, identity)
+    if cache_path is None:
+        return decode()
+    cached = _read_cache(cache_path, digest, identity)
+    if cached is not _CACHE_MISS:
+        return cached
+
+    decoded = decode()
+    _write_cache(cache_path, digest, identity, decoded)
+    _evict_after_write(cache_path, max_bytes)
+    return decoded
+
+
 def _cache_enabled() -> bool:
     value = _cache_setting(_CACHE_ENABLED_ENV, "").strip().casefold()
     return value not in {"0", "false", "no", "off"}
@@ -306,6 +360,23 @@ def _cache_path(content_sha256: str, loader_identity: str | None = None) -> Path
         / f"pyyaml-{loader_version}"
         / f"yaml12-{loader_token}"
         / f"v{_CACHE_FORMAT}"
+        / f"{content_sha256}.pickle"
+    )
+
+
+def _decoded_cache_path(
+    content_sha256: str,
+    decoder_identity: str,
+) -> Path | None:
+    root = _private_descendant(_cache_root(), "decoded-records")
+    if root is None:
+        return None
+    decoder_token = sha256(decoder_identity.encode("utf-8")).hexdigest()
+    return (
+        root
+        / "record-v1"
+        / "python-pickle-v1"
+        / decoder_token
         / f"{content_sha256}.pickle"
     )
 

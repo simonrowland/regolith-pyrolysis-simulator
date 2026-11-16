@@ -164,7 +164,12 @@ from simulator.battery.enums import (
     ValencePrintedForm,
     ValenceValueForm,
 )
-from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
+from simulator.yaml_cache import (
+    YAML12SafeLoader,
+    _simulator_decoder_identity,
+    load_cached_decoded_record,
+    load_cached_safe_yaml,
+)
 from simulator.battery.identity import (
     Exposure,
     Identity,
@@ -4288,6 +4293,42 @@ def observation_matches_source_tokens(
     return any(token in folded_id or token in folded_source for token in tokens)
 
 
+def _decode_work_store_file(
+    payload: bytes,
+) -> tuple[Work, list[Experiment]] | None:
+    document = _load_yaml_text(payload)
+    if not isinstance(document, Mapping) or "work" not in document:
+        return None
+    work = work_from_plain(document["work"])
+    experiments = [
+        experiment_from_plain(raw_experiment)
+        for raw_experiment in (document.get("experiments") or [])
+    ]
+    return work, experiments
+
+
+def _decode_observation_store_file(payload: bytes) -> list[Observation]:
+    document = _load_yaml_text(payload)
+    if not isinstance(document, Mapping):
+        return []
+    return [
+        observation_from_plain(raw_observation)
+        for raw_observation in (document.get("observations") or [])
+    ]
+
+
+def _load_decoded_store_file(
+    path: Path,
+    decode: Callable[[bytes], Any],
+) -> Any:
+    payload = path.read_bytes()
+    return load_cached_decoded_record(
+        payload,
+        decoder_identity=_simulator_decoder_identity,
+        decode=lambda: decode(payload),
+    )
+
+
 def load_migrated_store(
     root: Path | None = None,
     *,
@@ -4310,13 +4351,12 @@ def load_migrated_store(
     for path in iter_work_store_paths(works_dir):
         if path.name == "ALIASES.yaml":
             continue
-        doc = load_yaml(path)
-        if not isinstance(doc, Mapping) or "work" not in doc:
+        decoded = _load_decoded_store_file(path, _decode_work_store_file)
+        if decoded is None:
             continue
-        work = work_from_plain(doc["work"])
+        work, decoded_experiments = decoded
         works[work.work_id] = work
-        for raw_exp in doc.get("experiments") or []:
-            exp = experiment_from_plain(raw_exp)
+        for exp in decoded_experiments:
             experiments[exp.experiment_id] = exp
     for directory in (
         root / "data" / "literature" / "extracts-v2",
@@ -4327,11 +4367,10 @@ def load_migrated_store(
         for path in iter_observation_store_paths(directory):
             if not path_matches_source_tokens(path, directory, tokens):
                 continue
-            doc = load_yaml(path)
-            if not isinstance(doc, Mapping):
-                continue
-            for raw_obs in doc.get("observations") or []:
-                obs = observation_from_plain(raw_obs)
+            decoded_observations = _load_decoded_store_file(
+                path, _decode_observation_store_file
+            )
+            for obs in decoded_observations:
                 if not observation_matches_source_tokens(
                     obs.observation_id, obs.source_id, tokens
                 ):
