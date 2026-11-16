@@ -25,6 +25,7 @@ _CRYSTAL_WORD = re.compile(
     r"triclinic|tetragonal|\bsolid\b",
     re.IGNORECASE,
 )
+_GLASS_WORD = re.compile(r"\bglass\b", re.IGNORECASE)
 _LIQUID_WORD = re.compile(r"\bliquid\b", re.IGNORECASE)
 _GAS_WORD = re.compile(r"\bgas\b", re.IGNORECASE)
 
@@ -60,17 +61,23 @@ def phase_windows(text: str) -> tuple[PhaseWindow, ...]:
 
 def phase_of_label(label: str) -> State[Phase]:
     crystal = _CRYSTAL_WORD.search(label) is not None
+    glass = _GLASS_WORD.search(label) is not None
     liquid = _LIQUID_WORD.search(label) is not None
     gas = _GAS_WORD.search(label) is not None
     hits = [
         phase
-        for phase, flag in ((Phase.CR, crystal), (Phase.L, liquid), (Phase.G, gas))
+        for phase, flag in (
+            (Phase.CR, crystal),
+            (Phase.GLASS, glass),
+            (Phase.L, liquid),
+            (Phase.G, gas),
+        )
         if flag
     ]
     if len(hits) != 1:
         shown = label.strip() or "empty window label"
         return State.unknown(
-            f"phase window {shown!r} does not name one of crystal, liquid, gas"
+            f"phase window {shown!r} does not name one of crystal, glass, liquid, gas"
         )
     return State.of(hits[0])
 

@@ -229,7 +229,7 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "calciu!i olivine": Polymorph.CALCIUM_OLIVINE,
     "gbossoi.ll": Polymorph.GROSSULAR,
     "lolli stoll 'lb": Polymorph.WOLLASTONITE,
-    "psbudoilllstoiiti": Polymorph.PSEUDOWOLLASTONITE,
+    "psbudoiolllstoiiti": Polymorph.PSEUDOWOLLASTONITE,
     "ca-ll piboidb": Polymorph.CA_AL_PYROXENE,
     "cliiobistatite": Polymorph.CLINOENSTATITE,
     "ca_al_pyroxene": Polymorph.CA_AL_PYROXENE,

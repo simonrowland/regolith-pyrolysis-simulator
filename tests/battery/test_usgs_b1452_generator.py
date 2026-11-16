@@ -73,6 +73,7 @@ TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
 FAYALITE_ELEMENTS = "robie-hemingway-fisher-1978-usgs-b1452-0335"
 FAYALITE_OXIDES = "robie-hemingway-fisher-1978-usgs-b1452-0336"
+FAYALITE_OXIDES_PHASE_02 = "robie-hemingway-fisher-1978-usgs-b1452-0336-phase-02"
 REVIEWED_OXIDE_SAMPLES = {
     "robie-hemingway-fisher-1978-usgs-b1452-0314": (
         "kyanite",
@@ -1045,15 +1046,21 @@ def test_every_b1452_oxide_basis_record_keeps_oxide_log_k_reactions(
         )
         if (
             source_name_token is not None
+            and product.species.phase.is_value
             and product.species.phase.value is Phase.CR
-            and product.species.polymorph is not None
-            and product.species.polymorph.is_unknown
         ):
-            assert (product.species.polymorph.reason or "").startswith(
-                "printed phase window"
-            ), f"named crystal {record_id} did not map through the polymorph owner"
+            assert (
+                product.species.polymorph is not None
+                and product.species.polymorph.is_value
+            ), f"named crystal {record_id} is not mapped through the polymorph owner"
         if unresolved_terms:
-            if record_id in REVIEWED_OXIDE_SAMPLES:
+            temperature = row.identity.temperature_K
+            if (
+                record_id in REVIEWED_OXIDE_SAMPLES
+                and temperature is not None
+                and temperature.is_value
+                and temperature.value == Decimal("298.15")
+            ):
                 expected_name, _formula, _value = REVIEWED_OXIDE_SAMPLES[record_id]
                 expected_polymorph = resolve_printed_name_polymorph(expected_name)
                 assert expected_polymorph is not None
@@ -1072,7 +1079,7 @@ def test_every_b1452_oxide_basis_record_keeps_oxide_log_k_reactions(
         )
 
 
-def test_mullite_oxide_caption_keeps_deltas_refused_and_log_k_typed() -> None:
+def test_mullite_oxide_caption_keeps_deltas_refused_and_flags_unprinted_oxide_state() -> None:
     record_id = "robie-hemingway-fisher-1978-usgs-b1452-0320"
     record = _load(record_id)
     caption = generator._header_text(record).upper()
@@ -1119,10 +1126,22 @@ def test_mullite_oxide_caption_keeps_deltas_refused_and_log_k_typed() -> None:
         for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG)
     }
     assert all(row.identity.quantity.is_unknown for row in mullite_delta_rows)
-    assert all(
-        row.identity.quantity.is_value
-        and row.identity.quantity.value is Quantity.LOG10_K_REACTION
+    reference_log_k = next(
+        row
         for row in mullite_log_k_rows
+        if row.identity.temperature_K is not None
+        and row.identity.temperature_K.is_value
+        and row.identity.temperature_K.value == Decimal("298.15")
+    )
+    assert reference_log_k.value.point == Decimal("-4.901")
+    assert reference_log_k.identity.quantity.is_value
+    assert reference_log_k.identity.quantity.value is Quantity.LOG10_K_REACTION
+    hot_log_k_rows = [row for row in mullite_log_k_rows if row is not reference_log_k]
+    assert all(row.value.point is not None for row in hot_log_k_rows)
+    assert all(row.identity.quantity.is_unknown for row in hot_log_k_rows)
+    assert all(
+        "Al2O3 reference-oxide phase" in (row.identity.quantity.reason or "")
+        for row in hot_log_k_rows
     )
     assert all(
         row.identity.reaction is not None and row.identity.reaction.is_value
@@ -1153,12 +1172,15 @@ def test_mullite_oxide_caption_keeps_deltas_refused_and_log_k_typed() -> None:
 
 
 def test_fayalite_oxide_log_k_is_a_reaction_with_term_standard_states() -> None:
-    generated = _generation(FAYALITE_OXIDES)
-    observations = _formation_observations(
-        generated,
-        basis="from_the_oxides",
-        quantity=Quantity.LOG10_K_REACTION,
-    )
+    observations = [
+        observation
+        for record_id in (FAYALITE_OXIDES, FAYALITE_OXIDES_PHASE_02)
+        for observation in _formation_observations(
+            _generation(record_id),
+            basis="from_the_oxides",
+            quantity=Quantity.LOG10_K_REACTION,
+        )
+    ]
     printed_log_k = {
         "298.15": Decimal("3.640"),
         "1490": Decimal("-0.038"),
@@ -1271,13 +1293,19 @@ def test_reference_oxide_transition_boundaries_follow_the_printed_source() -> No
 
 
 def test_ilmenite_uses_its_melting_point_and_refuses_unprinted_tio2_state() -> None:
-    record_id = "robie-hemingway-fisher-1978-usgs-b1452-0232"
-    generated = _generation(record_id)
-    observations = _formation_observations(
-        generated,
-        basis="from_the_oxides",
-        quantity=Quantity.LOG10_K_REACTION,
+    record_ids = (
+        "robie-hemingway-fisher-1978-usgs-b1452-0232",
+        "robie-hemingway-fisher-1978-usgs-b1452-0232-phase-02",
     )
+    observations = [
+        observation
+        for record_id in record_ids
+        for observation in _formation_observations(
+            _generation(record_id),
+            basis="from_the_oxides",
+            quantity=Quantity.LOG10_K_REACTION,
+        )
+    ]
     by_temperature = {
         str(observation.identity.temperature_K.value): observation
         for observation in observations

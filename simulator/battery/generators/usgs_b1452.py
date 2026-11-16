@@ -126,9 +126,18 @@ B1452_ROW_POLYMORPHS = {
 B1452_PHASE_TEXT_CORRECTIONS = {
     # PDF p. 264 prints the ilmenite melting point as 1640 K.
     f"{SOURCE_ID}-0232": (("1&40", "1640"),),
+    f"{SOURCE_ID}-0232-phase-02": (("1&40", "1640"),),
     # PDF p. 380 prints the wollastonite bound as 1400 K.
     f"{SOURCE_ID}-0348": (("11t00", "1400"),),
+    # The two kaliophillite records OCR the unit K as a tilde.
+    f"{SOURCE_ID}-0379": (("~", "K"),),
+    f"{SOURCE_ID}-0379-phase-02": (("~", "K"),),
+    f"{SOURCE_ID}-0380": (("~", "K"),),
+    f"{SOURCE_ID}-0380-phase-02": (("~", "K"),),
 }
+B1452_CRYSTALLINE_PRODUCT_RECORDS = frozenset(
+    {f"{SOURCE_ID}-0336", f"{SOURCE_ID}-0336-phase-02"}
+)
 
 # Page-header units. Captured units_as_published on B1452 are OCR-destroyed
 # (J/aol•K, kJ/1101, …). Never map a stored unit from the captured string.
@@ -1269,15 +1278,6 @@ def _polymorph_from_text(text: str) -> State[Polymorph]:
 def _polymorph_for_phase_window(
     record: Mapping[str, Any], label: str
 ) -> State[Polymorph]:
-    explicit_parenthetical = re.search(r"\(([^)]+)\)", label)
-    if explicit_parenthetical:
-        resolution = _polymorph_from_text(explicit_parenthetical.group(1))
-        if resolution.is_unknown:
-            return State.unknown(
-                f"printed phase window {label!r}: {resolution.reason}"
-            )
-        return resolution
-
     qualifier = re.search(r"\b(alpha|beta|gamma|delta)\b|[αβγδ]", label, re.I)
     if qualifier:
         token = resolve_printed_name_polymorph(qualifier.group(0))
@@ -1288,6 +1288,15 @@ def _polymorph_for_phase_window(
             f"{qualifier.group(0)!r} is not closed"
         )
 
+    explicit_parenthetical = re.search(r"\(([^)]+)\)", label)
+    if explicit_parenthetical:
+        resolution = _polymorph_from_text(explicit_parenthetical.group(1))
+        if resolution.is_unknown:
+            return State.unknown(
+                f"printed phase window {label!r}: {resolution.reason}"
+            )
+        return resolution
+
     record_id = str(record.get("record_id") or "")
     override = B1452_RECORD_POLYMORPHS.get(record_id)
     if override is not None:
@@ -1296,7 +1305,7 @@ def _polymorph_for_phase_window(
     named = _polymorph_from_text(name)
     if named.is_value:
         return named
-    if "crystal" in label.lower():
+    if record_id in B1452_CRYSTALLINE_PRODUCT_RECORDS and "crystal" in label.lower():
         return State.of(Polymorph.CRYSTALLINE)
     return State.unknown(
         f"phase window {label!r} does not name a closed crystal polymorph"
@@ -1326,6 +1335,9 @@ def _phase_state(
     text = _normalized_phase_text(record)
     windows = phase_windows(text)
     if not windows:
+        phase, polymorph = _phase_from_text(text)
+        if phase.is_value and phase.value in {Phase.GLASS, Phase.AQ, Phase.G, Phase.L}:
+            return phase, polymorph
         reason = f"{record_id}: printed phase ranges are not parseable: {text!r}"
         return State.unknown(reason), State.unknown(reason)
     if (
@@ -1342,6 +1354,11 @@ def _phase_state(
         return State.unknown(reason), State.unknown(reason)
 
     phase = phase_of_label(window.label)
+    if (
+        phase.is_unknown
+        and record_id in B1452_RECORD_POLYMORPHS
+    ):
+        phase = State.of(Phase.CR)
     if not phase.is_value:
         return phase, State.unknown(phase.reason or "printed phase is unresolved")
     if phase.value is not Phase.CR:
