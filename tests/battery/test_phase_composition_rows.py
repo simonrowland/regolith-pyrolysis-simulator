@@ -2359,7 +2359,9 @@ def test_mole_sibling_rows_keep_experiment_order_and_append_reference() -> None:
         source_id="phase-source",
     )
 
-    amounts, refusal = _phase_mole_sibling_amounts((foreign, sibling), reference)
+    amounts, refusal = _phase_mole_sibling_amounts(
+        (foreign, sibling), reference, reference_present=False
+    )
 
     assert refusal is None
     assert amounts is not None
@@ -2375,7 +2377,7 @@ def test_mole_sibling_reference_id_collision_keeps_global_append_decision(
     """A same-id row in another experiment suppresses the external reference."""
 
     def hook(*args, **kwargs):
-        raise AssertionError("unclosed phase amounts must refuse before assembly")
+        raise AssertionError("incomplete phase amounts must refuse before assembly")
 
     monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
     work = F.work()
@@ -2444,7 +2446,7 @@ def test_mole_sibling_reference_id_collision_keeps_global_append_decision(
     assert residual.numeric is None
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
-    assert residual.refusal.detail["reason"] == "phase_mole_fraction_set_unclosed"
+    assert residual.refusal.detail["reason"] == "phase_mole_fraction_component_absent"
 
 
 def test_duplicate_mole_fraction_component_stays_refused(

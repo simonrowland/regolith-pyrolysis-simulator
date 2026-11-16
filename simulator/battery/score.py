@@ -918,13 +918,16 @@ class ScoreContext:
     _observations_by_experiment: Mapping[str, tuple[Observation, ...]] = field(
         init=False, repr=False, compare=False
     )
+    _observation_ids: frozenset[str] = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         rows_by_experiment: dict[str, list[Observation]] = {}
+        observation_ids: set[str] = set()
         for observation in self.observations.values():
             rows_by_experiment.setdefault(observation.experiment_id, []).append(
                 observation
             )
+            observation_ids.add(observation.observation_id)
         object.__setattr__(
             self,
             "_observations_by_experiment",
@@ -933,6 +936,7 @@ class ScoreContext:
                 for experiment_id, rows in rows_by_experiment.items()
             },
         )
+        object.__setattr__(self, "_observation_ids", frozenset(observation_ids))
 
 
 @dataclass(frozen=True)
@@ -10599,6 +10603,8 @@ def _coefficient_basis_detail(
 def _phase_mole_sibling_amounts(
     observations: Iterable[Observation],
     reference: Observation,
+    *,
+    reference_present: bool,
 ) -> tuple[Mapping[str, Decimal] | None, str | None]:
     """Printed sibling amounts for one phase point, or a typed refusal.
 
@@ -10623,7 +10629,7 @@ def _phase_mole_sibling_amounts(
         return None, None
     temperature = temperature_of(identity)
     rows = list(observations)
-    if all(row.observation_id != reference.observation_id for row in rows):
+    if not reference_present:
         rows.append(reference)
     amounts: dict[str, Decimal] = {}
     for row in rows:
@@ -17115,6 +17121,7 @@ def _compile_residual_with_lineage(
     phase_siblings, phase_sibling_refusal = _phase_mole_sibling_amounts(
         context._observations_by_experiment.get(reference.experiment_id, ()),
         reference,
+        reference_present=reference.observation_id in context._observation_ids,
     )
     if (
         prediction is None and predict in (None, predict_with_engine)
