@@ -533,7 +533,7 @@ def _cold_numbers(value: Any) -> Any:
 
 
 def equilibrium_to_hot(values: Mapping[str, Any], *, engine_id: str | None = None) -> Any:
-    from simulator.engine_cache_binary import EngineCacheValue
+    from simulator.engine_cache import EngineCacheValue
 
     return EngineCacheValue(
         equilibrium_cache_value(values, engine_id=engine_id),

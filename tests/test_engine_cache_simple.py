@@ -409,7 +409,7 @@ def test_hot_round_trip_preserves_float_hex_exactly(
 
 
 def test_engine_cache_binary_matches_shared_canonical_encoder() -> None:
-    from simulator.engine_cache_binary import pack
+    from simulator.engine_cache import pack
 
     values = (
         ["openimcc", 1, {"temperature_K": 1700.0000000000002}],

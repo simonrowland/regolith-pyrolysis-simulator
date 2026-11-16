@@ -152,7 +152,7 @@ PO2_OXYGEN_BALANCE_EFFUSION = "oxygen_balance_effusion"
 # multivalent element, is never rewritten as engine fO2 = -9.
 PO2_NOT_AN_INPUT = REDOX_MODE_NOT_AN_INPUT
 
-from simulator.engine_refusals import (
+from simulator.engine_cache import (
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
     REFUSAL_NO_LIQUID, REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH,
     REFUSAL_GATE_REFUSED_IN_ADAPTER, REFUSAL_UNAVAILABLE, REFUSAL_VALUE_IS_FLOOR,
@@ -779,7 +779,7 @@ class EquilibrateCell:
         return [*projection, flags]
 
     def to_hot(self) -> Any:
-        from simulator.engine_cache_binary import EngineCacheValue, Provenance
+        from simulator.engine_cache import EngineCacheValue, Provenance
 
         payload = self.to_engine_cache_value()
         if self.model_id is not None:
@@ -3883,7 +3883,7 @@ def internal_analytical_residue_vapor_pressure(
     from types import SimpleNamespace
 
     from simulator.engine_cache import _configured_engine_cache_path, cached_engine_call, record_engine_open
-    from simulator.engine_cache_binary import live_hot
+    from simulator.engine_cache import live_hot
     from simulator.melt_backend.base import equilibrium_cache_from_value, equilibrium_to_hot
 
     record_engine_open("internal-analytical", core)
@@ -4580,7 +4580,7 @@ class _IsolatedCellWorker:
                         detail="isolated worker response was not an object"
                     )
                 if result.get("status") == "refusal":
-                    from simulator.engine_refusals import cacheable_refusal
+                    from simulator.engine_cache import cacheable_refusal
 
                     if not cacheable_refusal(result):
                         return result

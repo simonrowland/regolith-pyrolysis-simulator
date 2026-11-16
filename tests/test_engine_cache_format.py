@@ -9,7 +9,7 @@ from simulator import engine_cache
 
 
 def test_binary_scalar_wire_pin_before_leaf_consolidation() -> None:
-    from simulator.engine_cache_binary import pack, unpack
+    from simulator.engine_cache import pack, unpack
 
     values = (None, False, True, -1, 1.25, -0.0, 0.0)
     expected = bytes.fromhex("07070001020301043ff40000000000000c0b")

@@ -104,7 +104,7 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> N
             hit_us = measure(lambda: original_call(engine, request, unexpected_miss))
             key_us = measure(lambda: engine_cache.engine_cache_key(engine, version, request))
             warnings.warn(f"cache-speed {engine} median_hit_us:{hit_us:.3f} median_key_us:{key_us:.3f}", stacklevel=1)
-    from simulator.engine_cache_binary import pack, unpack
+    from simulator.engine_cache import pack, unpack
 
     def check_strings(value):
         if isinstance(value, str):

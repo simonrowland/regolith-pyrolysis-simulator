@@ -8,7 +8,7 @@ from simulator.melt_backend.base import _call_with_hard_timeout
 
 
 def test_deterministic_refusal_allowlist_is_explicit():
-    from simulator.engine_refusals import CACHEABLE_REFUSAL_CODES
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
 
     assert CACHEABLE_REFUSAL_CODES == frozenset({
         "out_of_basis", "composition_projected", "sum_below_95_wt_pct", "no_liquid",

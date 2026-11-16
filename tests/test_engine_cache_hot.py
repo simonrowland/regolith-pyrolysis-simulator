@@ -4,7 +4,7 @@ import sqlite3
 import zlib
 
 from simulator import engine_cache
-from simulator.engine_cache_binary import unpack
+from simulator.engine_cache import unpack
 from simulator.melt_backend.base import EquilibriumResult
 
 
@@ -64,7 +64,7 @@ def test_unknown_shape_solves_without_a_fallback_payload(tmp_path, monkeypatch):
 
 
 def test_binary_value_encoding_is_canonical_and_exact():
-    from simulator.engine_cache_binary import pack
+    from simulator.engine_cache import pack
 
     assert pack({"b": 2.0, "a": -0.0}) == pack({"a": -0.0, "b": 2.0})
     assert unpack(pack({"a": -0.0}))["a"].hex() == "-0x0.0p+0"

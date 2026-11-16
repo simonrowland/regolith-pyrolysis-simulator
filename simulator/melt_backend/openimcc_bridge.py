@@ -324,7 +324,7 @@ class OpenImccBridgeResult:
         }
 
     def to_hot(self) -> Any:
-        from simulator.engine_cache_binary import EngineCacheValue, Provenance
+        from simulator.engine_cache import EngineCacheValue, Provenance
         from simulator.melt_backend.base import encode_engine_notice_codes
 
         transport = self.to_transport()
@@ -451,7 +451,7 @@ class OpenImccRedoxResult:
         }
 
     def to_hot(self) -> Any:
-        from simulator.engine_cache_binary import EngineCacheValue, Provenance
+        from simulator.engine_cache import EngineCacheValue, Provenance
 
         values = self.lean()
         return EngineCacheValue([
