@@ -12,7 +12,7 @@ import zlib
 import pytest
 
 from simulator import engine_cache as cache
-from simulator.engine_cache_binary import EngineCacheValue, Provenance, pack, unpack
+from simulator.engine_cache import EngineCacheValue, Provenance, pack, unpack
 
 
 @pytest.fixture(autouse=True)
@@ -275,7 +275,7 @@ def test_live_subprocess_snapshot_has_all_cold_rows_and_committed_wal(tmp_path, 
 import sys, time
 from pathlib import Path
 from simulator import engine_cache as c
-from simulator.engine_cache_binary import EngineCacheValue
+from simulator.engine_cache import EngineCacheValue
 with c._engine_cache_path_scope(Path(sys.argv[1])):
     i = 0
     while not Path(sys.argv[2]).exists():
