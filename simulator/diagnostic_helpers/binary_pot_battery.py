@@ -782,10 +782,11 @@ class EquilibrateCell:
 
     def to_hot(self) -> Any:
         from simulator.engine_cache import EngineCacheValue, Provenance
+        from simulator.melt_backend.base import _intern_equilibrium_source_provenance
 
         if self.backend_failure_disposition:
             return EngineCacheValue(self.as_payload(), cacheable=False)
-        payload = self.to_engine_cache_value()
+        payload = _intern_equilibrium_source_provenance(self.to_engine_cache_value())
         if self.model_id is not None:
             payload[11][8] = Provenance(self.model_id)
         if self.status == "refusal":

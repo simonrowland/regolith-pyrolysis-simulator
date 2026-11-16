@@ -81,6 +81,9 @@ def test_hot_round_trip_preserves_real_engine_consumer_view(
         warm = EquilibrateCell.from_hot(
             engine_cache.cached_engine_call(engine_name, {}, unexpected_solve)
         )
+        assert warm.vapor_pressure_backend_status == vapor_pressure_source_code(
+            cold.vapor_pressure_backend_status
+        )
         assert _hot_consumer_view(warm) == _hot_consumer_view(cold)
         assert _hot_consumer_view(EquilibrateCell.from_hot(payload)) == _hot_consumer_view(cold)
         assert engine_cache.engine_cache_counters()[engine_name]["hits"] == 1
@@ -96,8 +99,11 @@ def test_hot_round_trip_preserves_real_engine_consumer_view(
     ("vapor_pressure_backend_status_reason", '{"source":"antoine_fallback","version":"record"}'),
     ("engine_reason", "liquid reference with the complete engine warning"),
     ("vapor_pressures_source", {"SiO": "antoine_fallback_from_vaporock:detail", "Mg": "engine_lineage"}),
+    ("vapor_pressure_backend_status", "fallback"),
+    ("vapor_pressure_backend_status", "builtin_authoritative"),
+    ("vapor_pressure_backend_status", "openimcc"),
 ))
-def test_hot_round_trip_keeps_consumer_text_verbatim(field, value) -> None:
+def test_hot_round_trip_keeps_consumer_field_contract(field, value) -> None:
     cell = EquilibrateCell(
         pot_id="text", engine="internal-analytical", temperature_K=1700.0,
         po2=Po2Request(mode="engine_default", po2_bar=None), status="ok",
@@ -108,7 +114,10 @@ def test_hot_round_trip_keeps_consumer_text_verbatim(field, value) -> None:
     setattr(cell, field, value)
     hot, provenance = engine_cache.pack_hot(cell.to_hot().hot)
     restored = EquilibrateCell.from_hot(engine_cache.unpack_hot(hot, provenance))
-    assert getattr(restored, field) == value
+    expected = vapor_pressure_source_code(value) if field == "vapor_pressure_backend_status" else value
+    assert getattr(restored, field) == expected
+    if field == "vapor_pressures_source":
+        assert b"engine_lineage" not in hot
 
 
 def test_hot_cell_version_record_is_interned_once(tmp_path, monkeypatch) -> None:

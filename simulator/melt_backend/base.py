@@ -523,6 +523,14 @@ def _cold_numbers(value: Any) -> Any:
     return None
 
 
+def _intern_equilibrium_source_provenance(hot: list[Any]) -> list[Any]:
+    from simulator.engine_cache import Provenance
+
+    if hot[7]:
+        hot[7] = Provenance(hot[7])
+    return hot
+
+
 def equilibrium_to_hot(
     values: Mapping[str, Any], *, engine_id: str | None = None, live_value: Any = None,
 ) -> Any:
@@ -532,7 +540,9 @@ def equilibrium_to_hot(
     if isinstance(diagnostics, Mapping) and diagnostics.get('backend_failure_disposition'):
         return EngineCacheValue(values if live_value is None else live_value, cacheable=False)
     return EngineCacheValue(
-        equilibrium_cache_value(values, engine_id=engine_id),
+        _intern_equilibrium_source_provenance(
+            equilibrium_cache_value(values, engine_id=engine_id)
+        ),
         {
             name: numeric for name in _EQUILIBRIUM_COLD_FIELDS
             if (numeric := _cold_numbers(values.get(name))) is not None
