@@ -3883,7 +3883,7 @@ def internal_analytical_residue_vapor_pressure(
     from types import SimpleNamespace
 
     from simulator.engine_cache import _configured_engine_cache_path, cached_engine_call, record_engine_open
-    from simulator.engine_cache_binary import EngineCacheValue, live_hot
+    from simulator.engine_cache_binary import live_hot
     from simulator.melt_backend.base import equilibrium_cache_from_value, equilibrium_to_hot
 
     record_engine_open("internal-analytical", core)
@@ -3913,8 +3913,6 @@ def internal_analytical_residue_vapor_pressure(
             "engine_settings": _internal_analytical_cache_settings(core),
         }
         result = cached_engine_call("internal-analytical", request, solve)
-    if isinstance(result, EngineCacheValue):
-        result = live_hot(result)
     if isinstance(result, list):
         return SimpleNamespace(**equilibrium_cache_from_value(result, engine_id="internal-analytical"))
     return result
