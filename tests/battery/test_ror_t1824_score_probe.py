@@ -9,12 +9,23 @@ from simulator.battery.enums import (
     AdmissionStatus,
     Engine,
     EvidenceClass,
+    QUANTITY_UNITS,
     QuotedTargetKind,
     RefusalReason,
     SourceRelation,
 )
 from simulator.battery.records import QuotedFrom
-from simulator.battery.score import ScoreContext, comparison_candidates, resolve_source_relation, score_store
+from simulator.battery.score import (
+    ProprietaryProduced,
+    ScoreContext,
+    _duplicate_observation_refusal_detail,
+    comparison_candidates,
+    compile_residual,
+    resolve_source_relation,
+    score_proprietary_aggregate,
+    score_store,
+)
+from simulator.battery.validate import _quoted_source_observation_ids
 from tests.battery import factories as F
 from tests.battery.test_score import _predict
 
@@ -114,3 +125,121 @@ def test_quoted_twin_is_not_scored_as_an_independent_measurement(
     assert quoted_residuals[0].numeric is None
     assert quoted_residuals[0].refusal is not None
     assert quoted_residuals[0].refusal.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert quoted_residuals[0].source_relation is SourceRelation.SAME_INPUT
+
+
+@pytest.mark.parametrize("target_kind", tuple(QuotedTargetKind))
+def test_compile_residual_suppresses_quoted_twin(target_kind: QuotedTargetKind) -> None:
+    context, primary_id, quoted_id = _score_context(target_kind)
+    primary = context.observations[primary_id]
+    quoted = context.observations[quoted_id]
+
+    primary_residual, _ = compile_residual(
+        primary,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_predict(
+            primary.value.point,
+            primary.identity,
+            coefficient_sources=(primary_id,),
+        ),
+    )
+    quoted_residual, _ = compile_residual(
+        quoted,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_predict(
+            quoted.value.point,
+            quoted.identity,
+            coefficient_sources=(primary_id,),
+        ),
+    )
+
+    assert primary_residual.numeric is not None
+    assert quoted_residual.numeric is None
+    assert quoted_residual.refusal is not None
+    assert quoted_residual.refusal.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert quoted_residual.source_relation is SourceRelation.SAME_INPUT
+
+
+@pytest.mark.parametrize("target_kind", tuple(QuotedTargetKind))
+def test_quoted_citation_refusal_uses_validator_resolution(
+    target_kind: QuotedTargetKind,
+) -> None:
+    context, _primary_id, quoted_id = _score_context(target_kind)
+    quoted = context.observations[quoted_id]
+    quoted_experiment = context.experiments[quoted.experiment_id]
+    experiments = dict(context.experiments)
+    observations = dict(context.observations)
+
+    if target_kind is QuotedTargetKind.EXPERIMENT:
+        experiments.pop("primary-experiment")
+    else:
+        primary = observations.pop("primary-observation")
+        renamed_primary = replace(
+            primary, observation_id="primary-source::primary-observation"
+        )
+        observations[renamed_primary.observation_id] = renamed_primary
+
+    assert (
+        _quoted_source_observation_ids(
+            quoted_experiment, observations, experiments
+        )
+        is None
+    )
+    mismatched_context = replace(
+        context, experiments=experiments, observations=observations
+    )
+    detail = _duplicate_observation_refusal_detail(
+        mismatched_context, mismatched_context.observations[quoted_id]
+    )
+
+    assert detail is not None
+    assert detail["resolution"] == "primary_missing"
+
+
+@pytest.mark.parametrize("target_kind", tuple(QuotedTargetKind))
+def test_proprietary_aggregate_excludes_quoted_twin(
+    target_kind: QuotedTargetKind,
+) -> None:
+    context, primary_id, quoted_id = _score_context(target_kind)
+    identity = F.psat_identity("Fe")
+    observations = {
+        observation_id: replace(
+            context.observations[observation_id],
+            identity=identity,
+            value=replace(context.observations[observation_id].value, point=Decimal("1")),
+        )
+        for observation_id in (primary_id, quoted_id)
+    }
+    aggregate_context = replace(context, observations=observations)
+
+    class Provider:
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def score(self, request):
+            self.calls.append(request.observation_id)
+            return ProprietaryProduced(
+                observation_id=request.observation_id,
+                quantity=request.quantity,
+                scalar=Decimal("1"),
+                unit=QUANTITY_UNITS[request.quantity],
+                engine_version="test-version",
+                datafile_fingerprint="sha256:test-data",
+            )
+
+    provider = Provider()
+    aggregates = score_proprietary_aggregate(
+        aggregate_context,
+        engine=Engine.PROPRIETARY_REMOTE,
+        observation_ids=(primary_id, quoted_id),
+        provider=provider,
+    )
+
+    assert len(aggregates) == 1
+    assert aggregates[0].n == 1
+    assert dict(aggregates[0].refusal_counts_by_code) == {
+        RefusalReason.REFERENTIAL_INTEGRITY.value: 1
+    }
+    assert provider.calls == [primary_id]
