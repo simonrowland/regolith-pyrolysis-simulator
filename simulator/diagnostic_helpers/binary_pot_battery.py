@@ -3890,7 +3890,6 @@ def internal_analytical_residue_vapor_pressure(
     from types import SimpleNamespace
 
     from simulator.engine_cache import (
-        EngineCacheValue,
         _configured_engine_cache_path,
         cached_engine_call,
         record_engine_open,
@@ -3912,29 +3911,11 @@ def internal_analytical_residue_vapor_pressure(
         return result
 
     def solve():
-        from simulator.vapour_rail.run_disclosure import active_snapshot, disclosure_delta
-
-        disclosures_before = active_snapshot()
         result = solve_live()
         if getattr(result, "status", None) == "ok" and isinstance(getattr(result, "diagnostics", None), Mapping):
-            projected = equilibrium_to_hot(
+            return equilibrium_to_hot(
                 vars(result), engine_id="internal-analytical", live_value=result
             )
-            if isinstance(projected, EngineCacheValue) and projected.cacheable:
-                disclosures = [
-                    dict(item)
-                    for item in disclosure_delta(
-                        disclosures_before, active_snapshot()
-                    )
-                ]
-                return EngineCacheValue(
-                    {
-                        "_residue_pressure_equilibrium": projected.hot,
-                        "law_disclosures": disclosures,
-                    },
-                    projected.cold,
-                )
-            return projected
         return result
 
     if _configured_engine_cache_path() is None:
@@ -4588,6 +4569,12 @@ class _IsolatedCellWorker:
         self, payload: Mapping[str, Any], *, timeout_s: float
     ) -> dict[str, Any]:
         started_wall, started_cpu = time.perf_counter(), time.process_time()
+        from simulator.engine_cache import (
+            EngineCacheValue,
+            cached_engine_call,
+            engine_cache_settings,
+        )
+
         def solve() -> Any:
             with self._lock:
                 try:
@@ -4626,9 +4613,12 @@ class _IsolatedCellWorker:
 
                     if not cacheable_refusal(result):
                         return result
-            return EquilibrateCell.from_payload(result).to_hot()
-
-        from simulator.engine_cache import cached_engine_call, engine_cache_settings
+            hot = EquilibrateCell.from_payload(result).to_hot()
+            if self.engine == "internal-analytical":
+                # The child process has no run-disclosure registry to attach to
+                # this value, so it cannot safely populate the parent cache.
+                return EngineCacheValue(hot, cacheable=False)
+            return hot
 
         request = {
             key: payload[key]
