@@ -929,7 +929,11 @@ def _mutated_janaf_wall_document(table_id, mutation):
                       and (t < 3000 or (t-200 in nodes and t+200 in nodes))]
         assert candidates, table_id
         node = min(candidates, key=lambda t: abs(t - 1700))
-        temperature = float(node - 25)
+        # K-002 has 250 and 298.15 K rows below its 300 K node.
+        # Query between the immediately preceding row and the removed node;
+        # node-25 would exercise an intact chord in that nonuniform grid.
+        preceding = max(t for t in nodes if t < node)
+        temperature = float((preceding + node) / 2)
         if mutation == "missing_row":
             document["table"]["values"].remove(nodes[node])
         else:
