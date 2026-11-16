@@ -1196,7 +1196,7 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
     assert cold["gas_partial_pressures_Pa"] == warm["gas_partial_pressures_Pa"] == {
         "SiO": 1.25
     }
-    assert cold["engine_reason"] == warm["engine_reason"] == "liquid"
+    assert cold["engine_reason"] == warm["engine_reason"] == result["engine_reason"]
     assert cold["activities_standard_state"] == warm["activities_standard_state"] == result["activities_standard_state"]
     assert isolated._worker.calls == 1
 
@@ -1243,7 +1243,7 @@ def test_equilibrium_cache_value_contains_only_scoring_inputs() -> None:
     )
     assert restored.activity_coefficients == result.activity_coefficients
     assert restored.vapor_pressures_Pa == result.vapor_pressures_Pa
-    assert restored.vapor_pressures_source == {}
+    assert restored.vapor_pressures_source == result.vapor_pressures_source
     assert restored.status == "ok"
     assert restored.phase_assemblage_available is True
     assert restored.reported_activity_coefficients == {"FeO": 0.9}
@@ -1646,7 +1646,7 @@ def test_equilibrium_cache_maps_use_compact_canonical_json_objects() -> None:
     assert restored["activity_coefficients"] == {"FeO": 0.91}
     assert restored["reported_activity_coefficients"] == {"FeO": 0.89}
     assert restored["vapor_pressures_Pa"] == {"SiO": 12.5}
-    assert restored["vapor_pressures_source"] == {"SiO": "speciation"}
+    assert restored["vapor_pressures_source"] == {"SiO": "vaporock"}
     assert restored["liquid_composition_wt_pct"] == {"FeO": 25.0}
     assert restored["fe_redox_split"] == {"Fe2O3_wt_pct": 3.0}
 

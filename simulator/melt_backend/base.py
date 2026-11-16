@@ -474,14 +474,6 @@ def equilibrium_cache_value(
     engine_id: str | None = None,
 ) -> Any:
     """Project the scorer-consumed equilibrium fields into a compact payload."""
-    sources = values.get('vapor_pressures_source')
-    compact_sources = []
-    if isinstance(sources, Mapping):
-        for name, source in sorted(sources.items(), key=lambda item: str(item[0])):
-            code = vapor_pressure_source_code(source)
-            if code is not None:
-                compact_sources.append([str(name), code])
-
     liquid_fraction = finite_float(values.get('liquid_fraction'))
     phase_available = values.get('phase_assemblage_available', True)
     status = _equilibrium_cache_json(values.get('status'))
@@ -499,7 +491,7 @@ def equilibrium_cache_value(
         _cache_map(reported_coefficients, positive=True),
         _activity_detail_pairs(values.get('activity_coefficient_details')),
         _cache_map(values.get('vapor_pressures_Pa'), pressure=True),
-        {name: code for name, code in compact_sources},
+        _equilibrium_cache_json(values.get('vapor_pressures_source') or {}),
         _cache_map(values.get('vaporock_full_speciation_Pa'), pressure=True),
         _cache_map(values.get('liquid_composition_wt_pct')),
         _cache_map(values.get('fe_redox_split')),

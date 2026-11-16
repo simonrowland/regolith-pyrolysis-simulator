@@ -767,9 +767,9 @@ class EquilibrateCell:
         }
         flags = [
             self.engine_status,
-            _activity_reference_phase(self.engine_reason),
+            self.engine_reason,
             vapor_pressure_source_code(self.vapor_pressure_backend_status),
-            vapor_pressure_source_code(self.vapor_pressure_backend_status_reason),
+            self.vapor_pressure_backend_status_reason,
             self.authoritative_for_requested_vapor_pressure,
             self.authority,
             self.certified_band,
@@ -829,7 +829,7 @@ class EquilibrateCell:
             raise ValueError("invalid compact EquilibrateCell flags")
         (
             engine_status,
-            activity_phase,
+            engine_reason,
             vapor_status,
             vapor_status_reason,
             authoritative,
@@ -855,7 +855,7 @@ class EquilibrateCell:
         values = {
             "status": base.get("status") or "unknown",
             "engine_status": engine_status,
-            "engine_reason": activity_phase,
+            "engine_reason": engine_reason,
             "melt_activities": base.get("activity_coefficients") or {},
             "melt_activity_coefficients": base.get("reported_activity_coefficients") or {},
             "melt_activity_coefficient_details": base.get("activity_coefficient_details") or {},
