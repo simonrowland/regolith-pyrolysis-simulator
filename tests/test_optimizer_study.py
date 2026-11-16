@@ -7537,8 +7537,10 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
     assert summary["furnace_amortization_batch_cost_equivalents"] is None
     authority = summary["wall_deposit_sticking_authority"]
     bookings = {item["species"]: item for item in summary["wall_supply_bound_bookings"]}
-    assert bookings["CrO2"]["deposit_kg"] == 0.0
-    assert bookings["CrO2"]["supply_interval_upper_bound_used"] == 1
+    # d-424/d-367: this cold hour did not evaluate a transport pO2.
+    # CrO2's oxygen-dependent activity-1 law cannot price a zero bound.
+    assert "CrO2" not in bookings
+    assert authority["supply_unavailable"]["CrO2"] == ["missing_recorded_pO2"]
     assert authority["output_status"] == "status_bearing"
     assert authority.get("wall_saturation_pressure_refused_species") in (None, [])
     assert (
