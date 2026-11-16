@@ -62,6 +62,7 @@ def _without_cache_counters(value: Any) -> Any:
                 "elapsed_s",
                 "process_cpu_seconds",
                 "process_cpu_seconds_by_geometry",
+                "traceback",
             }
         }
     if isinstance(value, list):
