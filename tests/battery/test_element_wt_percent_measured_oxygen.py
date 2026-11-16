@@ -253,6 +253,21 @@ def test_no_iron_matches_stoichiometry_or_refuses() -> None:
     assert extra.refusal == OUTSIDE
 
 
+def test_two_equal_cation_moles_pin_current_oxide_formula_conversion() -> None:
+    """Golden pin before sharing this formula conversion with Xu's projection."""
+
+    decision = _decision(
+        {"Si": "28.085", "Mg": "24.305", "O": "47.997"}
+    )
+
+    assert decision.refusal is None
+    assert decision.oxygen_excess_mol_per_100g == Decimal("0")
+    assert decision.oxide_mole_fractions == (
+        ("SiO2", Decimal("0.5")),
+        ("MgO", Decimal("0.5")),
+    )
+
+
 def test_unlisted_duplicate_and_negative_amounts_refuse_without_a_partial() -> None:
     unlisted = _decision({"Si": "28.085", "S": "1", "O": "32"})
     assert unlisted.oxide_mole_fractions is None

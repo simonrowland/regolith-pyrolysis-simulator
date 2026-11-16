@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
-from simulator.battery.enums import Phase, Quantity, QuenchState, UncertaintyKind, ValueKind
+from simulator.battery.enums import AmountBasis, Phase, Quantity, QuenchState, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
 
@@ -66,6 +66,17 @@ def _assert_table1_grid(document: dict, expected: list[dict[str, str]]) -> None:
         assert values["composition_wt_pct_as_published"] == {
             oxide: expected_row[oxide] for oxide in OXIDES
         }
+        missing = [
+            oxide for oxide in OXIDES
+            if expected_row[oxide] in {"–", "—", "-"}
+        ]
+        assert values.get("composition_missing_components", []) == missing
+        if missing and any(expected_row[oxide] not in {"–", "—", "-"} for oxide in OXIDES):
+            assert values["composition_status"] == "calculated"
+        elif missing:
+            assert values["composition_status"] == "unknown_incomplete_as_published"
+        else:
+            assert values["composition_status"] == "complete"
         if values["composition_status"] == "complete":
             assert values["composition_wt_pct"] == {
                 oxide: expected_row[oxide] for oxide in OXIDES
@@ -129,6 +140,15 @@ def test_render_grid_binds_all_table1_cells_and_catches_both_mutations(
     with pytest.raises(AssertionError):
         _assert_table1_grid(extract_mutation, expected)
 
+    dash_mutation = deepcopy(document)
+    first_row = next(
+        item for item in dash_mutation["species"]["Fe"]["observations"]
+        if item["observation_id"].endswith("_row_01_daf_52")
+    )
+    first_row["values"]["composition_wt_pct_as_published"]["TiO2"] = "0"
+    with pytest.raises(AssertionError):
+        _assert_table1_grid(dash_mutation, expected)
+
     fO2_sign_mutation = deepcopy(document)
     first_fO2 = next(
         item for item in fO2_sign_mutation["species"]["Fe"]["observations"]
@@ -166,6 +186,7 @@ def test_migration_types_all_rows_and_binds_conditions_quench_and_species(
 
     experimental = [r for r in records if "table1_fe3_fe2_row_" in r.observation_id]
     assert len(experimental) == 67
+    usable_compositions = 0
     for record in experimental:
         source = source_observations[record.observation_id.split("::", 1)[-1]]
         values = source["values"]
@@ -187,16 +208,32 @@ def test_migration_types_all_rows_and_binds_conditions_quench_and_species(
         assert "approximately ±0.08" in record.uncertainty.verbatim["verbatim"]
 
         comp_state = conditions["composition"].state
-        if values["composition_status"] == "complete":
+        if values["composition_status"] in {"complete", "calculated"}:
             assert comp_state.is_value
             assert record.identity.composition.is_value
             assert record.identity.composition == comp_state
+            assert comp_state.value.amount_basis is AmountBasis.MOLE_FRACTION
+            assert abs(
+                sum(dict(comp_state.value.components).values(), Decimal("0"))
+                - Decimal("1")
+            ) < Decimal("1e-24")
+            assert conditions["composition"].inference is not None
+            assert conditions["composition"].inference.relation == "wt_pct_to_mole_fraction"
+            assert "x_i = (w_i / M_i) / Σ_j (w_j / M_j)" in conditions["composition"].inference.inputs
+            parameters = dict(conditions["composition"].inference.parameters)
+            projected = dict(comp_state.value.components)
+            for oxide in values.get("composition_missing_components", []):
+                assert oxide not in projected
+                assert f"original_{oxide}_wt_pct" not in parameters
+            usable_compositions += 1
         else:
+            assert values["composition_status"] == "unknown_incomplete_as_published"
             assert comp_state.is_unknown
             assert record.identity.composition.is_unknown
         assert conditions["T_C"].state.value == Decimal(values["T_C"])
         assert conditions["duration_h"].state.value == Decimal(values["duration_h_as_published"])
 
+    assert usable_compositions == 66
     standards = [r for r in records if "pu3_" in r.observation_id]
     assert len(standards) == 5
     assert sum(r.evidence.class_.value.value == "measured_direct" for r in standards) == 4

@@ -560,7 +560,10 @@ species:
           MgO: '9.10'
           CaO: '21.36'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.07'
       point_conditions:
         T_C:
@@ -613,8 +616,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.73'
+                Al2O3: '14.01'
+                Fe2O3: '9.87'
+                MgO: '9.10'
+                CaO: '21.36'
           locator:
             page: 4
             pdf_page_index: 3
@@ -694,7 +705,10 @@ species:
           MgO: '8.11'
           CaO: '19.03'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.61'
       point_conditions:
         T_C:
@@ -747,8 +761,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '40.96'
+                Al2O3: '21.77'
+                Fe2O3: '9.74'
+                MgO: '8.11'
+                CaO: '19.03'
           locator:
             page: 4
             pdf_page_index: 3
@@ -828,7 +850,10 @@ species:
           MgO: '6.68'
           CaO: '17.24'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.40'
         sample_note_as_published: Sample contains trace spinel.
       point_conditions:
@@ -882,8 +907,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '37.03'
+                Al2O3: '28.52'
+                Fe2O3: '9.92'
+                MgO: '6.68'
+                CaO: '17.24'
           locator:
             page: 4
             pdf_page_index: 3
@@ -963,7 +996,10 @@ species:
           MgO: '5.10'
           CaO: '11.88'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.58'
         sample_note_as_published: Sample contains trace silica.
       point_conditions:
@@ -1017,8 +1053,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '64.35'
+                Al2O3: '7.91'
+                Fe2O3: '10.34'
+                MgO: '5.10'
+                CaO: '11.88'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1098,7 +1142,10 @@ species:
           MgO: '4.33'
           CaO: '10.32'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.29'
       point_conditions:
         T_C:
@@ -1151,8 +1198,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '60.02'
+                Al2O3: '14.83'
+                Fe2O3: '9.79'
+                MgO: '4.33'
+                CaO: '10.32'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1232,7 +1287,10 @@ species:
           MgO: '3.90'
           CaO: '9.32'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.33'
       point_conditions:
         T_C:
@@ -1285,8 +1343,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '54.03'
+                Al2O3: '22.19'
+                Fe2O3: '9.89'
+                MgO: '3.90'
+                CaO: '9.32'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1366,7 +1432,10 @@ species:
           MgO: '8.92'
           CaO: '21.17'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.43'
       point_conditions:
         T_C:
@@ -1419,8 +1488,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.61'
+                Al2O3: '13.98'
+                Fe2O3: '9.76'
+                MgO: '8.92'
+                CaO: '21.17'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1500,7 +1577,10 @@ species:
           MgO: '8.07'
           CaO: '19.04'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.75'
       point_conditions:
         T_C:
@@ -1553,8 +1633,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '41.11'
+                Al2O3: '21.77'
+                Fe2O3: '9.75'
+                MgO: '8.07'
+                CaO: '19.04'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1634,7 +1722,10 @@ species:
           MgO: '7.00'
           CaO: '16.79'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.08'
       point_conditions:
         T_C:
@@ -1687,8 +1778,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '36.11'
+                Al2O3: '29.15'
+                Fe2O3: '10.03'
+                MgO: '7.00'
+                CaO: '16.79'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1768,7 +1867,10 @@ species:
           MgO: '4.80'
           CaO: '11.32'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.44'
       point_conditions:
         T_C:
@@ -1821,8 +1923,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '66'
+                Al2O3: '7.55'
+                Fe2O3: '9.78'
+                MgO: '4.80'
+                CaO: '11.32'
           locator:
             page: 4
             pdf_page_index: 3
@@ -1902,7 +2012,10 @@ species:
           MgO: '4.28'
           CaO: '10.20'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '98.96'
       point_conditions:
         T_C:
@@ -1955,8 +2068,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '59.96'
+                Al2O3: '14.90'
+                Fe2O3: '9.62'
+                MgO: '4.28'
+                CaO: '10.20'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2036,7 +2157,10 @@ species:
           MgO: '3.89'
           CaO: '9.30'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.31'
       point_conditions:
         T_C:
@@ -2089,8 +2213,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '54.18'
+                Al2O3: '22.20'
+                Fe2O3: '9.74'
+                MgO: '3.89'
+                CaO: '9.30'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2170,7 +2302,10 @@ species:
           MgO: '8.98'
           CaO: '21.20'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.93'
       point_conditions:
         T_C:
@@ -2223,8 +2358,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.58'
+                Al2O3: '13.99'
+                Fe2O3: '10.17'
+                MgO: '8.98'
+                CaO: '21.20'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2304,7 +2447,10 @@ species:
           MgO: '8.00'
           CaO: '19.06'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.39'
       point_conditions:
         T_C:
@@ -2357,8 +2503,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '41.11'
+                Al2O3: '21.71'
+                Fe2O3: '9.52'
+                MgO: '8.00'
+                CaO: '19.06'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2438,7 +2592,10 @@ species:
           MgO: '7.09'
           CaO: '16.87'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.53'
       point_conditions:
         T_C:
@@ -2491,8 +2648,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '36.12'
+                Al2O3: '29.50'
+                Fe2O3: '9.93'
+                MgO: '7.09'
+                CaO: '16.87'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2572,7 +2737,10 @@ species:
           MgO: '4.86'
           CaO: '11.46'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.87'
       point_conditions:
         T_C:
@@ -2625,8 +2793,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '65.93'
+                Al2O3: '7.57'
+                Fe2O3: '10.05'
+                MgO: '4.86'
+                CaO: '11.46'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2706,7 +2882,10 @@ species:
           MgO: '4.39'
           CaO: '10.33'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.42'
       point_conditions:
         T_C:
@@ -2759,8 +2938,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '60.16'
+                Al2O3: '14.85'
+                Fe2O3: '9.69'
+                MgO: '4.39'
+                CaO: '10.33'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2840,7 +3027,10 @@ species:
           MgO: '3.95'
           CaO: '9.34'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.45'
       point_conditions:
         T_C:
@@ -2893,8 +3083,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '54.04'
+                Al2O3: '22.41'
+                Fe2O3: '9.71'
+                MgO: '3.95'
+                CaO: '9.34'
           locator:
             page: 4
             pdf_page_index: 3
@@ -2974,7 +3172,10 @@ species:
           MgO: '8.84'
           CaO: '21.25'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.78'
       point_conditions:
         T_C:
@@ -3027,8 +3228,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.62'
+                Al2O3: '14.00'
+                Fe2O3: '10.08'
+                MgO: '8.84'
+                CaO: '21.25'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3108,7 +3317,10 @@ species:
           MgO: '9.57'
           CaO: '22.68'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.95'
       point_conditions:
         T_C:
@@ -3161,8 +3373,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '48.05'
+                Al2O3: '15.05'
+                Fe2O3: '4.60'
+                MgO: '9.57'
+                CaO: '22.68'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3242,7 +3462,10 @@ species:
           MgO: '8.11'
           CaO: '18.94'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.49'
       point_conditions:
         T_C:
@@ -3295,8 +3518,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '40.31'
+                Al2O3: '12.71'
+                Fe2O3: '19.42'
+                MgO: '8.11'
+                CaO: '18.94'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3376,7 +3607,10 @@ species:
           MgO: '9.01'
           CaO: '21.28'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.84'
       point_conditions:
         T_C:
@@ -3429,8 +3663,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.54'
+                Al2O3: '14.04'
+                Fe2O3: '9.98'
+                MgO: '9.01'
+                CaO: '21.28'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3510,7 +3752,10 @@ species:
           MgO: '9.47'
           CaO: '22.52'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.80'
       point_conditions:
         T_C:
@@ -3563,8 +3808,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '48.05'
+                Al2O3: '15.02'
+                Fe2O3: '4.73'
+                MgO: '9.47'
+                CaO: '22.52'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3644,7 +3897,10 @@ species:
           MgO: '8.09'
           CaO: '18.86'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.88'
       point_conditions:
         T_C:
@@ -3697,8 +3953,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '40.14'
+                Al2O3: '12.57'
+                Fe2O3: '20.22'
+                MgO: '8.09'
+                CaO: '18.86'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3778,7 +4042,10 @@ species:
           MgO: '15.10'
           CaO: '18.52'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.14'
       point_conditions:
         T_C:
@@ -3831,8 +4098,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.83'
+                Al2O3: '12.16'
+                Fe2O3: '9.54'
+                MgO: '15.10'
+                CaO: '18.52'
           locator:
             page: 4
             pdf_page_index: 3
@@ -3912,7 +4187,10 @@ species:
           MgO: '20.64'
           CaO: '15.51'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.22'
       point_conditions:
         T_C:
@@ -3965,8 +4243,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.25'
+                Al2O3: '10.24'
+                Fe2O3: '9.57'
+                MgO: '20.64'
+                CaO: '15.51'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4046,7 +4332,10 @@ species:
           MgO: '9.00'
           CaO: '21.22'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.00'
       point_conditions:
         T_C:
@@ -4099,8 +4388,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.55'
+                Al2O3: '13.97'
+                Fe2O3: '10.26'
+                MgO: '9.00'
+                CaO: '21.22'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4180,7 +4477,10 @@ species:
           MgO: '9.72'
           CaO: '22.67'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.09'
       point_conditions:
         T_C:
@@ -4233,8 +4533,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '48.13'
+                Al2O3: '15.10'
+                Fe2O3: '4.47'
+                MgO: '9.72'
+                CaO: '22.67'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4314,7 +4622,10 @@ species:
           MgO: '8.12'
           CaO: '18.99'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.33'
       point_conditions:
         T_C:
@@ -4367,8 +4678,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '40.53'
+                Al2O3: '12.75'
+                Fe2O3: '18.94'
+                MgO: '8.12'
+                CaO: '18.99'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4448,7 +4767,10 @@ species:
           MgO: '14.93'
           CaO: '18.38'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.14'
       point_conditions:
         T_C:
@@ -4501,8 +4823,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.89'
+                Al2O3: '12.11'
+                Fe2O3: '9.81'
+                MgO: '14.93'
+                CaO: '18.38'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4582,7 +4912,10 @@ species:
           MgO: '20.31'
           CaO: '15.33'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.87'
       point_conditions:
         T_C:
@@ -4635,8 +4968,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.46'
+                Al2O3: '10.20'
+                Fe2O3: '9.58'
+                MgO: '20.31'
+                CaO: '15.33'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4716,7 +5057,10 @@ species:
           MgO: '9.08'
           CaO: '21.27'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.09'
       point_conditions:
         T_C:
@@ -4769,8 +5113,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.51'
+                Al2O3: '14.04'
+                Fe2O3: '10.19'
+                MgO: '9.08'
+                CaO: '21.27'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4850,7 +5202,10 @@ species:
           MgO: '9.51'
           CaO: '22.47'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.77'
       point_conditions:
         T_C:
@@ -4903,8 +5258,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '47.97'
+                Al2O3: '14.93'
+                Fe2O3: '4.89'
+                MgO: '9.51'
+                CaO: '22.47'
           locator:
             page: 4
             pdf_page_index: 3
@@ -4984,7 +5347,10 @@ species:
           MgO: '8.16'
           CaO: '19.06'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.59'
       point_conditions:
         T_C:
@@ -5037,8 +5403,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '40.69'
+                Al2O3: '12.83'
+                Fe2O3: '18.86'
+                MgO: '8.16'
+                CaO: '19.06'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5118,7 +5492,10 @@ species:
           MgO: '14.84'
           CaO: '18.47'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '99.98'
       point_conditions:
         T_C:
@@ -5171,8 +5548,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.14'
+                Al2O3: '12.20'
+                Fe2O3: '9.33'
+                MgO: '14.84'
+                CaO: '18.47'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5252,7 +5637,10 @@ species:
           MgO: '20.50'
           CaO: '15.45'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.14'
       point_conditions:
         T_C:
@@ -5305,8 +5693,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.42'
+                Al2O3: '10.18'
+                Fe2O3: '9.59'
+                MgO: '20.50'
+                CaO: '15.45'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5386,7 +5782,10 @@ species:
           MgO: '9.32'
           CaO: '21.32'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.42'
       point_conditions:
         T_C:
@@ -5439,8 +5838,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '46.08'
+                Al2O3: '14.33'
+                Fe2O3: '9.36'
+                MgO: '9.32'
+                CaO: '21.32'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5520,7 +5927,10 @@ species:
           MgO: '14.71'
           CaO: '19.82'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.40'
       point_conditions:
         T_C:
@@ -5573,8 +5983,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '42.82'
+                Al2O3: '13.33'
+                Fe2O3: '9.73'
+                MgO: '14.71'
+                CaO: '19.82'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5654,7 +6072,10 @@ species:
           MgO: '19.72'
           CaO: '18.54'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.51'
       point_conditions:
         T_C:
@@ -5707,8 +6128,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '40.02'
+                Al2O3: '12.51'
+                Fe2O3: '9.73'
+                MgO: '19.72'
+                CaO: '18.54'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5788,7 +6217,10 @@ species:
           MgO: '5.01'
           CaO: '11.31'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.22'
       point_conditions:
         T_C:
@@ -5841,8 +6273,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '66.56'
+                Al2O3: '7.66'
+                Fe2O3: '9.69'
+                MgO: '5.01'
+                CaO: '11.31'
           locator:
             page: 4
             pdf_page_index: 3
@@ -5922,7 +6362,10 @@ species:
           MgO: '12.89'
           CaO: '10.18'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.73'
       point_conditions:
         T_C:
@@ -5975,8 +6418,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '60.61'
+                Al2O3: '6.92'
+                Fe2O3: '10.13'
+                MgO: '12.89'
+                CaO: '10.18'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6056,7 +6507,10 @@ species:
           MgO: '20.70'
           CaO: '9.18'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.74'
       point_conditions:
         T_C:
@@ -6109,8 +6563,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '54.54'
+                Al2O3: '6.26'
+                Fe2O3: '10.06'
+                MgO: '20.70'
+                CaO: '9.18'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6190,7 +6652,10 @@ species:
           MgO: '9.28'
           CaO: '21.15'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.02'
       point_conditions:
         T_C:
@@ -6243,8 +6708,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.94'
+                Al2O3: '14.32'
+                Fe2O3: '9.33'
+                MgO: '9.28'
+                CaO: '21.15'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6324,7 +6797,10 @@ species:
           MgO: '14.77'
           CaO: '19.69'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.21'
       point_conditions:
         T_C:
@@ -6377,8 +6853,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '42.76'
+                Al2O3: '13.22'
+                Fe2O3: '9.78'
+                MgO: '14.77'
+                CaO: '19.69'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6458,7 +6942,10 @@ species:
           MgO: '19.81'
           CaO: '18.51'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.25'
       point_conditions:
         T_C:
@@ -6511,8 +6998,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '39.84'
+                Al2O3: '12.35'
+                Fe2O3: '9.75'
+                MgO: '19.81'
+                CaO: '18.51'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6592,7 +7087,10 @@ species:
           MgO: '4.97'
           CaO: '11.35'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.53'
       point_conditions:
         T_C:
@@ -6645,8 +7143,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '66.77'
+                Al2O3: '7.68'
+                Fe2O3: '9.76'
+                MgO: '4.97'
+                CaO: '11.35'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6726,7 +7232,10 @@ species:
           MgO: '12.85'
           CaO: '10.13'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.42'
       point_conditions:
         T_C:
@@ -6779,8 +7288,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '60.55'
+                Al2O3: '6.90'
+                Fe2O3: '10.00'
+                MgO: '12.85'
+                CaO: '10.13'
           locator:
             page: 4
             pdf_page_index: 3
@@ -6860,7 +7377,10 @@ species:
           MgO: '20.73'
           CaO: '9.22'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.56'
       point_conditions:
         T_C:
@@ -6913,8 +7433,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '54.25'
+                Al2O3: '6.27'
+                Fe2O3: '10.09'
+                MgO: '20.73'
+                CaO: '9.22'
           locator:
             page: 4
             pdf_page_index: 3
@@ -7900,7 +8428,10 @@ species:
           MgO: '9.10'
           CaO: '21.02'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.58'
       point_conditions:
         T_C:
@@ -7953,8 +8484,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.71'
+                Al2O3: '15.00'
+                Fe2O3: '9.75'
+                MgO: '9.10'
+                CaO: '21.02'
           locator:
             page: 5
             pdf_page_index: 4
@@ -8034,7 +8573,10 @@ species:
           MgO: '9.82'
           CaO: '22.53'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.52'
       point_conditions:
         T_C:
@@ -8087,8 +8629,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '48.15'
+                Al2O3: '15.40'
+                Fe2O3: '4.61'
+                MgO: '9.82'
+                CaO: '22.53'
           locator:
             page: 5
             pdf_page_index: 4
@@ -8168,7 +8718,10 @@ species:
           MgO: '8.28'
           CaO: '18.96'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.76'
       point_conditions:
         T_C:
@@ -8221,8 +8774,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '40.77'
+                Al2O3: '13.09'
+                Fe2O3: '19.67'
+                MgO: '8.28'
+                CaO: '18.96'
           locator:
             page: 5
             pdf_page_index: 4
@@ -8302,7 +8863,10 @@ species:
           MgO: '9.26'
           CaO: '21.42'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.42'
       point_conditions:
         T_C:
@@ -8355,8 +8919,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.97'
+                Al2O3: '14.37'
+                Fe2O3: '9.39'
+                MgO: '9.26'
+                CaO: '21.42'
           locator:
             page: 5
             pdf_page_index: 4
@@ -8436,7 +9008,10 @@ species:
           MgO: '9.81'
           CaO: '22.59'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.55'
       point_conditions:
         T_C:
@@ -8489,8 +9064,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '48.23'
+                Al2O3: '15.37'
+                Fe2O3: '4.55'
+                MgO: '9.81'
+                CaO: '22.59'
           locator:
             page: 5
             pdf_page_index: 4
@@ -8570,7 +9153,10 @@ species:
           MgO: '8.33'
           CaO: '19.17'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.62'
       point_conditions:
         T_C:
@@ -8623,8 +9209,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '41.12'
+                Al2O3: '13.15'
+                Fe2O3: '18.85'
+                MgO: '8.33'
+                CaO: '19.17'
           locator:
             page: 5
             pdf_page_index: 4
@@ -8704,7 +9298,10 @@ species:
           MgO: '14.97'
           CaO: '18.65'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.39'
       point_conditions:
         T_C:
@@ -8757,8 +9354,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.35'
+                Al2O3: '12.56'
+                Fe2O3: '8.86'
+                MgO: '14.97'
+                CaO: '18.65'
           locator:
             page: 5
             pdf_page_index: 4
@@ -8838,7 +9443,10 @@ species:
           MgO: '21.02'
           CaO: '15.42'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.86'
       point_conditions:
         T_C:
@@ -8891,8 +9499,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '44.72'
+                Al2O3: '10.42'
+                Fe2O3: '9.28'
+                MgO: '21.02'
+                CaO: '15.42'
           locator:
             page: 5
             pdf_page_index: 4
@@ -8972,7 +9588,10 @@ species:
           MgO: '9.23'
           CaO: '21.36'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.50'
       point_conditions:
         T_C:
@@ -9025,8 +9644,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '46'
+                Al2O3: '14.39'
+                Fe2O3: '9.54'
+                MgO: '9.23'
+                CaO: '21.36'
           locator:
             page: 5
             pdf_page_index: 4
@@ -9106,7 +9733,10 @@ species:
           MgO: '9.74'
           CaO: '22.49'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.22'
       point_conditions:
         T_C:
@@ -9159,8 +9789,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '48.09'
+                Al2O3: '15.29'
+                Fe2O3: '4.62'
+                MgO: '9.74'
+                CaO: '22.49'
           locator:
             page: 5
             pdf_page_index: 4
@@ -9240,7 +9878,10 @@ species:
           MgO: '8.35'
           CaO: '19.09'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.88'
       point_conditions:
         T_C:
@@ -9293,8 +9934,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '40.93'
+                Al2O3: '13.15'
+                Fe2O3: '19.36'
+                MgO: '8.35'
+                CaO: '19.09'
           locator:
             page: 5
             pdf_page_index: 4
@@ -9374,7 +10023,10 @@ species:
           MgO: '15.10'
           CaO: '18.59'
           P2O5: –
-        composition_status: unknown_incomplete_as_published
+        composition_missing_components:
+        - TiO2
+        - P2O5
+        composition_status: calculated
         Total_wt_pct_as_published: '100.68'
       point_conditions:
         T_C:
@@ -9427,8 +10079,16 @@ species:
             note: One-atmosphere vertical tube furnace; 1 atm expressed as 101325 Pa.
         composition:
           state:
-            tag: unknown
-            reason: One or more oxide cells are em dashes; the incomplete composition is not reconstructed.
+            tag: value
+            value:
+              basis: printed_phase_composition
+              amount_basis: mass_percent
+              components:
+                SiO2: '45.6'
+                Al2O3: '12.62'
+                Fe2O3: '8.77'
+                MgO: '15.10'
+                CaO: '18.59'
           locator:
             page: 5
             pdf_page_index: 4
@@ -9502,6 +10162,14 @@ species:
           MgO: –
           CaO: –
           P2O5: –
+        composition_missing_components:
+        - SiO2
+        - TiO2
+        - Al2O3
+        - Fe2O3
+        - MgO
+        - CaO
+        - P2O5
         composition_status: unknown_incomplete_as_published
         Total_wt_pct_as_published: –
         sample_note_as_published: Bulk composition was not analyzed; the authors state that it was assumed equal

@@ -9,7 +9,7 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
-from simulator.battery.enums import FO2Channel, Phase, Quantity, QuenchState, UncertaintyKind, ValueKind
+from simulator.battery.enums import AmountBasis, FO2Channel, Phase, Quantity, QuenchState, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
 
@@ -66,8 +66,19 @@ def _assert_table1_grid(document: dict, expected: list[dict[str, str]]) -> None:
         }
         assert values["Total_wt_pct_as_published"] == expected_row["Total"]
         assert values["value"] == expected_row["Fe3+/Fe2+"]
-        assert values["composition_status"] == "unknown_incomplete_as_published"
-        assert values["composition_missing_components"]
+        missing = [
+            oxide for oxide in OXIDES
+            if expected_row[oxide] in {"–", "—", "-"}
+        ]
+        assert values["composition_status"] == "calculated"
+        assert values["composition_missing_components"] == missing
+        expected_composition = {
+            oxide: expected_row[oxide].split(" (", 1)[0]
+            for oxide in OXIDES
+            if oxide not in missing
+        }
+        actual_composition = observation["point_conditions"]["composition"]["state"]["value"]["components"]
+        assert actual_composition == expected_composition
         assert observation["locator"]["page"] == (4 if int(row_number) <= 49 else 5)
         assert observation["locator"]["pdf_page_index"] == observation["locator"]["page"] - 1
         assert observation["locator"]["row"] == row_number
@@ -95,6 +106,15 @@ def test_render_grid_binds_all_table1_cells_and_catches_both_mutations() -> None
     first_row["values"]["composition_wt_pct_as_published"]["SiO2"] = "56.17"
     with pytest.raises(AssertionError):
         _assert_table1_grid(extract_mutation, expected)
+
+    dash_mutation = deepcopy(document)
+    first_row = next(
+        item for item in dash_mutation["species"]["Fe"]["observations"]
+        if item["observation_id"].endswith("_row_01_haf_6")
+    )
+    first_row["values"]["composition_wt_pct_as_published"]["Na2O"] = "0"
+    with pytest.raises(AssertionError):
+        _assert_table1_grid(dash_mutation, expected)
 
 
 def test_migration_types_all_rows_and_binds_temperature_atmosphere_and_quench() -> None:
@@ -133,8 +153,28 @@ def test_migration_types_all_rows_and_binds_temperature_atmosphere_and_quench() 
         assert conditions["atmosphere"].state.value == "air"
         assert conditions["fO2_log"].state.is_unknown
         assert conditions["total_pressure_Pa"].state.value == Decimal("101325")
-        assert conditions["composition"].state.is_unknown
-        assert record.identity.composition.is_unknown
+        composition = conditions["composition"]
+        assert composition.state.is_value
+        assert record.identity.composition == composition.state
+        assert composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+        assert abs(
+            sum(dict(composition.state.value.components).values(), Decimal("0"))
+            - Decimal("1")
+        ) < Decimal("1e-24")
+        assert composition.inference is not None
+        assert composition.inference.relation == "wt_pct_to_mole_fraction"
+        assert "x_i = (w_i / M_i) / Σ_j (w_j / M_j)" in composition.inference.inputs
+        parameters = dict(composition.inference.parameters)
+        projected = dict(composition.state.value.components)
+        for oxide in values["composition_missing_components"]:
+            assert oxide not in projected
+            assert f"original_{oxide}_wt_pct" not in parameters
+        for oxide in OXIDES:
+            printed = values["composition_wt_pct_as_published"][oxide]
+            if oxide in values["composition_missing_components"]:
+                continue
+            central_amount = Decimal(printed.split(" (", 1)[0])
+            assert parameters[f"original_{oxide}_wt_pct"].state.value == central_amount
         assert conditions["quench_state"].state.value is QuenchState.NOT_STATED
         assert record.quench_state is QuenchState.NOT_STATED
         assert record.identity.species.phase.value is Phase.L
