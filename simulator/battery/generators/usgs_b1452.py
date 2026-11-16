@@ -27,6 +27,7 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     Quantity,
+    ReferenceStateConvention,
     UncertaintyKind,
 )
 from simulator.battery.generators.usgs_b1544 import _gibbs_identity
@@ -63,6 +64,7 @@ from simulator.battery.records import (
     Reaction,
     ReactionTerm,
     Species,
+    StandardState,
     State,
     phase_token,
     Uncertainty,
@@ -101,6 +103,9 @@ REFERENCE_TEMPERATURE_K = Decimal("298.15")
 B1452_RECORD_POLYMORPHS = {
     # Printed p. 301 is aragonite; the captured heading is OCR-damaged.
     f"{SOURCE_ID}-0275": Polymorph.ARAGONITE,
+    # Printed folio 346 (PDF p. 352) names Mullite (3-2); the captured name
+    # OCRs the initial M as f, leaving its crystal polymorph unresolved.
+    f"{SOURCE_ID}-0320": Polymorph.MULLITE,
     # Printed pp. 405–406 split KAlSiO4 into low and high kaliophillite.
     f"{SOURCE_ID}-0379": Polymorph.KALIOPHILLITE_LOW,
     # Printed p. 405 gives the high form from 810 to 1800 K.
@@ -1402,6 +1407,59 @@ def _basis_states(
     return State.of(reaction), State.of(elements)
 
 
+def _reaction_with_pure_endmember_states(
+    reaction: Reaction,
+) -> tuple[Reaction, str | None]:
+    """Attach the printed pure-phase standard state to each condensed term."""
+
+    terms: list[ReactionTerm] = []
+    unresolved: list[str] = []
+    for term in reaction.terms:
+        phase = phase_token(term.species)
+        polymorph = term.species.polymorph
+        if phase not in {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}:
+            reason = f"{term.species.formula} has no resolved condensed phase"
+            terms.append(
+                ReactionTerm(
+                    term.species,
+                    term.coefficient,
+                    State.unknown(reason),
+                )
+            )
+            unresolved.append(reason)
+            continue
+        if phase is Phase.CR and (polymorph is None or not polymorph.is_value):
+            reason = (
+                polymorph.reason
+                if polymorph is not None and polymorph.is_unknown
+                else f"{term.species.formula} crystal polymorph is unresolved"
+            )
+            terms.append(
+                ReactionTerm(
+                    term.species,
+                    term.coefficient,
+                    State.unknown(reason),
+                )
+            )
+            unresolved.append(reason)
+            continue
+        terms.append(
+            ReactionTerm(
+                term.species,
+                term.coefficient,
+                State.of(
+                    StandardState(
+                        convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                        endmember=term.species,
+                        component_basis=term.species.formula,
+                        reference_pressure_bar=Decimal("1"),
+                    )
+                ),
+            )
+        )
+    return Reaction(tuple(terms)), "; ".join(dict.fromkeys(unresolved)) or None
+
+
 def _unit_row_locator(kind: str) -> Locator:
     if kind == "table_298k":
         return Locator(
@@ -1468,7 +1526,33 @@ def _observation(
             "No quantity token represents formation from simple oxides; "
             f"{quantity.value} denotes formation from the elements."
         )
-    identity = fill_identity(identity_quantity, species, **known)
+    elif quantity is Quantity.LOG10_K_REACTION:
+        reaction_state, _ = _basis_states(species, basis)
+        known["per"] = State.not_applicable(
+            "reaction equilibrium constant is dimensionless"
+        )
+        known["standard_pressure_Pa"] = State.not_applicable(
+            "oxide reaction terms are condensed standard states"
+        )
+        known["formation_elements"] = State.not_applicable(
+            "reaction equilibrium is identified by its complete reaction"
+        )
+        if reaction_state.is_value:
+            reaction, unresolved_reason = _reaction_with_pure_endmember_states(
+                reaction_state.value
+            )
+            known["reaction"] = State.of(reaction)
+            if unresolved_reason:
+                identity_quantity = State.unknown(
+                    f"oxide reaction standard state unresolved: {unresolved_reason}"
+                )
+        else:
+            known["reaction"] = reaction_state
+            identity_quantity = State.unknown(
+                reaction_state.reason or "oxide reaction is unresolved"
+            )
+    identity_species = None if quantity is Quantity.LOG10_K_REACTION else species
+    identity = fill_identity(identity_quantity, identity_species, **known)
     published_page, pdf_page = _pages(record)
     unit = _page_units(token.table_kind, token.column)
     source_path = f"{SOURCE_PATH_PREFIX}/{record_id}.json"
@@ -2023,6 +2107,8 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             refuse(token, f"unparseable printed token {token.as_published!r}")
             continue
         quantity = COLUMN_QUANTITY[token.column]
+        if token.column == "log_kf" and token.formation_basis == "from_the_oxides":
+            quantity = Quantity.LOG10_K_REACTION
         if kind == "table_298k":
             temperature = REFERENCE_TEMPERATURE_K
         elif token.row_index not in usable_t:

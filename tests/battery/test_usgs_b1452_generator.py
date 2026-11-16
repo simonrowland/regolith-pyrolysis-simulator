@@ -17,6 +17,7 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     Quantity,
+    ReferenceStateConvention,
     UncertaintyKind,
 )
 from simulator.battery.generators import usgs_b1452 as generator
@@ -161,7 +162,12 @@ OXIDE_BASIS_RECORDS = (
     "robie-hemingway-fisher-1978-usgs-b1452-0398",
     "robie-hemingway-fisher-1978-usgs-b1452-0400",
 )
-FORMATION_QUANTITIES = (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
+FORMATION_QUANTITIES = (
+    Quantity.DELTA_FH,
+    Quantity.DELTA_FG,
+    Quantity.LOG10_KF,
+    Quantity.LOG10_K_REACTION,
+)
 
 
 def _load(record_id: str) -> dict:
@@ -251,6 +257,17 @@ def _formation_observations(
                 continue
         result.append(observation)
     return result
+
+
+def _formation_quantity(observation) -> Quantity | None:
+    return next(
+        (
+            quantity
+            for quantity in FORMATION_QUANTITIES
+            if f":{quantity.value}:" in observation.observation_id
+        ),
+        None,
+    )
 
 
 def test_table1_states_r_and_joule_formation_units() -> None:
@@ -912,7 +929,7 @@ def test_explicit_element_basis_heading_precedes_other_oxide_mentions(
 
 
 @pytest.mark.parametrize("record_id", OXIDE_BASIS_RECORDS)
-def test_every_b1452_oxide_basis_record_refuses_element_formation_quantities(
+def test_every_b1452_oxide_basis_record_keeps_oxide_log_k_reactions(
     record_id: str,
 ) -> None:
     record = _load(record_id)
@@ -937,21 +954,47 @@ def test_every_b1452_oxide_basis_record_refuses_element_formation_quantities(
         if any(f":{quantity.value}:" in row.observation_id for row in formation_rows)
     }
     assert quantities
+    # Only oxide-frame log K changes quantity: oxide ΔfH/ΔfG remain typed unknown.
+    assert quantities <= {
+        Quantity.DELTA_FH,
+        Quantity.DELTA_FG,
+        Quantity.LOG10_K_REACTION,
+    }
     for row in formation_rows:
-        quantity = next(
-            quantity
-            for quantity in FORMATION_QUANTITIES
-            if f":{quantity.value}:" in row.observation_id
-        )
-        assert row.identity.quantity.is_unknown
-        assert row.identity.quantity.reason == (
-            "No quantity token represents formation from simple oxides; "
-            f"{quantity.value} denotes formation from the elements."
-        )
+        quantity = _formation_quantity(row)
+        assert quantity is not None
         assert row.value.point is not None
+        if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+            assert row.identity.quantity.is_unknown
+            assert row.identity.quantity.reason == (
+                "No quantity token represents formation from simple oxides; "
+                f"{quantity.value} denotes formation from the elements."
+            )
+            continue
+        if quantity is not Quantity.LOG10_K_REACTION:
+            continue
+        reaction_state = row.identity.reaction
+        if reaction_state is None or not reaction_state.is_value:
+            assert row.identity.quantity.is_unknown
+            continue
+        unresolved_terms = [
+            term
+            for term in reaction_state.value.terms
+            if term.standard_state is None or not term.standard_state.is_value
+        ]
+        if unresolved_terms:
+            assert row.identity.quantity.is_unknown
+            continue
+        assert row.identity.quantity.is_value
+        assert row.identity.quantity.value is Quantity.LOG10_K_REACTION
+        assert all(
+            term.standard_state.value.convention
+            is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            for term in reaction_state.value.terms
+        )
 
 
-def test_mullite_oxide_caption_keeps_all_formation_rows_typed_refused() -> None:
+def test_mullite_oxide_caption_keeps_deltas_refused_and_log_k_typed() -> None:
     record_id = "robie-hemingway-fisher-1978-usgs-b1452-0320"
     record = _load(record_id)
     caption = generator._header_text(record).upper()
@@ -962,19 +1005,47 @@ def test_mullite_oxide_caption_keeps_all_formation_rows_typed_refused() -> None:
     mullite_rows = [
         row
         for row in generated.observations
-        if row.identity.species.formula == "3Al2O3.2SiO2"
+        if (
+            row.identity.species is not None
+            and row.identity.species.formula == "3Al2O3.2SiO2"
+            or row.identity.reaction is not None
+            and row.identity.reaction.is_value
+            and row.identity.reaction.value.terms[0].species.formula
+            == "3Al2O3.2SiO2"
+        )
         and any(
             f":{quantity.value}:" in row.observation_id
-            for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
+            for quantity in (
+                Quantity.DELTA_FH,
+                Quantity.DELTA_FG,
+                Quantity.LOG10_K_REACTION,
+            )
         )
     ]
     assert len(mullite_rows) == 48
-    assert {row.identity.quantity.reason for row in mullite_rows} == {
+    mullite_delta_rows = [
+        row
+        for row in mullite_rows
+        if _formation_quantity(row) in {Quantity.DELTA_FH, Quantity.DELTA_FG}
+    ]
+    mullite_log_k_rows = [
+        row
+        for row in mullite_rows
+        if _formation_quantity(row) is Quantity.LOG10_K_REACTION
+    ]
+    assert len(mullite_delta_rows) == 32
+    assert len(mullite_log_k_rows) == 16
+    assert {row.identity.quantity.reason for row in mullite_delta_rows} == {
         "No quantity token represents formation from simple oxides; "
         f"{quantity.value} denotes formation from the elements."
-        for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
+        for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG)
     }
-    assert all(row.identity.quantity.is_unknown for row in mullite_rows)
+    assert all(row.identity.quantity.is_unknown for row in mullite_delta_rows)
+    assert all(
+        row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.LOG10_K_REACTION
+        for row in mullite_log_k_rows
+    )
     assert all(
         row.identity.reaction is not None and row.identity.reaction.is_value
         for row in mullite_rows
@@ -986,8 +1057,8 @@ def test_mullite_oxide_caption_keeps_all_formation_rows_typed_refused() -> None:
 
     example = next(
         row
-        for row in mullite_rows
-        if quantity_token(row.identity) is None
+        for row in mullite_delta_rows
+        if _formation_quantity(row) is Quantity.DELTA_FG
         and row.value.point == Decimal("6.669")
         and row.identity.temperature_K is not None
         and row.identity.temperature_K.is_value
@@ -1001,6 +1072,44 @@ def test_mullite_oxide_caption_keeps_all_formation_rows_typed_refused() -> None:
         ("Al2O3", Decimal("-3")),
         ("SiO2", Decimal("-2")),
     )
+
+
+def test_fayalite_oxide_log_k_is_a_reaction_with_term_standard_states() -> None:
+    generated = _generation(FAYALITE_OXIDES)
+    observations = _formation_observations(
+        generated,
+        basis="from_the_oxides",
+        quantity=Quantity.LOG10_K_REACTION,
+        temperature="298.15",
+    )
+    assert len(observations) == 1
+    observation = observations[0]
+    assert observation.value.point == Decimal("3.640")
+    assert quantity_token(observation.identity) is Quantity.LOG10_K_REACTION
+    assert observation.identity.species is None
+    assert observation.identity.per is not None
+    assert observation.identity.per.is_not_applicable
+    assert observation.identity.standard_pressure_Pa is not None
+    assert observation.identity.standard_pressure_Pa.is_not_applicable
+    assert identity_equal(observation.identity, observation.identity).kind is IdentityEqualKind.EQUAL
+    reaction_state = observation.identity.reaction
+    assert reaction_state is not None and reaction_state.is_value
+    assert [
+        (term.species.formula, term.coefficient)
+        for term in reaction_state.value.terms
+    ] == [
+        ("Fe2SiO4", Decimal("1")),
+        ("SiO2", Decimal("-1")),
+        ("FeO", Decimal("-2")),
+    ]
+    assert reaction_atom_balance(reaction_state.value) == {}
+    for term in reaction_state.value.terms:
+        assert term.standard_state is not None and term.standard_state.is_value
+        standard = term.standard_state.value
+        assert standard.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert standard.endmember == term.species
+        assert standard.component_basis == term.species.formula
+        assert standard.reference_pressure_bar == Decimal("1")
 
 
 def test_b1452_element_reference_follows_the_janaf_state_at_temperature() -> None:
