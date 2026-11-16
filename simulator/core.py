@@ -14764,15 +14764,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         context = type(self).__new__(type(self))
         try:
             # C0 forecasts sweep temperature on a detached copy of this same
-            # melt composition. Establish the owner's per-hour authority pin
-            # before copying state, so the forecast's existing redox lookup
-            # admits this record instead of dispatching another curve scan.
-            try:
-                self._establish_melt_redox_gate_authority_for_current_hour()
-            except Exception:
-                # This is only a cache warm-up. The forecast still builds;
-                # the normal gate-owner lookup records any refusal when used.
-                pass
+            # melt composition. Reuse only an authority record already pinned
+            # for this hour and still admitted by the gate owner. Resolving
+            # here mutates parent cache and replay state; without an admitted
+            # pin, the forecast's normal owner path resolves it when needed.
+            current_hour = int(self.melt.hour)
+            gate_authority = getattr(
+                self,
+                '_melt_redox_gate_authority_this_tick',
+                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+            )
+            gate_authority_hour = getattr(
+                self,
+                '_melt_redox_gate_authority_tick_hour',
+                None,
+            )
+            reuse_gate_authority = (
+                gate_authority_hour == current_hour
+                and isinstance(gate_authority, Mapping)
+                and self._melt_redox_gate_record_is_admitted(gate_authority)
+            )
+            if not reuse_gate_authority:
+                gate_authority = _RESOLVE_MELT_REDOX_GATE_AUTHORITY
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
             # A copied registry would record forecast evaluations on an
@@ -14785,16 +14798,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and not parent_registry.computation
             ):
                 memo[id(parent_registry)] = parent_registry
-            gate_authority = getattr(
-                self,
-                '_melt_redox_gate_authority_this_tick',
-                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
-            )
-            if isinstance(gate_authority, Mapping):
+            if reuse_gate_authority:
                 # The forecast's temperature sweep does not change this
-                # composition-derived curve. Preserve the already-resolved
-                # record and curve through the existing deepcopy memo, so
-                # its origin, notices, and provider admission remain intact.
+                # composition-derived curve. Preserve the admitted record and
+                # curve through the deepcopy memo, so its origin, notices,
+                # and provider admission remain intact.
                 memo[id(gate_authority)] = gate_authority
                 gate_curve = gate_authority.get('curve')
                 if isinstance(gate_curve, Mapping):
@@ -14809,6 +14817,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if live_store is not None:
                 memo[id(live_store)] = forecast_store
             forecast_state = dict(self.__dict__)
+            forecast_state['_melt_redox_gate_authority_this_tick'] = (
+                gate_authority
+            )
+            forecast_state['_melt_redox_gate_authority_tick_hour'] = (
+                current_hour if reuse_gate_authority else None
+            )
             forecast_state['_sulfsat_gate'] = None
             forecast_state['_c0_forecast_sulfsat_identity'] = (
                 sulfsat_identity

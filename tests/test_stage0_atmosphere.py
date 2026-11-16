@@ -161,6 +161,22 @@ def _canonical_bytes(value):
     ).encode("utf-8")
 
 
+def _forecast_gate_parent_state_bytes(sim):
+    return _canonical_bytes(
+        {
+            "provider_outcome": getattr(
+                sim, "_freeze_gate_provider_outcome", None
+            ),
+            "replay_reasons": getattr(
+                sim, "_reduced_real_uncacheable_reasons", None
+            ),
+            "cache": getattr(
+                sim, "_freeze_gate_liquid_fraction_cache", None
+            ),
+        }
+    )
+
+
 _PYSULFSAT_MUTABLE_EXPORTS = (
     "oxide_mass_liq_anhyd",
     "cation_num_liq_anhyd",
@@ -320,7 +336,49 @@ def test_c0_forecast_preserves_sulfsat_cache_identity_without_gate_object():
     assert forecast_sulfur_side["sulfsat_available"] is True
 
 
-def test_c0_forecast_gate_warmup_refusal_does_not_refuse_context():
+def test_c0_forecast_reuses_current_validated_gate_pin_without_resolution(
+    monkeypatch,
+):
+    from simulator.engine_binding_admission import write_gate_curve_memo_record
+    from simulator.reduced_real_determinism import GateCurveProviderOutcome
+
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim._liquid_fraction_provider = "analytical"
+    sim.load_batch("lunar")
+    gate_curve = sim._freeze_gate_kress_floor_curve(None, [])
+    assert gate_curve is not None
+    gate_record = write_gate_curve_memo_record(
+        sim,
+        gate_curve,
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    sim._melt_redox_gate_authority_this_tick = gate_record
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    assert sim._melt_redox_gate_authority_tick_hour == int(sim.melt.hour)
+    assert sim._melt_redox_gate_record_is_admitted(gate_record)
+    state_before = _forecast_gate_parent_state_bytes(sim)
+    owner_calls = 0
+
+    def fail_if_resolved(*_args, **_kwargs):
+        nonlocal owner_calls
+        owner_calls += 1
+        raise AssertionError("forecast resolved a gate already pinned by parent")
+
+    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_record", fail_if_resolved)
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert context._melt_redox_gate_authority_this_tick is gate_record
+    assert context._resolved_melt_redox_gate_authority() is gate_record["curve"]
+    assert owner_calls == 0
+    assert _forecast_gate_parent_state_bytes(sim) == state_before
+
+
+def test_c0_forecast_without_gate_pin_defers_provider_refusal():
     from simulator.evaporation import EvaporationFluxRefusal
     from simulator.melt_backend.liquidus import LiquidusSampleError
 
@@ -353,15 +411,56 @@ def test_c0_forecast_gate_warmup_refusal_does_not_refuse_context():
     backend = RefusingBackend()
     provider._backend = backend
     provider._backend_initialised = True
+    state_before = _forecast_gate_parent_state_bytes(sim)
 
     context, status = sim._build_c0_forecast_context()
 
-    assert backend.equilibrate_calls == 1
+    assert backend.equilibrate_calls == 0
     assert status == ""
     assert context is not None
+    assert _forecast_gate_parent_state_bytes(sim) == state_before
     with pytest.raises(EvaporationFluxRefusal, match="liquid_fraction_provider_failed"):
         sim._melt_redox_liquidus_gate_record()
-    assert backend.equilibrate_calls == 2
+    assert backend.equilibrate_calls == 1
+
+
+def test_c0_forecast_does_not_resolve_gate_after_cache_install_failure(
+    monkeypatch,
+):
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim._freeze_gate_provider_outcome = "produced"
+    sim._reduced_real_uncacheable_reasons = ["baseline replay reason"]
+    sim._freeze_gate_liquid_fraction_cache = {
+        "key": "baseline cache entry",
+        "status": "live",
+    }
+    state_before = _forecast_gate_parent_state_bytes(sim)
+    resolver_calls = 0
+
+    def fail_after_cache_install(*_args, **_kwargs):
+        nonlocal resolver_calls
+        resolver_calls += 1
+        sim._freeze_gate_provider_outcome = "failed"
+        sim._reduced_real_uncacheable_reasons.append("late provider failure")
+        sim._freeze_gate_liquid_fraction_cache = {
+            "key": "partially installed cache",
+            "status": "computing",
+        }
+        raise RuntimeError("provider failed after cache install")
+
+    monkeypatch.setattr(
+        sim, "_melt_redox_liquidus_gate_record", fail_after_cache_install
+    )
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert resolver_calls == 0
+    assert _forecast_gate_parent_state_bytes(sim) == state_before
 
 
 def test_c0_forecast_rebuilds_registry_around_live_engine_pool_locks():
