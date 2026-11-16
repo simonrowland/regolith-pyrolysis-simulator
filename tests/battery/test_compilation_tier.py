@@ -7450,6 +7450,17 @@ def _close_cached_backend(engine: Engine) -> None:
         close()
 
 
+def test_magemin_fo2_readback_uses_configured_database() -> None:
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._database = "ig"
+    result = backend._fo2_operating_point(
+        -9.0, 12.25, False, bulk_components={},
+    )
+    assert result["fo2_indeterminate_no_redox_carrier"]["database"] == "ig"
+
+
 def test_magemin_lunar_unset_tio2_entropy_matches_janaf_o045() -> None:
     """Unset TiO2 at 2000 K is ig ``ru``. O-045 does not name a polymorph.
 

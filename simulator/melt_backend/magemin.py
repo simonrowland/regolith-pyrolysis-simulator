@@ -3912,7 +3912,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     ) -> Dict[str, Any]:
         solved = finite_float(native)
         database_name = (
-            str(database or self._effective_database()).lower().strip()
+            str(database or self._database).lower().strip()
         )
         carriers = self._DB_FO2_REDOX_CARRIERS.get(database_name)
         if carriers is not None and bulk_components is not None:
